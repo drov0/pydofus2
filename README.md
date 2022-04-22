@@ -16,9 +16,11 @@ Install node js. It is needed to run the simulated launcher.
 
 ### For windows users install make
 
-For windows users I recommend using git bash as your default terminal for the project in vscode.
+For windows users I recommend using git bash as your default terminal for the project in vscode and use it to setup the env.
 To install `make` under Windows, one way is throught the `chocolatey` package manager.
 [Follow this link to install chocolatey](https://www.liquidweb.com/kb/how-to-install-chocolatey-on-windows/)
+
+> :warning: If you don't run the make rules of this tuto on git bash you may encounter some annoying problems.
 
 ### Setup the dev environment
 

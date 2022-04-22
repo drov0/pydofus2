@@ -4,6 +4,10 @@ This is a full socket bot for the mmorpg dofus2 all in python. It also include m
 
 ## Getting Started
 
+First and foremost install Python 3.9.12, Its the version used to develop the project.
+
+> :warning: You may encounter compatibility issues with higher versions. [Link to python 3.9.12 download page](https://www.python.org/downloads/release/python-3912/)
+
 One thing you should keep in mind is that this will setup a virtual env for you to work on. If you get the error `ModuleNotFoundError: No module named 'com'` its most likely because you opened a neww terminal and you didn't activate the virtual env of the project.
 
 ### Install node js

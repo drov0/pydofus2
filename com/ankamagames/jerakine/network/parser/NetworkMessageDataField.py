@@ -1,11 +1,10 @@
-import logging
 from com.ankamagames.jerakine.logger.Logger import Logger
 from com.ankamagames.jerakine.network.CustomDataWrapper import ByteArray
 from com.ankamagames.jerakine.network.parser.ProtocolSpec import ProtocolSpec
 from com.ankamagames.jerakine.network.parser.TypeEnum import TypeEnum
 import com.ankamagames.jerakine.network.parser.NetworkMessageClassDefinition as nmcd
 
-logger = Logger("bot")
+logger = Logger(__name__)
 
 
 class NetMsgDataField:
@@ -62,7 +61,7 @@ class NetMsgDataField:
         if self.length is not None:
             return self.readVector()
         if self.TRACE:
-            logger.debug("self is primitive ? ", self.isPrimitive)
+            logger.debug("self is primitive ? " + str(self.isPrimitive))
         if self.isPrimitive:
             if self.TRACE:
                 logger.debug(
@@ -86,7 +85,7 @@ class NetMsgDataField:
     def readObject(self):
         className = self._spec["type"]
         if self.TRACE:
-            logger.debug("Is dynamic object ? ", self.isDynamicObj)
+            logger.debug("Is dynamic object ? " + str(self.isDynamicObj))
         if self.isDynamicObj:
             if self.TRACE:
                 logger.debug("Retrieving dynamic type Spec")
@@ -104,7 +103,7 @@ class NetMsgDataField:
         ret = []
         for _ in range(self.length):
             if self.TRACE:
-                logger.debug("self is primitive ? ", self.isPrimitive)
+                logger.debug("self is primitive ? " + str(self.isPrimitive))
             if self.isPrimitive:
                 ret.append(self.readPrimitive())
             else:

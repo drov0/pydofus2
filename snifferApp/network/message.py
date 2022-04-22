@@ -1,6 +1,7 @@
 from com.ankamagames.dofus.network.MessageReceiver import MessageReceiver
 from com.ankamagames.jerakine.logger.Logger import Logger
 from com.ankamagames.jerakine.network.CustomDataWrapper import Buffer, ByteArray
+from com.ankamagames.jerakine.network.NetworkMessage import NetworkMessage
 from com.ankamagames.jerakine.network.parser.NetworkMessageClassDefinition import (
     NetworkMessageClassDefinition,
 )
@@ -39,26 +40,48 @@ class Message:
         return ans
 
     @staticmethod
-    def fromRaw(buf: Buffer, from_client, src=None, dst=None):
+    def readMessageLength(staticHeader: int, src: ByteArray) -> int:
+        byteLenDynamicHeader: int = staticHeader & NetworkMessage.BIT_MASK
+        messageLength: int = int.from_bytes(src.read(byteLenDynamicHeader), "big")
+        return messageLength
+
+    @staticmethod
+    def getMessageId(firstOctet: int) -> int:
+        return firstOctet >> NetworkMessage.BIT_RIGHT_SHIFT_LEN_PACKET_ID
+
+    @staticmethod
+    def fromRaw(buf: Buffer, from_client: bool, src=None, dst=None):
         """Read a message from the buffer and
         empty the beginning of the buffer.
         msg fields spec:
-            id     |   len    |   data
-           2 bits  |  2 bits  |  len bits
+            id      |   len     |   data
+           2 bytes  |  2 bytes  |  len bytes
         """
         if not buf:
             return
-        try:
-            header = buf.readUnsignedShort()
-            if from_client:
+        if buf.remaining() < 2:
+            logger.info(
+                f"Not enough data to read the header, byte available : {buf.remaining()} (needed : 2)"
+            )
+            return None
+
+        staticHeader = buf.readUnsignedShort()
+        id = Message.getMessageId(staticHeader)
+        byteLenDynamicHeader = staticHeader & NetworkMessage.BIT_MASK
+        count = None
+        if from_client:
+            if buf.remaining() >= 4:
                 count = buf.readUnsignedInt()
             else:
-                count = None
-            lenData = int.from_bytes(buf.read(header & 3), "big")
-            id = header >> 2
-            data = ByteArray(buf.read(lenData))
-        except IndexError:
-            buf.position = 0
+                return None
+
+        if buf.remaining() >= byteLenDynamicHeader:
+            lenData = Message.readMessageLength(staticHeader, buf)
+            if buf.remaining() >= lenData:
+                data = buf.read(lenData)
+            else:
+                return None
+        else:
             return None
 
         if id == 2:
@@ -75,25 +98,6 @@ class Message:
             m_id=id, data=data, count=count, from_client=from_client, src=src, dst=dst
         )
 
-    def lenlenData(self):
-        if len(self.raw) > 65535:
-            return 3
-        if len(self.raw) > 255:
-            return 2
-        if len(self.raw) > 0:
-            return 1
-        return 0
-
-    def serialize(self):
-        header = 4 * self.id + self.lenlenData()
-        ans = ByteArray()
-        ans.writeUnsignedShort(header)
-        if self.count is not None:
-            ans.writeUnsignedInt(self.count)
-        ans += len(self.raw).to_bytes(self.lenlenData(), "big")
-        ans += self.raw
-        return ans
-
     @property
     def name(self):
         if not self.from_client:
@@ -106,6 +110,25 @@ class Message:
             self.parsed = self.parser.read(self.name, self.raw)
         return self.parsed
 
+    def lenlenData(self):
+        if len(self.raw) > 65535:
+            return 3
+        if len(self.raw) > 255:
+            return 2
+        if len(self.raw) > 0:
+            return 1
+        return 0
+
+    def serialize(self) -> ByteArray:
+        header = 4 * self.id + self.lenlenData()
+        ans = ByteArray()
+        ans.writeUnsignedShort(header)
+        if self.count is not None:
+            ans.writeUnsignedInt(self.count)
+        ans += len(self.raw).to_bytes(self.lenlenData(), "big")
+        ans += self.raw
+        return ans
+
     @staticmethod
     def from_json(json, count=None, random_hash=True):
         type_name: str = json["__type__"]
@@ -115,4 +138,9 @@ class Message:
         return Message(type_id, raw, count)
 
     def deserialize(self):
-        return NetworkMessageClassDefinition(self.name, self.raw).deserialize()
+        try:
+            return NetworkMessageClassDefinition(self.name, self.raw).deserialize()
+        except:
+            with open("messageFail.bin", "wb") as f:
+                f.write(self.serialize())
+            raise

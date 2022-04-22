@@ -204,7 +204,7 @@ class ConnectionsHandler:
     ) -> None:
         conn: IServerConnection = None
         if useSniffer:
-            if proxy != None:
+            if proxy is not None:
                 raise ArgumentError(
                     "Can't etablish a connection using a proxy and the sniffer."
                 )

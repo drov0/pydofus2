@@ -17,20 +17,32 @@ update: decompile gen-protocol gen-msgClasses gen-msgShuffle extract-keys unpack
 decompile:
 	@$(FFDEC) -config parallelSpeedUp=true -selectclass $(SELECTCLASS) -export script $(DOFUS_SRC) $(DOFUSINVOKER)
 
+.ONESHELL:
+
 extract-keys:
+	@echo "Extracting keys..."
 	@$(FFDEC) -config parallelSpeedUp=true -export binaryData $(KEYS_DIR) $(DOFUSINVOKER)
-	
+	@echo "Done."
+
 gen-protocol:
+	@echo "Generating protocol..."
 	@python protocolBuilder/protocolParser.py $(DOFUS_SRC)
+	@echo "Protocol generated"
 
 gen-msgClasses:
+	@echo "Generating msgClasses..."
 	@python protocolBuilder/exportClasses.py
+	@echo "msgClasses generated"
 
 gen-msgShuffle:
+	@echo "Generating msgShuffle..."
 	@python protocolBuilder/extractMsgShuffle.py $(DOFUS_SRC)/scripts/com/ankamagames/dofus/network/MessageReceiver.as
+	@echo "msgShuffle generated"
 
 unpack-maps:
+	@echo "Unpacking maps..."
 	@python scripts/unpack_maps.py $(DOFUS_SRC)
+	@echo "Maps unpacked"
 
 deps:
 	@pip install -r requirements.txt

@@ -159,19 +159,19 @@ class FeatureManager(metaclass=Singleton):
             featureIdLabel = str(featureId)
             logger.error(
                 "Tried to disable non-existing feature (ID: "
-                + featureIdLabel
+                + str(featureIdLabel)
                 + "). Is self an export issue?"
             )
             featureIdIndex = self._enabledFeatureIds.index(featureId)
-            if featureIdIndex is not -1:
+            if featureIdIndex != -1:
                 logger.warn(
                     "Yet non-existing feature (ID: "
-                    + featureIdLabel
+                    + str(featureIdLabel)
                     + ") is enabled... Disabling it"
                 )
                 del self._enabledFeatureIds[featureIdIndex]
                 logger.warn(
-                    "Non-existing feature (ID: " + featureIdLabel + ") disabled"
+                    "Non-existing feature (ID: " + str(featureIdLabel) + ") disabled"
                 )
             else:
                 logger.warn(
@@ -292,28 +292,24 @@ class FeatureManager(metaclass=Singleton):
     def removeListenerFromFeature(
         self, feature: OptionalFeature, listener: FunctionType
     ) -> bool:
-        listenerIndex: float = None
-        if feature == None:
+        if feature is None:
             logger.error("Feature instance to remove the listener from is None")
             return False
         listeners: list[FunctionType] = self._featureListeners[feature.id]
-        if listenerIndex is not -1:
-            listenerIndex = self.getFeatureListenerIndex(feature, listener)
-            if listenerIndex is not -1:
-                del listeners[listenerIndex]
-                if len(listeners) <= 0:
-                    listeners = None
+        listenerIndex = self.getFeatureListenerIndex(feature, listener)
+        if listenerIndex != -1:
+            del listeners[listenerIndex]
+            if len(listeners) <= 0:
+                listeners = None
         logger.error(
             "Listener "
-            + listener.prototype
+            + str(listener.__name__)
             + " could NOT be removed from "
             + str(feature)
         )
         return False
 
     def getEnabledFeatureKeywords(self) -> list[str]:
-        featureId: int = 0
-        feature: OptionalFeature = None
         enabledFeatureKeywords: list[str] = list[str]()
         for featureId in self._enabledFeatureIds:
             feature = OptionalFeature.getOptionalFeatureById(featureId)
@@ -331,7 +327,6 @@ class FeatureManager(metaclass=Singleton):
         return enabledFeatures
 
     def getDisabledFeatureIds(self) -> list[int]:
-        optionalFeature: OptionalFeature = None
         optionalFeatures: list = OptionalFeature.getAllOptionalFeatures()
         disabledFeatureIds: list[int] = list[int]()
         for optionalFeature in optionalFeatures:
@@ -369,18 +364,20 @@ class FeatureManager(metaclass=Singleton):
     def isFeatureHasListener(
         self, feature: OptionalFeature, listener: FunctionType
     ) -> bool:
-        return self.getFeatureListenerIndex(feature, listener) is not -1
+        return self.getFeatureListenerIndex(feature, listener) != -1
 
     def getFeatureListenerIndex(
         self, feature: OptionalFeature, listener: FunctionType
     ) -> float:
-        listeners: list[FunctionType] = self._featureListeners[feature.id]
-        if listeners == None:
+        listeners: list[FunctionType] = self._featureListeners.get(feature.id)
+        if listeners is None:
             return -1
         if len(listeners) <= 0:
             del self._featureListeners[feature.id]
             return -1
-        return listeners.index(listener)
+        if listener in listeners:
+            return listeners.index(listener)
+        return -1
 
     def fireFeatureActivationUpdate(
         self, feature: OptionalFeature, isEnabled: bool

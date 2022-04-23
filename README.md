@@ -97,3 +97,21 @@ make createBot botName='myBotName' account='grinder' charachterId='290210840786'
 ```bash 
 $ make test bot='myBotName'
 ```
+
+## For developpers 
+
+### Setup dependencies for the sniffer 
+
+Trought the course of the developement you will heavily rely on the sniffer to watch messages exchanged between the client and the server.
+
+This repo comes with its own sniffer capable to dissect dofus protocol messages.
+
+Before you can run the sniffer you have to install Wireshark (for the tshark module). [Link to download Wireshark](https://www.wireshark.org/download.html).
+
+To run the sinffer:
+```bash
+make startSniffer
+```
+this command will start a server on [link to access the sniffer webui after start](http://localhost:8888)
+
+

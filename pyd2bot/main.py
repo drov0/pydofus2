@@ -123,8 +123,7 @@ class TestBot:
 
 
 if __name__ == "__main__":
-    # botName = sys.argv[1]
-    botName = "shooter"
+    botName = sys.argv[1]
     bot = TestBot(botName)
     bot.main()
     sleep(30)

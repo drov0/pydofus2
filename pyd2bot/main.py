@@ -1,7 +1,6 @@
-from pathlib import Path
-import json
-import random
+import signal
 import sys
+from time import perf_counter, sleep
 from com.ankamagames.atouin.managers.FrustumManager import FrustumManager
 from com.ankamagames.dofus import Constants
 import com.ankamagames.dofus.kernel.Kernel as krnl
@@ -37,33 +36,37 @@ from pyd2bot.events.BotEventsManager import BotEventsManager
 from com.ankamagames.atouin.utils.DataMapProvider import DataMapProvider
 
 logger = Logger(__name__)
-AUTH_SERVER = "54.76.16.121"
-PORT = 5555
-
-botName = sys.argv[1]
-botInfos = BotsDataManager.getEntry(botName)
-SERVER_ID = botInfos["serverId"]
-CHARACTER_ID = botInfos["charachterId"]
-ACCOUNT_ID = botInfos["account"]
-haapi = Haapi()
-CONN = {
-    "host": AUTH_SERVER,
-    "port": PORT,
-}
-TOKEN = haapi.getLoginToken(ACCOUNT_ID)
 
 
 class TestBot:
-    def __init__(self):
+    AUTH_SERVER = "54.76.16.121"
+    PORT = 5555
+    CONN = {
+        "host": AUTH_SERVER,
+        "port": PORT,
+    }
+
+    def __init__(self, name):
         # Load language file to be able to translate ids to actual text
+        self.name = name
+        botInfos = BotsDataManager.getEntry(self.name)
+        self.SERVER_ID = botInfos["serverId"]
+        self.CHARACTER_ID = botInfos["charachterId"]
+        self.ACCOUNT_ID = botInfos["account"]
+        self.haapi = Haapi()
+        self.TOKEN = self.haapi.getLoginToken(self.ACCOUNT_ID)
         I18nFileAccessor().init(Constants.LANG_FILE_PATH)
         DataMapProvider().init(AnimatedCharacter)
         WorldPathFinder().init()
 
+    def stop(self):
+        print("Want to stop")
+        connh.ConnectionsHandler.getConnection().close()
+
     def main(self):
         krnl.Kernel().init()
-        auth.AuthentificationManager().setToken(TOKEN)
-        connh.ConnectionsHandler.connectToLoginServer(**CONN)
+        auth.AuthentificationManager().setToken(self.TOKEN)
+        connh.ConnectionsHandler.connectToLoginServer(**self.CONN)
         BotEventsManager().add_listener(
             BotEventsManager.SERVER_SELECTION, self.onServerSelection
         )
@@ -88,12 +91,14 @@ class TestBot:
 
     def onServerSelection(self, event):
         krnl.Kernel().getWorker().process(
-            ServerSelectionAction.create(serverId=SERVER_ID)
+            ServerSelectionAction.create(serverId=self.SERVER_ID)
         )
 
     def onCharacterSelection(self, event):
         krnl.Kernel().getWorker().process(
-            CharacterSelectionAction.create(characterId=CHARACTER_ID, btutoriel=False)
+            CharacterSelectionAction.create(
+                characterId=self.CHARACTER_ID, btutoriel=False
+            )
         )
 
     def onServerSelectionSuccess(self, event):
@@ -118,5 +123,14 @@ class TestBot:
 
 
 if __name__ == "__main__":
-    bot = TestBot()
+    # botName = sys.argv[1]
+    botName = "shooter"
+    bot = TestBot(botName)
     bot.main()
+    sleep(30)
+    socket = connh.ConnectionsHandler.getConnection().mainConnection._socket
+    record = socket.recording
+    record.position = 0
+    with open("recording.bin", "wb") as f:
+        f.write(record)
+    connh.ConnectionsHandler.getConnection().mainConnection._socket.close()

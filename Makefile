@@ -5,12 +5,13 @@ SELECTCLASS = com.ankamagames.dofus.BuildInfos,com.ankamagames.dofus.network.++,
 KEYS_DIR = $(CURDIR)/binaryData
 
 
+.ONESHELL:
+.PHONY: setup
 setup:
-	\python -m venv .venv; \
-	source .venv/Scripts/activate; \
-	echo "$(CURDIR)" >> .venv/pyd2bot.pth; \
-	pip install -r requirements.txt;\
-	
+	python -m venv .venv
+	source .venv/Scripts/activate
+	echo "$(CURDIR)" >> .venv/pyd2bot.pth
+	pip install -r requirements.txt
 
 update: decompile gen-protocol gen-msgClasses gen-msgShuffle extract-keys unpack-maps
 
@@ -51,7 +52,7 @@ startSniffer:
 	@python -m snifferApp 
 
 activate:
-	\. $(CURDIR)/.venv/Scripts/activate\
+	. .venv/Scripts/activate
 
 createAccount:
 	@python $(CURDIR)/hackedLauncher/CredsManager.py $(entryName) $(login) $(password)

@@ -28,7 +28,7 @@ class MessageReceiver(RawDataParser):
             clsModule = importlib.import_module(modulePath)
         cls = getattr(clsModule, cls_name)
         _messagesTypes[cls_infos["id"]] = cls
-    _unpackModes[1018] = UnpackMode.ASYNC
+    _unpackModes[2516] = UnpackMode.ASYNC
 
     def __init__(self):
         super().__init__()

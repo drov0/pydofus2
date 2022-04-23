@@ -1,4 +1,5 @@
 #!/usr/bin/python
+from asyncio.subprocess import Process
 import subprocess
 from types import FunctionType
 import pyshark
@@ -9,7 +10,7 @@ from com.ankamagames.jerakine.logger.Logger import Logger
 from com.ankamagames.jerakine.network.CustomDataWrapper import ByteArray
 from com.ankamagames.jerakine.network.ServerConnection import ServerConnection
 from snifferApp.network.message import Message
-import threading
+from threading import Thread
 
 logger = Logger(__name__)
 
@@ -62,12 +63,11 @@ class PacketEvent(Event):
         self.packet = p
 
 
-class Provider(threading.Thread):
+class Provider(Thread):
     LOW_LEVEL_DEBUG = False
 
     def __init__(self) -> None:
         super().__init__()
-        self.killsig = threading.Event()
         self.dispatcher: EventDispatcher = EventDispatcher()
         self.clientBuffer = SnifferBuffer()
         self.serverBuffer = SnifferBuffer()
@@ -105,8 +105,6 @@ class Provider(threading.Thread):
         capture = pyshark.LiveCapture(bpf_filter="tcp port 5555")
         try:
             for p in capture.sniff_continuously():
-                if self.killsig.is_set():
-                    return True
                 try:
                     p.tcp.payload.binary_value
                     isfromClient = self.isFromClient(p)
@@ -127,9 +125,6 @@ class Provider(threading.Thread):
                     pass
         except Exception as e:
             logger.error(f"Error: {e}", exc_info=True)
-
-    def interrupt(self):
-        self.killsig.set()
 
     def reset(self):
         self.clientBuffer = SnifferBuffer()
@@ -152,7 +147,6 @@ class DofusSniffer:
             "Server packet received", self.onServerPacketReceived, 0
         )
         self.handle = callback
-        self.running = False
 
     def processServerMsg(self, msg):
         if msg.__class__.__name__ == "SelectedServerDataMessage":
@@ -168,7 +162,7 @@ class DofusSniffer:
                 dst=event.packet.ip.dst,
             )
             if msg:
-                self.handle(msg.deserialize(), True)
+                self.handle(msg.deserialize())
             else:
                 break
 
@@ -177,12 +171,6 @@ class DofusSniffer:
 
     def start(self):
         self.provider.start()
-        self.running = True
-
-    def stop(self):
-        self.provider.interrupt()
-        self.provider.join()
-        self.running = False
 
 
 if __name__ == "__main__":

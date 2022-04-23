@@ -51,18 +51,18 @@ class FightTeam(GameContextActorInformations):
         self.teamType = teamType
         self.teamEntity = teamEntity
         self.teamInfos = teamInfos
-        self.teamOptions = list()
+        self.teamOptions = [False] * 4
         self.teamOptions[
-            FightOptionsEnum.FIGHT_OPTION_ASK_FOR_HELP
+            FightOptionsEnum.FIGHT_OPTION_ASK_FOR_HELP.value
         ] = teamOptions.isAskingForHelp
         self.teamOptions[
-            FightOptionsEnum.FIGHT_OPTION_SET_CLOSED
+            FightOptionsEnum.FIGHT_OPTION_SET_CLOSED.value
         ] = teamOptions.isClosed
         self.teamOptions[
-            FightOptionsEnum.FIGHT_OPTION_SET_SECRET
+            FightOptionsEnum.FIGHT_OPTION_SET_SECRET.value
         ] = teamOptions.isSecret
         self.teamOptions[
-            FightOptionsEnum.FIGHT_OPTION_SET_TO_PARTY_ONLY
+            FightOptionsEnum.FIGHT_OPTION_SET_TO_PARTY_ONLY.value
         ] = teamOptions.isRestrictedToPartyOnly
 
     def hasGroupMember(self) -> bool:

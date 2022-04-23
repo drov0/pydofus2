@@ -75,9 +75,9 @@ class MsgTable(Table):
         )
         self.tbody = Tbody(parent=self)
 
-    def appendMsg(self, msg):
+    def appendMsg(self, msg, from_client=False):
         logger.debug("Adding message to table")
-        MsgView(msg, parent=self.tbody)
+        MsgView(msg, from_client=from_client, parent=self.tbody)
 
     def clear(self, msg):
         self.tbody.remove()
@@ -85,12 +85,11 @@ class MsgTable(Table):
 
 
 class MsgView(Tr):
-    def __init__(self, msg: Message, *args, **kwargs):
-        if msg.from_client:
+    def __init__(self, msg: Message, from_client: bool, *args, **kwargs):
+        if from_client:
             super().__init__(class_="success", *args, **kwargs)
         else:
             super().__init__(class_="info", *args, **kwargs)
-        msg = msg.deserialize()
         logger.debug("Initializing UI Msg: {}".format(msg.__class__.__name__))
         self.msg = msg
         self.addEventListener("click", self.switch_view)

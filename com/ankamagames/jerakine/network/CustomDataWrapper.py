@@ -233,11 +233,6 @@ class ByteArray(bytearray):
             self += ba[offset + chunck_size : offset + size]
         self.position += size
 
-
-class Buffer(ByteArray):
-    def end(self):
+    def trim(self):
         del self[: self.position]
         self.position = 0
-
-    def reset(self):
-        self.__init__()

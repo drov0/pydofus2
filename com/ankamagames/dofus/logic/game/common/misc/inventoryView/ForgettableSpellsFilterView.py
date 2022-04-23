@@ -38,13 +38,13 @@ class ForgettableSpellsFilterView(StorageGenericView):
         return "forgettableSpellsFilter"
 
     def isListening(self, item: ItemWrapper) -> bool:
-        if self._parent == None:
+        if self._parent is None:
             return False
         data: Item = Item.getItemById(item.objectGID)
         return bool(
             self._parent.isListening(item)
             and super().isListening(item)
-            and self._allowedTypes.find(data.typeId) is not -1
+            and data.typeId in self._allowedTypes
         )
 
     def addItem(

@@ -8,10 +8,10 @@ KEYS_DIR = $(CURDIR)/binaryData
 .ONESHELL:
 .PHONY: setup
 setup:
-	python -m venv .venv;
-	source .venv/Scripts/activate;
-	echo "$(CURDIR)" >> .venv/pyd2bot.pth;
-	pip install -r requirements.txt;
+	python -m venv .venv
+	source .venv/Scripts/activate
+	echo "$(CURDIR)" >> .venv/pyd2bot.pth
+	pip install -r requirements.txt
 
 update: decompile gen-protocol gen-msgClasses gen-msgShuffle extract-keys unpack-maps
 

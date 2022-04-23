@@ -4,6 +4,8 @@ from com.ankamagames.jerakine.network.CustomDataWrapper import ByteArray
 
 
 class RawDataParser:
+    _messagesTypes = dict()
+
     def parse(self, data: ByteArray, msgId: int, msgLen: int) -> INetworkMessage:
         pass
 

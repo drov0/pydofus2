@@ -41,7 +41,7 @@ class ServerConnection(IServerConnection):
 
     DEBUG_VERBOSE: bool = True
 
-    LOG_ENCODED_CLIENT_MESSAGES: bool = False
+    LOG_ENCODED_CLIENT_MESSAGES: bool = True
 
     DEBUG_LOW_LEVEL_VERBOSE: bool = True
 
@@ -399,7 +399,7 @@ class ServerConnection(IServerConnection):
         ]:
             data = msg.pack()
             logger.debug(
-                "[{self._id}] [SND] > {msg} ---" + base64.encodebytes(data) + "---"
+                "[{self._id}] [SND] > {msg} ---" + str(base64.encodebytes(data)) + "---"
             )
         self._socket.send(msg.pack())
         self._latestSent = perf_counter()
@@ -427,6 +427,8 @@ class ServerConnection(IServerConnection):
 
             staticHeader = src.readUnsignedShort()
             messageId = self.getMessageId(staticHeader)
+            if messageId not in self._rawParser._messagesTypes:
+                raise Exception(f"Unknown message id {messageId}")
             byteLenDynamicHeader = staticHeader & NetworkMessage.BIT_MASK
 
             if src.remaining() >= byteLenDynamicHeader:

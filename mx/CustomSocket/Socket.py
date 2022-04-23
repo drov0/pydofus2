@@ -35,7 +35,7 @@ class Socket(threading.Thread):
         logger.info("Socket thread started.")
         while not self._kill.is_set():
             try:
-                rdata = self._sock.recv(8192)
+                rdata = self._sock.recv(1028)
                 self.recording.writeByteArray(len(rdata).to_bytes(4, "big"))
                 self.recording.writeByteArray(rdata)
                 if rdata:

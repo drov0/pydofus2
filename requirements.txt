@@ -6,4 +6,6 @@ whistle
 Py3AMF
 httpx
 black
+pylint
 jinja2
+pyshark

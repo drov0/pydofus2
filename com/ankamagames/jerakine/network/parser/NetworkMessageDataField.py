@@ -9,7 +9,7 @@ logger = Logger(__name__)
 
 class NetMsgDataField:
 
-    TRACE = False
+    TRACE = True
 
     dataReader = {
         TypeEnum.INT: "readInt",
@@ -43,12 +43,12 @@ class NetMsgDataField:
         return TypeEnum(self._spec["typeId"]) != TypeEnum.OBJECT
 
     def getFieldTypeLength(self):
-        if self.TRACE:
-            logger.debug("getting field type length")
+        # if self.TRACE:
+        #     logger.debug("getting field type length")
         l = self._spec.get("length")
         if l is None:
-            if self.TRACE:
-                logger.debug("field has no length")
+            # if self.TRACE:
+            #     logger.debug("field has no length")
             lTypeId = self._spec.get("lengthTypeId")
             if lTypeId is not None:
                 if self.TRACE:
@@ -60,13 +60,7 @@ class NetMsgDataField:
         self.length = self.getFieldTypeLength()
         if self.length is not None:
             return self.readVector()
-        if self.TRACE:
-            logger.debug("self is primitive ? " + str(self.isPrimitive))
         if self.isPrimitive:
-            if self.TRACE:
-                logger.debug(
-                    "self is primitive of type " + str(TypeEnum(self._spec["typeId"]))
-                )
             return self.readPrimitive()
         else:
             return self.readObject()
@@ -79,31 +73,30 @@ class NetMsgDataField:
             raise Exception(f"Type id {typeId} not found in known types ids")
         ret = getattr(self._raw, dataReader)()
         if self.TRACE:
-            logger.debug(f"read primitive {typeId} found {ret}")
+            logger.debug(
+                f"{self._spec['name']} : {TypeEnum(self._spec['typeId']).name} =  value is {ret}"
+            )
         return ret
 
     def readObject(self):
         className = self._spec["type"]
-        if self.TRACE:
-            logger.debug("Is dynamic object ? " + str(self.isDynamicObj))
         if self.isDynamicObj:
-            if self.TRACE:
-                logger.debug("Retrieving dynamic type Spec")
             typeId = self._raw.readUnsignedShort()
             classSpec = ProtocolSpec.getTypeSpecById(typeId)
-            if self.TRACE:
-                logger.debug("Dynamic type has name " + classSpec["name"])
             className = classSpec["name"]
+        logger.debug(className + " {")
         obj = nmcd.NetworkMessageClassDefinition(className, self._raw).deserialize()
+        logger.debug("}")
         return obj
 
     def readVector(self):
         if self.TRACE:
             logger.debug("reading vector of length " + str(self.length))
         ret = []
-        for _ in range(self.length):
+        for i in range(self.length):
             if self.TRACE:
-                logger.debug("self is primitive ? " + str(self.isPrimitive))
+                logger.debug("------------------------------------------------")
+                logger.debug("Reading vector element " + str(i))
             if self.isPrimitive:
                 ret.append(self.readPrimitive())
             else:

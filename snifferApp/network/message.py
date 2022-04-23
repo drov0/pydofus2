@@ -59,8 +59,9 @@ class Message:
         """
         if not buf:
             return
+
         if buf.remaining() < 2:
-            logger.info(
+            logger.debug(
                 f"Not enough data to read the header, byte available : {buf.remaining()} (needed : 2)"
             )
             return None
@@ -73,15 +74,23 @@ class Message:
             if buf.remaining() >= 4:
                 count = buf.readUnsignedInt()
             else:
+                logger.debug(
+                    f"Not enough data to read the count, byte available : {buf.remaining()} (needed : 4)"
+                )
                 return None
-
         if buf.remaining() >= byteLenDynamicHeader:
             lenData = Message.readMessageLength(staticHeader, buf)
             if buf.remaining() >= lenData:
                 data = buf.read(lenData)
             else:
+                logger.debug(
+                    f"Not enough data to read the data, byte available : {buf.remaining()} (needed : {lenData})"
+                )
                 return None
         else:
+            logger.debug(
+                f"Not enough data to read the data length, byte available : {buf.remaining()} (needed : {byteLenDynamicHeader})"
+            )
             return None
 
         if id == 2:
@@ -90,13 +99,10 @@ class Message:
             msg = Message.fromRaw(newbuffer, from_client)
             if not msg or newbuffer.remaining():
                 raise Exception("Unable to parse Message")
-            return msg
-
-        buf.end()
-
-        return Message(
+        res = Message(
             m_id=id, data=data, count=count, from_client=from_client, src=src, dst=dst
         )
+        return res
 
     @property
     def name(self):

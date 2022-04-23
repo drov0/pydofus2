@@ -8,7 +8,7 @@ First and foremost install Python 3.9.12, Its the version used to develop the pr
 
 > :warning: You may encounter compatibility issues with higher versions. [Link to python 3.9.12 download page](https://www.python.org/downloads/release/python-3912/)
 
-One thing you should keep in mind is that this will setup a virtual env for you to work on. If you get the error `ModuleNotFoundError: No module named 'com'` its most likely because you opened a neww terminal and you didn't activate the virtual env of the project.
+One thing you should keep in mind is that this will setup a virtual env for you to work on. If you get the error `ModuleNotFoundError: No module named 'com'` its most likely because you opened a new terminal and you didn't activate the virtual env of the project.
 
 ### Install node js
 
@@ -16,7 +16,7 @@ Install node js. It is needed to run the simulated launcher.
 
 ### For windows users install make
 
-For windows users I recommend using git bash as your default terminal for the project in vscode and use it to setup the env.
+For windows users I recommend configuring git bash as your default terminal for the project in vscode and use it to setup the env.
 To install `make` under Windows, one way is throught the `chocolatey` package manager.
 [Follow this link to install chocolatey](https://www.liquidweb.com/kb/how-to-install-chocolatey-on-windows/)
 
@@ -24,7 +24,7 @@ To install `make` under Windows, one way is throught the `chocolatey` package ma
 
 ### Setup the dev environment
 
-The command bellow will do it all for you. It will create a new Pyhon venv and install all the dependencies.
+The command bellow will do it all for you. It will create a new Python venv and install all the dependencies.
 After running it make sure to activate the virtual environment for the next steps.
 
 ```bash
@@ -50,7 +50,7 @@ $ make update
 
 ## Create bot data (account and creds)
 
-The following steps will help you setup, in a secure way, a bot account for you tests. Make sure to have one ready to use.
+The following steps will help you setup, in a secure way, a bot account for your tests. Make sure to have one ready to use.
 
 ### Create RSA key pair to encrypt your account credentials
 

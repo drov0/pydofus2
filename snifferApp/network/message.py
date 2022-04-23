@@ -1,6 +1,6 @@
 from com.ankamagames.dofus.network.MessageReceiver import MessageReceiver
 from com.ankamagames.jerakine.logger.Logger import Logger
-from com.ankamagames.jerakine.network.CustomDataWrapper import Buffer, ByteArray
+from com.ankamagames.jerakine.network.CustomDataWrapper import ByteArray
 from com.ankamagames.jerakine.network.NetworkMessage import NetworkMessage
 from com.ankamagames.jerakine.network.parser.NetworkMessageClassDefinition import (
     NetworkMessageClassDefinition,
@@ -30,13 +30,7 @@ class Message:
         return ans
 
     def __repr__(self):
-        ans = str.format(
-            "{}(m_id={}, data={!r}, count={})",
-            self.__class__.__name__,
-            self.id,
-            self.raw,
-            self.count,
-        )
+        ans = self.__str__()
         return ans
 
     @staticmethod
@@ -49,13 +43,12 @@ class Message:
     def getMessageId(firstOctet: int) -> int:
         return firstOctet >> NetworkMessage.BIT_RIGHT_SHIFT_LEN_PACKET_ID
 
-    @staticmethod
-    def fromRaw(buf: Buffer, from_client: bool, src=None, dst=None):
-        """Read a message from the buffer and
-        empty the beginning of the buffer.
+    @classmethod
+    def fromRaw(cls, buf: ByteArray, from_client: bool, src=None, dst=None):
+        """Read a message from the buffer and empty the beginning of the buffer.
         msg fields spec:
-            id      |   len     |   data
-           2 bytes  |  2 bytes  |  len bytes
+             id      |   len     |   data
+           1 bytes   |  1 bytes  |  len bytes
         """
         if not buf:
             return
@@ -86,22 +79,26 @@ class Message:
                 logger.debug(
                     f"Not enough data to read the data, byte available : {buf.remaining()} (needed : {lenData})"
                 )
+                buf.position = 0
                 return None
         else:
             logger.debug(
                 f"Not enough data to read the data length, byte available : {buf.remaining()} (needed : {byteLenDynamicHeader})"
             )
+            buf.position = 0
             return None
 
         if id == 2:
-            newbuffer = Buffer(data.readByteArray())
+            newbuffer = ByteArray(data.readByteArray())
             newbuffer.uncompress()
             msg = Message.fromRaw(newbuffer, from_client)
             if not msg or newbuffer.remaining():
                 raise Exception("Unable to parse Message")
-        res = Message(
+
+        res = cls(
             m_id=id, data=data, count=count, from_client=from_client, src=src, dst=dst
         )
+        buf.trim()
         return res
 
     @property
@@ -110,11 +107,6 @@ class Message:
             return MessageReceiver._messagesTypes[self.id].__name__
         else:
             return ProtocolSpec.getClassSpecById(self.id)["name"]
-
-    def json(self):
-        if not hasattr(self, "parsed"):
-            self.parsed = self.parser.read(self.name, self.raw)
-        return self.parsed
 
     def lenlenData(self):
         if len(self.raw) > 65535:

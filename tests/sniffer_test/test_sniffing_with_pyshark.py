@@ -1,9 +1,9 @@
 #!/usr/bin/python
-from pickletools import int4
+from asyncio.subprocess import Process
 import subprocess
+from types import FunctionType
 import pyshark
 import socket
-
 from whistle import Event, EventDispatcher
 from com.ankamagames.dofus.network.MessageReceiver import MessageReceiver
 from com.ankamagames.jerakine.logger.Logger import Logger
@@ -15,9 +15,46 @@ from threading import Thread
 logger = Logger(__name__)
 
 
+class SnifferBuffer:
+    def __init__(self):
+        self.memory = list()
+        self.buffer = ByteArray()
+        self.nextSeq = None
+
+    def getSeqRw(self, tcp_packet):
+        return int(tcp_packet.seq), tcp_packet.payload.binary_value
+
+    def updateFromMemory(self):
+        poped = []
+        for packet in self.memory:
+            seq, raw = self.getSeqRw(packet)
+            if seq == self.nextSeq:
+                poped.append(seq)
+                self.buffer += raw
+                self.nextSeq = seq + len(raw)
+        self.memory = [p for p in self.memory if p.seq not in poped]
+
+    def write(self, tcp_packet):
+        logger.debug(
+            f"nextSeq {self.nextSeq}, lenBuffer {len(self.buffer)}, lenMemory {len(self.memory)}"
+        )
+        seq, data = self.getSeqRw(tcp_packet)
+        logger.debug(f"Write (seq {seq}, len data {len(data)})")
+        self.updateFromMemory()
+        if self.nextSeq is None or seq == self.nextSeq:
+            self.buffer += data
+            self.nextSeq = seq + len(data)
+        else:
+            self.memory.append(tcp_packet)
+        self.updateFromMemory()
+        logger.debug(
+            f"new next seq {self.nextSeq}, new buffer len {len(self.buffer)}, new memory len {len(self.memory)}"
+        )
+
+
 class ServMsgHandler:
-    def process(self, msg: Message):
-        pass
+    def __init__(self, process: FunctionType):
+        self.process = process
 
 
 class PacketEvent(Event):
@@ -27,16 +64,18 @@ class PacketEvent(Event):
 
 
 class Provider(Thread):
-
     LOW_LEVEL_DEBUG = False
 
     def __init__(self) -> None:
         super().__init__()
         self.dispatcher: EventDispatcher = EventDispatcher()
-        self.clientBuffer = ByteArray()
-        self.serverBuffer = ByteArray()
+        self.clientBuffer = SnifferBuffer()
+        self.serverBuffer = SnifferBuffer()
+        self.lastSeq = 0
+        self.prevPaLen = 0
         self.LOCAL_IP = self.getLocalIp()
-        logger.debug(f"LOCAL_IP: {self.LOCAL_IP}")
+        if self.LOW_LEVEL_DEBUG:
+            logger.debug(f"LOCAL_IP: {self.LOCAL_IP}")
 
     def getLocalIp(self):
         s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
@@ -63,30 +102,42 @@ class Provider(Thread):
         )
 
     def run(self):
-        capture = pyshark.LiveCapture(
-            interface="Ethernet 4", bpf_filter="tcp port 5555"
-        )
-        for p in capture.sniff_continuously():
-            try:
-                isfromClient = self.isFromClient(p)
-                if self.LOW_LEVEL_DEBUG:
-                    logger.debug(f"isfromClient: {isfromClient}")
-                raw = p.tcp.payload.binary_value
-                if isfromClient:
-                    self.clientBuffer += raw
-                    self.dispatcher.dispatch("Client packet received", PacketEvent(p))
-                else:
-                    self.serverBuffer += raw
-                    self.dispatcher.dispatch("Server packet received", PacketEvent(p))
-            except AttributeError as e:
-                pass
+        capture = pyshark.LiveCapture(bpf_filter="tcp port 5555")
+        try:
+            for p in capture.sniff_continuously():
+                try:
+                    p.tcp.payload.binary_value
+                    isfromClient = self.isFromClient(p)
+                    if self.LOW_LEVEL_DEBUG:
+                        logger.debug(f"isfromClient: {isfromClient}")
+                    if isfromClient:
+                        self.clientBuffer.write(p.tcp)
+                        self.dispatcher.dispatch(
+                            "Client packet received", PacketEvent(p)
+                        )
+                    else:
+                        self.serverBuffer.write(p.tcp)
+                        self.dispatcher.dispatch(
+                            "Server packet received", PacketEvent(p)
+                        )
+                except AttributeError as e:
+                    # logger.debug(f"AttributeError: {e}", exc_info=True)
+                    pass
+        except Exception as e:
+            logger.error(f"Error: {e}", exc_info=True)
+
+    def reset(self):
+        self.clientBuffer = SnifferBuffer()
+        self.serverBuffer = SnifferBuffer()
+        self.lastSeq = 0
+        self.prevPaLen = 0
 
 
 class DofusSniffer:
-    def __init__(self, action):
+    def __init__(self, callback):
         self.servConn = ServerConnection()
         self.servConn.rawParser = MessageReceiver()
-        self.servConn.handler = ServMsgHandler()
+        self.servConn.handler = ServMsgHandler(self.processServerMsg)
         self.provider = Provider()
         self.servConn._id = "ServerSniffer"
         self.provider.dispatcher.add_listener(
@@ -95,32 +146,28 @@ class DofusSniffer:
         self.provider.dispatcher.add_listener(
             "Server packet received", self.onServerPacketReceived, 0
         )
-        self.handle = action
+        self.handle = callback
 
-    def mockReceiveFromServer(self, raw):
-        self.fromServerBuffer += raw
-        logger.info(
-            f"[{self.servConn._id}] Receive Event, byte available : {self.fromServerBuffer.remaining()}"
-        )
-        self.servConn.receive(self.fromServerBuffer)
+    def processServerMsg(self, msg):
+        if msg.__class__.__name__ == "SelectedServerDataMessage":
+            self.provider.reset()
+        self.handle(msg)
 
     def onClientPacketReceived(self, event: PacketEvent):
         while True:
             msg = Message.fromRaw(
-                self.provider.clientBuffer,
+                self.provider.clientBuffer.buffer,
                 True,
                 src=event.packet.ip.src,
                 dst=event.packet.ip.dst,
             )
-            if not msg:
-                self.provider.clientBuffer.position = 0
+            if msg:
+                self.handle(msg.deserialize())
+            else:
                 break
-            del self.provider.clientBuffer[: self.provider.clientBuffer.position]
-            self.provider.clientBuffer.position = 0
-            self.handle(msg)
 
     def onServerPacketReceived(self, event: PacketEvent):
-        self.servConn.receive(self.provider.serverBuffer)
+        self.servConn.receive(self.provider.serverBuffer.buffer)
 
     def start(self):
         self.provider.start()
@@ -128,10 +175,8 @@ class DofusSniffer:
 
 if __name__ == "__main__":
 
-    def handle(msgRaw: Message):
-        msg = msgRaw.deserialize()
-        if msgRaw.from_client:
-            logger.debug("[Client] [SND] the msg" + str(msg))
+    def handle(msg):
+        pass
 
     mySniffer = DofusSniffer(handle)
     mySniffer.start()

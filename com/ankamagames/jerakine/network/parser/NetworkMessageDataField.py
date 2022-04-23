@@ -9,7 +9,7 @@ logger = Logger(__name__)
 
 class NetMsgDataField:
 
-    TRACE = True
+    TRACE = False
 
     dataReader = {
         TypeEnum.INT: "readInt",
@@ -43,12 +43,8 @@ class NetMsgDataField:
         return TypeEnum(self._spec["typeId"]) != TypeEnum.OBJECT
 
     def getFieldTypeLength(self):
-        # if self.TRACE:
-        #     logger.debug("getting field type length")
         l = self._spec.get("length")
         if l is None:
-            # if self.TRACE:
-            #     logger.debug("field has no length")
             lTypeId = self._spec.get("lengthTypeId")
             if lTypeId is not None:
                 if self.TRACE:
@@ -84,9 +80,11 @@ class NetMsgDataField:
             typeId = self._raw.readUnsignedShort()
             classSpec = ProtocolSpec.getTypeSpecById(typeId)
             className = classSpec["name"]
-        logger.debug(className + " {")
+        if self.TRACE:
+            logger.debug(className + " {")
         obj = nmcd.NetworkMessageClassDefinition(className, self._raw).deserialize()
-        logger.debug("}")
+        if self.TRACE:
+            logger.debug("}")
         return obj
 
     def readVector(self):

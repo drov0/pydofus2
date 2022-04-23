@@ -1,4 +1,3 @@
-scapy
 wdom
 tqdm
 pycryptodomex

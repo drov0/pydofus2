@@ -13,6 +13,9 @@ from com.ankamagames.dofus.kernel.net.ConnectionsHandler import ConnectionsHandl
 from com.ankamagames.dofus.logic.common.managers.PlayerManager import PlayerManager
 from com.ankamagames.dofus.logic.game.common.managers.TimerManager import TimeManager
 import com.ankamagames.dofus.logic.game.roleplay.frames.RoleplayContextFrame as rcf
+from com.ankamagames.dofus.logic.game.roleplay.frames.RoleplayInteractivesFrame import (
+    RoleplayInteractivesFrame,
+)
 from com.ankamagames.dofus.logic.game.roleplay.messages.CharacterMovementStoppedMessage import (
     CharacterMovementStoppedMessage,
 )
@@ -32,8 +35,14 @@ from com.ankamagames.dofus.network.messages.game.context.roleplay.MapComplementa
 from com.ankamagames.dofus.network.messages.game.context.roleplay.anomaly.MapComplementaryInformationsAnomalyMessage import (
     MapComplementaryInformationsAnomalyMessage,
 )
+from com.ankamagames.dofus.network.messages.game.interactive.InteractiveMapUpdateMessage import (
+    InteractiveMapUpdateMessage,
+)
 from com.ankamagames.dofus.network.messages.game.interactive.InteractiveUsedMessage import (
     InteractiveUsedMessage,
+)
+from com.ankamagames.dofus.network.messages.game.interactive.StatedMapUpdateMessage import (
+    StatedMapUpdateMessage,
 )
 from com.ankamagames.dofus.network.types.game.context.fight.FightCommonInformations import (
     FightCommonInformations,
@@ -99,8 +108,6 @@ class RoleplayEntitiesFrame(AbstractEntitiesFrame, Frame):
         self._fightNumber: int = 0
 
         self._timeout: float = None
-
-        # self._loader:IResourceLoader = None
 
         self._currentPaddockItemCellId: int = None
 
@@ -366,14 +373,13 @@ class RoleplayEntitiesFrame(AbstractEntitiesFrame, Frame):
                         mo.state == MapObstacleStateEnum.OBSTACLE_OPENED,
                     )
 
-            # TODO: Add handling of interactive elements here
-            # rpIntFrame = Kernel().getWorker().getFrame(RoleplayInteractivesFrame)
-            # imumsg = InteractiveMapUpdateMessage()
-            # imumsg.initInteractiveMapUpdateMessage(mcidmsg.interactiveElements)
-            # rpIntFrame.process(imumsg)
-            # smumsg = StatedMapUpdateMessage()
-            # smumsg.initStatedMapUpdateMessage(mcidmsg.statedElements)
-            # rpIntFrame.process(smumsg)
+            rpIntFrame = Kernel().getWorker().getFrame(RoleplayInteractivesFrame)
+            imumsg = InteractiveMapUpdateMessage()
+            imumsg.init(mcidmsg.interactiveElements)
+            rpIntFrame.process(imumsg)
+            smumsg = StatedMapUpdateMessage()
+            smumsg.init(mcidmsg.statedElements)
+            rpIntFrame.process(smumsg)
 
             if currentMapHasChanged or currentSubAreaHasChanged:
                 # TODO: Here you notify the bot throught BotEventsManager that the map(or subarea) has changed
@@ -386,7 +392,7 @@ class RoleplayEntitiesFrame(AbstractEntitiesFrame, Frame):
             elif PlayedCharacterManager().isInAnomaly:
                 PlayedCharacterManager().isInAnomaly = False
 
-            # TODO: Here treat stuff related to the partyManagement when sone implementing party management frame
+            # TODO: Here handle stuff related to the partyManagement when implementing party management frame
             # if Kernel().getWorker().contains(PartyManagementFrame):
             #     partyManagementFrame = Kernel().getWorker().getFrame(PartyManagementFrame)
             #     if partyManagementFrame.playerShouldReceiveRewards:

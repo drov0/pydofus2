@@ -1,6 +1,4 @@
-from shutil import move
 from threading import Timer
-from time import sleep
 from time import perf_counter
 from com.ankamagames.atouin.messages.EntityMovementCompleteMessage import (
     EntityMovementCompleteMessage,
@@ -20,6 +18,9 @@ from com.ankamagames.dofus.logic.game.common.managers.PlayedCharacterManager imp
 from com.ankamagames.dofus.logic.game.common.misc.DofusEntities import DofusEntities
 from com.ankamagames.dofus.logic.game.roleplay.actions.PlayerFightRequestAction import (
     PlayerFightRequestAction,
+)
+from com.ankamagames.dofus.logic.game.roleplay.frames.RoleplayInteractivesFrame import (
+    RoleplayInteractivesFrame,
 )
 
 # from com.ankamagames.dofus.logic.game.roleplay.frames.RoleplayEntitiesFrame import RoleplayEntitiesFrame
@@ -170,9 +171,9 @@ class RoleplayMovementFrame(Frame):
             self._isRequestingMovement = False
             if self._followingIe:
                 self.activateSkill(
-                    self._followingIe.skillInstanceId,
-                    self._followingIe.ie,
-                    self._followingIe.additionalParam,
+                    self._followingIe["skillInstanceId"],
+                    self._followingIe["ie"],
+                    self._followingIe["additionalParam"],
                 )
                 self._followingIe = None
             if self._followingMonsterGroup:
@@ -229,9 +230,9 @@ class RoleplayMovementFrame(Frame):
                     self._isRequestingMovement = False
                 if self._followingIe:
                     self.activateSkill(
-                        self._followingIe.skillInstanceId,
-                        self._followingIe.ie,
-                        self._followingIe.additionalParam,
+                        self._followingIe["skillInstanceId"],
+                        self._followingIe["ie"],
+                        self._followingIe["additionalParam"],
                     )
                     self._followingIe = None
                 if self._followingMonsterGroup:
@@ -388,14 +389,11 @@ class RoleplayMovementFrame(Frame):
             logger.debug("Player is already moving, waiting for him to stop")
             return False
         movePath = Pathfinding.findPath(DataMapProvider(), playerEntity.position, cell)
-        pathDuration = movePath.getCrossingDuration()
-        # logger.info('Path estimated duration is : ' + str(pathDuration))
         self.sendPath(movePath)
         return True
 
     def sendPath(self, path: MovementPath) -> None:
         logger.info(f"Sending path {path}")
-        originalPath: MovementPath = path.clone()
         if path.start.cellId == path.end.cellId:
             logger.warn(
                 f"Discarding a movement path that begins and ends on the same cell ({path.start.cellId})."
@@ -403,16 +401,15 @@ class RoleplayMovementFrame(Frame):
             self._isRequestingMovement = False
             if self._followingIe:
                 self.activateSkill(
-                    self._followingIe.skillInstanceId,
-                    self._followingIe.ie,
-                    self._followingIe.additionalParam,
+                    self._followingIe["skillInstanceId"],
+                    self._followingIe["ie"],
+                    self._followingIe["additionalParam"],
                 )
                 self._followingIe = None
             if self._followingMonsterGroup:
                 self.requestMonsterFight(self._followingMonsterGroup.id)
                 self._followingMonsterGroup = None
             return
-        forceWalk: bool = False
         gmmrmsg = GameMapMovementRequestMessage()
         keymoves = MapMovementAdapter.getServerMovement(path)
         gmmrmsg.init(keymoves, PlayedCharacterManager().currentMap.mapId)
@@ -444,8 +441,6 @@ class RoleplayMovementFrame(Frame):
     def activateSkill(
         self, skillInstanceId: int, ie: InteractiveElement, additionalParam: int
     ) -> None:
-        iurmsg: InteractiveUseRequestMessage = None
-        iuwprmsg: InteractiveUseWithParamRequestMessage = None
         rpInteractivesFrame: RoleplayInteractivesFrame = (
             Kernel().getWorker().getFrame(RoleplayInteractivesFrame)
         )
@@ -453,18 +448,15 @@ class RoleplayMovementFrame(Frame):
             rpInteractivesFrame
             and rpInteractivesFrame.currentRequestedElementId != ie.elementId
             and not rpInteractivesFrame.usingInteractive
-            and not rpInteractivesFrame.isElementChangingState(ie.elementId)
         ):
             rpInteractivesFrame.currentRequestedElementId = ie.elementId
             if additionalParam == 0:
                 iurmsg = InteractiveUseRequestMessage()
-                iurmsg.initInteractiveUseRequestMessage(ie.elementId, skillInstanceId)
+                iurmsg.init(ie.elementId, skillInstanceId)
                 ConnectionsHandler.getConnection().send(iurmsg)
             else:
                 iuwprmsg = InteractiveUseWithParamRequestMessage()
-                iuwprmsg.initInteractiveUseWithParamRequestMessage(
-                    ie.elementId, skillInstanceId, additionalParam
-                )
+                iuwprmsg.init(ie.elementId, skillInstanceId, additionalParam)
                 ConnectionsHandler.getConnection().send(iuwprmsg)
             self._canMove = False
 

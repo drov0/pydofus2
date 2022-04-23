@@ -4,7 +4,7 @@ from com.ankamagames.jerakine.data.BinaryStream import BinaryStream
 from com.ankamagames.jerakine.types.positions.MapPoint import Point
 
 if TYPE_CHECKING:
-    from .map import Map
+    from com.ankamagames.atouin.data.map.Map import Map
 import math
 
 

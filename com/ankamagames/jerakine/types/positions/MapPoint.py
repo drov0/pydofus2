@@ -1,4 +1,5 @@
 import math
+from com.ankamagames.jerakine.map.IDataMapProvider import IDataMapProvider
 
 from com.ankamagames.jerakine.types.enums.DirectionsEnum import DirectionsEnum
 
@@ -194,6 +195,104 @@ class MapPoint:
         if self.isInMap(i1, i2):
             return MapPoint.fromCoords(i1, i2)
         return None
+
+    def getNearestFreeCell(
+        self, mapProvider: IDataMapProvider, allowThoughEntity: bool = True
+    ) -> "MapPoint":
+        for i in range(8):
+            mp = self.getNearestFreeCellInDirection(
+                i, mapProvider, False, allowThoughEntity
+            )
+            if mp:
+                return mp
+
+    def getNearestCellInDirection(self, orientation: int) -> "MapPoint":
+        if orientation == 0:
+            mp = MapPoint.fromCoords(self._nX + 1, self._nY + 1)
+        if orientation == 1:
+            mp = MapPoint.fromCoords(self._nX + 1, self._nY)
+        if orientation == 2:
+            mp = MapPoint.fromCoords(self._nX + 1, self._nY - 1)
+        if orientation == 3:
+            mp = MapPoint.fromCoords(self._nX, self._nY - 1)
+        if orientation == 4:
+            mp = MapPoint.fromCoords(self._nX - 1, self._nY - 1)
+        if orientation == 5:
+            mp = MapPoint.fromCoords(self._nX - 1, self._nY)
+        if orientation == 6:
+            mp = MapPoint.fromCoords(self._nX - 1, self._nY + 1)
+        if orientation == 7:
+            mp = MapPoint.fromCoords(self._nX, self._nY + 1)
+        if MapPoint.isInMap(mp._nX, mp._nY):
+            return mp
+        return None
+
+    def getNearestFreeCellInDirection(
+        self,
+        orientation: int,
+        mapProvider: IDataMapProvider,
+        allowItself: bool = True,
+        allowThoughEntity: bool = True,
+        ignoreSpeed: bool = False,
+        forbidenCellsId: list = None,
+    ) -> "MapPoint":
+        if forbidenCellsId is None:
+            forbidenCellsId = list()
+        cells: list[MapPoint] = list[MapPoint](8 * [True])
+        weights: list[int] = list[int](8 * [True])
+        for i in range(8):
+            mp = self.getNearestCellInDirection(i)
+            cells[i] = mp
+            if mp is not None:
+                speed = mapProvider.getCellSpeed(mp.cellId)
+                if mp.cellId not in forbidenCellsId:
+                    if mapProvider.pointMov(
+                        mp._nX, mp._nY, allowThoughEntity, self.cellId
+                    ):
+                        weights[i] = MapPoint.getOrientationsDistance(
+                            i, orientation
+                        ) + (
+                            (5 - speed if speed >= 0 else 11 + abs(speed))
+                            if not ignoreSpeed
+                            else 0
+                        )
+                    else:
+                        forbidenCellsId.append(mp.cellId)
+                        weights[i] = -1
+                else:
+                    if mapProvider.pointMov(
+                        mp._nX, mp._nY, allowThoughEntity, self.cellId
+                    ):
+                        weights[i] = (
+                            100
+                            + MapPoint.getOrientationsDistance(i, orientation)
+                            + (
+                                (5 - speed if speed >= 0 else 11 + abs(speed))
+                                if not ignoreSpeed
+                                else 0
+                            )
+                        )
+                    else:
+                        weights[i] = -1
+            else:
+                weights[i] = -1
+        minWeightOrientation: int = -1
+        minWeight: int = 10000
+        for i in range(8):
+            if weights[i] != -1 and weights[i] < minWeight and cells[i] is not None:
+                minWeight = weights[i]
+                minWeightOrientation = i
+        if minWeightOrientation != -1:
+            mp = cells[minWeightOrientation]
+        else:
+            mp = None
+        if (
+            mp is None
+            and allowItself
+            and mapProvider.pointMov(self._nX, self._nY, allowThoughEntity, self.cellId)
+        ):
+            return self
+        return mp
 
     def __eq__(self, mp: "MapPoint") -> bool:
         return self._nCellId == mp._nCellId

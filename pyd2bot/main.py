@@ -15,10 +15,6 @@ from com.ankamagames.dofus.logic.game.approach.actions.CharacterSelectionAction 
 from com.ankamagames.dofus.logic.game.common.managers.PlayedCharacterManager import (
     PlayedCharacterManager,
 )
-from com.ankamagames.dofus.logic.game.roleplay.frames.RoleplayMovementFrame import (
-    RoleplayMovementFrame,
-)
-from com.ankamagames.dofus.modules.utils.pathFinding.world.Edge import Edge
 from com.ankamagames.dofus.modules.utils.pathFinding.world.WorldPathFinder import (
     WorldPathFinder,
 )
@@ -29,11 +25,11 @@ from com.ankamagames.jerakine.resources.events.ResourceLoadedEvent import (
     ResourceLoadedEvent,
 )
 
-from hackedLauncher.CredsManager import CredsManager
 from hackedLauncher.Launcher import Haapi
 from pyd2bot.BotsDataManager import BotsDataManager
 from pyd2bot.events.BotEventsManager import BotEventsManager
 from com.ankamagames.atouin.utils.DataMapProvider import DataMapProvider
+from pyd2bot.FarmAPI import farmAPI
 
 logger = Logger(__name__)
 
@@ -119,6 +115,7 @@ class TestBot:
         logger.info(
             f"Bot is currently in the map {PlayedCharacterManager().currentMap.mapId}"
         )
+        FarmAPI.collectRessources()
         FrustumManager.randomMapChange()
 
 

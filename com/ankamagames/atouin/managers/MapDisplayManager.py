@@ -1,8 +1,12 @@
+# from com.ankamagames.atouin.managers.InteractiveCellManager import (
+#     InteractiveCellManager,
+# )
 from com.ankamagames.atouin.messages.MapLoadedMessage import MapLoadedMessage
 from com.ankamagames.jerakine.logger.Logger import Logger
 from time import perf_counter
 import com.ankamagames.atouin.utils.DataMapProvider as dmpm
 from com.ankamagames.jerakine.metaclasses.Singleton import Singleton
+from com.ankamagames.jerakine.types.positions.MapPoint import MapPoint
 from com.ankamagames.jerakine.types.positions.WorldPoint import WorldPoint
 
 logger = Logger(__name__)
@@ -16,6 +20,7 @@ class MapDisplayManager(metaclass=Singleton):
     _lastMap: WorldPoint
     _nMapLoadStart: int
     _nMapLoadEnd: int
+    _identifiedElementPosition: list[MapPoint]
 
     def __init__(self) -> None:
         from com.ankamagames.jerakine.resources.loaders.MapLoader import MapLoader
@@ -50,6 +55,18 @@ class MapDisplayManager(metaclass=Singleton):
         self._mapInstanceId = 0
         self._lastMap = None
 
+    def initIdentifiedElements(self):
+        self._identifiedElementPosition = dict()
+        for layer in self.dataMap.layers:
+            for cell in layer.cells:
+                for element in cell.elements:
+                    self._identifiedElementPosition[
+                        element.identifier
+                    ] = MapPoint.fromCellId(cell.cellId)
+
+    def getIdentifiedElementPosition(self, identifier: int) -> MapPoint:
+        return self._identifiedElementPosition[identifier]
+
     def mapDisplayed(self) -> None:
         InteractiveCellManager().updateInteractiveCell(self.currentDataMap)
 
@@ -70,4 +87,5 @@ class MapDisplayManager(metaclass=Singleton):
         self._currentMap = WorldPoint.fromMapId(map.id)
         msg = MapLoadedMessage()
         msg.id = self._currentMap.mapId
+        self.initIdentifiedElements()
         Kernel().getWorker().process(msg)

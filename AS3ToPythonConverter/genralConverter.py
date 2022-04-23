@@ -50,13 +50,13 @@ patterns = {
     " implements ": " ",
     " extends ": " ",
     "Vector\.<(\S+)>": r"list[\1]",
-    "function (\S+)\((.*)\) : (\S+)": r"def \1(self, \2) -> \3:",
-    "function (\S+)\((.*)\) :": r"def \1(self, \2):",
+    "function\s*(\S+)\((.*)\)\s*:\s*(\S+)": r"def \1(self, \2) -> \3:",
+    "function\s*(\S+)\((.*)\)\s*:": r"def \1(self, \2):",
     # "if !(.*)": r"if not \1",
     "([_a-zA-Z][_a-zA-Z0-9.]{0,30})\.length": r"len(\1)",
     "throw Error(.*)": r"raise Exception\1",
-    r"^(.*)function get (\S+)\((.*)\) : (\S+)$": r"\1@property\n\1def \2(self, \3) -> \4:",
-    r"^(.*)function set (\S+)\((.*)\) : (\S+)$": r"\1@\2.setter\n\1def \2(self, \3) -> \4:",
+    r"^(.*)function\s*get\s*(\S+)\((.*)\)\s*:\s*(\S+)$": r"\1@property\n\1def \2(self, \3) -> \4:",
+    r"^(.*)function\s*set\s*(\S+)\((.*)\)\s*:\s*(\S+)$": r"\1@\2.setter\n\1def \2(self, \3) -> \4:",
     "function [A-Z]+(\S+)\((.*)\)": r"def __init__(self, \2):",
     "_log:Logger = Log\.getLogger\((.*)\)": r"logger = Logger(__name__)",
     ", \)": r")",
@@ -336,11 +336,11 @@ def parseFile(file_p, out_p):
         code = fp.read()
         code = handleClassHeader(code)
         # code = processCompressedIfELseInAllCode(code)
-        # code = processSwitchCases(code)
+        code = processSwitchCases(code)
         for pattern, repl in patterns.items():
             code = re.sub(pattern, repl, code, flags=re.MULTILINE)
         code = deleteFirstTwoSpaces(code)
-        code = handleIndent(code)
+        # code = handleIndent(code)
         code = postSwitchCaseProcess(code)
     with open(out_p, "w") as fp:
         fp.write(code)
@@ -352,5 +352,5 @@ ROOTDIR = pathlib.Path(os.path.dirname(__file__))
 #     ROOTDIR / "inventoryView",
 # )
 t = perf_counter()
-parseFile(ROOTDIR / "target.as", ROOTDIR / "PropertyChangeEvent.py")
+parseFile(ROOTDIR / "target.as", ROOTDIR / "script.py")
 print("parsing took:", perf_counter() - t)

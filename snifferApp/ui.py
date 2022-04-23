@@ -38,10 +38,11 @@ class SnifferUI(Div):
         self.info = P("Press start", parent=self.button_wrapper)
 
         self.msgtable = MsgTable(parent=self)
-        self.dofusSniffer = DofusSniffer(self.msgtable.appendMsg)
+        self.dofusSniffer = None
 
     def start(self, event=None):
-        if not self.dofusSniffer.running:
+        if not self.dofusSniffer:
+            self.dofusSniffer = DofusSniffer(self.msgtable.appendMsg)
             self.dofusSniffer.start()
             self.info.textContent = "Sniffer started"
         else:
@@ -51,6 +52,7 @@ class SnifferUI(Div):
         logger.debug("Stop button clicked...")
         if self.dofusSniffer.running:
             self.dofusSniffer.stop()
+            self.dofusSniffer = None
             self.info.textContent = "Sniffer stopped"
         else:
             self.info.textContent = "Sniffer already stopped"
@@ -106,8 +108,6 @@ class MsgView(Tr):
         logger.debug("Changing view for message.")
         if not self.contents.textContent:
             self.contents.textContent = pformat(self.msg.to_json())
-        else:
-            self.contents.textContent = ""
 
 
 document = get_document()

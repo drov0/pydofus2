@@ -12,6 +12,7 @@ from snifferApp.network.message import Message
 import threading
 
 logger = Logger(__name__)
+LOW_LEVEL_DEBUG = False
 
 
 class SnifferBuffer:
@@ -34,11 +35,13 @@ class SnifferBuffer:
         self.memory = [p for p in self.memory if p.seq not in poped]
 
     def write(self, tcp_packet):
-        logger.debug(
-            f"nextSeq {self.nextSeq}, lenBuffer {len(self.buffer)}, lenMemory {len(self.memory)}"
-        )
+        if LOW_LEVEL_DEBUG:
+            logger.debug(
+                f"nextSeq {self.nextSeq}, lenBuffer {len(self.buffer)}, lenMemory {len(self.memory)}"
+            )
         seq, data = self.getSeqRw(tcp_packet)
-        logger.debug(f"Write (seq {seq}, len data {len(data)})")
+        if LOW_LEVEL_DEBUG:
+            logger.debug(f"Write (seq {seq}, len data {len(data)})")
         self.updateFromMemory()
         if self.nextSeq is None or seq == self.nextSeq:
             self.buffer += data
@@ -46,12 +49,13 @@ class SnifferBuffer:
         else:
             self.memory.append(tcp_packet)
         self.updateFromMemory()
-        logger.debug(
-            f"new next seq {self.nextSeq}, new buffer len {len(self.buffer)}, new memory len {len(self.memory)}"
-        )
+        if LOW_LEVEL_DEBUG:
+            logger.debug(
+                f"new next seq {self.nextSeq}, new buffer len {len(self.buffer)}, new memory len {len(self.memory)}"
+            )
 
 
-class ServMsgHandler:
+class ServerMsgHandler:
     def __init__(self, process: FunctionType):
         self.process = process
 
@@ -63,8 +67,6 @@ class PacketEvent(Event):
 
 
 class Provider(threading.Thread):
-    LOW_LEVEL_DEBUG = False
-
     def __init__(self) -> None:
         super().__init__()
         self.killsig = threading.Event()
@@ -74,7 +76,7 @@ class Provider(threading.Thread):
         self.lastSeq = 0
         self.prevPaLen = 0
         self.LOCAL_IP = self.getLocalIp()
-        if self.LOW_LEVEL_DEBUG:
+        if LOW_LEVEL_DEBUG:
             logger.debug(f"LOCAL_IP: {self.LOCAL_IP}")
 
     def getLocalIp(self):
@@ -91,7 +93,7 @@ class Provider(threading.Thread):
     def isFromClient(self, pa):
         dst = pa.ip.dst
         src = pa.ip.src
-        if self.LOW_LEVEL_DEBUG:
+        if LOW_LEVEL_DEBUG:
             logger.debug(f"src: {src}, dst: {dst}, LOCAL_IP: {self.LOCAL_IP}")
         if src == self.LOCAL_IP:
             return True
@@ -110,7 +112,7 @@ class Provider(threading.Thread):
                 try:
                     p.tcp.payload.binary_value
                     isfromClient = self.isFromClient(p)
-                    if self.LOW_LEVEL_DEBUG:
+                    if LOW_LEVEL_DEBUG:
                         logger.debug(f"isfromClient: {isfromClient}")
                     if isfromClient:
                         self.clientBuffer.write(p.tcp)
@@ -142,7 +144,7 @@ class DofusSniffer:
     def __init__(self, callback):
         self.servConn = ServerConnection()
         self.servConn.rawParser = MessageReceiver()
-        self.servConn.handler = ServMsgHandler(self.processServerMsg)
+        self.servConn.handler = ServerMsgHandler(self.processServerMsg)
         self.provider = Provider()
         self.servConn._id = "ServerSniffer"
         self.provider.dispatcher.add_listener(

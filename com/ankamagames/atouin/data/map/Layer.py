@@ -1,9 +1,24 @@
+from com.ankamagames.atouin.AtouinConstants import AtouinConstants
+from com.ankamagames.atouin.data.map.elements.BasicElement import BasicElement
 from com.ankamagames.atouin.data.map.elements.GraphicalElement import GraphicalElement
 from com.ankamagames.atouin.data.map.elements.SoundElement import SoundElement
+from com.ankamagames.atouin.enums.ElementTypesEnum import ElementTypesEnum
 from com.ankamagames.jerakine.data.BinaryStream import BinaryStream
+from com.ankamagames.jerakine.logger.Logger import Logger
+
+logger = Logger(__name__)
 
 
 class Layer:
+
+    LAYER_GROUND = 0
+
+    LAYER_ADDITIONAL_GROUND = 1
+
+    LAYER_DECOR = 2
+
+    LAYER_ADDITIONAL_DECOR = 3
+
     def __init__(self, raw, mapVersion):
         self.version = mapVersion
         self.read(raw)
@@ -26,13 +41,10 @@ class LayerCell:
     def read(self, raw: BinaryStream):
         self.cellId = raw.readShort()
         self.elementsCount = raw.readShort()
-        self.elements = []
-        for _ in range(self.elementsCount):
-            el_type = raw.readByte()
-            if el_type == 2:  # GRAPHICAL
-                el = GraphicalElement(raw, self.mapVersion)
-            elif el_type == 33:  # SOUND
-                el = SoundElement(raw, self.mapVersion)
-            else:
-                raise Exception("Invalid element type.")
-            self.elements.append(el)
+        self.elements = [None] * self.elementsCount
+        for i in range(self.elementsCount):
+            be = BasicElement.getElementFromType(raw.readByte(), self)
+            if AtouinConstants.DEBUG_FILES_PARSING:
+                logger.debug("    (Cell) Element at index " + i + " :")
+            be.fromRaw(raw, self.mapVersion)
+            self.elements[i] = be

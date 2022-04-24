@@ -209,7 +209,7 @@ class FightBotFrame(Frame, metaclass=Singleton):
       groupEntity:IEntity = None
       if self._inFight or self._wait:
          return
-      rpEF:RoleplayEntitiesFrame = Kernel().getWorker().getFrame(RoleplayEntitiesFrame)
+      rpEF:RoleplayEntitiesFrame = Kernel().getWorker().getFrame("RoleplayEntitiesFrame")
       if not rpEF:
          return
       avaibleCells:list = []

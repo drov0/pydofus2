@@ -1,6 +1,4 @@
-from shutil import move
 from threading import Timer
-from time import sleep
 from time import perf_counter
 from com.ankamagames.atouin.messages.EntityMovementCompleteMessage import (
     EntityMovementCompleteMessage,
@@ -21,6 +19,7 @@ from com.ankamagames.dofus.logic.game.common.misc.DofusEntities import DofusEnti
 from com.ankamagames.dofus.logic.game.roleplay.actions.PlayerFightRequestAction import (
     PlayerFightRequestAction,
 )
+import com.ankamagames.dofus.logic.game.roleplay.frames.RoleplayInteractivesFrame as rif
 
 # from com.ankamagames.dofus.logic.game.roleplay.frames.RoleplayEntitiesFrame import RoleplayEntitiesFrame
 from com.ankamagames.dofus.logic.game.roleplay.messages.CharacterMovementStoppedMessage import (
@@ -170,9 +169,9 @@ class RoleplayMovementFrame(Frame):
             self._isRequestingMovement = False
             if self._followingIe:
                 self.activateSkill(
-                    self._followingIe.skillInstanceId,
-                    self._followingIe.ie,
-                    self._followingIe.additionalParam,
+                    self._followingIe["skillInstanceId"],
+                    self._followingIe["ie"],
+                    self._followingIe["additionalParam"],
                 )
                 self._followingIe = None
             if self._followingMonsterGroup:
@@ -214,6 +213,7 @@ class RoleplayMovementFrame(Frame):
             return True
 
         if isinstance(msg, EntityMovementCompleteMessage):
+            logger.debug("Entity movement complete")
             emcmsg = msg
             if emcmsg.entity.id == PlayedCharacterManager().id:
                 gmmcmsg = GameMapMovementConfirmMessage()
@@ -229,9 +229,9 @@ class RoleplayMovementFrame(Frame):
                     self._isRequestingMovement = False
                 if self._followingIe:
                     self.activateSkill(
-                        self._followingIe.skillInstanceId,
-                        self._followingIe.ie,
-                        self._followingIe.additionalParam,
+                        self._followingIe["skillInstanceId"],
+                        self._followingIe["ie"],
+                        self._followingIe["additionalParam"],
                     )
                     self._followingIe = None
                 if self._followingMonsterGroup:
@@ -279,15 +279,15 @@ class RoleplayMovementFrame(Frame):
         if isinstance(msg, InteractiveUsedMessage):
             if msg.entityId == PlayedCharacterManager().id:
                 self._canMove = msg.canMove
-            return True
+            return False
 
         if isinstance(msg, InteractiveUseEndedMessage):
             self._canMove = True
-            return True
+            return False
 
         if isinstance(msg, InteractiveUseErrorMessage):
             self._canMove = True
-            return True
+            return False
 
         if isinstance(msg, LeaveDialogMessage):
             self._canMove = True
@@ -388,14 +388,11 @@ class RoleplayMovementFrame(Frame):
             logger.debug("Player is already moving, waiting for him to stop")
             return False
         movePath = Pathfinding.findPath(DataMapProvider(), playerEntity.position, cell)
-        pathDuration = movePath.getCrossingDuration()
-        # logger.info('Path estimated duration is : ' + str(pathDuration))
         self.sendPath(movePath)
         return True
 
     def sendPath(self, path: MovementPath) -> None:
         logger.info(f"Sending path {path}")
-        originalPath: MovementPath = path.clone()
         if path.start.cellId == path.end.cellId:
             logger.warn(
                 f"Discarding a movement path that begins and ends on the same cell ({path.start.cellId})."
@@ -403,16 +400,15 @@ class RoleplayMovementFrame(Frame):
             self._isRequestingMovement = False
             if self._followingIe:
                 self.activateSkill(
-                    self._followingIe.skillInstanceId,
-                    self._followingIe.ie,
-                    self._followingIe.additionalParam,
+                    self._followingIe["skillInstanceId"],
+                    self._followingIe["ie"],
+                    self._followingIe["additionalParam"],
                 )
                 self._followingIe = None
             if self._followingMonsterGroup:
                 self.requestMonsterFight(self._followingMonsterGroup.id)
                 self._followingMonsterGroup = None
             return
-        forceWalk: bool = False
         gmmrmsg = GameMapMovementRequestMessage()
         keymoves = MapMovementAdapter.getServerMovement(path)
         gmmrmsg.init(keymoves, PlayedCharacterManager().currentMap.mapId)
@@ -444,27 +440,22 @@ class RoleplayMovementFrame(Frame):
     def activateSkill(
         self, skillInstanceId: int, ie: InteractiveElement, additionalParam: int
     ) -> None:
-        iurmsg: InteractiveUseRequestMessage = None
-        iuwprmsg: InteractiveUseWithParamRequestMessage = None
-        rpInteractivesFrame: RoleplayInteractivesFrame = (
-            Kernel().getWorker().getFrame(RoleplayInteractivesFrame)
+        rpInteractivesFrame: rif.RoleplayInteractivesFrame = (
+            Kernel().getWorker().getFrame("RoleplayInteractivesFrame")
         )
         if (
             rpInteractivesFrame
             and rpInteractivesFrame.currentRequestedElementId != ie.elementId
             and not rpInteractivesFrame.usingInteractive
-            and not rpInteractivesFrame.isElementChangingState(ie.elementId)
         ):
             rpInteractivesFrame.currentRequestedElementId = ie.elementId
             if additionalParam == 0:
                 iurmsg = InteractiveUseRequestMessage()
-                iurmsg.initInteractiveUseRequestMessage(ie.elementId, skillInstanceId)
+                iurmsg.init(ie.elementId, skillInstanceId)
                 ConnectionsHandler.getConnection().send(iurmsg)
             else:
                 iuwprmsg = InteractiveUseWithParamRequestMessage()
-                iuwprmsg.initInteractiveUseWithParamRequestMessage(
-                    ie.elementId, skillInstanceId, additionalParam
-                )
+                iuwprmsg.init(ie.elementId, skillInstanceId, additionalParam)
                 ConnectionsHandler.getConnection().send(iuwprmsg)
             self._canMove = False
 

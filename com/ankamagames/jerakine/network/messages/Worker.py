@@ -148,7 +148,7 @@ class Worker(EventDispatcher, MessageHandler):
     def addFrame(self, frame: Frame) -> None:
         if self._terminated:
             return
-        if self._currentFrameTypesCache.get(type(frame)):
+        if self._currentFrameTypesCache.get(frame.__class__.__name__):
             frameRemoving = False
             frameAdding = False
             if self._processingMessage:
@@ -223,11 +223,11 @@ class Worker(EventDispatcher, MessageHandler):
                 return True
         return False
 
-    def contains(self, frameobject: object) -> bool:
-        return self.getFrame(frameobject) != None
+    def contains(self, frameClassName: str) -> bool:
+        return self.getFrame(frameClassName) is not None
 
-    def getFrame(self, frameobject: object) -> Frame:
-        return self._currentFrameTypesCache.get(frameobject)
+    def getFrame(self, frameClassName: str) -> Frame:
+        return self._currentFrameTypesCache.get(frameClassName)
 
     def pause(
         self, targetobject: object = None, unstoppableMsgobjectList: list = None
@@ -295,7 +295,7 @@ class Worker(EventDispatcher, MessageHandler):
         if frame.pushed():
             self._framesList.append(frame)
             self._framesList.sort(key=lambda x: x.priority.value, reverse=True)
-            self._currentFrameTypesCache[type(frame)] = frame
+            self._currentFrameTypesCache[frame.__class__.__name__] = frame
             if self.has_listeners(FramePushedEvent.EVENT_FRAME_PUSHED):
                 self.dispatch(
                     FramePushedEvent.EVENT_FRAME_PUSHED, FramePushedEvent(frame)
@@ -314,7 +314,7 @@ class Worker(EventDispatcher, MessageHandler):
                 index = -1
             if index > -1:
                 del self._framesList[index]
-                del self._currentFrameTypesCache[type(frame)]
+                del self._currentFrameTypesCache[frame.__class__.__name__]
                 if frame in self._framesBeingDeleted:
                     del self._framesBeingDeleted[frame]
             if self.has_listeners(FramePulledEvent.EVENT_FRAME_PULLED):

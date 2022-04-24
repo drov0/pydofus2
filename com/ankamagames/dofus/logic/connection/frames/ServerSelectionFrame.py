@@ -40,7 +40,6 @@ from com.ankamagames.jerakine.network.messages.ExpectedSocketClosureMessage impo
 )
 from com.ankamagames.jerakine.network.messages.Worker import Worker
 from com.ankamagames.jerakine.types.enums.Priority import Priority
-from pyd2bot.events.BotEventsManager import BotEventsManager
 
 logger = Logger(__name__)
 
@@ -95,8 +94,7 @@ class ServerSelectionFrame(Frame):
             self._serversList = slmsg.servers
             self._serversList.sort(key=lambda x: x.date)
             self.broadcastServersListUpdate()
-            BotEventsManager().dispatch(BotEventsManager.SERVER_SELECTION)
-            return True
+            return False
 
         elif isinstance(msg, ServerStatusUpdateMessage):
             ssumsg = msg
@@ -193,7 +191,6 @@ class ServerSelectionFrame(Frame):
             logger.debug(
                 f"Connection to game server using ports : {self._connexionPorts}"
             )
-            BotEventsManager().dispatch(BotEventsManager.SERVER_SELECTED)
             return True
 
         return False

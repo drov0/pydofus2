@@ -1,8 +1,6 @@
 import json
 import os
 from pathlib import Path
-from Cryptodome.PublicKey import RSA
-from Cryptodome.Cipher import PKCS1_OAEP
 from com.ankamagames.jerakine.network.CustomDataWrapper import ByteArray
 
 CURRDIR = Path(__file__).parent

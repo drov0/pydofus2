@@ -8,7 +8,8 @@ from com.ankamagames.dofus.kernel.Kernel import Kernel
 from com.ankamagames.dofus.logic.game.common.managers.PlayedCharacterManager import (
     PlayedCharacterManager,
 )
-import com.ankamagames.dofus.logic.game.roleplay.frames.RoleplayEntitiesFrame as rplEF
+import com.ankamagames.dofus.logic.game.roleplay.frames.RoleplayEntitiesFrame as ref
+import com.ankamagames.dofus.logic.game.roleplay.frames.RoleplayInteractivesFrame as rif
 from com.ankamagames.dofus.logic.game.roleplay.frames.RoleplayMovementFrame import (
     RoleplayMovementFrame,
 )
@@ -58,13 +59,14 @@ class RoleplayContextFrame(Frame):
         self._newCurrentMapIsReceived = value
 
     @property
-    def entitiesFrame(self) -> rplEF.RoleplayEntitiesFrame:
+    def entitiesFrame(self) -> ref.RoleplayEntitiesFrame:
         return self._roleplayEntitiesFrame
 
     def pushed(self) -> bool:
         self._movementFrame = RoleplayMovementFrame()
         self._worldFrame = rplWF.RoleplayWorldFrame()
-        self._roleplayEntitiesFrame = rplEF.RoleplayEntitiesFrame()
+        self._roleplayEntitiesFrame = ref.RoleplayEntitiesFrame()
+        self._interactivesFrame = rif.RoleplayInteractivesFrame()
         return True
 
     def process(self, msg: Message) -> bool:
@@ -96,11 +98,13 @@ class RoleplayContextFrame(Frame):
             return True
 
         elif isinstance(msg, MapLoadedMessage):
-            if not Kernel().getWorker().contains(rplEF.RoleplayEntitiesFrame):
+            if not Kernel().getWorker().contains("RoleplayEntitiesFrame"):
                 Kernel().getWorker().addFrame(self._roleplayEntitiesFrame)
-            if not Kernel().getWorker().contains(RoleplayMovementFrame):
+            if not Kernel().getWorker().contains("RoleplayInteractivesFrame"):
+                Kernel().getWorker().addFrame(self._interactivesFrame)
+            if not Kernel().getWorker().contains("RoleplayMovementFrame"):
                 Kernel().getWorker().addFrame(self._movementFrame)
-            if not Kernel().getWorker().contains(rplWF.RoleplayWorldFrame):
+            if not Kernel().getWorker().contains("RoleplayWorldFrame"):
                 Kernel().getWorker().addFrame(self._worldFrame)
             return False
 

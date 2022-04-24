@@ -43,7 +43,7 @@ class Skill(IDataCenter):
 
     clientDisplay: bool
 
-    _name: str
+    _name: str = None
 
     _parentJob: Job
 
@@ -66,7 +66,7 @@ class Skill(IDataCenter):
 
     @property
     def name(self) -> str:
-        if not self._name:
+        if self._name is None:
             self._name = I18n.getText(self.nameId)
         return self._name
 

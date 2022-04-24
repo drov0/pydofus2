@@ -1,11 +1,13 @@
+from com.ankamagames.atouin.data.map.Layer import Layer
 from com.ankamagames.atouin.managers.MapDisplayManager import MapDisplayManager
 from com.ankamagames.atouin.utils.DataMapProvider import DataMapProvider
 from com.ankamagames.dofus.types.entities.AnimatedCharacter import AnimatedCharacter
 from com.ankamagames.jerakine.types.positions.MapPoint import MapPoint
 
-currMapId = 190054912
+currMapId = 190582787
 MapDisplayManager().loadMap(currMapId)
-DataMapProvider.init(AnimatedCharacter)
-mp = MapPoint.fromCellId(15)
-print(DataMapProvider().pointMov(mp.x, mp.y))
-print(DataMapProvider().pointWeight(mp.x, mp.y))
+r: MapPoint = MapDisplayManager().getIdentifiedElementPosition(513809)
+print(r)
+
+r = MapPoint.fromCellId(112)
+print(r)

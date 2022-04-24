@@ -162,7 +162,7 @@ class PlayedCharacterUpdatesFrame(Frame):
 
     @property
     def roleplayContextFrame(self) -> rplCF.RoleplayContextFrame:
-        return krnl.Kernel().getWorker().getFrame(rplCF.RoleplayContextFrame)
+        return krnl.Kernel().getWorker().getFrame("RoleplayContextFrame")
 
     @property
     def kamasLimit(self) -> float:
@@ -179,7 +179,9 @@ class PlayedCharacterUpdatesFrame(Frame):
             scrmsg = msg
             if scrmsg.actorId == pcm.PlayedCharacterManager().id:
                 pcm.PlayedCharacterManager().restrictions = scrmsg.restrictions
-            rpEntitiesFrame = krnl.Kernel().getWorker().getFrame(RoleplayEntitiesFrame)
+            rpEntitiesFrame = (
+                krnl.Kernel().getWorker().getFrame("RoleplayEntitiesFrame")
+            )
             if rpEntitiesFrame:
                 infos = rpEntitiesFrame.getEntityInfos(scrmsg.actorId)
                 if infos and infos.humanoidInfo:
@@ -195,7 +197,7 @@ class PlayedCharacterUpdatesFrame(Frame):
 
         if isinstance(msg, CharacterStatsListMessage):
             # cslmsg = msg
-            # fightBattleFrame = krnl.Kernel().getWorker().getFrame(FightBattleFrame)
+            # fightBattleFrame = krnl.Kernel().getWorker().getFrame("FightBattleFrame")
             # if fightBattleFrame is not None and fightBattleFrame.executingSequence:
             #    fightBattleFrame.delayCharacterStatsList(cslmsg)
             # else:
@@ -204,8 +206,8 @@ class PlayedCharacterUpdatesFrame(Frame):
             #    playerInfos = self.roleplayContextFrame.entitiesFrame.getEntityInfos(pcm.PlayedCharacterManager().id)
             #    if playerInfos:
             #       playerInfos.alignmentInfos = cslmsg.stats.alignmentInfos
-            # if krnl.Kernel().getWorker().getFrame(QuestFrame).achievmentsListProcessed == False:
-            #    krnl.Kernel().getWorker().getFrame(QuestFrame)
+            # if krnl.Kernel().getWorker().getFrame("QuestFrame").achievmentsListProcessed == False:
+            #    krnl.Kernel().getWorker().getFrame("QuestFrame")
             return True
 
         if isinstance(msg, MapComplementaryInformationsDataMessage):
@@ -233,7 +235,7 @@ class PlayedCharacterUpdatesFrame(Frame):
             #       prism = PrismSubAreaWrapper.prismList[newSubArea.id]
             #       if prism.state == PrismStateEnum.PRISM_STATE_VULNERABLE:
             #          if krnl.Kernel().getWorker().contains(AllianceFrame):
-            #             allianceFrame = krnl.Kernel().getWorker().getFrame(AllianceFrame)
+            #             allianceFrame = krnl.Kernel().getWorker().getFrame("AllianceFrame")
 
             return False
 
@@ -365,7 +367,7 @@ class PlayedCharacterUpdatesFrame(Frame):
             # name = "flag_srv" + crmsg.type
 
             # if crmsg.type  == CompassTypeEnum.COMPASS_TYPE_SPOUSE:
-            #    socialFrame = krnl.Kernel().getWorker().getFrame(SocialFrame)
+            #    socialFrame = krnl.Kernel().getWorker().getFrame("SocialFrame")
             #    socialFrame.spouse.followSpouse = False
 
             # if crmsg.type  == CompassTypeEnum.COMPASS_TYPE_PARTY:
@@ -392,7 +394,7 @@ class PlayedCharacterUpdatesFrame(Frame):
                         pass
                     pcm.PlayedCharacterManager().followingPlayerIds = []
                 else:
-                    pmFrame = krnl.Kernel().getWorker().getFrame(PartyManagementFrame)
+                    pmFrame = krnl.Kernel().getWorker().getFrame("PartyManagementFrame")
                     if pmFrame:
                         memberInfo = pmFrame.getGroupMemberById(memberId)
                         if memberInfo:
@@ -423,7 +425,7 @@ class PlayedCharacterUpdatesFrame(Frame):
                 legend = cumsg.coords.worldX + "," + cumsg.coords.worldY
 
             if cumsg.type == CompassTypeEnum.COMPASS_TYPE_SPOUSE:
-                socialFrame2 = krnl.Kernel().getWorker().getFrame(SocialFrame)
+                socialFrame2 = krnl.Kernel().getWorker().getFrame("SocialFrame")
                 socialFrame2.spouse.followSpouse = True
             return True
 
@@ -601,7 +603,9 @@ class PlayedCharacterUpdatesFrame(Frame):
         if pcm.PlayedCharacterManager().isFighting:
             if CurrentPlayedFighterManager().isRealPlayer():
                 pass
-            spellWrapper.SpellWrapper.refreshAllPlayerSpellHolder(pcm.PlayedCharacterManager().id)
+            spellWrapper.SpellWrapper.refreshAllPlayerSpellHolder(
+                pcm.PlayedCharacterManager().id
+            )
         else:
             pass
 

@@ -104,7 +104,7 @@ class AuthentificationFrame(Frame):
                 iMsg, IdentificationAccountForceMessage
             )
             # Plogger.info(f"Current version : {iMsg.version.major}.{iMsg.version.minor}.{iMsg.version.code}.{iMsg.version.build}")
-            dhf = krnl.Kernel().getWorker().getFrame(DisconnectionHandlerFrame)
+            dhf = krnl.Kernel().getWorker().getFrame("DisconnectionHandlerFrame")
             time = perf_counter()
             elapsedTimesSinceConnectionFail = list[int]()
             failureTimes = StoreDataManager().getData(

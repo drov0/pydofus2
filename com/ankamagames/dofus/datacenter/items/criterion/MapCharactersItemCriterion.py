@@ -27,7 +27,7 @@ class MapCharactersItemCriterion(ItemCriterion, IDataCenter):
         entitiesInfos: dict = None
         actorInfo: GameContextActorInformations = None
         entitiesFrame: RoleplayEntitiesFrame = (
-            Kernel().getWorker().getFrame(RoleplayEntitiesFrame)
+            Kernel().getWorker().getFrame("RoleplayEntitiesFrame")
         )
         if entitiesFrame:
             entitiesInfos = entitiesFrame.entities

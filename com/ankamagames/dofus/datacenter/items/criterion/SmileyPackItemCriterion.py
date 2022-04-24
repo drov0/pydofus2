@@ -5,7 +5,7 @@ class SmileyPackItemCriterion(ItemCriterion, IDataCenter):
     @property
     def isRespected(self) -> bool:
         pack: SmileyPack = None
-        packList: list = Kernel().getWorker().getFrame(ChatFrame)
+        packList: list = Kernel().getWorker().getFrame("ChatFrame")
         for pack in packList:
             if pack.id == _criterionValue:
                 return False
@@ -30,7 +30,7 @@ class SmileyPackItemCriterion(ItemCriterion, IDataCenter):
 
     def getCriterion(self) -> int:
         pack: SmileyPack = None
-        packList: list = Kernel().getWorker().getFrame(ChatFrame)
+        packList: list = Kernel().getWorker().getFrame("ChatFrame")
         for pack in packList:
             if pack.id == _criterionValue:
                 return 1

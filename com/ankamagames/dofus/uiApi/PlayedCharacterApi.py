@@ -147,7 +147,7 @@ class PlayedCharacterApi(IApi, metaclass=Singleton):
 
     def getSpells(self, returnBreedSpells: bool) -> list:
         spim: SpellInventoryManagementFrame = (
-            Kernel().getWorker().getFrame(SpellInventoryManagementFrame)
+            Kernel().getWorker().getFrame("SpellInventoryManagementFrame")
         )
         if returnBreedSpells:
             return spim.getBreedSpellsInVariantslist()
@@ -214,7 +214,7 @@ class PlayedCharacterApi(IApi, metaclass=Singleton):
         playerInfo: GameRolePlayCharacterInformations = None
         option = None
         title2: Title = None
-        titleId: int = Kernel().getWorker().getFrame(TinselFrame).currentTitle
+        titleId: int = Kernel().getWorker().getFrame("TinselFrame").currentTitle
         if titleId:
             return Title.getTitleById(titleId)
         playerInfo = self.getEntityInfos()
@@ -227,26 +227,27 @@ class PlayedCharacterApi(IApi, metaclass=Singleton):
 
     def getOrnament(self) -> Ornament:
         ornament: Ornament = None
-        ornamentId: int = Kernel().getWorker().getFrame(TinselFrame).currentOrnament
+        ornamentId: int = Kernel().getWorker().getFrame("TinselFrame").currentOrnament
         if ornamentId:
             return Ornament.getOrnamentById(ornamentId)
         return None
 
     def getKnownTitles(self) -> list[int]:
-        return Kernel().getWorker().getFrame(TinselFrame).knownTitles
+        return Kernel().getWorker().getFrame("TinselFrame").knownTitles
 
     def getKnownOrnaments(self) -> list[int]:
-        return Kernel().getWorker().getFrame(TinselFrame).knownOrnaments
+        return Kernel().getWorker().getFrame("TinselFrame").knownOrnaments
 
     def titlesOrnamentsAskedBefore(self) -> bool:
-        return Kernel().getWorker().getFrame(TinselFrame).titlesOrnamentsAskedBefore
+        return Kernel().getWorker().getFrame("TinselFrame").titlesOrnamentsAskedBefore
 
     def getEntityInfos(self) -> GameRolePlayCharacterInformations:
         import com.ankamagames.dofus.logic.game.fight.frames.FightEntitiesFrame as fightEntitiesFrame
+
         entitiesFrame: AbstractEntitiesFrame = None
         if self.isInFight():
-            entitiesFrame = Kernel().getFrame(fightEntitiesFrame.FightEntitiesFrame)
-            entitiesFrame = Kernel().getFrame(RoleplayEntitiesFrame)
+            entitiesFrame = Kernel().getFrame("FightEntitiesFrame")
+            entitiesFrame = Kernel().getFrame("RoleplayEntitiesFrame")
         if not entitiesFrame:
             return None
         return entitiesFrame.getEntityInfos(PlayedCharacterManager().id)
@@ -259,7 +260,7 @@ class PlayedCharacterApi(IApi, metaclass=Singleton):
 
     def getKamasMaxLimit(self) -> float:
         playedCharacterFrame: pcuF.PlayedCharacterUpdatesFrame = (
-            Kernel().getWorker().getFrame(pcuF.PlayedCharacterUpdatesFrame)
+            Kernel().getWorker().getFrame("PlayedCharacterUpdatesFrame")
         )
         if playedCharacterFrame:
             return playedCharacterFrame.kamasLimit
@@ -294,11 +295,11 @@ class PlayedCharacterApi(IApi, metaclass=Singleton):
             FightContextFrame,
         )
 
-        return Kernel().getWorker().getFrame(FightContextFrame) != None
+        return Kernel().getWorker().getFrame("FightContextFrame") != None
 
     def isInPreFight(self) -> bool:
         return Kernel().getWorker().contains(
-            FightPreparationFrame
+            'FightPreparationFrame'
         ) or Kernel().getWorker().isBeingAdded(FightPreparationFrame)
 
     def isSpectator(self) -> bool:
@@ -326,7 +327,9 @@ class PlayedCharacterApi(IApi, metaclass=Singleton):
         return PlayedCharacterManager().restrictions
 
     def isMutant(self) -> bool:
-        rcf: RoleplayContextFrame = Kernel().getWorker().getFrame(RoleplayContextFrame)
+        rcf: RoleplayContextFrame = (
+            Kernel().getWorker().getFrame("RoleplayContextFrame")
+        )
         infos: GameRolePlayActorInformations = rcf.entitiesFrame.getEntityInfos(
             PlayedCharacterManager().id
         )
@@ -411,7 +414,7 @@ class PlayedCharacterApi(IApi, metaclass=Singleton):
         return PlayedCharacterManager().isInHisHouse
 
     def getPlayerHouses(self) -> list[HouseWrapper]:
-        return Kernel().getWorker().getFrame(HouseFrame).accountHouses
+        return Kernel().getWorker().getFrame("HouseFrame").accountHouses
 
     def currentMap(self) -> WorldPointWrapper:
         return PlayedCharacterManager().currentMap
@@ -446,7 +449,7 @@ class PlayedCharacterApi(IApi, metaclass=Singleton):
 
     def getPlayerSet(self, objectGID: int) -> PlayerSetInfo:
         return pcuF.PlayedCharacterUpdatesFrame(
-            Kernel().getWorker().getFrame(pcuF.PlayedCharacterUpdatesFrame)
+            Kernel().getWorker().getFrame("PlayedCharacterUpdatesFrame")
         ).getPlayerSet(objectGID)
 
     def getWeapon(self) -> WeaponWrapper:
@@ -492,7 +495,7 @@ class PlayedCharacterApi(IApi, metaclass=Singleton):
         return PlayedCharacterManager().isInHavenbag
 
     def havenbagSharePermissions(self) -> int:
-        hbFrame: HavenbagFrame = Kernel().getWorker().getFrame(HavenbagFrame)
+        hbFrame: HavenbagFrame = Kernel().getWorker().getFrame("HavenbagFrame")
         return hbFrame.sharePermissions
 
     def isInBreach(self) -> bool:

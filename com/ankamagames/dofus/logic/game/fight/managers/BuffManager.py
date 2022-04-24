@@ -242,7 +242,7 @@ class BuffManager(metaclass=Singleton):
         self, targetId: float, currentTurnIsEnding: bool = True
     ) -> None:
         fightBattleFrame: fightBattleFrame.FightBattleFrame = (
-            Kernel().getWorker().getFrame(fightBattleFrame.FightBattleFrame)
+            Kernel().getWorker().getFrame("FightBattleFrame")
         )
         fightersCount = len(fightBattleFrame.fighters)
         if fightBattleFrame is None:
@@ -529,11 +529,9 @@ class BuffManager(metaclass=Singleton):
         self, sourceId: float, forceUndispellable: bool = False, dying: bool = False
     ) -> list:
         impactedTarget: list = []
-        entitiesFrame = (
-            Kernel().getWorker().getFrame(fightEntitiesFrame.FightEntitiesFrame)
-        )
+        entitiesFrame = Kernel().getWorker().getFrame("FightEntitiesFrame")
         fightBattleFrame: fightBattleFrame.FightBattleFrame = (
-            Kernel().getWorker().getFrame(fightBattleFrame.FightBattleFrame)
+            Kernel().getWorker().getFrame("FightBattleFrame")
         )
         infos: GameFightFighterInformations = entitiesFrame.getEntityInfos(sourceId)
         if GameDebugManager().buffsDebugActivated:
@@ -583,7 +581,7 @@ class BuffManager(metaclass=Singleton):
                     + ", le nouveau 'lanceur' sera "
                     + next
                 )
-            frame = Kernel().getWorker().getFrame(fightBattleFrame.FightBattleFrame)
+            frame = Kernel().getWorker().getFrame("FightBattleFrame")
             dontDecrementBuffThisTurn = False
             if frame.currentPlayerId == sourceId:
                 dontDecrementBuffThisTurn = True
@@ -601,7 +599,7 @@ class BuffManager(metaclass=Singleton):
 
     def getNextFighter(self, sourceId: float) -> float:
         frame: fightBattleFrame.FightBattleFrame = (
-            Kernel().getWorker().getFrame(fightBattleFrame.FightBattleFrame)
+            Kernel().getWorker().getFrame("FightBattleFrame")
         )
         if frame is None:
             return 0
@@ -652,7 +650,7 @@ class BuffManager(metaclass=Singleton):
 
     @property
     def fightEntitiesFrame(self) -> fightEntitiesFrame.FightEntitiesFrame:
-        return Kernel().getWorker().getFrame(fightEntitiesFrame.FightEntitiesFrame)
+        return Kernel().getWorker().getFrame("FightEntitiesFrame")
 
     def getBuffIndex(self, targetId: float, buffId: int) -> int:
         for i in self._buffs[targetId]:

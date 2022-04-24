@@ -28,6 +28,6 @@ class ArenaMaxSoloRankCriterion(IItemCriterion, IDataCenter):
 
     def getCriterion(self) -> int:
         frame: PartyManagementFrame = (
-            Kernel().getWorker().getFrame(PartyManagementFrame)
+            Kernel().getWorker().getFrame("PartyManagementFrame")
         )
         return int(frame.arenaRankSoloInfos.maxRank)

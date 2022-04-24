@@ -144,9 +144,9 @@ class ConnectionsHandler:
 
     @classmethod
     def closeConnection(cls) -> None:
-        if krnl.Kernel().getWorker().contains(HandshakeFrame):
+        if krnl.Kernel().getWorker().contains("HandshakeFrame"):
             krnl.Kernel().getWorker().removeFrame(
-                krnl.Kernel().getWorker().getFrame(HandshakeFrame)
+                krnl.Kernel().getWorker().getFrame("HandshakeFrame")
             )
         if cls._currentConnection and cls._currentConnection.connected:
             cls._currentConnection.close()

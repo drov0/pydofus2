@@ -12,7 +12,7 @@ class GuildItemCriterion(ItemCriterion, IDataCenter):
         return GuildItemCriterion(self.basicText)
 
     def getCriterion(self) -> int:
-        guild: GuildWrapper = Kernel().getWorker().getFrame(SocialFrame)
+        guild: GuildWrapper = Kernel().getWorker().getFrame("SocialFrame")
         if guild:
             return 1
         return 0

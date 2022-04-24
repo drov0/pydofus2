@@ -1,19 +1,16 @@
-from com.ankamagames.atouin.managers.InteractiveCellManager import (
-    InteractiveCellManager,
-)
+# from com.ankamagames.atouin.managers.InteractiveCellManager import (
+#     InteractiveCellManager,
+# )
+from lib2to3.pgen2.grammar import opmap
 from com.ankamagames.atouin.managers.MapDisplayManager import MapDisplayManager
+from com.ankamagames.berilia.enums.StatesEnum import StatesEnum
 from com.ankamagames.dofus.datacenter.interactives.Interactive import Interactive
 from com.ankamagames.dofus.datacenter.jobs.Skill import Skill
 from com.ankamagames.dofus.kernel.Kernel import Kernel
 from com.ankamagames.dofus.logic.game.common.managers.PlayedCharacterManager import (
     PlayedCharacterManager,
 )
-from com.ankamagames.dofus.logic.game.roleplay.frames.RoleplayContextFrame import (
-    RoleplayContextFrame,
-)
-from com.ankamagames.dofus.logic.game.roleplay.frames.RoleplayEntitiesFrame import (
-    RoleplayEntitiesFrame,
-)
+import com.ankamagames.dofus.logic.game.roleplay.frames.RoleplayEntitiesFrame as rpeF
 from com.ankamagames.dofus.logic.game.roleplay.frames.RoleplayWorldFrame import (
     RoleplayWorldFrame,
 )
@@ -53,7 +50,9 @@ from com.ankamagames.dofus.network.messages.game.interactive.StatedMapUpdateMess
 from com.ankamagames.dofus.network.types.game.interactive.InteractiveElement import (
     InteractiveElement,
 )
-from com.ankamagames.dofus.network.types.game.interactive.MapObstacle import MapObstacle
+from com.ankamagames.dofus.network.types.game.interactive.InteractiveElementSkill import (
+    InteractiveElementSkill,
+)
 from com.ankamagames.dofus.network.types.game.interactive.StatedElement import (
     StatedElement,
 )
@@ -61,9 +60,10 @@ from com.ankamagames.jerakine.benchmark.BenchmarkTimer import BenchmarkTimer
 from com.ankamagames.jerakine.logger.Logger import Logger
 from com.ankamagames.jerakine.messages.Frame import Frame
 from com.ankamagames.jerakine.messages.Message import Message
-from com.ankamagames.jerakine.types.Object import Object
 from com.ankamagames.jerakine.types.enums.Priority import Priority
 from com.ankamagames.jerakine.types.positions.MapPoint import MapPoint
+
+logger = Logger(__name__)
 
 
 class InteractiveElementData:
@@ -113,7 +113,7 @@ class RoleplayInteractivesFrame(Frame):
 
     _usingInteractive: bool = False
 
-    _nextInteractiveUsed: object
+    _nextInteractiveUsed: object = None
 
     _interactiveActionTimers: dict
 
@@ -129,10 +129,13 @@ class RoleplayInteractivesFrame(Frame):
 
     _mouseDown: bool
 
+    _collectableIe = dict[int, dict]()
+
     dirmov: int = 666
 
     def __init__(self):
-        self._ie = dict[int, InteractiveElementData]
+        self._ie = dict[int, InteractiveElementData]()
+        self._collectableIe = dict[int, dict]()
         self._currentUsages = list()
         self._entities = dict()
         self._interactiveActionTimers = dict()
@@ -145,12 +148,8 @@ class RoleplayInteractivesFrame(Frame):
         return Priority.HIGH
 
     @property
-    def roleplayContextFrame(self) -> RoleplayContextFrame:
-        return Kernel().getWorker().getFrame(RoleplayContextFrame)
-
-    @property
     def roleplayWorldFrame(self) -> RoleplayWorldFrame:
-        return Kernel().getWorker().getFrame(RoleplayWorldFrame)
+        return Kernel().getWorker().getFrame("RoleplayWorldFrame")
 
     @property
     def currentRequestedElementId(self) -> int:
@@ -185,9 +184,9 @@ class RoleplayInteractivesFrame(Frame):
             imumsg = msg
             self.clear()
             for ie in imumsg.interactiveElements:
-                if len(ie.enabledSkills):
+                if ie.enabledSkills:
                     self.registerInteractive(ie, ie.enabledSkills[0].skillId)
-                elif len(ie.disabledSkills):
+                elif ie.disabledSkills:
                     self.registerInteractive(ie, ie.disabledSkills[0].skillId)
             return True
 
@@ -220,6 +219,7 @@ class RoleplayInteractivesFrame(Frame):
                     if rwf:
                         rwf.cellClickEnabled = False
                 self._entities[iumsg.elemId] = iumsg.entityId
+                logger.debug("added elem id %d to intities", iumsg.elemId)
             return False
 
         if isinstance(msg, InteractiveUseErrorMessage):
@@ -250,11 +250,13 @@ class RoleplayInteractivesFrame(Frame):
             return True
 
         if isinstance(msg, InteractiveUseEndedMessage):
-            iuemsg = InteractiveUseEndedMessage(msg)
+            logger.debug("InteractiveUseEndedMessage for %d", msg.elemId)
+            iuemsg = msg
             self.interactiveUsageFinished(
                 self._entities[iuemsg.elemId], iuemsg.elemId, iuemsg.skillId
             )
             del self._entities[iuemsg.elemId]
+            del self._collectableIe[iuemsg.elemId]
             return False
 
         if isinstance(msg, GameContextDestroyMessage):
@@ -264,7 +266,7 @@ class RoleplayInteractivesFrame(Frame):
 
     def pulled(self) -> bool:
         self._entities = dict()
-        self._ie = dict[int, InteractiveElementData]
+        self._ie = dict[int, InteractiveElementData]()
         self._modContextMenu = None
         self._currentUsages = list()
         self._nextInteractiveUsed = None
@@ -275,18 +277,16 @@ class RoleplayInteractivesFrame(Frame):
         self._enableWorldInteraction = pEnable
 
     def clear(self) -> None:
-        timeout: int = 0
-        ieObj = None
         for timeout in self._currentUsages:
             clearTimeout(timeout)
-        for ieObj in self._ie:
-            self.removeInteractive(self._ie[ieObj].element)
+        self._ie.clear()
 
     def getInteractiveElementsCells(self) -> list[int]:
-        cells: list[int] = list[int]()
-        for cellObj in self._ie.values():
-            if cellObj is not None:
-                cells.append(cellObj.position.cellId)
+        cells = [
+            cellObj.position.cellId
+            for cellObj in self._ie.values()
+            if cellObj is not None
+        ]
         return cells
 
     def getInteractiveActionTimer(self, pUser) -> BenchmarkTimer:
@@ -296,8 +296,8 @@ class RoleplayInteractivesFrame(Frame):
         return self._ie.get(elementId)
 
     def registerInteractive(self, ie: InteractiveElement, firstSkill: int) -> None:
-        entitiesFrame: RoleplayEntitiesFrame = (
-            Kernel().getWorker().getFrame(RoleplayEntitiesFrame)
+        entitiesFrame: rpeF.RoleplayEntitiesFrame = (
+            Kernel().getWorker().getFrame("RoleplayEntitiesFrame")
         )
         if entitiesFrame:
             found = False
@@ -316,8 +316,53 @@ class RoleplayInteractivesFrame(Frame):
         del self._ie[ie.elementId]
 
     def updateStatedElement(self, se: StatedElement, globalv: bool = False) -> None:
-        if se.elementId == self._currentUsedElementId:
-            self._usingInteractive = True
+        if se.onCurrentMap:
+            enabled = False 
+            if se.elementId == self._currentUsedElementId:
+                self._usingInteractive = True
+            if (
+                self._ie[se.elementId]
+                and self._ie[se.elementId].element
+                and self._ie[se.elementId].element.elementId == se.elementId
+            ):
+                interactive = Interactive.getInteractiveById(
+                    self._ie[se.elementId].element.elementTypeId
+                )
+                if interactive:
+                    isCollectable = False
+                    for interactiveSkill in self._ie[
+                        se.elementId
+                    ].element.enabledSkills:
+                        skill = Skill.getSkillById(interactiveSkill.skillId)
+                        if skill.elementActionId == self.ACTION_COLLECTABLE_RESOURCES:
+                            isCollectable = True
+                            enabled = True
+                            break
+
+                    if not isCollectable:
+                        for interactiveSkill in self._ie[
+                            se.elementId
+                        ].element.disabledSkills:
+                            skill = Skill.getSkillById(interactiveSkill.skillId)
+                            if (
+                                skill.elementActionId
+                                == self.ACTION_COLLECTABLE_RESOURCES
+                            ):
+                                isCollectable = True
+                                break
+                    if isCollectable:
+                        self._collectableIe[
+                            self._ie[se.elementId].element.elementId
+                        ] = {"state": se.elementState, "skill": interactiveSkill, 'enabled': enabled}
+
+    def canBeCollected(self, elementId: int) -> InteractiveElementSkill:
+        if (
+            elementId in self._collectableIe
+            and self._collectableIe[elementId]["state"] == StatesEnum.STATE_NORMAL
+            and self._collectableIe[elementId]["enabled"]
+        ):
+            return self._collectableIe[elementId]["skill"]
+        return None
 
     def skillClicked(self, ie: InteractiveElementData, skillInstanceId: int) -> None:
         msg: InteractiveElementActivationMessage = InteractiveElementActivationMessage(
@@ -329,7 +374,6 @@ class RoleplayInteractivesFrame(Frame):
         self, entityId: float, elementId: int, skillId: int
     ) -> None:
         if entityId == PlayedCharacterManager().id:
-            Kernel().getWorker().process(ChangeWorldInteractionAction.create(True))
             if self.roleplayWorldFrame:
                 self.roleplayWorldFrame.cellClickEnabled = True
             self._usingInteractive = False

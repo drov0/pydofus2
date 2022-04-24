@@ -162,7 +162,7 @@ class FightEventsHelper:
         self.sendFightEvent(None, None, 0, -1)
         self.sendAllFightEvents()
         entitiesFrame: fightEntitiesFrame.FightEntitiesFrame = (
-            Kernel().getWorker().getFrame(fightEntitiesFrame.FightEntitiesFrame)
+            Kernel().getWorker().getFrame("FightEntitiesFrame")
         )
         entitiesList: dict = entitiesFrame.entities if entitiesFrame else dict()
         self.groupAllEventsForDisplay(entitiesList)

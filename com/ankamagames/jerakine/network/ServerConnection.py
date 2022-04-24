@@ -39,13 +39,13 @@ logger = Logger(__name__)
 
 class ServerConnection(IServerConnection):
 
-    DEBUG_VERBOSE: bool = False
+    DEBUG_VERBOSE: bool = True
 
     LOG_ENCODED_CLIENT_MESSAGES: bool = False
 
     DEBUG_LOW_LEVEL_VERBOSE: bool = False
 
-    DEBUG_DATA: bool = False
+    DEBUG_DATA: bool = True
 
     LATENCY_AVG_BUFFER_SIZE: int = 50
 

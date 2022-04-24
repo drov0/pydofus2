@@ -152,7 +152,10 @@ class StorageGenericView(IStorageView):
         self, a: ItemWrapper, b: ItemWrapper, sortDepth: int = 0
     ) -> int:
         returnValue: int = 0
-        if self._sortFieldsCache[sortDepth] == storageoptmgr.StorageOptionManager.SORT_FIELD_NAME:
+        if (
+            self._sortFieldsCache[sortDepth]
+            == storageoptmgr.StorageOptionManager.SORT_FIELD_NAME
+        ):
             if not self._sortRevertCache:
                 returnValue = (
                     1
@@ -165,7 +168,10 @@ class StorageGenericView(IStorageView):
                     if a.nameWithoutAccent < b.nameWithoutAccent
                     else (-1 if a.nameWithoutAccent > b.nameWithoutAccent else 0)
                 )
-        if self._sortFieldsCache[sortDepth] == storageoptmgr.StorageOptionManager.SORT_FIELD_WEIGHT:
+        if (
+            self._sortFieldsCache[sortDepth]
+            == storageoptmgr.StorageOptionManager.SORT_FIELD_WEIGHT
+        ):
             if not self._sortRevertCache:
                 returnValue = (
                     1 if a.weight < b.weight else (-1 if a.weight > b.weight else 0)
@@ -190,7 +196,10 @@ class StorageGenericView(IStorageView):
                     if a.weight * a.quantity > b.weight * b.quantity
                     else (-1 if a.weight * a.quantity < b.weight * b.quantity else 0)
                 )
-        if self._sortFieldsCache[sortDepth] == storageoptmgr.StorageOptionManager.SORT_FIELD_QUANTITY:
+        if (
+            self._sortFieldsCache[sortDepth]
+            == storageoptmgr.StorageOptionManager.SORT_FIELD_QUANTITY
+        ):
             if not self._sortRevertCache:
                 returnValue = (
                     1
@@ -203,7 +212,10 @@ class StorageGenericView(IStorageView):
                     if a.quantity > b.quantity
                     else (-1 if a.quantity < b.quantity else 0)
                 )
-        if self._sortFieldsCache[sortDepth] == storageoptmgr.StorageOptionManager.SORT_FIELD_DEFAULT:
+        if (
+            self._sortFieldsCache[sortDepth]
+            == storageoptmgr.StorageOptionManager.SORT_FIELD_DEFAULT
+        ):
             if not self._sortRevertCache:
                 returnValue = (
                     1
@@ -272,7 +284,10 @@ class StorageGenericView(IStorageView):
                         else 0
                     )
                 )
-        if self._sortFieldsCache[sortDepth] == storageoptmgr.StorageOptionManager.SORT_FIELD_LEVEL:
+        if (
+            self._sortFieldsCache[sortDepth]
+            == storageoptmgr.StorageOptionManager.SORT_FIELD_LEVEL
+        ):
             if not self._sortRevertCache:
                 returnValue = (
                     1 if a.level < b.level else (-1 if a.level > b.level else 0)
@@ -307,7 +322,7 @@ class StorageGenericView(IStorageView):
 
     def getItemAveragePrice(self, pItemGID: int) -> float:
         avgPricesFrame: AveragePricesFrame = (
-            Kernel().getWorker().getFrame(AveragePricesFrame)
+            Kernel().getWorker().getFrame("AveragePricesFrame")
         )
         return (
             float(avgPricesFrame.pricesData.items[pItemGID])
@@ -328,7 +343,10 @@ class StorageGenericView(IStorageView):
         else:
             sameSort = False
         self._sortFieldsCache = self.sortFields()
-        if self._sortFieldsCache[0] != storageoptmgr.StorageOptionManager.SORT_FIELD_NONE:
+        if (
+            self._sortFieldsCache[0]
+            != storageoptmgr.StorageOptionManager.SORT_FIELD_NONE
+        ):
             if not sameSort:
                 self._sortRevertCache = self.sortRevert()
             elif storageoptmgr.StorageOptionManager().newSort:

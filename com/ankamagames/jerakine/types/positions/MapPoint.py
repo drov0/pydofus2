@@ -1,7 +1,9 @@
 import math
+from com.ankamagames.jerakine.logger.Logger import Logger
 from com.ankamagames.jerakine.map.IDataMapProvider import IDataMapProvider
-
 from com.ankamagames.jerakine.types.enums.DirectionsEnum import DirectionsEnum
+
+logger = Logger(__name__)
 
 
 class Point:
@@ -133,10 +135,10 @@ class MapPoint:
         return Point(self._nX, self._nY)
 
     def distanceTo(self, mp: "MapPoint") -> int:
-        return math.sqrt((self.y - mp.y) ** 2 + (self.y - mp.y) ** 2)
+        return math.sqrt((self.x - mp.x) ** 2 + (self.y - mp.y) ** 2)
 
     def distanceToCell(self, mp: "MapPoint"):
-        return abs(self.y - mp.y) + abs(self.y - mp.y)
+        return abs(self.x - mp.x) + abs(self.y - mp.y)
 
     def orientationTo(self, mp: "MapPoint") -> DirectionsEnum:
         if self._nX == mp._nX and self._nY == mp._nY:
@@ -170,24 +172,27 @@ class MapPoint:
             nb = DirectionsEnum.UP_RIGHT
         return nb
 
-    def advancedOrientationTo(self, mp: "MapPoint", b: bool) -> int:
-        if mp == None:
+    def advancedOrientationTo(self, target: "MapPoint", fourDir: bool = True) -> int:
+        if target is None:
             return 0
-        i1 = mp.x - self.x
-        i2 = self.y - mp.y
-        i3 = (
-            math.acos(i1 / math.sqrt(math.pow(i1, 2) + math.pow(i2, 2)))
+        xDiff = target.x - self.x
+        yDiff = self.y - target.y
+        dist = math.sqrt(math.pow(xDiff, 2) + math.pow(yDiff, 2))
+        if dist == 0:
+            return 0
+        angle = (
+            math.acos(xDiff / dist)
             * 180
             / math.pi
-            * (-1 if mp.y > self.y else 1)
+            * (-1 if target.y > self.y else 1)
         )
-        if b:
-            i3 = round(i3 / 90) * 2 + 1
+        if fourDir:
+            angle = round(angle / 90) * 2 + 1
         else:
-            i3 = round(i3 / 45) + 1
-        if i3 < 0:
-            i3 += 8
-        return i3
+            angle = round(angle / 45) + 1
+        if angle < 0:
+            angle += 8
+        return angle
 
     def pointSymetry(self, mp: "MapPoint") -> "MapPoint":
         i1 = 2 * mp.x - self.x
@@ -209,21 +214,21 @@ class MapPoint:
     def getNearestCellInDirection(self, orientation: int) -> "MapPoint":
         if orientation == 0:
             mp = MapPoint.fromCoords(self._nX + 1, self._nY + 1)
-        if orientation == 1:
+        elif orientation == 1:
             mp = MapPoint.fromCoords(self._nX + 1, self._nY)
-        if orientation == 2:
+        elif orientation == 2:
             mp = MapPoint.fromCoords(self._nX + 1, self._nY - 1)
-        if orientation == 3:
+        elif orientation == 3:
             mp = MapPoint.fromCoords(self._nX, self._nY - 1)
-        if orientation == 4:
+        elif orientation == 4:
             mp = MapPoint.fromCoords(self._nX - 1, self._nY - 1)
-        if orientation == 5:
+        elif orientation == 5:
             mp = MapPoint.fromCoords(self._nX - 1, self._nY)
-        if orientation == 6:
+        elif orientation == 6:
             mp = MapPoint.fromCoords(self._nX - 1, self._nY + 1)
-        if orientation == 7:
+        elif orientation == 7:
             mp = MapPoint.fromCoords(self._nX, self._nY + 1)
-        if MapPoint.isInMap(mp._nX, mp._nY):
+        elif MapPoint.isInMap(mp._nX, mp._nY):
             return mp
         return None
 

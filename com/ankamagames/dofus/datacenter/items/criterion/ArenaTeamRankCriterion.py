@@ -18,7 +18,7 @@ class ArenaTeamRankCriterion(ItemCriterion, IDataCenter):
 
     def getCriterion(self) -> int:
         frame: PartyManagementFrame = (
-            Kernel().getWorker().getFrame(PartyManagementFrame)
+            Kernel().getWorker().getFrame("PartyManagementFrame")
         )
         rank: int = 0
         if frame.arenaRankGroupInfos and frame.arenaRankGroupInfos.rank > rank:

@@ -114,7 +114,7 @@ class FightReachableCellsMaker:
         movementPoint: int = -1,
     ):
         entitiesFrame: FightEntitiesFrame = (
-            Kernel().getWorker().getFrame(FightEntitiesFrame)
+            Kernel().getWorker().getFrame("FightEntitiesFrame")
         )
         stats = StatsManager().getStats(infos.contextualId)
         movementPoints: Stat = stats.getStat(StatIds.MOVEMENT_POINTS)

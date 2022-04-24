@@ -98,7 +98,7 @@ class CurrentPlayedFighterManager(metaclass=Singleton):
             playerManager.spellsInventory = playerManager.playerSpellList
             # FIXME: Uncomment this when spell cast frame is implemented
             # if knl.Kernel.getWorker().contains(FightSpellCastFrame):
-            #    knl.Kernel.getWorker().removeFrame(knl.Kernel.getWorker().getFrame(FightSpellCastFrame))
+            #    knl.Kernel.getWorker().removeFrame(knl.Kernel.getWorker().getFrame("FightSpellCastFrame)")
 
     def setCharacteristicsInformations(
         self, id: float, characteristics: CharacterCharacteristicsInformations

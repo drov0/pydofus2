@@ -19,9 +19,7 @@ from com.ankamagames.dofus.logic.game.common.misc.DofusEntities import DofusEnti
 from com.ankamagames.dofus.logic.game.roleplay.actions.PlayerFightRequestAction import (
     PlayerFightRequestAction,
 )
-from com.ankamagames.dofus.logic.game.roleplay.frames.RoleplayInteractivesFrame import (
-    RoleplayInteractivesFrame,
-)
+import com.ankamagames.dofus.logic.game.roleplay.frames.RoleplayInteractivesFrame as rif
 
 # from com.ankamagames.dofus.logic.game.roleplay.frames.RoleplayEntitiesFrame import RoleplayEntitiesFrame
 from com.ankamagames.dofus.logic.game.roleplay.messages.CharacterMovementStoppedMessage import (
@@ -215,6 +213,7 @@ class RoleplayMovementFrame(Frame):
             return True
 
         if isinstance(msg, EntityMovementCompleteMessage):
+            logger.debug("Entity movement complete")
             emcmsg = msg
             if emcmsg.entity.id == PlayedCharacterManager().id:
                 gmmcmsg = GameMapMovementConfirmMessage()
@@ -280,15 +279,15 @@ class RoleplayMovementFrame(Frame):
         if isinstance(msg, InteractiveUsedMessage):
             if msg.entityId == PlayedCharacterManager().id:
                 self._canMove = msg.canMove
-            return True
+            return False
 
         if isinstance(msg, InteractiveUseEndedMessage):
             self._canMove = True
-            return True
+            return False
 
         if isinstance(msg, InteractiveUseErrorMessage):
             self._canMove = True
-            return True
+            return False
 
         if isinstance(msg, LeaveDialogMessage):
             self._canMove = True
@@ -441,8 +440,8 @@ class RoleplayMovementFrame(Frame):
     def activateSkill(
         self, skillInstanceId: int, ie: InteractiveElement, additionalParam: int
     ) -> None:
-        rpInteractivesFrame: RoleplayInteractivesFrame = (
-            Kernel().getWorker().getFrame(RoleplayInteractivesFrame)
+        rpInteractivesFrame: rif.RoleplayInteractivesFrame = (
+            Kernel().getWorker().getFrame("RoleplayInteractivesFrame")
         )
         if (
             rpInteractivesFrame

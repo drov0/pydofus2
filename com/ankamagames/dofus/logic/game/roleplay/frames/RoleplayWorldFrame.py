@@ -13,9 +13,7 @@ from com.ankamagames.dofus.logic.game.common.managers.PlayedCharacterManager imp
 )
 from com.ankamagames.dofus.logic.game.common.misc.DofusEntities import DofusEntities
 from typing import TYPE_CHECKING
-from com.ankamagames.dofus.logic.game.roleplay.frames.RoleplayInteractivesFrame import (
-    RoleplayInteractivesFrame,
-)
+import com.ankamagames.dofus.logic.game.roleplay.frames.RoleplayInteractivesFrame as riF
 
 from com.ankamagames.dofus.logic.game.roleplay.messages.InteractiveElementActivationMessage import (
     InteractiveElementActivationMessage,
@@ -25,9 +23,7 @@ if TYPE_CHECKING:
     from com.ankamagames.dofus.logic.game.roleplay.frames.RoleplayContextFrame import (
         RoleplayContextFrame,
     )
-from com.ankamagames.dofus.logic.game.roleplay.frames.RoleplayEntitiesFrame import (
-    RoleplayEntitiesFrame,
-)
+
 from com.ankamagames.dofus.logic.game.roleplay.frames.RoleplayMovementFrame import (
     RoleplayMovementFrame,
 )
@@ -114,11 +110,11 @@ class RoleplayWorldFrame(Frame):
             RoleplayContextFrame,
         )
 
-        return Kernel().getWorker().getFrame(RoleplayContextFrame)
+        return Kernel().getWorker().getFrame("RoleplayContextFrame")
 
     @property
     def roleplayMovementFrame(self) -> RoleplayMovementFrame:
-        return Kernel().getWorker().getFrame(RoleplayMovementFrame)
+        return Kernel().getWorker().getFrame("RoleplayMovementFrame")
 
     def pushed(self) -> bool:
         self._allowOnlyCharacterInteraction = False
@@ -208,8 +204,8 @@ class RoleplayWorldFrame(Frame):
         if isinstance(msg, InteractiveElementActivationMessage):
             sendInteractiveUseRequest = True
             ieamsg = msg
-            interactiveFrame: RoleplayInteractivesFrame = (
-                Kernel().getWorker().getFrame(RoleplayInteractivesFrame)
+            interactiveFrame: riF.RoleplayInteractivesFrame = (
+                Kernel().getWorker().getFrame("RoleplayInteractivesFrame")
             )
             if not (interactiveFrame and interactiveFrame.usingInteractive):
                 playerEntity = DofusEntities.getEntity(PlayedCharacterManager().id)
@@ -223,22 +219,26 @@ class RoleplayWorldFrame(Frame):
                     if mp:
                         cellData = cells[mp.cellId]
                         forbidden = not cellData.mov or cellData.farmCell
-                    if not forbidden:
-                        numWalkableCells = 8
-                        for j in range(8):
-                            mp2 = mp.getNearestCellInDirection(j)
-                            if mp2 and (
-                                not dmp.pointMov(mp2.x, mp2.y, True, mp.cellId)
-                                or not dmp.pointMov(mp2.x - 1, mp2.y, True, mp.cellId)
-                                and not dmp.pointMov(mp2.x, mp2.y - 1, True, mp.cellId)
-                            ):
-                                numWalkableCells -= 1
-                        if not numWalkableCells:
-                            forbidden = True
-                    if forbidden:
-                        if not forbiddenCellsIds:
-                            forbiddenCellsIds = []
-                        forbiddenCellsIds.append(mp.cellId)
+                        if not forbidden:
+                            numWalkableCells = 8
+                            for j in range(8):
+                                mp2 = mp.getNearestCellInDirection(j)
+                                if mp2 and (
+                                    not dmp.pointMov(mp2.x, mp2.y, True, mp.cellId)
+                                    or not dmp.pointMov(
+                                        mp2.x - 1, mp2.y, True, mp.cellId
+                                    )
+                                    and not dmp.pointMov(
+                                        mp2.x, mp2.y - 1, True, mp.cellId
+                                    )
+                                ):
+                                    numWalkableCells -= 1
+                            if not numWalkableCells:
+                                forbidden = True
+                        if forbidden:
+                            if not forbiddenCellsIds:
+                                forbiddenCellsIds = []
+                            forbiddenCellsIds.append(mp.cellId)
                 ieCellData = cells[ieamsg.position.cellId]
                 skills = ieamsg.interactiveElement.enabledSkills
                 minimalRange = 63
@@ -258,7 +258,9 @@ class RoleplayWorldFrame(Frame):
                     nearestCell = MapPoint.fromCellId(playerEntity.position.cellId)
                 else:
                     nearestCell = ieamsg.position.getNearestFreeCellInDirection(
-                        ieamsg.position.advancedOrientationTo(playerEntity.position),
+                        ieamsg.position.advancedOrientationTo(
+                            playerEntity.position
+                        ),
                         DataMapProvider(),
                         True,
                         True,
@@ -283,18 +285,22 @@ class RoleplayWorldFrame(Frame):
                                 or nearestCell.cellId == playerEntity.position.cellId
                             ):
                                 iRange += 1
-                if len(skills) == 1 and skills[0].skillId == DataEnum.SKILL_POINT_OUT_EXIT:
+                if (
+                    len(skills) == 1
+                    and skills[0].skillId == DataEnum.SKILL_POINT_OUT_EXIT
+                ):
                     nearestCell.cellId = ieamsg.position.cellId
                     sendInteractiveUseRequest = False
                 if not nearestCell or nearestCell.cellId not in forbiddenCellsIds:
                     nearestCell = ieamsg.position
                 if sendInteractiveUseRequest:
                     self.roleplayMovementFrame.setFollowingInteraction(
-                    {
-                        "ie": ieamsg.interactiveElement,
-                        "skillInstanceId": ieamsg.skillInstanceId,
-                        "additionalParam": ieamsg.additionalParam,
-                    })
+                        {
+                            "ie": ieamsg.interactiveElement,
+                            "skillInstanceId": ieamsg.skillInstanceId,
+                            "additionalParam": ieamsg.additionalParam,
+                        }
+                    )
                 self.roleplayMovementFrame.resetNextMoveMapChange()
                 self.roleplayMovementFrame.askMoveTo(nearestCell)
             return True
@@ -305,6 +311,10 @@ class RoleplayWorldFrame(Frame):
         return True
 
     def onFramePushed(self, pEvent: FramePushedEvent) -> None:
+        from com.ankamagames.dofus.logic.game.roleplay.frames.RoleplayEntitiesFrame import (
+            RoleplayEntitiesFrame,
+        )
+
         if isinstance(pEvent.frame, RoleplayEntitiesFrame):
             pEvent.currentTarget.removeEventListener(
                 FramePushedEvent.EVENT_FRAME_PUSHED, self.onFramePushed

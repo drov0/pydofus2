@@ -84,9 +84,9 @@ class CleanupCrewFrame(Frame):
             return True
 
         else:
-            logger.info(
-                f"[Warning] {msg.__class__.__name__} wasn't stopped by a frame."
-            )
+            # logger.info(
+            #     f"[Warning] {msg.__class__.__name__} wasn't stopped by a frame."
+            # )
             return True
 
     def pulled(self) -> bool:

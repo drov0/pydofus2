@@ -3,5 +3,9 @@ class objectview(object):
         self.__dict__ = d
 
 
-obj = objectview({"a": 1})
-print(obj.a)
+for i in range(1, 10):
+    print(i)
+    if i == 5:
+        break
+    
+print(i)

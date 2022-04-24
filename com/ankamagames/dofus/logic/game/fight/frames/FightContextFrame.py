@@ -288,7 +288,7 @@ class FightContextFrame(Frame):
     @fightType.setter
     def fightType(self, t: int) -> None:
         self._fightType = t
-        # TODO: uncomment when party manager is done : partyFrame:PartyManagementFrame = Kernel().getWorker().getFrame(PartyManagementFrame)
+        # TODO: uncomment when party manager is done : partyFrame:PartyManagementFrame = Kernel().getWorker().getFrame("PartyManagementFrame")
         # partyFrame.lastFightType = t
 
     @property
@@ -512,10 +512,10 @@ class FightContextFrame(Frame):
             gfjmsg = msg
             preFightIsActive = not gfjmsg.isFightStarted
             self.fightType = gfjmsg.fightType
-            if not Kernel().getWorker().contains(FightEntitiesFrame):
+            if not Kernel().getWorker().contains("FightEntitiesFrame"):
                 Kernel().getWorker().addFrame(self._entitiesFrame)
             if preFightIsActive:
-                if not Kernel().getWorker().contains(FightPreparationFrame):
+                if not Kernel().getWorker().contains("FightPreparationFrame"):
                     Kernel().getWorker().addFrame(self._preparationFrame)
                 self.onlyTheOtherTeamCanPlace = not gfjmsg.isTeamPhase
             else:
@@ -564,7 +564,7 @@ class FightContextFrame(Frame):
             teoa = msg
             self._timelineOverEntity = True
             self._timelineOverEntityId = teoa.targetId
-            fscf = Kernel().getWorker().getFrame(FightSpellCastFrame)
+            fscf = Kernel().getWorker().getFrame("FightSpellCastFrame")
             self.overEntity(
                 teoa.targetId,
                 teoa.showRange,
@@ -581,7 +581,7 @@ class FightContextFrame(Frame):
             return True
 
         if isinstance(msg, TogglePointCellAction):
-            if Kernel().getWorker().contains(PointCellFrame):
+            if Kernel().getWorker().contains("PointCellFrame"):
 
                 Kernel().getWorker().removeFrame(PointCellFrame())
             else:
@@ -760,7 +760,7 @@ class FightContextFrame(Frame):
         if isinstance(msg, BreachEnterMessage):
             bemsg = msg
             PlayedCharacterManager().isInBreach = True
-            if not Kernel().getWorker().getFrame(BreachFrame):
+            if not Kernel().getWorker().getFrame("BreachFrame"):
                 breachFrame = BreachFrame()
                 breachFrame.ownerId = bemsg.owner
                 Kernel().getWorker().addFrame(breachFrame)
@@ -769,9 +769,9 @@ class FightContextFrame(Frame):
         if isinstance(msg, BreachExitResponseMessage):
             if PlayedCharacterManager().isInBreach:
                 PlayedCharacterManager().isInBreach = False
-                if Kernel().getWorker().getFrame(BreachFrame):
+                if Kernel().getWorker().getFrame("BreachFrame"):
                     Kernel().getWorker().removeFrame(
-                        Kernel().getWorker().getFrame(BreachFrame)
+                        Kernel().getWorker().getFrame("BreachFrame")
                     )
             return True
 
@@ -814,7 +814,7 @@ class FightContextFrame(Frame):
             self._timerMovementRange.cancel()
         self._currentFighterInfo = None
         simf: SpellInventoryManagementFrame = (
-            Kernel().getWorker().getFrame(SpellInventoryManagementFrame)
+            Kernel().getWorker().getFrame("SpellInventoryManagementFrame")
         )
         simf.deleteSpellsGlobalCoolDownsData()
         PlayedCharacterManager().isSpectator = False
@@ -830,7 +830,7 @@ class FightContextFrame(Frame):
 
     def initFighterPositionHistory(self, pFighterId: float) -> None:
         if not self._fightersPositionsHistory[pFighterId]:
-            fightContextFrame = Kernel().getWorker().getFrame(FightContextFrame)
+            fightContextFrame = Kernel().getWorker().getFrame("FightContextFrame")
             self._fightersPositionsHistory[pFighterId] = [
                 {
                     "cellId": fightContextFrame.entitiesFrame.getEntityInfos(

@@ -14,7 +14,7 @@ class AchievementItemCriterion(ItemCriterion, IDataCenter):
     @property
     def isRespected(self) -> bool:
         id: int = 0
-        # achievementFinishedList:list = Kernel().getWorker().getFrame(QuestFrame)
+        # achievementFinishedList:list = Kernel().getWorker().getFrame("QuestFrame")
         # for id in achievementFinishedList:
         #    if id == self._criterionValue:
         #       return True
@@ -25,7 +25,7 @@ class AchievementItemCriterion(ItemCriterion, IDataCenter):
 
     # def getCriterion(self) -> int:
     #    id:int = 0
-    #    achievementFinishedList:list =Kernel().getWorker().getFrame(QuestFrame)
+    #    achievementFinishedList:list =Kernel().getWorker().getFrame("QuestFrame")
     #    for id in achievementFinishedList:
     #       if id == _criterionValue:
     #          return 1

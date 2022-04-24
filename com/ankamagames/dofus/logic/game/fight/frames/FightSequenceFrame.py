@@ -1,5 +1,6 @@
 from types import FunctionType
 from typing import TYPE_CHECKING
+
 if TYPE_CHECKING:
     from com.ankamagames.dofus.logic.game.fight.frames.FightBattleFrame import (
         FightBattleFrame,
@@ -272,7 +273,7 @@ class FightSequenceFrame(Frame, ISpellCastProvider):
 
     _parent: "FightSequenceFrame"
 
-    _fightBattleFrame: 'FightBattleFrame'
+    _fightBattleFrame: "FightBattleFrame"
 
     _fightEntitiesFrame: FightEntitiesFrame
 
@@ -289,7 +290,7 @@ class FightSequenceFrame(Frame, ISpellCastProvider):
     _permanentTooltipsCallback: Callback
 
     def __init__(
-        self, pFightBattleFrame: 'FightBattleFrame', parent: FightSequenceFrame = None
+        self, pFightBattleFrame: "FightBattleFrame", parent: FightSequenceFrame = None
     ):
         super().__init__()
         self._instanceId = self._currentInstanceId
@@ -308,7 +309,7 @@ class FightSequenceFrame(Frame, ISpellCastProvider):
 
     def deleteTooltip(self, fighterId: float) -> None:
         fightContextFrame: FightContextFrame = (
-            Kernel().getWorker().getFrame(FightContextFrame)
+            Kernel().getWorker().getFrame("FightContextFrame")
         )
         if (
             FightContextFrame.fighterEntityTooltipId == fighterId
@@ -363,7 +364,9 @@ class FightSequenceFrame(Frame, ISpellCastProvider):
     @property
     def fightEntitiesFrame(self) -> FightEntitiesFrame:
         if not self._fightEntitiesFrame:
-            self._fightEntitiesFrame = Kernel().getWorker().getFrame(FightEntitiesFrame)
+            self._fightEntitiesFrame = (
+                Kernel().getWorker().getFrame("FightEntitiesFrame")
+            )
         return self._fightEntitiesFrame
 
     def addSubSequence(self, sequence: ISequencer) -> None:
@@ -667,7 +670,9 @@ class FightSequenceFrame(Frame, ISpellCastProvider):
                                         True,
                                     )
                                 )
-                    simf = Kernel().getWorker().getFrame(SpellInventoryManagementFrame)
+                    simf = (
+                        Kernel().getWorker().getFrame("SpellInventoryManagementFrame")
+                    )
                     for fighterInfos in entities:
                         gfsc = GameFightSpellCooldown()
                         if (
@@ -821,7 +826,9 @@ class FightSequenceFrame(Frame, ISpellCastProvider):
         if isinstance(msg, GameActionFightSlideMessage):
             gafsmsg = msg
             self.keepInMindToUpdateMovementArea()
-            fightContextFrame_gafsmsg = Kernel().getWorker().getFrame(FightContextFrame)
+            fightContextFrame_gafsmsg = (
+                Kernel().getWorker().getFrame("FightContextFrame")
+            )
             slideTargetInfos = fightContextFrame_gafsmsg.entitiesFrame.getEntityInfos(
                 gafsmsg.targetId
             )
@@ -932,7 +939,9 @@ class FightSequenceFrame(Frame, ISpellCastProvider):
             )
             if isinstance(entityInfosv, GameFightFighterInformations):
                 entityInfosv.spawnInfo.alive = False
-            fightContextFrame_gafvmsg = Kernel().getWorker().getFrame(FightContextFrame)
+            fightContextFrame_gafvmsg = (
+                Kernel().getWorker().getFrame("FightContextFrame")
+            )
             if fightContextFrame_gafvmsg:
                 fightContextFrame_gafvmsg.outEntity(gafvmsg.targetId)
             FightEntitiesFrame.getCurrentInstance().updateRemovedEntity(
@@ -1082,7 +1091,7 @@ class FightSequenceFrame(Frame, ISpellCastProvider):
             self.keepInMindToUpdateMovementArea()
             if gafcchmsg.cellId != -1:
                 fightContextFrame_gafcchmsg = (
-                    Kernel().getWorker().getFrame(FightContextFrame)
+                    Kernel().getWorker().getFrame("FightContextFrame")
                 )
                 fightContextFrame_gafcchmsg.saveFighterPosition(
                     gafcchmsg.targetId, gafcchmsg.cellId
@@ -1113,7 +1122,7 @@ class FightSequenceFrame(Frame, ISpellCastProvider):
                 else int(gaftcmsg.cellId)
             )
             fightContextFrame_gaftcmsg = (
-                Kernel().getWorker().getFrame(FightContextFrame)
+                Kernel().getWorker().getFrame("FightContextFrame")
             )
             fightContextFrame_gaftcmsg.saveFighterPosition(
                 gaftcmsg.targetId, throwCellId
@@ -1246,7 +1255,7 @@ class FightSequenceFrame(Frame, ISpellCastProvider):
         entityInfos: GameContextActorInformations = (
             FightEntitiesFrame.getCurrentInstance().getEntityInfos(gafdmsg.targetId)
         )
-        ftf: FightTurnFrame = Kernel().getWorker().getFrame(FightTurnFrame)
+        ftf: FightTurnFrame = Kernel().getWorker().getFrame("FightTurnFrame")
         updatePath: bool = (
             ftf
             and ftf.myTurn
@@ -1288,7 +1297,7 @@ class FightSequenceFrame(Frame, ISpellCastProvider):
                         fighterInfos.stats.summoner
                     )
         fightContextFrame: FightContextFrame = (
-            Kernel().getWorker().getFrame(FightContextFrame)
+            Kernel().getWorker().getFrame("FightContextFrame")
         )
         if fightContextFrame:
             fightContextFrame.outEntity(gafdmsg.targetId)
@@ -1485,7 +1494,7 @@ class FightSequenceFrame(Frame, ISpellCastProvider):
                         summon.stats.summoner = infos.contextualId
                 gfsfrsmsg = GameFightShowFighterRandomStaticPoseMessage()
                 gfsfrsmsg.initGameFightShowFighterRandomStaticPoseMessage(summon)
-                Kernel().getWorker().getFrame(FightEntitiesFrame).process(gfsfrsmsg)
+                Kernel().getWorker().getFrame("process(gfsfrsmsg")
                 illusionCreature = DofusEntities.getEntity(summon.contextualId)
                 if illusionCreature:
                     illusionCreature.visible = False
@@ -1497,7 +1506,7 @@ class FightSequenceFrame(Frame, ISpellCastProvider):
         self, gafepmsg: GameActionFightExchangePositionsMessage
     ) -> None:
         fightContextFrame: FightContextFrame = (
-            Kernel().getWorker().getFrame(FightContextFrame)
+            Kernel().getWorker().getFrame("FightContextFrame")
         )
         if not self.isSpellTeleportingToPreviousPosition():
             fightContextFrame.saveFighterPosition(
@@ -1525,7 +1534,7 @@ class FightSequenceFrame(Frame, ISpellCastProvider):
         self, gaftosmmsg: GameActionFightTeleportOnSameMapMessage
     ) -> None:
         fightContextFrame: FightContextFrame = (
-            Kernel().getWorker().getFrame(FightContextFrame)
+            Kernel().getWorker().getFrame("FightContextFrame")
         )
         if not self.isSpellTeleportingToPreviousPosition():
             if not self._teleportThroughPortal:
@@ -1554,7 +1563,7 @@ class FightSequenceFrame(Frame, ISpellCastProvider):
         )
         movementPathCells: list[int] = movementPath.getCells()
         fightContextFrame: FightContextFrame = (
-            Kernel().getWorker().getFrame(FightContextFrame)
+            Kernel().getWorker().getFrame("FightContextFrame")
         )
         nbCells: int = len(movementPathCells)
         movingEntity: TiphonSprite = DofusEntities.getEntity(gmmmsg.actorId)
@@ -1566,7 +1575,7 @@ class FightSequenceFrame(Frame, ISpellCastProvider):
                     carriedEntity.id, movementPathCells[i]
                 )
                 carriedEntity = carriedEntity.carriedEntity
-        fscf: FightSpellCastFrame = Kernel().getWorker().getFrame(FightSpellCastFrame)
+        fscf: FightSpellCastFrame = Kernel().getWorker().getFrame("FightSpellCastFrame")
         if fscf:
             fscf.entityMovement(gmmmsg.actorId)
         self._stepsBuffer.append(CallbackStep(Callback(deleteTooltip, gmmmsg.actorId)))
@@ -2041,14 +2050,14 @@ class FightSequenceFrame(Frame, ISpellCastProvider):
     def keepInMindToUpdateMovementArea(self) -> None:
         if self._updateMovementAreaAtSequenceEnd:
             return
-        fightTurnFrame: FightTurnFrame = Kernel().getWorker().getFrame(FightTurnFrame)
+        fightTurnFrame: FightTurnFrame = Kernel().getWorker().getFrame("FightTurnFrame")
         if fightTurnFrame and fightTurnFrame.myTurn:
             self._updateMovementAreaAtSequenceEnd = True
 
     def updateMovementArea(self) -> None:
         if not self._updateMovementAreaAtSequenceEnd:
             return
-        fightTurnFrame: FightTurnFrame = Kernel().getWorker().getFrame(FightTurnFrame)
+        fightTurnFrame: FightTurnFrame = Kernel().getWorker().getFrame("FightTurnFrame")
         if fightTurnFrame and fightTurnFrame.myTurn:
             self._updateMovementAreaAtSequenceEnd = False
 
@@ -2071,7 +2080,7 @@ class FightSequenceFrame(Frame, ISpellCastProvider):
         monsterS: Monster = None
         gfsgmsg: GameFightShowFighterMessage = GameFightShowFighterMessage()
         gfsgmsg.initGameFightShowFighterMessage(entity)
-        Kernel().getWorker().getFrame(FightEntitiesFrame).process(gfsgmsg)
+        Kernel().getWorker().getFrame("process(gfsgmsg")
         if ActionIdHelper.isRevive(actionId):
             self.fightEntitiesFrame.removeLastKilledAlly(entity.spawnInfo.teamId)
         summonedCreature: Sprite = DofusEntities.getEntity(entity.contextualId)

@@ -182,7 +182,7 @@ class FightPreparationFrame(Frame):
                 Kernel().getWorker().removeFrame(self)
                 gfemsg = GameFightEndMessage()
                 gfemsg.init()
-                fightContextFrame2 = Kernel().getWorker().getFrame(fightContextFrame.FightContextFrame)
+                fightContextFrame2 = Kernel().getWorker().getFrame("FightContextFrame")
                 if fightContextFrame2:
                     fightContextFrame2.process(gfemsg)
                 else:
@@ -208,7 +208,7 @@ class FightPreparationFrame(Frame):
             if cellEntity:
                 fighter = object()
                 fighter.name = self._fightContextFrame.getFighterName(cellEntity.id)
-                entitiesFrame = Kernel().getWorker().getFrame(FightEntitiesFrame)
+                entitiesFrame = Kernel().getWorker().getFrame("FightEntitiesFrame")
                 fighterInfos = entitiesFrame.getEntityInfos(cellEntity.id)
                 playerInfos = entitiesFrame.getEntityInfos(PlayedCharacterManager().id)
                 if not (
@@ -253,7 +253,7 @@ class FightPreparationFrame(Frame):
 
         if isinstance(msg, GameFightPlacementSwapPositionsOfferMessage):
             gfpspomsg = msg
-            entitiesFrame = Kernel().getWorker().getFrame(FightEntitiesFrame)
+            entitiesFrame = Kernel().getWorker().getFrame("FightEntitiesFrame")
             swapPositionRequest = SwapPositionRequest(
                 gfpspomsg.requestId, gfpspomsg.requesterId, gfpspomsg.requestedId
             )
@@ -289,7 +289,7 @@ class FightPreparationFrame(Frame):
                     swapPositionRequest.requesterId == PlayedCharacterManager().id
                     and gfpspcdmsg.cancellerId != PlayedCharacterManager().id
                 ):
-                    entitiesFrame = Kernel().getWorker().getFrame(FightEntitiesFrame)
+                    entitiesFrame = Kernel().getWorker().getFrame("FightEntitiesFrame")
                     cancellerInfo = entitiesFrame.getEntityInfos(gfpspcdmsg.cancellerId)
             return True
 
@@ -308,7 +308,7 @@ class FightPreparationFrame(Frame):
             ecmsg = msg
             clickedEntity = ecmsg.entity
             if clickedEntity:
-                entitiesFrame = Kernel().getWorker().getFrame(FightEntitiesFrame)
+                entitiesFrame = Kernel().getWorker().getFrame("FightEntitiesFrame")
                 fighterInfos = entitiesFrame.getEntityInfos(clickedEntity.id)
                 playerInfos = entitiesFrame.getEntityInfos(PlayedCharacterManager().id)
                 if not (
@@ -360,7 +360,7 @@ class FightPreparationFrame(Frame):
         if isinstance(msg, GameContextDestroyMessage):
             gfemsg2 = GameFightEndMessage()
             gfemsg2.initGameFightEndMessage()
-            fightContextFrame = Kernel().getWorker().getFrame(fightContextFrame.FightContextFrame)
+            fightContextFrame = Kernel().getWorker().getFrame("FightContextFrame")
             if fightContextFrame:
                 fightContextFrame.process(gfemsg2)
             else:

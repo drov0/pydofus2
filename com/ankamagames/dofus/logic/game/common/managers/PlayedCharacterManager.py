@@ -216,7 +216,7 @@ class PlayedCharacterManager(IDestroyable, metaclass=Singleton):
         from com.ankamagames.dofus.kernel.Kernel import Kernel
 
         fightContextFrame: FightContextFrame = (
-            Kernel().getWorker().getFrame(FightContextFrame)
+            Kernel().getWorker().getFrame("FightContextFrame")
         )
         return fightContextFrame and fightContextFrame.isKolossium
 

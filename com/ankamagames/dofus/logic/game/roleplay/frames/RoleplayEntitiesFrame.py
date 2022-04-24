@@ -13,9 +13,7 @@ from com.ankamagames.dofus.kernel.net.ConnectionsHandler import ConnectionsHandl
 from com.ankamagames.dofus.logic.common.managers.PlayerManager import PlayerManager
 from com.ankamagames.dofus.logic.game.common.managers.TimerManager import TimeManager
 import com.ankamagames.dofus.logic.game.roleplay.frames.RoleplayContextFrame as rcf
-from com.ankamagames.dofus.logic.game.roleplay.frames.RoleplayInteractivesFrame import (
-    RoleplayInteractivesFrame,
-)
+import com.ankamagames.dofus.logic.game.roleplay.frames.RoleplayInteractivesFrame as rif
 from com.ankamagames.dofus.logic.game.roleplay.messages.CharacterMovementStoppedMessage import (
     CharacterMovementStoppedMessage,
 )
@@ -91,7 +89,6 @@ from com.ankamagames.dofus.types.entities.AnimatedCharacter import AnimatedChara
 from com.ankamagames.jerakine.entities.interfaces.IEntity import IEntity
 from com.ankamagames.jerakine.messages.Frame import Frame
 from com.ankamagames.jerakine.messages.Message import Message
-from pyd2bot.events.BotEventsManager import BotEventsManager
 from com.ankamagames.dofus.logic.game.roleplay.types.FightTeam import FightTeam
 
 
@@ -156,7 +153,7 @@ class RoleplayEntitiesFrame(AbstractEntitiesFrame, Frame):
         self._monstersIds = list[float]()
         self._entitiesVisibleNumber = 0
         if self._waitForMap:
-            ccFrame = Kernel().getWorker().getFrame(ctxcf.ContextChangeFrame)
+            ccFrame = Kernel().getWorker().getFrame("ContextChangeFrame")
             connexion = ""
             if ccFrame:
                 connexion = ccFrame.mapChangeConnexion
@@ -172,7 +169,7 @@ class RoleplayEntitiesFrame(AbstractEntitiesFrame, Frame):
 
         if isinstance(msg, MapLoadedMessage):
             if self._waitForMap:
-                ccFrame = Kernel().getWorker().getFrame(ctxcf.ContextChangeFrame)
+                ccFrame = Kernel().getWorker().getFrame("ContextChangeFrame")
                 connexion = ""
                 if ccFrame:
                     connexion = ccFrame.mapChangeConnexion
@@ -246,7 +243,7 @@ class RoleplayEntitiesFrame(AbstractEntitiesFrame, Frame):
             #     Atouin().showWorld(True)
 
             roleplayContextFrame: rcf.RoleplayContextFrame = (
-                Kernel().getWorker().getFrame(rcf.RoleplayContextFrame)
+                Kernel().getWorker().getFrame("RoleplayContextFrame")
             )
             previousMap = PlayedCharacterManager().currentMap
             if (
@@ -373,7 +370,9 @@ class RoleplayEntitiesFrame(AbstractEntitiesFrame, Frame):
                         mo.state == MapObstacleStateEnum.OBSTACLE_OPENED,
                     )
 
-            rpIntFrame = Kernel().getWorker().getFrame(RoleplayInteractivesFrame)
+            rpIntFrame: rif.RoleplayInteractivesFrame = (
+                Kernel().getWorker().getFrame("RoleplayInteractivesFrame")
+            )
             imumsg = InteractiveMapUpdateMessage()
             imumsg.init(mcidmsg.interactiveElements)
             rpIntFrame.process(imumsg)
@@ -394,12 +393,11 @@ class RoleplayEntitiesFrame(AbstractEntitiesFrame, Frame):
 
             # TODO: Here handle stuff related to the partyManagement when implementing party management frame
             # if Kernel().getWorker().contains(PartyManagementFrame):
-            #     partyManagementFrame = Kernel().getWorker().getFrame(PartyManagementFrame)
+            #     partyManagementFrame = Kernel().getWorker().getFrame("PartyManagementFrame")
             #     if partyManagementFrame.playerShouldReceiveRewards:
             #         partyManagementFrame.playerShouldReceiveRewards = False
             #         partyManagementFrame.playerRewards = None
 
-            BotEventsManager().dispatch(BotEventsManager.MAP_DATA_LOADED)
             return False
 
         if isinstance(msg, CharacterMovementStoppedMessage):

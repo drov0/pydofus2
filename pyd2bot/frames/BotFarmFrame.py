@@ -10,6 +10,12 @@ from com.ankamagames.dofus.logic.game.common.managers.PlayedCharacterManager imp
 from com.ankamagames.dofus.network.messages.game.context.notification.NotificationByServerMessage import (
     NotificationByServerMessage,
 )
+from com.ankamagames.dofus.network.messages.game.context.roleplay.CurrentMapMessage import (
+    CurrentMapMessage,
+)
+from com.ankamagames.dofus.network.messages.game.context.roleplay.MapChangeFailedMessage import (
+    MapChangeFailedMessage,
+)
 from com.ankamagames.dofus.network.messages.game.context.roleplay.MapComplementaryInformationsDataMessage import (
     MapComplementaryInformationsDataMessage,
 )
@@ -49,9 +55,11 @@ logger = Logger(__name__)
 class BotFarmFrame(Frame):
     def __init__(self):
         super().__init__()
-        self.discard = []
+        self._ieDiscard = []
         self._currentRequestedElementId = -1
         self._usingInteractive = False
+        self._dstMapId = None
+        self._mapIdDiscard = []
         self._entities = dict()
 
     @property
@@ -73,18 +81,21 @@ class BotFarmFrame(Frame):
     def process(self, msg: Message) -> bool:
 
         if isinstance(msg, InteractiveUseErrorMessage):
+            logger.error(
+                f"[BotFarmFrame] Error unable to use interactive element {msg.elemId} with the skill {msg.skillInstanceUid}"
+            )
+            logger.debug(
+                f"[BotFarmFrame] elemId {msg.elemId} and currReqElmId {self._currentRequestedElementId}"
+            )
             if msg.elemId == self._currentRequestedElementId:
-                logger.error(
-                    f"[BotFarmFrame] Error unable to use interactive element {msg.elemId} with the skill {msg.skillInstanceUid}"
-                )
                 self._usingInteractive = False
-                self.discard.append(msg.elemId)
+                self._ieDiscard.append(msg.elemId)
                 self._currentRequestedElementId = FarmAPI().collectResource()
                 if self._currentRequestedElementId == -1:
                     FrustumManager.randomMapChange()
             return True
 
-        if isinstance(msg, InteractiveUsedMessage):
+        elif isinstance(msg, InteractiveUsedMessage):
             self.nbrOfFails = 0
             if PlayedCharacterManager().id == msg.entityId and msg.duration > 0:
                 logger.debug(
@@ -99,27 +110,38 @@ class BotFarmFrame(Frame):
             self._entities[msg.elemId] = msg.entityId
             return True
 
-        if isinstance(msg, InteractiveUseEndedMessage):
+        elif isinstance(msg, InteractiveUseEndedMessage):
             if self._entities[msg.elemId] == PlayedCharacterManager().id:
                 logger.debug(
                     f"[BotFarmFrame] Interactive element {msg.elemId} use ended"
                 )
                 self._usingInteractive = FirstHeaderLineIsContinuationDefect
-                self.lastCollected = msg.elemId
                 self._currentRequestedElementId = FarmAPI().collectResource()
                 if self._currentRequestedElementId == -1:
-                    FrustumManager.randomMapChange()
+                    self._dstMapId = FrustumManager.randomMapChange()
+
             del self._entities[msg.elemId]
             return True
 
-        if isinstance(msg, MapComplementaryInformationsDataMessage):
-            self.discard.clear()
+        elif isinstance(msg, MapComplementaryInformationsDataMessage):
+            self._ieDiscard.clear()
+            self._mapIdDiscard.clear()
             self._currentRequestedElementId = FarmAPI().collectResource()
             if self._currentRequestedElementId == -1:
                 FrustumManager.randomMapChange()
+            return True
 
-        if isinstance(msg, NotificationByServerMessage):
+        elif isinstance(msg, MapChangeFailedMessage):
+            logger.debug(
+                f"[BotFarmFrame] Map change to {self._dstMapId} failed will discard that destination"
+            )
+            self._mapIdDiscard.append(msg.mapId)
+            FrustumManager.randomMapChange(discard=[self._mapIdDiscard])
+            return True
+
+        elif isinstance(msg, NotificationByServerMessage):
             notification = Notification.getNotificationById(msg.id)
             if notification.titleId == 756273:
                 # inventory full notification
                 raise Exception(f"[{notification.title}] {notification.message}")
+            return True

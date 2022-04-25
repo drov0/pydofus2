@@ -72,6 +72,7 @@ class RoleplayContextFrame(Frame):
     def process(self, msg: Message) -> bool:
 
         if isinstance(msg, CurrentMapMessage):
+            logger.debug("[Mouvement frame] CurrentMapMessage received")
             mcmsg = msg
             self._newCurrentMapIsReceived = True
             newSubArea = SubArea.getSubAreaByMapId(mcmsg.mapId)
@@ -94,6 +95,9 @@ class RoleplayContextFrame(Frame):
                 self._previousMapId = PlayedCharacterManager().currentMap.mapId
             PlayedCharacterManager().currentMap = wp
             self._roleplayEntitiesFrame._waitForMap = True
+            if self._movementFrame._changeMapTimer is not None:
+                logger.debug("[Mouvement frame] Map change timer canceled")
+                self._movementFrame._changeMapTimer.cancel()
             MapDisplayManager().loadMap(int(mcmsg.mapId))
             return True
 

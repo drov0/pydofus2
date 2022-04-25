@@ -30,26 +30,29 @@ class MapChange:
 
 class FrustumManager:
     @classmethod
-    def randomMapChange(cls):
-        possibleChangeDirections = cls.getMapChangeDirections()
+    def randomMapChange(cls, discard=[]):
+        possibleChangeDirections = cls.getMapChangeDirections(discard)
         randomDirection = random.choice(list(possibleChangeDirections.keys()))
         mapChange = possibleChangeDirections[randomDirection]
         logger.debug(
             f"[MouvementAPI] Sending a click to change map towards direction '{randomDirection.name}'"
         )
         cls.sendClickAdjacentMsg(mapChange.destMapId, mapChange.outCellId)
+        return mapChange.destMapId
 
     @classmethod
-    def getMapChangeDirections(cls):
+    def getMapChangeDirections(cls, discard=[]):
         currentMap: Map = mdm.MapDisplayManager().dataMap
         playedCharacterManager = PlayedCharacterManager()
         playedEntity = DofusEntities.getEntity(playedCharacterManager.id)
         playedEntityCellId = playedEntity.position.cellId
         result = dict[DirectionsEnum, MapChange]()
         for direction in DirectionsEnum.getMapChangeDirections():
+            destMapId = currentMap.getNeighborIdFromDirection(direction)
+            if destMapId in discard:
+                continue
             cellId = currentMap.cellOutTowards(playedEntityCellId, direction)
             if cellId is not None:
-                destMapId = currentMap.getNeighborIdFromDirection(direction)
                 result[direction] = MapChange(destMapId, cellId)
         return result
 

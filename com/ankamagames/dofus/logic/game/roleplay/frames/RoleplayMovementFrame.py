@@ -22,7 +22,6 @@ from com.ankamagames.dofus.logic.game.roleplay.actions.PlayerFightRequestAction 
 )
 import com.ankamagames.dofus.logic.game.roleplay.frames.RoleplayInteractivesFrame as rif
 
-# from com.ankamagames.dofus.logic.game.roleplay.frames.RoleplayEntitiesFrame import RoleplayEntitiesFrame
 from com.ankamagames.dofus.logic.game.roleplay.messages.CharacterMovementStoppedMessage import (
     CharacterMovementStoppedMessage,
 )
@@ -46,6 +45,12 @@ from com.ankamagames.dofus.network.messages.game.context.GameMapNoMovementMessag
 )
 from com.ankamagames.dofus.network.messages.game.context.roleplay.ChangeMapMessage import (
     ChangeMapMessage,
+)
+from com.ankamagames.dofus.network.messages.game.context.roleplay.CurrentMapMessage import (
+    CurrentMapMessage,
+)
+from com.ankamagames.dofus.network.messages.game.context.roleplay.MapChangeFailedMessage import (
+    MapChangeFailedMessage,
 )
 from com.ankamagames.dofus.network.messages.game.context.roleplay.MapComplementaryInformationsDataMessage import (
     MapComplementaryInformationsDataMessage,
@@ -97,6 +102,7 @@ from com.ankamagames.dofus.network.types.game.interactive.InteractiveElement imp
 )
 from com.ankamagames.dofus.types.entities.AnimatedCharacter import AnimatedCharacter
 from com.ankamagames.jerakine.entities.interfaces.IEntity import IEntity
+from com.ankamagames.jerakine.entities.interfaces.IMovable import IMovable
 from com.ankamagames.jerakine.handlers.messages.Action import Action
 from com.ankamagames.jerakine.logger.Logger import Logger
 from com.ankamagames.jerakine.messages.Frame import Frame
@@ -117,6 +123,8 @@ class RoleplayMovementFrame(Frame):
     _wantToChangeMap: float = -1
 
     _changeMapByAutoTrip: bool = False
+
+    _changeMapTimer = None
 
     _followingMove: MapPoint
 
@@ -143,6 +151,7 @@ class RoleplayMovementFrame(Frame):
     _mapHasAggressiveMonsters: bool = False
 
     def __init__(self):
+        self._changeMapTimer = None
         super().__init__()
 
     @property
@@ -155,6 +164,7 @@ class RoleplayMovementFrame(Frame):
 
     def pushed(self) -> bool:
         self._wantToChangeMap = -1
+        self._changeMapTimer: Timer = None
         self._changeMapByAutoTrip = False
         self._followingIe = None
         self._followingMonsterGroup = None
@@ -453,6 +463,17 @@ class RoleplayMovementFrame(Frame):
         cmmsg: ChangeMapMessage = ChangeMapMessage()
         cmmsg.init(self._wantToChangeMap, self._changeMapByAutoTrip)
         ConnectionsHandler.getConnection().send(cmmsg)
+        self._changeMapTimer = Timer(5, self.onMapChangeFailed)
+        self._changeMapTimer.start()
+        logger.debug("[RolePlayMovement] Change map timer started.")
+
+    def onMapChangeFailed(self) -> None:
+        logger.debug(
+            f"[RolePlayMovement] Change map to dest {self._wantToChangeMap} failed!"
+        )
+        cmfm: MapChangeFailedMessage = MapChangeFailedMessage()
+        cmfm.init(self._wantToChangeMap)
+        Kernel().getWorker().processImmediately(cmfm)
 
     def activateSkill(
         self, skillInstanceId: int, ie: InteractiveElement, additionalParam: int

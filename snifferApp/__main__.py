@@ -1,7 +1,9 @@
 import argparse
 import logging
+import os
 from com.ankamagames.jerakine.logger.Logger import Logger
 from . import ui
+import webbrowser
 
 logger = logging.getLogger("labot")
 
@@ -9,6 +11,7 @@ logger = logging.getLogger("labot")
 def main(capture_file=None):
     ui.init(capture_file)
     ui.async_start()
+
 
 if __name__ == "__main__":
 
@@ -36,3 +39,6 @@ if __name__ == "__main__":
     else:
         logger.debug("Starting sniffer on live interface")
         main()
+        bpath = os.environ.get("WEB_BROWSER") + " %s"
+        if bpath:
+            webbrowser.get(bpath).open_new("http://127.0.0.1:8888")

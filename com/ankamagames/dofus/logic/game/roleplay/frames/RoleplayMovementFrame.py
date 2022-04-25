@@ -1,3 +1,4 @@
+from re import VERBOSE
 from threading import Timer
 from time import perf_counter
 from com.ankamagames.atouin.messages.EntityMovementCompleteMessage import (
@@ -111,6 +112,7 @@ logger = Logger(__name__)
 
 class RoleplayMovementFrame(Frame):
     CONSECUTIVE_MOVEMENT_DELAY: int = 0.25
+    VERBOSE = False
 
     _wantToChangeMap: float = -1
 
@@ -201,9 +203,10 @@ class RoleplayMovementFrame(Frame):
             else:
                 self._isRequestingMovement = False
                 pathDuration = max(1, clientMovePath.getCrossingDuration())
-                logger.debug(
-                    "Sending Entity movement complete in %s seconds", pathDuration
-                )
+                if self.VERBOSE:
+                    logger.debug(
+                        "Sending Entity movement complete in %s seconds", pathDuration
+                    )
                 Timer(
                     1.5 * pathDuration,
                     lambda: Kernel()
@@ -213,9 +216,11 @@ class RoleplayMovementFrame(Frame):
             return True
 
         elif isinstance(msg, EntityMovementCompleteMessage):
-            logger.debug("Entity movement complete")
             emcmsg = msg
             if emcmsg.entity.id == PlayedCharacterManager().id:
+                logger.debug(
+                    f"[RolePlayMovement] Mouvement complete, arrived at {emcmsg.entity.position.cellId}, destination point {self._destinationPoint}, wants to change map to: {self._wantToChangeMap}, following: {self._followingIe}"
+                )
                 gmmcmsg = GameMapMovementConfirmMessage()
                 ConnectionsHandler.getConnection().send(gmmcmsg)
                 if (
@@ -223,11 +228,14 @@ class RoleplayMovementFrame(Frame):
                     and emcmsg.entity.position.cellId == self._destinationPoint
                 ):
                     logger.debug(
-                        "Player arrived at destination point and he wanted to change map"
+                        f"[RolePlayMovement] Player arrived at destination point and he wanted to change map"
                     )
                     self.askMapChange()
                     self._isRequestingMovement = False
                 if self._followingIe:
+                    logger.debug(
+                        f"[RolePlayMovement] Player arrived at destination point and he wanted to collect resource {self._followingIe['ie'].elementId}"
+                    )
                     self._isRequestingMovement = False
                     self.activateSkill(
                         self._followingIe["skillInstanceId"],
@@ -360,19 +368,19 @@ class RoleplayMovementFrame(Frame):
         self._nextMovementBehavior = pValue
 
     def askMoveTo(self, cell: MapPoint) -> bool:
-        logger.debug(f"Asking to move to cell {cell}")
+        logger.debug(f"[RolePlayMovement] Asking to move to cell {cell}")
         if (
             not self._canMove
             or PlayedCharacterManager().state == PlayerLifeStatusEnum.STATUS_TOMBSTONE
         ):
-            logger.debug("Can't move or dead, aborting")
+            logger.debug("[RolePlayMovement] Can't move or dead, aborting")
             return False
         if self._isRequestingMovement:
-            logger.debug("Already requesting movement, aborting")
+            logger.debug("[RolePlayMovement] Already requesting movement, aborting")
             return False
         now: int = perf_counter()
         if self._latestMovementRequest + self.CONSECUTIVE_MOVEMENT_DELAY > now:
-            logger.debug("Too soon to request movement, aborting")
+            logger.debug("[RolePlayMovement] Too soon to request movement, aborting")
             return False
         self._isRequestingMovement = True
         playerEntity: AnimatedCharacter = DofusEntities.getEntity(
@@ -380,7 +388,7 @@ class RoleplayMovementFrame(Frame):
         )
         if not playerEntity:
             logger.warn(
-                "The player tried to move before its character was added to the scene. Aborting."
+                "[RolePlayMovement] The player tried to move before its character was added to the scene. Aborting."
             )
             self._isRequestingMovement = False
             return False
@@ -388,18 +396,22 @@ class RoleplayMovementFrame(Frame):
         if playerEntity.isMoving:
             playerEntity.stop()
             self._followingMove = cell
-            logger.debug("Player is already moving, waiting for him to stop")
+            logger.debug(
+                "[RolePlayMovement] Player is already moving, waiting for him to stop"
+            )
             return False
         movePath = Pathfinding.findPath(DataMapProvider(), playerEntity.position, cell)
         self.sendPath(movePath)
         return True
 
     def sendPath(self, path: MovementPath) -> None:
-        logger.info(f"Sending path {path}")
+        if self.VERBOSE:
+            logger.info(f"[RolePlayMovement] Sending movement path {path}")
         if path.start.cellId == path.end.cellId:
-            logger.warn(
-                f"Discarding a movement path that begins and ends on the same cell ({path.start.cellId})."
-            )
+            if self.VERBOSE:
+                logger.warn(
+                    f"[RolePlayMovement] Discarding a movement path that begins and ends on the same cell ({path.start.cellId})."
+                )
             self._isRequestingMovement = False
             if self._followingIe:
                 self.activateSkill(
@@ -416,9 +428,8 @@ class RoleplayMovementFrame(Frame):
         keymoves = MapMovementAdapter.getServerMovement(path)
         gmmrmsg.init(keymoves, PlayedCharacterManager().currentMap.mapId)
         ConnectionsHandler.getConnection().send(gmmrmsg)
-        logger.info(
-            f"Sending a movement request to the server. Path length: {len(keymoves)}"
-        )
+        if self.VERBOSE:
+            logger.debug(f"[RolePlayMovement] Movement request sent to server.")
         self._latestMovementRequest = perf_counter()
 
     def applyGameMapMovement(
@@ -427,7 +438,7 @@ class RoleplayMovementFrame(Frame):
         movedEntity: IEntity = DofusEntities.getEntity(actorId)
         if movedEntity is None:
             logger.warn(
-                f"The entity {actorId} moved before it was added to the scene. Aborting movement."
+                f"[RolePlayMovement] The entity {actorId} moved before it was added to the scene. Aborting movement."
             )
             return
         self._lastMoveEndCellId = movement.end.cellId
@@ -435,7 +446,10 @@ class RoleplayMovementFrame(Frame):
             self._isRequestingMovement = False
 
     def askMapChange(self) -> None:
-        logger.debug("Asking for a map change to map " + str(self._wantToChangeMap))
+        logger.debug(
+            "[RolePlayMovement] Asking for a map change to map "
+            + str(self._wantToChangeMap)
+        )
         cmmsg: ChangeMapMessage = ChangeMapMessage()
         cmmsg.init(self._wantToChangeMap, self._changeMapByAutoTrip)
         ConnectionsHandler.getConnection().send(cmmsg)
@@ -445,6 +459,9 @@ class RoleplayMovementFrame(Frame):
     ) -> None:
         rpInteractivesFrame: rif.RoleplayInteractivesFrame = (
             Kernel().getWorker().getFrame("RoleplayInteractivesFrame")
+        )
+        logger.debug(
+            f"[RolePlayMovement] requested registred Elm: {rpInteractivesFrame.currentRequestedElementId}, wants to activate {ie.elementId} and already using something {rpInteractivesFrame.usingInteractive}"
         )
         if (
             rpInteractivesFrame

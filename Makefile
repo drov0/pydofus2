@@ -48,7 +48,8 @@ unpack-maps:
 deps:
 	@pip install -r requirements.txt
 
-startSniffer:
+sniff:
+	source .venv/Scripts/activate
 	@python -m snifferApp 
 
 activate:
@@ -64,5 +65,6 @@ genKeys:
 	@ssh-keygen -t rsa -b 2056 -m PEM -f $(PASS_ENC_KEYS)/id_rsa
 
 test:
+	source .venv/Scripts/activate
 	@python $(CURDIR)/pyd2bot/main.py $(bot)
 

@@ -2,6 +2,7 @@
 #     InteractiveCellManager,
 # )
 from com.ankamagames.atouin.data.map.Layer import Layer
+from com.ankamagames.atouin.enums.ElementTypesEnum import ElementTypesEnum
 from com.ankamagames.atouin.messages.MapLoadedMessage import MapLoadedMessage
 from com.ankamagames.jerakine.logger.Logger import Logger
 from time import perf_counter
@@ -59,17 +60,18 @@ class MapDisplayManager(metaclass=Singleton):
     def initIdentifiedElements(self):
         self._identifiedElementPosition = dict()
         for layer in self.dataMap.layers:
+            if layer.layerId == Layer.LAYER_GROUND:
+                continue
             for cell in layer.cells:
                 for element in cell.elements:
-                    if layer.layerId == Layer.LAYER_GROUND:
-                        continue
-                    if element.identifier > 0:
-                        self._identifiedElementPosition[
-                            element.identifier
-                        ] = MapPoint.fromCellId(cell.cellId)
+                    if element.elementType == ElementTypesEnum.GRAPHICAL:
+                        if element.identifier > 0:
+                            self._identifiedElementPosition[
+                                element.identifier
+                            ] = MapPoint.fromCellId(cell.cellId)
 
-    def isIdentifiedElement(self, element: int) -> bool:
-        return element in self._identifiedElementPosition
+    def isIdentifiedElement(self, identifier: int) -> bool:
+        return identifier in self._identifiedElementPosition
 
     def getIdentifiedElementPosition(self, identifier: int) -> MapPoint:
         return self._identifiedElementPosition[identifier]
@@ -86,7 +88,9 @@ class MapDisplayManager(metaclass=Singleton):
         map = self._loader.load(mapId)
         self._nMapLoadEnd = perf_counter()
         logger.debug(
-            "Map loaded in " + str(self._nMapLoadEnd - self._nMapLoadStart) + " seconds"
+            f"Map {map.id} loaded in "
+            + str(self._nMapLoadEnd - self._nMapLoadStart)
+            + " seconds"
         )
         dmpm.DataMapProvider().resetUpdatedCell()
         dmpm.DataMapProvider().resetSpecialEffects()

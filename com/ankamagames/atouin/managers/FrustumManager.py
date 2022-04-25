@@ -35,7 +35,7 @@ class FrustumManager:
         randomDirection = random.choice(list(possibleChangeDirections.keys()))
         mapChange = possibleChangeDirections[randomDirection]
         logger.debug(
-            f"will send a click to change map towards direction {randomDirection}"
+            f"[MouvementAPI] Sending a click to change map towards direction '{randomDirection.name}'"
         )
         cls.sendClickAdjacentMsg(mapChange.destMapId, mapChange.outCellId)
 
@@ -62,10 +62,15 @@ class FrustumManager:
         playedEntityCellId = playedEntity.position.cellId
         cellId = currentMap.cellOutTowards(playedEntityCellId, direction)
         if cellId is not None:
-            logger.debug("FrustumManager.changeMapToDirection: cellId = " + str(cellId))
+            logger.debug(
+                f"[MouvementAPI] FrustumManager.changeMapToDirection: cellId = "
+                + str(cellId)
+            )
             cls.sendClickAdjacentMsg(destMapId, cellId)
         else:
-            logger.warn("Impossible to change map to direction " + str(direction))
+            logger.warn(
+                "[MouvementAPI] Unable to change map to direction " + str(direction)
+            )
 
     @classmethod
     def sendClickAdjacentMsg(cls, mapId: float, cellId: int) -> None:

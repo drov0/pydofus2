@@ -352,5 +352,5 @@ ROOTDIR = pathlib.Path(os.path.dirname(__file__))
 #     ROOTDIR / "inventoryView",
 # )
 t = perf_counter()
-parseFile(ROOTDIR / "target.as", ROOTDIR / "StatesEnum.py")
+parseFile(ROOTDIR / "target.as", ROOTDIR / "Notification.py")
 print("parsing took:", perf_counter() - t)

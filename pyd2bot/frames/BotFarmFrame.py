@@ -1,9 +1,14 @@
+from email.errors import FirstHeaderLineIsContinuationDefect
 import threading
 from com.ankamagames.atouin.managers.FrustumManager import FrustumManager
 from com.ankamagames.dofus.datacenter.jobs.Skill import Skill
+from com.ankamagames.dofus.datacenter.notifications.Notification import Notification
 from com.ankamagames.dofus.kernel.Kernel import Kernel
 from com.ankamagames.dofus.logic.game.common.managers.PlayedCharacterManager import (
     PlayedCharacterManager,
+)
+from com.ankamagames.dofus.network.messages.game.context.notification.NotificationByServerMessage import (
+    NotificationByServerMessage,
 )
 from com.ankamagames.dofus.network.messages.game.context.roleplay.MapComplementaryInformationsDataMessage import (
     MapComplementaryInformationsDataMessage,
@@ -28,6 +33,8 @@ from com.ankamagames.jerakine.messages.Frame import Frame
 from com.ankamagames.jerakine.messages.Message import Message
 from com.ankamagames.jerakine.types.enums.Priority import Priority
 from typing import TYPE_CHECKING
+
+from pyd2bot.apis.FarmAPI import FarmAPI
 
 if TYPE_CHECKING:
     from com.ankamagames.dofus.logic.game.roleplay.frames.RoleplayInteractivesFrame import (
@@ -67,17 +74,23 @@ class BotFarmFrame(Frame):
 
         if isinstance(msg, InteractiveUseErrorMessage):
             if msg.elemId == self._currentRequestedElementId:
-                self._currentRequestedElementId = -1
+                logger.error(
+                    f"[BotFarmFrame] Error unable to use interactive element {msg.elemId} with the skill {msg.skillInstanceUid}"
+                )
                 self._usingInteractive = False
                 self.discard.append(msg.elemId)
-                if not self.collectResource():
+                self._currentRequestedElementId = FarmAPI().collectResource()
+                if self._currentRequestedElementId == -1:
                     FrustumManager.randomMapChange()
             return True
 
         if isinstance(msg, InteractiveUsedMessage):
             self.nbrOfFails = 0
             if PlayedCharacterManager().id == msg.entityId and msg.duration > 0:
-                self._currentUsedElementId = msg.elemId
+                logger.debug(
+                    f"[BotFarmFrame] Started using interactive element {msg.elemId} ...."
+                )
+                self._currentRequestedElementId = msg.elemId
             if self._currentRequestedElementId == msg.elemId:
                 self._currentRequestedElementId = -1
             if msg.duration > 0:
@@ -88,43 +101,25 @@ class BotFarmFrame(Frame):
 
         if isinstance(msg, InteractiveUseEndedMessage):
             if self._entities[msg.elemId] == PlayedCharacterManager().id:
-                self._usingInteractive = False
-                self._currentUsedElementId = -1
+                logger.debug(
+                    f"[BotFarmFrame] Interactive element {msg.elemId} use ended"
+                )
+                self._usingInteractive = FirstHeaderLineIsContinuationDefect
                 self.lastCollected = msg.elemId
-                if not self.collectResource():
+                self._currentRequestedElementId = FarmAPI().collectResource()
+                if self._currentRequestedElementId == -1:
                     FrustumManager.randomMapChange()
             del self._entities[msg.elemId]
             return True
 
         if isinstance(msg, MapComplementaryInformationsDataMessage):
             self.discard.clear()
-            if not self.collectResource():
+            self._currentRequestedElementId = FarmAPI().collectResource()
+            if self._currentRequestedElementId == -1:
                 FrustumManager.randomMapChange()
 
-    def collectResource(self):
-        for ie in self.rolePlayEntitiesFrame.interactiveElements:
-            if ie.elementId in self.discard:
-                continue
-            ie_data = self.roleplayInteractivesFrame.getInteractiveElement(ie.elementId)
-            if ie.elementId in self.roleplayInteractivesFrame._collectableIe:
-                cole = self.roleplayInteractivesFrame._collectableIe[ie.elementId]
-                enabled = cole["enabled"]
-                state = cole["state"]
-                skill = Skill.getSkillById(cole["skill"].skillId)
-                logger.debug(
-                    f">> elemId: {ie.elementId}, enabled: {enabled}, skill: {skill.name}, state: {state}"
-                )
-            interactiveSkill = self.roleplayInteractivesFrame.canBeCollected(
-                ie.elementId
-            )
-            if interactiveSkill is not None:
-                skill = Skill.getSkillById(interactiveSkill.skillId)
-                logger.debug(
-                    "====> Collecting %d with skill %s", ie.elementId, skill.name
-                )
-                self.roleplayInteractivesFrame.skillClicked(
-                    ie_data, interactiveSkill.skillInstanceUid
-                )
-                self._currentRequestedElementId = ie.elementId
-                return True
-        return False
+        if isinstance(msg, NotificationByServerMessage):
+            notification = Notification.getNotificationById(msg.id)
+            if notification.titleId == 756273:
+                # inventory full notification
+                raise Exception(f"[{notification.title}] {notification.message}")

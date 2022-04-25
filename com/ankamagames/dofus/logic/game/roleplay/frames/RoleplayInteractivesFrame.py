@@ -66,6 +66,25 @@ from com.ankamagames.jerakine.types.positions.MapPoint import MapPoint
 logger = Logger(__name__)
 
 
+class CollectableElement:
+    def __init__(
+        self, id: int, interactiveSkill: InteractiveElementSkill, enabled: bool
+    ):
+        self.id = id
+        self.skill = Skill.getSkillById(interactiveSkill.skillId)
+        self.skillName = self.skill.name
+        self.interactiveSkill = interactiveSkill
+        self.enabled = enabled
+
+    def __str__(self):
+        return "CollectableElement(id={}, skill={}, SkillUID={}, enabled={})".format(
+            self.id,
+            self.skillName,
+            self.interactiveSkill.skillInstanceUid,
+            self.enabled,
+        )
+
+
 class InteractiveElementData:
     def __init__(
         self, element: InteractiveElement, position: MapPoint, firstSkill: int
@@ -135,7 +154,7 @@ class RoleplayInteractivesFrame(Frame):
 
     def __init__(self):
         self._ie = dict[int, InteractiveElementData]()
-        self._collectableIe = dict[int, dict]()
+        self._collectableIe = dict[int, CollectableElement]()
         self._currentUsages = list()
         self._entities = dict()
         self._interactiveActionTimers = dict()
@@ -174,6 +193,14 @@ class RoleplayInteractivesFrame(Frame):
     @property
     def worldInteractionIsEnable(self) -> bool:
         return self._enableWorldInteraction
+
+    @property
+    def interactives(self) -> dict[int, InteractiveElementData]:
+        return self._ie
+
+    @property
+    def collectables(self) -> dict[int, CollectableElement]:
+        return self._collectableIe
 
     def pushed(self) -> bool:
         return True
@@ -254,7 +281,6 @@ class RoleplayInteractivesFrame(Frame):
             return True
 
         if isinstance(msg, InteractiveUseEndedMessage):
-            logger.debug("InteractiveUseEndedMessage for %d", msg.elemId)
             iuemsg = msg
             self.interactiveUsageFinished(
                 self._entities[iuemsg.elemId], iuemsg.elemId, iuemsg.skillId
@@ -321,59 +347,31 @@ class RoleplayInteractivesFrame(Frame):
     def removeInteractive(self, ie: InteractiveElement) -> None:
         del self._ie[ie.elementId]
 
-    def updateStatedElement(self, se: StatedElement, globalv: bool = False) -> None:
-        if se.onCurrentMap:
-            enabled = False
-            if se.elementId == self._currentUsedElementId:
-                self._usingInteractive = True
-            if (
-                self._ie.get(se.elementId)
-                and self._ie[se.elementId].element
-                and self._ie[se.elementId].element.elementId == se.elementId
-            ):
-                interactive = Interactive.getInteractiveById(
-                    self._ie[se.elementId].element.elementTypeId
-                )
-                if interactive:
-                    isCollectable = False
-                    for interactiveSkill in self._ie[
-                        se.elementId
-                    ].element.enabledSkills:
-                        skill = Skill.getSkillById(interactiveSkill.skillId)
-                        if skill.elementActionId == self.ACTION_COLLECTABLE_RESOURCES:
-                            isCollectable = True
-                            enabled = True
-                            break
-
-                    if not isCollectable:
-                        for interactiveSkill in self._ie[
-                            se.elementId
-                        ].element.disabledSkills:
-                            skill = Skill.getSkillById(interactiveSkill.skillId)
-                            if (
-                                skill.elementActionId
-                                == self.ACTION_COLLECTABLE_RESOURCES
-                            ):
-                                isCollectable = True
-                                break
-
-                    if isCollectable:
-                        self._collectableIe[
-                            self._ie[se.elementId].element.elementId
-                        ] = {
-                            "state": se.elementState,
-                            "skill": interactiveSkill,
-                            "enabled": enabled,
-                        }
-
-    def canBeCollected(self, elementId: int) -> InteractiveElementSkill:
-        if (
-            elementId in self._collectableIe
-            and self._collectableIe[elementId]["state"] == StatesEnum.STATE_NORMAL
-            and self._collectableIe[elementId]["enabled"]
-        ):
-            return self._collectableIe[elementId]["skill"]
+    def isCollectable(self, ie: InteractiveElement) -> CollectableElement:
+        interactive = Interactive.getInteractiveById(ie.elementTypeId)
+        if interactive is not None:
+            for interactiveSkill in ie.enabledSkills:
+                skill = Skill.getSkillById(interactiveSkill.skillId)
+                if skill.elementActionId == self.ACTION_COLLECTABLE_RESOURCES:
+                    if skill.name == "Panneau directionnel : via référence hint":
+                        raise Exception("Panneau can't be collectable resource")
+                    return CollectableElement(ie.elementId, interactiveSkill, True)
+            for interactiveSkill in ie.disabledSkills:
+                skill = Skill.getSkillById(interactiveSkill.skillId)
+                if skill.elementActionId == self.ACTION_COLLECTABLE_RESOURCES:
+                    return CollectableElement(ie.elementId, interactiveSkill, False)
         return None
+
+    def updateStatedElement(self, se: StatedElement, globalv: bool = False) -> None:
+        if se.elementId == self._currentUsedElementId:
+            self._usingInteractive = True
+        if se.elementId in self._ie and self._ie[se.elementId].element.onCurrentMap:
+            collectable = self.isCollectable(self._ie[se.elementId].element)
+            if collectable is not None:
+                self._collectableIe[collectable.id] = collectable
+
+    def canBeCollected(self, elementId: int) -> CollectableElement:
+        return self._collectableIe.get(elementId)
 
     def skillClicked(self, ie: InteractiveElementData, skillInstanceId: int) -> None:
         msg: InteractiveElementActivationMessage = InteractiveElementActivationMessage(

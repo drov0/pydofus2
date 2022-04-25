@@ -12,10 +12,10 @@ class IDataMapProvider:
 
     def pointMov(
         self,
-        param1: int,
-        param2: int,
-        param3: bool = True,
-        param4: int = -1,
+        x: int,
+        y: int,
+        allowThroughtEntity: bool = True,
+        cellId: int = -1,
         param5: int = -1,
         param6: bool = True,
     ) -> bool:

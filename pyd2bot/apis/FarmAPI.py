@@ -29,13 +29,12 @@ class FarmAPI(metaclass=Singleton):
         ce = None
         if elementId is None:
             for it in self.rplInteractivesFrame.collectables.values():
-                if it.enabled:
+                if it.enabled and not it.id:
                     ce = it
                     elementId = it.id
                     break
         else:
             ce = self.rplInteractivesFrame.collectables.get(elementId)
-
         if ce is not None and ce.enabled:
             if self.VERBOSE:
                 logger.info(f"[{self.id}] Collecting {ce} ...")

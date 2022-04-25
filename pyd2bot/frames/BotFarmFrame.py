@@ -55,7 +55,6 @@ logger = Logger(__name__)
 class BotFarmFrame(Frame):
     def __init__(self):
         super().__init__()
-        self._ieDiscard = []
         self._currentRequestedElementId = -1
         self._usingInteractive = False
         self._dstMapId = None
@@ -89,7 +88,8 @@ class BotFarmFrame(Frame):
             )
             if msg.elemId == self._currentRequestedElementId:
                 self._usingInteractive = False
-                self._ieDiscard.append(msg.elemId)
+                del self.roleplayInteractivesFrame._ie[msg.elemId]
+                del self.roleplayInteractivesFrame._collectableIe[msg.elemId]
                 self._currentRequestedElementId = FarmAPI().collectResource()
                 if self._currentRequestedElementId == -1:
                     FrustumManager.randomMapChange()
@@ -122,7 +122,6 @@ class BotFarmFrame(Frame):
             return True
 
         elif isinstance(msg, MapComplementaryInformationsDataMessage):
-            self._ieDiscard.clear()
             self._mapIdDiscard.clear()
             self._currentRequestedElementId = FarmAPI().collectResource()
             if self._currentRequestedElementId == -1:

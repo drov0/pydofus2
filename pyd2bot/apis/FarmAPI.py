@@ -38,8 +38,10 @@ class FarmAPI(metaclass=Singleton):
 
         if ce is not None and ce.enabled:
             if self.VERBOSE:
-                logger.info(f"[self.id] Collecting {ce} ...")
+                logger.info(f"[{self.id}] Collecting {ce} ...")
             ie = self.rplInteractivesFrame.interactives.get(elementId)
+            if ie is None:
+                raise Exception(f"[{self.id}] InteractiveElement {elementId} not found")
             self.rplInteractivesFrame.skillClicked(
                 ie, ce.interactiveSkill.skillInstanceUid
             )

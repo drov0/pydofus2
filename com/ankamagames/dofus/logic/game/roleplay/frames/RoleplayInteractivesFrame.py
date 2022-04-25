@@ -1,9 +1,4 @@
-# from com.ankamagames.atouin.managers.InteractiveCellManager import (
-#     InteractiveCellManager,
-# )
-from lib2to3.pgen2.grammar import opmap
 from com.ankamagames.atouin.managers.MapDisplayManager import MapDisplayManager
-from com.ankamagames.berilia.enums.StatesEnum import StatesEnum
 from com.ankamagames.dofus.datacenter.interactives.Interactive import Interactive
 from com.ankamagames.dofus.datacenter.jobs.Skill import Skill
 from com.ankamagames.dofus.kernel.Kernel import Kernel
@@ -310,6 +305,7 @@ class RoleplayInteractivesFrame(Frame):
         for timeout in self._currentUsages:
             clearTimeout(timeout)
         self._ie.clear()
+        self._collectableIe.clear()
 
     def getInteractiveElementsCells(self) -> list[int]:
         cells = [
@@ -353,8 +349,6 @@ class RoleplayInteractivesFrame(Frame):
             for interactiveSkill in ie.enabledSkills:
                 skill = Skill.getSkillById(interactiveSkill.skillId)
                 if skill.elementActionId == self.ACTION_COLLECTABLE_RESOURCES:
-                    if skill.name == "Panneau directionnel : via référence hint":
-                        raise Exception("Panneau can't be collectable resource")
                     return CollectableElement(ie.elementId, interactiveSkill, True)
             for interactiveSkill in ie.disabledSkills:
                 skill = Skill.getSkillById(interactiveSkill.skillId)

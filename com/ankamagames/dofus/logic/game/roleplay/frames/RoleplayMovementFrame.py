@@ -177,7 +177,7 @@ class RoleplayMovementFrame(Frame):
     def process(self, msg: Message) -> bool:
 
         if isinstance(msg, GameMapNoMovementMessage):
-            logger.debug("Map change impossible")
+            logger.debug("Movement impossible")
             self._isRequestingMovement = False
             if self._followingIe:
                 self.activateSkill(

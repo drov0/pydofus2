@@ -47,7 +47,7 @@ class Skill(IDataCenter):
 
     _parentJob: Job
 
-    _interactive: Interactive
+    _interactive: Interactive = None
 
     _gatheredRessource: ItemWrapper
 

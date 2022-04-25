@@ -212,7 +212,7 @@ class RoleplayMovementFrame(Frame):
                 ).start()
             return True
 
-        if isinstance(msg, EntityMovementCompleteMessage):
+        elif isinstance(msg, EntityMovementCompleteMessage):
             logger.debug("Entity movement complete")
             emcmsg = msg
             if emcmsg.entity.id == PlayedCharacterManager().id:
@@ -228,6 +228,7 @@ class RoleplayMovementFrame(Frame):
                     self.askMapChange()
                     self._isRequestingMovement = False
                 if self._followingIe:
+                    self._isRequestingMovement = False
                     self.activateSkill(
                         self._followingIe["skillInstanceId"],
                         self._followingIe["ie"],
@@ -235,6 +236,7 @@ class RoleplayMovementFrame(Frame):
                     )
                     self._followingIe = None
                 if self._followingMonsterGroup:
+                    self._isRequestingMovement = False
                     self.requestMonsterFight(self._followingMonsterGroup.id)
                     self._followingMonsterGroup = None
                 Kernel().getWorker().processImmediately(
@@ -242,7 +244,7 @@ class RoleplayMovementFrame(Frame):
                 )
             return True
 
-        if isinstance(msg, EntityMovementStoppedMessage):
+        elif isinstance(msg, EntityMovementStoppedMessage):
             emsmsg = msg
             if emsmsg.entity.id == PlayedCharacterManager().id:
                 canceledMoveMessage = GameMapMovementCancelMessage()
@@ -260,7 +262,7 @@ class RoleplayMovementFrame(Frame):
                     self._followingMessage = None
             return True
 
-        if isinstance(msg, TeleportOnSameMapMessage):
+        elif isinstance(msg, TeleportOnSameMapMessage):
             tosmmsg = msg
             teleportedEntity = DofusEntities.getEntity(tosmmsg.targetId)
             if teleportedEntity:
@@ -276,47 +278,47 @@ class RoleplayMovementFrame(Frame):
                 )
             return True
 
-        if isinstance(msg, InteractiveUsedMessage):
+        elif isinstance(msg, InteractiveUsedMessage):
             if msg.entityId == PlayedCharacterManager().id:
                 self._canMove = msg.canMove
             return False
 
-        if isinstance(msg, InteractiveUseEndedMessage):
+        elif isinstance(msg, InteractiveUseEndedMessage):
             self._canMove = True
             return False
 
-        if isinstance(msg, InteractiveUseErrorMessage):
+        elif isinstance(msg, InteractiveUseErrorMessage):
             self._canMove = True
             return False
 
-        if isinstance(msg, LeaveDialogMessage):
+        elif isinstance(msg, LeaveDialogMessage):
             self._canMove = True
             return False
 
-        if isinstance(msg, ExchangeLeaveMessage):
+        elif isinstance(msg, ExchangeLeaveMessage):
             self._canMove = True
             return False
 
-        if isinstance(msg, EditHavenBagFinishedMessage):
+        elif isinstance(msg, EditHavenBagFinishedMessage):
             self._canMove = True
             return False
 
-        if isinstance(msg, GameRolePlayDelayedActionFinishedMessage):
+        elif isinstance(msg, GameRolePlayDelayedActionFinishedMessage):
             if msg.delayedCharacterId == PlayedCharacterManager().id:
                 self._canMove = True
             return False
 
-        if isinstance(msg, GuildFightPlayersHelpersLeaveMessage):
+        elif isinstance(msg, GuildFightPlayersHelpersLeaveMessage):
             if msg.playerId == PlayedCharacterManager().id:
                 self._canMove = True
             return False
 
-        if isinstance(msg, PrismFightDefenderLeaveMessage):
+        elif isinstance(msg, PrismFightDefenderLeaveMessage):
             if msg.fighterToRemoveId == PlayedCharacterManager().id:
                 self._canMove = True
             return False
 
-        if isinstance(msg, GameRolePlayFightRequestCanceledMessage):
+        elif isinstance(msg, GameRolePlayFightRequestCanceledMessage):
             if (
                 msg.targetId == PlayedCharacterManager().id
                 or msg.sourceId == PlayedCharacterManager().id
@@ -324,8 +326,9 @@ class RoleplayMovementFrame(Frame):
                 self._canMove = True
             return False
 
-        if isinstance(msg, MapComplementaryInformationsDataMessage):
+        elif isinstance(msg, MapComplementaryInformationsDataMessage):
             self._mapHasAggressiveMonsters = msg.hasAggressiveMonsters
+            self._isRequestingMovement = False
             return False
 
         else:

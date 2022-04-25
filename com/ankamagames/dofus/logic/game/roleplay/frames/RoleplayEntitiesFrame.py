@@ -1,5 +1,6 @@
 import random
 from timeit import Timer
+from com.ankamagames.atouin.managers.EntitiesManager import EntitiesManager
 from com.ankamagames.atouin.managers.MapDisplayManager import MapDisplayManager
 from com.ankamagames.atouin.messages.MapLoadedMessage import MapLoadedMessage
 from com.ankamagames.atouin.utils.DataMapProvider import DataMapProvider
@@ -326,13 +327,13 @@ class RoleplayEntitiesFrame(AbstractEntitiesFrame, Frame):
 
             for fight in mcidmsg.fights:
                 selfFightExists = False
-                for fightCache in self._fights:
+                for fightCache in self._fights.values():
                     if fight.fightId == fightCache.fightId:
                         selfFightExists = True
                 if not selfFightExists:
                     self.addFight(fight)
 
-            for fightCache in self._fights:
+            for fightCache in self._fights.values():
                 selfFightExists = False
                 for fight in mcidmsg.fights:
                     if fight.fightId == fightCache.fightId:
@@ -433,11 +434,11 @@ class RoleplayEntitiesFrame(AbstractEntitiesFrame, Frame):
             fightTeam = FightTeam(
                 fight,
                 team.teamTypeId,
-                teamEntity,
+                team,
                 team,
                 infos.fightTeamsOptions[team.teamId],
             )
-            self.registerActorWithId(fightTeam, teamEntity.id)
-            teams.push(fightTeam)
+            self.registerActorWithId(fightTeam, EntitiesManager().getFreeEntityId())
+            teams.append(fightTeam)
             teamCounter += 1
         self._fights[infos.fightId] = fight

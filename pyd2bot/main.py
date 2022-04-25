@@ -52,8 +52,18 @@ class TestBot:
         auth.AuthentificationManager().setToken(self.TOKEN)
         connh.ConnectionsHandler.connectToLoginServer(**self.CONN)
 
+    @property
+    def mainConn(self):
+        return connh.ConnectionsHandler.getConnection().mainConnection
+
 
 if __name__ == "__main__":
     botName = sys.argv[1]
     bot = TestBot(botName)
     bot.main()
+    while True:
+        try:
+            sleep(0.3)
+        except KeyboardInterrupt:
+            bot.mainConn.close()
+            sys.exit(0)

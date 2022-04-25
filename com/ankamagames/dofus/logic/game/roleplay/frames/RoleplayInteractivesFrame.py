@@ -204,7 +204,7 @@ class RoleplayInteractivesFrame(Frame):
                 )
             else:
                 self.removeInteractive(ieumsg.interactiveElement)
-            return True
+            return False
 
         if isinstance(msg, InteractiveUsedMessage):
             iumsg = msg
@@ -219,7 +219,11 @@ class RoleplayInteractivesFrame(Frame):
                     if rwf:
                         rwf.cellClickEnabled = False
                 self._entities[iumsg.elemId] = iumsg.entityId
-                logger.debug("added elem id %d to intities", iumsg.elemId)
+                logger.debug(
+                    "Element %d being farmed by the Entitie %d",
+                    iumsg.elemId,
+                    iumsg.entityId,
+                )
             return False
 
         if isinstance(msg, InteractiveUseErrorMessage):
@@ -239,7 +243,7 @@ class RoleplayInteractivesFrame(Frame):
         if isinstance(msg, StatedElementUpdatedMessage):
             seumsg = msg
             self.updateStatedElement(seumsg.statedElement)
-            return True
+            return False
 
         if isinstance(msg, MapObstacleUpdateMessage):
             moumsg = msg
@@ -296,6 +300,8 @@ class RoleplayInteractivesFrame(Frame):
         return self._ie.get(elementId)
 
     def registerInteractive(self, ie: InteractiveElement, firstSkill: int) -> None:
+        if not MapDisplayManager().isIdentifiedElement(ie.elementId):
+            return
         entitiesFrame: rpeF.RoleplayEntitiesFrame = (
             Kernel().getWorker().getFrame("RoleplayEntitiesFrame")
         )
@@ -317,11 +323,11 @@ class RoleplayInteractivesFrame(Frame):
 
     def updateStatedElement(self, se: StatedElement, globalv: bool = False) -> None:
         if se.onCurrentMap:
-            enabled = False 
+            enabled = False
             if se.elementId == self._currentUsedElementId:
                 self._usingInteractive = True
             if (
-                self._ie[se.elementId]
+                self._ie.get(se.elementId)
                 and self._ie[se.elementId].element
                 and self._ie[se.elementId].element.elementId == se.elementId
             ):
@@ -350,10 +356,15 @@ class RoleplayInteractivesFrame(Frame):
                             ):
                                 isCollectable = True
                                 break
+
                     if isCollectable:
                         self._collectableIe[
                             self._ie[se.elementId].element.elementId
-                        ] = {"state": se.elementState, "skill": interactiveSkill, 'enabled': enabled}
+                        ] = {
+                            "state": se.elementState,
+                            "skill": interactiveSkill,
+                            "enabled": enabled,
+                        }
 
     def canBeCollected(self, elementId: int) -> InteractiveElementSkill:
         if (

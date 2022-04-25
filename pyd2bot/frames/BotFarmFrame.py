@@ -96,16 +96,14 @@ class BotFarmFrame(Frame):
             return True
 
         elif isinstance(msg, InteractiveUsedMessage):
-            self.nbrOfFails = 0
             if PlayedCharacterManager().id == msg.entityId and msg.duration > 0:
                 logger.debug(
                     f"[BotFarmFrame] Started using interactive element {msg.elemId} ...."
                 )
                 self._currentRequestedElementId = msg.elemId
-            if self._currentRequestedElementId == msg.elemId:
-                self._currentRequestedElementId = -1
-            if msg.duration > 0:
-                if PlayedCharacterManager().id == msg.entityId:
+                if self._currentRequestedElementId == msg.elemId:
+                    self._currentRequestedElementId = -1
+                if msg.duration > 0:
                     self._usingInteractive = True
             self._entities[msg.elemId] = msg.entityId
             return True

@@ -55,7 +55,7 @@ class MapZones(list[Zone]):
             while nodes:
                 cell = nodes.pop()
                 seen.add(cell)
-                nodes |= dataMap.getCellNeighbours(cell.id) - seen
+                nodes |= dataMap.getCellNeighbours(cell.id, True) - seen
                 ret[cell.id] = cell
             return ret
 

@@ -4,6 +4,7 @@ from com.ankamagames.atouin.data.map.Fixture import Fixture
 from com.ankamagames.atouin.data.map.Cell import Cell
 from com.ankamagames.atouin.data.map.Layer import Layer
 from com.ankamagames.atouin.utils.CellIdConverter import CellIdConverter
+from com.ankamagames.atouin.utils.DataMapProvider import DataMapProvider
 from com.ankamagames.jerakine.data.BinaryStream import BinaryStream
 from com.ankamagames.jerakine.logger.Logger import Logger
 from com.ankamagames.jerakine.types.enums.DirectionsEnum import DirectionsEnum
@@ -197,12 +198,17 @@ class Map:
 
         raise Exception("Invalid direction.")
 
-    def getCellNeighbours(self, cellId: int) -> set["Cell"]:
+    def getCellNeighbours(self, cellId: int, allowThrought: bool = True) -> set["Cell"]:
+        currMp = MapPoint.fromCellId(cellId)
         neighbours = set[Cell]()
         for i in DirectionsEnum:
             cell = self.getNeighbourCellFromDirection(cellId, i)
             if cell and cell.isAccessibleDuringRP():
-                neighbours.add(cell)
+                canMovTo = DataMapProvider().pointMov(
+                    currMp._nX, currMp._nY, allowThrought, cell.id, dataMap=self
+                )
+                if canMovTo:
+                    neighbours.add(cell)
         return neighbours
 
     def getNeighborIdFromDirection(self, direction: DirectionsEnum) -> int:

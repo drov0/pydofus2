@@ -28,13 +28,13 @@ The command bellow will do it all for you. It will create a new Python venv and 
 After running it make sure to activate the virtual environment for the next steps.
 
 ```bash
-$ make setup
+make setup
 ```
 
 After the setup is done, don't forget to activate the environment:
 
 ```bash
-$ source .venv/Scripts/activate
+source .venv/Scripts/activate
 ```
 
 ### Fetch the data from Dofus Invoker(protocol, keys, version, msgClasses, maps)
@@ -43,7 +43,7 @@ Before exectuting the command bellow make sure to have an updated version of the
 This will fetch important data from the sources of the game.
 
 ```bash
-$ make update
+make update
 ```
 
 > :warning: This process takes quite some time so be patient.
@@ -56,16 +56,18 @@ The following steps will help you setup, in a secure way, a bot account for your
 
 * Create a folder outside the repository for example `/c/keys`.
   
-* Add a new environment variable `PASS_ENC_KEYS` pointing to this folder. In my case, since I use git bash, I edited my bashrc 
-```bash 
-$ vim ~/.bashrc
+* Add a new environment variable `PASS_ENC_KEYS` pointing to this folder. In my case, since I use git bash, I edited my bashrc
+  
+```bash
+vim ~/.bashrc
 ```
+
 and I added the line `export PASS_ENC_KEY=/c/keys`. This variable is used by the launcher to find the key to use to encrypt your passwords before saving them.
 
 * Then run :
 
 ```bash
-$ make genKeys
+make genKeys
 ```
 
 > :warning: You may have to restart your terminal for the new variable to be added to env.
@@ -75,7 +77,7 @@ $ make genKeys
 Example:
 
 ```bash
-$ make createAccount entryName='grinder' login='myAccountAwsomeLogin' password='keepThisOneSafe'
+make createAccount entryName='grinder' login='myAccountAwsomeLogin' password='keepThisOneSafe'
 ```
 
 > :warning: Make sure to put the password inside single quotes to avoid having problems with special chars.
@@ -85,7 +87,7 @@ $ make createAccount entryName='grinder' login='myAccountAwsomeLogin' password='
 Example:
 
 ```bash
-make createBot botName='myBotName' account='grinder' charachterId='290210840786' serverId='210'
+make createBot botName='grinder' account='grinder' charachterId='335911059666' serverId='210'
 ```
 
 > Here the 'account' arg should correspond to the entryName you chose for your account creds.
@@ -94,8 +96,8 @@ make createBot botName='myBotName' account='grinder' charachterId='290210840786'
 
 ### Launch the bot
 
-```bash 
-$ make test bot='myBotName'
+```bash
+make test bot='myBotName'
 ```
 
 ## For developpers 
@@ -109,9 +111,15 @@ This repo comes with its own sniffer capable to dissect dofus protocol messages.
 Before you can run the sniffer you have to install Wireshark (for the tshark module). [Link to download Wireshark](https://www.wireshark.org/download.html).
 
 To run the sinffer:
+
 ```bash
 make startSniffer
 ```
-this command will start a server on [link to access the sniffer webui after start](http://localhost:8888)
 
+This command will start a server on [link to access the sniffer webui after start](http://localhost:8888)
 
+If you want the page to automatically open on your browser set the env variable `WEB_BROWSER` with the path to your browser. 
+
+For Edge users (like me), to get the browser path, visite the page `edge:version` on the browser it self, the of the field `Command-line` will contain the browser path. It should look like this `"C:\Program Files (x86)\Microsoft\Edge\Application\msedge.exe" --profile-directory=Default --flag-switches-begin --flag-switches-end`.
+
+Set the variable `WEB BROWSER` to `C:\Program Files (x86)\Microsoft\Edge\Application\msedge.exe --profile-directory=Default --flag-switches-begin --flag-switches-end`

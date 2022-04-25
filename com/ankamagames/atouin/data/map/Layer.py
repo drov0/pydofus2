@@ -41,7 +41,7 @@ class LayerCell:
     def read(self, raw: BinaryStream):
         self.cellId = raw.readShort()
         self.elementsCount = raw.readShort()
-        self.elements = [None] * self.elementsCount
+        self.elements: list[BasicElement] = [None] * self.elementsCount
         for i in range(self.elementsCount):
             be = BasicElement.getElementFromType(raw.readByte(), self)
             if AtouinConstants.DEBUG_FILES_PARSING:

@@ -423,7 +423,7 @@ class RoleplayEntitiesFrame(AbstractEntitiesFrame, Frame):
             return self._entities[entityId].teamType
 
     def addFight(self, infos: FightCommonInformations):
-        teamEntity: IEntity = None
+        teamEntity: IEntity = AnimatedCharacter(EntitiesManager().getFreeEntityId())
         fightTeam: "FightTeam" = None
         if self._fights.get(infos.fightId):
             return
@@ -434,11 +434,13 @@ class RoleplayEntitiesFrame(AbstractEntitiesFrame, Frame):
             fightTeam = FightTeam(
                 fight,
                 team.teamTypeId,
-                team,
+                teamEntity,
                 team,
                 infos.fightTeamsOptions[team.teamId],
             )
-            self.registerActorWithId(fightTeam, EntitiesManager().getFreeEntityId())
+            self.registerActorWithId(
+                fightTeam, teamEntity.id
+            )
             teams.append(fightTeam)
             teamCounter += 1
         self._fights[infos.fightId] = fight

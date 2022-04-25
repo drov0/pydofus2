@@ -70,8 +70,8 @@ class DataMapProvider(IDataMapProvider, metaclass=Singleton):
         dataMap=None,
     ) -> bool:
         if MapPoint.isInMap(x, y):
-            if not dataMap:
-                dataMap = mdmm.MapDisplayManager().currentDataMap
+            if dataMap is None:
+                dataMap = mdmm.MapDisplayManager().dataMap
             useNewSystem = dataMap.isUsingNewMovementSystem
             cellId = MapTools.getCellIdByCoord(x, y)
             cellData = dataMap.cells[cellId]

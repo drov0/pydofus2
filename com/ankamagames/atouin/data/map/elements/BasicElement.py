@@ -11,7 +11,6 @@ class BasicElement:
     _cell: Cell
 
     def __init__(self, cell: Cell):
-        super().__init__()
         self._cell = cell
 
     @classmethod
@@ -40,7 +39,7 @@ class BasicElement:
 
     @property
     def elementType(self) -> int:
-        return -1
+        return NotImplementedError
 
     def fromRaw(self, raw: ByteArray, mapVersion: int) -> None:
         raise NotImplementedError

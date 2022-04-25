@@ -73,7 +73,7 @@ class EntitiesManager(metaclass=Singleton):
 
     def getFreeEntityId(self) -> float:
         self._currentRandomEntity -= 1
-        while self._entities[self._currentRandomEntity] != None:
+        while self._entities.get(self._currentRandomEntity) is not None:
             self._currentRandomEntity -= 1
         return self._currentRandomEntity
 

@@ -25,6 +25,7 @@ class SnifferBuffer:
         return int(tcp_packet.seq), tcp_packet.payload.binary_value
 
     def updateFromMemory(self):
+        self.memory.sort(key=lambda e: e.seq)
         poped = []
         for packet in self.memory:
             seq, raw = self.getSeqRw(packet)
@@ -111,6 +112,8 @@ class Provider(threading.Thread):
                     return True
                 try:
                     p.tcp.payload.binary_value
+                    if int(p.tcp.seq) == 1:
+                        self.reset()
                     isfromClient = self.isFromClient(p)
                     if LOW_LEVEL_DEBUG:
                         logger.debug(f"isfromClient: {isfromClient}")

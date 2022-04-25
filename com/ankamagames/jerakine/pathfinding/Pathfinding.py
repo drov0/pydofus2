@@ -181,10 +181,6 @@ class Pathfinding:
                             cls._openListWeights[cellId] = heuristic + movementCost
                             if cellId not in cls._openList:
                                 cls._openList.append(cellId)
-        if cls._isCellClosed[endCellId] == True:
-            logger.info("Path to dest found")
-        else:
-            logger.error("Path to dest not found")
         movPath: MovementPath = MovementPath()
         movPath.start = start
         if cls._parentOfCell[endCellId] == MapTools.INVALID_CELL_ID:

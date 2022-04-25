@@ -1,11 +1,15 @@
 import threading
 from com.ankamagames.atouin.managers.FrustumManager import FrustumManager
+from com.ankamagames.dofus.datacenter.jobs.Skill import Skill
 from com.ankamagames.dofus.kernel.Kernel import Kernel
 from com.ankamagames.dofus.logic.game.common.managers.PlayedCharacterManager import (
     PlayedCharacterManager,
 )
 from com.ankamagames.dofus.network.messages.game.context.roleplay.MapComplementaryInformationsDataMessage import (
     MapComplementaryInformationsDataMessage,
+)
+from com.ankamagames.dofus.network.messages.game.interactive.InteractiveElementUpdatedMessage import (
+    InteractiveElementUpdatedMessage,
 )
 from com.ankamagames.dofus.network.messages.game.interactive.InteractiveUseEndedMessage import (
     InteractiveUseEndedMessage,
@@ -15,6 +19,9 @@ from com.ankamagames.dofus.network.messages.game.interactive.InteractiveUseError
 )
 from com.ankamagames.dofus.network.messages.game.interactive.InteractiveUsedMessage import (
     InteractiveUsedMessage,
+)
+from com.ankamagames.dofus.network.messages.game.interactive.StatedElementUpdatedMessage import (
+    StatedElementUpdatedMessage,
 )
 from com.ankamagames.jerakine.logger.Logger import Logger
 from com.ankamagames.jerakine.messages.Frame import Frame
@@ -35,7 +42,7 @@ logger = Logger(__name__)
 class BotFarmFrame(Frame):
     def __init__(self):
         super().__init__()
-        self.nbrOfFails = 0
+        self.discard = []
         self._currentRequestedElementId = -1
         self._usingInteractive = False
         self._entities = dict()
@@ -59,12 +66,10 @@ class BotFarmFrame(Frame):
     def process(self, msg: Message) -> bool:
 
         if isinstance(msg, InteractiveUseErrorMessage):
-            if self.nbrOfFails > 3:
-                raise Exception("Too many fails, aborting")
             if msg.elemId == self._currentRequestedElementId:
                 self._currentRequestedElementId = -1
                 self._usingInteractive = False
-                self.nbrOfFails += 1
+                self.discard.append(msg.elemId)
                 if not self.collectResource():
                     FrustumManager.randomMapChange()
             return True
@@ -85,22 +90,38 @@ class BotFarmFrame(Frame):
             if self._entities[msg.elemId] == PlayedCharacterManager().id:
                 self._usingInteractive = False
                 self._currentUsedElementId = -1
+                self.lastCollected = msg.elemId
                 if not self.collectResource():
                     FrustumManager.randomMapChange()
             del self._entities[msg.elemId]
             return True
 
         if isinstance(msg, MapComplementaryInformationsDataMessage):
+            self.discard.clear()
             if not self.collectResource():
                 FrustumManager.randomMapChange()
 
     def collectResource(self):
         for ie in self.rolePlayEntitiesFrame.interactiveElements:
+            if ie.elementId in self.discard:
+                continue
             ie_data = self.roleplayInteractivesFrame.getInteractiveElement(ie.elementId)
+            if ie.elementId in self.roleplayInteractivesFrame._collectableIe:
+                cole = self.roleplayInteractivesFrame._collectableIe[ie.elementId]
+                enabled = cole["enabled"]
+                state = cole["state"]
+                skill = Skill.getSkillById(cole["skill"].skillId)
+                logger.debug(
+                    f">> elemId: {ie.elementId}, enabled: {enabled}, skill: {skill.name}, state: {state}"
+                )
             interactiveSkill = self.roleplayInteractivesFrame.canBeCollected(
                 ie.elementId
             )
             if interactiveSkill is not None:
+                skill = Skill.getSkillById(interactiveSkill.skillId)
+                logger.debug(
+                    "====> Collecting %d with skill %s", ie.elementId, skill.name
+                )
                 self.roleplayInteractivesFrame.skillClicked(
                     ie_data, interactiveSkill.skillInstanceUid
                 )

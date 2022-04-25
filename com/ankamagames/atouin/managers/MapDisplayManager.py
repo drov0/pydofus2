@@ -1,6 +1,7 @@
 # from com.ankamagames.atouin.managers.InteractiveCellManager import (
 #     InteractiveCellManager,
 # )
+from com.ankamagames.atouin.data.map.Layer import Layer
 from com.ankamagames.atouin.messages.MapLoadedMessage import MapLoadedMessage
 from com.ankamagames.jerakine.logger.Logger import Logger
 from time import perf_counter
@@ -60,9 +61,15 @@ class MapDisplayManager(metaclass=Singleton):
         for layer in self.dataMap.layers:
             for cell in layer.cells:
                 for element in cell.elements:
-                    self._identifiedElementPosition[
-                        element.identifier
-                    ] = MapPoint.fromCellId(cell.cellId)
+                    if layer.layerId == Layer.LAYER_GROUND:
+                        continue
+                    if element.identifier > 0:
+                        self._identifiedElementPosition[
+                            element.identifier
+                        ] = MapPoint.fromCellId(cell.cellId)
+
+    def isIdentifiedElement(self, element: int) -> bool:
+        return element in self._identifiedElementPosition
 
     def getIdentifiedElementPosition(self, identifier: int) -> MapPoint:
         return self._identifiedElementPosition[identifier]

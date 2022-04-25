@@ -45,7 +45,7 @@ class ServerConnection(IServerConnection):
 
     DEBUG_LOW_LEVEL_VERBOSE: bool = False
 
-    DEBUG_DATA: bool = True
+    DEBUG_DATA: bool = False
 
     LATENCY_AVG_BUFFER_SIZE: int = 50
 
@@ -365,11 +365,7 @@ class ServerConnection(IServerConnection):
             if isinstance(msg, INetworkDataContainerMessage):
                 self._asyncNetworkDataContainerMessage = msg
             elif not self._pause:
-                if (
-                    self.DEBUG_DATA
-                    and msg.getMessageId() != 176
-                    and msg.getMessageId() != 6362
-                ):
+                if self.DEBUG_DATA and msg.getMessageId() not in [176, 6362]:
                     logger.debug(f"[{self._id}] [RCV] " + msg.__class__.__name__)
                 if not self.disabledIn:
                     self._handler.process(msg)

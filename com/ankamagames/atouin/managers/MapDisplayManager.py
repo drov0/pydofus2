@@ -22,7 +22,7 @@ class MapDisplayManager(metaclass=Singleton):
     _lastMap: WorldPoint
     _nMapLoadStart: int
     _nMapLoadEnd: int
-    _identifiedElementPosition: list[MapPoint]
+    _identifiedElementPosition: dict[int, MapPoint]
 
     def __init__(self) -> None:
         from com.ankamagames.jerakine.resources.loaders.MapLoader import MapLoader
@@ -71,10 +71,10 @@ class MapDisplayManager(metaclass=Singleton):
                             ] = MapPoint.fromCellId(cell.cellId)
 
     def isIdentifiedElement(self, identifier: int) -> bool:
-        return identifier in self._identifiedElementPosition
+        return self._identifiedElementPosition.get(identifier)
 
     def getIdentifiedElementPosition(self, identifier: int) -> MapPoint:
-        return self._identifiedElementPosition[identifier]
+        return self._identifiedElementPosition.get(identifier)
 
     def mapDisplayed(self) -> None:
         InteractiveCellManager().updateInteractiveCell(self.currentDataMap)

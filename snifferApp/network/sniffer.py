@@ -12,7 +12,7 @@ from snifferApp.network.message import Message
 import threading
 
 logger = Logger(__name__)
-LOW_LEVEL_DEBUG = False
+LOW_LEVEL_DEBUG = True
 
 
 class SnifferBuffer:

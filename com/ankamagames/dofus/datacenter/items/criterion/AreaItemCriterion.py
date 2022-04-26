@@ -30,7 +30,7 @@ class AreaItemCriterion(ItemCriterion, IDataCenter):
     @property
     def text(self) -> str:
         readableCriterion: str = None
-        area: Area = Area.getAreaById(_self.value)
+        area: Area = Area.getAreaById(self._criterionValue)
         if not area:
             return "error on AreaItemCriterion"
         areaName: str = area.name

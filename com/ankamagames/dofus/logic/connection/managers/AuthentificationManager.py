@@ -8,6 +8,7 @@ from com.ankamagames.dofus.network.messages.connection.IdentificationMessage imp
     IdentificationMessage,
 )
 from com.ankamagames.dofus.network.types.version.Version import Version
+from com.ankamagames.jerakine.data.XmlConfig import XmlConfig
 from com.ankamagames.jerakine.logger.Logger import Logger
 from com.ankamagames.jerakine.metaclasses.Singleton import Singleton
 from com.ankamagames.jerakine.network.CustomDataWrapper import ByteArray
@@ -77,7 +78,7 @@ class AuthentificationManager(metaclass=Singleton):
                 "autoconnect": False,
                 "credentials": self.getAuthCredentials(),
                 "failedAttempts": [],
-                "lang": "fr",
+                "lang": XmlConfig().getEntry("config.lang.current"),
                 "serverId": 0,
                 "sessionOptionalSalt": 0,
                 "useCertificate": False,

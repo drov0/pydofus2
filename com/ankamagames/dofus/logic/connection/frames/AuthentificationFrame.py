@@ -1,7 +1,11 @@
+import hashlib
 from time import perf_counter
 from com.ankamagames.dofus import Constants
 import com.ankamagames.dofus.kernel.Kernel as krnl
 import com.ankamagames.dofus.kernel.net.ConnectionsHandler as connh
+from com.ankamagames.dofus.logic.connection.actions.LoginValidationAction import (
+    LoginValidationAction,
+)
 import com.ankamagames.dofus.logic.connection.frames.ServerSelectionFrame as ssfrm
 from com.ankamagames.dofus.logic.connection.managers.AuthentificationManager import (
     AuthentificationManager,
@@ -34,6 +38,7 @@ from com.ankamagames.dofus.network.messages.connection.IdentificationSuccessWith
 from com.ankamagames.dofus.network.messages.security.ClientKeyMessage import (
     ClientKeyMessage,
 )
+from com.ankamagames.jerakine.data.XmlConfig import XmlConfig
 from com.ankamagames.jerakine.logger.Logger import Logger
 from com.ankamagames.jerakine.managers.StoreDataManager import StoreDataManager
 from com.ankamagames.jerakine.messages.Frame import Frame
@@ -163,6 +168,97 @@ class AuthentificationFrame(Frame):
             if not self._dispatchModuleHook:
                 self._dispatchModuleHook = True
                 self.pushed()
+            return True
+
+        elif isinstance(msg, LoginValidationAction):
+            lva = msg
+            if (
+                self._lastLoginHash
+                != hashlib.md5(lva.username.encode("utf-8")).hexdigest()
+            ):
+                pass
+            self._lastLoginHash = hashlib.md5(lva.username.encode("utf-8")).hexdigest()
+            ports = XmlConfig().getEntry("config.connection.port")
+            connexionPorts = list(map(int, ports.split(",")))
+            connectionHostsEntry = XmlConfig().getEntry("config.connection.host")
+            connexionHosts = (
+                [lva.host]
+                if lva.host
+                else (
+                    self._connexionHosts
+                    if len(self._connexionHosts) > 0
+                    else connectionHostsEntry.split(",")
+                )
+            )
+            self._connexionHosts = connexionHosts
+            tmpHosts = []
+            for tmpHost in connexionHosts:
+                tmpHosts.append({"host": tmpHost, "random": random.random()})
+            tmpHosts.sort(key=lambda e: e["random"])
+            connexionHosts = []
+            for randomHost in tmpHosts:
+                connexionHosts.append(randomHost["host"])
+            defaultPort = int(
+                StoreDataManager().getData(
+                    Constants.DATASTORE_COMPUTER_OPTIONS, "defaultConnectionPort"
+                )
+            )
+            self._connexionSequence = list()
+            firstConnexionSequence = list()
+            for host in connexionHosts:
+                for port in connexionPorts:
+                    if defaultPort == port:
+                        firstConnexionSequence.append({"host": host, "port": port})
+                    else:
+                        self._connexionSequence.append({"host": host, "port": port})
+            if self.HIDDEN_PORT not in connexionPorts:
+                for host in connexionHosts:
+                    self._connexionSequence.append(
+                        {"host": host, "port": self.HIDDEN_PORT}
+                    )
+
+            self._connexionSequence = firstConnexionSequence + self._connexionSequence
+
+            if Constants.EVENT_MODE:
+                rawParam = Constants.EVENT_MODE_PARAM
+                if rawParam and rawParam[0] != "!":
+                    rawParam = base64.b64decode(rawParam)
+                    params = []
+                    tmp = rawParam.split(",")
+                    for param in tmp:
+                        tmp2 = param.split(":")
+                        params[tmp2[0]] = tmp2[1]
+                    if params["login"]:
+                        lva.username = params["login"]
+                    if params["password"]:
+                        lva.password = params["password"]
+
+            AuthentificationManager().setValidationAction(lva)
+            connInfo = self._connexionSequence.pop(0)
+            connh.ConnectionsHandler.connectToLoginServer(
+                connInfo["host"], connInfo["port"]
+            )
+            return True
+
+        if isinstance(msg, ServerConnectionFailedMessage):
+            scfMsg = msg
+            if (
+                scfMsg.failedConnection
+                == connh.ConnectionsHandler.getConnection().getSubConnection(scfMsg)
+            ):
+                connh.ConnectionsHandler.getConnection().mainConnection.stopConnectionTimeout()
+                if self._connexionSequence:
+                    retryConnInfo = self._connexionSequence.pop(0)
+                    if retryConnInfo:
+                        connh.ConnectionsHandler.connectToLoginServer(
+                            retryConnInfo["host"], retryConnInfo["port"]
+                        )
+                    else:
+                        PlayerManager().destroy()
+                        raise logger.debug(
+                            "Unable to connect to the server for reason."
+                            + DisconnectionReasonEnum.UNEXPECTED.name
+                        )
             return True
 
     def pushed(self) -> bool:

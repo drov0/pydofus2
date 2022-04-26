@@ -8,3 +8,4 @@ black
 pylint
 jinja2
 pyshark
+xmltodict

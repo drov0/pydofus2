@@ -1,10 +1,11 @@
 from com.ankamagames.dofus.misc.BuildTypeParser import BuildTypeParser
 from com.ankamagames.dofus.network.enums.BuildTypeEnum import BuildTypeEnum
+from com.ankamagames.jerakine.metaclasses.Singleton import Singleton
 from com.ankamagames.jerakine.types.Version import Version
 import com.ankamagames.dofus.Constants as Constants
 
 
-class BuildInfos:
+class BuildInfos(metaclass=Singleton):
     with open(Constants.GAME_VERSION_PATH, "r") as fp:
         VERSION: Version = Version(fp.read().strip(), BuildTypeEnum.RELEASE.value)
 

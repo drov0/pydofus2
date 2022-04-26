@@ -94,7 +94,6 @@ class WorldPathFinder(metaclass=Singleton):
             cb(path)
 
     def next(self) -> None:
-        cb: FunctionType = None
         dstV: Vertex = self.worldGraph.getVertex(self.dst, self.linkedZone)
         self.linkedZone += 1
         if dstV is None:

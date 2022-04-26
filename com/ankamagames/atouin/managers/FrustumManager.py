@@ -66,8 +66,7 @@ class FrustumManager:
         cellId = currentMap.cellOutTowards(playedEntityCellId, direction)
         if cellId is not None:
             logger.debug(
-                f"[MouvementAPI] FrustumManager.changeMapToDirection: cellId = "
-                + str(cellId)
+                f"[MouvementAPI] FrustumManager.changeMapToDirection  = {direction.name}"
             )
             cls.sendClickAdjacentMsg(destMapId, cellId)
         else:
@@ -88,3 +87,9 @@ class FrustumManager:
         msg.cellId = cellId
         msg.id = mapId
         Kernel().getWorker().process(msg)
+
+    @classmethod
+    def changeMapToMapdId(cls, destMapId: int) -> None:
+        currentMap: Map = mdm.MapDisplayManager().dataMap
+        direction = currentMap.getDirectionToNeighbor(destMapId)
+        cls.changeMapToDirection(direction)

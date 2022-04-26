@@ -3,6 +3,12 @@ from com.ankamagames.atouin.AtouinConstants import AtouinConstants
 from com.ankamagames.atouin.data.map.Cell import Cell
 from typing import TYPE_CHECKING
 
+from com.ankamagames.dofus.modules.utils.pathFinding.world.WorldGraph import WorldGraph
+from com.ankamagames.dofus.modules.utils.pathFinding.world.WorldPathFinder import (
+    WorldPathFinder,
+)
+from com.ankamagames.jerakine.entities.interfaces.IEntity import IEntity
+
 if TYPE_CHECKING:
     from com.ankamagames.atouin.data.map.Map import Map
 import com.ankamagames.atouin.managers.MapDisplayManager as mdm
@@ -57,16 +63,33 @@ class FrustumManager:
         return result
 
     @classmethod
-    def changeMapToDirection(cls, direction: DirectionsEnum) -> None:
+    def getTransitionByDirection(cls, direction):
+        playedEntity: IEntity = DofusEntities.getEntity(PlayedCharacterManager().id)
+        if not playedEntity:
+            raise Exception("No entity found for player")
+        playedEntityCellId: int = playedEntity.position.cellId
+        playerCell: Cell = mdm.MapDisplayManager().dataMap.cells[playedEntityCellId]
         currentMap: Map = mdm.MapDisplayManager().dataMap
-        destMapId = currentMap.getNeighborIdFromDirection(direction)
-        playedCharacterManager = PlayedCharacterManager()
-        playedEntity = DofusEntities.getEntity(playedCharacterManager.id)
-        playedEntityCellId = playedEntity.position.cellId
-        cellId = currentMap.cellOutTowards(playedEntityCellId, direction)
+        currVertex = WorldPathFinder().worldGraph.getVertex(
+            currentMap.id, playerCell.linkedZoneRP
+        )
+        outgoingEdges = WorldPathFinder().worldGraph.getOutgoingEdgesFromVertex(
+            currVertex
+        )
+        for edge in outgoingEdges:
+            for tr in edge.transitions:
+                if DirectionsEnum(tr.direction) == direction:
+                    return edge.dst.mapId, tr.cell
+        return None, None
+
+    @classmethod
+    def changeMapToDirection(cls, direction: DirectionsEnum) -> None:
+        destMapId, cellId = cls.getTransitionByDirection(direction)
+        if destMapId is None:
+            raise Exception("No map found for direction " + direction.name)
         if cellId is not None:
             logger.debug(
-                f"[MouvementAPI] FrustumManager.changeMapToDirection  = {direction.name}"
+                f"[MouvementAPI] change Map To Direction  '{direction.name}'"
             )
             cls.sendClickAdjacentMsg(destMapId, cellId)
         else:

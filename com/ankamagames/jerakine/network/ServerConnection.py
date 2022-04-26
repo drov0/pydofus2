@@ -398,6 +398,7 @@ class ServerConnection(IServerConnection):
                 "[{self._id}] [SND] > {msg} ---" + str(base64.encodebytes(data)) + "---"
             )
         self._socket.send(msg.pack())
+        logger.debug(f"[{self._id}] {msg} sent")
         self._latestSent = perf_counter()
         self._lastSent = perf_counter()
         self._sendSequenceId += 1

@@ -212,6 +212,7 @@ class Map:
         return neighbours
 
     def getDirectionToNeighbor(self, dstMapId):
+        logger.debug("current map id: %d", self.id)
         for direction in DirectionsEnum.getMapChangeDirections():
             neighbour = self.getNeighborIdFromDirection(direction)
             logger.debug("Neighbour: %s", neighbour)

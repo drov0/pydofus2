@@ -78,7 +78,6 @@ class WorldPathFinder(metaclass=Singleton):
         AStar.stopSearch()
 
     def onAStarComplete(self, path: list[Edge]) -> None:
-        cb: FunctionType = None
         if path is None:
             self.next()
         else:
@@ -89,9 +88,7 @@ class WorldPathFinder(metaclass=Singleton):
                 + str(TimeDebug.getElapsedTime())
                 + "s"
             )
-            cb = self.callback
-            self.callback = None
-            cb(path)
+            self.callback(path)
 
     def next(self) -> None:
         dstV: Vertex = self.worldGraph.getVertex(self.dst, self.linkedZone)

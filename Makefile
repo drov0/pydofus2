@@ -21,9 +21,7 @@ decompile:
 .ONESHELL:
 
 extract-keys:
-	@echo "Extracting keys..."
 	@$(FFDEC) -config parallelSpeedUp=true -export binaryData $(KEYS_DIR) $(DOFUSINVOKER)
-	@echo "Done."
 
 gen-protocol:
 	@echo "Generating protocol..."

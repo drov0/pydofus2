@@ -224,11 +224,9 @@ class ProtocolParser:
         msg_type["protocolId"] = protocolId
 
         if "messages" in str(msg_type["path"]):
-            assert protocolId not in self.json["msg_by_id"]
             self.json["msg_by_id"][protocolId] = msg_type
 
         elif "types" in str(msg_type["path"]):
-            assert protocolId not in self.json["type_by_id"]
             self.json["type_by_id"][protocolId] = msg_type
 
         if sum(field["type"] == "Boolean" for field in fields) > 1:

@@ -29,7 +29,7 @@ class FarmAPI(metaclass=Singleton):
         ce = None
         if elementId is None:
             for it in self.rplInteractivesFrame.collectables.values():
-                if it.enabled and not it.id:
+                if it.enabled:
                     ce = it
                     elementId = it.id
                     break

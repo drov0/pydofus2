@@ -38,3 +38,4 @@ class FightEntitiesHolder(IEntityLocalizer, metaclss=Singleton):
             if isinstance(entity, TiphonSprite):
                 entity = None
         self._holdedEntities = None
+        _self = None

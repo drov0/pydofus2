@@ -1,5 +1,3 @@
-# SIGNATURE_KEY_DATA = Constants_SIGNATURE_KEY_DATA
-
 import os
 from pathlib import Path
 from com.ankamagames.jerakine.network.CustomDataWrapper import ByteArray

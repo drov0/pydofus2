@@ -6,6 +6,7 @@ from com.ankamagames.atouin.messages.MapLoadedMessage import MapLoadedMessage
 from com.ankamagames.dofus.datacenter.monsters.Monster import Monster
 import com.ankamagames.dofus.datacenter.spells.Spell as spellmod
 from com.ankamagames.dofus.datacenter.world.SubArea import SubArea
+from com.ankamagames.dofus.internalDatacenter.spells.SpellWrapper import SpellWrapper
 from com.ankamagames.dofus.internalDatacenter.world.WorldPointWrapper import (
     WorldPointWrapper,
 )

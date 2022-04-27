@@ -175,10 +175,12 @@ class FightReachableCellsMaker:
 
         self.compute()
 
-    def getreachableCells(self) -> list[int]:
+    @property
+    def reachableCells(self) -> list[int]:
         return self._reachableCells
 
-    def getunreachableCells(self) -> list[int]:
+    @property
+    def unreachableCells(self) -> list[int]:
         return self._unreachableCells
 
     def compute(self) -> None:

@@ -133,3 +133,6 @@ class BotFarmFrame(Frame):
                 # inventory full notification
                 raise Exception(f"[{notification.title}] {notification.message}")
             return True
+
+    def pulled(self) -> bool:
+        return True

@@ -1,5 +1,5 @@
 import random
-from timeit import Timer
+from threading import Timer
 from com.ankamagames.atouin.managers.EntitiesManager import EntitiesManager
 from com.ankamagames.atouin.managers.MapDisplayManager import MapDisplayManager
 from com.ankamagames.atouin.messages.MapLoadedMessage import MapLoadedMessage
@@ -127,8 +127,6 @@ class RoleplayEntitiesFrame(AbstractEntitiesFrame, Frame):
 
         self._monstersIds = list[float]()
 
-        # self._breachFrame:BreachFrame = None
-
         self._lastStaticAnimations = dict()
 
         self._waitingEmotesAnims = dict()
@@ -144,6 +142,8 @@ class RoleplayEntitiesFrame(AbstractEntitiesFrame, Frame):
         # self._aggressions = list[Aggression]()
 
         self._aggroTimeoutIdsMonsterAssoc = dict()
+
+        self._responseTimer: Timer = None
         super().__init__()
 
     def pushed(self) -> bool:
@@ -161,10 +161,17 @@ class RoleplayEntitiesFrame(AbstractEntitiesFrame, Frame):
             mirmsg = MapInformationsRequestMessage()
             mirmsg.init(mapId_=MapDisplayManager().currentMapPoint.mapId)
             ConnectionsHandler.getConnection().send(mirmsg, connexion)
+            self._responseTimer = Timer(5, self.onMapDataRequestTimeout)
+
         else:
             self._waitForMap = True
         self._interactiveElements = list[InteractiveElement]()
         return super().pushed()
+
+    def onMapDataRequestTimeout(self):
+        mirmsg = MapInformationsRequestMessage()
+        mirmsg.init(mapId_=MapDisplayManager().currentMapPoint.mapId)
+        ConnectionsHandler.getConnection().send(mirmsg)
 
     def process(self, msg: Message):
 
@@ -181,6 +188,7 @@ class RoleplayEntitiesFrame(AbstractEntitiesFrame, Frame):
             return True
 
         if isinstance(msg, MapComplementaryInformationsDataMessage):
+            self._responseTimer.cancel()
             mcidmsg = msg
             currentMapHasChanged = False
             currentSubAreaHasChanged = False
@@ -438,9 +446,7 @@ class RoleplayEntitiesFrame(AbstractEntitiesFrame, Frame):
                 team,
                 infos.fightTeamsOptions[team.teamId],
             )
-            self.registerActorWithId(
-                fightTeam, teamEntity.id
-            )
+            self.registerActorWithId(fightTeam, teamEntity.id)
             teams.append(fightTeam)
             teamCounter += 1
         self._fights[infos.fightId] = fight

@@ -1,3 +1,4 @@
+from types import FunctionType
 from com.ankamagames.jerakine.logger.Logger import Logger
 from com.ankamagames.dofus.internalDatacenter.stats.DetailedStats import DetailedStat
 from com.ankamagames.dofus.internalDatacenter.stats.EntityStats import EntityStats
@@ -31,7 +32,7 @@ class StatsManager(metaclass=Singleton):
     def __init__(self):
         self._entityStats = dict()
         self._isVerbose = self.DEFAULT_IS_VERBOSE
-        self._statListeners = dict()
+        self._statListeners = dict[str, list[FunctionType]]()
         logger.info("Instantiating stats manager")
         self._dataStoreType = DataStoreType(
             self.DATA_STORE_CATEGORY,
@@ -103,3 +104,58 @@ class StatsManager(metaclass=Singleton):
         del self._entityStats[entityKey]
         logger.info("Stats for entity with ID " + entityKey + " deleted")
         return True
+
+    def isStatHasListener(self, statId: float, listener: FunctionType) -> bool:
+        return self.getFeatureListenerIndex(statId, listener) != -1
+
+    def getFeatureListenerIndex(self, statId: float, listener: FunctionType) -> int:
+        key: str = str(statId)
+        listeners = self._statListeners.get(key)
+        if not listeners:
+            return -1
+        if len(listeners) <= 0:
+            del self._statListeners[key]
+            return -1
+        return self._statListeners[key].index(listener)
+
+    def addListenerToStat(self, statId: float, listener: FunctionType) -> bool:
+        if listener is None:
+            logger.error("Listener provided is None")
+            return False
+        isListenerAdded: bool = False
+        key: str = str(statId)
+        if not self.isStatHasListener(statId, listener):
+            if not self._statListeners.get(key):
+                self._statListeners[key] = list[FunctionType]()
+            self._statListeners[key].append(listener)
+            isListenerAdded = True
+        if isListenerAdded:
+            logger.info(
+                f"Listener {listener.__annotations__} added to stat with ID " + key
+            )
+        else:
+            logger.error(
+                f"Listener {listener.__annotations__} could NOT added to stat with ID "
+                + key
+            )
+        return isListenerAdded
+
+    def removeListenerFromStat(self, statId: float, listener: FunctionType) -> bool:
+        if listener is None:
+            logger.error("Listener provided is None")
+            return False
+        isListenerRemoved: bool = False
+        key: str = str(statId)
+        if self.isStatHasListener(statId, listener):
+            self._statListeners[key].remove(listener)
+            isListenerRemoved = True
+        if isListenerRemoved:
+            logger.info(
+                f"Listener {listener.__annotations__} removed from stat with ID " + key
+            )
+        else:
+            logger.error(
+                f"Listener {listener.__annotations__} could NOT removed from stat with ID "
+                + key
+            )
+        return isListenerRemoved

@@ -1,4 +1,5 @@
 from abc import abstractmethod
+from xml.dom.minidom import Entity
 from com.ankamagames.dofus.datacenter.monsters.Monster import Monster
 from com.ankamagames.dofus.internalDatacenter.world.WorldPointWrapper import (
     WorldPointWrapper,
@@ -110,10 +111,7 @@ class AbstractEntitiesFrame(Frame):
         return self._entities.get(entityId)
 
     def getEntitiesIdsList(self) -> list[float]:
-        gcai: GameContextActorInformations = None
-        entitiesList: list[float] = list[float](0, False)
-        for gcai in self._entities:
-            entitiesList.append(gcai.contextualId)
+        entitiesList = [gcai.contextualId for gcai in self._entities.values()]
         return entitiesList
 
     def hasEntity(self, entityId: float) -> bool:
@@ -130,7 +128,7 @@ class AbstractEntitiesFrame(Frame):
         self, infos: GameContextActorInformations, actorId: float
     ) -> None:
         if self._entities == None:
-            self._entities = dict()
+            self._entities = dict[int, GameContextActorInformations]()
         if not self._entities.get(actorId):
             self._entitiesTotal += 1
         self._entities[actorId] = infos

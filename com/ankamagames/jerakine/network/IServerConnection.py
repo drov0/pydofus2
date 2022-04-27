@@ -8,57 +8,60 @@ from com.ankamagames.jerakine.network.RawDataParser import RawDataParser
 class IServerConnection(EventDispatcher):
     @property
     def rawParser(self) -> RawDataParser:
-        pass
+        raise NotImplementedError()
 
     @rawParser.setter
     def rawParser(self, param1: RawDataParser) -> None:
-        pass
+        raise NotImplementedError()
 
     @property
     def handler(self) -> MessageHandler:
-        pass
+        raise NotImplementedError()
 
     @handler.setter
     def handler(self, param1: MessageHandler) -> None:
-        pass
+        raise NotImplementedError()
 
     def pauseBuffer(self) -> list:
-        pass
+        raise NotImplementedError()
 
     def connected(self) -> bool:
-        pass
+        raise NotImplementedError()
 
     def connecting(self) -> bool:
-        pass
+        raise NotImplementedError()
 
     def latencyAvg(self) -> int:
-        pass
+        raise NotImplementedError()
 
     def latencySamplesCount(self) -> int:
-        pass
+        raise NotImplementedError()
 
     def latencySamplesMax(self) -> int:
-        pass
+        raise NotImplementedError()
 
     @property
     def lagometer(self) -> ILagometer:
-        pass
+        raise NotImplementedError()
 
     @lagometer.setter
     def lagometer(self, param1: ILagometer) -> None:
-        pass
+        raise NotImplementedError()
 
     def connect(self, param1: str, param2: int) -> None:
-        pass
+        raise NotImplementedError()
 
     def close(self) -> None:
-        pass
+        raise NotImplementedError()
 
     def pause(self) -> None:
-        pass
+        raise NotImplementedError()
 
     def resume(self) -> None:
-        pass
+        raise NotImplementedError()
 
     def send(self, param1: INetworkMessage, param2: str = "") -> None:
-        pass
+        raise NotImplementedError()
+
+    def stopConnectionTimeout(self) -> None:
+        raise NotImplementedError()

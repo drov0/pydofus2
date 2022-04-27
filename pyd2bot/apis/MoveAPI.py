@@ -34,7 +34,7 @@ class MapChange:
         self.outCellId = outCellId
 
 
-class FrustumManager:
+class MoveAPI:
     @classmethod
     def randomMapChange(cls, discard=[]):
         possibleChangeDirections = cls.getMapChangeDirections(discard)
@@ -47,7 +47,7 @@ class FrustumManager:
         return mapChange.destMapId
 
     @classmethod
-    def getMapChangeDirections(cls, discard=[]):
+    def getMapChangeDirections(cls, discard=[]) -> dict[int, MapChange]:
         currentMap: Map = mdm.MapDisplayManager().dataMap
         playedCharacterManager = PlayedCharacterManager()
         playedEntity = DofusEntities.getEntity(playedCharacterManager.id)
@@ -63,39 +63,11 @@ class FrustumManager:
         return result
 
     @classmethod
-    def getTransitionByDirection(cls, direction):
-        playedEntity: IEntity = DofusEntities.getEntity(PlayedCharacterManager().id)
-        if not playedEntity:
-            raise Exception("No entity found for player")
-        playedEntityCellId: int = playedEntity.position.cellId
-        playerCell: Cell = mdm.MapDisplayManager().dataMap.cells[playedEntityCellId]
-        currentMap: Map = mdm.MapDisplayManager().dataMap
-        currVertex = WorldPathFinder().worldGraph.getVertex(
-            currentMap.id, playerCell.linkedZoneRP
-        )
-        outgoingEdges = WorldPathFinder().worldGraph.getOutgoingEdgesFromVertex(
-            currVertex
-        )
-        for edge in outgoingEdges:
-            for tr in edge.transitions:
-                if DirectionsEnum(tr.direction) == direction:
-                    return edge.dst.mapId, tr.cell
-        return None, None
-
-    @classmethod
     def changeMapToDirection(cls, direction: DirectionsEnum) -> None:
-        destMapId, cellId = cls.getTransitionByDirection(direction)
-        if destMapId is None:
-            raise Exception("No map found for direction " + direction.name)
-        if cellId is not None:
-            logger.debug(
-                f"[MouvementAPI] change Map To Direction  '{direction.name}'"
-            )
-            cls.sendClickAdjacentMsg(destMapId, cellId)
-        else:
-            logger.warn(
-                "[MouvementAPI] Unable to change map to direction " + str(direction)
-            )
+        mapChange = cls.getMapChangeDirections().get(direction)
+        if mapChange is None:
+            raise Exception(f"No map found for direction '{direction.name}'")
+        cls.sendClickAdjacentMsg(mapChange.destMapId, mapChange.outCellId)
 
     @classmethod
     def sendClickAdjacentMsg(cls, mapId: float, cellId: int) -> None:

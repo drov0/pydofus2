@@ -589,7 +589,7 @@ class ServerConnection(IServerConnection):
             return
         if self.DEBUG_DATA:
             logger.debug("[" + str(self._id) + "] Connection closed.")
-        Timer(3, self.removeListeners).start()
+        Timer(30, self.removeListeners).start()
         if self._lagometer:
             self._lagometer.stop()
         from com.ankamagames.jerakine.network.ServerConnectionClosedMessage import (

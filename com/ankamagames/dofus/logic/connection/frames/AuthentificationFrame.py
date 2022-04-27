@@ -1,8 +1,13 @@
+import base64
 import hashlib
+import random
 from time import perf_counter
 from com.ankamagames.dofus import Constants
 import com.ankamagames.dofus.kernel.Kernel as krnl
 import com.ankamagames.dofus.kernel.net.ConnectionsHandler as connh
+from com.ankamagames.dofus.kernel.net.DisconnectionReasonEnum import (
+    DisconnectionReasonEnum,
+)
 from com.ankamagames.dofus.logic.connection.actions.LoginValidationAction import (
     LoginValidationAction,
 )
@@ -66,7 +71,7 @@ class AuthentificationFrame(Frame):
 
     _connexionSequence: list
 
-    _lastLoginHash: str
+    _lastLoginHash: str = None
 
     _currentLogIsForced: bool = False
 
@@ -240,7 +245,7 @@ class AuthentificationFrame(Frame):
             )
             return True
 
-        if isinstance(msg, ServerConnectionFailedMessage):
+        elif isinstance(msg, ServerConnectionFailedMessage):
             scfMsg = msg
             if (
                 scfMsg.failedConnection

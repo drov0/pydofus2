@@ -19,8 +19,9 @@ class LoginValidationAction(AbstractAction, Action, IDontLogThisMessage):
     def __init__(self, params: list = None):
         super().__init__(params)
 
+    @classmethod
     def create(
-        self,
+        cls,
         username: str,
         password: str,
         autoSelectServer: bool,

@@ -70,8 +70,9 @@ class Kernel(metaclass=Singleton):
             CleanupCrewFrame,
         )
         from com.ankamagames.dofus.logic.common.frames.QueueFrame import QueueFrame
+
         self._worker.addFrame(AuthentificationFrame())
         self._worker.addFrame(QueueFrame())
+        self.getWorker().addFrame(dhF.DisconnectionHandlerFrame())
         if not self._worker.contains(CleanupCrewFrame):
             self._worker.addFrame(CleanupCrewFrame())
-        self.getWorker().addFrame(dhF.DisconnectionHandlerFrame())

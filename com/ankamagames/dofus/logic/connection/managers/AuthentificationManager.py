@@ -1,6 +1,9 @@
 from argparse import ArgumentError
 import os
 from com.ankamagames.dofus.BuildInfos import BuildInfos
+from com.ankamagames.dofus.logic.connection.actions.LoginValidationAction import (
+    LoginValidationAction,
+)
 from com.ankamagames.dofus.logic.connection.managers.AuthentificationManager__verifyKey import (
     AuthentificationManager__verifyKey,
 )
@@ -60,6 +63,9 @@ class AuthentificationManager(metaclass=Singleton):
             + "\n-----END PUBLIC KEY-----"
         )
 
+    def setValidationAction(self, lva: LoginValidationAction):
+        self._lva = lva
+
     def getCanAutoConnectWithToken(self) -> bool:
         return self.nextToken != None
 
@@ -75,11 +81,11 @@ class AuthentificationManager(metaclass=Singleton):
         imsg = NetworkMessage.from_json(
             {
                 "__type__": "IdentificationMessage",
-                "autoconnect": False,
+                "autoconnect": self._lva.autoSelectServer,
                 "credentials": self.getAuthCredentials(),
                 "failedAttempts": [],
                 "lang": XmlConfig().getEntry("config.lang.current"),
-                "serverId": 0,
+                "serverId": self._lva.serverId,
                 "sessionOptionalSalt": 0,
                 "useCertificate": False,
                 "useLoginToken": True,

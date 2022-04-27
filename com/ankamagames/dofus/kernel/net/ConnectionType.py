@@ -2,7 +2,7 @@ class ConnectionType:
 
     DISCONNECTED: str = "disconnected"
 
-    TO_LOGIN_SERVER: str = "serverloggerin"
+    TO_LOGIN_SERVER: str = "server_login"
 
     TO_GAME_SERVER: str = "server_game"
 

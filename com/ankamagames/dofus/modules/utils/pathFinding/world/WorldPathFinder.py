@@ -72,6 +72,9 @@ class WorldPathFinder(metaclass=Singleton):
         self.linkedZone = 1
         WorldPathFinder.callback = callback
         self.dst = destinationMapId
+        if int(playedCharacterManager.currentMap.mapId) == int(self.dst):
+            callback([])
+            return
         self.next()
 
     def abortPathSearch(self) -> None:

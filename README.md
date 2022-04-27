@@ -94,11 +94,13 @@ make createBot botName='grinder' account='grinder' charachterId='335911059666' s
 
 > :warning: If you don't know how to get your server ID and character Id. Start the sniffer 'make startSniffer', go to page localhost:8888 and login manually. Then look for serverSelectionMessage.
 
-### Launch the bot
+### Develop your own bot or run the existing examples
 
-```bash
-make test bot='myBotName'
-```
+Under the folder bot_test_examples, you will fin a bunch of bot examples that uses this framework.
+
+You can run one of them by setting in the main file of the example the variable `botName` by the one you chose to create your bot account. 
+
+Basically to develop you own bot you have to implement in one or multiple `Frame` classes the logic of your bot and then register them in them file with the function `registerFrame`.
 
 ## For developpers 
 

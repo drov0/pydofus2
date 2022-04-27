@@ -57,7 +57,9 @@ from com.ankamagames.jerakine.messages.Frame import Frame
 from com.ankamagames.jerakine.messages.Message import Message
 from com.ankamagames.jerakine.types.enums.Priority import Priority
 from com.ankamagames.jerakine.types.positions.MapPoint import MapPoint
-from com.ankamagames.jerakine.utils.display.spellZone.SpellShapeEnum import SpellShapeEnum
+from com.ankamagames.jerakine.utils.display.spellZone.SpellShapeEnum import (
+    SpellShapeEnum,
+)
 from damageCalculation.tools.StatIds import StatIds
 
 from typing import TYPE_CHECKING
@@ -381,7 +383,9 @@ class FightSpellCastFrame(Frame):
                 SelectionManager().addSelection(
                     self._targetCenterSelection, self.SELECTION_CENTER_TARGET
                 )
-                SelectionManager().addSelection(self._targetSelection, self.SELECTION_TARGET)
+                SelectionManager().addSelection(
+                    self._targetSelection, self.SELECTION_TARGET
+                )
             if not self._targetSelection.zone or self._targetSelection.zone is Custom:
                 entityInfo = FightEntitiesFrame.getCurrentInstance().getEntityInfos(
                     self._spellLevel["playerId"]
@@ -595,11 +599,6 @@ class FightSpellCastFrame(Frame):
             )
         if len(portalUsableCells) > 0:
             self._portalsSelection = Selection()
-            self._portalsSelection.renderer = self.createZoneRenderer(
-                self.PORTAL_COLOR, PlacementStrataEnums.STRATA_AREA
-            )
-            self._portalsSelection.color = self.PORTAL_COLOR
-            self._portalsSelection.alpha = True
             self._portalsSelection.zone = Custom(portalUsableCells)
             SelectionManager().addSelection(
                 self._portalsSelection, self.SELECTION_PORTALS, origin
@@ -614,14 +613,6 @@ class FightSpellCastFrame(Frame):
     def removeSummoningPreview(self) -> None:
         if self._summoningPreview:
             self._summoningPreview.remove()
-
-    def getParentEntity(self, pEntity: TiphonSprite) -> TiphonSprite:
-        parentEntity: TiphonSprite = None
-        parent: TiphonSprite = pEntity.parentSprite
-        while parent:
-            parentEntity = parent
-            parent = parent.parentSprite
-        return pEntity if not parentEntity else parentEntity
 
     def clearTarget(self) -> None:
         if not self._clearTargetTimer.running:

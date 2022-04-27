@@ -211,6 +211,14 @@ class Map:
                     neighbours.add(cell)
         return neighbours
 
+    def getDirectionToNeighbor(self, dstMapId):
+        logger.debug("current map id: %d", self.id)
+        for direction in DirectionsEnum.getMapChangeDirections():
+            neighbour = self.getNeighborIdFromDirection(direction)
+            logger.debug("Neighbour: %s", neighbour)
+            if int(neighbour) == int(dstMapId):
+                return direction
+
     def getNeighborIdFromDirection(self, direction: DirectionsEnum) -> int:
         if direction == DirectionsEnum.LEFT:
             return self.leftNeighbourId

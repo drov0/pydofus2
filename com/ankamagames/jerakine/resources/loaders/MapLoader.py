@@ -1,12 +1,17 @@
 from functools import lru_cache
 from pathlib import Path
 from com.ankamagames.dofus import Constants
+from com.ankamagames.jerakine.data.XmlConfig import XmlConfig
+from com.ankamagames.jerakine.logger.Logger import Logger
 from com.ankamagames.jerakine.metaclasses.Singleton import Singleton
 from dataAdapter.dlm import DLM
 
+logger = Logger(__name__)
+
 
 class MapLoader(metaclass=Singleton):
-    DLM_KEY = "649ae451ca33ec53bbcbcc33becf15f4"
+    DLM_KEY = XmlConfig().getEntry("config.maps.encryptionKey")
+    logger.debug(f"Maps encryption key: {DLM_KEY}")
 
     def __init__(self) -> None:
         self._reader = DLM(self.DLM_KEY)

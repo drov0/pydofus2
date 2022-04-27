@@ -3,12 +3,13 @@ from subprocess import Popen, PIPE
 import json
 import httpx
 from com.ankamagames.jerakine.logger.Logger import Logger
+from com.ankamagames.jerakine.metaclasses.Singleton import Singleton
 
 logger = Logger(__name__)
 from hackedLauncher.CredsManager import CredsManager
 
 
-class Haapi:
+class Haapi(metaclass=Singleton):
     def __init__(self) -> None:
         self.url = "https://haapi.ankama.com"
         self.APIKEY = None

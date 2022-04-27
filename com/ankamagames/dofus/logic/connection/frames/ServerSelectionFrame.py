@@ -153,7 +153,6 @@ class ServerSelectionFrame(Frame):
             self._serversList = ssdemsg.servers
             self._serversList.sort(key=lambda x: x.date)
             self.broadcastServersListUpdate(True)
-            return True
 
         elif isinstance(msg, ExpectedSocketClosureMessage):
             from com.ankamagames.dofus.logic.game.approach.frames.GameServerApproachFrame import (
@@ -174,8 +173,10 @@ class ServerSelectionFrame(Frame):
             )
             return True
 
-        elif isinstance(msg, SelectedServerDataMessage):
-            ssdmsg = msg
+        if isinstance(
+            msg, (SelectedServerDataMessage, SelectedServerDataExtendedMessage)
+        ):
+            ssdmsg: SelectedServerDataMessage = msg
             connh.ConnectionsHandler.connectionGonnaBeClosed(
                 DisconnectionReasonEnum.SWITCHING_TO_GAME_SERVER
             )
@@ -185,15 +186,12 @@ class ServerSelectionFrame(Frame):
             )
             PlayerManager().server = Server.getServerById(ssdmsg.serverId)
             PlayerManager().kisServerPort = 0
-            self._connexionPorts = []
-            for port in ssdmsg.ports:
-                self._connexionPorts.append(port)
+            self._connexionPorts = ssdmsg.ports
             logger.debug(
                 f"Connection to game server using ports : {self._connexionPorts}"
             )
-            return True
 
-        return False
+            return True
 
     def pulled(self) -> bool:
         self._serversList = None

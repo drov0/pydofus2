@@ -378,6 +378,12 @@ class RoleplayMovementFrame(Frame):
         self._nextMovementBehavior = pValue
 
     def askMoveTo(self, cell: MapPoint) -> bool:
+        playerEntity: AnimatedCharacter = DofusEntities.getEntity(
+            PlayedCharacterManager().id
+        )
+        if playerEntity.position.cellId == cell.cellId:
+            logger.debug("[RolePlayMovement] Already on the cell")
+            return True
         logger.debug(f"[RolePlayMovement] Asking to move to cell {cell}")
         if (
             not self._canMove
@@ -393,9 +399,6 @@ class RoleplayMovementFrame(Frame):
             logger.debug("[RolePlayMovement] Too soon to request movement, aborting")
             return False
         self._isRequestingMovement = True
-        playerEntity: AnimatedCharacter = DofusEntities.getEntity(
-            PlayedCharacterManager().id
-        )
         if not playerEntity:
             logger.warn(
                 "[RolePlayMovement] The player tried to move before its character was added to the scene. Aborting."

@@ -144,7 +144,6 @@ class AStar:
         from com.ankamagames.dofus.datacenter.items.criterion.GroupItemCriterion import (
             GroupItemCriterion,
         )
-
         criterionWhiteList: list = [
             "Ad",
             "DM",

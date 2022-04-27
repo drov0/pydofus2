@@ -164,7 +164,7 @@ class Worker(EventDispatcher, MessageHandler):
             if not frameRemoving or frameAdding:
                 logger.error(
                     "Someone asked for the frame "
-                    + frame
+                    + frame.__class__.__name__
                     + " to be "
                     + "added to the worker, but there is already another "
                     + "frame of the same type within it."

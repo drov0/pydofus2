@@ -114,7 +114,7 @@ SWITCH_CASE_PATTERN = (
 )
 CASE_PATTERN1 = "(?P<spaces>\s*)case (?P<testvar>\S+) is (?P<testvalue>\S+):"
 CASE_PATTERN2 = "(?P<spaces>\s*)case (?P<testvalue>\S+):"
-INDENT_SIZE = 3
+INDENT_SIZE = 4
 
 
 def processCaseBlock(block, case_pattern, testvar=None):
@@ -352,5 +352,5 @@ ROOTDIR = pathlib.Path(os.path.dirname(__file__))
 #     ROOTDIR / "inventoryView",
 # )
 t = perf_counter()
-parseFile(ROOTDIR / "target.as", ROOTDIR / "IMovable.py")
+parseFile(ROOTDIR / "target.as", ROOTDIR / "DisconnectionReasonEnum.py")
 print("parsing took:", perf_counter() - t)

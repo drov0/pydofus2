@@ -72,13 +72,15 @@ class WorldPathFinder(metaclass=Singleton):
         self.linkedZone = 1
         WorldPathFinder.callback = callback
         self.dst = destinationMapId
+        if int(playedCharacterManager.currentMap.mapId) == int(self.dst):
+            callback([])
+            return
         self.next()
 
     def abortPathSearch(self) -> None:
         AStar.stopSearch()
 
     def onAStarComplete(self, path: list[Edge]) -> None:
-        cb: FunctionType = None
         if path is None:
             self.next()
         else:
@@ -89,12 +91,9 @@ class WorldPathFinder(metaclass=Singleton):
                 + str(TimeDebug.getElapsedTime())
                 + "s"
             )
-            cb = self.callback
-            self.callback = None
-            cb(path)
+            self.callback(path)
 
     def next(self) -> None:
-        cb: FunctionType = None
         dstV: Vertex = self.worldGraph.getVertex(self.dst, self.linkedZone)
         self.linkedZone += 1
         if dstV is None:

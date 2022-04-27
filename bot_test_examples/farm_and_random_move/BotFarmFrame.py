@@ -1,6 +1,6 @@
 from email.errors import FirstHeaderLineIsContinuationDefect
 import threading
-from com.ankamagames.atouin.managers.FrustumManager import FrustumManager
+from pyd2bot.apis.MoveAPI import MoveAPI
 from com.ankamagames.dofus.datacenter.jobs.Skill import Skill
 from com.ankamagames.dofus.datacenter.notifications.Notification import Notification
 from com.ankamagames.dofus.kernel.Kernel import Kernel
@@ -10,17 +10,11 @@ from com.ankamagames.dofus.logic.game.common.managers.PlayedCharacterManager imp
 from com.ankamagames.dofus.network.messages.game.context.notification.NotificationByServerMessage import (
     NotificationByServerMessage,
 )
-from com.ankamagames.dofus.network.messages.game.context.roleplay.CurrentMapMessage import (
-    CurrentMapMessage,
-)
 from com.ankamagames.dofus.network.messages.game.context.roleplay.MapChangeFailedMessage import (
     MapChangeFailedMessage,
 )
 from com.ankamagames.dofus.network.messages.game.context.roleplay.MapComplementaryInformationsDataMessage import (
     MapComplementaryInformationsDataMessage,
-)
-from com.ankamagames.dofus.network.messages.game.interactive.InteractiveElementUpdatedMessage import (
-    InteractiveElementUpdatedMessage,
 )
 from com.ankamagames.dofus.network.messages.game.interactive.InteractiveUseEndedMessage import (
     InteractiveUseEndedMessage,
@@ -30,9 +24,6 @@ from com.ankamagames.dofus.network.messages.game.interactive.InteractiveUseError
 )
 from com.ankamagames.dofus.network.messages.game.interactive.InteractiveUsedMessage import (
     InteractiveUsedMessage,
-)
-from com.ankamagames.dofus.network.messages.game.interactive.StatedElementUpdatedMessage import (
-    StatedElementUpdatedMessage,
 )
 from com.ankamagames.jerakine.logger.Logger import Logger
 from com.ankamagames.jerakine.messages.Frame import Frame
@@ -92,7 +83,7 @@ class BotFarmFrame(Frame):
                 del self.roleplayInteractivesFrame._collectableIe[msg.elemId]
                 self._currentRequestedElementId = FarmAPI().collectResource()
                 if self._currentRequestedElementId == -1:
-                    FrustumManager.randomMapChange()
+                    MoveAPI.randomMapChange()
             return True
 
         elif isinstance(msg, InteractiveUsedMessage):
@@ -116,7 +107,7 @@ class BotFarmFrame(Frame):
                 self._usingInteractive = FirstHeaderLineIsContinuationDefect
                 self._currentRequestedElementId = FarmAPI().collectResource()
                 if self._currentRequestedElementId == -1:
-                    self._dstMapId = FrustumManager.randomMapChange()
+                    self._dstMapId = MoveAPI.randomMapChange()
 
             del self._entities[msg.elemId]
             return True
@@ -125,7 +116,7 @@ class BotFarmFrame(Frame):
             self._mapIdDiscard.clear()
             self._currentRequestedElementId = FarmAPI().collectResource()
             if self._currentRequestedElementId == -1:
-                FrustumManager.randomMapChange()
+                MoveAPI.randomMapChange()
             return True
 
         elif isinstance(msg, MapChangeFailedMessage):
@@ -133,7 +124,7 @@ class BotFarmFrame(Frame):
                 f"[BotFarmFrame] Map change to {self._dstMapId} failed will discard that destination"
             )
             self._mapIdDiscard.append(msg.mapId)
-            FrustumManager.randomMapChange(discard=[self._mapIdDiscard])
+            MoveAPI.randomMapChange(discard=[self._mapIdDiscard])
             return True
 
         elif isinstance(msg, NotificationByServerMessage):

@@ -2,12 +2,15 @@ from com.ankamagames.jerakine.network.CustomDataWrapper import ByteArray
 from Cryptodome.PublicKey import RSA
 
 
-class SignatureKey:
+class SignatureKey(RSA.RsaKey):
     PUBLIC_KEY_HEADER: str = "DofusPublicKey"
     PRIVATE_KEY_HEADER: str = "DofusPrivateKey"
 
-    @staticmethod
-    def import_key(input: ByteArray):
+    def __init__(self, *args, **kwargs: int) -> None:
+        super().__init__(*args, **kwargs)
+
+    @classmethod
+    def import_key(cls, input: ByteArray) -> "SignatureKey":
         header: str = input.readUTF()
         if (
             header != SignatureKey.PUBLIC_KEY_HEADER
@@ -19,4 +22,4 @@ class SignatureKey:
             N = int.from_bytes(bytes(N, "utf"), "big")
             E = input.readUTF()
             E = int.from_bytes(bytes(E, "utf"), "big")
-            return RSA.RsaKey(n=N, e=E)
+            return SignatureKey(n=N, e=E)

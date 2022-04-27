@@ -398,6 +398,7 @@ class ServerConnection(IServerConnection):
                 "[{self._id}] [SND] > {msg} ---" + str(base64.encodebytes(data)) + "---"
             )
         self._socket.send(msg.pack())
+        logger.debug(f"[{self._id}] {msg} sent")
         self._latestSent = perf_counter()
         self._lastSent = perf_counter()
         self._sendSequenceId += 1
@@ -588,7 +589,7 @@ class ServerConnection(IServerConnection):
             return
         if self.DEBUG_DATA:
             logger.debug("[" + str(self._id) + "] Connection closed.")
-        Timer(3, self.removeListeners).start()
+        Timer(30, self.removeListeners).start()
         if self._lagometer:
             self._lagometer.stop()
         from com.ankamagames.jerakine.network.ServerConnectionClosedMessage import (

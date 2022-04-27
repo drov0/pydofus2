@@ -2,8 +2,10 @@
 
 import os
 from pathlib import Path
+from com.ankamagames.jerakine.network.CustomDataWrapper import ByteArray
 from com.ankamagames.jerakine.types.DataStoreType import DataStoreType
 from com.ankamagames.jerakine.types.enums.DataStoreEnum import DataStoreEnum
+from com.hurlan.crypto.SignatureKey import SignatureKey
 
 
 LOG_UPLOAD_MODE = False
@@ -68,3 +70,10 @@ PROTOCOL_MSG_SHUFFLE_PATH = ROOTDIR / "network" / "MsgShuffle.json"
 GAME_VERSION_PATH = DOFUS_ROOTDIR / "VERSION"
 
 BINARY_DATA_DIR = ROOTDIR / "../../../binaryData"
+
+with open(
+    BINARY_DATA_DIR
+    / "13_com.ankamagames.dofus.Constants_SIGNATURE_KEY_DATA_com.ankamagames.dofus.Constants_SIGNATURE_KEY_DATA.bin",
+    "rb",
+) as fs:
+    SIGNATURE_KEY_DATA = SignatureKey.import_key(ByteArray(fs.read()))

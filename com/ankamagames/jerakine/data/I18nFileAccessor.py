@@ -1,5 +1,5 @@
+from com.ankamagames.dofus import Constants
 from com.ankamagames.jerakine.logger.Logger import Logger
-import pathlib
 from com.ankamagames.jerakine.metaclasses.Singleton import Singleton
 from com.ankamagames.jerakine.data.BinaryStream import BinaryStream
 
@@ -10,8 +10,8 @@ class I18nFileAccessor(metaclass=Singleton):
 
     directBuffer = None
 
-    def init(self, fileUri: str):
-        nativeFile = pathlib.Path(fileUri)
+    def init(self):
+        nativeFile = Constants.LANG_FILE_PATH
         if not nativeFile or not nativeFile.exists():
             raise Exception("I18n file not readable.")
         self.stream = BinaryStream(nativeFile.open("rb"), big_endian=True)

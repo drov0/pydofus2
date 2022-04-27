@@ -3,6 +3,12 @@ from com.ankamagames.atouin.AtouinConstants import AtouinConstants
 from com.ankamagames.atouin.data.map.Cell import Cell
 from typing import TYPE_CHECKING
 
+from com.ankamagames.dofus.modules.utils.pathFinding.world.WorldGraph import WorldGraph
+from com.ankamagames.dofus.modules.utils.pathFinding.world.WorldPathFinder import (
+    WorldPathFinder,
+)
+from com.ankamagames.jerakine.entities.interfaces.IEntity import IEntity
+
 if TYPE_CHECKING:
     from com.ankamagames.atouin.data.map.Map import Map
 import com.ankamagames.atouin.managers.MapDisplayManager as mdm
@@ -28,7 +34,7 @@ class MapChange:
         self.outCellId = outCellId
 
 
-class FrustumManager:
+class MoveAPI:
     @classmethod
     def randomMapChange(cls, discard=[]):
         possibleChangeDirections = cls.getMapChangeDirections(discard)
@@ -41,7 +47,7 @@ class FrustumManager:
         return mapChange.destMapId
 
     @classmethod
-    def getMapChangeDirections(cls, discard=[]):
+    def getMapChangeDirections(cls, discard=[]) -> dict[int, MapChange]:
         currentMap: Map = mdm.MapDisplayManager().dataMap
         playedCharacterManager = PlayedCharacterManager()
         playedEntity = DofusEntities.getEntity(playedCharacterManager.id)
@@ -58,22 +64,10 @@ class FrustumManager:
 
     @classmethod
     def changeMapToDirection(cls, direction: DirectionsEnum) -> None:
-        currentMap: Map = mdm.MapDisplayManager().dataMap
-        destMapId = currentMap.getNeighborIdFromDirection(direction)
-        playedCharacterManager = PlayedCharacterManager()
-        playedEntity = DofusEntities.getEntity(playedCharacterManager.id)
-        playedEntityCellId = playedEntity.position.cellId
-        cellId = currentMap.cellOutTowards(playedEntityCellId, direction)
-        if cellId is not None:
-            logger.debug(
-                f"[MouvementAPI] FrustumManager.changeMapToDirection: cellId = "
-                + str(cellId)
-            )
-            cls.sendClickAdjacentMsg(destMapId, cellId)
-        else:
-            logger.warn(
-                "[MouvementAPI] Unable to change map to direction " + str(direction)
-            )
+        mapChange = cls.getMapChangeDirections().get(direction)
+        if mapChange is None:
+            raise Exception(f"No map found for direction '{direction.name}'")
+        cls.sendClickAdjacentMsg(mapChange.destMapId, mapChange.outCellId)
 
     @classmethod
     def sendClickAdjacentMsg(cls, mapId: float, cellId: int) -> None:
@@ -88,3 +82,9 @@ class FrustumManager:
         msg.cellId = cellId
         msg.id = mapId
         Kernel().getWorker().process(msg)
+
+    @classmethod
+    def changeMapToMapdId(cls, destMapId: int) -> None:
+        currentMap: Map = mdm.MapDisplayManager().dataMap
+        direction = currentMap.getDirectionToNeighbor(destMapId)
+        cls.changeMapToDirection(direction)

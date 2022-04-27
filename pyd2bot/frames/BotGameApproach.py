@@ -3,6 +3,9 @@ from com.ankamagames.dofus.kernel.Kernel import Kernel
 from com.ankamagames.dofus.logic.connection.actions.ServerSelectionAction import (
     ServerSelectionAction,
 )
+from com.ankamagames.dofus.logic.connection.managers.AuthentificationManager import (
+    AuthentificationManager,
+)
 from com.ankamagames.dofus.logic.game.approach.actions.CharacterSelectionAction import (
     CharacterSelectionAction,
 )
@@ -24,12 +27,10 @@ import threading
 logger = Logger(__name__)
 
 
-class BotAuthFrame(Frame):
-    def __init__(self, serverId, characterId):
-        self.serverId = serverId
+class BotGameApproach(Frame):
+    def __init__(self, characterId):
         self.characterId = characterId
         self._insideGame = threading.Event()
-        self._insideGame.clear()
         super().__init__()
 
     @property
@@ -44,9 +45,10 @@ class BotAuthFrame(Frame):
         return True
 
     def process(self, msg: Message) -> bool:
-
         if isinstance(msg, ServersListMessage):
-            self._worker.process(ServerSelectionAction.create(serverId=self.serverId))
+            self._worker.process(
+                ServerSelectionAction.create(AuthentificationManager()._lva.serverId)
+            )
             return True
 
         elif isinstance(msg, CharactersListMessage):

@@ -8,6 +8,7 @@ logger = Logger(__name__)
 
 
 if __name__ == "__main__":
-    bot = Bot("grinder")
+    botName = "grinder"
+    bot = Bot(botName)
     bot._worker.addFrame(WalkMeToDestinationMapFrame(191104002))
     bot.start()

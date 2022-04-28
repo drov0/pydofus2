@@ -1,5 +1,6 @@
 import random
 from typing import TYPE_CHECKING
+from com.ankamagames.dofus.datacenter.world.MapPosition import MapPosition
 
 from com.ankamagames.dofus.modules.utils.pathFinding.world.WorldPathFinder import (
     WorldPathFinder,
@@ -71,7 +72,21 @@ class MoveAPI:
         if mapChange is None:
             raise Exception(f"No map found for direction '{direction.name}'")
         cls.sendClickAdjacentMsg(mapChange.destMapId, mapChange.outCellId)
-
+    @classmethod
+    def MapChange(cls,x,y, discard=[]):
+        possibleChangeDirections = cls.getMapChangeDirections(discard)
+        for direction in possibleChangeDirections:
+            coords = MapPosition.getMapPositionById(possibleChangeDirections[direction].destMapId)
+            if coords.posX == x and coords.posY == y:
+                mapChange = possibleChangeDirections[direction]
+                logger.debug(
+                    f"[MouvementAPI] Sending a click to change map towards direction '{direction.name}'"
+                )
+                cls.sendClickAdjacentMsg(mapChange.destMapId, mapChange.outCellId)
+                return mapChange.destMapId
+    logger.error(
+        f"Didnt work"
+        )
     @classmethod
     def sendClickAdjacentMsg(cls, mapId: float, cellId: int) -> None:
         msg: AdjacentMapClickMessage = AdjacentMapClickMessage()

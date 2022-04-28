@@ -385,7 +385,7 @@ class RoleplayMovementFrame(Frame):
         )
         if playerEntity.position.cellId == cell.cellId:
             logger.debug("[RolePlayMovement] Already on the cell")
-            return True
+            #return True
         logger.debug(f"[RolePlayMovement] Asking to move to cell {cell}")
         if (
             not self._canMove

@@ -1,6 +1,6 @@
-# pyd2bot
+# pydofus2
 
-This is a full socket bot for the mmorpg dofus2 all in python. It also include most of the game backend that can be used for other purposes.
+This is a pyton client for the mmorpg dofus2 all in python. It includes most of the game backend and no front end stuff.
 
 ## Getting Started
 

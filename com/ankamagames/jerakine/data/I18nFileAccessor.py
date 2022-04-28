@@ -91,7 +91,7 @@ class I18nFileAccessor(metaclass=Singleton):
         pointer: int = self.unDiacriticalIndex.get(key)
         if not pointer:
             return None
-        if self.directBuffer == None:
+        if self.directBuffer is None:
             self.stream.position = pointer
             return self.stream.readUTF()
         self.directBuffer.position = pointer
@@ -121,9 +121,8 @@ class I18nFileAccessor(metaclass=Singleton):
             self.directBuffer = None
         else:
             self.directBuffer = BinaryStream()
-            self.stream.position(0)
-            raise Exception("Not implemented yet.")
-            self.stream.readBytes(self.directBuffer)
+            self.stream.position = 0
+            self.directBuffer.writeBytes(self.stream.readBytes())
 
     def close(self) -> None:
         self.stream = None

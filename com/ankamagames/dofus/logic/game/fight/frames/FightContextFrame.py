@@ -6,6 +6,9 @@ from com.ankamagames.atouin.messages.MapLoadedMessage import MapLoadedMessage
 from com.ankamagames.dofus.datacenter.monsters.Monster import Monster
 import com.ankamagames.dofus.datacenter.spells.Spell as spellmod
 from com.ankamagames.dofus.datacenter.world.SubArea import SubArea
+from com.ankamagames.dofus.internalDatacenter.fight.FightResultEntryWrapper import (
+    FightResultEntryWrapper,
+)
 from com.ankamagames.dofus.internalDatacenter.spells.SpellWrapper import SpellWrapper
 from com.ankamagames.dofus.internalDatacenter.world.WorldPointWrapper import (
     WorldPointWrapper,
@@ -16,7 +19,13 @@ from com.ankamagames.dofus.logic.common.managers.PlayerManager import PlayerMana
 from com.ankamagames.dofus.logic.game.common.managers.PlayedCharacterManager import (
     PlayedCharacterManager,
 )
+from com.ankamagames.dofus.logic.game.common.messages.FightEndingMessage import (
+    FightEndingMessage,
+)
 from com.ankamagames.dofus.logic.game.common.misc.DofusEntities import DofusEntities
+from com.ankamagames.dofus.logic.game.fight.actions.UpdateSpellModifierAction import (
+    UpdateSpellModifierAction,
+)
 import com.ankamagames.dofus.logic.game.fight.fightEvents.FightEventsHelper as fightEventsHelper
 from com.ankamagames.dofus.logic.game.fight.frames import FightSequenceFrame
 from com.ankamagames.dofus.logic.game.fight.frames.FightBattleFrame import (
@@ -28,10 +37,17 @@ from com.ankamagames.dofus.logic.game.fight.frames.FightEntitiesFrame import (
 from com.ankamagames.dofus.logic.game.fight.frames.FightPreparationFrame import (
     FightPreparationFrame,
 )
+from com.ankamagames.dofus.logic.game.fight.managers.BuffManager import BuffManager
 from com.ankamagames.dofus.logic.game.fight.managers.CurrentPlayedFighterManager import (
     CurrentPlayedFighterManager,
 )
+from com.ankamagames.dofus.logic.game.fight.managers.SpellModifiersManager import (
+    SpellModifiersManager,
+)
 from com.ankamagames.dofus.logic.game.fight.types.CastingSpell import CastingSpell
+from com.ankamagames.dofus.network.enums.CharacterSpellModificationTypeEnum import (
+    CharacterSpellModificationTypeEnum,
+)
 from com.ankamagames.dofus.network.enums.FightEventEnum import FightEventEnum
 from com.ankamagames.dofus.network.enums.FightOutcomeEnum import FightOutcomeEnum
 from com.ankamagames.dofus.network.enums.FightTypeEnum import FightTypeEnum
@@ -80,6 +96,9 @@ from com.ankamagames.dofus.network.messages.game.context.fight.GameFightStarting
 )
 from com.ankamagames.dofus.network.messages.game.context.fight.GameFightUpdateTeamMessage import (
     GameFightUpdateTeamMessage,
+)
+from com.ankamagames.dofus.network.messages.game.context.fight.arena.ArenaFighterIdleMessage import (
+    ArenaFighterIdleMessage,
 )
 from com.ankamagames.dofus.network.messages.game.context.fight.arena.ArenaFighterLeaveMessage import (
     ArenaFighterLeaveMessage,
@@ -289,7 +308,8 @@ class FightContextFrame(Frame):
     @fightType.setter
     def fightType(self, t: int) -> None:
         self._fightType = t
-        # TODO: uncomment when party manager is done : partyFrame:PartyManagementFrame = Kernel().getWorker().getFrame("PartyManagementFrame")
+        # TODO: uncomment when party manager is done
+        # partyFrame:PartyManagementFrame = Kernel().getWorker().getFrame("PartyManagementFrame")
         # partyFrame.lastFightType = t
 
     @property
@@ -386,22 +406,22 @@ class FightContextFrame(Frame):
                 logger.log(
                     2,
                     "KIS fight started : "
-                    + gfsmsg.fightId
+                    + str(gfsmsg.fightId)
                     + "-"
-                    + PlayedCharacterManager().currentMap.mapId
+                    + str(PlayedCharacterManager().currentMap.mapId)
                     + " (port : "
-                    + PlayerManager().kisServerPort
+                    + str(PlayerManager().kisServerPort)
                     + ")",
                 )
             else:
                 logger.log(
                     2,
                     "Game fight started : "
-                    + gfsmsg.fightId
+                    + str(gfsmsg.fightId)
                     + "-"
-                    + PlayedCharacterManager().currentMap.mapId
+                    + str(PlayedCharacterManager().currentMap.mapId)
                     + " (port : "
-                    + PlayerManager().gameServerPort
+                    + str(PlayerManager().gameServerPort)
                     + ")",
                 )
             CurrentPlayedFighterManager().currentFighterId = PlayedCharacterManager().id
@@ -541,7 +561,6 @@ class FightContextFrame(Frame):
             gfsm = msg
             preFightIsActive = False
             Kernel().getWorker().removeFrame(self._preparationFrame)
-            self._entitiesFrame.removeSwords()
             CurrentPlayedFighterManager().getSpellCastManager().resetInitialCooldown()
             Kernel().getWorker().addFrame(self._battleFrame)
             if PlayerManager().kisServerPort > 0:
@@ -583,7 +602,6 @@ class FightContextFrame(Frame):
 
         if isinstance(msg, TogglePointCellAction):
             if Kernel().getWorker().contains("PointCellFrame"):
-
                 Kernel().getWorker().removeFrame(PointCellFrame())
             else:
                 Kernel().getWorker().addFrame(PointCellFrame())
@@ -591,11 +609,7 @@ class FightContextFrame(Frame):
 
         if isinstance(msg, GameFightEndMessage):
             gfemsg = msg
-            if self._entitiesFrame.isInCreaturesFightMode():
-                self._entitiesFrame.showCreaturesInFight(False)
-            self.hideMovementRange()
             CurrentPlayedFighterManager().resetPlayerSpellList()
-            mdm.MapDisplayManager().activeIdentifiedElements(True)
             fightEventsHelper.FightEventsHelper.sendAllFightEvent(True)
             PlayedCharacterManager().isFighting = False
             PlayedCharacterManager().fightId = -1
@@ -610,38 +624,41 @@ class FightContextFrame(Frame):
                 pass
             else:
                 fightEnding = FightEndingMessage()
-                fightEnding.initFightEndingMessage()
+                fightEnding.init()
                 Kernel().getWorker().process(fightEnding)
-                results = list[FightResultEntry]()
+                results = list[FightResultEntryWrapper]()
                 resultIndex = 0
-                winners = list[FightResultEntry]()
+                winners = list[FightResultEntryWrapper]()
                 temp = []
                 for resultEntry in gfemsg.results:
                     temp.append(resultEntry)
                 isSpectator = True
                 for i in range(len(temp)):
                     resultEntry = temp[i]
-                if isinstance(resultEntry, FightResultPlayerListEntry):
-                    id = resultEntry.id
-                    frew = FightResultEntry, self._entitiesFrame.getEntityInfos(id)
-                    frew.alive = FightResultPlayerListEntry(resultEntry).alive
-                if isinstance(resultEntry, FightResultTaxCollectorListEntry):
-                    id = resultEntry.id
-                    frew = (
-                        FightResultEntryWrapperresultEntry,
-                        self._entitiesFrame.getEntityInfos(id),
-                    )
-                    frew.alive = FightResultTaxCollectorListEntry(resultEntry).alive
-                if isinstance(resultEntry, FightResultFighterListEntry):
-                    id = resultEntry.id
-                    frew = (
-                        FightResultEntryWrapperresultEntry,
-                        self._entitiesFrame.getEntityInfos(id),
-                    )
-                    frew.alive = FightResultFighterListEntry(resultEntry).alive
+                    if isinstance(resultEntry, FightResultPlayerListEntry):
+                        id = resultEntry.id
+                        frew = FightResultEntryWrapper(
+                            resultEntry, self._entitiesFrame.getEntityInfos(id)
+                        )
+                        frew.alive = FightResultPlayerListEntry(resultEntry).alive
+                    if isinstance(resultEntry, FightResultTaxCollectorListEntry):
+                        id = resultEntry.id
+                        frew = FightResultEntryWrapper(
+                            resultEntry,
+                            self._entitiesFrame.getEntityInfos(id),
+                        )
+                        frew.alive = FightResultTaxCollectorListEntry(resultEntry).alive
+                    if isinstance(resultEntry, FightResultFighterListEntry):
+                        id = resultEntry.id
+                        frew = FightResultEntryWrapper(
+                            resultEntry,
+                            self._entitiesFrame.getEntityInfos(id),
+                        )
+                        frew.alive = FightResultFighterListEntry(resultEntry).alive
 
-                if isinstance(resultEntry, FightResultListEntry):
-                    frew = FightResultEntryWrapper(resultEntry, None, isSpectator)
+                    if isinstance(resultEntry, FightResultListEntry):
+                        frew = FightResultEntryWrapper(resultEntry, None, isSpectator)
+
                     frew.fightInitiator = self._fightAttackerId == id
                     frew.wave = resultEntry.wave
                     if (
@@ -661,64 +678,58 @@ class FightContextFrame(Frame):
                         results[_loc116_] = frew
                         if frew.id == PlayedCharacterManager().id:
                             isSpectator = False
-                    if hardcoreLoots:
-                        currentWinner = 0
-                        for loot in hardcoreLoots.rewards.objects:
-                            winners[currentWinner].rewards.objects.append(loot)
+
+                if hardcoreLoots:
+                    currentWinner = 0
+                    for loot in hardcoreLoots.rewards.objects:
+                        winners[currentWinner].rewards.objects.append(loot)
                         currentWinner += 1
                         currentWinner %= len(winners)
-                        kamas = hardcoreLoots.rewards.kamas
-                        kamasPerWinner = math.floor(kamas / len(winners))
-                        if kamas % len(winners) != 0:
-                            kamasPerWinner += 1
-                        for winner in winners:
-                            if kamas < kamasPerWinner:
-                                winner.rewards.kamas = kamas
-                            else:
-                                winner.rewards.kamas = kamasPerWinner
+                    kamas = hardcoreLoots.rewards.kamas
+                    kamasPerWinner = math.floor(kamas / len(winners))
+                    if kamas % len(winners) != 0:
+                        kamasPerWinner += 1
+                    for winner in winners:
+                        if kamas < kamasPerWinner:
+                            winner.rewards.kamas = kamas
+                        else:
+                            winner.rewards.kamas = kamasPerWinner
                         kamas -= winner.rewards.kamas
-                    winnersName = ""
-                    losersName = ""
-                    for namedTeamWO in gfemsg.namedPartyTeamsOutcomes:
-                        if (
-                            namedTeamWO.team.partyName
-                            and namedTeamWO.team.partyName != ""
-                        ):
-                            if namedTeamWO.outcome == FightOutcomeEnum.RESULT_VICTORY:
-                                winnersName = namedTeamWO.team.partyName
-                            elif namedTeamWO.outcome == FightOutcomeEnum.RESULT_LOST:
-                                losersName = namedTeamWO.team.partyName
-                    resultsRecap = {
-                        "results": results,
-                        "rewardRate": gfemsg.rewardRate,
-                        "sizeMalus": gfemsg.lootShareLimitMalus,
-                        "duration": gfemsg.duration,
-                        "challenges": self.challengesList,
-                        "turns": self._battleFrame.turnsCount,
-                        "fightType": self._fightType,
-                        "winnersName": winnersName,
-                        "losersName": losersName,
-                        "isSpectator": isSpectator,
-                    }
-                    if isinstance(msg, BreachGameFightEndMessage):
-                        resultsRecap["budget"] = gfemsg.budget
-                    idols = list[int]()
-                    if self._fightIdols:
-                        numIdols = len(self._fightIdols)
-                        for j in range(numIdols):
-                            idols.append(self._fightIdols[j].id)
-                    resultsRecap["idols"] = idols
-                    resultsKey = self.saveResults(resultsRecap)
-                    if not PlayedCharacterManager().isSpectator:
-                        fightEventsHelper.FightEventsHelper.sendFightEvent(
-                            FightEventEnum.FIGHT_END, [resultsKey], 0, -1, True
-                        )
+                winnersName = ""
+                losersName = ""
+                for namedTeamWO in gfemsg.namedPartyTeamsOutcomes:
+                    if namedTeamWO.team.partyName and namedTeamWO.team.partyName != "":
+                        if namedTeamWO.outcome == FightOutcomeEnum.RESULT_VICTORY:
+                            winnersName = namedTeamWO.team.partyName
+                        elif namedTeamWO.outcome == FightOutcomeEnum.RESULT_LOST:
+                            losersName = namedTeamWO.team.partyName
+                resultsRecap = {
+                    "results": results,
+                    "rewardRate": gfemsg.rewardRate,
+                    "sizeMalus": gfemsg.lootShareLimitMalus,
+                    "duration": gfemsg.duration,
+                    "challenges": self.challengesList,
+                    "turns": self._battleFrame.turnsCount,
+                    "fightType": self._fightType,
+                    "winnersName": winnersName,
+                    "losersName": losersName,
+                    "isSpectator": isSpectator,
+                }
+                if isinstance(msg, BreachGameFightEndMessage):
+                    resultsRecap["budget"] = gfemsg.budget
+                idols = [fi.id for fi in self._fightIdols]
+                resultsRecap["idols"] = idols
+                resultsKey = self.saveResults(resultsRecap)
+                if not PlayedCharacterManager().isSpectator:
+                    fightEventsHelper.FightEventsHelper.sendFightEvent(
+                        FightEventEnum.FIGHT_END, [resultsKey], 0, -1, True
+                    )
 
-                    if PlayerManager().kisServerPort > 0:
-                        pass
+                if PlayerManager().kisServerPort > 0:
+                    pass
 
-                    Kernel().getWorker().removeFrame(self)
-                    return True
+            Kernel().getWorker().removeFrame(self)
+            return True
 
         if isinstance(msg, ChallengeTargetsListRequestAction):
             ctlra = msg
@@ -814,7 +825,7 @@ class FightContextFrame(Frame):
         if self._timerMovementRange:
             self._timerMovementRange.cancel()
         self._currentFighterInfo = None
-        simf: SpellInventoryManagementFrame = (
+        simf: "SpellInventoryManagementFrame" = (
             Kernel().getWorker().getFrame("SpellInventoryManagementFrame")
         )
         simf.deleteSpellsGlobalCoolDownsData()

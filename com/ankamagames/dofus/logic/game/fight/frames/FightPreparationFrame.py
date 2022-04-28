@@ -359,7 +359,7 @@ class FightPreparationFrame(Frame):
 
         if isinstance(msg, GameContextDestroyMessage):
             gfemsg2 = GameFightEndMessage()
-            gfemsg2.initGameFightEndMessage()
+            gfemsg2.init()
             fightContextFrame = Kernel().getWorker().getFrame("FightContextFrame")
             if fightContextFrame:
                 fightContextFrame.process(gfemsg2)

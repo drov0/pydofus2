@@ -1,6 +1,20 @@
 from types import FunctionType
 from typing import TYPE_CHECKING
 
+from com.ankamagames.dofus.logic.game.fight.frames.FightTurnFrame import FightTurnFrame
+from com.ankamagames.dofus.logic.game.fight.messages.GameActionFightLeaveMessage import (
+    GameActionFightLeaveMessage,
+)
+from com.ankamagames.dofus.logic.game.fight.miscs.SpellScriptBuffer import SpellScriptBuffer
+from com.ankamagames.dofus.logic.game.fight.steps.FightPlaySpellScriptStep import FightPlaySpellScriptStep
+from com.ankamagames.dofus.logic.game.fight.steps.FightRefreshFighterStep import (
+    FightRefreshFighterStep,
+)
+from com.ankamagames.jerakine.sequencer.ParallelStartSequenceStep import (
+    ParallelStartSequenceStep,
+)
+from com.ankamagames.jerakine.types.events.SequencerEvent import SequencerEvent
+
 if TYPE_CHECKING:
     from com.ankamagames.dofus.logic.game.fight.frames.FightBattleFrame import (
         FightBattleFrame,
@@ -23,7 +37,12 @@ from com.ankamagames.dofus.logic.game.common.managers.PlayedCharacterManager imp
     PlayedCharacterManager,
 )
 from com.ankamagames.dofus.logic.game.common.misc.DofusEntities import DofusEntities
-from com.ankamagames.dofus.logic.game.fight.frames import FightContextFrame
+from com.ankamagames.dofus.logic.game.fight.frames.FightContextFrame import (
+    FightContextFrame,
+)
+from com.ankamagames.dofus.logic.game.fight.frames.FightEntitiesFrame import (
+    FightEntitiesFrame,
+)
 
 from com.ankamagames.dofus.logic.game.fight.managers.BuffManager import BuffManager
 from com.ankamagames.dofus.logic.game.fight.managers.CurrentPlayedFighterManager import (
@@ -362,7 +381,7 @@ class FightSequenceFrame(Frame, ISpellCastProvider):
         return True
 
     @property
-    def fightEntitiesFrame(self) -> FightEntitiesFrame:
+    def fightEntitiesFrame(self) -> "FightEntitiesFrame":
         if not self._fightEntitiesFrame:
             self._fightEntitiesFrame = (
                 Kernel().getWorker().getFrame("FightEntitiesFrame")
@@ -370,25 +389,10 @@ class FightSequenceFrame(Frame, ISpellCastProvider):
         return self._fightEntitiesFrame
 
     def addSubSequence(self, sequence: ISequencer) -> None:
-        ++self._subSequenceWaitingCount
+        self._subSequenceWaitingCount += 1
         self._stepsBuffer.append(ParallelStartSequenceStep([sequence], False))
 
     def process(self, msg: Message) -> bool:
-        forceDetailedLogs: bool = False
-        closeCombatWeaponId: int = 0
-        fxScriptId: int = 0
-        sourceCellId: int = 0
-        critical = False
-        isAlly: bool = False
-        throwCellId: int = 0
-        dropCellId: int = 0
-        startIndex: int = 0
-        stepsChanged: bool = False
-        playSpellScriptStepPosition: int = 0
-        stepIndex: int = 0
-        stepSubIndex: int = 0
-        gcdValue: int = 0
-        shape: int = 0
 
         if isinstance(msg, GameFightRefreshFighterMessage):
             gfrfmsg = msg
@@ -421,7 +425,7 @@ class FightSequenceFrame(Frame, ISpellCastProvider):
                 )
                 if forceDetailedLogs:
                     gafscmsg.verboseCast = True
-            fightEntitiesFrame = FightEntitiesFrame.getCurrentInstance()
+            fightEntitiesFrame:FightEntitiesFrame = FightEntitiesFrame.getCurrentInstance()
             sourceCellId = -1
             if fightEntitiesFrame and fightEntitiesFrame.hasEntity(gafscmsg.sourceId):
                 fighterInfo = fightEntitiesFrame.getEntityInfos(gafscmsg.sourceId)
@@ -449,13 +453,13 @@ class FightSequenceFrame(Frame, ISpellCastProvider):
                     "\r[BUFFS DEBUG] Sort "
                     + tempCastingSpell.spell.name
                     + " ("
-                    + gafscmsg.spellId
+                    + str(gafscmsg.spellId)
                     + ") lanc� par "
-                    + gafscmsg.sourceId
+                    + str(gafscmsg.sourceId)
                     + " sur "
-                    + gafscmsg.targetId
+                    + str(gafscmsg.targetId)
                     + " (cellule "
-                    + gafscmsg.destinationCellId
+                    + str(gafscmsg.destinationCellId)
                     + ")"
                 )
             if not self._fightBattleFrame.currentPlayerId:
@@ -469,44 +473,6 @@ class FightSequenceFrame(Frame, ISpellCastProvider):
                 fxScriptId = tempCastingSpell.spell.getScriptId(
                     tempCastingSpell.isCriticalHit
                 )
-                self.appendPlaySpellScriptStep(
-                    fxScriptId,
-                    gafscmsg.sourceId,
-                    gafscmsg.destinationCellId,
-                    gafscmsg.spellId,
-                    gafscmsg.spellLevel,
-                    cssb,
-                )
-                startIndex = 0
-                stepsChanged = True
-                playSpellScriptStepPosition = 0
-                while stepsChanged:
-                    stepsChanged = False
-                    for stepIndex in range(len(self._stepsBuffer)):
-                        if self._stepsBuffer[stepIndex] == self._playSpellScriptStep:
-                            playSpellScriptStepPosition = stepIndex
-                        if self._spellScriptTemporaryBuffer:
-                            for stepSubIndex in range(
-                                startIndex,
-                                len(self._spellScriptTemporaryBuffer.stepsBuffer),
-                            ):
-                                if (
-                                    self._stepsBuffer[stepIndex]
-                                    == self._spellScriptTemporaryBuffer.stepsBuffer[
-                                        stepSubIndex
-                                    ]
-                                ):
-                                    stepsChanged = True
-                                    startIndex = stepSubIndex
-                                    self._stepsBuffer = self._stepsBuffer.slice(
-                                        0, stepIndex
-                                    ).extend(self._stepsBuffer.slice(stepIndex + 1))
-                        if stepsChanged:
-                            pass
-                sliced = self._stepsBuffer[playSpellScriptStepPosition + 1 :]
-                self._stepsBuffer = self._stepsBuffer[: playSpellScriptStepPosition + 1]
-                self._stepsBuffer.extend(cssb.stepsBuffer)
-                self._stepsBuffer.extend(sliced)
                 self._fightBattleFrame.isFightAboutToEnd = True
                 return True
             if self._castingSpell:
@@ -1174,8 +1140,8 @@ class FightSequenceFrame(Frame, ISpellCastProvider):
             return False
 
     def execute(self, callback: FunctionType = None) -> None:
-        self._sequencer = SerialSequencer(FIGHT_SEQUENCERS_CATEGORY)
-        self._sequencer.addEventListener(
+        self._sequencer = SerialSequencer(self.FIGHT_SEQUENCERS_CATEGORY)
+        self._sequencer.add_listener(
             SequencerEvent.SEQUENCE_STEP_FINISH, self.onStepEnd
         )
         if self._parent:
@@ -2079,8 +2045,8 @@ class FightSequenceFrame(Frame, ISpellCastProvider):
         summonedEntityInfosS: GameFightMonsterInformations = None
         monsterS: Monster = None
         gfsgmsg: GameFightShowFighterMessage = GameFightShowFighterMessage()
-        gfsgmsg.initGameFightShowFighterMessage(entity)
-        Kernel().getWorker().getFrame("process(gfsgmsg")
+        gfsgmsg.init(entity)
+        Kernel().getWorker().getFrame().process(gfsgmsg)
         if ActionIdHelper.isRevive(actionId):
             self.fightEntitiesFrame.removeLastKilledAlly(entity.spawnInfo.teamId)
         summonedCreature: Sprite = DofusEntities.getEntity(entity.contextualId)

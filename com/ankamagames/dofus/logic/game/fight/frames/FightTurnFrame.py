@@ -211,7 +211,7 @@ class FightTurnFrame(Frame):
     @turnDuration.setter
     def turnDuration(self, v: int) -> None:
         self._turnDuration = v
-        self._remainingDurationSeconds = math.floor(v / 1000)
+        self._remainingDurationSeconds = math.floor(v)
         if self._intervalTurn:
             self._intervalTurn.cancel()
         self._intervalTurn = Timer(10, self.onSecondTick)

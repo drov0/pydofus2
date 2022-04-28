@@ -13,4 +13,5 @@ class WeakReference:
         return None
 
     def destroy(self) -> None:
+        del self.dictionary
         self.dictionary = None

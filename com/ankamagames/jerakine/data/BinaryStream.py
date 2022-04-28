@@ -22,6 +22,9 @@ class BinaryStream:
     def position(self, value):
         self._stream.seek(value)
 
+    def writeBytes(self, value):
+        self._stream.write(value)
+
     def seek(self, value: int):
         self._stream.seek(value)
 

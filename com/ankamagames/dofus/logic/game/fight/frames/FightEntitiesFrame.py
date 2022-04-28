@@ -1,8 +1,5 @@
 from com.ankamagames.atouin.managers.MapDisplayManager import MapDisplayManager
-<<<<<<< HEAD
-=======
 from com.ankamagames.dofus.datacenter.world.SubArea import SubArea
->>>>>>> 2af849eb585c6644c1401c18d53d32e4fa0c55fe
 from com.ankamagames.dofus.internalDatacenter.world.WorldPointWrapper import (
     WorldPointWrapper,
 )
@@ -177,7 +174,8 @@ class FightEntitiesFrame(AbstractEntitiesFrame, Frame):
         self.lastKilledDefenders = list[GameFightFighterInformations]()
         super().__init__()
 
-    def getCurrentInstance(self) -> "FightEntitiesFrame":
+    @classmethod
+    def getCurrentInstance(cls) -> "FightEntitiesFrame":
         return krnl.Kernel().getWorker().getFrame("FightEntitiesFrame")
 
     def pushed(self) -> bool:

@@ -45,9 +45,8 @@ class Cache(InfiniteCache, ICache):
         return super().peek(ref)
 
     def store(self, ref, obj) -> bool:
-        bb: int = 0
         if self._bounds and self._size + 1 > self._bounds:
-            bb = self._bounds * 0.7 + 1 >> 0
+            bb = int(self._bounds * 0.7 + 1) >> 0
             self._gc.purge(bb)
         super().store(ref, obj)
         self._gc.used(ref)

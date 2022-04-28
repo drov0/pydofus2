@@ -8,6 +8,7 @@ class InfiniteCache(ICache):
 
     def __init__(self):
         self._cache = dict()
+        self._size = 0
         super().__init__()
 
     @property

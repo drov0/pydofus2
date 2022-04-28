@@ -25,4 +25,4 @@ class PathElement:
         return self.cellId == other.cellId and self.orientation == other.orientation
 
     def __str__(self) -> str:
-        return "PE(cellId: {}, orientation: {})".format(self.cellId, self._nOrientation)
+        return f"PE(cellId: {self.cellId}, orientation: {self._nOrientation})"

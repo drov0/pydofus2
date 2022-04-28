@@ -9,6 +9,7 @@ class UpdateSpellModifierAction(AbstractAction, Action):
         self._spellId = spellId
         self._statId = statId
 
+    @classmethod
     def create(
         cls, entityId: float, spellId: float, statId: float
     ) -> "UpdateSpellModifierAction":

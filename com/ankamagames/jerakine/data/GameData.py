@@ -12,10 +12,10 @@ logger = Logger(__name__)
 class GameData(AbstractDataManager):
 
     CACHE_SIZE_RATIO: float = 0.1
-    _directObjectCaches: dict = dict()
-    _objectCaches: dict = dict()
-    _objectsCaches: dict = dict()
-    _overrides: dict = dict()
+    _directObjectCaches: dict[str, WeakReference] = dict()
+    _objectCaches: dict[str, Cache] = dict()
+    _objectsCaches: dict[str, SoftReference] = dict()
+    _overrides: dict[str, dict[int, int]] = dict()
 
     def __init__(self):
         super().__init__()
@@ -49,13 +49,12 @@ class GameData(AbstractDataManager):
                 return o
         o = GameDataFileAccessor().getObject(moduleId, keyId)
         cls._directObjectCaches[moduleId][keyId] = WeakReference(o)
-        cls._objectCaches[moduleId]
+        cls._objectCaches[moduleId].store(keyId, o)
         return o
 
     @classmethod
     def getObjects(cls, moduleId: str) -> list:
-        objects: list = None
-        if cls._objectsCaches.get(moduleId):
+        if moduleId in cls._objectsCaches:
             objects = cls._objectsCaches[moduleId].object
             if objects:
                 return objects

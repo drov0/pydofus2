@@ -1,8 +1,9 @@
+from whistle import EventDispatcher
 from com.ankamagames.jerakine.sequencer.ISequencable import ISequencable
 from com.ankamagames.jerakine.sequencer.ISequencableListener import ISequencableListener
 
 
-class ISequencer(ISequencableListener):
+class ISequencer(ISequencableListener,EventDispatcher):
     def addStep(self, param1: ISequencable) -> None:
         pass
 

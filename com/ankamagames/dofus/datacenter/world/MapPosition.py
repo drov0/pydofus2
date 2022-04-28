@@ -5,7 +5,9 @@ from com.ankamagames.jerakine.interfaces.IDataCenter import IDataCenter
 from com.ankamagames.jerakine.logger.Logger import Logger
 from com.ankamagames.jerakine.types.DataStoreType import DataStoreType
 from com.ankamagames.jerakine.types.enums.DataStoreEnum import DataStoreEnum
-
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from com.ankamagames.dofus.datacenter.world.SubArea import SubArea
 logger = Logger(__name__)
 
 
@@ -105,7 +107,7 @@ class MapPosition(IDataCenter):
 
     @staticmethod
     def getMapPositions() -> list:
-        return GameData.getobjects(MapPosition.MODULE)
+        return GameData.getObjects(MapPosition.MODULE)
 
     @staticmethod
     def getMapIdByCoord(x: int, y: int) -> list[float]:

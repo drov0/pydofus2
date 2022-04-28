@@ -1,5 +1,8 @@
 from com.ankamagames.jerakine.data.I18nFileAccessor import I18nFileAccessor
 from com.ankamagames.jerakine.data.AbstractDataManager import AbstractDataManager
+from com.ankamagames.jerakine.logger.Logger import Logger
+
+logger = Logger(__name__)
 
 
 class I18n(AbstractDataManager):
@@ -15,8 +18,9 @@ class I18n(AbstractDataManager):
         if not id:
             return None
         txt: str = I18nFileAccessor().getText(id)
-        if txt == None or txt == "None":
+        if not txt or txt == "None":
             return "[UNKNOWN_TEXT_ID_" + str(id) + "]"
+        logger.debug(txt)
         return cls.replaceParams(txt, params, replace)
 
     @classmethod

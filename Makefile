@@ -55,7 +55,7 @@ activate:
 	. .venv/Scripts/activate
 
 createAccount:
-	@python $(CURDIR)/hackedLauncher/CredsManager.py $(entryName) $(login) $(password)
+	@python $(CURDIR)/launcher/CredsManager.py $(entryName) $(login) $(password)
 
 createBot:
 	@python $(CURDIR)/pyd2bot/BotsDataManager.py $(botName) $(account) $(serverId) $(charachterId)

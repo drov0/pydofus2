@@ -1,8 +1,10 @@
+from pathlib import Path
 import site
 import os
 
-ROOTDIR = CURR_DIR = os.getcwd()
+ROOTDIR = CURR_DIR = Path(os.getcwd())
 SITEDIR = site.getsitepackages()[0]
-print(SITEDIR)
+with open(os.path.join(SITEDIR, "pydofus2.pth"), "w+") as fp:
+    fp.write(str(ROOTDIR / "pydofus2"))
 with open(os.path.join(SITEDIR, "pyd2bot.pth"), "w+") as fp:
-    fp.write(ROOTDIR)
+    fp.write(str(ROOTDIR / "pyd2bot"))

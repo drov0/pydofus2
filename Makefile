@@ -58,7 +58,7 @@ createAccount:
 	@python $(CURDIR)/launcher/CredsManager.py $(entryName) $(login) $(password)
 
 createBot:
-	@python $(CURDIR)/pyd2bot/BotsDataManager.py $(botName) $(account) $(serverId) $(charachterId)
+	@python $(CURDIR)/pyd2bot/managers/BotsDataManager.py $(botName) $(account) $(serverId) $(charachterId)
 
 genKeys:
 	@ssh-keygen -t rsa -b 2056 -m PEM -f $(PASS_ENC_KEYS)/id_rsa

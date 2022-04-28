@@ -16,7 +16,7 @@ from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
     from com.ankamagames.jerakine.network.ServerConnection import ServerConnection
-from hackedLauncher.Launcher import Haapi
+from launcher.Launcher import Haapi
 from pyd2bot.managers.BotsDataManager import BotsDataManager
 from pyd2bot.frames.BotGameApproach import BotGameApproach
 from com.ankamagames.atouin.utils.DataMapProvider import DataMapProvider
@@ -59,9 +59,6 @@ class Bot:
                 if self.mainConn is not None:
                     self.mainConn.close()
                 sys.exit(0)
-
-    def addFrame(self, frame):
-        self._worker.addFrame(frame)
 
     def registerFrame(self, frame):
         self._worker.addFrame(frame)

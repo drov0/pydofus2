@@ -2,15 +2,16 @@ DOFUSINVOKER = $(LOCALAPPDATA)/Ankama/Dofus/DofusInvoker.swf
 FFDEC = $(CURDIR)/FFDec/ffdec.bat
 DOFUS_SRC = $(CURDIR)/protocolBuilder/sources
 SELECTCLASS = com.ankamagames.dofus.BuildInfos,com.ankamagames.dofus.network.++,com.ankamagames.jerakine.network.++
-KEYS_DIR = $(CURDIR)/binaryData
-
+PYDOFUS_DIR = $(CURDIR)/pydofus2
+PYD2BOT_DIR = $(CURDIR)
 
 .ONESHELL:
 .PHONY: setup
 setup:
 	python -m venv .venv
 	source .venv/Scripts/activate
-	echo "$(CURDIR)" >> .venv/pyd2bot.pth
+	echo "$(PYDOFUS_DIR)" >> .venv/pydofus2.pth
+	echo "$(PYD2BOT_DIR)" >> .venv/pyd2bot.pth
 	pip install -r requirements.txt
 
 update: decompile gen-protocol gen-msgClasses gen-msgShuffle extract-keys unpack-maps
@@ -21,7 +22,7 @@ decompile:
 .ONESHELL:
 
 extract-keys:
-	@$(FFDEC) -config parallelSpeedUp=true -export binaryData $(KEYS_DIR) $(DOFUSINVOKER)
+	@$(FFDEC) -config parallelSpeedUp=true -export binaryData $(PYDOFUS_DIR)/binaryData $(DOFUSINVOKER)
 
 gen-protocol:
 	@echo "Generating protocol..."

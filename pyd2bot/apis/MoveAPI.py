@@ -1,13 +1,9 @@
 import random
-from com.ankamagames.atouin.AtouinConstants import AtouinConstants
-from com.ankamagames.atouin.data.map.Cell import Cell
 from typing import TYPE_CHECKING
 
-from com.ankamagames.dofus.modules.utils.pathFinding.world.WorldGraph import WorldGraph
 from com.ankamagames.dofus.modules.utils.pathFinding.world.WorldPathFinder import (
     WorldPathFinder,
 )
-from com.ankamagames.jerakine.entities.interfaces.IEntity import IEntity
 
 if TYPE_CHECKING:
     from com.ankamagames.atouin.data.map.Map import Map
@@ -38,6 +34,8 @@ class MoveAPI:
     @classmethod
     def randomMapChange(cls, discard=[]):
         possibleChangeDirections = cls.getMapChangeDirections(discard)
+        if len(possibleChangeDirections) == 0:
+            raise Exception("No possible map change direction")
         randomDirection = random.choice(list(possibleChangeDirections.keys()))
         mapChange = possibleChangeDirections[randomDirection]
         logger.debug(
@@ -48,19 +46,24 @@ class MoveAPI:
 
     @classmethod
     def getMapChangeDirections(cls, discard=[]) -> dict[int, MapChange]:
+        outgoingDirections = dict()
         currentMap: Map = mdm.MapDisplayManager().dataMap
         playedCharacterManager = PlayedCharacterManager()
         playedEntity = DofusEntities.getEntity(playedCharacterManager.id)
         playedEntityCellId = playedEntity.position.cellId
-        result = dict[DirectionsEnum, MapChange]()
-        for direction in DirectionsEnum.getMapChangeDirections():
-            destMapId = currentMap.getNeighborIdFromDirection(direction)
-            if destMapId in discard:
-                continue
-            cellId = currentMap.cellOutTowards(playedEntityCellId, direction)
-            if cellId is not None:
-                result[direction] = MapChange(destMapId, cellId)
-        return result
+        v = WorldPathFinder().getCurrentPlayerVertex()
+        outgoingEdges = WorldPathFinder().worldGraph.getOutgoingEdgesFromVertex(v)
+        for e in outgoingEdges:
+            for tr in e.transitions:
+                try:
+                    direction = DirectionsEnum(tr.direction)
+                    destMapId = e.dst.mapId
+                    # cellId = currentMap.cellOutTowards(playedEntityCellId, direction)
+                    cellId = tr.cell
+                    outgoingDirections[direction] = MapChange(destMapId, cellId)
+                except ValueError:
+                    pass
+        return outgoingDirections
 
     @classmethod
     def changeMapToDirection(cls, direction: DirectionsEnum) -> None:

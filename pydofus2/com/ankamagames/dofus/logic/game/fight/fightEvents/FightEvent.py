@@ -50,4 +50,4 @@ class FightEvent:
         self.id = FightEvent.FIGHT_EVENT_ID_COUNTER
 
     def reset(self) -> None:
-        FIGHT_EVENT_ID_COUNTER = 0
+        FightEvent.FIGHT_EVENT_ID_COUNTER = 0

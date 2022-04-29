@@ -123,6 +123,8 @@ class BotFarmPathFrame(Frame):
                 logger.debug(
                     f"[BotFarmFrame] Interactive element {msg.elemId} use ended"
                 )
+                for iw in InventoryManager().realInventory:
+                    logger.debug(f"{iw.name}: {iw.quantity}")
                 logger.debug(
                     "***********************************************************************"
                 )

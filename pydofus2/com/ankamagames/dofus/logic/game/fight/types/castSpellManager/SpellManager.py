@@ -2,6 +2,7 @@ from com.ankamagames.dofus.datacenter.spells.Spell import Spell
 from com.ankamagames.dofus.datacenter.spells.SpellLevel import SpellLevel
 import com.ankamagames.dofus.internalDatacenter.spells.SpellWrapper as spellw
 from typing import TYPE_CHECKING
+from com.ankamagames.dofus.logic.game.fight.managers.SpellModifiersManager import SpellModifiersManager
 
 if TYPE_CHECKING:
     from com.ankamagames.dofus.logic.game.fight.managers.SpellCastInFightManager import (

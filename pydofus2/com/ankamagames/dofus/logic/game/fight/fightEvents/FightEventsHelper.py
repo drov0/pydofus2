@@ -8,7 +8,12 @@ from com.ankamagames.dofus.logic.game.common.managers.PlayedCharacterManager imp
     PlayedCharacterManager,
 )
 from com.ankamagames.dofus.logic.game.fight.fightEvents.FightEvent import FightEvent
-import com.ankamagames.dofus.logic.game.fight.frames.FightEntitiesFrame as fightEntitiesFrame
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from com.ankamagames.dofus.logic.game.fight.frames.FightEntitiesFrame import (
+        FightEntitiesFrame,
+    )
 from com.ankamagames.dofus.logic.game.fight.types.BasicBuff import BasicBuff
 from com.ankamagames.dofus.logic.game.fight.types.StatBuff import StatBuff
 from com.ankamagames.dofus.misc.utils.GameDebugManager import GameDebugManager
@@ -106,7 +111,7 @@ class FightEventsHelper:
 
     def addFightText(self, fightEvent: FightEvent) -> None:
         num: int = len(self._events)
-        groupByType = self.NOT_GROUPABLE_BY_TYPE_EVENTS.find(fightEvent.name) == -1
+        groupByType = fightEvent.name not in self.NOT_GROUPABLE_BY_TYPE_EVENTS
         if GameDebugManager().detailedFightLog_unGroupEffects:
             groupByType = False
         if fightEvent.name == FightEventEnum.FIGHTER_CASTED_SPELL:
@@ -161,7 +166,7 @@ class FightEventsHelper:
         EnterFrameDispatcher().removeEventListener(self.sendEvents)
         self.sendFightEvent(None, None, 0, -1)
         self.sendAllFightEvents()
-        entitiesFrame: fightEntitiesFrame.FightEntitiesFrame = (
+        entitiesFrame: "FightEntitiesFrame" = (
             Kernel().getWorker().getFrame("FightEntitiesFrame")
         )
         entitiesList: dict = entitiesFrame.entities if entitiesFrame else dict()
@@ -259,7 +264,7 @@ class FightEventsHelper:
         event: FightEvent = None
         targetList: list[float] = list[float]()
         for event in eventList:
-            if targetList.find(event.targetId) == -1:
+            if event.targetId not in targetList:
                 targetList.append(event.targetId)
         return targetList
 
@@ -390,9 +395,9 @@ class FightEventsHelper:
                     else:
                         teamId = t.teamId
                     if (
-                        team.find("allies") != -1
+                        "allies" not in team
                         and teamId == playerTeamId
-                        or team.find("enemies") != -1
+                        or "enemies" not in team
                         and teamId != playerTeamId
                     ):
                         list.remove(t.contextualId)
@@ -407,12 +412,11 @@ class FightEventsHelper:
         return False
 
     def getGroupedListEvent(self, pInEventList: list[FightEvent]) -> list[FightEvent]:
-        event: FightEvent = None
         baseEvent: FightEvent = pInEventList[0]
         listToConcat: list[FightEvent] = list[FightEvent]()
         listToConcat.append(baseEvent)
         for event in pInEventList:
-            if listToConcat.find(event) == -1 and self.needToGroupFightEventsData(
+            if event not in listToConcat and self.needToGroupFightEventsData(
                 self.getNumberOfParametersToCheck(baseEvent), event, baseEvent
             ):
                 listToConcat.append(event)
@@ -447,7 +451,7 @@ class FightEventsHelper:
                     nbTotalEnemies += 1
                 if (
                     not checkAlive or checkAlive and fighterInfos.spawnInfo.alive
-                ) and targetList.find(fighterInfos.contextualId) != -1:
+                ) and fighterInfos.contextualId not in targetList:
                     if fighterInfos.spawnInfo.teamId == playerTeamId:
                         alliesCount += 1
                     else:

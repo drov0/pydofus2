@@ -1,0 +1,58 @@
+from com.ankamagames.dofus.logic.game.fight.types.BasicBuff import BasicBuff
+from com.ankamagames.dofus.logic.game.fight.types.CastingSpell import CastingSpell
+from com.ankamagames.dofus.network.types.game.actions.fight.FightTemporarySpellBoostEffect import (
+    FightTemporarySpellBoostEffect,
+)
+from com.ankamagames.jerakine.logger.Logger import Logger
+
+logger = Logger(__name__)
+
+
+class SpellBuff(BasicBuff):
+    spellId: int
+
+    delta: int
+
+    modifType: int
+
+    def __init__(
+        self,
+        effect: FightTemporarySpellBoostEffect = None,
+        castingSpell: CastingSpell = None,
+        actionId: int = 0,
+    ):
+        if effect:
+            super().__init__(
+                effect,
+                castingSpell,
+                actionId,
+                effect.boostedSpellId,
+                None,
+                effect.delta,
+            )
+            self.spellId = effect.boostedSpellId
+            self.delta = effect.delta
+
+    @property
+    def type(self) -> str:
+        return "SpellBuff"
+
+    def clone(self, id: int = 0) -> BasicBuff:
+        sb: SpellBuff = SpellBuff()
+        sb.spellId = self.spellId
+        sb.delta = self.delta
+        sb.modifType = self.modifType
+        sb.id = uid
+        sb.uid = uid
+        sb.dataUid = dataUid
+        sb.actionId = actionId
+        sb.targetId = targetId
+        sb.castingSpell = castingSpell
+        sb.duration = duration
+        sb.dispelable = dispelable
+        sb.source = source
+        sb.aliveSource = aliveSource
+        sb.sourceJustReaffected = sourceJustReaffected
+        sb.parentBoostUid = parentBoostUid
+        sb.initParam(param1, param2, param3)
+        return sb

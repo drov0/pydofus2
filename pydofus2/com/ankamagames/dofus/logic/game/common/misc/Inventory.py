@@ -206,7 +206,7 @@ class Inventory:
                 self.modifyItemFromViews(itemSet, itemSet.item)
 
     def releaseHooks(self) -> None:
-        self._hookLock.release()
+        pass
 
     def refillView(self, src: str, dst: str) -> None:
         fromView: IInventoryView = self.getView(src)

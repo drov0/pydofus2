@@ -2,7 +2,6 @@ from typing import Any, TYPE_CHECKING
 from com.ankamagames.berilia.types.messages.managers.SlotDataHolderManager import (
     SlotDataHolderManager,
 )
-
 if TYPE_CHECKING:
     from com.ankamagames.dofus.datacenter.effects.EffectInstance import EffectInstance
     from com.ankamagames.dofus.logic.game.common.spell.SpellModifiers import (

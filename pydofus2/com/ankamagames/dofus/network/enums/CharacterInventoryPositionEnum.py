@@ -1,6 +1,3 @@
-from enum import Enum
-
-
 class CharacterInventoryPositionEnum:
 
     ACCESSORY_POSITION_HAT: int = 6

@@ -1,0 +1,68 @@
+from com.ankamagames.dofus.internalDatacenter.spells.SpellWrapper import SpellWrapper
+from com.ankamagames.dofus.kernel.Kernel import Kernel
+from com.ankamagames.dofus.logic.game.fight.steps.IFightStep import IFightStep
+from com.ankamagames.dofus.logic.game.common.frames.SpellInventoryManagementFrame import SpellInventoryManagementFrame
+from com.ankamagames.dofus.logic.game.common.managers.PlayedCharacterManager import PlayedCharacterManager
+from com.ankamagames.dofus.logic.game.fight.frames.FightEntitiesFrame import FightEntitiesFrame
+from com.ankamagames.dofus.logic.game.fight.managers.CurrentPlayedFighterManager import CurrentPlayedFighterManager
+from com.ankamagames.dofus.logic.game.fight.types.SpellCastInFightManager import SpellCastInFightManager
+from com.ankamagames.dofus.logic.game.fight.types.castSpellManager.SpellManager import SpellManager
+from com.ankamagames.jerakine.sequencer.AbstractSequencable import AbstractSequencable
+
+class FightSpellCooldownVariationStep(AbstractSequencable, IFightStep):
+
+    _fighterId:float
+
+    _spellId:int
+
+    _actionId:int
+
+    _value:int
+
+    _isGlobal:bool
+
+    def __init__(self, fighterId:float, actionId:int, spellId:int, value:int, isGlobal:bool = False):
+        super().__init__()
+        self._fighterId = fighterId
+        self._spellId = spellId
+        self._actionId = actionId
+        self._value = value
+        self._isGlobal = isGlobal
+
+    @property
+    def stepType(self) -> str:
+        return "spellCooldownVariation"
+
+    def start(self) -> None:
+        if self._fighterId == CurrentPlayedFighterManager().currentFighterId or self._fighterId == PlayedCharacterManager().id:
+            spellCastManager = CurrentPlayedFighterManager().getSpellCastManagerById(self._fighterId)
+            simf : 'SpellInventoryManagementFrame' = Kernel().getWorker().getFrame('SpellInventoryManagementFrame')
+            spellList = simf.getFullSpellListByOwnerId(self._fighterId)
+            for spellKnown in spellList:
+                if spellKnown.id == self._spellId:
+                    spellLvl = spellKnown.spellLevel
+            if spellCastManager and spellLvl > 0:
+                if not spellCastManager.getSpellManagerBySpellId(self._spellId):
+                    spellCastManager.castSpell(self._spellId, spellLvl, [], False)
+                spellManager = spellCastManager.getSpellManagerBySpellId(self._spellId)
+                spellManager.forceCooldown(self._value, True)
+        if self._isGlobal:
+            fightEntitiesFrame = FightEntitiesFrame.getCurrentInstance()
+            if fightEntitiesFrame is not null:
+                entityIds = fightEntitiesFrame.getEntityIdsWithTeamId(fightEntitiesFrame.getEntityTeamId(self._fighterId))
+                spellWrapper = None
+                for each (entityId in entityIds)
+                    if self._fighterId == entityId:
+                        spellCastManager = CurrentPlayedFighterManager().getSpellCastManagerById(entityId)
+                        if spellCastManager is not null:
+                            spellWrapper = SpellWrapper.getSpellWrapperById(self._spellId, entityId)
+                            if spellWrapper is not null:
+                                spellManager = spellCastManager.getSpellManagerBySpellId(self._spellId, True, spellWrapper.spellLevel)
+                                spellManager.forceCooldown(self._value)
+        executeCallbacks()
+
+    @property
+    def targets(self) -> list[Number]:
+        return <Number>[self._fighterId]
+
+

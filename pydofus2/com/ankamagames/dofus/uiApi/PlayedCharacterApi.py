@@ -299,7 +299,7 @@ class PlayedCharacterApi(IApi, metaclass=Singleton):
 
     def isInPreFight(self) -> bool:
         return Kernel().getWorker().contains(
-            'FightPreparationFrame'
+            "FightPreparationFrame"
         ) or Kernel().getWorker().isBeingAdded(FightPreparationFrame)
 
     def isSpectator(self) -> bool:

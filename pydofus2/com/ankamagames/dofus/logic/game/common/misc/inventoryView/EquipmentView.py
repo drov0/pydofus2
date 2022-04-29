@@ -18,11 +18,19 @@ class EquipmentView(IInventoryView):
     _initializing: bool
 
     def __init__(self):
+<<<<<<< Updated upstream
         self._content = list[ItemWrapper]([None]*62)
         super().__init__()
 
     def initialize(self, items: list[ItemWrapper]) -> None:
         self._content = list[ItemWrapper]([None]*62)
+=======
+        self._content = list[ItemWrapper]([None] * 62)
+        super().__init__()
+
+    def initialize(self, items: list[ItemWrapper]) -> None:
+        self._content = list[ItemWrapper]([None] * 62)
+>>>>>>> Stashed changes
         PlayedCharacterManager().currentWeapon = None
         for item in items:
             if self.isListening(item):

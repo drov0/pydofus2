@@ -1,5 +1,6 @@
 import re
 from typing import Any
+from com.ankamagames.dofus.datacenter.spells.SpellLevel import SpellLevel
 from com.ankamagames.dofus.datacenter.spells.SpellType import SpellType
 from com.ankamagames.dofus.datacenter.spells.SpellVariant import SpellVariant
 from com.ankamagames.dofus.types.IdAccessors import IdAccessors
@@ -43,23 +44,23 @@ class Spell(IDataCenter):
 
     useParamCache: bool = True
 
-    verbose_cast: bool
+    verbose_cast: bool = False
 
-    default_zone: str
+    default_zone: str = "0"
 
-    bypassSummoningLimit: bool
+    bypassSummoningLimit: bool = False
 
-    canAlwaysTriggerSpells: bool
+    canAlwaysTriggerSpells: bool = False
 
-    adminName: str
+    adminName: str = ""
 
-    _name: str
+    _name: str = ""
 
-    _description: str
+    _description: str = ""
 
-    _spellLevels: list
+    _spellLevels: list[SpellLevel] = []
 
-    _spellVariant: SpellVariant
+    _spellVariant: SpellVariant = None
 
     def __init__(self):
         self._spellLevels = []

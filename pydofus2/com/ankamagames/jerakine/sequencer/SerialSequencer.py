@@ -1,3 +1,4 @@
+import sys
 from whistle import EventDispatcher
 from com.ankamagames.jerakine.events.SequencerEvent import SequencerEvent
 from com.ankamagames.jerakine.logger.Logger import Logger
@@ -16,13 +17,13 @@ from com.ankamagames.jerakine.sequencer.AbstractSequencable import AbstractSeque
 logger = Logger(__name__)
 
 
-class SerialSequencer(EventDispatcher, ISequencer):
+class SerialSequencer(ISequencer, EventDispatcher):
 
     DEFAULT_SEQUENCER_NAME: str = "SerialSequencerDefault"
 
-    SEQUENCERS: list = []
+    SEQUENCERS: dict = dict()
 
-    _aStep: list
+    _aStep: list[ISequencable]
 
     _currentStep: ISequencable
 
@@ -41,8 +42,8 @@ class SerialSequencer(EventDispatcher, ISequencer):
     def __init__(self, type: str = "SerialSequencerDefault"):
         self._aStep = list()
         super().__init__()
-        if not self.SEQUENCERS[type]:
-            self.SEQUENCERS[type] = dict(True)
+        if not self.SEQUENCERS.get(type):
+            self.SEQUENCERS[type] = dict()
         self.SEQUENCERS[type][self] = True
 
     def clearByType(self, type: str) -> None:
@@ -152,11 +153,11 @@ class SerialSequencer(EventDispatcher, ISequencer):
         try:
             if isinstance(self._currentStep, ISubSequenceSequencable):
                 self._activeSubSequenceCount += 1
-                self._currentStep.add_listener(
+                self._currentStep.addListener(
                     SequencerEvent.SEQUENCE_END, self.onSubSequenceEnd
                 )
             if (
-                self._defaultStepTimeout != int.MIN_VALUE
+                self._defaultStepTimeout != -sys.naxsize + 1
                 and self._currentStep.hasDefaultTimeout
             ):
                 self._currentStep.timeout = self._defaultStepTimeout

@@ -4,6 +4,7 @@ from com.ankamagames.atouin.managers.InteractiveCellManager import (
     InteractiveCellManager,
 )
 from com.ankamagames.dofus.enums.ElementEnum import ElementEnum
+from com.ankamagames.dofus.internalDatacenter.spells.SpellWrapper import SpellWrapper
 from com.ankamagames.dofus.logic.game.common.misc.ISpellCastProvider import (
     ISpellCastProvider,
 )
@@ -18,6 +19,18 @@ from com.ankamagames.dofus.logic.game.fight.messages.GameActionFightLeaveMessage
 from com.ankamagames.dofus.logic.game.fight.miscs.SpellScriptBuffer import (
     SpellScriptBuffer,
 )
+from com.ankamagames.dofus.logic.game.fight.steps.FightChangeVisibilityStep import FightChangeVisibilityStep
+from com.ankamagames.dofus.logic.game.fight.steps.FightCloseCombatStep import (
+    FightCloseCombatStep,
+)
+from com.ankamagames.dofus.logic.game.fight.steps.FightDeathStep import FightDeathStep
+from com.ankamagames.dofus.logic.game.fight.steps.FightDispellStep import (
+    FightDispellStep,
+)
+from com.ankamagames.dofus.logic.game.fight.steps.FightFighterStatsListStep import (
+    FightFighterStatsListStep,
+)
+from com.ankamagames.dofus.logic.game.fight.steps.FightKillStep import FightKillStep
 from com.ankamagames.dofus.logic.game.fight.steps.FightLifeVariationStep import (
     FightLifeVariationStep,
 )
@@ -26,6 +39,18 @@ from com.ankamagames.dofus.logic.game.fight.steps.FightPlaySpellScriptStep impor
 )
 from com.ankamagames.dofus.logic.game.fight.steps.FightRefreshFighterStep import (
     FightRefreshFighterStep,
+)
+from com.ankamagames.dofus.logic.game.fight.steps.FightShieldPointsVariationStep import (
+    FightShieldPointsVariationStep,
+)
+from com.ankamagames.dofus.logic.game.fight.steps.FightSpellCastStep import (
+    FightSpellCastStep,
+)
+from com.ankamagames.dofus.logic.game.fight.steps.FightSpellCooldownVariationStep import (
+    FightSpellCooldownVariationStep,
+)
+from com.ankamagames.dofus.logic.game.fight.steps.FightSpellImmunityStep import (
+    FightSpellImmunityStep,
 )
 from com.ankamagames.dofus.logic.game.fight.steps.FightUpdateStatStep import (
     FightUpdateStatStep,
@@ -46,6 +71,10 @@ if TYPE_CHECKING:
     from com.ankamagames.dofus.logic.game.fight.frames.FightBattleFrame import (
         FightBattleFrame,
     )
+    from com.ankamagames.dofus.logic.game.common.frames.SpellInventoryManagementFrame import (
+        SpellInventoryManagementFrame,
+    )
+
 from com.ankamagames.atouin.managers.EntitiesManager import EntitiesManager
 from com.ankamagames.dofus.datacenter.effects.Effect import Effect
 from com.ankamagames.dofus.datacenter.effects.EffectInstance import EffectInstance
@@ -471,7 +500,7 @@ class FightSequenceFrame(Frame, ISpellCastProvider):
                     + tempCastingSpell.spell.name
                     + " ("
                     + str(gafscmsg.spellId)
-                    + ") lanc� par "
+                    + ") lance par "
                     + str(gafscmsg.sourceId)
                     + " sur "
                     + str(gafscmsg.targetId)
@@ -486,7 +515,6 @@ class FightSequenceFrame(Frame, ISpellCastProvider):
                     gafscmsg.destinationCellId
                 )
             if gafscmsg and gafscmsg.actionId == ActionIds.ACTION_FINISH_MOVE:
-                cssb = SpellScriptBuffer(tempCastingSpell)
                 fxScriptId = tempCastingSpell.spell.getScriptId(
                     tempCastingSpell.isCriticalHit
                 )
@@ -517,7 +545,7 @@ class FightSequenceFrame(Frame, ISpellCastProvider):
                 self._castingSpells.append(tempCastingSpell)
                 if isinstance(msg, GameActionFightCloseCombatMessage):
                     self._castingSpell.weaponId = msg.weaponGenericId
-                    self.appendPlaySpellScriptStep(
+                    self.pushPlaySpellScriptStep(
                         7,
                         gafscmsg.sourceId,
                         gafscmsg.destinationCellId,
@@ -528,7 +556,7 @@ class FightSequenceFrame(Frame, ISpellCastProvider):
                     fxScriptId = tempCastingSpell.spell.getScriptId(
                         tempCastingSpell.isCriticalHit
                     )
-                    self.appendPlaySpellScriptStep(
+                    self.pushPlaySpellScriptStep(
                         fxScriptId,
                         gafscmsg.sourceId,
                         gafscmsg.destinationCellId,
@@ -542,7 +570,7 @@ class FightSequenceFrame(Frame, ISpellCastProvider):
                 self._castingSpell.weaponId = GameActionFightCloseCombatMessage(
                     msg
                 ).weaponGenericId
-                self._playSpellScriptStep = self.appendPlaySpellScriptStep(
+                self._playSpellScriptStep = self.pushPlaySpellScriptStep(
                     7,
                     gafscmsg.sourceId,
                     gafscmsg.destinationCellId,
@@ -554,7 +582,7 @@ class FightSequenceFrame(Frame, ISpellCastProvider):
                 fxScriptId = self._castingSpell.spell.getScriptId(
                     self._castingSpell.isCriticalHit
                 )
-                self._playSpellScriptStep = self.appendPlaySpellScriptStep(
+                self._playSpellScriptStep = self.pushPlaySpellScriptStep(
                     fxScriptId,
                     gafscmsg.sourceId,
                     gafscmsg.destinationCellId,
@@ -562,9 +590,7 @@ class FightSequenceFrame(Frame, ISpellCastProvider):
                     gafscmsg.spellLevel,
                     self._spellScriptTemporaryBuffer,
                 )
-            self._stepsBuffer = self._stepsBuffer.extend(
-                self._spellScriptTemporaryBuffer.stepsBuffer
-            )
+            self._stepsBuffer.extend(self._spellScriptTemporaryBuffer.stepsBuffer)
             if gafscmsg.critical != FightSpellCastCriticalEnum.CRITICAL_FAIL:
                 spellTargetEntities = []
                 spellTargetEntities.append(gafscmsg.targetId)
@@ -595,13 +621,11 @@ class FightSequenceFrame(Frame, ISpellCastProvider):
                         gafscmsg.verboseCast,
                     )
                 )
-            if gafscmsg.sourceId == CurrentPlayedFighterManager().currentFighterId:
-                KernelEventsManager().processCallback(TriggerHookList.FightSpellCast)
             playerManager = PlayedCharacterManager()
             isAlly = False
             if (
                 entities
-                and entities[playerManager.id]
+                and entities.get(playerManager.id)
                 and fighter
                 and entities[playerManager.id].spawnInfo.teamId
                 == fighter.spawnInfo.teamId
@@ -651,13 +675,13 @@ class FightSequenceFrame(Frame, ISpellCastProvider):
                                         True,
                                     )
                                 )
-                    simf = (
+                    simf: "SpellInventoryManagementFrame" = (
                         Kernel().getWorker().getFrame("SpellInventoryManagementFrame")
                     )
                     for fighterInfos in entities:
                         gfsc = GameFightSpellCooldown()
                         if (
-                            fighterInfos is GameFightEntityInformation
+                            isinstance(fighterInfos, GameFightEntityInformation)
                             and gafscmsg.sourceId != fighterInfos.contextualId
                         ):
                             gfsc.init(gafscmsg.spellId, castSpellLevel.globalCooldown)
@@ -665,7 +689,7 @@ class FightSequenceFrame(Frame, ISpellCastProvider):
                                 fighterInfos.contextualId, gfsc
                             )
                         elif (
-                            fighterInfos is GameFightCharacterInformations
+                            isinstance(fighterInfos, GameFightCharacterInformations)
                             and gafscmsg.sourceId != fighterInfos.contextualId
                             and fighterInfos.contextualId == playerManager.id
                         ):
@@ -678,7 +702,7 @@ class FightSequenceFrame(Frame, ISpellCastProvider):
             target = fightEntitiesFrame.getEntityInfos(gafscmsg.targetId)
             if target and target.disposition.cellId == -1:
                 for ei in self._castingSpell.spellRank.effects:
-                    if ei.hasOwnProperty("zoneShape"):
+                    if hasattr(ei, "zoneShape"):
                         shape = ei.zoneShape
                 if shape == SpellShapeEnum.P:
                     ts = DofusEntities.getEntity(gafscmsg.targetId)
@@ -989,10 +1013,6 @@ class FightSequenceFrame(Frame, ISpellCastProvider):
 
         if isinstance(msg, GameActionFightTackledMessage):
             gaftmsg = msg
-            if gaftmsg.sourceId == PlayedCharacterManager().id:
-                SpeakingItemManager().triggerEvent(
-                    SpeakingItemManager.SPEAK_TRIGGER_PLAYER_TACKLED
-                )
             self.pushStep(FightTackledStep(gaftmsg.sourceId))
             return True
 
@@ -1162,30 +1182,7 @@ class FightSequenceFrame(Frame, ISpellCastProvider):
             or self._fightBattleFrame.masterId == gafdmsg.targetId
         ):
             self._fightBattleFrame.prepareNextPlayableCharacter(gafdmsg.targetId)
-        speakingItemManager: SpeakingItemManager = SpeakingItemManager()
-        if gafdmsg.targetId == playerId:
-            if gafdmsg.sourceId == gafdmsg.targetId:
-                speakingItemManager.triggerEvent(
-                    SpeakingItemManager.SPEAK_TRIGGER_KILLED_HIMSELF
-                )
-            elif sourceInfos.spawnInfo.teamId != playerInfos.spawnInfo.teamId:
-                speakingItemManager.triggerEvent(
-                    SpeakingItemManager.SPEAK_TRIGGER_KILLED_BY_ENEMY
-                )
-            else:
-                speakingItemManager.triggerEvent(
-                    SpeakingItemManager.SPEAK_TRIGGER_KILLED_BY_ENEMY
-                )
-        elif gafdmsg.sourceId == playerId:
-            if targetInfos:
-                if targetInfos.spawnInfo.teamId != playerInfos.spawnInfo.teamId:
-                    speakingItemManager.triggerEvent(
-                        SpeakingItemManager.SPEAK_TRIGGER_KILL_ENEMY
-                    )
-                else:
-                    speakingItemManager.triggerEvent(
-                        SpeakingItemManager.SPEAK_TRIGGER_KILL_ALLY
-                    )
+
         entityDeathStepAlreadyInBuffer: bool = False
         for step in self._stepsBuffer:
             if step is FightDeathStep and step.entityId == gafdmsg.targetId:
@@ -1328,12 +1325,6 @@ class FightSequenceFrame(Frame, ISpellCastProvider):
         gafmsmsg: GameActionFightMultipleSummonMessage,
         gffinfos: GameFightFighterInformations,
     ) -> GameFightFighterInformations:
-        summons: GameContextSummonsInformation = None
-        sum: GameContextBasicSpawnInformation = None
-        gffninfos: GameFightFighterNamedInformations = None
-        gfeinfos: GameFightEntityInformation = None
-        gfminfos: GameFightMonsterInformations = None
-        gfsminfos: GameFightMonsterInformations = None
         for summons in gafmsmsg.summons:
             for sum in summons.summons:
                 if isinstance(summons.spawnInformation, SpawnCharacterInformation):
@@ -1564,7 +1555,7 @@ class FightSequenceFrame(Frame, ISpellCastProvider):
                         self._castingSpell.defaultTargetGfxId = 1016
                     elif mark.markType == GameActionMarkTypeEnum.TRAP:
                         self._castingSpell.defaultTargetGfxId = 1017
-                    self.appendPlaySpellScriptStep(
+                    self.pushPlaySpellScriptStep(
                         1,
                         gaftgtmsg.sourceId,
                         triggeredCellId,

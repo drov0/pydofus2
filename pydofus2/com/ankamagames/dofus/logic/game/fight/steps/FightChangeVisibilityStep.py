@@ -108,7 +108,7 @@ class FightChangeVisibilityStep(AbstractSequencable, IFightStep):
             self._entityId,
             self.castingSpellId,
         )
-        fcf: FightContextFrame = Kernel.getWorker().getFrame(FightContextFrame)
+        fcf: 'FightContextFrame' = Kernel().getWorker().getFrame('FightContextFrame')
         if self._visibilityState == GameActionFightInvisibilityStateEnum.INVISIBLE:
             fcf.addToHiddenEntities(self._entityId)
         else:

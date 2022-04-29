@@ -18,6 +18,10 @@ from com.ankamagames.dofus.internalDatacenter.DataEnum import DataEnum
 from com.ankamagames.dofus.logic.game.common.managers.PlayedCharacterManager import (
     PlayedCharacterManager,
 )
+from com.ankamagames.dofus.logic.game.fight.miscs.ActionIdProtocol import (
+    ActionIdProtocol,
+)
+from com.ankamagames.dofus.misc.ObjectEffectAdapter import ObjectEffectAdapter
 from com.ankamagames.dofus.network.types.game.data.items.ObjectItem import ObjectItem
 from com.ankamagames.dofus.network.types.game.data.items.effects.ObjectEffect import (
     ObjectEffect,
@@ -99,31 +103,30 @@ class ItemWrapper(Item, ISlotData, ICellZoneProvider, IDataCenter):
 
     effectsList: list[ObjectEffect]
 
-    livingobjectId: int
+    livingobjectId: int = None
 
-    livingobjectMood: int
+    livingobjectMood: int = None
+    livingobjectSkin: int = None
 
-    livingobjectSkin: int
+    livingobjectCategory: int = None
 
-    livingobjectCategory: int
+    livingobjectXp: int = None
 
-    livingobjectXp: int
+    livingobjectMaxXp: int = None
 
-    livingobjectMaxXp: int
+    livingobjectLevel: int = None
 
-    livingobjectLevel: int
+    livingobjectFoodDate: str = None
 
-    livingobjectFoodDate: str
+    wrapperobjectCategory: int = None
 
-    wrapperobjectCategory: int
+    _isobjectWrapped: bool = None
 
-    _isobjectWrapped: bool
+    exchangeAllowed: bool = None
 
-    exchangeAllowed: bool
+    isPresetobject: bool = None
 
-    isPresetobject: bool
-
-    isOkForMultiUse: bool
+    isOkForMultiUse: bool = None
 
     givenExperienceAsSuperFood: float = 0
 
@@ -628,7 +631,6 @@ class ItemWrapper(Item, ISlotData, ICellZoneProvider, IDataCenter):
         item.givenExperienceAsSuperFood = self.givenExperienceAsSuperFood
         item.experiencePoints = self.experiencePoints
         item.evolutiveLevel = self.evolutiveLevel
-        item.customTextureUri = self.customTextureUri
         return item
 
     def addHolder(self, h: ISlotDataHolder) -> None:
@@ -676,13 +678,8 @@ class ItemWrapper(Item, ISlotData, ICellZoneProvider, IDataCenter):
         return len(self.LEVEL_STEP)
 
     def updateEffects(self, updateEffects: list[ObjectEffect]) -> None:
-        effect: ObjectEffect = None
-        itemType: ItemType = None
-        effectInstance: EffectInstance = None
         itbt: Item = Item.getItemById(self.objectGID)
-        shape: int = 0
-        zoneSize: int = 0
-        zoneMinSize: int = 0
+        shape = None
         if itbt and itbt.isWeapon:
             itemType = ItemType.getItemTypeById(itbt.typeId)
             if itemType is not None:

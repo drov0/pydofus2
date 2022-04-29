@@ -25,11 +25,13 @@ class FarmAPI(metaclass=Singleton):
     def rplInteractivesFrame(self) -> "RoleplayInteractivesFrame":
         return Kernel().getWorker().getFrame("RoleplayInteractivesFrame")
 
-    def collectResource(self, elementId: int = None) -> None:
+    def collectResource(self, elementId: int = None, skills=[]) -> None:
         ce = None
         if elementId is None:
             for it in self.rplInteractivesFrame.collectables.values():
                 if it.enabled:
+                    if skills and it.skill.id not in skills:
+                        continue
                     ce = it
                     elementId = it.id
                     break
@@ -37,13 +39,13 @@ class FarmAPI(metaclass=Singleton):
             ce = self.rplInteractivesFrame.collectables.get(elementId)
         if ce is not None and ce.enabled:
             if self.VERBOSE:
-                logger.info(f"[{self.id}] Collecting {ce} ...")
+                logger.info(
+                    f"[{self.id}] Collecting {ce} ... skillId : {ce.skill.id}"
+                )
             ie = self.rplInteractivesFrame.interactives.get(elementId)
             if ie is None:
                 raise Exception(f"[{self.id}] InteractiveElement {elementId} not found")
-            self.rplInteractivesFrame.skillClicked(
-                ie, ce.interactiveSkill.skillInstanceUid
-            )
+            self.rplInteractivesFrame.skillClicked(ie)
             return elementId
         return -1
 

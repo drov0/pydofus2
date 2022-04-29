@@ -60,7 +60,6 @@ class BotGameApproach(Frame):
             return True
 
         elif isinstance(msg, MapComplementaryInformationsDataMessage):
-            logger.info("Map loaded")
             self._insideGame.set()
             self._worker.removeFrame(self)
             return False

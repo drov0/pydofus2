@@ -10,5 +10,5 @@ logger = Logger(__name__)
 if __name__ == "__main__":
     botName = "grinder"
     bot = Bot(botName)
-    bot.registerFrame(WalkMeToDestinationMapFrame(191104002))
+    bot.registerFrame(WalkMeToDestinationMapFrame(154010372))
     bot.start()

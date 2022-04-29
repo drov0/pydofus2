@@ -6,6 +6,9 @@ from com.ankamagames.dofus.logic.connection.actions.LoginValidationWithTokenActi
 )
 import com.ankamagames.dofus.logic.connection.managers.AuthentificationManager as auth
 import com.ankamagames.dofus.kernel.net.ConnectionsHandler as connh
+from com.ankamagames.dofus.logic.game.common.frames.InventoryManagementFrame import (
+    InventoryManagementFrame,
+)
 from com.ankamagames.dofus.modules.utils.pathFinding.world.WorldPathFinder import (
     WorldPathFinder,
 )
@@ -37,6 +40,7 @@ class Bot:
         self._worker = krnl.Kernel().getWorker()
         self._gameApproachFrame = BotGameApproach(self.CHARACTER_ID)
         self._worker.addFrame(self._gameApproachFrame)
+        self._worker.addFrame(InventoryManagementFrame())
         I18nFileAccessor().init()
         DataMapProvider().init(AnimatedCharacter)
         WorldPathFinder().init()
@@ -44,12 +48,14 @@ class Bot:
     def stop(self):
         connh.ConnectionsHandler.getConnection().close()
 
-    def start(self):
+    def connect(self):
         self._worker.processImmediately(
             LoginValidationWithTokenAction.create(
                 autoSelectServer=True, serverId=self.SERVER_ID
             )
         )
+
+    def join(self):
         while True:
             try:
                 sleep(0.2)
@@ -59,6 +65,9 @@ class Bot:
                 if self.mainConn is not None:
                     self.mainConn.close()
                 sys.exit(0)
+
+    def start(self):
+        self.connect()
 
     def registerFrame(self, frame):
         self._worker.addFrame(frame)

@@ -207,9 +207,9 @@ class RoleplayInteractivesFrame(Frame):
             self.clear()
             for ie in imumsg.interactiveElements:
                 if ie.enabledSkills:
-                    self.registerInteractive(ie, ie.enabledSkills[0].skillId)
+                    self.registerInteractive(ie, ie.enabledSkills[0].skillInstanceUid)
                 elif ie.disabledSkills:
-                    self.registerInteractive(ie, ie.disabledSkills[0].skillId)
+                    self.registerInteractive(ie, ie.disabledSkills[0].skillInstanceUid)
             return True
 
         if isinstance(msg, InteractiveElementUpdatedMessage):
@@ -217,12 +217,12 @@ class RoleplayInteractivesFrame(Frame):
             if len(ieumsg.interactiveElement.enabledSkills):
                 self.registerInteractive(
                     ieumsg.interactiveElement,
-                    ieumsg.interactiveElement.enabledSkills[0].skillId,
+                    ieumsg.interactiveElement.enabledSkills[0].skillInstanceUid,
                 )
             elif len(ieumsg.interactiveElement.disabledSkills):
                 self.registerInteractive(
                     ieumsg.interactiveElement,
-                    ieumsg.interactiveElement.disabledSkills[0].skillId,
+                    ieumsg.interactiveElement.disabledSkills[0].skillInstanceUid,
                 )
             else:
                 self.removeInteractive(ieumsg.interactiveElement)
@@ -242,7 +242,7 @@ class RoleplayInteractivesFrame(Frame):
                         rwf.cellClickEnabled = False
                 self._entities[iumsg.elemId] = iumsg.entityId
                 logger.debug(
-                    f"Interactive element {iumsg.elemId} is being used by the Entity {'CurrentPlayer' if iumsg.entityId == PlayedCharacterManager().id else '{iumsg.entityId}'}"
+                    f"Interactive element {iumsg.elemId} is being used by the Entity {'CurrentPlayer' if iumsg.entityId == PlayedCharacterManager().id else {iumsg.entityId}}"
                 )
             return False
 
@@ -365,9 +365,9 @@ class RoleplayInteractivesFrame(Frame):
     def canBeCollected(self, elementId: int) -> CollectableElement:
         return self._collectableIe.get(elementId)
 
-    def skillClicked(self, ie: InteractiveElementData, skillInstanceId: int) -> None:
+    def skillClicked(self, ie: InteractiveElementData) -> None:
         msg: InteractiveElementActivationMessage = InteractiveElementActivationMessage(
-            ie.element, ie.position, skillInstanceId
+            ie.element, ie.position, ie.firstSkill
         )
         Kernel().getWorker().process(msg)
 

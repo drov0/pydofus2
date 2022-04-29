@@ -2,7 +2,6 @@ from mailbox import Message
 from tkinter import Frame
 from pyd2bot.apis.MoveAPI import MoveAPI
 from com.ankamagames.dofus.kernel.Kernel import Kernel
-from com.ankamagames.dofus.modules.utils.pathFinding.world.Edge import Edge
 from com.ankamagames.dofus.modules.utils.pathFinding.world.WorldPathFinder import (
     WorldPathFinder,
 )
@@ -53,7 +52,7 @@ class WalkMeToDestinationMapFrame(Frame):
                 e = self.path[self.nextStepIndex]
                 self.nextStepIndex += 1
                 direction = DirectionsEnum(e.transitions[0].direction)
-                MoveAPI.changeMapToDirection(direction)
+                MoveAPI.changeMapToDstDirection(direction)
             else:
                 WorldPathFinder().findPath(self.dstMapId, self.onComputeOver)
 
@@ -79,4 +78,4 @@ class WalkMeToDestinationMapFrame(Frame):
         e = self.path[0]
         self.nextStepIndex = 1
         direction = DirectionsEnum(e.transitions[0].direction)
-        MoveAPI.changeMapToDirection(direction)
+        MoveAPI.changeMapToDstDirection(direction)

@@ -1,3 +1,4 @@
+import sys
 from com.ankamagames.dofus.datacenter.world.MapPosition import MapPosition
 from com.ankamagames.jerakine.data.GameData import GameData
 from com.ankamagames.jerakine.interfaces.IDataCenter import IDataCenter
@@ -11,7 +12,7 @@ class MapCoordinates(IDataCenter):
 
     MODULE: str = "MapCoordinates"
 
-    UNDEFINED_COORD: int = int.MIN_VALUE
+    UNDEFINED_COORD: int = -sys.maxsize - 1
 
     compressedCoords: int
 

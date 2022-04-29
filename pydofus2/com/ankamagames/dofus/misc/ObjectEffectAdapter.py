@@ -1,6 +1,3 @@
-from com.ankamagames.dofus.datacenter.effects.instances.EffectInstanceString import (
-    EffectInstanceString,
-)
 from com.ankamagames.dofus.enums.ActionIds import ActionIds
 from com.ankamagames.dofus.datacenter.effects.EffectInstance import EffectInstance
 from com.ankamagames.dofus.datacenter.effects.instances.EffectInstanceCreature import (
@@ -26,6 +23,9 @@ from com.ankamagames.dofus.datacenter.effects.instances.EffectInstanceMinMax imp
 )
 from com.ankamagames.dofus.datacenter.effects.instances.EffectInstanceMount import (
     EffectInstanceMount,
+)
+from com.ankamagames.dofus.datacenter.effects.instances.EffectInstanceString import (
+    EffectInstanceString,
 )
 from com.ankamagames.dofus.datacenter.items.IncarnationLevel import IncarnationLevel
 from com.ankamagames.dofus.network.types.game.data.items.effects.ObjectEffect import (
@@ -64,77 +64,73 @@ logger = Logger(__name__)
 
 
 class ObjectEffectAdapter:
-    def fromNetwork(self, oe: ObjectEffect) -> EffectInstance:
-        effect: EffectInstance = None
-        level: int = 0
-        floor: int = 0
-        nextFloor: int = 0
-        incLevel: IncarnationLevel = None
-        incLevelPlusOne: IncarnationLevel = None
-        serverEffect: ObjectEffectInteger = None
-        clientEffects: list[EffectInstanceInteger] = None
-        intEffect: EffectInstanceInteger = None
-        if oe is ObjectEffectDice and oe.actionId == ActionIds.ACTION_INCARNATION:
+    def __init__(self):
+        super().__init__()
+
+    @classmethod
+    def fromNetwork(cls, oe: ObjectEffect) -> EffectInstance:
+        if (
+            isinstance(oe, ObjectEffectDice)
+            and oe.actionId == ActionIds.ACTION_INCARNATION
+        ):
             effect = EffectInstanceDate()
-            effect.year = ObjectEffectDice(oe).diceNum
-            effect.month = (
-                ObjectEffectDice(oe).diceSide * 32768 + ObjectEffectDice(oe).diceConst
-            )
+            effect.year = oe.diceNum
+            effect.month = oe.diceSide * 32768 + oe.diceConst
             level = 1
             while True:
                 incLevel = IncarnationLevel.getIncarnationLevelByIdAndLevel(
-                    ObjectEffectDice(oe).diceNum, level
+                    oe.diceNum, level
                 )
                 if incLevel:
                     floor = incLevel.requiredXp
                 level += 1
                 incLevelPlusOne = IncarnationLevel.getIncarnationLevelByIdAndLevel(
-                    ObjectEffectDice(oe).diceNum, level
+                    oe.diceNum, level
                 )
                 if incLevelPlusOne:
                     nextFloor = incLevelPlusOne.requiredXp
                 if nextFloor < effect.month and level < 51:
                     break
-            level -= 1
+                level -= 1
             effect.day = level
             effect.hour = 0
             effect.minute = 0
         else:
             if isinstance(oe, ObjectEffectString):
                 effect = EffectInstanceString()
-                effect.text = ObjectEffectString(oe).value
-            elif isinstance(oe, ObjectEffectInteger):
+                effect.text = oe.value
+            if isinstance(oe, ObjectEffectInteger):
                 effect = EffectInstanceInteger()
-                EffectInstanceInteger(effect).value = ObjectEffectInteger(oe).value
-            elif isinstance(oe, ObjectEffectMinMax):
+                effect.value = oe.value
+            if isinstance(oe, ObjectEffectMinMax):
                 effect = EffectInstanceMinMax()
-                effect.min = ObjectEffectMinMax(oe).min
-                effect.max = ObjectEffectMinMax(oe).max
-            elif isinstance(oe, ObjectEffectDice):
+                effect.min = oe.min
+                effect.max = oe.max
+            if isinstance(oe, ObjectEffectDice):
                 effect = EffectInstanceDice()
-                EffectInstanceDice(effect).diceNum = ObjectEffectDice(oe).diceNum
-                EffectInstanceDice(effect).diceSide = ObjectEffectDice(oe).diceSide
-                EffectInstanceDice(effect).value = ObjectEffectDice(oe).diceConst
-            elif isinstance(oe, ObjectEffectDate):
+                effect.diceNum = oe.diceNum
+                effect.diceSide = oe.diceSide
+                effect.value = oe.diceConst
+            if isinstance(oe, ObjectEffectDate):
                 effect = EffectInstanceDate()
-                effect.year = ObjectEffectDate(oe).year
-                effect.month = ObjectEffectDate(oe).month + 1
-                effect.day = ObjectEffectDate(oe).day
-                effect.hour = ObjectEffectDate(oe).hour
-                effect.minute = ObjectEffectDate(oe).minute
-            elif isinstance(oe, ObjectEffectDuration):
+                effect.year = oe.year
+                effect.month = oe.month + 1
+                effect.day = oe.day
+                effect.hour = oe.hour
+                effect.minute = oe.minute
+            if isinstance(oe, ObjectEffectDuration):
                 effect = EffectInstanceDuration()
-                effect.days = ObjectEffectDuration(oe).days
-                effect.hours = ObjectEffectDuration(oe).hours
-                effect.minutes = ObjectEffectDuration(oe).minutes
-            elif isinstance(oe, ObjectEffectLadder):
+                effect.days = oe.days
+                effect.hours = oe.hours
+                effect.minutes = oe.minutes
+            if isinstance(oe, ObjectEffectLadder):
                 effect = EffectInstanceLadder()
-                effect.monsterFamilyId = ObjectEffectLadder(oe).monsterFamilyId
-                effect.monsterCount = ObjectEffectLadder(oe).monsterCount
-            elif isinstance(oe, ObjectEffectCreature):
+                effect.monsterFamilyId = oe.monsterFamilyId
+                effect.monsterCount = oe.monsterCount
+            if isinstance(oe, ObjectEffectCreature):
                 effect = EffectInstanceCreature()
-                effect.monsterFamilyId = ObjectEffectCreature(oe).monsterFamilyId
-            elif isinstance(oe, ObjectEffectMount):
+                effect.monsterFamilyId = oe.monsterFamilyId
+            if isinstance(oe, ObjectEffectMount):
                 effect = EffectInstanceMount()
                 effect.id = oe.id
                 effect.expirationDate = oe.expirationDate
@@ -149,7 +145,7 @@ class ObjectEffectAdapter:
                 effect.reproductionCount = oe.reproductionCount
                 effect.reproductionCountMax = oe.reproductionCountMax
                 clientEffects = list[EffectInstanceInteger]()
-                for serverEffect in oe.effects:
+                for serverEffect in oe:
                     intEffect = EffectInstanceInteger()
                     intEffect.value = serverEffect.value
                     intEffect.effectId = serverEffect.actionId

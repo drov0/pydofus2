@@ -1,7 +1,13 @@
 from email.errors import FirstHeaderLineIsContinuationDefect
 import threading
+
+from com.ankamagames.dofus.logic.game.common.managers.InventoryManager import (
+    InventoryManager,
+)
+from com.ankamagames.dofus.logic.game.roleplay.actions.DeleteObjectAction import (
+    DeleteObjectAction,
+)
 from pyd2bot.apis.MoveAPI import MoveAPI
-from com.ankamagames.dofus.datacenter.jobs.Skill import Skill
 from com.ankamagames.dofus.datacenter.notifications.Notification import Notification
 from com.ankamagames.dofus.kernel.Kernel import Kernel
 from com.ankamagames.dofus.logic.game.common.managers.PlayedCharacterManager import (
@@ -74,16 +80,11 @@ class BotFarmFrame(Frame):
             logger.error(
                 f"[BotFarmFrame] Error unable to use interactive element {msg.elemId} with the skill {msg.skillInstanceUid}"
             )
-            logger.debug(
-                f"[BotFarmFrame] elemId {msg.elemId} and currReqElmId {self._currentRequestedElementId}"
-            )
             if msg.elemId == self._currentRequestedElementId:
                 self._usingInteractive = False
                 del self.roleplayInteractivesFrame._ie[msg.elemId]
                 del self.roleplayInteractivesFrame._collectableIe[msg.elemId]
-                self._currentRequestedElementId = FarmAPI().collectResource()
-                if self._currentRequestedElementId == -1:
-                    MoveAPI.randomMapChange()
+                self.doFarm()
             return True
 
         elif isinstance(msg, InteractiveUsedMessage):
@@ -105,9 +106,7 @@ class BotFarmFrame(Frame):
                     "------------------------------------------------------------"
                 )
                 self._usingInteractive = FirstHeaderLineIsContinuationDefect
-                self._currentRequestedElementId = FarmAPI().collectResource()
-                if self._currentRequestedElementId == -1:
-                    self._dstMapId = MoveAPI.randomMapChange()
+                self.doFarm()
 
             del self._entities[msg.elemId]
             return True
@@ -115,9 +114,7 @@ class BotFarmFrame(Frame):
         elif isinstance(msg, MapComplementaryInformationsDataMessage):
             logger.debug("------------------------------------------------------------")
             self._mapIdDiscard.clear()
-            self._currentRequestedElementId = FarmAPI().collectResource()
-            if self._currentRequestedElementId == -1:
-                MoveAPI.randomMapChange()
+            self.doFarm()
             return True
 
         elif isinstance(msg, MapChangeFailedMessage):
@@ -125,15 +122,25 @@ class BotFarmFrame(Frame):
                 f"[BotFarmFrame] Map change to {self._dstMapId} failed will discard that destination"
             )
             self._mapIdDiscard.append(msg.mapId)
-            MoveAPI.randomMapChange(discard=[self._mapIdDiscard])
+            MoveAPI.randomMapChange(discard=self._mapIdDiscard)
             return True
 
         elif isinstance(msg, NotificationByServerMessage):
             notification = Notification.getNotificationById(msg.id)
             if notification.titleId == 756273:
-                # inventory full notification
-                raise Exception(f"[{notification.title}] {notification.message}")
+                for iw in InventoryManager().realInventory:
+                    doa = DeleteObjectAction.create(iw.objectUID, iw.quantity)
+                    Kernel().getWorker().process(doa)
+                self.doFarm()
             return True
+
+    def doFarm(self):
+        self._currentRequestedElementId = FarmAPI().collectResource()
+        if self._currentRequestedElementId == -1:
+            (
+                self._dstMapId,
+                self._currentRequestedElementId,
+            ) = MoveAPI.randomMapChange()
 
     def pulled(self) -> bool:
         return True

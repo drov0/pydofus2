@@ -24,5 +24,3 @@ class StorageEquipmentView(StorageGenericView):
 
     def updateView(self) -> None:
         super().updateView()
-        if StorageOptionManager().currentStorageView == self:
-            pass

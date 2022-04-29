@@ -1,7 +1,4 @@
-from enum import Enum
-
-
-class ItemCategoryEnum(Enum):
+class ItemCategoryEnum:
 
     ALL_CATEGORY: int = -1
 

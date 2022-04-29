@@ -62,4 +62,4 @@ class Transition:
         return self._id
 
     def __str__(self) -> str:
-        pass
+        return f"Transition(type={self._type}, direction={self._direction}, skillId={self._skillId}, criterion={self._criterion}, transitionMapId={self._transitionMapId}, cell={self._cell}, id={self._id})"

@@ -14,19 +14,19 @@ logger = Logger(__name__)
 
 class StorageGenericView(IStorageView):
 
-    _content: list[ItemWrapper]
+    _content: list[ItemWrapper] = None
 
-    _sortedContent: list[ItemWrapper]
+    _sortedContent: list[ItemWrapper] = None
 
     _sorted: bool = False
 
-    _sortFieldsCache: list
+    _sortFieldsCache: list = None
 
-    _sortRevertCache: bool
+    _sortRevertCache: bool = False
 
-    _typesQty: dict
+    _typesQty: dict = None
 
-    _types: dict
+    _types: dict = None
 
     def __init__(self):
         self._typesQty = dict()
@@ -45,7 +45,7 @@ class StorageGenericView(IStorageView):
         for item in items:
             if self.isListening(item):
                 self.addItem(item, 0, False)
-        self._content.sort(self.sortItemsByIndex)
+        self._content.sort(key=lambda e: e.sortOrder)
         self.updateView()
 
     @property
@@ -67,11 +67,11 @@ class StorageGenericView(IStorageView):
     ) -> None:
         clone: ItemWrapper = item.clone()
         clone.quantity -= invisible
-        self._content.unshift(clone)
+        self._content.insert(0, clone)
         if self._sortedContent:
-            self._sortedContent.unshift(clone)
-        if self._typesQty[item.typeId] and self._typesQty[item.typeId] > 0:
-            ++self._typesQty[item.typeId]
+            self._sortedContent.insert(0, clone)
+        if self._typesQty.get(item.typeId) and self._typesQty.get(item.typeId) > 0:
+            self._typesQty[item.typeId] += 1
         else:
             self._typesQty[item.typeId] = 1
             self._types[item.typeId] = item.type
@@ -83,14 +83,14 @@ class StorageGenericView(IStorageView):
         if idx == -1:
             return
         if self._typesQty[item.typeId] and self._typesQty[item.typeId] > 0:
-            --self._typesQty[item.typeId]
+            self._typesQty[item.typeId] -= 1
             if self._typesQty[item.typeId] == 0:
                 del self._types[item.typeId]
-        self._content.splice(idx, 1)
+        del self._content[idx]
         if self._sortedContent:
             idx = self.getItemIndex(item, self._sortedContent)
             if idx != -1:
-                self._sortedContent.splice(idx, 1)
+                del self._sortedContent[idx]
         self.updateView()
 
     def modifyItem(
@@ -133,7 +133,6 @@ class StorageGenericView(IStorageView):
         return self._types
 
     def getItemIndex(self, item: ItemWrapper, iwlist: list[ItemWrapper] = None) -> int:
-        iw: ItemWrapper = None
         if iwlist is None:
             iwlist = self._content
         for i, iw in enumerate(iwlist):

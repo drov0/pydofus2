@@ -45,11 +45,11 @@ class SpellState(IDataCenter):
     displayTurnRemaining: bool
 
     @staticmethod
-    def getSpellStateById(id: int):
+    def getSpellStateById(id: int) -> "SpellState":
         return GameData.getObject(SpellState.MODULE, id)
 
     @staticmethod
-    def getSpellStates() -> list:
+    def getSpellStates() -> list["SpellState"]:
         return GameData.getObjects(SpellState.MODULE)
 
     idAccessors: IdAccessors = IdAccessors(getSpellStateById, getSpellStates)

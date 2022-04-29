@@ -54,7 +54,7 @@ class StorageOptionManager(metaclass=Singleton):
 
     MAX_SORT_FIELDS: int = 2
 
-    _inventory: "Inventory"
+    _inventory: "Inventory" = None
 
     _categoryFilter: int = -1
 
@@ -64,15 +64,15 @@ class StorageOptionManager(metaclass=Singleton):
 
     _bankFilterType: int = -1
 
-    _sortFields: list
+    _sortFields: list = None
 
-    _sortRevert: bool
+    _sortRevert: bool = False
 
-    _sortBankFields: list
+    _sortBankFields: list = None
 
-    _sortBankRevert: bool
+    _sortBankRevert: bool = False
 
-    _newSort: bool
+    _newSort: bool = True
 
     _associatedRunesActive: bool = False
 

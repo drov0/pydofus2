@@ -48,9 +48,11 @@ class ItemType(IDataCenter):
     def __init__(self):
         super().__init__()
 
+    @classmethod
     def getItemTypeById(cls, id: int) -> "ItemType":
         return GameData.getObject(cls.MODULE, id)
 
+    @classmethod
     def getItemTypes(cls) -> list:
         return GameData.getObjects(cls.MODULE)
 
@@ -93,8 +95,8 @@ class ItemType(IDataCenter):
     def parseZone(self) -> None:
         params: list = None
         if self.rawZone and len(self.rawZone):
-            self._zoneShape = self.rawZone.charCodeAt(0)
-            params = self.rawZone.substr(1).split(",")
+            self._zoneShape = self.rawZone[0]
+            params = self.rawZone[1:].split(",")
             if len(params) > 0:
                 self._zoneSize = int(params[0])
             else:

@@ -61,7 +61,7 @@ class FightPlaySpellScriptStep(AbstractSequencable, IFightStep):
                 + " for spell '"
                 + self._spellCastProvider.castingSpell.spell.name
                 + "' ("
-                + self._spellCastProvider.castingSpell.spell.id
+                + str(self._spellCastProvider.castingSpell.spell.id)
                 + ")"
             )
         else:

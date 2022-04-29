@@ -13,6 +13,9 @@ import com.ankamagames.dofus.datacenter.spells.SpellLevel as spellLevelmod
 from com.ankamagames.jerakine.data.I18n import I18n
 from com.ankamagames.jerakine.interfaces.IDataCenter import IDataCenter
 from com.ankamagames.jerakine.logger.Logger import Logger
+from com.ankamagames.jerakine.utils.display.spellZone.SpellShapeEnum import (
+    SpellShapeEnum,
+)
 
 logger = Logger(__name__)
 
@@ -293,12 +296,11 @@ class EffectInstance(IDataCenter):
         o: MonsterRace = MonsterRace.getMonsterRaceById(id)
         return o.name if not o else EffectInstance.UNKNOWN_NAME
 
-    @staticmethod
     def parseZone(self) -> None:
         params: list = None
         if self.rawZone and len(self.rawZone):
-            self.zoneShape = self.rawZone.charCodeAt(0)
-            params = self.rawZone.substr(1).split(",")
+            self.zoneShape = self.rawZone[0]
+            params = self.rawZone[1:].split(",")
             if self.zoneShape == SpellShapeEnum.l:
                 self.zoneMinSize = int(params[0])
                 self.zoneSize = int(params[1])

@@ -120,29 +120,20 @@ class InventoryManager(metaclass=Singleton):
         self._builds = list()
         self._shortcutBarItems = list()
         self._shortcutBarSpells = list()
-        self.inventory.addView(RealView(self.inventory.hookLock))
-        self.inventory.addView(EquipmentView(self.inventory.hookLock))
-        self.inventory.addView(RoleplayBuffView(self.inventory.hookLock))
-        self.inventory.addView(CertificateView(self.inventory.hookLock))
-        self.inventory.addView(StorageView(self.inventory.hookLock))
-        self.inventory.addView(StorageEquipmentView(self.inventory.hookLock))
-        self.inventory.addView(StorageConsumablesView(self.inventory.hookLock))
-        self.inventory.addView(StorageResourcesView(self.inventory.hookLock))
-        self.inventory.addView(StorageCosmeticsView(self.inventory.hookLock))
-        self.inventory.addView(StorageMinoukiView(self.inventory.hookLock))
-        self.inventory.addView(StorageMinoukiFilteredView(self.inventory.hookLock))
-        self.inventory.addView(StorageQuestCategory(self.inventory.hookLock))
-        self.inventory.addView(StorageFilteredView(self.inventory.hookLock))
+        self.inventory.addView(RealView())
+        self.inventory.addView(EquipmentView())
+        self.inventory.addView(RoleplayBuffView())
+        self.inventory.addView(CertificateView())
+        self.inventory.addView(StorageView())
+        self.inventory.addView(StorageEquipmentView())
+        self.inventory.addView(StorageConsumablesView())
+        self.inventory.addView(StorageResourcesView())
+        self.inventory.addView(StorageCosmeticsView())
+        self.inventory.addView(StorageMinoukiView())
+        self.inventory.addView(StorageMinoukiFilteredView())
+        self.inventory.addView(StorageQuestCategory())
+        self.inventory.addView(StorageFilteredView())
 
-    def getInstance(self) -> "InventoryManager":
-        if not _self:
-            _self = InventoryManager()
-        return _self
-
-    def getWatchInstance(self) -> "InventoryManager":
-        if not _watchSelf:
-            _watchSelf = InventoryManager()
-        return _watchSelf
 
     def init(self) -> None:
         self._inventory.initialize(list[ItemWrapper]())

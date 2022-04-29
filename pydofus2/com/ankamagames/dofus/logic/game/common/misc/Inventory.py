@@ -18,7 +18,7 @@ class Inventory:
 
     _itemsDict: dict
 
-    _views: dict
+    _views: dict[str, IInventoryView]
 
     _kamas: float = 0
 
@@ -40,7 +40,7 @@ class Inventory:
         self._views[view.name] = view
 
     def getView(self, name: str) -> IInventoryView:
-        return self._views[name]
+        return self._views.get(name)
 
     def removeView(self, name: str) -> None:
         view: IInventoryView = self.getView(name)
@@ -62,8 +62,6 @@ class Inventory:
         return 0
 
     def initialize(self, items: list[ItemWrapper]) -> None:
-        item: ItemWrapper = None
-        itemSet: ItemSet = None
         self._itemsDict = dict()
         for item in items:
             itemSet = ItemSet(item)
@@ -72,10 +70,8 @@ class Inventory:
 
     def initializeFromObjectItems(self, items: list[ObjectItem]) -> None:
         self._itemsDict = dict()
-        iteml: iteml[ItemWrapper] = iteml[ItemWrapper]()
-        l: int = len(items)
-        for i in range(l):
-            item = items[i]
+        iteml: list[ItemWrapper] = list[ItemWrapper]()
+        for item in items:
             iw = ItemWrapper.create(
                 item.position,
                 item.objectUID,
@@ -99,7 +95,7 @@ class Inventory:
         self.addItem(iw)
 
     def addItem(self, item: ItemWrapper) -> None:
-        itemSet: ItemSet = self._itemsDict[item.objectUID]
+        itemSet: ItemSet = self._itemsDict.get(item.objectUID)
         if itemSet:
             oldItem = item.clone()
             itemSet.item.quantity += item.quantity
@@ -221,7 +217,7 @@ class Inventory:
 
     def addItemToViews(self, itemSet: "ItemSet") -> None:
         view: IInventoryView = None
-        for view in self._views:
+        for view in self._views.values():
             if view.isListening(itemSet.item):
                 view.addItem(itemSet.item, 0)
 
@@ -231,7 +227,7 @@ class Inventory:
         quantity: int = 0
         for mask in itemSet.masks:
             quantity += mask
-        for view in self._views:
+        for view in self._views.values():
             if view.isListening(itemSet.item):
                 if view.isListening(oldItem):
                     view.modifyItem(itemSet.item, oldItem, quantity)
@@ -241,14 +237,12 @@ class Inventory:
                 view.removeItem(oldItem, quantity)
 
     def removeItemFromViews(self, itemSet: "ItemSet") -> None:
-        view: IInventoryView = None
-        for view in self._views:
+        for view in self._views.values():
             if view.isListening(itemSet.item):
                 view.removeItem(itemSet.item, 0)
 
     def initializeViews(self, items: list[ItemWrapper]) -> None:
-        view: IInventoryView = None
-        for view in self._views:
+        for view in self._views.values():
             view.initialize(items)
 
     def copyItem(self, target: ItemWrapper, source: ItemWrapper) -> None:
@@ -263,9 +257,9 @@ class Inventory:
 
 class ItemSet:
 
-    item: ItemWrapper
+    item: ItemWrapper = None
 
-    _masks: dict
+    _masks: dict = {}
 
     def __init__(self, iw: ItemWrapper):
         self.item = iw

@@ -146,23 +146,23 @@ class Item(IPostInit, IDataCenter):
 
     _description: str
 
-    _type: ItemType
+    _type: ItemType = None
 
     _weight: int = None
 
-    _itemSet: ItemSet
+    _itemSet: ItemSet = None
 
-    _conditions: GroupItemCriterion
+    _conditions: GroupItemCriterion = None
 
-    _conditionsTarget: GroupItemCriterion
+    _conditionsTarget: GroupItemCriterion = None
 
-    _craftVisibleConditions: GroupItemCriterion
+    _craftVisibleConditions: GroupItemCriterion = None
 
-    _craftConditions: GroupItemCriterion
+    _craftConditions: GroupItemCriterion = None
 
-    _craftFeasibleConditions: GroupItemCriterion
+    _craftFeasibleConditions: GroupItemCriterion = None
 
-    _recipes: list
+    _recipes: list = None
 
     _craftXpByJobLevel: dict
 
@@ -364,7 +364,7 @@ class Item(IPostInit, IDataCenter):
             experienceInt = math.floor(self._basicExperienceAsFood * 100000)
             self._basicExperienceAsFood = experienceInt / 100000
         return self._basicExperienceAsFood
-    
+
     def copy(self, src: "Item", to: "Item") -> None:
         to.id = src.id
         to.nameId = src.nameId

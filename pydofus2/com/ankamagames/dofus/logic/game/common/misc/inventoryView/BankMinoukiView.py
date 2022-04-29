@@ -65,11 +65,11 @@ class BankMinoukiView(StorageGenericView):
                     self._typesQty[effect.parameter2] -= 1
                     if self._typesQty[effect.parameter2] == 0:
                         del self._types[effect.parameter2]
-        self._content.splice(idx, 1)
+        self._content.remove(idx)
         if self._sortedContent:
             idx = self.getItemIndex(item, self._sortedContent)
             if idx != -1:
-                self._sortedContent.splice(idx, 1)
+                self._sortedContent.remove(idx)
         self.updateView()
 
     def getMinoukiCardTypes(self, item: ItemWrapper) -> list:

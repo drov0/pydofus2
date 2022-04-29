@@ -17,8 +17,7 @@ class ListView(IInventoryView):
         raise Exception("get name() is abstract method, it should be implemented")
 
     def initialize(self, items: list[ItemWrapper]) -> None:
-        item: ItemWrapper = None
-        self._view.splice(0, len(self._view))
+        self._view.clear()
         for item in items:
             self._view.append(item)
         self.updateView()
@@ -33,28 +32,27 @@ class ListView(IInventoryView):
         self._view.append(item)
 
     def removeItem(self, item: ItemWrapper, invisible: int) -> None:
-        i: int = self._view.find(item)
-        if i == -1:
+        if item not in self._view:
             raise Exception(
                 "Demande de suppression d'un item (id "
-                + item.objectUID
+                + str(item.objectUID)
                 + ") qui n'existe pas dans la vue "
                 + self.name
             )
-        self._view.splice(i, 1)
+        self._view.remove(item)
 
     def modifyItem(
         self, item: ItemWrapper, oldItem: ItemWrapper, invisible: int
     ) -> None:
-        i: int = self._view.find(item)
-        if i == -1:
+        if item not in self._view:
             raise Exception(
                 "Demande de modification d'un item (id "
-                + item.objectUID
+                + str(item.objectUID)
                 + ") qui n'existe pas dans la vue "
                 + self.name
             )
-        self._view[i] = item
+        idx = self._view.index(item)
+        self._view[idx] = item
 
     def isListening(self, item: ItemWrapper) -> bool:
         raise Exception("isListening() is abstract method, it should be implemented")

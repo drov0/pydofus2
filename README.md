@@ -96,17 +96,17 @@ make createBot botName='grinder' account='grinder' charachterId='335911059666' s
 
 ### Develop your own bot or run the existing examples
 
-Under the folder bot_test_examples, you will fin a bunch of bot examples that uses this framework.
+Under the folder pyd2bot/examples, you will fin a bunch of bot examples that uses this framework.
 
-You can run one of them by setting in the main file of the example the variable `botName` by the one you chose to create your bot account. 
+You can run one of them by setting in the main file of the example the variable `botName` by the one you chose to create your bot account.
 
-Basically to develop you own bot you have to implement in one or multiple `Frame` classes the logic of your bot and then register them in them file with the function `registerFrame`.
+Basically to develop you own bot you have to implement one or multiple `Frame` classes the logic of your bot and then register them in the bot kernel with the function `registerFrame`.
 
-## For developpers 
+## For developpers
 
-### Setup dependencies for the sniffer 
+### Setup dependencies for the sniffer
 
-Trought the course of the developement you will heavily rely on the sniffer to watch messages exchanged between the client and the server.
+Troughout the course of the developement you will heavily rely on the sniffer to watch messages exchanged between the client and the server.
 
 This repo comes with its own sniffer capable to dissect dofus protocol messages.
 

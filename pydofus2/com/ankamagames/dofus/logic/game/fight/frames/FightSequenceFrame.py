@@ -1,19 +1,46 @@
 from types import FunctionType
 from typing import TYPE_CHECKING
+from com.ankamagames.atouin.managers.InteractiveCellManager import (
+    InteractiveCellManager,
+)
+from com.ankamagames.dofus.enums.ElementEnum import ElementEnum
+from com.ankamagames.dofus.logic.game.common.misc.ISpellCastProvider import (
+    ISpellCastProvider,
+)
 
 from com.ankamagames.dofus.logic.game.fight.frames.FightTurnFrame import FightTurnFrame
+from com.ankamagames.dofus.logic.game.fight.managers.MarkedCellsManager import (
+    MarkedCellsManager,
+)
 from com.ankamagames.dofus.logic.game.fight.messages.GameActionFightLeaveMessage import (
     GameActionFightLeaveMessage,
 )
-from com.ankamagames.dofus.logic.game.fight.miscs.SpellScriptBuffer import SpellScriptBuffer
-from com.ankamagames.dofus.logic.game.fight.steps.FightPlaySpellScriptStep import FightPlaySpellScriptStep
+from com.ankamagames.dofus.logic.game.fight.miscs.SpellScriptBuffer import (
+    SpellScriptBuffer,
+)
+from com.ankamagames.dofus.logic.game.fight.steps.FightLifeVariationStep import (
+    FightLifeVariationStep,
+)
+from com.ankamagames.dofus.logic.game.fight.steps.FightPlaySpellScriptStep import (
+    FightPlaySpellScriptStep,
+)
 from com.ankamagames.dofus.logic.game.fight.steps.FightRefreshFighterStep import (
     FightRefreshFighterStep,
+)
+from com.ankamagames.dofus.logic.game.fight.steps.FightUpdateStatStep import (
+    FightUpdateStatStep,
+)
+from com.ankamagames.dofus.logic.game.fight.steps.FightVanishStep import FightVanishStep
+from com.ankamagames.dofus.logic.game.fight.steps.FightVisibilityStep import (
+    FightVisibilityStep,
 )
 from com.ankamagames.jerakine.sequencer.ParallelStartSequenceStep import (
     ParallelStartSequenceStep,
 )
 from com.ankamagames.jerakine.types.events.SequencerEvent import SequencerEvent
+from com.ankamagames.jerakine.utils.display.spellZone.SpellShapeEnum import (
+    SpellShapeEnum,
+)
 
 if TYPE_CHECKING:
     from com.ankamagames.dofus.logic.game.fight.frames.FightBattleFrame import (
@@ -258,7 +285,7 @@ from com.ankamagames.jerakine.sequencer.ISequencer import ISequencer
 from com.ankamagames.jerakine.sequencer.SerialSequencer import SerialSequencer
 from com.ankamagames.jerakine.types.Callback import Callback
 from com.ankamagames.jerakine.types.enums.Priority import Priority
-from com.ankamagames.jerakine.types.positions.MapPoint import MapPoint
+from com.ankamagames.jerakine.types.positions.MapPoint import MapPoint, Point
 from com.ankamagames.jerakine.types.positions.MovementPath import MovementPath
 
 logger = Logger(__name__)
@@ -309,7 +336,7 @@ class FightSequenceFrame(Frame, ISpellCastProvider):
     _permanentTooltipsCallback: Callback
 
     def __init__(
-        self, pFightBattleFrame: "FightBattleFrame", parent: 'FightSequenceFrame' = None
+        self, pFightBattleFrame: "FightBattleFrame", parent: "FightSequenceFrame" = None
     ):
         super().__init__()
         self._instanceId = self._currentInstanceId
@@ -413,7 +440,9 @@ class FightSequenceFrame(Frame, ISpellCastProvider):
                 )
                 if forceDetailedLogs:
                     gafscmsg.verboseCast = True
-            fightEntitiesFrame:FightEntitiesFrame = FightEntitiesFrame.getCurrentInstance()
+            fightEntitiesFrame: FightEntitiesFrame = (
+                FightEntitiesFrame.getCurrentInstance()
+            )
             sourceCellId = -1
             if fightEntitiesFrame and fightEntitiesFrame.hasEntity(gafscmsg.sourceId):
                 fighterInfo = fightEntitiesFrame.getEntityInfos(gafscmsg.sourceId)
@@ -465,7 +494,7 @@ class FightSequenceFrame(Frame, ISpellCastProvider):
                 return True
             if self._castingSpell:
                 if closeCombatWeaponId != 0:
-                    self.appendStep(
+                    self.pushStep(
                         FightCloseCombatStep(
                             gafscmsg.sourceId,
                             closeCombatWeaponId,
@@ -474,7 +503,7 @@ class FightSequenceFrame(Frame, ISpellCastProvider):
                         )
                     )
                 elif sourceCellId >= 0:
-                    self.appendStep(
+                    self.pushStep(
                         FightSpellCastStep(
                             gafscmsg.sourceId,
                             gafscmsg.destinationCellId,
@@ -487,9 +516,7 @@ class FightSequenceFrame(Frame, ISpellCastProvider):
                     )
                 self._castingSpells.append(tempCastingSpell)
                 if isinstance(msg, GameActionFightCloseCombatMessage):
-                    self._castingSpell.weaponId = GameActionFightCloseCombatMessage(
-                        msg
-                    ).weaponGenericId
+                    self._castingSpell.weaponId = msg.weaponGenericId
                     self.appendPlaySpellScriptStep(
                         7,
                         gafscmsg.sourceId,
@@ -548,7 +575,7 @@ class FightSequenceFrame(Frame, ISpellCastProvider):
             entities = FightEntitiesFrame.getCurrentInstance().entities
             fighter = entities[gafscmsg.sourceId]
             if closeCombatWeaponId != 0:
-                self.appendStep(
+                self.pushStep(
                     FightCloseCombatStep(
                         gafscmsg.sourceId,
                         closeCombatWeaponId,
@@ -557,7 +584,7 @@ class FightSequenceFrame(Frame, ISpellCastProvider):
                     )
                 )
             else:
-                self.appendStep(
+                self.pushStep(
                     FightSpellCastStep(
                         gafscmsg.sourceId,
                         gafscmsg.destinationCellId,
@@ -605,7 +632,7 @@ class FightSequenceFrame(Frame, ISpellCastProvider):
                             )
                             if spellCastManager.currentTurn > 1:
                                 if spellManager and spellManager.cooldown <= gcdValue:
-                                    self.appendStep(
+                                    self.pushStep(
                                         FightSpellCooldownVariationStep(
                                             playerManager.id,
                                             0,
@@ -615,7 +642,7 @@ class FightSequenceFrame(Frame, ISpellCastProvider):
                                         )
                                     )
                             else:
-                                self.appendStep(
+                                self.pushStep(
                                     FightSpellCooldownVariationStep(
                                         playerManager.id,
                                         0,
@@ -633,9 +660,7 @@ class FightSequenceFrame(Frame, ISpellCastProvider):
                             fighterInfos is GameFightEntityInformation
                             and gafscmsg.sourceId != fighterInfos.contextualId
                         ):
-                            gfsc.initGameFightSpellCooldown(
-                                gafscmsg.spellId, castSpellLevel.globalCooldown
-                            )
+                            gfsc.init(gafscmsg.spellId, castSpellLevel.globalCooldown)
                             simf.addSpellGlobalCoolDownInfo(
                                 fighterInfos.contextualId, gfsc
                             )
@@ -644,49 +669,12 @@ class FightSequenceFrame(Frame, ISpellCastProvider):
                             and gafscmsg.sourceId != fighterInfos.contextualId
                             and fighterInfos.contextualId == playerManager.id
                         ):
-                            gfsc.initGameFightSpellCooldown(
-                                gafscmsg.spellId, castSpellLevel.globalCooldown
-                            )
+                            gfsc.init(gafscmsg.spellId, castSpellLevel.globalCooldown)
                             simf.addSpellGlobalCoolDownInfo(
                                 fighterInfos.contextualId, gfsc
                             )
             if not fightEntitiesFrame:
                 return True
-            playerId = PlayedCharacterManager().id
-            sourceInfos = fightEntitiesFrame.getEntityInfos(gafscmsg.sourceId)
-            playerInfos = fightEntitiesFrame.getEntityInfos(playerId)
-            if critical:
-                if gafscmsg.sourceId == playerId:
-                    SpeakingItemManager().triggerEvent(
-                        SpeakingItemManager.SPEAK_TRIGGER_CC_OWNER
-                    )
-                elif (
-                    playerInfos
-                    and sourceInfos.spawnInfo.teamId == playerInfos.spawnInfo.teamId
-                ):
-                    SpeakingItemManager().triggerEvent(
-                        SpeakingItemManager.SPEAK_TRIGGER_CC_ALLIED
-                    )
-                else:
-                    SpeakingItemManager().triggerEvent(
-                        SpeakingItemManager.SPEAK_TRIGGER_CC_ENEMY
-                    )
-            elif gafscmsg.critical == FightSpellCastCriticalEnum.CRITICAL_FAIL:
-                if gafscmsg.sourceId == playerId:
-                    SpeakingItemManager().triggerEvent(
-                        SpeakingItemManager.SPEAK_TRIGGER_EC_OWNER
-                    )
-                elif (
-                    playerInfos
-                    and sourceInfos.spawnInfo.teamId == playerInfos.spawnInfo.teamId
-                ):
-                    SpeakingItemManager().triggerEvent(
-                        SpeakingItemManager.SPEAK_TRIGGER_EC_ALLIED
-                    )
-                else:
-                    SpeakingItemManager().triggerEvent(
-                        SpeakingItemManager.SPEAK_TRIGGER_EC_ENEMY
-                    )
             target = fightEntitiesFrame.getEntityInfos(gafscmsg.targetId)
             if target and target.disposition.cellId == -1:
                 for ei in self._castingSpell.spellRank.effects:
@@ -717,7 +705,7 @@ class FightSequenceFrame(Frame, ISpellCastProvider):
 
         if isinstance(msg, FighterStatsListMessage):
             fslmsg = msg
-            self.appendStep(FightFighterStatsListStep(fslmsg.stats))
+            self.pushStep(FightFighterStatsListStep(fslmsg.stats))
             return True
 
         if isinstance(msg, GameActionFightPointsVariationMessage):
@@ -729,12 +717,12 @@ class FightSequenceFrame(Frame, ISpellCastProvider):
 
         if isinstance(msg, GameActionFightLifeAndShieldPointsLostMessage):
             gaflasplmsg = msg
-            self.appendStep(
+            self.pushStep(
                 FightShieldPointsVariationStep(
                     gaflasplmsg.targetId, -gaflasplmsg.shieldLoss, gaflasplmsg.elementId
                 )
             )
-            self.appendStep(
+            self.pushStep(
                 FightLifeVariationStep(
                     gaflasplmsg.targetId,
                     -gaflasplmsg.loss,
@@ -746,7 +734,7 @@ class FightSequenceFrame(Frame, ISpellCastProvider):
 
         if isinstance(msg, GameActionFightLifePointsGainMessage):
             gaflpgmsg = msg
-            self.appendStep(
+            self.pushStep(
                 FightLifeVariationStep(
                     gaflpgmsg.targetId, gaflpgmsg.delta, 0, ElementEnum.ELEMENT_NONE
                 )
@@ -755,7 +743,7 @@ class FightSequenceFrame(Frame, ISpellCastProvider):
 
         if isinstance(msg, GameActionFightLifePointsLostMessage):
             gaflplmsg = msg
-            self.appendStep(
+            self.pushStep(
                 FightLifeVariationStep(
                     gaflplmsg.targetId,
                     -gaflplmsg.loss,
@@ -780,7 +768,7 @@ class FightSequenceFrame(Frame, ISpellCastProvider):
         if isinstance(msg, GameActionFightSlideMessage):
             gafsmsg = msg
             self.keepInMindToUpdateMovementArea()
-            fightContextFrame_gafsmsg = (
+            fightContextFrame_gafsmsg: "FightContextFrame" = (
                 Kernel().getWorker().getFrame("FightContextFrame")
             )
             slideTargetInfos = fightContextFrame_gafsmsg.entitiesFrame.getEntityInfos(
@@ -790,7 +778,7 @@ class FightSequenceFrame(Frame, ISpellCastProvider):
                 fightContextFrame_gafsmsg.saveFighterPosition(
                     gafsmsg.targetId, gafsmsg.endCellId
                 )
-                self.appendSlideStep(
+                self.pushSlideStep(
                     gafsmsg.targetId, gafsmsg.startCellId, gafsmsg.endCellId
                 )
             return True
@@ -805,7 +793,7 @@ class FightSequenceFrame(Frame, ISpellCastProvider):
             gafmsmsg = msg
             self.keepInMindToUpdateMovementArea()
             gffinfos = GameFightFighterInformations()
-            self.appendStep(
+            self.pushStep(
                 FightUpdateStatStep(
                     gffinfos.contextualId,
                     gffinfos.stats.characteristics.characteristics,
@@ -821,7 +809,7 @@ class FightSequenceFrame(Frame, ISpellCastProvider):
                 infos = fightEntitiesFrame.getEntityInfos(rcmsg.fighterId)
                 if infos:
                     infos.stats = rcmsg.stats
-            self.appendStep(
+            self.pushStep(
                 FightUpdateStatStep(
                     rcmsg.fighterId, rcmsg.stats.characteristics.characteristics
                 )
@@ -835,17 +823,17 @@ class FightSequenceFrame(Frame, ISpellCastProvider):
 
         if isinstance(msg, GameActionFightUnmarkCellsMessage):
             gafucmsg = msg
-            self.appendStep(FightUnmarkCellsStep(gafucmsg.markId))
+            self.pushStep(FightUnmarkCellsStep(gafucmsg.markId))
             return True
 
         if isinstance(msg, GameActionFightChangeLookMessage):
             gafclmsg = msg
-            self.appendStep(
-                FightChangeLookStep(
-                    gafclmsg.targetId,
-                    EntityLookAdapter.fromNetwork(gafclmsg.entityLook),
-                )
-            )
+            # self.pushStep(
+            #     FightChangeLookStep(
+            #         gafclmsg.targetId,
+            #         EntityLookAdapter.fromNetwork(gafclmsg.entityLook),
+            #     )
+            # )
             return True
 
         if isinstance(msg, GameActionFightInvisibilityMessage):
@@ -856,12 +844,12 @@ class FightSequenceFrame(Frame, ISpellCastProvider):
             if GameDebugManager().buffsDebugActivated:
                 logger.debug(
                     "[BUFFS DEBUG] Changement de l'invisibilit� de "
-                    + gafimsg.targetId
+                    + str(gafimsg.targetId)
                     + " (cellule "
-                    + inviInfo.disposition.cellId
+                    + str(inviInfo.disposition.cellId)
                     + ")"
                     + " nouvel �tat "
-                    + gafimsg.state
+                    + str(gafimsg.state)
                 )
             fightEntitiesFrame.setLastKnownEntityPosition(
                 gafimsg.targetId, inviInfo.disposition.cellId
@@ -869,7 +857,7 @@ class FightSequenceFrame(Frame, ISpellCastProvider):
             fightEntitiesFrame.setLastKnownEntityMovementPoint(
                 gafimsg.targetId, 0, True
             )
-            self.appendStep(FightChangeVisibilityStep(gafimsg.targetId, gafimsg.state))
+            self.pushStep(FightChangeVisibilityStep(gafimsg.targetId, gafimsg.state))
             return True
 
         if isinstance(msg, GameActionFightLeaveMessage):
@@ -887,7 +875,7 @@ class FightSequenceFrame(Frame, ISpellCastProvider):
         if isinstance(msg, GameActionFightVanishMessage):
             gafvmsg = msg
             self.keepInMindToUpdateMovementArea()
-            self.appendStep(FightVanishStep(gafvmsg.targetId, gafvmsg.sourceId))
+            self.pushStep(FightVanishStep(gafvmsg.targetId, gafvmsg.sourceId))
             entityInfosv = FightEntitiesFrame.getCurrentInstance().getEntityInfos(
                 gafvmsg.targetId
             )
@@ -915,7 +903,7 @@ class FightSequenceFrame(Frame, ISpellCastProvider):
                     + " de "
                     + gafdiemsg.targetId
                 )
-            self.appendStep(
+            self.pushStep(
                 FightDispellEffectStep(gafdiemsg.targetId, gafdiemsg.boostUID)
             )
             return True
@@ -929,7 +917,7 @@ class FightSequenceFrame(Frame, ISpellCastProvider):
                     + " de "
                     + gafdsmsg.targetId
                 )
-            self.appendStep(
+            self.pushStep(
                 FightDispellSpellStep(
                     gafdsmsg.targetId, gafdsmsg.spellId, gafdsmsg.verboseCast
                 )
@@ -943,7 +931,7 @@ class FightSequenceFrame(Frame, ISpellCastProvider):
                     "[BUFFS DEBUG] Message de retrait de tous les buffs de "
                     + gafdimsg.targetId
                 )
-            self.appendStep(FightDispellStep(gafdimsg.targetId))
+            self.pushStep(FightDispellStep(gafdimsg.targetId))
             return True
 
         if isinstance(msg, GameActionFightDodgePointLossMessage):
@@ -955,7 +943,7 @@ class FightSequenceFrame(Frame, ISpellCastProvider):
 
         if isinstance(msg, GameActionFightSpellCooldownVariationMessage):
             gafscvmsg = msg
-            self.appendStep(
+            self.pushStep(
                 FightSpellCooldownVariationStep(
                     gafscvmsg.targetId,
                     gafscvmsg.actionId,
@@ -967,34 +955,32 @@ class FightSequenceFrame(Frame, ISpellCastProvider):
 
         if isinstance(msg, GameActionFightSpellImmunityMessage):
             gafsimsg = msg
-            self.appendStep(FightSpellImmunityStep(gafsimsg.targetId))
+            self.pushStep(FightSpellImmunityStep(gafsimsg.targetId))
             return True
 
         if isinstance(msg, GameActionFightKillMessage):
             gafkmsg = msg
-            self.appendStep(FightKillStep(gafkmsg.targetId, gafkmsg.sourceId))
+            self.pushStep(FightKillStep(gafkmsg.targetId, gafkmsg.sourceId))
             return True
 
         if isinstance(msg, GameActionFightReduceDamagesMessage):
             gafredmsg = msg
-            self.appendStep(
-                FightReducedDamagesStep(gafredmsg.targetId, gafredmsg.amount)
-            )
+            self.pushStep(FightReducedDamagesStep(gafredmsg.targetId, gafredmsg.amount))
             return True
 
         if isinstance(msg, GameActionFightReflectDamagesMessage):
             gafrfdmsg = msg
-            self.appendStep(FightReflectedDamagesStep(gafrfdmsg.sourceId))
+            self.pushStep(FightReflectedDamagesStep(gafrfdmsg.sourceId))
             return True
 
         if isinstance(msg, GameActionFightReflectSpellMessage):
             gafrsmsg = msg
-            self.appendStep(FightReflectedSpellStep(gafrsmsg.targetId))
+            self.pushStep(FightReflectedSpellStep(gafrsmsg.targetId))
             return True
 
         if isinstance(msg, GameActionFightStealKamaMessage):
             gafskmsg = msg
-            self.appendStep(
+            self.pushStep(
                 FightStealingKamasStep(
                     gafskmsg.sourceId, gafskmsg.targetId, gafskmsg.amount
                 )
@@ -1007,7 +993,7 @@ class FightSequenceFrame(Frame, ISpellCastProvider):
                 SpeakingItemManager().triggerEvent(
                     SpeakingItemManager.SPEAK_TRIGGER_PLAYER_TACKLED
                 )
-            self.appendStep(FightTackledStep(gaftmsg.sourceId))
+            self.pushStep(FightTackledStep(gaftmsg.sourceId))
             return True
 
         if isinstance(msg, GameActionFightTriggerGlyphTrapMessage):
@@ -1022,7 +1008,7 @@ class FightSequenceFrame(Frame, ISpellCastProvider):
 
         if isinstance(msg, GameActionFightActivateGlyphTrapMessage):
             gafagtmsg = msg
-            self.appendStep(FightMarkActivateStep(gafagtmsg.markId, gafagtmsg.active))
+            self.pushStep(FightMarkActivateStep(gafagtmsg.markId, gafagtmsg.active))
             return True
 
         if isinstance(msg, GameActionFightDispellableEffectMessage):
@@ -1033,7 +1019,7 @@ class FightSequenceFrame(Frame, ISpellCastProvider):
 
         if isinstance(msg, GameActionFightModifyEffectsDurationMessage):
             gafmedmsg = msg
-            self.appendStep(
+            self.pushStep(
                 FightModifyEffectsDurationStep(
                     gafmedmsg.sourceId, gafmedmsg.targetId, gafmedmsg.delta
                 )
@@ -1057,7 +1043,7 @@ class FightSequenceFrame(Frame, ISpellCastProvider):
                         carriedByCarried.id, gafcchmsg.cellId
                     )
                     carriedByCarried = carriedByCarried.carriedEntity
-                self.appendStep(
+                self.pushStep(
                     FightCarryCharacterStep(
                         gafcchmsg.sourceId, gafcchmsg.targetId, gafcchmsg.cellId
                     )
@@ -1099,7 +1085,7 @@ class FightSequenceFrame(Frame, ISpellCastProvider):
 
         if isinstance(msg, GameActionFightInvisibleDetectedMessage):
             gafidMsg = msg
-            self.appendStep(
+            self.pushStep(
                 FightInvisibleTemporarilyDetectedStepDofusEntities.getEntity(
                     gafidMsg.sourceId
                 )
@@ -1114,7 +1100,7 @@ class FightSequenceFrame(Frame, ISpellCastProvider):
 
         if isinstance(msg, GameFightTurnListMessage):
             gftmsg = msg
-            self.appendStep(FightTurnListStep(gftmsg.ids, gftmsg.deadsIds))
+            self.pushStep(FightTurnListStep(gftmsg.ids, gftmsg.deadsIds))
             return True
         if isinstance(msg, GameFightSynchronizeMessage):
             self.keepInMindToUpdateMovementArea()
@@ -1150,7 +1136,7 @@ class FightSequenceFrame(Frame, ISpellCastProvider):
                     actorInfo.spawnInfo.alive
                     and actorInfo.stats.summoner == gafdmsg.targetId
                 ):
-                    self.appendStep(FightDeathStep(gcai.contextualId))
+                    self.pushStep(FightDeathStep(gcai.contextualId))
         playerId = PlayedCharacterManager().id
         sourceInfos = self.fightEntitiesFrame.getEntityInfos(gafdmsg.sourceId)
         targetInfos = self.fightEntitiesFrame.getEntityInfos(gafdmsg.targetId)
@@ -1205,7 +1191,7 @@ class FightSequenceFrame(Frame, ISpellCastProvider):
             if step is FightDeathStep and step.entityId == gafdmsg.targetId:
                 entityDeathStepAlreadyInBuffer = True
         if not entityDeathStepAlreadyInBuffer:
-            self.appendStep(FightDeathStep(gafdmsg.targetId))
+            self.pushStep(FightDeathStep(gafdmsg.targetId))
         entityInfos: GameContextActorInformations = (
             FightEntitiesFrame.getCurrentInstance().getEntityInfos(gafdmsg.targetId)
         )
@@ -1274,8 +1260,8 @@ class FightSequenceFrame(Frame, ISpellCastProvider):
             if isinstance(gcaiL, GameFightFighterInformations):
                 summonerIdL = gcaiL.stats.summoner
                 if summonerIdL == gaflmsg.targetId:
-                    self.appendStep(FightDeathStep(gcaiL.contextualId))
-        self.appendStep(FightDeathStep(gaflmsg.targetId, False))
+                    self.pushStep(FightDeathStep(gcaiL.contextualId))
+        self.pushStep(FightDeathStep(gaflmsg.targetId, False))
         entityInfosL = fightEntityFrame_gaflmsg.getEntityInfos(gaflmsg.targetId)
         if isinstance(entityInfosL, GameFightMonsterInformations):
             summonedEntityInfosL = entityInfosL
@@ -1324,7 +1310,7 @@ class FightSequenceFrame(Frame, ISpellCastProvider):
                     spellGrade = Spell.getSpellById(spellId).getSpellLevel(
                         effect.parameter1.grade
                     )
-        self.appendStep(
+        self.pushStep(
             FightMarkCellsStep(
                 gafmcmsg.mark.markId,
                 gafmcmsg.mark.markType,
@@ -1425,12 +1411,6 @@ class FightSequenceFrame(Frame, ISpellCastProvider):
         return gffinfos
 
     def fighterSummonEntity(self, gafsnmsg: GameActionFightSummonMessage) -> None:
-        summon: GameFightFighterInformations = None
-        fightEntities: dict = None
-        fighterId = None
-        gfsfrsmsg: GameFightShowFighterRandomStaticPoseMessage = None
-        illusionCreature: Sprite = None
-        infos: GameFightFighterInformations = None
         for summon in gafsnmsg.summons:
             if (
                 gafsnmsg.actionId == ActionIds.ACTION_CHARACTER_ADD_ILLUSION_RANDOM
@@ -1441,18 +1421,18 @@ class FightSequenceFrame(Frame, ISpellCastProvider):
                     infos = self.fightEntitiesFrame.getEntityInfos(fighterId)
                     if (
                         not self.fightEntitiesFrame.entityIsIllusion(fighterId)
-                        and infos.hasOwnProperty("name")
-                        and summon.hasOwnProperty("name")
-                        and infos["name"] == summon["name"]
+                        and hasattr(infos, "name")
+                        and hasattr(summon, "name")
+                        and getattr(infos, "name") == getattr(summon, "name")
                     ):
                         summon.stats.summoner = infos.contextualId
                 gfsfrsmsg = GameFightShowFighterRandomStaticPoseMessage()
-                gfsfrsmsg.initGameFightShowFighterRandomStaticPoseMessage(summon)
+                gfsfrsmsg.init(summon)
                 Kernel().getWorker().getFrame("process(gfsfrsmsg")
                 illusionCreature = DofusEntities.getEntity(summon.contextualId)
                 if illusionCreature:
                     illusionCreature.visible = False
-                self.appendStep(FightVisibilityStep(summon.contextualId, True))
+                self.pushStep(FightVisibilityStep(summon.contextualId, True))
             else:
                 self.summonEntity(summon, gafsnmsg.sourceId, gafsnmsg.actionId)
 
@@ -1475,7 +1455,7 @@ class FightSequenceFrame(Frame, ISpellCastProvider):
         self._stepsBuffer.append(
             CallbackStep(Callback(deleteTooltip, gafepmsg.targetCellId))
         )
-        self.appendStep(
+        self.pushStep(
             FightExchangePositionsStep(
                 gafepmsg.sourceId,
                 gafepmsg.casterCellId,
@@ -1533,14 +1513,14 @@ class FightSequenceFrame(Frame, ISpellCastProvider):
         if fscf:
             fscf.entityMovement(gmmmsg.actorId)
         self._stepsBuffer.append(CallbackStep(Callback(deleteTooltip, gmmmsg.actorId)))
-        self.appendStep(FightEntityMovementStep(gmmmsg.actorId, movementPath))
+        self.pushStep(FightEntityMovementStep(gmmmsg.actorId, movementPath))
 
     def fighterHasTriggeredGlyphOrTrap(
         self, gaftgtmsg: GameActionFightTriggerGlyphTrapMessage
     ) -> None:
         triggeredSpellId: int = 0
         eid: EffectInstanceDice = None
-        self.appendStep(
+        self.pushStep(
             FightMarkTriggeredStep(
                 gaftgtmsg.triggeringCharacterId, gaftgtmsg.sourceId, gaftgtmsg.markId
             )
@@ -1675,7 +1655,7 @@ class FightSequenceFrame(Frame, ISpellCastProvider):
                         buff.effect.visibleInFightLog = True
                     if GameDebugManager().detailedFightLog_showBuffsInUi:
                         buff.effect.visibleInBuffUi = True
-                    self.appendStep(
+                    self.pushStep(
                         FightTemporaryBoostStep(
                             gaftbmsg.effect.targetId,
                             buff.effect.description,
@@ -1686,10 +1666,10 @@ class FightSequenceFrame(Frame, ISpellCastProvider):
                         )
                     )
                 if actionId == ActionIds.ACTION_CHARACTER_BOOST_SHIELD:
-                    self.appendStep(
+                    self.pushStep(
                         FightShieldPointsVariationStepgaftbmsg.effect.targetId, buff
                     )
-            self.appendStep(FightDisplayBuffStep(buff))
+            self.pushStep(FightDisplayBuffStep(buff))
 
     def executeBuffer(self, callback: FunctionType) -> None:
         allowHitAnim: bool = False
@@ -2040,7 +2020,7 @@ class FightSequenceFrame(Frame, ISpellCastProvider):
         summonedCreature: Sprite = DofusEntities.getEntity(entity.contextualId)
         if summonedCreature:
             summonedCreature.visible = False
-        self.appendStep(FightSummonStep(sourceId, entity))
+        self.pushStep(FightSummonStep(sourceId, entity))
         isBomb: bool = False
         isCreature: bool = False
         summonedCharacterInfoS: GameFightCharacterInformations = None

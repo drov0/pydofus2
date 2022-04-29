@@ -103,6 +103,11 @@ class BotFarmPathFrame(Frame):
 
         elif isinstance(msg, InteractiveUsedMessage):
             if PlayedCharacterManager().id == msg.entityId and msg.duration > 0:
+                pourcentt = (
+                    PlayedCharacterManager().inventoryWeight
+                    / PlayedCharacterManager().inventoryWeightMax
+                ) * 100
+                logger.debug(f"[BotFarmFrame] Inventory weight {pourcentt:.2f}%")
                 logger.debug(
                     f"[BotFarmFrame] Started using interactive element {msg.elemId} ...."
                 )
@@ -149,7 +154,9 @@ class BotFarmPathFrame(Frame):
         elif isinstance(msg, NotificationByServerMessage):
             notification = Notification.getNotificationById(msg.id)
             if notification.titleId == 756273:
-                logger.debug("Full pod reached will destroy all items in inventory")
+                logger.debug(
+                    "[BotFarmFrame] Full pod reached will destroy all items in inventory"
+                )
                 for iw in InventoryManager().realInventory:
                     doa = DeleteObjectAction.create(iw.objectUID, iw.quantity)
                     Kernel().getWorker().process(doa)

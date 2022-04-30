@@ -14,12 +14,16 @@ from com.ankamagames.dofus.logic.game.common.managers.PlayedCharacterManager imp
     PlayedCharacterManager,
 )
 from com.ankamagames.dofus.logic.game.common.misc.DofusEntities import DofusEntities
+from com.ankamagames.dofus.logic.game.fight.actions.GameFightTurnFinishAction import (
+    GameFightTurnFinishAction,
+)
 import com.ankamagames.dofus.logic.game.fight.fightEvents.FightEventsHelper as fightEventsHelper
 import com.ankamagames.dofus.logic.game.fight.frames.FightContextFrame as fightContextFrame
 import com.ankamagames.dofus.logic.game.fight.frames.FightEntitiesFrame as fightEntitiesFrame
 from com.ankamagames.dofus.logic.game.fight.frames.FightSequenceFrame import (
     FightSequenceFrame,
 )
+from com.ankamagames.dofus.logic.game.fight.frames.FightTurnFrame import FightTurnFrame
 from com.ankamagames.dofus.logic.game.fight.managers.BuffManager import BuffManager
 from com.ankamagames.dofus.logic.game.fight.managers.CurrentPlayedFighterManager import (
     CurrentPlayedFighterManager,
@@ -30,8 +34,12 @@ from com.ankamagames.dofus.logic.game.fight.managers.FightersStateManager import
 from com.ankamagames.dofus.logic.game.fight.managers.SpellCastInFightManager import (
     SpellCastInFightManager,
 )
+from com.ankamagames.dofus.logic.game.fight.miscs.FightEntitiesHolder import (
+    FightEntitiesHolder,
+)
 from com.ankamagames.dofus.logic.game.fight.types.BasicBuff import BasicBuff
 from com.ankamagames.dofus.logic.game.fight.types.StatBuff import StatBuff
+from com.ankamagames.dofus.logic.game.fight.types.TriggeredBuff import TriggeredBuff
 from com.ankamagames.dofus.misc.utils.GameDebugManager import GameDebugManager
 from com.ankamagames.dofus.network.messages.game.actions.GameActionAcknowledgementMessage import (
     GameActionAcknowledgementMessage,
@@ -325,7 +333,7 @@ class FightBattleFrame(Frame):
             for effectTrigger in gauetcmsg.targetIds:
                 for buffTriggered in BuffManager().getAllBuff(effectTrigger.targetId):
                     if (
-                        buffTriggered is TriggeredBuff
+                        isinstance(buffTriggered, TriggeredBuff)
                         and buffTriggered.effect.effectUid == effectTrigger.effectId
                     ):
                         buffTriggered.triggerCount = effectTrigger.count
@@ -337,9 +345,9 @@ class FightBattleFrame(Frame):
             if sscmsg.masterId == playerId:
                 self._masterId = sscmsg.masterId
                 self._slaveId = sscmsg.slaveId
-                if not self._currentPlayerId and self._turnsList.find(
+                if not self._currentPlayerId and self._turnsList.index(
                     self._masterId
-                ) > self._turnsList.find(self._slaveId):
+                ) > self._turnsList.index(self._slaveId):
                     self.prepareNextPlayableCharacter(self._masterId)
             return False
 
@@ -359,7 +367,7 @@ class FightBattleFrame(Frame):
             self._currentPlayerId = gftsmsg.id
             if not self._lastPlayerId:
                 self._lastPlayerId = self._currentPlayerId
-            logger.info("Start turn for entityId: " + self._currentPlayerId)
+            logger.info("Start turn for entityId: " + str(self._currentPlayerId))
             if self._currentPlayerId == playerId:
                 self._slaveId = 0
             self._playingSlaveEntity = gftsmsg.id == self._slaveId
@@ -393,14 +401,7 @@ class FightBattleFrame(Frame):
                 ):
                     entity = DofusEntities.getEntity(gftsmsg.id)
                     if entity != None:
-                        ss = SerialSequencer()
-                        ss.addStep(AddGfxEntityStep(154, entity.position.cellId))
-                        ss.start()
-                        yOffset = 65 * entity.look.getScaleY()
-                        ss2 = SerialSequencer()
-                        ss2.addStep(
-                            AddGfxEntityStep(153, entity.position.cellId, 0, -yOffset)
-                        )
+
                         ss2.start()
                     self._playerNewTurn = entity
             deadEntityInfo = fightEntitiesFrame.FightEntitiesFrame.getCurrentInstance().getEntityInfos(
@@ -480,10 +481,8 @@ class FightBattleFrame(Frame):
                 self._lastPlayerId = gftemsg.id
             else:
                 self._nextLastPlayerId = gftemsg.id
-            entityInfos = (
-                fightBattleFrame.FightEntitiesFrame.getCurrentInstance().getEntityInfos(
-                    gftemsg.id
-                )
+            entityInfos = fightEntitiesFrame.FightEntitiesFrame.getCurrentInstance().getEntityInfos(
+                gftemsg.id
             )
             if (
                 isinstance(entityInfos, GameFightFighterInformations)
@@ -568,10 +567,8 @@ class FightBattleFrame(Frame):
 
         if isinstance(msg, GameFightLeaveMessage):
             gflmsg = msg
-            fighterInfos2 = (
-                fightBattleFrame.FightEntitiesFrame.getCurrentInstance().getEntityInfos(
-                    self._lastPlayerId
-                )
+            fighterInfos2 = fightEntitiesFrame.FightEntitiesFrame.getCurrentInstance().getEntityInfos(
+                self._lastPlayerId
             )
             leaveSequenceFrame = FightSequenceFrame(self)
             if fighterInfos2 and fighterInfos2.spawnInfo.alive:
@@ -650,12 +647,9 @@ class FightBattleFrame(Frame):
         fsf: FightSequenceFrame = None
         self.applyDelayedStats()
         DataMapProvider().isInFight = False
-        TweenMax.killAll(False)
         if krnl.Kernel().getWorker().contains("FightTurnFrame"):
             krnl.Kernel().getWorker().removeFrame(self._turnFrame)
-        BuffManager().destroy()
-        MarkedCellsManager().destroy()
-        LinkedCellsManager().destroy()
+        BuffManager.clear()
         if self._executingSequence or krnl.Kernel().getWorker().contains(
             "FightSequenceFrame"
         ):
@@ -664,9 +658,8 @@ class FightBattleFrame(Frame):
             )
             fsf = krnl.Kernel().getWorker().getFrame("FightSequenceFrame")
             krnl.Kernel().getWorker().removeFrame(fsf)
-        SerialSequencer.clearByType(FIGHT_SEQUENCER_NAME)
+        SerialSequencer.clearByType(self.FIGHT_SEQUENCER_NAME)
         SerialSequencer.clearByType(FightSequenceFrame.FIGHT_SEQUENCERS_CATEGORY)
-        AFKFightManager().enabled = False
         self._currentSequenceFrame = None
         self._sequenceFrameSwitcher = None
         self._turnFrame = None
@@ -679,17 +672,10 @@ class FightBattleFrame(Frame):
         self._playingSlaveEntity = False
         self._masterId = 0
         self._slaveId = 0
-        if self._playerNewTurn:
-            self._playerNewTurn.destroy()
-        if self._skipTurnTimer:
-            self._skipTurnTimer.cancel()
-            self._skipTurnTimer = None
+        del self._playerNewTurn
+        del self._skipTurnTimer
         self._destroyed = True
-        if self._autoEndTurnTimer:
-            self._autoEndTurnTimer.removeEventListener(
-                TimerEvent.TIMER_COMPLETE, self.sendAutoEndTurn
-            )
-            self._autoEndTurnTimer = None
+        self._autoEndTurnTimer = None
         return True
 
     def delayCharacterStatsList(self, msg: CharacterStatsListMessage) -> None:
@@ -708,9 +694,7 @@ class FightBattleFrame(Frame):
             else:
                 nextCharacterId = self.getNextPlayableCharacterId()
             nextCharacterEntity = (
-                fightBattleFrame.FightEntitiesFrame.getCurrentInstance().getEntityInfos(
-                    nextCharacterId
-                )
+                FightEntitiesFrame.getCurrentInstance().getEntityInfos(nextCharacterId)
             )
             if not nextCharacterEntity or not nextCharacterEntity.spawnInfo.alive:
                 return
@@ -778,7 +762,7 @@ class FightBattleFrame(Frame):
 
     def waitAnimations(self) -> None:
         key = None
-        entitiesFrame: fightBattleFrame.FightEntitiesFrame = (
+        entitiesFrame: fightEntitiesFrame.FightEntitiesFrame = (
             krnl.Kernel().getWorker().getFrame("FightEntitiesFrame")
         )
         entityIdList: list[float] = None
@@ -910,7 +894,7 @@ class FightBattleFrame(Frame):
 
     def confirmTurnEnd(self) -> None:
         fighterInfos: GameFightFighterInformations = (
-            fightBattleFrame.FightEntitiesFrame.getCurrentInstance().getEntityInfos(
+            fightEntitiesFrame.FightEntitiesFrame.getCurrentInstance().getEntityInfos(
                 self._lastPlayerId
             )
         )
@@ -932,7 +916,6 @@ class FightBattleFrame(Frame):
         ConnectionsHandler.getConnection().send(turnEnd)
 
     def endBattle(self, fightEnd: GameFightEndMessage) -> None:
-        EntitiesManager().cleanDeadLook()
         _holder: FightEntitiesHolder = FightEntitiesHolder()
         entities: dict = _holder.getEntities()
         for coward in entities:
@@ -943,25 +926,19 @@ class FightBattleFrame(Frame):
         fightContextFrame = krnl.Kernel().getWorker().getFrame("FightContextFrame")
         fightContextFrame.process(fightEnd)
 
-    def onSkipTurnTimeOut(self, event: TimerEvent) -> None:
+    def onSkipTurnTimeOut(self, event) -> None:
         action: Action = None
-        self._skipTurnTimer.removeEventListener(
-            TimerEvent.TIMER, self.onSkipTurnTimeOut
-        )
         self._skipTurnTimer = None
         fightContextFrame = krnl.Kernel().getWorker().getFrame("FightContextFrame")
-        if AFKFightManager().isAfk and (
-            fightContextFrame and not fightContextFrame.isKolossium
-        ):
-            action = GameFightTurnFinishAction()
-            krnl.Kernel().getWorker().process(action)
+        action = GameFightTurnFinishAction()
+        krnl.Kernel().getWorker().process(action)
 
     def gameFightSynchronize(
         self, fighters: list[GameFightFighterInformations]
     ) -> None:
         newWaveAppeared: bool = False
         newWaveMonster: bool = False
-        entitiesFrame: fightBattleFrame.FightEntitiesFrame = (
+        entitiesFrame: fightEntitiesFrame.FightEntitiesFrame = (
             krnl.Kernel().getWorker().getFrame("FightEntitiesFrame")
         )
         newWaveMonsterIndex: int = 0

@@ -37,11 +37,11 @@ class FightEventsHelper:
 
     _events: list[list[FightEvent]] = list[list[FightEvent]]()
 
-    _joinedEvents: list[FightEvent]
+    _joinedEvents: list[FightEvent] = list[FightEvent]()
 
-    _detailsActive: bool
+    _detailsActive: bool = False
 
-    _lastSpellId: int
+    _lastSpellId: int = -1
 
     NOT_GROUPABLE_BY_TYPE_EVENTS: list = [FightEventEnum.FIGHTER_CASTED_SPELL]
 
@@ -59,8 +59,9 @@ class FightEventsHelper:
         self._joinedEvents = list[FightEvent]()
         self._lastSpellId = -1
 
+    @classmethod
     def sendFightEvent(
-        self,
+        cls,
         name: str,
         params: list,
         fighterId: float,
@@ -76,7 +77,7 @@ class FightEventsHelper:
             fighterId,
             checkParams,
             pCastingSpellId,
-            len(self._fightEvents),
+            len(cls._fightEvents),
             pFirstParamToCheck,
             buff,
         )
@@ -84,30 +85,30 @@ class FightEventsHelper:
             pass
         else:
             if name:
-                self._fightEvents[0] = fightEvent
-            if self._joinedEvents and len(self._joinedEvents) > 0:
-                if self._joinedEvents[0].name == FightEventEnum.FIGHTER_GOT_TACKLED:
+                cls._fightEvents[0] = fightEvent
+            if cls._joinedEvents and len(cls._joinedEvents) > 0:
+                if cls._joinedEvents[0].name == FightEventEnum.FIGHTER_GOT_TACKLED:
                     if (
                         name == FightEventEnum.FIGHTER_MP_LOST
                         or name == FightEventEnum.FIGHTER_AP_LOST
                     ):
-                        self._joinedEvents[0] = fightEvent
+                        cls._joinedEvents[0] = fightEvent
                         return
                     if name != FightEventEnum.FIGHTER_VISIBILITY_CHANGED:
-                        feTackle = self._joinedEvents.pop(0)
-                        for fe in self._joinedEvents:
+                        feTackle = cls._joinedEvents.pop(0)
+                        for fe in cls._joinedEvents:
                             if fe.name == FightEventEnum.FIGHTER_AP_LOST:
                                 feTackle.params[1] = fe.params[1]
                             else:
                                 feTackle.params[2] = fe.params[1]
-                        self.addFightText(feTackle)
-                        self._joinedEvents = None
+                        cls.addFightText(feTackle)
+                        cls._joinedEvents = None
             elif name == FightEventEnum.FIGHTER_GOT_TACKLED:
-                self._joinedEvents = list[FightEvent]()
-                self._joinedEvents.append(fightEvent)
+                cls._joinedEvents = list[FightEvent]()
+                cls._joinedEvents.append(fightEvent)
                 return
             if name:
-                self.addFightText(fightEvent)
+                cls.addFightText(fightEvent)
 
     def addFightText(self, fightEvent: FightEvent) -> None:
         num: int = len(self._events)

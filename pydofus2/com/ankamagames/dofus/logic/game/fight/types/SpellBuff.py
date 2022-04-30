@@ -42,17 +42,17 @@ class SpellBuff(BasicBuff):
         sb.spellId = self.spellId
         sb.delta = self.delta
         sb.modifType = self.modifType
-        sb.id = uid
-        sb.uid = uid
-        sb.dataUid = dataUid
-        sb.actionId = actionId
-        sb.targetId = targetId
-        sb.castingSpell = castingSpell
-        sb.duration = duration
-        sb.dispelable = dispelable
-        sb.source = source
-        sb.aliveSource = aliveSource
-        sb.sourceJustReaffected = sourceJustReaffected
-        sb.parentBoostUid = parentBoostUid
+        sb.id = self.uid
+        sb.uid = self.uid
+        sb.dataUid = self.dataUid
+        sb.actionId = self.actionId
+        sb.targetId = self.targetId
+        sb.castingSpell = self.castingSpell
+        sb.duration = self.duration
+        sb.dispelable = self.dispelable
+        sb.source = self.source
+        sb.aliveSource = self.aliveSource
+        sb.sourceJustReaffected = self.sourceJustReaffected
+        sb.parentBoostUid = self.parentBoostUid
         sb.initParam(param1, param2, param3)
         return sb

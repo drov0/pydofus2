@@ -72,7 +72,7 @@ class BuffManager(metaclass=Singleton):
             logger.debug("[BUFFS DEBUG] Creation du buff " + effect.uid)
 
         if isinstance(effect, FightTemporarySpellBoostEffect):
-            buff = SpellBuffeffect
+            buff = SpellBuff(effect, castingSpell, actionId)
             if GameDebugManager().buffsDebugActivated:
                 logger.debug(
                     "[BUFFS DEBUG]      Buff " + effect.uid + " : type SpellBuff"

@@ -352,5 +352,5 @@ ROOTDIR = pathlib.Path(os.path.dirname(__file__))
 #     ROOTDIR / "inventoryView",
 # )
 t = perf_counter()
-parseFile(ROOTDIR / "target.as", ROOTDIR / "AnimFunData.py")
+parseFile(ROOTDIR / "target.as", ROOTDIR / "FightActionPointsVariationStep.py")
 print("parsing took:", perf_counter() - t)

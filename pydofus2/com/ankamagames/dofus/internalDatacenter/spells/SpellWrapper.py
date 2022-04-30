@@ -2,6 +2,7 @@ from typing import Any, TYPE_CHECKING
 from com.ankamagames.berilia.types.messages.managers.SlotDataHolderManager import (
     SlotDataHolderManager,
 )
+
 if TYPE_CHECKING:
     from com.ankamagames.dofus.datacenter.effects.EffectInstance import EffectInstance
     from com.ankamagames.dofus.logic.game.common.spell.SpellModifiers import (
@@ -51,7 +52,7 @@ class SpellWrapper(ISlotData, ICellZoneProvider, IDataCenter):
 
     _cache: list = []
 
-    _playersCache: dict = dict()
+    _playersCache: dict = dict([int, "SpellWrapper"])
 
     _cac: "SpellWrapper"
 
@@ -187,7 +188,7 @@ class SpellWrapper(ISlotData, ICellZoneProvider, IDataCenter):
 
     def refreshSpellHolders(self, playerID: float) -> None:
         wrapper: SpellWrapper = None
-        for wrapper in self._playersCache[playerID]:
+        for wrapper in self._playersCache.get(playerID):
             if wrapper:
                 wrapper._slotDataHolderManager.refreshAll()
         if self._cac:

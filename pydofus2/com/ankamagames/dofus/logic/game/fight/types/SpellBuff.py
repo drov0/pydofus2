@@ -54,5 +54,5 @@ class SpellBuff(BasicBuff):
         sb.aliveSource = self.aliveSource
         sb.sourceJustReaffected = self.sourceJustReaffected
         sb.parentBoostUid = self.parentBoostUid
-        sb.initParam(param1, param2, param3)
+        sb.initParam(self.diceNum, self.diceSide, self.value)
         return sb

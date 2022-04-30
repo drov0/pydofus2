@@ -7,8 +7,8 @@ from time import perf_counter
 from tqdm import tqdm
 
 patterns = {
-    "^\n?(\s*)public static function get(\S+)ById\(id:(?:uint|int|double)\)\s*:\s*(\S+)\n?\s*{\n?\s*return\s*GameData\.getObject\(\s*MODULE\s*,\s*id\s*\)\s*as\s*(\S+);\n?\s*}\n?$$": r"\n\1@classmethod\1def get\2ById(cls, id:int) -> '\3':\1\treturn GameData.getObject(cls.MODULE, id)\n",
-    "^\n?(\s*)public static function get(\S+)s\(\)\s*:\s*Array\n?\s*{\n?\s*return\s*GameData\.getObjects\(\s*MODULE\s*\)\s*;\n?\s*}\n?$$": r"\n\1@classmethod\1def get\2s(cls) -> list['\2']:\1\treturn GameData.getObjects(cls.MODULE)\n",
+    "^\n?(\s*)(?:public|override) (?:static|public) function get(\S+)ById\(id:(?:uint|int|double)\)\s*:\s*(\S+)\n?\s*{\n?\s*return\s*GameData\.getObject\(\s*MODULE\s*,\s*id\s*\)\s*as\s*(\S+);\n?\s*}\n?$$": r"\n\1@classmethod\1def get\2ById(cls, id:int) -> '\3':\1\treturn GameData.getObject(cls.MODULE, id)\n",
+    "^\n?(\s*)(?:public|override) (?:static|public) function get(\S+)s\(\)\s*:\s*Array\n?\s*{\n?\s*return\s*GameData\.getObjects\(\s*MODULE\s*\)\s*;\n?\s*}\n?$$": r"\n\1@classmethod\1def get\2s(cls) -> list['\2']:\1\treturn GameData.getObjects(cls.MODULE)\n",
     "for each\((\S+) in (.*)\)": r"for \1 in \2:",
     "\((\S+) as (\S+)\)": r"\1",
     "^\s*from com.ankamagames.jerakine.logger.Log import Log": "",
@@ -21,6 +21,7 @@ patterns = {
     "static ": "",
     "private ": "",
     "protected ": "",
+    "override ": "",
     "const ": "",
     "final ": "",
     "override ": "",
@@ -105,6 +106,8 @@ patterns = {
     "_operator": "self._operator",
     "_criterionValue": "self._criterionValue",
     "else$$": r"else:",
+    "for each \((.*)\)$$": r"for \1:",
+    "Kernel.getWorker\(\).getFrame\((\S+)\)": r"Kernel().getWorker().getFrame('\1')",
     # " as [A-Z]+\S+": "",
     # "(\S+) is ([A-Z]+\S+)": r"isinstance(\1, \2)",
     # "(\S+) ? (\S+) : (^[:\s]+)": r"\2 if \1 else \3",
@@ -351,6 +354,7 @@ ROOTDIR = pathlib.Path(os.path.dirname(__file__))
 #     r"C:\Users\majdoub\OneDrive\Documents\scripts\com\ankamagames\dofus\logic\game\common\misc\inventoryView",
 #     ROOTDIR / "inventoryView",
 # )
+
 t = perf_counter()
-parseFile(ROOTDIR / "target.as", ROOTDIR / "FightActionPointsVariationStep.py")
+parseFile(ROOTDIR / "target.as", ROOTDIR / "FightCarryCharacterStep.py")
 print("parsing took:", perf_counter() - t)

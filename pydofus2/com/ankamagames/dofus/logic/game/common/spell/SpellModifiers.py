@@ -59,7 +59,7 @@ class SpellModifiers:
         updateSpellModifierAction = UpdateSpellModifierAction.create(
             self.entityId, self.spellId, modifier.id
         )
-        Kernel.getWorker().process(updateSpellModifierAction)
+        Kernel().getWorker().process(updateSpellModifierAction)
 
     def getModifier(self, modifierId: float) -> SpellModifier:
         if modifierId not in self._modifiers:

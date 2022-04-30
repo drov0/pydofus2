@@ -1,11 +1,14 @@
 from com.ankamagames.dofus.kernel.Kernel import Kernel
-from com.ankamagames.dofus.logic.game.fight.frames.FightEntitiesFrame import (
-    FightEntitiesFrame,
-)
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from com.ankamagames.dofus.logic.game.fight.frames.FightEntitiesFrame import (
+        FightEntitiesFrame,
+    )
+    from com.ankamagames.dofus.network.types.game.context.GameContextActorInformations import (
+        GameContextActorInformations,
+    )
 from com.ankamagames.dofus.logic.game.fight.steps.IFightStep import IFightStep
-from com.ankamagames.dofus.network.types.game.context.GameContextActorInformations import (
-    GameContextActorInformations,
-)
+
 from com.ankamagames.jerakine.sequencer.AbstractSequencable import AbstractSequencable
 
 
@@ -22,8 +25,8 @@ class FightRefreshFighterStep(AbstractSequencable, IFightStep):
         return "refreshFighter"
 
     def start(self) -> None:
-        fightEntitiesFrame: FightEntitiesFrame = Kernel.getWorker().getFrame(
-            FightEntitiesFrame
+        fightEntitiesFrame: 'FightEntitiesFrame' = (
+            Kernel().getWorker().getFrame('FightEntitiesFrame')
         )
         currentFighterInfos: GameContextActorInformations = (
             fightEntitiesFrame.getEntityInfos(self._infos.contextualId)

@@ -10,7 +10,7 @@ class EntitiesManager(metaclass=Singleton):
 
     def __init__(self):
         self._entities = dict[float, "IEntity"]()
-        self._entitiesScheduledForDestruction = []
+        self._entitiesScheduledForDestruction = dict()
         self._currentRandomEntity: float = self.RANDOM_ENTITIES_ID_START
 
     def addAnimatedEntity(
@@ -34,7 +34,7 @@ class EntitiesManager(metaclass=Singleton):
     def removeEntity(self, entityID: float) -> None:
         if self._entities.get(entityID):
             del self._entities[entityID]
-            if self._entitiesScheduledForDestruction[entityID]:
+            if self._entitiesScheduledForDestruction.get(entityID):
                 del self._entitiesScheduledForDestruction[entityID]
 
     def clearEntities(self) -> None:
@@ -57,7 +57,8 @@ class EntitiesManager(metaclass=Singleton):
     def entities(self) -> dict[int, "IEntity"]:
         return self._entities
 
-    def entitiesScheduledForDestruction(self) -> list:
+    @property
+    def entitiesScheduledForDestruction(self) -> dict[int, "IEntity"]:
         return self._entitiesScheduledForDestruction
 
     def entitiesCount(self) -> int:

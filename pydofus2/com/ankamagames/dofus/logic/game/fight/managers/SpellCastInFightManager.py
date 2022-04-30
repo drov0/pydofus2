@@ -37,8 +37,8 @@ class SpellCastInFightManager:
             spell.newTurn()
 
     def resetInitialCooldown(self, hasBeenSummoned: bool = False) -> None:
-        spim: SpellInventoryManagementFrame = Kernel.getWorker().getFrame(
-            SpellInventoryManagementFrame
+        spim: SpellInventoryManagementFrame = (
+            Kernel().getWorker().getFrame(SpellInventoryManagementFrame)
         )
         spellList: list = spim.getFullSpellListByOwnerId(self.entityId)
         for spellWrapper in spellList:

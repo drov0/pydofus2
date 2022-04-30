@@ -27,6 +27,7 @@ from com.ankamagames.jerakine.sequencer.AbstractSequencable import AbstractSeque
 from com.ankamagames.jerakine.sequencer.ISequencer import ISequencer
 from com.ankamagames.jerakine.types.events.SequencerEvent import SequencerEvent
 from damageCalculation.tools.StatIds import StatIds
+from whistle import Event
 
 logger = Logger(__name__)
 
@@ -66,7 +67,6 @@ class FightDeathStep(AbstractSequencable, IFightStep):
         return self._entityId
 
     def start(self) -> None:
-        waitAnimation: bool = False
         dyingEntity: IEntity = DofusEntities.getEntity(self._entityId)
         if not dyingEntity:
             logger.warn(
@@ -86,9 +86,7 @@ class FightDeathStep(AbstractSequencable, IFightStep):
             fightBattleFrame.deadFightersList.append(self._entityId)
         self._needToWarn = True
         BuffManager().dispell(dyingEntity.id, False, False, True)
-        impactedTarget: list = BuffManager().removeLinkedBuff(
-            dyingEntity.id, False, True
-        )
+        BuffManager().removeLinkedBuff(dyingEntity.id, False, True)
         BuffManager().reaffectBuffs(dyingEntity.id)
         fighterStats.setStat(Stat(StatIds.CUR_PERMANENT_DAMAGE, 0))
         fighterStats.setStat(
@@ -112,11 +110,7 @@ class FightDeathStep(AbstractSequencable, IFightStep):
         return [self._entityId]
 
     def manualRollOut(self, fighterId: float) -> None:
-        fightContextFrame: FightContextFrame = None
-        if FightContextFrame.fighterEntityTooltipId == fighterId:
-            fightContextFrame = Kernel.getWorker().getFrame(FightContextFrame)
-            if fightContextFrame:
-                fightContextFrame.outEntity(fighterId)
+        pass
 
     def onAnimEnd(self, dyingEntity) -> None:
         pass

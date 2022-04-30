@@ -1,3 +1,10 @@
+import json
+import os
+from pathlib import Path
+
+CURRDIR = Path(os.path.dirname(os.path.realpath(__file__)))
+
+
 class ActionIdHelper:
 
     STAT_BUFF_ACTION_IDS: list = [
@@ -156,27 +163,30 @@ class ActionIdHelper:
         2835,
     ]
 
-    actionIdToStatNameMap = _loc1_
+    with open(CURRDIR / "actionIdToStatNameMap.json", "r") as fs:
+        actionIdToStatNameMap = json.load(fs)
 
-    percentStatBoostActionIdToStat = _loc1_
+    with open(CURRDIR / "percentStatBoostActionIdToStat.json", "r") as fs:
+        percentStatBoostActionIdToStat = json.load(fs)
 
-    flatStatBoostActionIdToStat = _loc1_
+    with open(CURRDIR / "flatStatBoostActionIdToStat.json", "r") as fs:
+        flatStatBoostActionIdToStat = json.load(fs)
 
-    shieldActionIdToStatId = _loc1_
+    with open(CURRDIR / "shieldActionsIdToStatId.json", "r") as fs:
+        shieldActionIdToStatId = json.load(fs)
 
-    def __init__(self):
-        pass
-
-    def isBasedOnCasterLife(self, param1: int) -> bool:
+    @classmethod
+    def isBasedOnCasterLife(cls, param1: int) -> bool:
         if not (
-            ActionIdHelper.isBasedOnCasterLifePercent(param1)
-            or ActionIdHelper.isBasedOnCasterLifeMidlife(param1)
-            or ActionIdHelper.isBasedOnCasterLifeMissing(param1)
+            cls.isBasedOnCasterLifePercent(param1)
+            or cls.isBasedOnCasterLifeMidlife(param1)
+            or cls.isBasedOnCasterLifeMissing(param1)
         ):
-            return bool(ActionIdHelper.isBasedOnCasterLifeMissingMaxLife(param1))
+            return bool(cls.isBasedOnCasterLifeMissingMaxLife(param1))
         return True
 
-    def isBasedOnCasterLifePercent(self, param1: int) -> bool:
+    @classmethod
+    def isBasedOnCasterLifePercent(cls, param1: int) -> bool:
         _loc2_: int = param1
         if _loc2_ != 85:
             if _loc2_ != 86:
@@ -188,7 +198,8 @@ class ActionIdHelper:
                                     return False
         return True
 
-    def isBasedOnCasterLifeMissing(self, param1: int) -> bool:
+    @classmethod
+    def isBasedOnCasterLifeMissing(cls, param1: int) -> bool:
         if (
             param1 == 279
             or param1 == 275
@@ -199,7 +210,8 @@ class ActionIdHelper:
             return True
         return False
 
-    def isBasedOnCasterLifeMissingMaxLife(self, param1: int) -> bool:
+    @classmethod
+    def isBasedOnCasterLifeMissingMaxLife(cls, param1: int) -> bool:
         if (
             param1 == 1118
             or param1 == 1121
@@ -210,20 +222,24 @@ class ActionIdHelper:
             return True
         return False
 
-    def isBasedOnCasterLifeMidlife(self, param1: int) -> bool:
+    @classmethod
+    def isBasedOnCasterLifeMidlife(cls, param1: int) -> bool:
         return param1 == 672
 
-    def isSplash(self, param1: int) -> bool:
-        if not ActionIdHelper.isSplashDamage(param1):
-            return bool(ActionIdHelper.isSplashHeal(param1))
+    @classmethod
+    def isSplash(cls, param1: int) -> bool:
+        if not cls.isSplashDamage(param1):
+            return bool(cls.isSplashHeal(param1))
         return True
 
-    def isSplashDamage(self, param1: int) -> bool:
-        if not ActionIdHelper.isSplashFinalDamage(param1):
-            return bool(ActionIdHelper.isSplashRawDamage(param1))
+    @classmethod
+    def isSplashDamage(cls, param1: int) -> bool:
+        if not cls.isSplashFinalDamage(param1):
+            return bool(cls.isSplashRawDamage(param1))
         return True
 
-    def isSplashFinalDamage(self, param1: int) -> bool:
+    @classmethod
+    def isSplashFinalDamage(cls, param1: int) -> bool:
         _loc2_: int = param1
         if _loc2_ != 1223:
             if _loc2_ != 1224:
@@ -234,7 +250,8 @@ class ActionIdHelper:
                                 return False
         return True
 
-    def isSplashRawDamage(self, param1: int) -> bool:
+    @classmethod
+    def isSplashRawDamage(cls, param1: int) -> bool:
         _loc2_: int = param1
         if _loc2_ != 1123:
             if _loc2_ != 1124:
@@ -245,12 +262,14 @@ class ActionIdHelper:
                                 return False
         return True
 
-    def isSplashHeal(self, param1: int) -> bool:
+    @classmethod
+    def isSplashHeal(cls, param1: int) -> bool:
         if param1 == 2020:
             return True
         return False
 
-    def isBasedOnMovementPoints(self, param1: int) -> bool:
+    @classmethod
+    def isBasedOnMovementPoints(cls, param1: int) -> bool:
         if (
             param1 == 1012
             or param1 == 1013
@@ -261,7 +280,8 @@ class ActionIdHelper:
             return True
         return False
 
-    def isBasedOnTargetLifePercent(self, param1: int) -> bool:
+    @classmethod
+    def isBasedOnTargetLifePercent(cls, param1: int) -> bool:
         if (
             param1 == 1071
             or param1 == 1068
@@ -273,7 +293,8 @@ class ActionIdHelper:
             return True
         return False
 
-    def isTargetMaxLifeAffected(self, param1: int) -> bool:
+    @classmethod
+    def isTargetMaxLifeAffected(cls, param1: int) -> bool:
         if not (
             param1 == 1037
             or param1 == 153
@@ -287,18 +308,20 @@ class ActionIdHelper:
             return param1 == 2845
         return True
 
-    def isBasedOnTargetLife(self, param1: int) -> bool:
+    @classmethod
+    def isBasedOnTargetLife(cls, param1: int) -> bool:
         if not (
-            ActionIdHelper.isBasedOnTargetLifePercent(param1)
-            or ActionIdHelper.isBasedOnTargetMaxLife(param1)
+            cls.isBasedOnTargetLifePercent(param1) or cls.isBasedOnTargetMaxLife(param1)
         ):
-            return bool(ActionIdHelper.isBasedOnTargetLifeMissingMaxLife(param1))
+            return bool(cls.isBasedOnTargetLifeMissingMaxLife(param1))
         return True
 
-    def isBasedOnTargetMaxLife(self, param1: int) -> bool:
+    @classmethod
+    def isBasedOnTargetMaxLife(cls, param1: int) -> bool:
         return param1 == 1109
 
-    def isBasedOnTargetLifeMissingMaxLife(self, param1: int) -> bool:
+    @classmethod
+    def isBasedOnTargetLifeMissingMaxLife(cls, param1: int) -> bool:
         if (
             param1 == 1092
             or param1 == 1095
@@ -309,7 +332,8 @@ class ActionIdHelper:
             return True
         return False
 
-    def isBoostable(self, param1: int) -> bool:
+    @classmethod
+    def isBoostable(cls, param1: int) -> bool:
         _loc2_: bool = False
         _loc3_: int = param1
         if _loc3_ != 80:
@@ -320,16 +344,17 @@ class ActionIdHelper:
                             if _loc3_ != 1065:
                                 if _loc3_ != 1066:
                                     _loc2_ = (
-                                        ActionIdHelper.isBasedOnCasterLife(param1)
-                                        or ActionIdHelper.isBasedOnTargetLife(param1)
-                                        or ActionIdHelper.isSplash(param1)
+                                        cls.isBasedOnCasterLife(param1)
+                                        or cls.isBasedOnTargetLife(param1)
+                                        or cls.isSplash(param1)
                                     )
                                     if _loc2_ == True:
                                         return False
                                     return True
         return False
 
-    def isLifeSteal(self, param1: int) -> bool:
+    @classmethod
+    def isLifeSteal(cls, param1: int) -> bool:
         if (
             param1 == 95
             or param1 == 2828
@@ -342,7 +367,8 @@ class ActionIdHelper:
             return True
         return False
 
-    def isHeal(self, param1: int) -> bool:
+    @classmethod
+    def isHeal(cls, param1: int) -> bool:
         _loc2_: int = param1
         if _loc2_ != 81:
             if _loc2_ != 90:
@@ -356,7 +382,8 @@ class ActionIdHelper:
                                             return False
         return True
 
-    def isShield(self, param1: int) -> bool:
+    @classmethod
+    def isShield(cls, param1: int) -> bool:
         _loc2_: int = param1
         if _loc2_ != 1020:
             if _loc2_ != 1039:
@@ -364,7 +391,8 @@ class ActionIdHelper:
                     return False
         return True
 
-    def isTargetMarkDispell(self, param1: int) -> bool:
+    @classmethod
+    def isTargetMarkDispell(cls, param1: int) -> bool:
         _loc2_: int = param1
         if _loc2_ != 2018:
             if _loc2_ != 2019:
@@ -372,13 +400,15 @@ class ActionIdHelper:
                     return False
         return True
 
-    def isStatBoost(self, param1: int) -> bool:
+    @classmethod
+    def isStatBoost(cls, param1: int) -> bool:
         if param1 in [266, 268, 269, 270, 271, 414]:
             return True
         else:
             return False
 
-    def statBoostToStatName(self, param1: int) -> str:
+    @classmethod
+    def statBoostToStatName(cls, param1: int) -> str:
         if param1 == 266:
             return "chance"
         elif param1 == 268:
@@ -392,7 +422,8 @@ class ActionIdHelper:
         else:
             return param1
 
-    def statBoostToBuffActionId(self, param1: int) -> int:
+    @classmethod
+    def statBoostToBuffActionId(cls, param1: int) -> int:
         if param1 == 266:
             return 123
         elif param1 == 268:
@@ -406,7 +437,8 @@ class ActionIdHelper:
         else:
             return 0
 
-    def statBoostToDebuffActionId(self, param1: int) -> int:
+    @classmethod
+    def statBoostToDebuffActionId(cls, param1: int) -> int:
         if param1 == 266:
             return 152
         elif param1 == 268:
@@ -420,12 +452,14 @@ class ActionIdHelper:
         else:
             return -1
 
-    def isDamage(self, param1: int, param2: int) -> bool:
+    @classmethod
+    def isDamage(cls, param1: int, param2: int) -> bool:
         if param1 == 2 and param2 != 127 and param2 != 101:
             return True
         return False
 
-    def isPush(self, param1: int) -> bool:
+    @classmethod
+    def isPush(cls, param1: int) -> bool:
         _loc2_: int = param1
         if _loc2_ != 5:
             if _loc2_ != 1021:
@@ -434,7 +468,8 @@ class ActionIdHelper:
                         return False
         return True
 
-    def isPull(self, param1: int) -> bool:
+    @classmethod
+    def isPull(cls, param1: int) -> bool:
         _loc2_: int = param1
         if _loc2_ != 6:
             if _loc2_ != 1022:
@@ -442,30 +477,34 @@ class ActionIdHelper:
                     return False
         return True
 
-    def isForcedDrag(self, param1: int) -> bool:
+    @classmethod
+    def isForcedDrag(cls, param1: int) -> bool:
         _loc2_: int = param1
         if _loc2_ != 1021:
             if _loc2_ != 1022:
                 return False
         return True
 
-    def isDrag(self, param1: int) -> bool:
-        if not ActionIdHelper.isPush(param1):
-            return ActionIdHelper.isPull(param1)
+    @classmethod
+    def isDrag(cls, param1: int) -> bool:
+        if not cls.isPush(param1):
+            return cls.isPull(param1)
         return True
 
-    def allowCollisionDamage(self, param1: int) -> bool:
+    @classmethod
+    def allowCollisionDamage(cls, param1: int) -> bool:
         _loc2_: int = param1
         if _loc2_ != 5:
             if _loc2_ != 1041:
                 return False
         return True
 
-    def isSummon(self, param1: int) -> bool:
+    @classmethod
+    def isSummon(cls, param1: int) -> bool:
         _loc2_: bool = False
         _loc3_: int = param1
         if _loc3_ == 181:
-            _loc2_ = ActionIdHelper.isSummonWithSlot(param1)
+            _loc2_ = cls.isSummonWithSlot(param1)
             if _loc2_ == True:
                 return True
             return True
@@ -473,13 +512,14 @@ class ActionIdHelper:
             if _loc3_ != 1008:
                 if _loc3_ != 1097:
                     if _loc3_ != 1189:
-                        _loc2_ = ActionIdHelper.isSummonWithSlot(param1)
+                        _loc2_ = cls.isSummonWithSlot(param1)
                         if _loc2_ == True:
                             return True
                         return False
         return True
 
-    def isSummonWithSlot(self, param1: int) -> bool:
+    @classmethod
+    def isSummonWithSlot(cls, param1: int) -> bool:
         _loc2_: int = param1
         if _loc2_ != 180:
             if _loc2_ != 405:
@@ -489,7 +529,8 @@ class ActionIdHelper:
                             return False
         return True
 
-    def isSummonWithoutTarget(self, param1: int) -> bool:
+    @classmethod
+    def isSummonWithoutTarget(cls, param1: int) -> bool:
         _loc2_: int = param1
         if _loc2_ != 180:
             if _loc2_ != 181:
@@ -502,21 +543,24 @@ class ActionIdHelper:
                                         return False
         return True
 
-    def isKillAndSummon(self, param1: int) -> bool:
+    @classmethod
+    def isKillAndSummon(cls, param1: int) -> bool:
         _loc2_: int = param1
         if _loc2_ != 405:
             if _loc2_ != 2796:
                 return False
         return True
 
-    def isRevive(self, param1: int) -> bool:
+    @classmethod
+    def isRevive(cls, param1: int) -> bool:
         _loc2_: int = param1
         if _loc2_ != 780:
             if _loc2_ != 1034:
                 return False
         return True
 
-    def getSplashFinalTakenDamageElement(self, param1: int) -> int:
+    @classmethod
+    def getSplashFinalTakenDamageElement(cls, param1: int) -> int:
         if param1 == 0:
             return 1224
         if param1 == 1:
@@ -530,7 +574,8 @@ class ActionIdHelper:
         else:
             return 1223
 
-    def getSplashRawTakenDamageElement(self, param1: int) -> int:
+    @classmethod
+    def getSplashRawTakenDamageElement(cls, param1: int) -> int:
         if param1 == 0:
             return 1124
         if param1 == 1:
@@ -544,7 +589,8 @@ class ActionIdHelper:
         else:
             return 1123
 
-    def isFakeDamage(self, param1: int) -> bool:
+    @classmethod
+    def isFakeDamage(cls, param1: int) -> bool:
         _loc2_: int = param1
         if _loc2_ != 90:
             if _loc2_ != 1047:
@@ -552,7 +598,8 @@ class ActionIdHelper:
                     return False
         return True
 
-    def isSpellExecution(self, param1: int) -> bool:
+    @classmethod
+    def isSpellExecution(cls, param1: int) -> bool:
         if (
             param1 == 1160
             or param1 == 2160
@@ -570,7 +617,8 @@ class ActionIdHelper:
             return True
         return False
 
-    def isTeleport(self, param1: int) -> bool:
+    @classmethod
+    def isTeleport(cls, param1: int) -> bool:
         _loc2_: bool = False
         _loc3_: int = param1
         if _loc3_ != 4:
@@ -580,54 +628,62 @@ class ActionIdHelper:
                         if _loc3_ != 1104:
                             if _loc3_ != 1105:
                                 if _loc3_ != 1106:
-                                    _loc2_ = ActionIdHelper.isExchange(param1)
+                                    _loc2_ = cls.isExchange(param1)
                                     if _loc2_ == True:
                                         return True
                                     return False
         return True
 
-    def isExchange(self, param1: int) -> bool:
+    @classmethod
+    def isExchange(cls, param1: int) -> bool:
         _loc2_: int = param1
         if _loc2_ != 8:
             if _loc2_ != 1023:
                 return False
         return True
 
-    def canTeleportOverBreedSwitchPos(self, param1: int) -> bool:
+    @classmethod
+    def canTeleportOverBreedSwitchPos(cls, param1: int) -> bool:
         _loc2_: int = param1
         if _loc2_ != 4:
             if _loc2_ != 1023:
                 return False
         return True
 
-    def allowAOEMalus(self, param1: int) -> bool:
-        if ActionIdHelper.isSplash(param1) and False or ActionIdHelper.isShield(param1):
+    @classmethod
+    def allowAOEMalus(cls, param1: int) -> bool:
+        if cls.isSplash(param1) and False or cls.isShield(param1):
             return False
         return True
 
-    def canTriggerHealMultiplier(self, param1: int) -> bool:
+    @classmethod
+    def canTriggerHealMultiplier(cls, param1: int) -> bool:
         if param1 == 90:
             return False
         return True
 
-    def canTriggerDamageMultiplier(self, param1: int) -> bool:
+    @classmethod
+    def canTriggerDamageMultiplier(cls, param1: int) -> bool:
         if param1 == 90:
             return False
         return True
 
-    def canTriggerOnHeal(self, param1: int) -> bool:
+    @classmethod
+    def canTriggerOnHeal(cls, param1: int) -> bool:
         _loc2_: int = param1
         if _loc2_ != 90:
             if _loc2_ != 786:
                 return True
         return False
 
-    def canTriggerOnDamage(self, param1: int) -> bool:
+    @classmethod
+    def canTriggerOnDamage(cls, param1: int) -> bool:
         if param1 == 1048:
             return False
         return True
 
-    def StatToBuffPercentActionIds(self, param1: int) -> int:
+    @classmethod
+    def StatToBuffPercentActionIds(cls, param1: int) -> int:
         if param1 == 1:
             return 2846
         if param1 == 10:
@@ -647,7 +703,8 @@ class ActionIdHelper:
         else:
             return -1
 
-    def StatToDebuffPercentActionIds(self, param1: int) -> int:
+    @classmethod
+    def StatToDebuffPercentActionIds(cls, param1: int) -> int:
         if param1 == 1:
             return 2847
         if param1 == 10:
@@ -667,7 +724,8 @@ class ActionIdHelper:
         else:
             return -1
 
-    def isLinearBuffActionIds(self, param1: int) -> bool:
+    @classmethod
+    def isLinearBuffActionIds(cls, param1: int) -> bool:
         if param1 == [
             31,
             33,
@@ -691,49 +749,53 @@ class ActionIdHelper:
         else:
             return True
 
-    def isStatModifier(self, param1: int) -> bool:
+    @classmethod
+    def isStatModifier(cls, actionId: int) -> bool:
         if (
-            int(ActionIdHelper.STAT_BUFF_ACTION_IDS.find(param1)) != -1
-            or int(ActionIdHelper.STAT_DEBUFF_ACTION_IDS.find(param1)) != -1
-        ) and not ActionIdHelper.isShield(param1):
+            actionId in cls.STAT_BUFF_ACTION_IDS
+            or actionId in cls.STAT_DEBUFF_ACTION_IDS
+        ) and not cls.isShield(actionId):
             return True
         return False
 
-    def isBuff(self, param1: int) -> bool:
-        return int(ActionIdHelper.STAT_BUFF_ACTION_IDS.find(param1)) != -1
+    @classmethod
+    def isBuff(cls, actionId: int) -> bool:
+        return actionId in cls.STAT_BUFF_ACTION_IDS
 
-    def isDebuff(self, param1: int) -> bool:
-        return int(ActionIdHelper.STAT_DEBUFF_ACTION_IDS.find(param1)) != -1
+    @classmethod
+    def isDebuff(cls, actionsId: int) -> bool:
+        return actionsId in cls.STAT_DEBUFF_ACTION_IDS
 
-    def getActionIdStatName(self, param1: int) -> str:
-        return ActionIdHelper.actionIdToStatNameMap.h[param1]
+    @classmethod
+    def getActionIdStatName(cls, actionId: int) -> str:
+        return cls.actionIdToStatNameMap[str(actionId)]
 
-    def isPercentStatBoostActionId(self, param1: int) -> bool:
-        _loc2_: IMap = ActionIdHelper.percentStatBoostActionIdToStat
-        return param1 in _loc2_.h
+    @classmethod
+    def isPercentStatBoostActionId(cls, actionId: int) -> bool:
+        return str(actionId) in cls.percentStatBoostActionIdToStat
 
-    def isFlatStatBoostActionId(self, param1: int) -> bool:
-        _loc2_: IMap = ActionIdHelper.flatStatBoostActionIdToStat
-        return param1 in _loc2_.h
+    @classmethod
+    def isFlatStatBoostActionId(cls, actionId: int) -> bool:
+        return str(actionId) in cls.flatStatBoostActionIdToStat
 
-    def getStatIdFromStatActionId(self, param1: int) -> int:
-        if ActionIdHelper.isFlatStatBoostActionId(param1):
-            return ActionIdHelper.flatStatBoostActionIdToStat.h[param1]
-        if ActionIdHelper.isPercentStatBoostActionId(param1):
-            return ActionIdHelper.percentStatBoostActionIdToStat.h[param1]
-        _loc2_ = ActionIdHelper.shieldActionIdToStatId
-        if param1 in _loc2_.h:
-            return ActionIdHelper.shieldActionIdToStatId.h[param1]
+    @classmethod
+    def getStatIdFromStatActionId(cls, statId: int) -> int:
+        if cls.isFlatStatBoostActionId(statId):
+            return cls.flatStatBoostActionIdToStat[str(statId)]
+        if cls.isPercentStatBoostActionId(statId):
+            return cls.percentStatBoostActionIdToStat[str(statId)]
+        if str(statId) in cls.shieldActionIdToStatId:
+            return cls.shieldActionIdToStatId[str(statId)]
         return -1
 
-    def isStatUpdated(self, param1: int) -> bool:
-        _loc2_: IMap = ActionIdHelper.flatStatBoostActionIdToStat
-        if not (param1 in _loc2_.h):
-            _loc3_ = ActionIdHelper.flatStatBoostActionIdToStat
-            return param1 in _loc3_.h
+    @classmethod
+    def isStatUpdated(cls, actionId: int) -> bool:
+        if str(actionId) not in cls.flatStatBoostActionIdToStat:
+            return str(actionId) in cls.flatStatBoostActionIdToStat
         return True
 
-    def isStatSteal(self, param1: int) -> bool:
+    @classmethod
+    def isStatSteal(cls, param1: int) -> bool:
         if not (
             param1 == 266
             or param1 == 267
@@ -744,7 +806,8 @@ class ActionIdHelper:
             return param1 == 271
         return True
 
-    def spellExecutionHasGlobalLimitation(self, param1: int) -> bool:
+    @classmethod
+    def spellExecutionHasGlobalLimitation(cls, param1: int) -> bool:
         _loc2_: int = param1
         if _loc2_ != 2017:
             if _loc2_ != 2160:
@@ -754,7 +817,8 @@ class ActionIdHelper:
                             return False
         return True
 
-    def isDamageInflicted(self, param1: int) -> bool:
+    @classmethod
+    def isDamageInflicted(cls, param1: int) -> bool:
         if not (
             param1 == 100
             or param1 == 144

@@ -353,11 +353,10 @@ class Worker(EventDispatcher, MessageHandler):
             efd.EnterFrameDispatcher().removeWorker()
 
     def processTreatments(self, startTime: int, maxTime: int) -> None:
-        treatment: Treatment = None
         while perf_counter() - startTime < maxTime and len(self._treatmentsQueue) > 0:
             treatment = self._treatmentsQueue[0]
             if treatment.process():
-                del self._treatmentsQueue[self._treatmentsQueue.find(treatment)]
+                self._treatmentsQueue.pop(0)
 
     def aNoneFlood(self, messageName: str) -> bool:
         if len(self._messagesQueue) > self.LONG_MESSAGE_QUEUE:

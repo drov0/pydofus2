@@ -17,6 +17,8 @@ class AnimatedCharacter(IMovable, IEntity, IObstacle, IDisplayable):
         self._stop = False
         self.speedAdjust: float = 0.0
         self.cantWalk8Directions: bool = False
+        self._carriedEntity = None
+        self._direction = None
         super().__init__()
 
     @property
@@ -74,3 +76,19 @@ class AnimatedCharacter(IMovable, IEntity, IObstacle, IDisplayable):
     @stop.setter
     def stop(self, value: bool) -> None:
         self._stop = value
+
+    @property
+    def carriedEntity(self) -> IEntity:
+        return self._carriedEntity
+
+    @carriedEntity.setter
+    def carriedEntity(self, entity) -> None:
+        self._carriedEntity = entity
+
+    @property
+    def direction(self) -> int:
+        return self._direction
+
+    @direction.setter
+    def direction(self, value: int) -> None:
+        self._direction = value

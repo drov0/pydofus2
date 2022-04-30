@@ -5,12 +5,12 @@ from typing import Any
 class Treatment:
     def __init__(self, object, func: FunctionType, params: list):
         self._object = object
-        self._calledFunctionType = func
+        self._calledFunction = func
         self._params = params
 
     @property
     def calledfunction(self) -> FunctionType:
-        return self._calledFunctionType
+        return self._calledFunction
 
     @property
     def params(self) -> list:
@@ -21,13 +21,13 @@ class Treatment:
         return self._object
 
     def process(self) -> bool:
-        self._calledFunctionType(self._object, self._params)
+        self._calledFunction(self._object, self._params)
         return True
 
     def isSameTreatment(self, object, func: FunctionType, params: list) -> bool:
         if (
             object != self._object
-            or func != self._calledFunctionType
+            or func != self._calledFunction
             or len(self._params) != len(params)
         ):
             return False
@@ -38,12 +38,7 @@ class Treatment:
 
     def isCloseTreatment(self, object, func: FunctionType, params: list) -> bool:
         param = None
-        if (
-            object
-            and object != self._object
-            or func
-            and func != self._calledFunctionType
-        ):
+        if object and object != self._object or func and func != self._calledFunction:
             return False
         for param in params:
             if self._params.find(param) == -1:

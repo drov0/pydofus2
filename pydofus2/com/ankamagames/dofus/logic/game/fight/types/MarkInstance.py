@@ -24,6 +24,3 @@ class MarkInstance:
     active: bool
 
     markImpactCellId: int
-
-    def __init__(self):
-        super().__init__()

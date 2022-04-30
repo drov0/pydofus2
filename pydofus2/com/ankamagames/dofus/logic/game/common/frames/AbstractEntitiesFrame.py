@@ -82,6 +82,10 @@ class AbstractEntitiesFrame(Frame):
         super().__init__()
 
     @property
+    def entities(self):
+        return self._entities
+
+    @property
     def priority(self) -> int:
         return Priority.NORMAL
 
@@ -183,3 +187,24 @@ class AbstractEntitiesFrame(Frame):
 
     def removeActor(self, actorId: float) -> None:
         self.unregisterActor(actorId)
+
+    def addCarrier(
+        self,
+        carrierEntity: AnimatedCharacter,
+        carriedEntity: AnimatedCharacter,
+        isPending: bool = False,
+    ) -> None:
+        if carrierEntity is None or carriedEntity is None:
+            return
+
+        if carriedEntity.id in self._pendingCarriedEntities:
+            del self._pendingCarriedEntities[carriedEntity.id]
+
+        if carriedEntity.id in self._entitiesIcons:
+            self._carriedEntities[carriedEntity.id] = carrierEntity
+
+        elif isPending:
+            self._pendingCarriedEntities[carriedEntity.id] = {
+                "carrierEntity": carrierEntity,
+                "carriedEntity": carriedEntity,
+            }

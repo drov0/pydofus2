@@ -182,7 +182,7 @@ class FightTurnFrame(Frame):
         self._myTurn = b
         if b:
             self.startRemindTurn()
-            self.getMovementArea()
+            self.drawMovementArea()
         else:
             self._isRequestingMovement = False
             if self._remindTurnTimeoutId is not None:
@@ -202,7 +202,7 @@ class FightTurnFrame(Frame):
                 if scf:
                     scf.refreshTarget(True)
         if self._myTurn and not scf:
-            self.getPath()
+            self.drawPath()
 
     @property
     def turnDuration(self) -> int:
@@ -301,7 +301,7 @@ class FightTurnFrame(Frame):
                 self._isRequestingMovement = False
                 spellCastFrame = Kernel().getWorker().getFrame(FightSpellCastFrame)
                 if not spellCastFrame:
-                    self.getPath()
+                    self.drawPath()
                 self.startRemindTurn()
                 if self._finishingTurn:
                     self.finishTurn()
@@ -363,7 +363,7 @@ class FightTurnFrame(Frame):
         Kernel().getWorker().removeFrame(self._spellCastFrame)
         return True
 
-    def getMovementArea(self) -> list[int]:
+    def drawMovementArea(self) -> list[int]:
         if not self._playerEntity or IMovable(self._playerEntity).isMoving:
             return []
         playerPosition: MapPoint = self._playerEntity.position
@@ -391,7 +391,7 @@ class FightTurnFrame(Frame):
         reachableCells: list[int] = fightReachableCellsMaker.reachableCells
         return reachableCells
 
-    def getPath(self, destCell: MapPoint = None) -> None:
+    def drawPath(self, destCell: MapPoint = None) -> None:
         if Kernel().getWorker().contains(FightSpellCastFrame):
             return
         if self._isRequestingMovement:
@@ -600,4 +600,4 @@ class FightTurnFrame(Frame):
             and stat.entityId == self._currentFighterId
             and stat.totalValue is not self._lastMP
         ):
-            self.getMovementArea()
+            self.drawMovementArea()

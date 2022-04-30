@@ -223,7 +223,7 @@ class FightBotFrame(Frame, metaclass=Singleton):
       ccmsg.cell = avaibleCells[math.floor(len(avaibleCells) * random.random())]
       ccmsg.cellId = ccmsg.cell.cellId
       ccmsg.id = MapDisplayManager().currentMapPoint.mapId
-      Kernel.getWorker().process(ccmsg)
+      Kernel().getWorker().process(ccmsg)
    
    def fightRandomMove(self) -> None:
       reachableCells:FightReachableCellsMaker = FightReachableCellsMakerFightEntitiesFrame.getCurrentInstance().getEntityInfos(PlayedCharacterManager().id)
@@ -234,7 +234,7 @@ class FightBotFrame(Frame, metaclass=Singleton):
       ccmsg.cell = MapPoint.fromCellId(reachableCells.reachableCells[math.floor(len(reachableCells.reachableCells) * random.random())])
       ccmsg.cellId = ccmsg.cell.cellId
       ccmsg.id = MapDisplayManager().currentMapPoint.mapId
-      Kernel.getWorker().process(ccmsg)
+      Kernel().getWorker().process(ccmsg)
    
    def randomOver(self, *foo) -> None:
       e:IEntity = None
@@ -250,10 +250,10 @@ class FightBotFrame(Frame, metaclass=Singleton):
          return
       if self._lastEntityOver:
          emomsg2 = EntityMouseOutMessage(self._lastEntityOver)
-         Kernel.getWorker().process(emomsg2)
+         Kernel().getWorker().process(emomsg2)
       self._lastEntityOver = entity
       emomsg:EntityMouseOverMessage = EntityMouseOverMessage(entity)
-      Kernel.getWorker().process(emomsg)
+      Kernel().getWorker().process(emomsg)
       avaibleElem:list = []
       for ui in Berilia().uiList:
          for elem in ui.getElements():
@@ -263,10 +263,10 @@ class FightBotFrame(Frame, metaclass=Singleton):
          return
       if self._lastElemOver:
          momsg2 = GenericPool.get(MouseOutMessage,self._lastElemOver,MouseEvent(MouseEvent.MOUSE_OUT))
-         Kernel.getWorker().process(momsg2)
+         Kernel().getWorker().process(momsg2)
       target:GraphicContainer = avaibleElem[math.floor(len(avaibleElem) * Math.random())]
       momsg:MouseOverMessage = GenericPool.get(MouseOverMessage,target,MouseEvent(MouseEvent.MOUSE_OVER))
-      Kernel.getWorker().process(momsg)
+      Kernel().getWorker().process(momsg)
       self._lastElemOver = target
    
    def castSpell(self, spellId:int, onMySelf:bool) -> None:

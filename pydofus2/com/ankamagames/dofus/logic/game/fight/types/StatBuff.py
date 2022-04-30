@@ -2,6 +2,7 @@ from com.ankamagames.dofus.datacenter.effects.Effect import Effect
 from com.ankamagames.dofus.datacenter.effects.instances.EffectInstanceDice import (
     EffectInstanceDice,
 )
+from com.ankamagames.dofus.logic.game.fight.miscs.ActionIdHelper import ActionIdHelper
 import com.ankamagames.dofus.logic.game.fight.types.BasicBuff as basicBuff
 from com.ankamagames.dofus.logic.game.fight.types.CastingSpell import CastingSpell
 from com.ankamagames.dofus.network.types.game.actions.fight.FightTemporaryBoostEffect import (
@@ -69,5 +70,5 @@ class StatBuff(basicBuff.BasicBuff):
         sb.aliveSource = self.aliveSource
         sb.sourceJustReaffected = self.sourceJustReaffected
         sb.parentBoostUid = self.parentBoostUid
-        sb.initParam(self.param1, self.param2, self.param3)
+        sb.initParam(self.diceNum, self.diceSide, self.value)
         return sb

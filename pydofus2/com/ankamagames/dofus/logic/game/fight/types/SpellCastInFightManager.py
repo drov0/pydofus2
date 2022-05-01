@@ -1,8 +1,6 @@
 from com.ankamagames.dofus.internalDatacenter.spells.SpellWrapper import SpellWrapper
 from com.ankamagames.dofus.kernel.Kernel import Kernel
-from com.ankamagames.dofus.logic.game.common.frames.SpellInventoryManagementFrame import (
-    SpellInventoryManagementFrame,
-)
+
 from com.ankamagames.dofus.logic.game.common.spell.SpellModifiers import SpellModifiers
 from com.ankamagames.dofus.logic.game.fight.managers.CurrentPlayedFighterManager import (
     CurrentPlayedFighterManager,
@@ -21,6 +19,9 @@ from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from com.ankamagames.dofus.network.types.game.context.fight.GameFightSpellCooldown import (
         GameFightSpellCooldown,
+    )
+    from com.ankamagames.dofus.logic.game.common.frames.SpellInventoryManagementFrame import (
+        SpellInventoryManagementFrame,
     )
 from com.ankamagames.jerakine.logger.Logger import Logger
 
@@ -52,8 +53,8 @@ class SpellCastInFightManager:
     def resetInitialCooldown(self, hasBeenSummoned: bool = False) -> None:
         spellWrapper: SpellWrapper = None
         spellManager: SpellManager = None
-        spim: SpellInventoryManagementFrame = (
-            Kernel().getWorker().getFrame(SpellInventoryManagementFrame)
+        spim: "SpellInventoryManagementFrame" = (
+            Kernel().getWorker().getFrame("SpellInventoryManagementFrame")
         )
         spellList: list = spim.getFullSpellListByOwnerId(self.entityId)
         for spellWrapper in spellList:
@@ -72,7 +73,7 @@ class SpellCastInFightManager:
                 spellManager.resetInitialCooldown(self.currentTurn)
 
     def updateCooldowns(
-        self, spellCooldowns: list[GameFightSpellCooldown] = None
+        self, spellCooldowns: list["GameFightSpellCooldown"] = None
     ) -> None:
         if self.needCooldownUpdate and not spellCooldowns:
             spellCooldowns = self._storedSpellCooldowns

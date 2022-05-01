@@ -7,7 +7,7 @@ from com.ankamagames.jerakine.logger.Logger import Logger
 logger = Logger(__name__)
 
 
-class GraphicCell(Sprite, ICustomUnicNameGetter):
+class GraphicCell(ICustomUnicNameGetter):
 
     _dropValidator: FunctionType
 

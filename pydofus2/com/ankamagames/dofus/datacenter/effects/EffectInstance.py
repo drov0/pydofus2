@@ -90,7 +90,7 @@ class EffectInstance(IDataCenter):
 
     spellId: int
 
-    _effectData: Effect
+    _effectData: Effect = None
 
     _durationstrValue: int
 

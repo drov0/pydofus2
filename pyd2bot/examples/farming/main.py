@@ -9,3 +9,4 @@ if __name__ == "__main__":
     bot = Bot(botName)
     bot.registerFrame(BotFarmFrame())
     bot.start()
+    bot.join()

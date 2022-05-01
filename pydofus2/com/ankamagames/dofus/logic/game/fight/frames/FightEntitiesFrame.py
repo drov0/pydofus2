@@ -14,9 +14,12 @@ from com.ankamagames.dofus.logic.game.common.misc.DofusEntities import DofusEnti
 from com.ankamagames.dofus.logic.game.fight.actions.RemoveEntityAction import (
     RemoveEntityAction,
 )
-from com.ankamagames.dofus.logic.game.fight.frames.FightContextFrame import (
-    FightContextFrame,
-)
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from com.ankamagames.dofus.logic.game.fight.frames.FightContextFrame import (
+        FightContextFrame,
+    )
 from com.ankamagames.dofus.logic.game.fight.managers.CurrentPlayedFighterManager import (
     CurrentPlayedFighterManager,
 )
@@ -169,7 +172,7 @@ class FightEntitiesFrame(AbstractEntitiesFrame, Frame):
     def __init__(self):
         self._ie = dict(True)
         self._tempFighterList = []
-        self._entitiesIconsToUpdate = list[float](0)
+        self._entitiesIconsToUpdate = list[float]()
         self.lastKilledChallengers = list[GameFightFighterInformations]()
         self.lastKilledDefenders = list[GameFightFighterInformations]()
         super().__init__()
@@ -285,7 +288,7 @@ class FightEntitiesFrame(AbstractEntitiesFrame, Frame):
                 else:
                     self.updateFighter(gfsfmsg.informations)
                 self._illusionEntities[gfsfmsg.informations.contextualId] = False
-            fightContextFrame: FightContextFrame = (
+            fightContextFrame: "FightContextFrame" = (
                 krnl.Kernel().getWorker().getFrame("FightContextFrame")
             )
             if fightContextFrame.fightersPositionsHistory[

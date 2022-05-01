@@ -1,9 +1,6 @@
 from ast import Is
 from types import FunctionType
 from typing import TYPE_CHECKING
-from com.ankamagames.atouin.managers.InteractiveCellManager import (
-    InteractiveCellManager,
-)
 from com.ankamagames.dofus.enums.ElementEnum import ElementEnum
 from com.ankamagames.dofus.internalDatacenter.spells.SpellWrapper import SpellWrapper
 from com.ankamagames.dofus.logic.game.common.misc.ISpellCastProvider import (

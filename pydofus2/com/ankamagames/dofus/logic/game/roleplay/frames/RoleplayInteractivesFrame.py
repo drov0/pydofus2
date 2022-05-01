@@ -339,7 +339,8 @@ class RoleplayInteractivesFrame(Frame):
         self._ie[ie.elementId] = InteractiveElementData(ie, worldPos, firstSkill)
 
     def removeInteractive(self, ie: InteractiveElement) -> None:
-        del self._ie[ie.elementId]
+        if self._ie.get(ie.elementId):
+            del self._ie[ie.elementId]
 
     def isCollectable(self, ie: InteractiveElement) -> CollectableElement:
         interactive = Interactive.getInteractiveById(ie.elementTypeId)

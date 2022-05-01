@@ -37,16 +37,22 @@ class ContextChangeFrame(Frame):
     def process(self, msg: Message) -> bool:
 
         if isinstance(msg, GameContextCreateMessage):
-            context = GameContextEnum(msg.context)
+            context = msg.context
             if context == GameContextEnum.ROLE_PLAY:
                 import com.ankamagames.dofus.logic.game.roleplay.frames.RoleplayContextFrame as rplCF
 
                 Kernel().getWorker().addFrame(rplCF.RoleplayContextFrame())
+
             elif context == GameContextEnum.FIGHT:
-                # Kernel().getWorker().addFrame(FightContextFrame())
+
+                import com.ankamagames.dofus.logic.game.fight.frames.FightContextFrame as fcf
+
+                Kernel().getWorker().addFrame(fcf.FightContextFrame())
                 pass
+
             else:
                 Kernel().panic(PanicMessages.WRONG_CONTEXT_CREATED, [msg.context])
+
             return True
 
         if isinstance(msg, GameContextQuitAction):

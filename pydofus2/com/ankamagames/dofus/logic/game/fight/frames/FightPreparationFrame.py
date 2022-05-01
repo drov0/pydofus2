@@ -27,7 +27,12 @@ from com.ankamagames.dofus.logic.game.fight.actions.GameFightReadyAction import 
 from com.ankamagames.dofus.logic.game.fight.actions.RemoveEntityAction import (
     RemoveEntityAction,
 )
-import com.ankamagames.dofus.logic.game.fight.frames.FightContextFrame as fightContextFrame
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from com.ankamagames.dofus.logic.game.fight.frames.FightContextFrame import (
+        FightContextFrame,
+    )
 from com.ankamagames.dofus.logic.game.fight.frames.FightEntitiesFrame import (
     FightEntitiesFrame,
 )
@@ -92,6 +97,9 @@ from com.ankamagames.dofus.network.messages.game.context.fight.GameFightUpdateTe
 from com.ankamagames.dofus.network.messages.game.idol.IdolFightPreparationUpdateMessage import (
     IdolFightPreparationUpdateMessage,
 )
+from com.ankamagames.dofus.network.types.game.context.fight.GameFightFighterInformations import (
+    GameFightFighterInformations,
+)
 from com.ankamagames.dofus.types.entities.AnimatedCharacter import AnimatedCharacter
 from com.ankamagames.jerakine.entities.messages.EntityClickMessage import (
     EntityClickMessage,
@@ -115,7 +123,7 @@ class FightPreparationFrame(Frame):
 
     SELECTION_DEFENDER: str = "FightPlacementDefenderTeam"
 
-    _fightContextFrame: fightContextFrame.FightContextFrame
+    _fightContextFrame: "FightContextFrame"
 
     _playerTeam: int
 
@@ -127,7 +135,7 @@ class FightPreparationFrame(Frame):
 
     _fightersId: list[float]
 
-    def __init__(self, fightContextFrame: fightContextFrame.FightContextFrame):
+    def __init__(self, fightContextFrame: "FightContextFrame"):
         super().__init__()
         self._fightContextFrame = fightContextFrame
 
@@ -182,7 +190,9 @@ class FightPreparationFrame(Frame):
                 Kernel().getWorker().removeFrame(self)
                 gfemsg = GameFightEndMessage()
                 gfemsg.init()
-                fightContextFrame2 = Kernel().getWorker().getFrame("FightContextFrame")
+                fightContextFrame2: "FightContextFrame" = (
+                    Kernel().getWorker().getFrame("FightContextFrame")
+                )
                 if fightContextFrame2:
                     fightContextFrame2.process(gfemsg)
                 else:
@@ -208,9 +218,15 @@ class FightPreparationFrame(Frame):
             if cellEntity:
                 fighter = object()
                 fighter.name = self._fightContextFrame.getFighterName(cellEntity.id)
-                entitiesFrame = Kernel().getWorker().getFrame("FightEntitiesFrame")
-                fighterInfos = entitiesFrame.getEntityInfos(cellEntity.id)
-                playerInfos = entitiesFrame.getEntityInfos(PlayedCharacterManager().id)
+                entitiesFrame: "FightEntitiesFrame" = (
+                    Kernel().getWorker().getFrame("FightEntitiesFrame")
+                )
+                fighterInfos: GameFightFighterInformations = (
+                    entitiesFrame.getEntityInfos(cellEntity.id)
+                )
+                playerInfos: GameFightFighterInformations = (
+                    entitiesFrame.getEntityInfos(PlayedCharacterManager().id)
+                )
                 if not (
                     fighterInfos.contextualId != playerInfos.contextualId
                     and fighterInfos.spawnInfo.teamId == playerInfos.spawnInfo.teamId
@@ -360,7 +376,9 @@ class FightPreparationFrame(Frame):
         if isinstance(msg, GameContextDestroyMessage):
             gfemsg2 = GameFightEndMessage()
             gfemsg2.init()
-            fightContextFrame = Kernel().getWorker().getFrame("FightContextFrame")
+            fightContextFrame: "FightContextFrame" = (
+                Kernel().getWorker().getFrame("FightContextFrame")
+            )
             if fightContextFrame:
                 fightContextFrame.process(gfemsg2)
             else:
@@ -382,12 +400,7 @@ class FightPreparationFrame(Frame):
         return True
 
     def removeSelections(self) -> None:
-        sc: Selection = SelectionManager().getSelection(self.SELECTION_CHALLENGER)
-        if sc:
-            sc.remove()
-        sd: Selection = SelectionManager().getSelection(self.SELECTION_DEFENDER)
-        if sd:
-            sd.remove()
+        pass
 
     def isValidPlacementCell(self, cellId: int, team: int) -> bool:
         mapPoint: MapPoint = MapPoint.fromCellId(cellId)

@@ -3,6 +3,7 @@ from threading import Timer
 from com.ankamagames.atouin.managers.EntitiesManager import EntitiesManager
 import com.ankamagames.atouin.managers.MapDisplayManager as mdm
 from com.ankamagames.atouin.messages.MapLoadedMessage import MapLoadedMessage
+from com.ankamagames.atouin.utils.DataMapProvider import DataMapProvider
 from com.ankamagames.dofus.datacenter.monsters.Monster import Monster
 import com.ankamagames.dofus.datacenter.spells.Spell as spellmod
 from com.ankamagames.dofus.datacenter.world.SubArea import SubArea
@@ -16,6 +17,9 @@ from com.ankamagames.dofus.internalDatacenter.world.WorldPointWrapper import (
 from com.ankamagames.dofus.kernel.Kernel import Kernel
 from com.ankamagames.dofus.kernel.net.ConnectionsHandler import ConnectionsHandler
 from com.ankamagames.dofus.logic.common.managers.PlayerManager import PlayerManager
+from com.ankamagames.dofus.logic.game.common.frames.SpellInventoryManagementFrame import (
+    SpellInventoryManagementFrame,
+)
 from com.ankamagames.dofus.logic.game.common.managers.PlayedCharacterManager import (
     PlayedCharacterManager,
 )
@@ -27,7 +31,9 @@ from com.ankamagames.dofus.logic.game.fight.actions.UpdateSpellModifierAction im
     UpdateSpellModifierAction,
 )
 import com.ankamagames.dofus.logic.game.fight.fightEvents.FightEventsHelper as fightEventsHelper
-from com.ankamagames.dofus.logic.game.fight.frames import FightSequenceFrame
+from com.ankamagames.dofus.logic.game.fight.frames.FightSequenceFrame import (
+    FightSequenceFrame,
+)
 from com.ankamagames.dofus.logic.game.fight.frames.FightBattleFrame import (
     FightBattleFrame,
 )
@@ -367,7 +373,7 @@ class FightContextFrame(Frame):
             return fighterInfos.level
         if isinstance(fighterInfos, GameFightMonsterInformations):
             if self.fightType == FightTypeEnum.FIGHT_TYPE_BREACH:
-                minLevel = 99999999999999999
+                minLevel = float("inf")
                 for entity in self._entitiesFrame.entities.values():
                     if isinstance(
                         self._entitiesFrame.entities[entity],
@@ -475,25 +481,21 @@ class FightContextFrame(Frame):
             playerCoolDownInfo.slaveId = PlayedCharacterManager().id
             cooldownInfos.insert(0, playerCoolDownInfo)
             playedFighterManager = CurrentPlayedFighterManager()
-            num = len(cooldownInfos)
-            for i in range(num):
-                infos = cooldownInfos[i]
+            for cd in cooldownInfos:
                 spellCastManager = playedFighterManager.getSpellCastManagerById(
-                    infos.slaveId
+                    cd.slaveId
                 )
                 spellCastManager.currentTurn = gfrmsg.gameTurn
                 spellCastManager.updateCooldowns(cooldownInfos[i].spellCooldowns)
-                if infos.slaveId != playerId:
+                if cd.slaveId != playerId:
                     CurrentPlayedFighterManager().setCurrentSummonedCreature(
-                        infos.summonCount, infos.slaveId
+                        cd.summonCount, cd.slaveId
                     )
                     CurrentPlayedFighterManager().setCurrentSummonedBomb(
-                        infos.bombCount, infos.slaveId
+                        cd.bombCount, cd.slaveId
                     )
             castingSpellPool = []
-            numEffects = len(gfrmsg.effects)
-            for i in range(numEffects):
-                buff = gfrmsg.effects[i]
+            for buff in gfrmsg.effects:
                 if not castingSpellPool[buff.effect.targetId]:
                     castingSpellPool[buff.effect.targetId] = []
                 targetPool = castingSpellPool[buff.effect.targetId]
@@ -550,11 +552,11 @@ class FightContextFrame(Frame):
             if timeBeforeStart == 0 and preFightIsActive:
                 timeBeforeStart = -1
 
-            if PlayerManager().kisServerPort > 0:
-                if ExternalNotificationManager().canAddExternalNotification(
-                    ExternalNotificationTypeEnum.KOLO_JOIN
-                ):
-                    pass
+            # if PlayerManager().kisServerPort > 0:
+            #     if ExternalNotificationManager().canAddExternalNotification(
+            #         ExternalNotificationTypeEnum.KOLO_JOIN
+            #     ):
+            #         pass
             return True
 
         if isinstance(msg, GameFightStartMessage):
@@ -563,11 +565,11 @@ class FightContextFrame(Frame):
             Kernel().getWorker().removeFrame(self._preparationFrame)
             CurrentPlayedFighterManager().getSpellCastManager().resetInitialCooldown()
             Kernel().getWorker().addFrame(self._battleFrame)
-            if PlayerManager().kisServerPort > 0:
-                if ExternalNotificationManager().canAddExternalNotification(
-                    ExternalNotificationTypeEnum.KOLO_START
-                ):
-                    pass
+            # if PlayerManager().kisServerPort > 0:
+            #     if ExternalNotificationManager().canAddExternalNotification(
+            #         ExternalNotificationTypeEnum.KOLO_START
+            #     ):
+            #         pass
             self._fightIdols = gfsm.idols
 
             return True
@@ -613,14 +615,10 @@ class FightContextFrame(Frame):
             fightEventsHelper.FightEventsHelper.sendAllFightEvent(True)
             PlayedCharacterManager().isFighting = False
             PlayedCharacterManager().fightId = -1
-            SpellWrapper.removeAllSpellWrapperBut(
-                PlayedCharacterManager().id, SecureCenter.ACCESS_KEY
-            )
-            SpellWrapper.resetAllCoolDown(
-                PlayedCharacterManager().id, SecureCenter.ACCESS_KEY
-            )
-            SpellModifiersManager().destroy()
-            if gfemsg.results == None:
+            SpellWrapper.removeAllSpellWrapperBut(PlayedCharacterManager().id, None)
+            SpellWrapper.resetAllCoolDown(PlayedCharacterManager().id, None)
+            SpellModifiersManager.clear()
+            if gfemsg.results is None:
                 pass
             else:
                 fightEnding = FightEndingMessage()
@@ -734,7 +732,7 @@ class FightContextFrame(Frame):
         if isinstance(msg, ChallengeTargetsListRequestAction):
             ctlra = msg
             ctlrmsg = ChallengeTargetsListRequestMessage()
-            ctlrmsg.initChallengeTargetsListRequestMessage(ctlra.challengeId)
+            ctlrmsg.init(ctlra.challengeId)
             ConnectionsHandler.getConnection().send(ctlrmsg)
             return True
 
@@ -761,7 +759,7 @@ class FightContextFrame(Frame):
         if isinstance(msg, MapObstacleUpdateMessage):
             moumsg = msg
             for mo in moumsg.obstacles:
-                InteractiveCellManager().updateCell(
+                DataMapProvider().updateCellMovLov(
                     mo.obstacleCellId, mo.state == MapObstacleStateEnum.OBSTACLE_OPENED
                 )
             return True
@@ -837,12 +835,14 @@ class FightContextFrame(Frame):
             self._hiddenEntites.append(entityId)
 
     def removeFromHiddenEntities(self, entityId: float) -> None:
-        if self._hiddenEntites.find(entityId) != -1:
-            self._hiddenEntites.splice(self._hiddenEntites.find(entityId), 1)
+        if entityId in self._hiddenEntites:
+            self._hiddenEntites.remove(entityId)
 
     def initFighterPositionHistory(self, pFighterId: float) -> None:
-        if not self._fightersPositionsHistory[pFighterId]:
-            fightContextFrame = Kernel().getWorker().getFrame("FightContextFrame")
+        if not self._fightersPositionsHistory.get(pFighterId):
+            fightContextFrame: "FightContextFrame" = (
+                Kernel().getWorker().getFrame("FightContextFrame")
+            )
             self._fightersPositionsHistory[pFighterId] = [
                 {
                     "cellId": fightContextFrame.entitiesFrame.getEntityInfos(
@@ -856,7 +856,7 @@ class FightContextFrame(Frame):
         self.initFighterPositionHistory(pFighterId)
         positions: list = self._fightersPositionsHistory[pFighterId]
         savedPos: object = positions[len(positions) - 2] if len(positions) > 1 else None
-        return int(savedPos.cellId) if savedPos else -1
+        return int(savedPos["cellId"] if savedPos else -1)
 
     def deleteFighterPreviousPosition(self, pFighterId: float) -> None:
         if self._fightersPositionsHistory[pFighterId]:
@@ -878,7 +878,6 @@ class FightContextFrame(Frame):
             entity = DofusEntities.getEntity(self._timelineOverEntityId)
             if entity and entity.position:
                 FightContextFrame.currentCell = entity.position.cellId
-                self.overEntity(self._timelineOverEntityId)
 
     def getFighterInfos(self, fighterId: float) -> GameFightFighterInformations:
         return self.entitiesFrame.getEntityInfos(fighterId)

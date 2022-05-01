@@ -14,8 +14,8 @@ if TYPE_CHECKING:
     from com.ankamagames.dofus.logic.game.fight.frames.FightEntitiesFrame import (
         FightEntitiesFrame,
     )
-from com.ankamagames.dofus.logic.game.fight.types.BasicBuff import BasicBuff
-from com.ankamagames.dofus.logic.game.fight.types.StatBuff import StatBuff
+    from com.ankamagames.dofus.logic.game.fight.types.BasicBuff import BasicBuff
+    from com.ankamagames.dofus.logic.game.fight.types.StatBuff import StatBuff
 from com.ankamagames.dofus.misc.utils.GameDebugManager import GameDebugManager
 from com.ankamagames.dofus.network.enums.FightEventEnum import FightEventEnum
 from com.ankamagames.dofus.network.types.game.context.fight.GameFightFighterInformations import (
@@ -69,7 +69,7 @@ class FightEventsHelper:
         sendNow: bool = False,
         checkParams: int = 0,
         pFirstParamToCheck: int = 1,
-        buff: BasicBuff = None,
+        buff: "BasicBuff" = None,
     ) -> None:
         fightEvent: FightEvent = FightEvent(
             name,
@@ -348,11 +348,11 @@ class FightEventsHelper:
                 if (
                     event != listToConcat[0]
                     and event.targetId == listToConcat[0].targetId
-                    and listToConcat[0] is StatBuff
+                    and isinstance(listToConcat[0], "StatBuff")
                 ):
                     listToConcat[0].params[1] += event.params[1]
             evt = listToConcat[0]
-            if isinstance(evt.buff, StatBuff):
+            if isinstance(evt.buff, "StatBuff"):
                 tmpEffect = evt.buff.effect.clone()
                 if isinstance(tmpEffect, EffectInstanceDice):
                     buffStackCount = 1

@@ -264,9 +264,13 @@ class GameServerApproachFrame(Frame):
             return True
 
         elif isinstance(msg, CharacterSelectedForceMessage):
-            logger.error("Impossible to select character, server is full.")
-            self._requestedCharacterId = 0
-            return True
+            if not self._reconnectMsgSend:
+                krnl.Kernel().beingInReconection = True
+                self.characterId = msg.id
+                self._reconnectMsgSend = True
+                connh.ConnectionsHandler.getConnection().send(
+                    CharacterSelectedForceReadyMessage()
+                )
 
         elif isinstance(msg, BasicTimeMessage):
             btmsg = msg

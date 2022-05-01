@@ -1,12 +1,3 @@
-from com.ankamagames.dofus.kernel.Kernel import Kernel
-from com.ankamagames.dofus.logic.game.common.misc.DofusEntities import DofusEntities
-from com.ankamagames.dofus.logic.game.fight.frames.FightPreparationFrame import (
-    FightPreparationFrame,
-)
-from com.ankamagames.dofus.types.entities.AnimatedCharacter import AnimatedCharacter
-from flash.geom.Rectangle import Rectangle
-
-
 class SwapPositionRequest:
 
     _instanceName: str

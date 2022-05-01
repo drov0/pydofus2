@@ -1,4 +1,3 @@
-from com.ankamagames.dofus.internalDatacenter.items.ItemWrapper import ItemWrapper
 from com.ankamagames.dofus.logic.game.common.misc.Inventory import Inventory
 from com.ankamagames.dofus.logic.game.common.misc.PlayerInventory import PlayerInventory
 from com.ankamagames.dofus.logic.game.common.misc.inventoryView.BankConsumablesView import (
@@ -69,6 +68,10 @@ from com.ankamagames.dofus.network.enums.CharacterInventoryPositionEnum import (
 )
 from com.ankamagames.jerakine.logger.Logger import Logger
 from com.ankamagames.jerakine.metaclasses.Singleton import Singleton
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from com.ankamagames.dofus.internalDatacenter.items.ItemWrapper import ItemWrapper
 
 logger = Logger(__name__)
 
@@ -134,9 +137,8 @@ class InventoryManager(metaclass=Singleton):
         self.inventory.addView(StorageQuestCategory())
         self.inventory.addView(StorageFilteredView())
 
-
     def init(self) -> None:
-        self._inventory.initialize(list[ItemWrapper]())
+        self._inventory.initialize(list["ItemWrapper"]())
         self._builds = list()
         self._shortcutBarItems = list()
         self._shortcutBarSpells = list()
@@ -146,7 +148,7 @@ class InventoryManager(metaclass=Singleton):
         return self._inventory
 
     @property
-    def realInventory(self) -> list[ItemWrapper]:
+    def realInventory(self) -> list["ItemWrapper"]:
         return self._inventory.getView("real").content
 
     @property

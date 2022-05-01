@@ -1,3 +1,4 @@
+from com.ankamagames.dofus.logic.game.fight.miscs.TackleUtil import TackleUtil
 from com.ankamagames.jerakine.logger.Logger import Logger
 from com.ankamagames.atouin.data.map.Map import Map
 from com.ankamagames.dofus.internalDatacenter.stats.Stat import Stat
@@ -19,7 +20,6 @@ from com.ankamagames.dofus.network.types.game.context.fight.GameFightMonsterInfo
 from damageCalculation.tools.StatIds import StatIds
 from com.ankamagames.atouin.data.map.Cell import Cell
 from com.ankamagames.jerakine.types.positions.MapPoint import MapPoint
-import ankamagames.dofus.logic.game.fight.miscs.TackleUtil as TackleUtil
 
 logger = Logger(__name__)
 

@@ -7,7 +7,7 @@ from com.ankamagames.jerakine.entities.interfaces.IEntity import IEntity
 from com.ankamagames.jerakine.metaclasses.Singleton import Singleton
 
 
-class FightEntitiesHolder(IEntityLocalizer, metaclss=Singleton):
+class FightEntitiesHolder(IEntityLocalizer, metaclass=Singleton):
 
     _holdedEntities: dict
 

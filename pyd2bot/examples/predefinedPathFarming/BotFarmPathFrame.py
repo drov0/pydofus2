@@ -38,6 +38,8 @@ from com.ankamagames.jerakine.types.enums.Priority import Priority
 from typing import TYPE_CHECKING, Tuple
 
 from pyd2bot.apis.FarmAPI import FarmAPI
+from pyd2bot.examples.autotrip.AutoTripFrame import AutoTripFrame
+from pyd2bot.examples.predefinedPathFarming.FarmParcours import FarmParcours
 
 if TYPE_CHECKING:
     from com.ankamagames.dofus.logic.game.roleplay.frames.RoleplayInteractivesFrame import (
@@ -54,20 +56,20 @@ def GetNextMap(path, index):
 
 
 class BotFarmPathFrame(Frame):
-    def __init__(self, path: list[Tuple[int, int]], skillsToUse: list):
+    def __init__(self, parcours: FarmParcours):
         super().__init__()
         self._currentRequestedElementId = -1
         self._usingInteractive = False
         self._dstMapId = -1
         self._mapIdDiscard = []
         self._entities = dict()
-        self.path = path
+        self.parcours = parcours
         self.pathIndex = None
-        self.skillIds = skillsToUse
 
     @property
     def currMapCoords(self):
-        return MapPosition.getMapPositionById(MapDisplayManager().dataMap.id)
+        mp = MapPosition.getMapPositionById(MapDisplayManager().dataMap.id)
+        return mp.posX, mp.posY
 
     @property
     def priority(self) -> int:
@@ -80,6 +82,14 @@ class BotFarmPathFrame(Frame):
     @property
     def roleplayInteractivesFrame(self) -> "RoleplayInteractivesFrame":
         return Kernel().getWorker().getFrame("RoleplayInteractivesFrame")
+
+    @property
+    def currPathStep(self):
+        if self.currMapCoords in self.parcours.path:
+            return (self.parcours.path.index(self.currMapCoords) + 1) % len(
+                self.parcours.path
+            )
+        return None
 
     def pushed(self) -> bool:
         self._worker = Kernel().getWorker()
@@ -123,8 +133,6 @@ class BotFarmPathFrame(Frame):
                 logger.debug(
                     f"[BotFarmFrame] Interactive element {msg.elemId} use ended"
                 )
-                for iw in InventoryManager().realInventory:
-                    logger.debug(f"{iw.name}: {iw.quantity}")
                 logger.debug(
                     "***********************************************************************"
                 )
@@ -137,11 +145,11 @@ class BotFarmPathFrame(Frame):
             logger.debug(
                 "-----------------------------------------------------------------------------"
             )
-            self._dstMapId = -1
-            self._mapIdDiscard.clear()
-            mp = MapPosition.getMapPositionById(msg.mapId)
-            self.pathIndex = (self.path.index((mp.posX, mp.posY)) + 1) % len(self.path)
-            self.doFarm()
+            if not Kernel().getWorker().contains("AutoTripFrame"):
+                self._dstMapId = -1
+                self._mapIdDiscard.clear()
+                self.getCurrStep(msg.mapId)
+                self.doFarm()
             return True
 
         elif isinstance(msg, MapChangeFailedMessage):
@@ -149,7 +157,7 @@ class BotFarmPathFrame(Frame):
                 f"[BotFarmFrame] Map change to {self._dstMapId} failed will discard that destination"
             )
             self._mapIdDiscard.append(msg.mapId)
-            x, y = self.path[self.pathIndex]
+            x, y = self.parcours.path[self.pathIndex]
             MoveAPI.changeMapToDstCoords(x, y)
             return True
 
@@ -165,15 +173,23 @@ class BotFarmPathFrame(Frame):
                 self.doFarm()
             return True
 
+    def getCurrStep(self, mapId):
+        if self.currMapCoords in self.parcours.path:
+            self.pathIndex = (self.parcours.path.index(self.currMapCoords) + 1) % len(
+                self.parcours.path
+            )
+        else:
+            if not Kernel().getWorker().contains("AutoTripFrame"):
+                Kernel().getWorker().addFrame(AutoTripFrame(self.parcours.startMapId))
+
     def doFarm(self):
         self._currentRequestedElementId = FarmAPI().collectResource(
-            skills=self.skillIds
+            skills=self.parcours.skillIds
         )
         if self._currentRequestedElementId == -1 and self._dstMapId == -1:
-            x, y = self.path[self.pathIndex]
-            currMp = self.currMapCoords
+            x, y = self.parcours.path[self.pathIndex]
             logger.debug(
-                f"[BotFarmFrame] Current Map {currMp.posX, currMp.posY} Moving to {x, y}"
+                f"[BotFarmFrame] Current Map {self.currMapCoords} Moving to {x, y}"
             )
             dstMapId = MoveAPI.changeMapToDstCoords(x, y)
             if dstMapId == -1:

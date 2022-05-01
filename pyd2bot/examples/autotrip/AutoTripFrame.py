@@ -14,11 +14,15 @@ from com.ankamagames.dofus.network.messages.game.context.roleplay.MapComplementa
 from com.ankamagames.jerakine.logger.Logger import Logger
 from com.ankamagames.jerakine.types.enums.DirectionsEnum import DirectionsEnum
 from com.ankamagames.jerakine.types.enums.Priority import Priority
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from pyd2bot.examples.predefinedPathFarming.BotFarmPathFrame import BotFarmPathFrame
 
 logger = Logger(__name__)
 
 
-class WalkMeToDestinationMapFrame(Frame):
+class AutoTripFrame(Frame):
     dstMapId = None
     nextStepIndex = None
     path = None
@@ -44,17 +48,7 @@ class WalkMeToDestinationMapFrame(Frame):
     def process(self, msg: Message) -> bool:
 
         if isinstance(msg, MapComplementaryInformationsDataMessage):
-            logger.debug("Next step index: %s", self.nextStepIndex)
-            if self.nextStepIndex is not None:
-                if self.nextStepIndex == len(self.path):
-                    logger.info("Arrived at destination")
-                    return True
-                e = self.path[self.nextStepIndex]
-                self.nextStepIndex += 1
-                direction = DirectionsEnum(e.transitions[0].direction)
-                MoveAPI.changeMapToDstDirection(direction)
-            else:
-                WorldPathFinder().findPath(self.dstMapId, self.onComputeOver)
+            self.walkToNextStep()
 
         if isinstance(msg, MapChangeFailedMessage):
             if self.changeMapFails > 5:
@@ -62,6 +56,25 @@ class WalkMeToDestinationMapFrame(Frame):
                 return True
             self.changeMapFails += 1
             Kernel().getWorker().getFrame("RoleplayMovementFrame").askMapChange()
+
+    def walkToNextStep(self):
+        logger.debug("Next step index: %s", self.nextStepIndex)
+        if self.nextStepIndex is not None:
+            if self.nextStepIndex == len(self.path):
+                logger.info("Arrived at destination")
+                Kernel().getWorker().removeFrame(self)
+                if Kernel().getWorker().contains("BotFarmPathFrame"):
+                    bfpf: "BotFarmPathFrame" = (
+                        Kernel().getWorker().contains("BotFarmPathFrame")
+                    )
+                    bfpf.doFarm()
+                return True
+            e = self.path[self.nextStepIndex]
+            self.nextStepIndex += 1
+            direction = DirectionsEnum(e.transitions[0].direction)
+            MoveAPI.changeMapToDstDirection(direction)
+        else:
+            WorldPathFinder().findPath(self.dstMapId, self.onComputeOver)
 
     def onComputeOver(self, *args):
         path = None

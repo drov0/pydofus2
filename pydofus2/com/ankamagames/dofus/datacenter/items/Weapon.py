@@ -31,12 +31,14 @@ class Weapon(Item, IDataCenter):
     def __init__(self):
         super().__init__()
 
-    def getWeaponById(self, weaponId: int) -> "Weapon":
+    @classmethod
+    def getWeaponById(cls, weaponId: int) -> "Weapon":
         item: Item = Item.getItemById(weaponId)
         if item and item.isWeapon:
-            return Weapon(item)
+            return item
         return None
 
+    @classmethod
     def getWeapons(self) -> list:
         item: Item = None
         items: list = Item.getItems()
@@ -51,10 +53,10 @@ class Weapon(Item, IDataCenter):
     @property
     def isWeapon(self) -> bool:
         return True
-
+    
     def copy(self, src: Item, to: Item) -> None:
         super().copy(src, to)
-        if to.hasOwnProperty("apCost") and src.hasOwnProperty("apCost"):
+        if hasattr(to, "apCost") and hasattr(src, "apCost"):
             to.apCost = src.apCost
             to.minRange = src.minRange
             to.range = src.range
@@ -66,6 +68,4 @@ class Weapon(Item, IDataCenter):
             to.criticalHitBonus = src.criticalHitBonus
             to.criticalFailureProbability = src.criticalFailureProbability
         else:
-            logger.error(
-                "Failed to properly copy weapon data " + src.id + " to " + to.id
-            )
+            logger.error(f"Failed to properly copy weapon data {src.id} to {to.id}")

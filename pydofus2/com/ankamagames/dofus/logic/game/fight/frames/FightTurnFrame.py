@@ -27,12 +27,15 @@ from com.ankamagames.dofus.logic.game.fight.actions.GameFightSpellCastAction imp
 from com.ankamagames.dofus.logic.game.fight.actions.GameFightTurnFinishAction import (
     GameFightTurnFinishAction,
 )
-from com.ankamagames.dofus.logic.game.fight.frames.FightContextFrame import (
-    FightContextFrame,
-)
-from com.ankamagames.dofus.logic.game.fight.frames.FightSpellCastFrame import (
-    FightSpellCastFrame,
-)
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from com.ankamagames.dofus.logic.game.fight.frames.FightContextFrame import (
+        FightContextFrame,
+    )
+    from com.ankamagames.dofus.logic.game.fight.frames.FightSpellCastFrame import (
+        FightSpellCastFrame,
+    )
 from com.ankamagames.dofus.logic.game.fight.managers.CurrentPlayedFighterManager import (
     CurrentPlayedFighterManager,
 )
@@ -97,8 +100,6 @@ logger = Logger(__name__)
 
 
 class FightTurnFrame(Frame):
-
-    SWF_LIB: str = XmlConfig().getEntry("config.ui.skin").extend("assets_tacticmod.swf")
 
     TAKLED_CURSOR_NAME: str = "TackledCursor"
 
@@ -254,13 +255,15 @@ class FightTurnFrame(Frame):
                 or playerInformation
                 and playerInformation.spawnInfo.alive
             ):
-                self._spellCastFrame = FightSpellCastFrame(gfsca.spellId)
+                import com.ankamagames.dofus.logic.game.fight.frames.FightSpellCastFrame as fscf
+
+                self._spellCastFrame = fscf.FightSpellCastFrame(gfsca.spellId)
                 Kernel().getWorker().addFrame(self._spellCastFrame)
             return True
 
         elif isinstance(msg, CellClickMessage):
             ccmsg = msg
-            if not Kernel().getWorker().contains(FightSpellCastFrame):
+            if not Kernel().getWorker().contains("FightSpellCastFrame"):
                 if DataMapProvider().pointMov(
                     MapPoint.fromCellId(ccmsg.cellId).x,
                     MapPoint.fromCellId(ccmsg.cellId).y,
@@ -299,7 +302,9 @@ class FightTurnFrame(Frame):
                 return True
             if emcmsg.entity.id == self._currentFighterId:
                 self._isRequestingMovement = False
-                spellCastFrame = Kernel().getWorker().getFrame(FightSpellCastFrame)
+                spellCastFrame: "FightSpellCastFrame" = (
+                    Kernel().getWorker().getFrame("FightSpellCastFrame")
+                )
                 if not spellCastFrame:
                     self.drawPath()
                 self.startRemindTurn()
@@ -392,14 +397,15 @@ class FightTurnFrame(Frame):
         return reachableCells
 
     def drawPath(self, destCell: MapPoint = None) -> None:
-        if Kernel().getWorker().contains(FightSpellCastFrame):
+        if Kernel().getWorker().contains("FightSpellCastFrame"):
             return
+        fcf: "FightContextFrame" = Kernel().getWorker().getFrame("FightContextFrame")
         if self._isRequestingMovement:
             return
         if not destCell:
-            if FightContextFrame.currentCell == -1:
+            if fcf.currentCell == -1:
                 return
-            destCell = MapPoint.fromCellId(FightContextFrame.currentCell)
+            destCell = MapPoint.fromCellId(fcf.currentCell)
         if not self._playerEntity:
             self.removePath()
             return

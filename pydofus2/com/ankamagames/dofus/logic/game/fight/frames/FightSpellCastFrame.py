@@ -618,7 +618,7 @@ class FightSpellCastFrame(Frame):
         if not self._clearTargetTimer.running:
             self._clearTargetTimer.start()
 
-    def onClearTarget(self, event: TimerEvent) -> None:
+    def onClearTarget(self, event) -> None:
         self.refreshTarget()
 
     def getTargetThroughPortal(self, target: int, drawLinks: bool = False) -> int:

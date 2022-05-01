@@ -1,6 +1,5 @@
 import re
 from typing import Any
-from com.ankamagames.dofus.datacenter.spells.SpellLevel import SpellLevel
 from com.ankamagames.dofus.datacenter.spells.SpellType import SpellType
 from com.ankamagames.dofus.datacenter.spells.SpellVariant import SpellVariant
 from com.ankamagames.dofus.types.IdAccessors import IdAccessors
@@ -8,7 +7,10 @@ from com.ankamagames.jerakine.data.GameData import GameData
 from com.ankamagames.jerakine.data.I18n import I18n
 from com.ankamagames.jerakine.interfaces.IDataCenter import IDataCenter
 from com.ankamagames.jerakine.logger.Logger import Logger
+from typing import TYPE_CHECKING
 
+if TYPE_CHECKING:
+    from com.ankamagames.dofus.datacenter.spells.SpellLevel import SpellLevel
 logger = Logger(__name__)
 
 
@@ -58,7 +60,7 @@ class Spell(IDataCenter):
 
     _description: str = ""
 
-    _spellLevels: list[SpellLevel] = []
+    _spellLevels: list["SpellLevel"] = []
 
     _spellVariant: SpellVariant = None
 

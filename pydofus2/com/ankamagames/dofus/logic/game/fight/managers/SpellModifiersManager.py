@@ -191,6 +191,3 @@ class SpellModifiersManager(metaclass=Singleton):
             + " deleted"
         )
         return True
-
-    def destroy(self) -> None:
-        _singleton = None

@@ -52,7 +52,7 @@ class SpellWrapper(ISlotData, ICellZoneProvider, IDataCenter):
 
     _cache: list = []
 
-    _playersCache: dict = dict([int, "SpellWrapper"])
+    _playersCache: dict = dict[int, "SpellWrapper"]()
 
     _cac: "SpellWrapper"
 

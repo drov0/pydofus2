@@ -5,12 +5,12 @@ from com.ankamagames.dofus.datacenter.optionalFeatures.CustomModeBreedSpell impo
 )
 from com.ankamagames.dofus.datacenter.spells.FinishMove import FinishMove
 from com.ankamagames.dofus.datacenter.spells.Spell import Spell
-from com.ankamagames.dofus.datacenter.spells.SpellLevel import SpellLevel
 from com.ankamagames.dofus.datacenter.spells.SpellVariant import SpellVariant
 from com.ankamagames.dofus.internalDatacenter.spells.SpellWrapper import SpellWrapper
 from com.ankamagames.dofus.kernel.Kernel import Kernel
 from com.ankamagames.dofus.kernel.net.ConnectionsHandler import ConnectionsHandler
-from com.ankamagames.dofus.logic.common.managers.FeatureManager import FeatureManager
+
+# from com.ankamagames.dofus.logic.common.managers.FeatureManager import FeatureManager
 from com.ankamagames.dofus.logic.common.managers.StatsManager import StatsManager
 from com.ankamagames.dofus.logic.game.common.managers.InventoryManager import (
     InventoryManager,
@@ -18,17 +18,11 @@ from com.ankamagames.dofus.logic.game.common.managers.InventoryManager import (
 from com.ankamagames.dofus.logic.game.common.managers.PlayedCharacterManager import (
     PlayedCharacterManager,
 )
-from com.ankamagames.dofus.logic.game.fight.frames.FightSpellCastFrame import (
-    FightSpellCastFrame,
-)
 from com.ankamagames.dofus.logic.game.fight.managers.CurrentPlayedFighterManager import (
     CurrentPlayedFighterManager,
 )
 from com.ankamagames.dofus.logic.game.fight.managers.SpellModifiersManager import (
     SpellModifiersManager,
-)
-from com.ankamagames.dofus.logic.game.fight.types.SpellCastInFightManager import (
-    SpellCastInFightManager,
 )
 from com.ankamagames.dofus.logic.game.fight.types.castSpellManager.SpellManager import (
     SpellManager,
@@ -66,11 +60,7 @@ from com.ankamagames.dofus.network.messages.game.inventory.spells.SpellListMessa
 from com.ankamagames.dofus.network.types.game.context.fight.GameFightSpellCooldown import (
     GameFightSpellCooldown,
 )
-from com.ankamagames.dofus.network.types.game.data.items.SpellItem import SpellItem
-from com.ankamagames.dofus.network.types.game.finishmoves.FinishMoveInformations import (
-    FinishMoveInformations,
-)
-from com.ankamagames.dofus.uiApi.FightApi import FightApi
+
 from com.ankamagames.dofus.uiApi.PlayedCharacterApi import PlayedCharacterApi
 from com.ankamagames.jerakine.logger.Logger import Logger
 from com.ankamagames.jerakine.messages.Frame import Frame
@@ -122,9 +112,6 @@ class SpellInventoryManagementFrame(Frame, metaclass=Singleton):
     def process(self, msg: Message) -> bool:
         if isinstance(msg, SpellListMessage):
             slmsg = msg
-            alternativeBreedSpells = FeatureManager().isFeatureWithKeywordEnabled(
-                "character.spell.breed.alternative"
-            )
             playerId = PlayedCharacterManager().id
             self._fullSpellList[playerId] = list()
             idsList = list()
@@ -228,7 +215,6 @@ class SpellInventoryManagementFrame(Frame, metaclass=Singleton):
 
         elif isinstance(msg, SlaveSwitchContextMessage):
             sscmsg = msg
-            FightApi.slaveContext = True
             slaveId = sscmsg.slaveId
             spellCastManager = CurrentPlayedFighterManager().getSpellCastManagerById(
                 slaveId
@@ -430,10 +416,10 @@ class SpellInventoryManagementFrame(Frame, metaclass=Singleton):
             del self._spellsGlobalCooldowns[id]
 
     def getBreedSpellsInVariantslist(self) -> list:
-        if FeatureManager().isFeatureWithKeywordEnabled(
-            "character.spell.breed.alternative"
-        ):
-            return self.generateCurrentCustomModeBreedSpells()
+        # if FeatureManager().isFeatureWithKeywordEnabled(
+        #     "character.spell.breed.alternative"
+        # ):
+        #     return self.generateCurrentCustomModeBreedSpells()
         playerBreedId: int = PlayedCharacterManager().infos.breed
         breedData: Breed = Breed.getBreedById(playerBreedId)
         breedSpellsId: list = breedData.allSpellsId
@@ -466,9 +452,10 @@ class SpellInventoryManagementFrame(Frame, metaclass=Singleton):
 
     def getCommonSpellsInVariantslist(self) -> list:
         playerBreedId: int = PlayedCharacterManager().infos.breed
-        _isForgettableSpellsUi: bool = FeatureManager().isFeatureWithKeywordEnabled(
-            "character.spell.forgettable"
-        )
+        _isForgettableSpellsUi: bool = False
+        # FeatureManager().isFeatureWithKeywordEnabled(
+        #     "character.spell.forgettable"
+        # )
         if _isForgettableSpellsUi:
             breedSpellsId = CustomModeBreedSpell.getCustomModeBreedSpellIds(
                 playerBreedId

@@ -1,7 +1,5 @@
 from typing import TYPE_CHECKING
-from com.ankamagames.dofus.logic.game.common.managers.InventoryManager import (
-    InventoryManager,
-)
+
 
 if TYPE_CHECKING:
     from com.ankamagames.dofus.internalDatacenter.items.ItemWrapper import ItemWrapper
@@ -252,8 +250,13 @@ class PlayedCharacterManager(IDestroyable, metaclass=Singleton):
 
     @property
     def isMutated(self) -> bool:
+        from com.ankamagames.dofus.logic.game.common.managers.InventoryManager import (
+            InventoryManager,
+        )
+
         l: int = 0
         i: int = 0
+
         rpBuffs = InventoryManager().inventory.getView("roleplayBuff").content
         if rpBuffs:
             l = len(rpBuffs)

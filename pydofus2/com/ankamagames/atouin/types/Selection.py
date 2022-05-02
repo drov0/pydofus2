@@ -1,18 +1,20 @@
-from tokenize import Floatnumber
 from com.ankamagames.atouin.managers.MapDisplayManager import MapDisplayManager
 from com.ankamagames.jerakine.logger.Logger import Logger
+from com.ankamagames.jerakine.types.zones.IZone import IZone
 
 logger = Logger(__name__)
 
 
 class Selection:
-    _mapId: Floatnumber
+    _mapId: float = None
 
     cells: list[int]
 
     cellId: int
 
     visible: bool
+
+    zone: IZone = None
 
     def __init__(self):
         super().__init__()
@@ -31,11 +33,7 @@ class Selection:
         self.visible = True
 
     def remove(self, aCells: list[int] = None) -> None:
-        if self.renderer:
-            if not aCells or aCells == self.cells:
-                self.visible = False
-            else:
-                pass
+        pass
 
     def isInside(self, cellId: int) -> bool:
         return cellId in self.cells

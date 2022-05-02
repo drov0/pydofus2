@@ -31,15 +31,15 @@ class SpellModifiersManager(metaclass=Singleton):
         self._isVerbose = self.DEFAULT_IS_VERBOSE
         super().__init__()
         logger.info("Instantiating spells manager")
-        if _dataStoreType is None:
-            _dataStoreType = DataStoreType(
+        if self._dataStoreType is None:
+            self._dataStoreType = DataStoreType(
                 self.DATA_STORE_CATEGORY,
                 True,
                 DataStoreEnum.LOCATION_LOCAL,
                 DataStoreEnum.BIND_COMPUTER,
             )
         rawIsVerbose = StoreDataManager().getData(
-            _dataStoreType, self.DATA_STORE_KEY_IS_VERBOSE
+            self._dataStoreType, self.DATA_STORE_KEY_IS_VERBOSE
         )
         self._isVerbose = (
             rawIsVerbose if isinstance(rawIsVerbose, bool) else self.DEFAULT_IS_VERBOSE
@@ -128,7 +128,7 @@ class SpellModifiersManager(metaclass=Singleton):
         if rawSpellModifier == None:
             return
         entityKey: str = str(entityId)
-        spellsModifierStats: dict = self._entitiesMap[entityKey]
+        spellsModifierStats: dict = self._entitiesMap.get(entityKey)
         if spellsModifierStats == None:
             spellsModifierStats = self._entitiesMap[entityKey] = dict()
         spellKey: str = str(rawSpellModifier.spellId)
@@ -191,6 +191,3 @@ class SpellModifiersManager(metaclass=Singleton):
             + " deleted"
         )
         return True
-
-    def destroy(self) -> None:
-        _singleton = None

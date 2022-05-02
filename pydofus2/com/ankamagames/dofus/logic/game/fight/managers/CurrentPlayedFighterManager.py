@@ -97,8 +97,8 @@ class CurrentPlayedFighterManager(metaclass=Singleton):
             logger.info("Remise à jour de la liste des sorts du joueur")
             playerManager.spellsInventory = playerManager.playerSpellList
             # FIXME: Uncomment this when spell cast frame is implemented
-            # if knl.Kernel.getWorker().contains(FightSpellCastFrame):
-            #    knl.Kernel.getWorker().removeFrame(knl.Kernel.getWorker().getFrame("FightSpellCastFrame)")
+            # if knl.Kernel().getWorker().contains(FightSpellCastFrame):
+            #    knl.Kernel().getWorker().removeFrame(knl.Kernel().getWorker().getFrame("FightSpellCastFrame)")
 
     def setCharacteristicsInformations(
         self, id: float, characteristics: CharacterCharacteristicsInformations
@@ -151,16 +151,16 @@ class CurrentPlayedFighterManager(metaclass=Singleton):
         return None
 
     def getSpellCastManager(self) -> scifm.SpellCastInFightManager:
-        scm: scifm.SpellCastInFightManager = self._spellCastInFightManagerList[
+        scm: scifm.SpellCastInFightManager = self._spellCastInFightManagerList.get(
             self._currentFighterId
-        ]
+        )
         if not scm:
             scm = scifm.SpellCastInFightManager(self._currentFighterId)
             self._spellCastInFightManagerList[self._currentFighterId] = scm
         return scm
 
     def getSpellCastManagerById(self, id: float) -> scifm.SpellCastInFightManager:
-        scm: scifm.SpellCastInFightManager = self._spellCastInFightManagerList[id]
+        scm: scifm.SpellCastInFightManager = self._spellCastInFightManagerList.get(id)
         if not scm:
             scm = scifm.SpellCastInFightManager(id)
             self._spellCastInFightManagerList[id] = scm

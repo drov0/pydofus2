@@ -2,6 +2,9 @@ from com.ankamagames.dofus.datacenter.spells.Spell import Spell
 from com.ankamagames.dofus.datacenter.spells.SpellLevel import SpellLevel
 import com.ankamagames.dofus.internalDatacenter.spells.SpellWrapper as spellw
 from typing import TYPE_CHECKING
+from com.ankamagames.dofus.logic.game.fight.managers.SpellModifiersManager import (
+    SpellModifiersManager,
+)
 
 if TYPE_CHECKING:
     from com.ankamagames.dofus.logic.game.fight.managers.SpellCastInFightManager import (
@@ -17,27 +20,27 @@ class SpellManager:
 
     logger = Logger(__name__)
 
-    _spellId: int
+    _spellId: int = 0
 
-    _spellLevel: int
+    _spellLevel: int = 0
 
-    _lastCastTurn: int
+    _lastCastTurn: int = 0
 
-    _spellHasBeenCast: bool
+    _spellHasBeenCast: bool = False
 
-    _forcedCooldown: bool
+    _forcedCooldown: bool = False
 
-    _lastInitialCooldownReset: int
+    _lastInitialCooldownReset: int = 0
 
-    _castThisTurn: int
+    _castThisTurn: int = 0
 
-    _targetsThisTurn: dict
+    _targetsThisTurn: dict = None
 
-    _spellCastManager: "SpellCastInFightManager"
+    _spellCastManager: "SpellCastInFightManager" = None
 
-    _castIntervalModificator: int
+    _castIntervalModificator: int = 0
 
-    _castIntervalSetModificator: int
+    _castIntervalSetModificator: int = 0
 
     def __init__(
         self,

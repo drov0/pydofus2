@@ -1,3 +1,4 @@
+import sys
 from whistle import EventDispatcher
 from com.ankamagames.jerakine.events.SequencerEvent import SequencerEvent
 from com.ankamagames.jerakine.logger.Logger import Logger
@@ -16,40 +17,41 @@ from com.ankamagames.jerakine.sequencer.AbstractSequencable import AbstractSeque
 logger = Logger(__name__)
 
 
-class SerialSequencer(EventDispatcher, ISequencer):
+class SerialSequencer(ISequencer, EventDispatcher):
 
     DEFAULT_SEQUENCER_NAME: str = "SerialSequencerDefault"
 
-    SEQUENCERS: list = []
+    SEQUENCERS: dict = dict()
 
-    _aStep: list
+    _aStep: list[ISequencable]
 
-    _currentStep: ISequencable
+    _currentStep: ISequencable = None
 
-    _lastStep: ISequencable
+    _lastStep: ISequencable = None
 
     _running: bool = False
 
-    _type: str
+    _type: str = None
 
-    _activeSubSequenceCount: int
+    _activeSubSequenceCount: int = None
 
-    _paused: bool
+    _paused: bool = None
 
     _defaultStepTimeout: int = -2147483648
 
     def __init__(self, type: str = "SerialSequencerDefault"):
         self._aStep = list()
         super().__init__()
-        if not self.SEQUENCERS[type]:
-            self.SEQUENCERS[type] = dict(True)
+        if not self.SEQUENCERS.get(type):
+            self.SEQUENCERS[type] = dict()
         self.SEQUENCERS[type][self] = True
 
-    def clearByType(self, type: str) -> None:
+    @classmethod
+    def clearByType(cls, type: str) -> None:
         seq = None
-        for seq in self.SEQUENCERS[type]:
+        for seq in cls.SEQUENCERS[type]:
             SerialSequencer(seq).clear()
-        del self.SEQUENCERS[type]
+        del cls.SEQUENCERS[type]
 
     @property
     def currentStep(self) -> ISequencable:
@@ -152,11 +154,11 @@ class SerialSequencer(EventDispatcher, ISequencer):
         try:
             if isinstance(self._currentStep, ISubSequenceSequencable):
                 self._activeSubSequenceCount += 1
-                self._currentStep.add_listener(
+                self._currentStep.addListener(
                     SequencerEvent.SEQUENCE_END, self.onSubSequenceEnd
                 )
             if (
-                self._defaultStepTimeout != int.MIN_VALUE
+                self._defaultStepTimeout != -sys.maxsize + 1
                 and self._currentStep.hasDefaultTimeout
             ):
                 self._currentStep.timeout = self._defaultStepTimeout
@@ -203,7 +205,7 @@ class SerialSequencer(EventDispatcher, ISequencer):
                 )
             worker = EnterFrameDispatcher().worker
             worker.addSingleTreatmentAtPos(
-                self, self.start, [], worker.findTreatments(None, self.start, []).length
+                self, self.start, [], len(worker.findTreatments(None, self.start, []))
             )
 
     def onSubSequenceEnd(self, e: SequencerEvent) -> None:

@@ -1,20 +1,27 @@
 from operator import methodcaller
+import sys
 from com.ankamagames.dofus.datacenter.effects.instances.EffectInstanceDice import (
     EffectInstanceDice,
 )
 from com.ankamagames.dofus.datacenter.spells.Spell import Spell
 from com.ankamagames.dofus.datacenter.spells.SpellLevel import SpellLevel
+from com.ankamagames.dofus.enums.ActionIds import ActionIds
 from com.ankamagames.dofus.internalDatacenter.spells.SpellWrapper import SpellWrapper
 from com.ankamagames.dofus.kernel.Kernel import Kernel
 import com.ankamagames.dofus.logic.game.fight.fightEvents.FightEventsHelper as fightEventsHelper
-import com.ankamagames.dofus.logic.game.fight.frames.FightBattleFrame as fightBattleFrame
 import com.ankamagames.dofus.logic.game.fight.frames.FightEntitiesFrame as fightEntitiesFrame
 from com.ankamagames.dofus.logic.game.fight.managers.CurrentPlayedFighterManager import (
     CurrentPlayedFighterManager,
 )
+from com.ankamagames.dofus.logic.game.fight.miscs.ActionIdProtocol import (
+    ActionIdProtocol,
+)
 import com.ankamagames.dofus.logic.game.fight.types.BasicBuff as basicBuff
-from com.ankamagames.dofus.logic.game.fight.types.CastingSpell import CastingSpell
+from com.ankamagames.dofus.logic.game.fight.types.SpellBuff import SpellBuff
 from com.ankamagames.dofus.logic.game.fight.types.StatBuff import StatBuff
+from com.ankamagames.dofus.logic.game.fight.types.StateBuff import StateBuff
+from com.ankamagames.dofus.logic.game.fight.types.TriggeredBuff import TriggeredBuff
+from com.ankamagames.dofus.logic.game.misc.StatBuffFactory import StatBuffFactory
 from com.ankamagames.dofus.misc.utils.GameDebugManager import GameDebugManager
 from com.ankamagames.dofus.network.types.game.actions.fight.AbstractFightDispellableEffect import (
     AbstractFightDispellableEffect,
@@ -42,7 +49,13 @@ from com.ankamagames.dofus.network.types.game.context.fight.GameFightFighterInfo
 )
 from com.ankamagames.jerakine.logger.Logger import Logger
 from com.ankamagames.jerakine.metaclasses.Singleton import Singleton
+from typing import TYPE_CHECKING
 
+if TYPE_CHECKING:
+    from com.ankamagames.dofus.logic.game.fight.types.CastingSpell import CastingSpell
+    from com.ankamagames.dofus.logic.game.fight.frames.FightBattleFrame import (
+        FightBattleFrame,
+    )
 logger = Logger(__name__)
 
 
@@ -52,37 +65,40 @@ class BuffManager(metaclass=Singleton):
 
     INCREMENT_MODE_TARGET: int = 2
 
-    _buffs: dict
+    _buffs: dict[int, list[basicBuff.BasicBuff]]
 
-    spellBuffsToIgnore: list[CastingSpell]
+    spellBuffsToIgnore: list["CastingSpell"]
 
     def __init__(self):
         self._buffs = dict()
-        self.spellBuffsToIgnore = list[CastingSpell]()
+        self.spellBuffsToIgnore = list["CastingSpell"]()
         super().__init__()
 
+    @classmethod
     def makeBuffFromEffect(
-        self,
+        cls,
         effect: AbstractFightDispellableEffect,
-        castingSpell: CastingSpell,
+        castingSpell: "CastingSpell",
         actionId: int,
     ) -> basicBuff.BasicBuff:
         criticalEffect: bool = False
         if GameDebugManager().buffsDebugActivated:
-            logger.debug("[BUFFS DEBUG] Creation du buff " + effect.uid)
+            logger.debug("[BUFFS DEBUG] Creation du buff " + str(effect.uid))
 
         if isinstance(effect, FightTemporarySpellBoostEffect):
-            buff = SpellBuffeffect
+            buff = SpellBuff(effect, castingSpell, actionId)
             if GameDebugManager().buffsDebugActivated:
                 logger.debug(
-                    "[BUFFS DEBUG]      Buff " + effect.uid + " : type SpellBuff"
+                    "[BUFFS DEBUG]      Buff " + str(effect.uid) + " : type SpellBuff"
                 )
 
         if isinstance(effect, FightTriggeredEffect):
-            buff = TriggeredBuffeffect
+            buff = TriggeredBuff(effect, castingSpell, actionId)
             if GameDebugManager().buffsDebugActivated:
                 logger.debug(
-                    "[BUFFS DEBUG]      Buff " + effect.uid + " : type TriggeredBuff"
+                    "[BUFFS DEBUG]      Buff "
+                    + str(effect.uid)
+                    + " : type TriggeredBuff"
                 )
 
         if isinstance(effect, FightTemporaryBoostWeaponDamagesEffect):
@@ -103,10 +119,10 @@ class BuffManager(metaclass=Singleton):
                 )
 
         if isinstance(effect, FightTemporaryBoostStateEffect):
-            buff = StateBuffeffect
+            buff = StateBuff(effect, castingSpell, actionId)
             if GameDebugManager().buffsDebugActivated:
                 logger.debug(
-                    "[BUFFS DEBUG]      Buff " + effect.uid + " : type StateBuff"
+                    "[BUFFS DEBUG]      Buff " + str(effect.uid) + " : type StateBuff"
                 )
 
         if isinstance(effect, FightTemporarySpellImmunityEffect):
@@ -117,20 +133,21 @@ class BuffManager(metaclass=Singleton):
             if GameDebugManager().buffsDebugActivated:
                 logger.debug(
                     "[BUFFS DEBUG]      Buff "
-                    + effect.uid
+                    + str(effect.uid)
                     + " : type BasicBuff avec FightTemporarySpellImmunityEffect"
                 )
 
         if isinstance(effect, FightTemporaryBoostEffect):
-            buff = StatBuffFactory.createStatBuffeffect
+            buff = StatBuffFactory.createStatBuff(effect, castingSpell, actionId)
             if GameDebugManager().buffsDebugActivated:
                 logger.debug(
-                    "[BUFFS DEBUG]      Buff " + effect.uid + " : type StatBuff"
+                    "[BUFFS DEBUG]      Buff " + str(effect.uid) + " : type StatBuff"
                 )
 
         buff.id = effect.uid
         spellLevelsId: int = -1
         spell: Spell = Spell.getSpellById(effect.spellId)
+        level: SpellLevel = None
         for level in spell.spellLevelsInfo:
             for effectInstanceDice in level.effects:
                 if effectInstanceDice.effectUid == effect.effectId:
@@ -153,16 +170,7 @@ class BuffManager(metaclass=Singleton):
             buff.castingSpell.spellRank = spellLevel
         if GameDebugManager().buffsDebugActivated:
             logger.debug(
-                "[BUFFS DEBUG]      Buff "
-                + effect.uid
-                + " : sort lanceur "
-                + buff.castingSpell.spell.name
-                + " ("
-                + buff.castingSpell.spell.id
-                + ") niveau "
-                + buff.castingSpell.spellRank.grade
-                + " par "
-                + buff.castingSpell.casterId
+                f"[BUFFS DEBUG]      Buff {effect.uid} : spell casted '{buff.castingSpell.spell.name}' ({buff.castingSpell.spell.id}) level {buff.castingSpell.spellRank.grade} by {buff.castingSpell.casterId}"
             )
         return buff
 
@@ -186,8 +194,8 @@ class BuffManager(metaclass=Singleton):
     ) -> None:
         modified: bool = False
         skipBuffUpdate: bool = False
-        newBuffs: dict = dict()
-        for targetBuffs in self._buffs:
+        newBuffs: dict = dict[int, list]()
+        for targetBuffs in self._buffs.values():
             for buffItem in targetBuffs:
                 if (
                     dispellEffect
@@ -224,7 +232,7 @@ class BuffManager(metaclass=Singleton):
                             continue
                     modified = buffItem.incrementDuration(delta, dispellEffect)
                     if buffItem.active:
-                        if newBuffs[buffItem.targetId] == None:
+                        if newBuffs.get(buffItem.targetId) == None:
                             newBuffs[buffItem.targetId] = []
                         newBuffs[buffItem.targetId].append(buffItem)
                         if modified:
@@ -232,31 +240,31 @@ class BuffManager(metaclass=Singleton):
                     else:
                         buffItem.onRemoved()
                 else:
-                    if newBuffs[buffItem.targetId] == None:
+                    if newBuffs.get(buffItem.targetId) is None:
                         newBuffs[buffItem.targetId] = []
                     newBuffs[buffItem.targetId].append(buffItem)
         self._buffs = newBuffs
-        fightEventsHelper.FightEventsHelper.sendAllFightEvent(True)
+        fightEventsHelper.FightEventsHelper().sendAllFightEvent(True)
 
     def markFinishingBuffs(
         self, targetId: float, currentTurnIsEnding: bool = True
     ) -> None:
-        fightBattleFrame: fightBattleFrame.FightBattleFrame = (
+        fightBattleFrame: "FightBattleFrame" = (
             Kernel().getWorker().getFrame("FightBattleFrame")
         )
-        fightersCount = len(fightBattleFrame.fighters)
+        fightersCount = 0
         if fightBattleFrame is None:
             return
         currentFighterId: float = fightBattleFrame.currentPlayerId
         if GameDebugManager().buffsDebugActivated:
             logger.debug(
-                f"[BUFFS DEBUG] Recherche des buffs de {targetId}"
-                + " qui vont finir durant le tour  (combattant actuel "
+                f"[BUFFS DEBUG] Looking for buffs of {targetId}"
+                + " that will finish during the turn  (current fighter "
                 + str(currentFighterId)
                 + ")    currentTurnIsEnding "
                 + str(currentTurnIsEnding)
             )
-        if self._buffs[targetId] == None:
+        if targetId not in self._buffs:
             return
         for buffItem in self._buffs[targetId]:
             if buffItem.duration == 1:
@@ -287,12 +295,12 @@ class BuffManager(metaclass=Singleton):
                         currentFighterIndex = i
                 if GameDebugManager().buffsDebugActivated:
                     logger.debug(
-                        "[BUFFS DEBUG]             Index des combattants pour ce buff : lanceur "
-                        + casterIndex
-                        + ", cible "
-                        + targetIndex
-                        + "     combattant actuel "
-                        + currentFighterIndex
+                        "[BUFFS DEBUG]             Index of fighters for this buff : caster "
+                        + str(casterIndex)
+                        + ", target "
+                        + str(targetIndex)
+                        + ", current fighter "
+                        + str(currentFighterIndex)
                     )
                 if casterIndex == -1 or targetIndex == -1 or currentFighterIndex == -1:
                     logger.warn(
@@ -309,13 +317,13 @@ class BuffManager(metaclass=Singleton):
                     buffWillEndBeforeTargetTurn = True
                     if GameDebugManager().buffsDebugActivated:
                         logger.debug(
-                            "[BUFFS DEBUG]                 cible = target, le buff doit etre desactiv�"
+                            "[BUFFS DEBUG]                 cible = target, the buff must be disabled"
                         )
                 elif currentFighterIndex == targetIndex and currentTurnIsEnding:
                     buffWillEndBeforeTargetTurn = True
                     if GameDebugManager().buffsDebugActivated:
                         logger.debug(
-                            "[BUFFS DEBUG]                 fin du tour de la cible, le buff doit etre desactiv�"
+                            "[BUFFS DEBUG]                 end of the target turn, the buff must be disabled"
                         )
                 else:
                     if casterIndex > targetIndex:
@@ -323,12 +331,12 @@ class BuffManager(metaclass=Singleton):
                             currentFighterIndex -= fightersCount
                         casterIndex -= fightersCount
                     logger.debug(
-                        "[BUFFS DEBUG]           --->  Index des combattants pour ce buff : lanceur "
-                        + casterIndex
-                        + ", cible "
-                        + targetIndex
-                        + "     combattant actuel "
-                        + currentFighterIndex
+                        "[BUFFS DEBUG]           --->  Index of fighters for this buff : caster "
+                        + str(casterIndex)
+                        + ", target "
+                        + str(targetIndex)
+                        + ", current fighter "
+                        + str(currentFighterIndex)
                     )
                     if (
                         currentFighterIndex < casterIndex
@@ -343,29 +351,32 @@ class BuffManager(metaclass=Singleton):
                     if GameDebugManager().buffsDebugActivated:
                         logger.debug(
                             "[BUFFS DEBUG]                   Buff "
-                            + buffItem.uid
-                            + " doit �tre d�sactiv�, il ne doit plus �tre affich� dans les stats du combattant"
+                            + str(buffItem.uid)
+                            + " should be deactivated, should not be shown amongs the stats of the fighter"
                         )
-                    basicBuff.BasicBuff(buffItem).onDisabled()
+                    buffItem.onDisabled()
 
     def addBuff(self, buff: basicBuff.BasicBuff, applyBuff: bool = True) -> None:
-        if not self._buffs[buff.targetId]:
+        sameBuff = None
+        if not self._buffs.get(buff.targetId):
             self._buffs[buff.targetId] = []
         if GameDebugManager().buffsDebugActivated:
             logger.debug(
-                "[BUFFS DEBUG] Ajout du buff " + buff.uid + " sur " + buff.targetId
+                "[BUFFS DEBUG] Ajout du buff "
+                + str(buff.uid)
+                + " sur "
+                + str(buff.targetId)
             )
-        buffsCount: int = self._buffs[buff.targetId].length
+        buffsCount: int = len(self._buffs[buff.targetId])
         for i in range(buffsCount):
             actualBuff = self._buffs[buff.targetId][i]
             if buff.equals(actualBuff):
                 sameBuff = actualBuff
-            i += 1
         if not sameBuff or buff.actionId == ActionIds.ACTION_CHARACTER_BOOST_THRESHOLD:
             self._buffs[buff.targetId].append(buff)
         else:
             if (
-                sameBuff is TriggeredBuff
+                isinstance(sameBuff, TriggeredBuff)
                 and sameBuff.effect.triggers.find("|") != -1
                 or sameBuff.castingSpell.spellRank
                 and sameBuff.castingSpell.spellRank.maxStack > 0
@@ -386,9 +397,9 @@ class BuffManager(metaclass=Singleton):
         if GameDebugManager().buffsDebugActivated:
             logger.debug(
                 "[BUFFS DEBUG] Mise � jour du buff "
-                + buff.uid
+                + str(buff.uid)
                 + " sur "
-                + buff.targetId
+                + str(buff.targetId)
             )
         if not self._buffs[targetId]:
             return False
@@ -397,7 +408,7 @@ class BuffManager(metaclass=Singleton):
             return False
         self._buffs[targetId][i].onRemoved()
         self._buffs[targetId][i].updateParam(
-            buff.param1, buff.param2, buff.param3, buff.id
+            buff.diceNum, buff.diceSide, buff.value, buff.id
         )
         oldBuff = self._buffs[targetId][i]
         if not oldBuff:
@@ -419,16 +430,16 @@ class BuffManager(metaclass=Singleton):
             )
         newBuffs: list = []
         for buff in self._buffs[targetId]:
-            if buff.canBeDispell(forceUndispellable, int.MIN_VALUE, dying):
+            if buff.canBeDispell(forceUndispellable, -sys.maxsize + 1, dying):
                 if GameDebugManager().buffsDebugActivated:
                     logger.debug(
-                        "[BUFFS DEBUG]      Buff " + buff.uid + " doit �tre retir�"
+                        "[BUFFS DEBUG]      Buff " + str(buff.uid) + " doit �tre retir�"
                     )
                 pass
                 buff.onRemoved()
             else:
                 if GameDebugManager().buffsDebugActivated:
-                    logger.debug("[BUFFS DEBUG]      Buff " + buff.uid + " reste")
+                    logger.debug("[BUFFS DEBUG]      Buff " + str(buff.uid) + " reste")
                 newBuffs.append(buff)
         self._buffs[targetId] = newBuffs
 
@@ -443,25 +454,23 @@ class BuffManager(metaclass=Singleton):
         if GameDebugManager().buffsDebugActivated:
             logger.debug(
                 "[BUFFS DEBUG] Desenvoutement de tous les buffs du sort "
-                + spellId
+                + str(spellId)
                 + " de "
-                + targetId
+                + str(targetId)
             )
         newBuffs: list = []
         currentFighterId: float = CurrentPlayedFighterManager().currentFighterId
         for buff in self._buffs[targetId]:
             if spellId == buff.castingSpell.spell.id and buff.canBeDispell(
-                forceUndispellable, int.MIN_VALUE, dying
+                forceUndispellable, -sys.maxsize + 1, dying
             ):
                 if GameDebugManager().buffsDebugActivated:
-                    logger.debug(
-                        "[BUFFS DEBUG]      Buff " + buff.uid + " doit �tre retir�"
-                    )
+                    logger.debug(f"[BUFFS DEBUG]      Buff {buff.uid} doit �tre retir�")
                 buff.onRemoved()
                 pass
             else:
                 if GameDebugManager().buffsDebugActivated:
-                    logger.debug("[BUFFS DEBUG]      Buff " + buff.uid + " reste")
+                    logger.debug(f"[BUFFS DEBUG]      Buff {buff.uid} reste")
                 newBuffs.append(buff)
         self._buffs[targetId] = newBuffs
 
@@ -485,27 +494,27 @@ class BuffManager(metaclass=Singleton):
                 if GameDebugManager().buffsDebugActivated:
                     logger.debug(
                         "[BUFFS DEBUG] Desenvoutement du buff stack� "
-                        + boostUID
+                        + str(boostUID)
                         + " de "
-                        + targetId
+                        + str(targetId)
                     )
                 buff.onRemoved()
                 isState = False
                 if buff.actionId == ActionIds.ACTION_BOOST_SPELL_BASE_DMG:
-                    buff.param1 = buff.stack[0].param1
-                    buff.param2 -= buff.stack[0].param2
-                    buff.param3 -= buff.stack[0].param3
+                    buff.diceNum = buff.stack[0].diceNum
+                    buff.diceSide -= buff.stack[0].diceSide
+                    buff.value -= buff.stack[0].value
                 if buff.actionId == ActionIds.ACTION_CHARACTER_PUNISHMENT:
-                    buff.param1 -= buff.stack[0].param2
+                    buff.diceNum -= buff.stack[0].diceSide
                 if (
                     buff.actionId == ActionIds.ACTION_FIGHT_SET_STATE
                     or buff.actionId == ActionIds.ACTION_FIGHT_UNSET_STATE
                 ):
                     isState = True
                 else:
-                    buff.param1 -= buff.stack[0].param1
-                    buff.param2 -= buff.stack[0].param2
-                    buff.param3 -= buff.stack[0].param3
+                    buff.diceNum -= buff.stack[0].diceNum
+                    buff.diceSide -= buff.stack[0].diceSide
+                    buff.value -= buff.stack[0].value
                 buff.stack.pop(0)
                 buff.refreshDescription()
                 if not isState:
@@ -520,7 +529,7 @@ class BuffManager(metaclass=Singleton):
                         + " de "
                         + str(targetId)
                     )
-                self._buffs[targetId].splice(self._buffs[targetId].find(buff), 1)
+                self._buffs[targetId].remove(buff)
                 buff.onRemoved()
                 if targetId == CurrentPlayedFighterManager().currentFighterId:
                     SpellWrapper.refreshAllPlayerSpellHolder(targetId)
@@ -530,7 +539,7 @@ class BuffManager(metaclass=Singleton):
     ) -> list:
         impactedTarget: list = []
         entitiesFrame = Kernel().getWorker().getFrame("FightEntitiesFrame")
-        fightBattleFrame: fightBattleFrame.FightBattleFrame = (
+        fightBattleFrame: "FightBattleFrame" = (
             Kernel().getWorker().getFrame("FightBattleFrame")
         )
         infos: GameFightFighterInformations = entitiesFrame.getEntityInfos(sourceId)
@@ -581,7 +590,9 @@ class BuffManager(metaclass=Singleton):
                     + ", le nouveau 'lanceur' sera "
                     + next
                 )
-            frame = Kernel().getWorker().getFrame("FightBattleFrame")
+            frame: "FightBattleFrame" = (
+                Kernel().getWorker().getFrame("FightBattleFrame")
+            )
             dontDecrementBuffThisTurn = False
             if frame.currentPlayerId == sourceId:
                 dontDecrementBuffThisTurn = True
@@ -598,9 +609,7 @@ class BuffManager(metaclass=Singleton):
                         buff.sourceJustReaffected = dontDecrementBuffThisTurn
 
     def getNextFighter(self, sourceId: float) -> float:
-        frame: fightBattleFrame.FightBattleFrame = (
-            Kernel().getWorker().getFrame("FightBattleFrame")
-        )
+        frame: "FightBattleFrame" = Kernel().getWorker().getFrame("FightBattleFrame")
         if frame is None:
             return 0
         found: bool = False
@@ -616,8 +625,8 @@ class BuffManager(metaclass=Singleton):
     def getFighterInfo(self, targetId: float) -> GameFightFighterInformations:
         return self.fightEntitiesFrame.getEntityInfos(targetId)
 
-    def getAllBuff(self, targetId: float) -> list:
-        return self._buffs[targetId]
+    def getAllBuff(self, targetId: float) -> list[StatBuff]:
+        return self._buffs.get(targetId, [])
 
     def getLifeThreshold(self, targetId: float) -> int:
         targetBuffs: list = self._buffs[targetId]
@@ -635,15 +644,14 @@ class BuffManager(metaclass=Singleton):
         return lifeThreshold
 
     def resetTriggerCount(self, targetId: float) -> bool:
-        for buff in self._buffs[targetId]:
-
+        for buff in self._buffs.get(targetId, []):
             if isinstance(buff, TriggeredBuff):
-                TriggeredBuff(buff).triggerCount = 0
+                buff.triggerCount = 0
                 return True
         return False
 
     def getBuff(self, buffId: int, playerId: float) -> basicBuff.BasicBuff:
-        for buff in self._buffs[playerId]:
+        for buff in self._buffs.get(playerId, []):
             if buffId == buff.id:
                 return buff
         return None
@@ -653,10 +661,10 @@ class BuffManager(metaclass=Singleton):
         return Kernel().getWorker().getFrame("FightEntitiesFrame")
 
     def getBuffIndex(self, targetId: float, buffId: int) -> int:
-        for i in self._buffs[targetId]:
-            if buffId == self._buffs[targetId][i].id:
-                return int(i)
-            for subBuff in self._buffs[targetId][i].stack:
+        for i, sbuff in enumerate(self._buffs.get(targetId, [])):
+            if buffId == sbuff.id:
+                return i
+            for subBuff in sbuff.stack:
                 if buffId == subBuff.id:
-                    return int(i)
+                    return i
         return -1

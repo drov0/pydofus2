@@ -14,7 +14,7 @@ class UsableStat(DetailedStat):
         contextModifValue: float,
         usedValue: float,
     ):
-        super().self.__init__(
+        super().__init__(
             id,
             baseValue,
             additionalValue,

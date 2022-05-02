@@ -3,18 +3,18 @@ from com.ankamagames.jerakine.metaclasses.Singleton import Singleton
 
 class GameDebugManager(metaclass=Singleton):
 
-    buffsDebugActivated: bool
+    buffsDebugActivated: bool = True
 
-    haxeGenerateTestFromNextSpellCast: bool
+    haxeGenerateTestFromNextSpellCast: bool = True
 
-    haxeGenerateTestFromNextSpellCast_stats: bool
+    haxeGenerateTestFromNextSpellCast_stats: bool = True
 
-    haxeGenerateTestFromNextSpellCast_infos: bool
+    haxeGenerateTestFromNextSpellCast_infos: bool = True
 
-    detailedFightLog_unGroupEffects: bool
+    detailedFightLog_unGroupEffects: bool = True
 
-    detailedFightLog_showIds: bool
+    detailedFightLog_showIds: bool = True
 
-    detailedFightLog_showEverything: bool
+    detailedFightLog_showEverything: bool = True
 
-    detailedFightLog_showBuffsInUi: bool
+    detailedFightLog_showBuffsInUi: bool = True

@@ -1,7 +1,4 @@
-from enum import Enum
-
-
-class GameContextEnum(Enum):
+class GameContextEnum:
 
     ROLE_PLAY: int = 1
 

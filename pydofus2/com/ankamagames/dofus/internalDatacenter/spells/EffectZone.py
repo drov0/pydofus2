@@ -5,19 +5,19 @@ class EffectZone:
 
     _effect: EffectInstance = EffectInstance()
 
-    zoneSize: object
+    zoneSize: object = None
 
-    zoneShape: int
+    zoneShape: int = None
 
-    zoneMinSize: object
+    zoneMinSize: object = None
 
-    zoneEfficiencyPercent: object
+    zoneEfficiencyPercent: object = None
 
-    zoneMaxEfficiency: object
+    zoneMaxEfficiency: object = None
 
-    zoneStopAtTarget: object
+    zoneStopAtTarget: object = None
 
-    _targetMask: str
+    _targetMask: str = None
 
     def __init__(self, rawZone: str, targetMask: str):
         super().__init__()

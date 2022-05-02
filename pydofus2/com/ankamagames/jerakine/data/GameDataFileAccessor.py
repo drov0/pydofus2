@@ -48,6 +48,8 @@ class GameDataFileAccessor(metaclass=Singleton):
         return self._modules[moduleName].getObject(objectId)
 
     def getObjects(self, moduleName: str) -> list[object]:
+        if moduleName not in self._modules:
+            self.initFromModuleName(moduleName)
         return self._modules[moduleName].getObjects()
 
     def close(self) -> None:

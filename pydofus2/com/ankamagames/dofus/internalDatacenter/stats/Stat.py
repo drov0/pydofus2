@@ -1,3 +1,6 @@
+from com.ankamagames.dofus.datacenter.characteristics.Characteristic import (
+    Characteristic,
+)
 from com.ankamagames.jerakine.logger.Logger import Logger
 from damageCalculation.tools import StatIds
 
@@ -8,15 +11,20 @@ class Stat:
 
     UNKNOWN_STAT_NAME: str = "unknown"
     _entityId: float = None
-    _id: float
+    _id: float = StatIds.UNKNOWN
     _totalValue: float = 0
-    _name: str = None
+    _name: str = ""
 
     def __init__(self, id: float, totalValue: float):
-        self._id = StatIds.UNKNOWN
-        super()
         self._id = id
         self._totalValue = totalValue
+        self._name = self.getStatName()
+
+    def getStatName(self) -> str:
+        characteristic: Characteristic = Characteristic.getCharacteristicById(self._id)
+        if characteristic is not None:
+            return characteristic.keyword
+        return self.UNKNOWN_STAT_NAME
 
     @property
     def entityId(self) -> float:
@@ -46,13 +54,13 @@ class Stat:
 
     def getFormattedMessage(self, message: str) -> str:
         return (
-            self.__class__._name
+            "Stat"
             + " "
             + self._name
             + " (Entity ID: "
-            + self._entityId.__str__()
+            + str(self._entityId)
             + ", ID: "
-            + self._id.__str__()
+            + str(self._id)
             + "): "
             + message
         )

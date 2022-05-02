@@ -7,7 +7,10 @@ from com.ankamagames.jerakine.data.GameData import GameData
 from com.ankamagames.jerakine.data.I18n import I18n
 from com.ankamagames.jerakine.interfaces.IDataCenter import IDataCenter
 from com.ankamagames.jerakine.logger.Logger import Logger
+from typing import TYPE_CHECKING
 
+if TYPE_CHECKING:
+    from com.ankamagames.dofus.datacenter.spells.SpellLevel import SpellLevel
 logger = Logger(__name__)
 
 
@@ -43,23 +46,23 @@ class Spell(IDataCenter):
 
     useParamCache: bool = True
 
-    verbose_cast: bool
+    verbose_cast: bool = False
 
-    default_zone: str
+    default_zone: str = "0"
 
-    bypassSummoningLimit: bool
+    bypassSummoningLimit: bool = False
 
-    canAlwaysTriggerSpells: bool
+    canAlwaysTriggerSpells: bool = False
 
-    adminName: str
+    adminName: str = ""
 
-    _name: str
+    _name: str = ""
 
-    _description: str
+    _description: str = ""
 
-    _spellLevels: list
+    _spellLevels: list["SpellLevel"] = []
 
-    _spellVariant: SpellVariant
+    _spellVariant: SpellVariant = None
 
     def __init__(self):
         self._spellLevels = []
@@ -98,7 +101,7 @@ class Spell(IDataCenter):
         if not self._spellVariant:
             allSpellVariants = SpellVariant.getSpellVariants()
             for variant in allSpellVariants:
-                if variant.spellIds.find(self.id) != -1:
+                if self.id in variant.spellIds:
                     self._spellVariant = variant
                     return self._spellVariant
         return self._spellVariant
@@ -116,9 +119,9 @@ class Spell(IDataCenter):
 
         if not self._spellLevels or len(self._spellLevels) != len(self.spellLevels):
             levelCount = len(self.spellLevels)
+            self._spellLevels = [None] * levelCount
             for i in range(levelCount):
                 self._spellLevels[i] = SpellLevel.getLevelById(self.spellLevels[i])
-                i += 1
         return self._spellLevels
 
     def getScriptId(self, critical: bool = False) -> int:

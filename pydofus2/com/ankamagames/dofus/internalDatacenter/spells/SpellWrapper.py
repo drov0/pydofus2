@@ -50,11 +50,11 @@ logger = Logger(__name__)
 
 class SpellWrapper(ISlotData, ICellZoneProvider, IDataCenter):
 
-    _cache: list = []
+    _cache = {}
 
-    _playersCache: dict = dict()
+    _playersCache: dict = dict[int, dict]()
 
-    _cac: "SpellWrapper"
+    _cac: "SpellWrapper" = None
 
     BASE_DAMAGE_EFFECT_IDS: list = [
         100,
@@ -73,17 +73,16 @@ class SpellWrapper(ISlotData, ICellZoneProvider, IDataCenter):
         1016,
     ]
 
-    _uri: str
+    _uri: str = None
 
-    _slotDataHolderManager: SlotDataHolderManager
+    _slotDataHolderManager: SlotDataHolderManager = None
+    _canTargetCasterOutOfZone: object = None
 
-    _canTargetCasterOutOfZone: object
+    _variantActivated: bool = False
 
-    _variantActivated: bool
+    _spellLevel: SpellLevel = None
 
-    _spellLevel: SpellLevel
-
-    _spell: Spell
+    _spell: Spell = None
 
     id: int = 0
 
@@ -128,9 +127,11 @@ class SpellWrapper(ISlotData, ICellZoneProvider, IDataCenter):
         if spellID == 0:
             useCache = False
         if useCache:
-            if cls._cache[spellID] and not playerId:
+            if spellID in cls._cache and not playerId:
                 spell = cls._cache[spellID]
-            elif cls._playersCache[playerId] and cls._playersCache[playerId][spellID]:
+            elif (
+                playerId in cls._playersCache and spellID in cls._playersCache[playerId]
+            ):
                 spell = cls._playersCache[playerId][spellID]
         if spellID == 0 and cls._cac != None:
             spell = cls._cac
@@ -139,9 +140,9 @@ class SpellWrapper(ISlotData, ICellZoneProvider, IDataCenter):
             spell.id = spellID
             if useCache:
                 if playerId:
-                    if not cls._playersCache[playerId]:
-                        cls._playersCache[playerId] = []
-                    if not cls._playersCache[playerId][spellID]:
+                    if playerId not in cls._playersCache:
+                        cls._playersCache[playerId] = {}
+                    if spellID not in cls._playersCache[playerId]:
                         cls._playersCache[playerId][spellID] = spell
                 else:
                     cls._cache[spellID] = spell
@@ -164,49 +165,54 @@ class SpellWrapper(ISlotData, ICellZoneProvider, IDataCenter):
         spell.setSpellEffects(areModifiers)
         return spell
 
+    @classmethod
     def getSpellWrapperById(
-        self, spellId: int, playerID: float, forceCreate: bool = False
+        cls, spellId: int, playerID: float, forceCreate: bool = False
     ) -> "SpellWrapper":
         if forceCreate:
-            return self.create(spellId)
+            return cls.create(spellId)
         if playerID != 0:
-            if not self._playersCache[playerID]:
+            if playerID not in cls._playersCache:
                 return None
-            if not self._playersCache[playerID][spellId] and self._cache[spellId]:
-                self._playersCache[playerID][spellId] = self._cache[spellId].clone()
+            if not cls._playersCache[playerID].get(spellId) and cls._cache.get(spellId):
+                cls._playersCache[playerID][spellId] = cls._cache[spellId].clone()
             if spellId == 0:
-                return self._cac
-            if self._playersCache[playerID][spellId]:
-                return self._playersCache[playerID][spellId]
+                return cls._cac
+            if spellId in cls._playersCache[playerID]:
+                return cls._playersCache[playerID][spellId]
             return None
-        return self._cache[spellId]
+        return cls._cache[spellId]
 
-    def refreshAllPlayerSpellHolder(self, playerId: float) -> None:
+    @classmethod
+    def refreshAllPlayerSpellHolder(cls, playerId: float) -> None:
         EnterFrameDispatcher().worker.addUniqueSingleTreatment(
-            SpellWrapper, self.refreshSpellHolders, [playerId]
+            SpellWrapper, cls.refreshSpellHolders, [playerId]
         )
 
-    def refreshSpellHolders(self, playerID: float) -> None:
+    @classmethod
+    def refreshSpellHolders(cls, playerID: float) -> None:
         wrapper: SpellWrapper = None
-        for wrapper in self._playersCache[playerID]:
+        for wrapper in cls._playersCache.get(playerID, dict()).values():
             if wrapper:
                 wrapper._slotDataHolderManager.refreshAll()
-        if self._cac:
-            self._cac._slotDataHolderManager.refreshAll()
+        if cls._cac:
+            cls._cac._slotDataHolderManager.refreshAll()
 
-    def resetAllCoolDown(self, playerId: float, accessKey: object) -> None:
-        for wrapper in self._playersCache[playerId]:
+    @classmethod
+    def resetAllCoolDown(cls, playerId: float, accessKey: object) -> None:
+        for wrapper in cls._playersCache[playerId].values():
             wrapper.actualCooldown = 0
 
-    def removeAllSpellWrapperBut(self, playerId: float, accessKey: object) -> None:
+    @classmethod
+    def removeAllSpellWrapperBut(cls, playerId: float, accessKey: object) -> None:
         temp: list = []
-        for id in self._playersCache:
+        for id in cls._playersCache:
             if float(id) != playerId:
                 temp.append(id)
         num = len(temp)
         i = 0
         while i < num:
-            del self._playersCache[temp[i]]
+            del cls._playersCache[temp[i]]
             i += 1
 
     def removeAllSpellWrapper(self) -> None:
@@ -215,9 +221,7 @@ class SpellWrapper(ISlotData, ICellZoneProvider, IDataCenter):
 
     @property
     def actualCooldown(self) -> int:
-        return (
-            int(self._actualCooldown) if PlayedCharacterManager().isFighting else int(0)
-        )
+        return self._actualCooldown if PlayedCharacterManager().isFighting else 0
 
     @actualCooldown.setter
     def actualCooldown(self, u: int) -> None:
@@ -670,14 +674,6 @@ class SpellWrapper(ISlotData, ICellZoneProvider, IDataCenter):
         self.spellLevel = index + 1
 
     def setSpellEffects(self, areModifiers: bool = True) -> None:
-        effectInstance: "EffectInstance" = None
-        damageBaseSpellModifier: SpellModifier = None
-        damageSpellModifier: SpellModifier = None
-        healSpellModifier: SpellModifier = None
-        modif: int = 0
-        len: int = 0
-        entityId: float = None
-        effectInstanceDice: EffectInstanceDice = None
         self.effects = list["EffectInstance"]()
         self.criticalEffect = list["EffectInstance"]()
         for effectInstance in self._spellLevel.effects:
@@ -761,7 +757,7 @@ class SpellWrapper(ISlotData, ICellZoneProvider, IDataCenter):
             self.criticalEffect.append(effectInstance)
         llen = len(self._spellLevel.additionalEffectsZones)
         if llen > 0:
-            self.additionalEffectsZones = list[EffectZone](0)
+            self.additionalEffectsZones = list[EffectZone]()
         for j in range(0, llen, 2):
             self.additionalEffectsZones.append(
                 EffectZone(

@@ -161,6 +161,9 @@ class MovementPath:
                     raise Exception("Path too long. Maybe an orientation problem?")
             self._aPath.pop()
 
+    def __len__(self) -> int:
+        return len(self._aPath)
+
     def getCells(self) -> list[int]:
         mp: MapPoint = None
         cells: list[int] = list[int]()

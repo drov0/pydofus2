@@ -19,7 +19,5 @@ class IMovementBehavior:
     def isMoving(self, param1: IMovable) -> bool:
         raise NotImplementedError()
 
-    def synchroniseSubEntitiesPosition(
-        self, param1: IMovable, param2: DisplayObject = None
-    ) -> None:
+    def synchroniseSubEntitiesPosition(self, param1: IMovable, param2=None) -> None:
         raise NotImplementedError()

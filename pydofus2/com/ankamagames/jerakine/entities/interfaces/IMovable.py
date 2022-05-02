@@ -18,7 +18,7 @@ class IMovable(IEntity):
         raise NotImplementedError()
 
     def jump(self, param1: MapPoint) -> None:
-        raise NotImplementedError()
+        pass
 
     def stop(self, param1: bool = False) -> None:
         raise NotImplementedError()

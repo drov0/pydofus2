@@ -1,3 +1,4 @@
+import sys
 from com.ankamagames.dofus.datacenter.items.EvolutiveItemType import EvolutiveItemType
 from com.ankamagames.dofus.types.IdAccessors import IdAccessors
 from com.ankamagames.jerakine.data.GameData import GameData
@@ -76,19 +77,19 @@ class ItemType(IDataCenter):
 
     @property
     def zoneSize(self) -> int:
-        if self._zoneSize == int.MAX_VALUE:
+        if self._zoneSize == -sys.maxsize - 1:
             self.parseZone()
         return self._zoneSize
 
     @property
     def zoneShape(self) -> int:
-        if self._zoneShape == int.MAX_VALUE:
+        if self._zoneShape == -sys.maxsize - 1:
             self.parseZone()
         return self._zoneShape
 
     @property
     def zoneMinSize(self) -> int:
-        if self._zoneMinSize == int.MAX_VALUE:
+        if self._zoneMinSize == -sys.maxsize - 1:
             self.parseZone()
         return self._zoneMinSize
 

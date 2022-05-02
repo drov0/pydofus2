@@ -9,6 +9,12 @@ from com.ankamagames.dofus.network.types.game.context.fight.GameFightSpellCooldo
     GameFightSpellCooldown,
 )
 from com.ankamagames.jerakine.logger.Logger import Logger
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from com.ankamagames.dofus.logic.game.common.frames.SpellInventoryManagementFrame import (
+        SpellInventoryManagementFrame,
+    )
 
 logger = Logger(__name__)
 
@@ -32,13 +38,13 @@ class SpellCastInFightManager:
 
     def nextTurn(self) -> None:
         spell: SpellManager = None
-        ++self.currentTurn
-        for spell in self._spells:
+        self.currentTurn += 1
+        for spell in self._spells.values():
             spell.newTurn()
 
     def resetInitialCooldown(self, hasBeenSummoned: bool = False) -> None:
-        spim: SpellInventoryManagementFrame = Kernel.getWorker().getFrame(
-            SpellInventoryManagementFrame
+        spim: "SpellInventoryManagementFrame" = (
+            Kernel().getWorker().getFrame("SpellInventoryManagementFrame")
         )
         spellList: list = spim.getFullSpellListByOwnerId(self.entityId)
         for spellWrapper in spellList:
@@ -49,7 +55,7 @@ class SpellCastInFightManager:
                     > spellWrapper.spellLevelInfos.initialCooldown
                 ):
                     return
-                if self._spells[spellWrapper.spellId] == None:
+                if self._spells.get(spellWrapper.spellId) == None:
                     self._spells[spellWrapper.spellId] = SpellManager(
                         self, spellWrapper.spellId, spellWrapper.spellLevel
                     )
@@ -120,14 +126,14 @@ class SpellCastInFightManager:
         pTargets: list,
         pCountForCooldown: bool = True,
     ) -> None:
-        if self._spells[pSpellId] == None:
+        if pSpellId not in self._spells:
             self._spells[pSpellId] = SpellManager(self, pSpellId, pSpellLevel)
         self._spells[pSpellId]
 
     def getSpellManagerBySpellId(
         self, pSpellId: int, isForceNewInstance: bool = False, pSpellLevelId: int = -1
     ) -> SpellManager:
-        spellManager: SpellManager = self._spells[pSpellId]
+        spellManager: SpellManager = self._spells.get(pSpellId)
         if spellManager == None and isForceNewInstance and pSpellLevelId != -1:
             spellManager = self._spells[pSpellId] = SpellManager(
                 self, pSpellId, pSpellLevelId

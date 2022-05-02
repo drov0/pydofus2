@@ -1,15 +1,20 @@
 from whistle import EventDispatcher
-from com.ankamagames.jerakine.sequencer.ISequencableListener import ISequencableListener
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from com.ankamagames.jerakine.sequencer.ISequencableListener import (
+        ISequencableListener,
+    )
 
 
 class ISequencable(EventDispatcher):
     def start(self) -> None:
         pass
 
-    def addListener(self, param1: ISequencableListener) -> None:
+    def addListener(self, param1: "ISequencableListener") -> None:
         pass
 
-    def removeListener(self, param1: ISequencableListener) -> None:
+    def removeListener(self, param1: "ISequencableListener") -> None:
         pass
 
     def __str__(self) -> str:

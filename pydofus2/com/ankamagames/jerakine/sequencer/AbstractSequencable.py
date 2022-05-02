@@ -10,17 +10,17 @@ class AbstractSequencable(IPausableSequencable):
 
     DEFAULT_TIMEOUT: int = 5000
 
-    _listeners: dict
+    _listeners: dict = None
 
-    _timeOut: Timer
+    _timeOut: Timer = None
 
     _castingSpellId: int = -1
 
-    _timeoutMax: int
+    _timeoutMax: int = None
 
     _withTimeOut: bool = False
 
-    _paused: bool
+    _paused: bool = False
 
     _finished: bool = False
 
@@ -77,13 +77,12 @@ class AbstractSequencable(IPausableSequencable):
         self._listeners[listener] = listener
 
     def executeCallbacks(self) -> None:
-        listener: ISequencableListener = None
         # FightProfiler().stop()
         if self._timeOut:
             self._timeOut.cancel()
             self._timeOut = None
         self._finished = True
-        for listener in self._listeners:
+        for listener in list(self._listeners.keys()):
             if listener:
                 listener.stepFinished(self, self._withTimeOut)
 

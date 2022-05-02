@@ -1,7 +1,4 @@
-from enum import Enum
-
-
-class ActionIds(Enum):
+class ActionIds:
 
     ACTION_CHARACTER_CHANGE_MAP: int = 2
 

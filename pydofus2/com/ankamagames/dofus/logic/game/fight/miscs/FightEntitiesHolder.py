@@ -7,7 +7,7 @@ from com.ankamagames.jerakine.entities.interfaces.IEntity import IEntity
 from com.ankamagames.jerakine.metaclasses.Singleton import Singleton
 
 
-class FightEntitiesHolder(IEntityLocalizer, metaclss=Singleton):
+class FightEntitiesHolder(IEntityLocalizer, metaclass=Singleton):
 
     _holdedEntities: dict
 
@@ -23,7 +23,8 @@ class FightEntitiesHolder(IEntityLocalizer, metaclss=Singleton):
         self._holdedEntities[entity.id] = entity
 
     def unholdEntity(self, entityId: float) -> None:
-        del self._holdedEntities[entityId]
+        if entityId in self._holdedEntities:
+            del self._holdedEntities[entityId]
 
     def reset(self) -> None:
         self._holdedEntities.clear()

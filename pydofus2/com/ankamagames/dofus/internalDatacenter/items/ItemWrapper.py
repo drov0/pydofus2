@@ -1,5 +1,4 @@
 import math
-from com.ankamagames.dofus.datacenter.effects.EffectInstance import EffectInstance
 from com.ankamagames.dofus.datacenter.effects.instances.EffectInstanceDice import (
     EffectInstanceDice,
 )
@@ -38,6 +37,10 @@ from com.ankamagames.jerakine.utils.display.spellZone.ICellZoneProvider import (
 from com.ankamagames.jerakine.utils.display.spellZone.IZoneShape import IZoneShape
 from com.ankamagames.jerakine.utils.display.spellZone.ZoneEffect import ZoneEffect
 from com.ankamagames.jerakine.utils.misc.StringUtils import StringUtils
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from com.ankamagames.dofus.datacenter.effects.EffectInstance import EffectInstance
 
 logger = Logger(__name__)
 
@@ -99,7 +102,7 @@ class ItemWrapper(Item, ISlotData, ICellZoneProvider, IDataCenter):
 
     quantity: int = 0
 
-    effects: list[EffectInstance]
+    effects: list["EffectInstance"]
 
     effectsList: list[ObjectEffect]
 
@@ -137,7 +140,7 @@ class ItemWrapper(Item, ISlotData, ICellZoneProvider, IDataCenter):
     MEMORY_LOG = dict()
 
     def __init__(self):
-        self.effects = list[EffectInstance]()
+        self.effects = list["EffectInstance"]()
         super().__init__()
 
     @classmethod
@@ -151,7 +154,7 @@ class ItemWrapper(Item, ISlotData, ICellZoneProvider, IDataCenter):
         useCache: bool = True,
     ) -> "ItemWrapper":
         item: ItemWrapper = None
-        effect: EffectInstance = None
+        effect: "EffectInstance" = None
         refItem: Item = Item.getItemById(objectGID)
         cachedItem: ItemWrapper = (
             cls._cache.get(objectUID) if objectUID > 0 else cls._cacheGId.get(objectGID)
@@ -189,7 +192,7 @@ class ItemWrapper(Item, ISlotData, ICellZoneProvider, IDataCenter):
         item.sortOrder = cls._uniqueIndex
         item.livingobjectCategory = 0
         item.wrapperobjectCategory = 0
-        item.effects = list[EffectInstance]()
+        item.effects = list["EffectInstance"]()
         item.exchangeAllowed = True
         item.updateEffects(newEffects)
         for effect in item.effects:
@@ -241,7 +244,7 @@ class ItemWrapper(Item, ISlotData, ICellZoneProvider, IDataCenter):
         item.sortOrder = self._uniqueIndex
         item.livingobjectCategory = 0
         item.wrapperobjectCategory = 0
-        item.effects = list[EffectInstance]()
+        item.effects = list["EffectInstance"]()
         item.exchangeAllowed = True
         item.updateEffects(item.effectsList)
         return item
@@ -383,7 +386,7 @@ class ItemWrapper(Item, ISlotData, ICellZoneProvider, IDataCenter):
 
     @property
     def spellZoneEffects(self) -> list[IZoneShape]:
-        i: EffectInstance = None
+        i: "EffectInstance" = None
         zone: ZoneEffect = None
         spellEffects: list[IZoneShape] = list[IZoneShape]()
         for i in self.effects:
@@ -422,12 +425,12 @@ class ItemWrapper(Item, ISlotData, ICellZoneProvider, IDataCenter):
         return itbt and itbt.itemSetId != -1
 
     @property
-    def favoriteEffect(self) -> list[EffectInstance]:
+    def favoriteEffect(self) -> list["EffectInstance"]:
         saO: object = None
         itbt: Item = None
-        boostedEffect: EffectInstance = None
-        effect: EffectInstance = None
-        result: list[EffectInstance] = list[EffectInstance]()
+        boostedEffect: "EffectInstance" = None
+        effect: "EffectInstance" = None
+        result: list["EffectInstance"] = list["EffectInstance"]()
         if PlayedCharacterManager() and self.objectGID > 0:
             saO = PlayedCharacterManager().currentSubArea
             itbt = Item.getItemById(self.objectGID)
@@ -491,7 +494,7 @@ class ItemWrapper(Item, ISlotData, ICellZoneProvider, IDataCenter):
         bestName: str = None
         miniboss: list = None
         boss: list = None
-        effect: EffectInstance = None
+        effect: "EffectInstance" = None
         monster: Monster = None
         gradeId: int = 0
         grade: MonsterGrade = None
@@ -565,7 +568,7 @@ class ItemWrapper(Item, ISlotData, ICellZoneProvider, IDataCenter):
 
     @property
     def isMimiCryWithWrapperobject(self) -> bool:
-        effectInstance: EffectInstance = None
+        effectInstance: "EffectInstance" = None
         if not self._mimicryItemSkinGID:
             return False
         mimicryItem: Item = Item.getItemById(self._mimicryItemSkinGID)
@@ -595,7 +598,7 @@ class ItemWrapper(Item, ISlotData, ICellZoneProvider, IDataCenter):
         self.objectGID = objectGID
         self.quantity = quantity
         self.effectsList = newEffects
-        self.effects = list[EffectInstance]()
+        self.effects = list["EffectInstance"]()
         self.livingobjectCategory = 0
         self.wrapperobjectCategory = 0
         self.livingobjectId = 0
@@ -639,7 +642,7 @@ class ItemWrapper(Item, ISlotData, ICellZoneProvider, IDataCenter):
     def removeHolder(self, h: ISlotDataHolder) -> None:
         pass
 
-    def updateLivingobjects(self, effect: EffectInstance) -> None:
+    def updateLivingobjects(self, effect: "EffectInstance") -> None:
         if effect.effectId == ActionIds.ACTION_PETS_LAST_MEAL:
             self.livingobjectFoodDate = effect.description
 
@@ -665,7 +668,7 @@ class ItemWrapper(Item, ISlotData, ICellZoneProvider, IDataCenter):
                 - self.LEVEL_STEP[self.livingobjectLevel - 1]
             )
 
-    def updatePresets(self, effect: EffectInstance) -> None:
+    def updatePresets(self, effect: "EffectInstance") -> None:
         if effect.effectId == ActionIds.ACTION_ITEM_EQUIP_PRESET:
             self.presetIcon = int(effect.parameter0)
         else:
@@ -748,7 +751,7 @@ class ItemWrapper(Item, ISlotData, ICellZoneProvider, IDataCenter):
 
     @property
     def itemHoldsLegendaryPower(self) -> bool:
-        effect: EffectInstance = None
+        effect: "EffectInstance" = None
         for effect in self.effects:
             if effect.effectId == ActionIds.ACTION_LEGENDARY_POWER_SPELL:
                 return True
@@ -756,7 +759,7 @@ class ItemWrapper(Item, ISlotData, ICellZoneProvider, IDataCenter):
 
     @property
     def itemHoldsLegendaryStatus(self) -> bool:
-        effect: EffectInstance = None
+        effect: "EffectInstance" = None
         for effect in self.effects:
             if effect.effectId == ActionIds.ACTION_LEGENDARY_STATUS:
                 return True
@@ -768,7 +771,7 @@ class ItemWrapper(Item, ISlotData, ICellZoneProvider, IDataCenter):
 
     @property
     def itemHasLockedLegendarySpell(self) -> bool:
-        effect: EffectInstance = None
+        effect: "EffectInstance" = None
         categories: list = None
         cat: LegendaryPowerCategory = None
         for effect in self.effects:
@@ -780,7 +783,7 @@ class ItemWrapper(Item, ISlotData, ICellZoneProvider, IDataCenter):
         return False
 
     def canBeUsedForAutoPiloting(self, other: "ItemWrapper") -> bool:
-        effect: EffectInstance = None
+        effect: "EffectInstance" = None
         if not self.itemHasAutoPilotingEffect or other == None:
             return False
         if other.typeId == DataEnum.ITEM_TYPE_PETSMOUNT:
@@ -792,7 +795,7 @@ class ItemWrapper(Item, ISlotData, ICellZoneProvider, IDataCenter):
 
     @property
     def itemHasAutoPilotingEffect(self) -> bool:
-        effect: EffectInstance = None
+        effect: "EffectInstance" = None
         for effect in self.effects:
             if effect.effectId == ActionIds.ACTION_SELF_PILOTING:
                 return True

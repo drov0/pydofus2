@@ -61,7 +61,7 @@ class PlayerManager(IDestroyable):
 
         self._gameServerPort: int = None
 
-        self._kisServerPort: int = None
+        self._kisServerPort: int = 0
 
         self.serverCommunityId: int = -1
 

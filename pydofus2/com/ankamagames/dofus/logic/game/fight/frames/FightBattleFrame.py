@@ -1,5 +1,5 @@
 from threading import Timer
-from time import perf_counter
+from time import perf_counter, sleep
 from types import FunctionType
 from com.ankamagames.atouin.managers.EntitiesManager import EntitiesManager
 from com.ankamagames.atouin.utils.DataMapProvider import DataMapProvider
@@ -10,17 +10,24 @@ from com.ankamagames.dofus.kernel.net.ConnectionsHandler import ConnectionsHandl
 from com.ankamagames.dofus.logic.common.managers.PlayerManager import PlayerManager
 from com.ankamagames.dofus.logic.common.managers.StatsManager import StatsManager
 import com.ankamagames.dofus.logic.game.common.frames.PlayedCharacterUpdatesFrame as pcuF
+from com.ankamagames.dofus.logic.game.common.frames.SpellInventoryManagementFrame import (
+    SpellInventoryManagementFrame,
+)
 from com.ankamagames.dofus.logic.game.common.managers.PlayedCharacterManager import (
     PlayedCharacterManager,
 )
 from com.ankamagames.dofus.logic.game.common.misc.DofusEntities import DofusEntities
-import com.ankamagames.dofus.logic.game.fight.fightEvents.FightEventsHelper as fightEventsHelper
-import com.ankamagames.dofus.logic.game.fight.frames.FightContextFrame as fightContextFrame
-import com.ankamagames.dofus.logic.game.fight.frames.FightEntitiesFrame as fightEntitiesFrame
-from com.ankamagames.dofus.logic.game.fight.frames.FightSequenceFrame import (
-    FightSequenceFrame,
+from com.ankamagames.dofus.logic.game.fight.actions.GameFightTurnFinishAction import (
+    GameFightTurnFinishAction,
 )
-from com.ankamagames.dofus.logic.game.fight.managers.BuffManager import BuffManager
+import com.ankamagames.dofus.logic.game.fight.fightEvents.FightEventsHelper as fightEventsHelper
+from com.ankamagames.dofus.logic.game.fight.frames.FightSequenceSwitcherFrame import (
+    FightSequenceSwitcherFrame,
+)
+import com.ankamagames.dofus.logic.game.fight.frames.FightEntitiesFrame as fightEntitiesFrame
+import com.ankamagames.dofus.logic.game.fight.frames.FightSequenceFrame as fightSequenceFrame
+from com.ankamagames.dofus.logic.game.fight.frames.FightTurnFrame import FightTurnFrame
+import com.ankamagames.dofus.logic.game.fight.managers.BuffManager as buffManager
 from com.ankamagames.dofus.logic.game.fight.managers.CurrentPlayedFighterManager import (
     CurrentPlayedFighterManager,
 )
@@ -30,11 +37,23 @@ from com.ankamagames.dofus.logic.game.fight.managers.FightersStateManager import
 from com.ankamagames.dofus.logic.game.fight.managers.SpellCastInFightManager import (
     SpellCastInFightManager,
 )
-from com.ankamagames.dofus.logic.game.fight.types.BasicBuff import BasicBuff
+from com.ankamagames.dofus.logic.game.fight.managers.SpellModifiersManager import (
+    SpellModifiersManager,
+)
+from com.ankamagames.dofus.logic.game.fight.miscs.FightEntitiesHolder import (
+    FightEntitiesHolder,
+)
+from com.ankamagames.dofus.logic.game.fight.steps.FightVisibilityStep import (
+    FightVisibilityStep,
+)
 from com.ankamagames.dofus.logic.game.fight.types.StatBuff import StatBuff
+from com.ankamagames.dofus.logic.game.fight.types.TriggeredBuff import TriggeredBuff
 from com.ankamagames.dofus.misc.utils.GameDebugManager import GameDebugManager
 from com.ankamagames.dofus.network.messages.game.actions.GameActionAcknowledgementMessage import (
     GameActionAcknowledgementMessage,
+)
+from com.ankamagames.dofus.network.messages.game.actions.fight.GameActionFightDeathMessage import (
+    GameActionFightDeathMessage,
 )
 from com.ankamagames.dofus.network.messages.game.actions.fight.GameActionUpdateEffectTriggerCountMessage import (
     GameActionUpdateEffectTriggerCountMessage,
@@ -112,13 +131,17 @@ from com.ankamagames.dofus.network.types.game.context.fight.GameFightFighterInfo
     GameFightFighterInformations,
 )
 from com.ankamagames.dofus.types.entities.AnimatedCharacter import AnimatedCharacter
-from com.ankamagames.jerakine.benchmark.BenchmarkTimer import BenchmarkTimer
 from com.ankamagames.jerakine.handlers.messages.Action import Action
 from com.ankamagames.jerakine.logger.Logger import Logger
 from com.ankamagames.jerakine.messages.Frame import Frame
 from com.ankamagames.jerakine.messages.Message import Message
-from com.ankamagames.jerakine.sequencer.SerialSequencer import SerialSequencer
 from com.ankamagames.jerakine.types.enums.Priority import Priority
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from com.ankamagames.dofus.logic.game.fight.frames.FightContextFrame import (
+        FightContextFrame,
+    )
 
 logger = Logger(__name__)
 
@@ -129,33 +152,33 @@ class FightBattleFrame(Frame):
 
     isFightAboutToEnd: bool = False
 
-    _sequenceFrameSwitcher: FightSequenceSwitcherFrame
+    _sequenceFrameSwitcher: FightSequenceSwitcherFrame = None
 
-    _turnFrame: FightTurnFrame
+    _turnFrame: FightTurnFrame = None
 
-    _currentSequenceFrame: FightSequenceFrame
+    _currentSequenceFrame: fightSequenceFrame.FightSequenceFrame = None
 
-    _sequenceFrames: list
+    _sequenceFrames: list = []
 
-    _executingSequence: bool
+    _executingSequence: bool = False
 
-    _confirmTurnEnd: bool
+    _confirmTurnEnd: bool = None
 
-    _endBattle: bool
+    _endBattle: bool = False
 
-    _battleResults: GameFightEndMessage
+    _battleResults: GameFightEndMessage = None
 
-    _refreshTurnsList: bool
+    _refreshTurnsList: bool = None
 
-    _newTurnsList: list[float]
+    _newTurnsList: list[float] = None
 
-    _newDeadTurnsList: list[float]
+    _newDeadTurnsList: list[float] = None
 
-    _turnsList: list[float]
+    _turnsList: list[float] = None
 
-    _deadTurnsList: list[float]
+    _deadTurnsList: list[float] = None
 
-    _playerTargetedEntitiesList: list[float]
+    _playerTargetedEntitiesList: list[float] = None
 
     _fightIsPaused: bool = False
 
@@ -167,40 +190,40 @@ class FightBattleFrame(Frame):
 
     _neverSynchronizedBefore: bool = True
 
-    _delayCslmsg: CharacterStatsListMessage
+    _delayCslmsg: CharacterStatsListMessage = None
 
-    _playerNewTurn: AnimatedCharacter
+    _playerNewTurn: AnimatedCharacter = None
 
     _turnsCount: int = 0
 
-    _destroyed: bool
+    _destroyed: bool = False
 
     _playingSlaveEntity: bool = False
 
-    _lastPlayerId: float
+    _lastPlayerId: float = None
 
-    _nextLastPlayerId: float
+    _nextLastPlayerId: float = None
 
-    _currentPlayerId: float = 0
+    _currentPlayerId: float = None
 
-    _skipTurnTimer: BenchmarkTimer
+    _skipTurnTimer: Timer = None
 
-    _masterId: float
+    _masterId: float = None
 
-    _slaveId: float
+    _slaveId: float = None
 
     _autoEndTurn: bool = False
 
-    _autoEndTurnTimer: BenchmarkTimer
+    _autoEndTurnTimer: Timer
 
-    _newWave: bool
+    _newWave: bool = False
 
-    _newWaveId: int
+    _newWaveId: int = 0
 
-    _sequenceFrameCached: FightSequenceFrame = None
+    _sequenceFrameCached: fightSequenceFrame.FightSequenceFrame = None
 
     def __init__(self):
-        self._playerTargetedEntitiesList = list[float](0)
+        self._playerTargetedEntitiesList = list[float]()
         super().__init__()
 
     @property
@@ -241,6 +264,8 @@ class FightBattleFrame(Frame):
 
     @property
     def currentPlayerId(self) -> float:
+        if self._currentPlayerId is None:
+            return PlayedCharacterManager().id
         return self._currentPlayerId
 
     @property
@@ -248,7 +273,7 @@ class FightBattleFrame(Frame):
         return self._executingSequence
 
     @property
-    def currentSequenceFrame(self) -> FightSequenceFrame:
+    def currentSequenceFrame(self) -> fightSequenceFrame.FightSequenceFrame:
         return self._currentSequenceFrame
 
     @property
@@ -278,7 +303,7 @@ class FightBattleFrame(Frame):
         DataMapProvider().isInFight = True
         krnl.Kernel().getWorker().addFrame(self._turnFrame)
         self._destroyed = False
-        self._autoEndTurnTimer = Timer(0.06, self.sendAutoEndTurn)
+        self._autoEndTurnTimer = Timer(6, self.sendAutoEndTurn)
         self._neverSynchronizedBefore = True
         return True
 
@@ -314,7 +339,7 @@ class FightBattleFrame(Frame):
             if self._executingSequence:
                 self._synchroniseFighters = gftcimsg.fighters
                 self._synchroniseFightersInstanceId = (
-                    FightSequenceFrame.currentInstanceId
+                    fightSequenceFrame.FightSequenceFrame.currentInstanceId
                 )
             else:
                 self.gameFightSynchronize(gftcimsg.fighters)
@@ -323,9 +348,11 @@ class FightBattleFrame(Frame):
         if isinstance(msg, GameActionUpdateEffectTriggerCountMessage):
             gauetcmsg = msg
             for effectTrigger in gauetcmsg.targetIds:
-                for buffTriggered in BuffManager().getAllBuff(effectTrigger.targetId):
+                for buffTriggered in buffManager.BuffManager().getAllBuff(
+                    effectTrigger.targetId
+                ):
                     if (
-                        buffTriggered is TriggeredBuff
+                        isinstance(buffTriggered, TriggeredBuff)
                         and buffTriggered.effect.effectUid == effectTrigger.effectId
                     ):
                         buffTriggered.triggerCount = effectTrigger.count
@@ -337,9 +364,9 @@ class FightBattleFrame(Frame):
             if sscmsg.masterId == playerId:
                 self._masterId = sscmsg.masterId
                 self._slaveId = sscmsg.slaveId
-                if not self._currentPlayerId and self._turnsList.find(
+                if not self._currentPlayerId and self._turnsList.index(
                     self._masterId
-                ) > self._turnsList.find(self._slaveId):
+                ) > self._turnsList.index(self._slaveId):
                     self.prepareNextPlayableCharacter(self._masterId)
             return False
 
@@ -359,15 +386,15 @@ class FightBattleFrame(Frame):
             self._currentPlayerId = gftsmsg.id
             if not self._lastPlayerId:
                 self._lastPlayerId = self._currentPlayerId
-            logger.info("Start turn for entityId: " + self._currentPlayerId)
+            logger.info("Start turn for entityId: " + str(self._currentPlayerId))
             if self._currentPlayerId == playerId:
                 self._slaveId = 0
             self._playingSlaveEntity = gftsmsg.id == self._slaveId
             self._turnFrame.turnDuration = gftsmsg.waitTime * 100
             isResumeMessage = msg is GameFightTurnResumeMessage
             if not isResumeMessage:
-                BuffManager().decrementDuration(gftsmsg.id)
-                BuffManager().resetTriggerCount(gftsmsg.id)
+                buffManager.BuffManager().decrementDuration(gftsmsg.id)
+                buffManager.BuffManager().resetTriggerCount(gftsmsg.id)
             else:
                 currentPlayedFighterId = CurrentPlayedFighterManager().currentFighterId
                 nextPlayable = self.getNextPlayableCharacterId()
@@ -392,16 +419,6 @@ class FightBattleFrame(Frame):
                     and not FightEntitiesHolder().getEntity(gftsmsg.id)
                 ):
                     entity = DofusEntities.getEntity(gftsmsg.id)
-                    if entity != None:
-                        ss = SerialSequencer()
-                        ss.addStep(AddGfxEntityStep(154, entity.position.cellId))
-                        ss.start()
-                        yOffset = 65 * entity.look.getScaleY()
-                        ss2 = SerialSequencer()
-                        ss2.addStep(
-                            AddGfxEntityStep(153, entity.position.cellId, 0, -yOffset)
-                        )
-                        ss2.start()
                     self._playerNewTurn = entity
             deadEntityInfo = fightEntitiesFrame.FightEntitiesFrame.getCurrentInstance().getEntityInfos(
                 gftsmsg.id
@@ -416,47 +433,22 @@ class FightBattleFrame(Frame):
                 self._turnFrame.myTurn = True
             else:
                 self._turnFrame.myTurn = False
-            if self._turnFrame.myTurn and PlayerManager().kisServerPort > 0:
-                if ExternalNotificationManager().canAddExternalNotification(
-                    ExternalNotificationTypeEnum.KOLO_TURN_START
-                ):
-                    pass
             if self._skipTurnTimer:
-                self._skipTurnTimer.stop()
-                self._skipTurnTimer.removeEventListener(
-                    TimerEvent.TIMER, self.onSkipTurnTimeOut
-                )
-                self._skipTurnTimer = None
+                self._skipTurnTimer.cancel()
             if gftsmsg.id == playerId or self._playingSlaveEntity:
-                if AFKFightManager().isAfk:
-                    fightContextFrame = (
-                        krnl.Kernel().getWorker().getFrame("FightContextFrame")
-                    )
-                    if fightContextFrame and not fightContextFrame.isKolossium:
-                        time = perf_counter()
-                        if AFKFightManager().lastTurnSkip + 5 * 1000 < time:
-                            action = GameFightTurnFinishAction()
-                            krnl.Kernel().getWorker().process(action)
-                        else:
-                            self._skipTurnTimer = Timer(
-                                5 - (time - AFKFightManager().lastTurnSkip),
-                                self.onSkipTurnTimeOut,
-                            )
-                            self._skipTurnTimer.start()
-                else:
-                    fightEntitesFrame = (
-                        krnl.Kernel().getWorker().getFrame("FightEntitiesFrame")
-                    )
-                    alivePlayers = 0
-                    for en in fightEntitesFrame.entities:
-                        if (
-                            en is GameFightCharacterInformations
-                            and GameFightCharacterInformations(en).spawnInfo.alive
-                            and en.contextualId > 0
-                        ):
-                            alivePlayers += 1
-                    if alivePlayers > 0:
-                        AFKFightManager().initialize()
+                fightEntitesFrame: "fightEntitiesFrame.FightEntitiesFrame" = (
+                    krnl.Kernel().getWorker().getFrame("FightEntitiesFrame")
+                )
+                alivePlayers = 0
+                for en in fightEntitesFrame.entities:
+                    if (
+                        en is GameFightCharacterInformations
+                        and GameFightCharacterInformations(en).spawnInfo.alive
+                        and en.contextualId > 0
+                    ):
+                        alivePlayers += 1
+                # if alivePlayers > 0:
+                #     AFKFightManager().initialize()
             self.removeSavedPosition(gftsmsg.id)
             entitiesFrame = krnl.Kernel().getWorker().getFrame("FightEntitiesFrame")
             entitiesIds = entitiesFrame.getEntitiesIdsList()
@@ -480,24 +472,20 @@ class FightBattleFrame(Frame):
                 self._lastPlayerId = gftemsg.id
             else:
                 self._nextLastPlayerId = gftemsg.id
-            entityInfos = (
-                fightBattleFrame.FightEntitiesFrame.getCurrentInstance().getEntityInfos(
-                    gftemsg.id
-                )
+            entityInfos = fightEntitiesFrame.FightEntitiesFrame.getCurrentInstance().getEntityInfos(
+                gftemsg.id
             )
             if (
                 isinstance(entityInfos, GameFightFighterInformations)
                 and not entityInfos
             ):
                 fighterInfosTE = entityInfos
-                BuffManager().markFinishingBuffs(gftemsg.id)
+                buffManager.BuffManager().markFinishingBuffs(gftemsg.id)
                 pass
                 if gftemsg.id == CurrentPlayedFighterManager().currentFighterId:
                     CurrentPlayedFighterManager().getSpellCastManager().nextTurn()
                     spellwrapper.SpellWrapper.refreshAllPlayerSpellHolder(gftemsg.id)
             if gftemsg.id == CurrentPlayedFighterManager().currentFighterId:
-                AFKFightManager().lastTurnSkip = perf_counter()
-                AFKFightManager().confirm = True
                 self._turnFrame.myTurn = False
             return True
 
@@ -506,7 +494,7 @@ class FightBattleFrame(Frame):
             if not self._sequenceFrameSwitcher:
                 self._sequenceFrameSwitcher = FightSequenceSwitcherFrame()
                 krnl.Kernel().getWorker().addFrame(self._sequenceFrameSwitcher)
-            self._currentSequenceFrame = FightSequenceFrame(
+            self._currentSequenceFrame = fightSequenceFrame.FightSequenceFrame(
                 self, self._currentSequenceFrame
             )
             self._sequenceFrameSwitcher.currentFrame = self._currentSequenceFrame
@@ -560,27 +548,20 @@ class FightBattleFrame(Frame):
             CurrentPlayedFighterManager().getSpellCastManager().currentTurn = (
                 self._turnsCount
             )
-
             if GameDebugManager().buffsDebugActivated:
-                logger.debug(f"[BUFFS DEBUG] Début du tour de jeu {self._turnsCount}!")
-            BuffManager().spellBuffsToIgnore = []
+                logger.debug(f"[BUFFS DEBUG] Fight turn {self._turnsCount} started!")
+            buffManager.BuffManager().spellBuffsToIgnore = []
             return True
 
         if isinstance(msg, GameFightLeaveMessage):
             gflmsg = msg
-            fighterInfos2 = (
-                fightBattleFrame.FightEntitiesFrame.getCurrentInstance().getEntityInfos(
-                    self._lastPlayerId
-                )
+            fighterInfos2 = fightEntitiesFrame.FightEntitiesFrame.getCurrentInstance().getEntityInfos(
+                self._lastPlayerId
             )
-            leaveSequenceFrame = FightSequenceFrame(self)
+            leaveSequenceFrame = fightSequenceFrame.FightSequenceFrame(self)
             if fighterInfos2 and fighterInfos2.spawnInfo.alive:
-                fakeDeathMessage = GameActionFightLeaveMessage()
-                leaveSequenceFrame.process(
-                    fakeDeathMessage.initGameActionFightLeaveMessage(
-                        0, 0, gflmsg.charId
-                    )
-                )
+                fakeDeathMessage = GameActionFightDeathMessage()
+                leaveSequenceFrame.process(fakeDeathMessage.init(0, 0, gflmsg.charId))
                 self._sequenceFrames.append(leaveSequenceFrame)
                 self.executeNextSequence()
             if (
@@ -631,10 +612,10 @@ class FightBattleFrame(Frame):
             self._fightIsPaused = gfpmsg.isPaused
             return True
 
-        if isinstance(msg, DisableAfkAction):
-            AFKFightManager().confirm = False
-            AFKFightManager().enabled = False
-            return True
+        # if isinstance(msg, DisableAfkAction):
+        #     AFKFightManager().confirm = False
+        #     AFKFightManager().enabled = False
+        #     return True
 
         if isinstance(msg, UpdateSpellModifierMessage):
             usmmsg = msg
@@ -646,16 +627,12 @@ class FightBattleFrame(Frame):
             return False
 
     def pulled(self) -> bool:
-        entityId: float = None
-        fsf: FightSequenceFrame = None
+        fsf: fightSequenceFrame.FightSequenceFrame = None
         self.applyDelayedStats()
         DataMapProvider().isInFight = False
-        TweenMax.killAll(False)
         if krnl.Kernel().getWorker().contains("FightTurnFrame"):
             krnl.Kernel().getWorker().removeFrame(self._turnFrame)
-        BuffManager().destroy()
-        MarkedCellsManager().destroy()
-        LinkedCellsManager().destroy()
+        buffManager.BuffManager.clear()
         if self._executingSequence or krnl.Kernel().getWorker().contains(
             "FightSequenceFrame"
         ):
@@ -664,9 +641,6 @@ class FightBattleFrame(Frame):
             )
             fsf = krnl.Kernel().getWorker().getFrame("FightSequenceFrame")
             krnl.Kernel().getWorker().removeFrame(fsf)
-        SerialSequencer.clearByType(FIGHT_SEQUENCER_NAME)
-        SerialSequencer.clearByType(FightSequenceFrame.FIGHT_SEQUENCERS_CATEGORY)
-        AFKFightManager().enabled = False
         self._currentSequenceFrame = None
         self._sequenceFrameSwitcher = None
         self._turnFrame = None
@@ -679,17 +653,10 @@ class FightBattleFrame(Frame):
         self._playingSlaveEntity = False
         self._masterId = 0
         self._slaveId = 0
-        if self._playerNewTurn:
-            self._playerNewTurn.destroy()
-        if self._skipTurnTimer:
-            self._skipTurnTimer.cancel()
-            self._skipTurnTimer = None
+        self._playerNewTurn = None
+        self._skipTurnTimer = None
         self._destroyed = True
-        if self._autoEndTurnTimer:
-            self._autoEndTurnTimer.removeEventListener(
-                TimerEvent.TIMER_COMPLETE, self.sendAutoEndTurn
-            )
-            self._autoEndTurnTimer = None
+        self._autoEndTurnTimer = None
         return True
 
     def delayCharacterStatsList(self, msg: CharacterStatsListMessage) -> None:
@@ -707,16 +674,14 @@ class FightBattleFrame(Frame):
                 )
             else:
                 nextCharacterId = self.getNextPlayableCharacterId()
-            nextCharacterEntity = (
-                fightBattleFrame.FightEntitiesFrame.getCurrentInstance().getEntityInfos(
-                    nextCharacterId
-                )
+            nextCharacterEntity = fightEntitiesFrame.FightEntitiesFrame.getCurrentInstance().getEntityInfos(
+                nextCharacterId
             )
             if not nextCharacterEntity or not nextCharacterEntity.spawnInfo.alive:
                 return
             CurrentPlayedFighterManager().currentFighterId = nextCharacterId
             if nextCharacterId == self._masterId:
-                FightApi.slaveContext = False
+                # FightApi.slaveContext = False
                 CurrentPlayedFighterManager().resetPlayerSpellList()
                 SpellInventoryManagementFrame.getCurrentInstance().applySpellGlobalCoolDownInfo(
                     self._masterId
@@ -759,7 +724,12 @@ class FightBattleFrame(Frame):
     def executeNextSequence(self) -> bool:
         if self._executingSequence:
             return False
-        nextSequenceFrame: FightSequenceFrame = self._sequenceFrames.pop(0)
+        if self._sequenceFrames:
+            nextSequenceFrame: fightSequenceFrame.FightSequenceFrame = (
+                self._sequenceFrames.pop(0)
+            )
+        else:
+            nextSequenceFrame = None
         if nextSequenceFrame:
             self._executingSequence = True
             nextSequenceFrame.execute(self.finishSequence(nextSequenceFrame))
@@ -778,7 +748,7 @@ class FightBattleFrame(Frame):
 
     def waitAnimations(self) -> None:
         key = None
-        entitiesFrame: fightBattleFrame.FightEntitiesFrame = (
+        entitiesFrame: fightEntitiesFrame.FightEntitiesFrame = (
             krnl.Kernel().getWorker().getFrame("FightEntitiesFrame")
         )
         entityIdList: list[float] = None
@@ -813,10 +783,7 @@ class FightBattleFrame(Frame):
         else:
             self.sendAcknowledgement()
 
-    def onLastAnimationFinished(self, tiphonEvent: TiphonEvent = None) -> None:
-        tiphonEvent.sprite.removeEventListener(
-            TiphonEvent.ANIMATION_END, self.onLastAnimationFinished
-        )
+    def onLastAnimationFinished(self, tiphonEvent=None) -> None:
         self.sendAcknowledgement()
         if self._confirmTurnEnd:
             self.confirmDelayedTurnEnd()
@@ -825,16 +792,16 @@ class FightBattleFrame(Frame):
         if self._sequenceFrameCached == None:
             return
         ack: GameActionAcknowledgementMessage = GameActionAcknowledgementMessage()
-        ack.initGameActionAcknowledgementMessage(
-            True, self._sequenceFrameCached.ackIdent
-        )
+        ack.init(True, self._sequenceFrameCached.ackIdent)
         self._sequenceFrameCached = None
         try:
             ConnectionsHandler.getConnection().send(ack)
         except Exception as e:
             pass
 
-    def finishSequence(self, sequenceFrame: FightSequenceFrame) -> FunctionType:
+    def finishSequence(
+        self, sequenceFrame: fightSequenceFrame.FightSequenceFrame
+    ) -> FunctionType:
         def function() -> None:
             if self._destroyed:
                 return
@@ -844,7 +811,7 @@ class FightBattleFrame(Frame):
                 self._sequenceFrameCached = sequenceFrame
                 if not self.isFightAboutToEnd:
                     self.sendAcknowledgement()
-            fightEventsHelper.FightEventsHelper.sendAllFightEvent(True)
+            fightEventsHelper.FightEventsHelper().sendAllFightEvent(True)
             logger.info("Sequence finished.")
             self._executingSequence = False
             if self._refreshTurnsList:
@@ -902,20 +869,15 @@ class FightBattleFrame(Frame):
     ) -> None:
         self._turnsList = turnsList
         self._deadTurnsList = deadTurnsList
-        pass
-        if Dofus().options.getOption(
-            "orderFighters"
-        ) and krnl.Kernel().getWorker().getFrame("FightEntitiesFrame"):
-            krnl.Kernel().getWorker().getFrame("FightEntitiesFrame")
 
     def confirmTurnEnd(self) -> None:
         fighterInfos: GameFightFighterInformations = (
-            fightBattleFrame.FightEntitiesFrame.getCurrentInstance().getEntityInfos(
+            fightEntitiesFrame.FightEntitiesFrame.getCurrentInstance().getEntityInfos(
                 self._lastPlayerId
             )
         )
         if fighterInfos:
-            BuffManager().markFinishingBuffs(self._lastPlayerId)
+            buffManager.BuffManager().markFinishingBuffs(self._lastPlayerId)
             if self._lastPlayerId == CurrentPlayedFighterManager().currentFighterId:
                 spellwrapper.SpellWrapper.refreshAllPlayerSpellHolder(
                     self._lastPlayerId
@@ -930,9 +892,9 @@ class FightBattleFrame(Frame):
         turnEnd: GameFightTurnReadyMessage = GameFightTurnReadyMessage()
         turnEnd.init(True)
         ConnectionsHandler.getConnection().send(turnEnd)
+        logger.debug("Turn end confirmed.")
 
     def endBattle(self, fightEnd: GameFightEndMessage) -> None:
-        EntitiesManager().cleanDeadLook()
         _holder: FightEntitiesHolder = FightEntitiesHolder()
         entities: dict = _holder.getEntities()
         for coward in entities:
@@ -943,29 +905,23 @@ class FightBattleFrame(Frame):
         fightContextFrame = krnl.Kernel().getWorker().getFrame("FightContextFrame")
         fightContextFrame.process(fightEnd)
 
-    def onSkipTurnTimeOut(self, event: TimerEvent) -> None:
+    def onSkipTurnTimeOut(self, event) -> None:
         action: Action = None
-        self._skipTurnTimer.removeEventListener(
-            TimerEvent.TIMER, self.onSkipTurnTimeOut
-        )
         self._skipTurnTimer = None
         fightContextFrame = krnl.Kernel().getWorker().getFrame("FightContextFrame")
-        if AFKFightManager().isAfk and (
-            fightContextFrame and not fightContextFrame.isKolossium
-        ):
-            action = GameFightTurnFinishAction()
-            krnl.Kernel().getWorker().process(action)
+        action = GameFightTurnFinishAction()
+        krnl.Kernel().getWorker().process(action)
 
     def gameFightSynchronize(
         self, fighters: list[GameFightFighterInformations]
     ) -> None:
         newWaveAppeared: bool = False
         newWaveMonster: bool = False
-        entitiesFrame: fightBattleFrame.FightEntitiesFrame = (
+        entitiesFrame: fightEntitiesFrame.FightEntitiesFrame = (
             krnl.Kernel().getWorker().getFrame("FightEntitiesFrame")
         )
         newWaveMonsterIndex: int = 0
-        BuffManager().synchronize()
+        buffManager.BuffManager().synchronize()
         for fighterInfos in fighters:
             stats = StatsManager().getStats(fighterInfos.contextualId)
             if fighterInfos.spawnInfo.alive:
@@ -974,23 +930,22 @@ class FightBattleFrame(Frame):
                     and fighterInfos.wave != 0
                     and not DofusEntities.getEntity(fighterInfos.contextualId)
                 )
-                entitiesFrame.updateFighter(fighterInfos, None)
-                BuffManager().markFinishingBuffs(fighterInfos.contextualId, False)
-                for buff in BuffManager().getAllBuff(fighterInfos.contextualId):
+                entitiesFrame.updateFighter(fighterInfos)
+                buffManager.BuffManager().markFinishingBuffs(
+                    fighterInfos.contextualId, False
+                )
+                for buff in buffManager.BuffManager().getAllBuff(
+                    fighterInfos.contextualId
+                ):
                     if isinstance(buff, StatBuff):
                         buff.isRecent = False
                 if newWaveMonster:
                     newWaveAppeared = True
                     DofusEntities.getEntity(fighterInfos.contextualId).visible = False
-                    sequencer = SerialSequencer()
-                    sequencer.addStep(WaitStep(0.3 * newWaveMonsterIndex))
-                    sequencer.addStep(
-                        AddGfxEntityStep(2715, fighterInfos.disposition.cellId)
-                    )
-                    sequencer.addStep(
-                        FightVisibilityStep(fighterInfos.contextualId, True)
-                    )
-                    sequencer.start()
+                    sleep(0.3 * newWaveMonsterIndex)
+                    entity = DofusEntities.getEntity(self._fighterId)
+                    if entity:
+                        entity.visible = self._visibility
                     newWaveMonsterIndex += 1
         if newWaveAppeared:
             self._newWave = False
@@ -1000,14 +955,18 @@ class FightBattleFrame(Frame):
             self._neverSynchronizedBefore = False
 
     def removeSavedPosition(self, pEntityId: float) -> None:
-        fightContextFrame = krnl.Kernel().getWorker().getFrame("FightContextFrame")
-        savedPositions: list = fightContextFrame.fightersPositionsHistory[pEntityId]
+        fightContextFrame: "FightContextFrame" = (
+            krnl.Kernel().getWorker().getFrame("FightContextFrame")
+        )
+        savedPositions: list = fightContextFrame.fightersPositionsHistory.get(pEntityId)
         if savedPositions:
             nbPos = len(savedPositions)
-            for i in range(nbPos):
+            i = 0
+            while i < nbPos:
                 savedPos = savedPositions[i]
-                savedPos.lives -= 1
-                if savedPos.lives == 0:
+                savedPos["lives"] -= 1
+                if savedPos["lives"] == 0:
                     del savedPositions[i]
                     i -= 1
                     nbPos -= 1
+                i += 1

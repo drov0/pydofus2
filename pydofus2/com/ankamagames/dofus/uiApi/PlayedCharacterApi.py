@@ -1,5 +1,8 @@
 from com.ankamagames.berilia.interfaces.IApi import IApi
 from com.ankamagames.dofus.datacenter.breeds.Breed import Breed
+from com.ankamagames.dofus.datacenter.optionalFeatures.CustomModeBreedSpell import (
+    CustomModeBreedSpell,
+)
 from com.ankamagames.dofus.datacenter.optionalFeatures.ForgettableSpell import (
     ForgettableSpell,
 )
@@ -9,6 +12,8 @@ from com.ankamagames.dofus.internalDatacenter.items.ItemWrapper import ItemWrapp
 from com.ankamagames.dofus.internalDatacenter.items.WeaponWrapper import WeaponWrapper
 from typing import TYPE_CHECKING
 
+from com.ankamagames.dofus.types.data.PlayerSetInfo import PlayerSetInfo
+
 if TYPE_CHECKING:
     from com.ankamagames.dofus.internalDatacenter.items.IdolsPresetWrapper import (
         IdolsPresetWrapper,
@@ -16,6 +21,10 @@ if TYPE_CHECKING:
     from com.ankamagames.dofus.internalDatacenter.spells.SpellWrapper import (
         SpellWrapper,
     )
+    from com.ankamagames.dofus.logic.game.common.frames.SpellInventoryManagementFrame import (
+        SpellInventoryManagementFrame,
+    )
+
 from com.ankamagames.dofus.internalDatacenter.mount.MountData import MountData
 from com.ankamagames.dofus.internalDatacenter.stats.EntityStats import EntityStats
 from com.ankamagames.dofus.internalDatacenter.world.WorldPointWrapper import (
@@ -142,11 +151,11 @@ class PlayedCharacterApi(IApi, metaclass=Singleton):
                 equipment.append(item)
         return equipment
 
-    def getSpellInventory(self) -> list:
+    def getSpellInventory(self) -> list["SpellWrapper"]:
         return PlayedCharacterManager().spellsInventory
 
     def getSpells(self, returnBreedSpells: bool) -> list:
-        spim: SpellInventoryManagementFrame = (
+        spim: "SpellInventoryManagementFrame" = (
             Kernel().getWorker().getFrame("SpellInventoryManagementFrame")
         )
         if returnBreedSpells:
@@ -182,7 +191,7 @@ class PlayedCharacterApi(IApi, metaclass=Singleton):
     def getCustomModeBreedSpellById(self, id: int) -> CustomModeBreedSpell:
         return CustomModeBreedSpell.getCustomModeBreedSpellById(id)
 
-    def getCustomModeSpellIds(self) -> list:
+    def getCustomModeSpellIds(self) -> list[int]:
         return CustomModeBreedSpell.getAllCustomModeBreedSpellIds()
 
     def getCustomModeBreedSpellList(self, breedId: int) -> list:
@@ -209,28 +218,28 @@ class PlayedCharacterApi(IApi, metaclass=Singleton):
     def getPetsMount(self) -> ItemWrapper:
         return PlayedCharacterManager().petsMount
 
-    def getTitle(self) -> Title:
-        title: Title = None
-        playerInfo: GameRolePlayCharacterInformations = None
-        option = None
-        title2: Title = None
-        titleId: int = Kernel().getWorker().getFrame("TinselFrame").currentTitle
-        if titleId:
-            return Title.getTitleById(titleId)
-        playerInfo = self.getEntityInfos()
-        if playerInfo and playerInfo.humanoidInfo:
-            for option in playerInfo.humanoidInfo.options:
-                if isinstance(option, HumanOptionTitle):
-                    titleId = option.titleId
-            return Title.getTitleById(titleId)
-        return None
+    # def getTitle(self) -> Title:
+    #     title: Title = None
+    #     playerInfo: GameRolePlayCharacterInformations = None
+    #     option = None
+    #     title2: Title = None
+    #     titleId: int = Kernel().getWorker().getFrame("TinselFrame").currentTitle
+    #     if titleId:
+    #         return Title.getTitleById(titleId)
+    #     playerInfo = self.getEntityInfos()
+    #     if playerInfo and playerInfo.humanoidInfo:
+    #         for option in playerInfo.humanoidInfo.options:
+    #             if isinstance(option, HumanOptionTitle):
+    #                 titleId = option.titleId
+    #         return Title.getTitleById(titleId)
+    #     return None
 
-    def getOrnament(self) -> Ornament:
-        ornament: Ornament = None
-        ornamentId: int = Kernel().getWorker().getFrame("TinselFrame").currentOrnament
-        if ornamentId:
-            return Ornament.getOrnamentById(ornamentId)
-        return None
+    # def getOrnament(self) -> Ornament:
+    #     ornament: Ornament = None
+    #     ornamentId: int = Kernel().getWorker().getFrame("TinselFrame").currentOrnament
+    #     if ornamentId:
+    #         return Ornament.getOrnamentById(ornamentId)
+    #     return None
 
     def getKnownTitles(self) -> list[int]:
         return Kernel().getWorker().getFrame("TinselFrame").knownTitles
@@ -299,7 +308,7 @@ class PlayedCharacterApi(IApi, metaclass=Singleton):
 
     def isInPreFight(self) -> bool:
         return Kernel().getWorker().contains(
-            'FightPreparationFrame'
+            "FightPreparationFrame"
         ) or Kernel().getWorker().isBeingAdded(FightPreparationFrame)
 
     def isSpectator(self) -> bool:
@@ -413,8 +422,8 @@ class PlayedCharacterApi(IApi, metaclass=Singleton):
     def isInHisHouse(self) -> bool:
         return PlayedCharacterManager().isInHisHouse
 
-    def getPlayerHouses(self) -> list[HouseWrapper]:
-        return Kernel().getWorker().getFrame("HouseFrame").accountHouses
+    # def getPlayerHouses(self) -> list[HouseWrapper]:
+    #     return Kernel().getWorker().getFrame("HouseFrame").accountHouses
 
     def currentMap(self) -> WorldPointWrapper:
         return PlayedCharacterManager().currentMap
@@ -453,8 +462,6 @@ class PlayedCharacterApi(IApi, metaclass=Singleton):
         ).getPlayerSet(objectGID)
 
     def getWeapon(self) -> WeaponWrapper:
-        build: BuildWrapper = None
-        iw: ItemWrapper = None
         if InventoryManager().currentBuildId != -1:
             for build in InventoryManager().builds:
                 if build.id == InventoryManager().currentBuildId:

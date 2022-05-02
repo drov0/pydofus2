@@ -1,17 +1,17 @@
 from typing import TYPE_CHECKING
 
+
 if TYPE_CHECKING:
     from com.ankamagames.dofus.internalDatacenter.items.ItemWrapper import ItemWrapper
-    from com.ankamagames.dofus.internalDatacenter.items.WeaponWrapper import (
-        WeaponWrapper,
-    )
-    from com.ankamagames.dofus.internalDatacenter.mount.MountData import MountData
     from com.ankamagames.dofus.network.types.game.character.choice.CharacterBaseInformations import (
         CharacterBaseInformations,
     )
     from com.ankamagames.dofus.internalDatacenter.stats.EntityStats import EntityStats
     from com.ankamagames.dofus.datacenter.world.SubArea import SubArea
     from com.ankamagames.dofus.datacenter.world.WorldMap import WorldMap
+    from com.ankamagames.dofus.internalDatacenter.spells.SpellWrapper import (
+        SpellWrapper,
+    )
     from com.ankamagames.dofus.internalDatacenter.jobs.KnownJobWrapper import (
         KnownJobWrapper,
     )
@@ -75,7 +75,7 @@ class PlayedCharacterManager(IDestroyable, metaclass=Singleton):
         self.restrictions: "ActorRestrictionsInformations" = None
         self.realEntityLook: "EntityLook" = None
         self.characteristics: "CharacterCharacteristicsInformations" = None
-        self.spellsInventory = list()
+        self.spellsInventory = list["SpellWrapper"]()
         self.playerSpellList = list()
         self.playerShortcutList = list()
         self.inventory = list["ItemWrapper"]()
@@ -250,8 +250,13 @@ class PlayedCharacterManager(IDestroyable, metaclass=Singleton):
 
     @property
     def isMutated(self) -> bool:
+        from com.ankamagames.dofus.logic.game.common.managers.InventoryManager import (
+            InventoryManager,
+        )
+
         l: int = 0
         i: int = 0
+
         rpBuffs = InventoryManager().inventory.getView("roleplayBuff").content
         if rpBuffs:
             l = len(rpBuffs)

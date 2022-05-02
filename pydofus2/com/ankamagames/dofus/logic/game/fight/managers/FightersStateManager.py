@@ -10,10 +10,10 @@ class FightersStateManager(metaclass=Singleton):
         self._entityStates = dict()
 
     def addStateOnTarget(self, targetId: float, stateId: int, delta: int = 1) -> None:
-        if not self._entityStates[targetId]:
+        if not self._entityStates.get(targetId):
             self._entityStates[targetId] = dict()
 
-        if not self._entityStates[targetId][stateId]:
+        if not self._entityStates[targetId].get(stateId):
             self._entityStates[targetId][stateId] = delta
 
         else:
@@ -22,28 +22,26 @@ class FightersStateManager(metaclass=Singleton):
     def removeStateOnTarget(
         self, targetId: float, stateId: int, delta: int = 1
     ) -> None:
-        if not self._entityStates[targetId]:
+        if not self._entityStates.get(targetId):
             logger.error("Can't find state list for " + targetId + " to remove state")
             return
 
-        if self._entityStates[targetId][stateId]:
+        if self._entityStates[targetId].get(stateId):
             self._entityStates[targetId][stateId] -= delta
             if self._entityStates[targetId][stateId] == 0:
                 del self._entityStates[targetId][stateId]
 
     def hasState(self, targetId: float, stateId: int) -> bool:
-        if (
-            not self._entityStates[targetId]
-            or not self._entityStates[targetId][stateId]
+        if not self._entityStates.get(targetId) or not self._entityStates[targetId].get(
+            stateId
         ):
             return False
-
         return self._entityStates[targetId][stateId] > 0
 
     def getStates(self, targetId: float) -> list:
         stateId = None
         states: list = list()
-        if not self._entityStates[targetId]:
+        if not self._entityStates.get(targetId):
             return states
 
         for stateId in self._entityStates[targetId]:
@@ -57,7 +55,7 @@ class FightersStateManager(metaclass=Singleton):
 
         stateId = None
         fighterstatus: FighterStatus = FighterStatus()
-        for stateId in self._entityStates[targetId]:
+        for stateId in self._entityStates.get(targetId, {}):
 
             state = SpellState.getSpellStateById(stateId)
             if state and self._entityStates[targetId][stateId] > 0:

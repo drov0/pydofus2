@@ -1,3 +1,8 @@
+from com.ankamagames.atouin.managers.MapDisplayManager import MapDisplayManager
+from com.ankamagames.dofus.logic.game.fight.miscs.TackleUtil import TackleUtil
+from com.ankamagames.dofus.network.types.game.context.FightEntityDispositionInformations import (
+    FightEntityDispositionInformations,
+)
 from com.ankamagames.jerakine.logger.Logger import Logger
 from com.ankamagames.atouin.data.map.Map import Map
 from com.ankamagames.dofus.internalDatacenter.stats.Stat import Stat
@@ -19,7 +24,6 @@ from com.ankamagames.dofus.network.types.game.context.fight.GameFightMonsterInfo
 from damageCalculation.tools.StatIds import StatIds
 from com.ankamagames.atouin.data.map.Cell import Cell
 from com.ankamagames.jerakine.types.positions.MapPoint import MapPoint
-import ankamagames.dofus.logic.game.fight.miscs.TackleUtil as TackleUtil
 
 logger = Logger(__name__)
 
@@ -32,12 +36,11 @@ class _ReachableCellData:
     mapPoint: MapPoint
     state: int
     evadePercent: float = 1
-    bestRemainingMp: int
-    bestRemainingMpNoTackle: int
-    mpUpdated: bool
+    bestRemainingMp: int = 0
+    bestRemainingMpNoTackle: int = 0
+    mpUpdated: bool = False
     gridX: int
     gridY: int
-
     cellGrid: list[list["_ReachableCellData"]]
 
     def __init__(
@@ -52,9 +55,9 @@ class _ReachableCellData:
         self.gridY = gridY
         self.cellGrid = cellGrid
 
-    def findState(self, dataMap: Map) -> None:
+    def findState(self) -> None:
         neighbour: _ReachableCellData = None
-        cellData: Cell = dataMap.cells[self.mapPoint.cellId]
+        cellData: Cell = MapDisplayManager().dataMap.cells[self.mapPoint.cellId]
         if not cellData.mov or cellData.nonWalkableDuringFight:
             self.state = self.STATE_UNREACHABLE
 
@@ -143,12 +146,12 @@ class FightReachableCellsMaker:
 
             self._mapPoint = MapPoint.fromCellId(infos.disposition.cellId)
 
-        self._cellGrid = list[list[_ReachableCellData]](self._mp * 2 + 1)
-        for i in self._cellGrid:
-            self._cellGrid[i] = list[_ReachableCellData](self._mp * 2 + 1)
+        self._cellGrid = list[list[_ReachableCellData]]([None] * (self._mp * 2 + 1))
+        for i in range(len(self._cellGrid)):
+            self._cellGrid[i] = list[_ReachableCellData]([None] * (self._mp * 2 + 1))
 
         entities = EntitiesManager().entities
-        for entity in entities:
+        for entity in entities.values():
             if entity.id != infos.contextualId and entity.position:
                 x = entity.position.x - self._mapPoint.x + self._mp
                 y = entity.position.y - self._mapPoint.y + self._mp
@@ -159,7 +162,8 @@ class FightReachableCellsMaker:
                     if entityInfos:
                         if not (
                             isinstance(
-                                entityInfos.disposition, EntityDispositionInformations
+                                entityInfos.disposition,
+                                FightEntityDispositionInformations,
                             )
                             and entityInfos.disposition.carryingCharacterId
                             == infos.contextualId
@@ -184,21 +188,19 @@ class FightReachableCellsMaker:
         return self._unreachableCells
 
     def compute(self) -> None:
-        tmpCells: list[_ReachableCellData] = None
+        tmpCells: list[_ReachableCellData] = []
         node: _ReachableCellData = None
         mp: int = self._mp
         untacledMp: int = self._mp
         self._waitingCells = list[_ReachableCellData]()
         self._watchedCells = list[_ReachableCellData]()
         self.markNode(self._mapPoint.x, self._mapPoint.y, mp, untacledMp)
-        while len(self._waitingCells) or len(self._watchedCells):
-            if len(self._waitingCells):
-                tmpCells = self._waitingCells
-                self._waitingCells = list[_ReachableCellData]()
-
-            else:
-                tmpCells = self._watchedCells
-                self._watchedCells = list[_ReachableCellData]()
+        if self._waitingCells:
+            tmpCells = self._waitingCells.copy()
+            self._waitingCells.clear()
+        else:
+            tmpCells = self._watchedCells.copy()
+            self._watchedCells.clear()
 
         for node in tmpCells:
             mp = int(node.bestRemainingMp * node.evadePercent + 0.49) - 1
@@ -240,16 +242,9 @@ class FightReachableCellsMaker:
             or mp > node.bestRemainingMp
             or untackledMp > node.bestRemainingMpNoTackle
         ):
-            index = self._unreachableCells.index(node.mapPoint.cellId)
-            if mp >= 0 and index != -1:
+            if mp >= 0 and node.mapPoint.cellId in self._unreachableCells:
                 self._reachableCells.append(node.mapPoint.cellId)
-                if index == -1:
-                    raise Exception(
-                        "INTERNAL ERROR : "
-                        + node.mapPoint.cellId
-                        + " : Can't delete cell because it don't exist"
-                    )
-                del self._unreachableCells[index]
+                self._unreachableCells.remove(node.mapPoint.cellId)
 
             node.updateMp(mp, untackledMp)
             if untackledMp > 0:

@@ -22,7 +22,7 @@ class DetailedStat(Stat):
         self._objectsAndMountBonusValue = objectsAndMountBonusValue
         self._alignGiftBonusValue = alignGiftBonusValue
         self._contextModifValue = contextModifValue
-        super(
+        super().__init__(
             id,
             self._baseValue
             + self._additionalValue

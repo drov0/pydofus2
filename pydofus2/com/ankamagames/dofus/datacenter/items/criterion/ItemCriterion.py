@@ -1,3 +1,6 @@
+from com.ankamagames.dofus.logic.game.common.managers.PlayedCharacterManager import (
+    PlayedCharacterManager,
+)
 from com.ankamagames.jerakine.logger.Logger import Logger
 from com.ankamagames.dofus.datacenter.items.criterion.IItemCriterion import (
     IItemCriterion,
@@ -158,7 +161,7 @@ class ItemCriterion(IItemCriterion):
     def getCriterion(self) -> int:
         criterion: int = 0
         player: PlayedCharacterManager = PlayedCharacterManager()
-        statsManager: statsManager = statsManager()
+        statsManager: statsManager = StatsManager()
 
         if statsManager == None:
             return 0

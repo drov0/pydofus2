@@ -14,9 +14,12 @@ from com.ankamagames.dofus.logic.game.common.misc.DofusEntities import DofusEnti
 from com.ankamagames.dofus.logic.game.fight.actions.RemoveEntityAction import (
     RemoveEntityAction,
 )
-from com.ankamagames.dofus.logic.game.fight.frames.FightContextFrame import (
-    FightContextFrame,
-)
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from com.ankamagames.dofus.logic.game.fight.frames.FightContextFrame import (
+        FightContextFrame,
+    )
 from com.ankamagames.dofus.logic.game.fight.managers.CurrentPlayedFighterManager import (
     CurrentPlayedFighterManager,
 )
@@ -154,7 +157,7 @@ class FightEntitiesFrame(AbstractEntitiesFrame, Frame):
 
     _lastKnownPlayerStatus: dict
 
-    _realFightersLooks: dict
+    _realFightersLooks: dict = {}
 
     _mountsVisible: bool
 
@@ -167,9 +170,9 @@ class FightEntitiesFrame(AbstractEntitiesFrame, Frame):
     lastKilledDefenders: list[GameFightFighterInformations]
 
     def __init__(self):
-        self._ie = dict(True)
+        self._ie = dict()
         self._tempFighterList = []
-        self._entitiesIconsToUpdate = list[float](0)
+        self._entitiesIconsToUpdate = list[float]()
         self.lastKilledChallengers = list[GameFightFighterInformations]()
         self.lastKilledDefenders = list[GameFightFighterInformations]()
         super().__init__()
@@ -285,12 +288,12 @@ class FightEntitiesFrame(AbstractEntitiesFrame, Frame):
                 else:
                     self.updateFighter(gfsfmsg.informations)
                 self._illusionEntities[gfsfmsg.informations.contextualId] = False
-            fightContextFrame: FightContextFrame = (
+            fightContextFrame: "FightContextFrame" = (
                 krnl.Kernel().getWorker().getFrame("FightContextFrame")
             )
-            if fightContextFrame.fightersPositionsHistory[
+            if fightContextFrame.fightersPositionsHistory.get(
                 gfsfmsg.informations.contextualId
-            ]:
+            ):
                 pass
             return True
 
@@ -475,7 +478,7 @@ class FightEntitiesFrame(AbstractEntitiesFrame, Frame):
     def setLastKnownEntityMovementPoint(
         self, id: float, value: int, add: bool = False
     ) -> None:
-        if id in self._lastKnownMovementPoint:
+        if id not in self._lastKnownMovementPoint:
             self._lastKnownMovementPoint[id] = 0
         if not add:
             self._lastKnownMovementPoint[id] = value
@@ -484,10 +487,8 @@ class FightEntitiesFrame(AbstractEntitiesFrame, Frame):
 
     def pulled(self) -> bool:
         self._tempFighterList = None
-        for obj in self._ie.values():
-            self.removeInteractive(obj["element"])
-        for fighterId in self._realFightersLooks:
-            del self._realFightersLooks[fighterId]
+        self._ie.clear()
+        self._realFightersLooks.clear()
         return super().pulled()
 
     def registerInteractive(self, ie: InteractiveElement, firstSkill: int) -> None:

@@ -26,27 +26,28 @@ class FarmAPI(metaclass=Singleton):
         return Kernel().getWorker().getFrame("RoleplayInteractivesFrame")
 
     def collectResource(self, elementId: int = None, skills=[]) -> None:
-        ce = None
-        if elementId is None:
-            for it in self.rplInteractivesFrame.collectables.values():
-                if it.enabled:
-                    if skills and it.skill.id not in skills:
-                        continue
-                    ce = it
-                    elementId = it.id
-                    break
-        else:
-            ce = self.rplInteractivesFrame.collectables.get(elementId)
-        if ce is not None and ce.enabled:
-            if self.VERBOSE:
-                logger.info(
-                    f"[{self.id}] Collecting {ce} ... skillId : {ce.skill.id}"
-                )
-            ie = self.rplInteractivesFrame.interactives.get(elementId)
-            if ie is None:
-                raise Exception(f"[{self.id}] InteractiveElement {elementId} not found")
-            self.rplInteractivesFrame.skillClicked(ie)
-            return elementId
+        if self.rplInteractivesFrame:
+            ce = None
+            if elementId is None:
+                for it in self.rplInteractivesFrame.collectables.values():
+                    if it.enabled:
+                        if skills and it.skill.id not in skills:
+                            continue
+                        ce = it
+                        elementId = it.id
+                        break
+            else:
+                ce = self.rplInteractivesFrame.collectables.get(elementId)
+            if ce is not None and ce.enabled:
+                if self.VERBOSE:
+                    logger.info(
+                        f"[{self.id}] Collecting {ce} ... skillId : {ce.skill.id}"
+                    )
+                ie = self.rplInteractivesFrame.interactives.get(elementId)
+                if ie is None:
+                    raise Exception(f"[{self.id}] InteractiveElement {elementId} not found")
+                self.rplInteractivesFrame.skillClicked(ie)
+                return elementId
         return -1
 
     def listCollectables(self):

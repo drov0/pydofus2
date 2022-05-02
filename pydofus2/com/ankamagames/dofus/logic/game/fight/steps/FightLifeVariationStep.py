@@ -2,9 +2,6 @@ from com.ankamagames.dofus.logic.game.fight.steps.IFightStep import IFightStep
 from com.ankamagames.dofus.internalDatacenter.stats.EntityStats import EntityStats
 from com.ankamagames.dofus.internalDatacenter.stats.Stat import Stat
 from com.ankamagames.dofus.logic.common.managers.StatsManager import StatsManager
-from com.ankamagames.dofus.logic.game.common.managers.PlayedCharacterManager import (
-    PlayedCharacterManager,
-)
 from com.ankamagames.dofus.logic.game.fight.fightEvents.FightEventsHelper import (
     FightEventsHelper,
 )
@@ -16,9 +13,6 @@ from com.ankamagames.dofus.logic.game.fight.steps.abstract.AbstractStatContextua
 )
 from com.ankamagames.dofus.logic.game.fight.types.FightEventEnum import FightEventEnum
 from com.ankamagames.dofus.network.enums.GameContextEnum import GameContextEnum
-from com.ankamagames.dofus.network.types.game.context.fight.GameFightCharacterInformations import (
-    GameFightCharacterInformations,
-)
 from com.ankamagames.dofus.network.types.game.context.fight.GameFightFighterInformations import (
     GameFightFighterInformations,
 )
@@ -82,7 +76,7 @@ class FightLifeVariationStep(AbstractStatContextualStep, IFightStep):
         if not self._fighterInfo:
             super().executeCallbacks()
             return
-        EnterFrameDispatcher().worker.addSingleTreatment(StatsManager(), self.apply, [])
+        EnterFrameDispatcher().worker.addSingleTreatment(self, self.apply, [])
 
     def apply(self) -> None:
         stats: EntityStats = StatsManager().getStats(self._targetId)
@@ -107,7 +101,7 @@ class FightLifeVariationStep(AbstractStatContextualStep, IFightStep):
             )
         )
         if self._delta < 0 or self._delta == 0 and not self.skipTextEvent:
-            FightEventsHelper.sendFightEvent(
+            FightEventsHelper().sendFightEvent(
                 FightEventEnum.FIGHTER_LIFE_LOSS,
                 [self._targetId, abs(self._delta), self._elementId],
                 self._targetId,
@@ -116,7 +110,7 @@ class FightLifeVariationStep(AbstractStatContextualStep, IFightStep):
                 2,
             )
         elif self._delta > 0:
-            FightEventsHelper.sendFightEvent(
+            FightEventsHelper().sendFightEvent(
                 FightEventEnum.FIGHTER_LIFE_GAIN,
                 [self._targetId, abs(self._delta), self._elementId],
                 self._targetId,
@@ -125,7 +119,7 @@ class FightLifeVariationStep(AbstractStatContextualStep, IFightStep):
                 2,
             )
         if self._permanentDamages < 0:
-            FightEventsHelper.sendFightEvent(
+            FightEventsHelper().sendFightEvent(
                 FightEventEnum.FIGHTER_PERMANENT_DAMAGE,
                 [self._targetId, abs(self._permanentDamages), self._elementId],
                 self._targetId,

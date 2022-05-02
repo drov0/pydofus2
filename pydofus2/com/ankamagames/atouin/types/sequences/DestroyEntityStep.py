@@ -30,8 +30,7 @@ class DestroyEntityStep(AbstractSequencable):
         pass
 
     def destroyEntity(self, pEvent) -> None:
-
-        if EntitiesManager().entitiesScheduledForDestruction[self._entity.id]:
+        if EntitiesManager().entitiesScheduledForDestruction.get(self._entity.id):
             del self._entity
         if pEvent and self._waitAnimForCallback:
             self.executeCallbacks()

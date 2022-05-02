@@ -65,21 +65,21 @@ class Breed(IDataCenter):
 
     sortIndex: int
 
-    _shortName: str
+    _shortName: str = None
 
-    _longName: str
+    _longName: str = None
 
-    _description: str
+    _description: str = None
 
-    _gameplayDescription: str
+    _gameplayDescription: str = None
 
-    _gameplayClassDescription: str
+    _gameplayClassDescription: str = None
 
-    _allSpellsId: list
+    _allSpellsId: list = None
 
-    _breedSpellsVariants: list[Spell]
+    _breedSpellsVariants: list[Spell] = None
 
-    _breedSpellVariants: list[SpellVariant]
+    _breedSpellVariants: list[SpellVariant] = None
 
     def __init__(self):
         super().__init__()

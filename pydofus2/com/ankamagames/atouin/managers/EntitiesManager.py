@@ -10,7 +10,7 @@ class EntitiesManager(metaclass=Singleton):
 
     def __init__(self):
         self._entities = dict[float, "IEntity"]()
-        self._entitiesScheduledForDestruction = []
+        self._entitiesScheduledForDestruction = dict()
         self._currentRandomEntity: float = self.RANDOM_ENTITIES_ID_START
 
     def addAnimatedEntity(
@@ -34,7 +34,7 @@ class EntitiesManager(metaclass=Singleton):
     def removeEntity(self, entityID: float) -> None:
         if self._entities.get(entityID):
             del self._entities[entityID]
-            if self._entitiesScheduledForDestruction[entityID]:
+            if self._entitiesScheduledForDestruction.get(entityID):
                 del self._entitiesScheduledForDestruction[entityID]
 
     def clearEntities(self) -> None:
@@ -57,7 +57,8 @@ class EntitiesManager(metaclass=Singleton):
     def entities(self) -> dict[int, "IEntity"]:
         return self._entities
 
-    def entitiesScheduledForDestruction(self) -> list:
+    @property
+    def entitiesScheduledForDestruction(self) -> dict[int, "IEntity"]:
         return self._entitiesScheduledForDestruction
 
     def entitiesCount(self) -> int:
@@ -88,12 +89,12 @@ class EntitiesManager(metaclass=Singleton):
 
     def getEntitiesOnCell(self, cellId: int, oClass=None) -> list:
         useFilter = oClass != None
-        isMultiFilter: bool = useFilter and oClass is list
+        isMultiFilter: bool = useFilter and isinstance(oClass, list)
         result: list = []
-        for e in self._entities:
+        for e in self._entities.values():
             if e and e.position and e.position.cellId == cellId:
                 if not isMultiFilter:
-                    if not useFilter or not isMultiFilter and e is oClass:
+                    if not useFilter or not isMultiFilter and isinstance(e, oClass):
                         result.append(e)
                 else:
                     for cls in oClass:

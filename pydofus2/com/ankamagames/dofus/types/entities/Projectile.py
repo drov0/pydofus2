@@ -91,15 +91,7 @@ class Projectile(IDisplayable, IMovable, IEntity):
         return self._displayed
 
     def initDirection(self, direction: int = -1) -> None:
-        self._displayBehavior = AtouinDisplayBehavior()
-        self._movementBehavior = ParableMovementBehavior()
-        self.setDirection(
-            int(DirectionsEnum.RIGHT) if direction == -1 else int(direction)
-        )
-        if not self.startPlayingOnlyWhenDisplayed or self.parent:
-            self.setAnim()
-        else:
-            self.add_listener(Event.ADDED_TO_STAGE, self.onProjectileAdded)
+        pass
 
     def display(self, strata: int = 0) -> None:
         self._displayBehavior.display(self, strata)
@@ -127,10 +119,3 @@ class Projectile(IDisplayable, IMovable, IEntity):
 
     def stop(self, forceStop: bool = False) -> None:
         self._movementBehavior.stop(self)
-
-    def setAnim(self) -> None:
-        setAnimation("FX")
-
-    def onProjectileAdded(self, e: Event) -> None:
-        removeEventListener(Event.ADDED_TO_STAGE, self.onProjectileAdded)
-        self.setAnim()

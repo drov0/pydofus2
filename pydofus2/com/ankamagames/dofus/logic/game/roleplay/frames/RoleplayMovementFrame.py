@@ -219,7 +219,7 @@ class RoleplayMovementFrame(Frame):
                         "Sending Entity movement complete in %s seconds", pathDuration
                     )
                 Timer(
-                    1.5 * pathDuration,
+                    1.0 * pathDuration,
                     lambda: Kernel()
                     .getWorker()
                     .processImmediately(EntityMovementCompleteMessage(movedEntity)),

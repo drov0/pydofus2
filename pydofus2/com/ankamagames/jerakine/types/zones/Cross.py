@@ -47,13 +47,13 @@ class Cross(IZone):
     def surface(self) -> int:
         return self._radius * 4 + 1
 
-    @minRadius.setter
-    def minRadius(self, r: int) -> None:
-        self._minRadius = r
-
     @property
     def minRadius(self) -> int:
         return self._minRadius
+
+    @minRadius.setter
+    def minRadius(self, r: int) -> None:
+        self._minRadius = r
 
     @property
     def direction(self) -> int:
@@ -63,13 +63,13 @@ class Cross(IZone):
     def direction(self, d: int) -> None:
         self._direction = d
 
-    @diagonal.setter
-    def diagonal(self, d: bool) -> None:
-        self._diagonal = d
-
     @property
     def diagonal(self) -> bool:
         return self._diagonal
+
+    @diagonal.setter
+    def diagonal(self, d: bool) -> None:
+        self._diagonal = d
 
     @property
     def allDirections(self) -> bool:

@@ -31,13 +31,13 @@ class Lozenge(IZone):
     def radius(self, n: int) -> None:
         self._radius = n
 
-    @minRadius.setter
-    def minRadius(self, r: int) -> None:
-        self._minRadius = r
-
     @property
     def minRadius(self) -> int:
         return self._minRadius
+
+    @minRadius.setter
+    def minRadius(self, r: int) -> None:
+        self._minRadius = r
 
     @property
     def direction(self) -> int:

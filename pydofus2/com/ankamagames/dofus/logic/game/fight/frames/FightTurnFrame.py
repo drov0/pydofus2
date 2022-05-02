@@ -27,12 +27,15 @@ from com.ankamagames.dofus.logic.game.fight.actions.GameFightSpellCastAction imp
 from com.ankamagames.dofus.logic.game.fight.actions.GameFightTurnFinishAction import (
     GameFightTurnFinishAction,
 )
-from com.ankamagames.dofus.logic.game.fight.frames.FightContextFrame import (
-    FightContextFrame,
-)
-from com.ankamagames.dofus.logic.game.fight.frames.FightSpellCastFrame import (
-    FightSpellCastFrame,
-)
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from com.ankamagames.dofus.logic.game.fight.frames.FightContextFrame import (
+        FightContextFrame,
+    )
+    from com.ankamagames.dofus.logic.game.fight.frames.FightSpellCastFrame import (
+        FightSpellCastFrame,
+    )
 from com.ankamagames.dofus.logic.game.fight.managers.CurrentPlayedFighterManager import (
     CurrentPlayedFighterManager,
 )
@@ -85,20 +88,19 @@ from damageCalculation.tools.StatIds import StatIds
 from threading import Timer
 from typing import TYPE_CHECKING
 
+from com.ankamagames.dofus.logic.game.fight.frames.FightEntitiesFrame import (
+    FightEntitiesFrame,
+)
+
 if TYPE_CHECKING:
     from com.ankamagames.dofus.logic.game.fight.frames.FightBattleFrame import (
         FightBattleFrame,
-    )
-    from com.ankamagames.dofus.logic.game.fight.frames.FightEntitiesFrame import (
-        FightEntitiesFrame,
     )
     from com.ankamagames.jerakine.entities.interfaces.IMovable import IMovable
 logger = Logger(__name__)
 
 
 class FightTurnFrame(Frame):
-
-    SWF_LIB: str = XmlConfig().getEntry("config.ui.skin").extend("assets_tacticmod.swf")
 
     TAKLED_CURSOR_NAME: str = "TackledCursor"
 
@@ -182,7 +184,7 @@ class FightTurnFrame(Frame):
         self._myTurn = b
         if b:
             self.startRemindTurn()
-            self.getMovementArea()
+            self.drawMovementArea()
         else:
             self._isRequestingMovement = False
             if self._remindTurnTimeoutId is not None:
@@ -202,7 +204,7 @@ class FightTurnFrame(Frame):
                 if scf:
                     scf.refreshTarget(True)
         if self._myTurn and not scf:
-            self.getPath()
+            self.drawPath()
 
     @property
     def turnDuration(self) -> int:
@@ -254,13 +256,15 @@ class FightTurnFrame(Frame):
                 or playerInformation
                 and playerInformation.spawnInfo.alive
             ):
-                self._spellCastFrame = FightSpellCastFrame(gfsca.spellId)
+                import com.ankamagames.dofus.logic.game.fight.frames.FightSpellCastFrame as fscf
+
+                self._spellCastFrame = fscf.FightSpellCastFrame(gfsca.spellId)
                 Kernel().getWorker().addFrame(self._spellCastFrame)
             return True
 
         elif isinstance(msg, CellClickMessage):
             ccmsg = msg
-            if not Kernel().getWorker().contains(FightSpellCastFrame):
+            if not Kernel().getWorker().contains("FightSpellCastFrame"):
                 if DataMapProvider().pointMov(
                     MapPoint.fromCellId(ccmsg.cellId).x,
                     MapPoint.fromCellId(ccmsg.cellId).y,
@@ -299,9 +303,11 @@ class FightTurnFrame(Frame):
                 return True
             if emcmsg.entity.id == self._currentFighterId:
                 self._isRequestingMovement = False
-                spellCastFrame = Kernel().getWorker().getFrame(FightSpellCastFrame)
+                spellCastFrame: "FightSpellCastFrame" = (
+                    Kernel().getWorker().getFrame("FightSpellCastFrame")
+                )
                 if not spellCastFrame:
-                    self.getPath()
+                    self.drawPath()
                 self.startRemindTurn()
                 if self._finishingTurn:
                     self.finishTurn()
@@ -363,8 +369,8 @@ class FightTurnFrame(Frame):
         Kernel().getWorker().removeFrame(self._spellCastFrame)
         return True
 
-    def getMovementArea(self) -> list[int]:
-        if not self._playerEntity or IMovable(self._playerEntity).isMoving:
+    def drawMovementArea(self) -> list[int]:
+        if not self._playerEntity or self._playerEntity.isMoving:
             return []
         playerPosition: MapPoint = self._playerEntity.position
         stats: EntityStats = CurrentPlayedFighterManager().getStats()
@@ -376,7 +382,7 @@ class FightTurnFrame(Frame):
         playerInfos: GameFightFighterInformations = entitiesFrame.getEntityInfos(
             self._playerEntity.id
         )
-        tackle: float = TackleUtil.getTackle(playerInfos, playerPosition)
+        tackle: float = TackleUtil.getTackle(entitiesFrame, playerInfos, playerPosition)
         self._tackleByCellId = dict()
         self._tackleByCellId[playerPosition.cellId] = tackle
         mpLost: int = int(movementPoints * (1 - tackle) + 0.5)
@@ -391,15 +397,16 @@ class FightTurnFrame(Frame):
         reachableCells: list[int] = fightReachableCellsMaker.reachableCells
         return reachableCells
 
-    def getPath(self, destCell: MapPoint = None) -> None:
-        if Kernel().getWorker().contains(FightSpellCastFrame):
+    def drawPath(self, destCell: MapPoint = None) -> None:
+        if Kernel().getWorker().contains("FightSpellCastFrame"):
             return
+        fcf: "FightContextFrame" = Kernel().getWorker().getFrame("FightContextFrame")
         if self._isRequestingMovement:
             return
         if not destCell:
-            if FightContextFrame.currentCell == -1:
+            if fcf.currentCell == -1:
                 return
-            destCell = MapPoint.fromCellId(FightContextFrame.currentCell)
+            destCell = MapPoint.fromCellId(fcf.currentCell)
         if not self._playerEntity:
             self.removePath()
             return
@@ -600,4 +607,4 @@ class FightTurnFrame(Frame):
             and stat.entityId == self._currentFighterId
             and stat.totalValue is not self._lastMP
         ):
-            self.getMovementArea()
+            self.drawMovementArea()

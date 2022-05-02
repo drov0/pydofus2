@@ -25,7 +25,7 @@ logger = Logger(__name__)
 
 
 class StatsManager(metaclass=Singleton):
-    DEFAULT_IS_VERBOSE = False
+    DEFAULT_IS_VERBOSE = True
     DATA_STORE_CATEGORY = "ComputerModule_statsManager"
     DATA_STORE_KEY_IS_VERBOSE = "statsManagerIsVerbose"
 
@@ -49,23 +49,25 @@ class StatsManager(metaclass=Singleton):
 
     def setStats(self, stats: EntityStats) -> bool:
         logger.info("Setting stats for entity with ID " + str(stats.entityId))
-        if stats == None:
+        if stats is None:
             logger.error("Tried to set None stats. Aborting")
             return False
-        self._entityStats[float(stats.entityId)] = stats
+        key = str(float(stats.entityId))
+        self._entityStats[key] = stats
         return True
 
     def getStats(self, entityId: float) -> EntityStats:
-        entityId = float(entityId)
+        key = str(float(entityId))
         logger.info(f"Getting stats for entity with ID {entityId}")
-        return self._entityStats.get(entityId)
+        return self._entityStats.get(key)
 
     def addRawStats(
         self, entityId: float, rawStats: list[CharacterCharacteristic]
     ) -> None:
-        entityStats: EntityStats = self._entityStats.get(float(entityId))
+        key = str(float(entityId))
+        entityStats: EntityStats = self._entityStats.get(key)
         if entityStats is None:
-            entityStats = EntityStats(entityId)
+            entityStats = EntityStats(float(entityId))
             self.setStats(entityStats)
         for rawStat in rawStats:
             if isinstance(rawStat, CharacterUsableCharacteristicDetailed):
@@ -96,7 +98,7 @@ class StatsManager(metaclass=Singleton):
             entityStats.setStat(entityStat, False)
 
     def deleteStats(self, entityId: float) -> bool:
-        entityKey = str(entityId)
+        entityKey = str(float(entityId))
         if entityKey not in self._entityStats:
             logger.error(
                 "Tried to del stats for entity with ID "
@@ -126,7 +128,7 @@ class StatsManager(metaclass=Singleton):
             logger.error("Listener provided is None")
             return False
         isListenerAdded: bool = False
-        key: str = str(statId)
+        key: str = str(float(statId))
         if not self.isStatHasListener(statId, listener):
             if not self._statListeners.get(key):
                 self._statListeners[key] = list[FunctionType]()
@@ -134,11 +136,12 @@ class StatsManager(metaclass=Singleton):
             isListenerAdded = True
         if isListenerAdded:
             logger.info(
-                f"Listener {listener.__annotations__} added to stat with ID " + key
+                f"Listener {listener.__name__}{listener.__annotations__} added to stat with ID "
+                + key
             )
         else:
             logger.error(
-                f"Listener {listener.__annotations__} could NOT added to stat with ID "
+                f"Listener {listener.__name__}{listener.__annotations__} could NOT added to stat with ID "
                 + key
             )
         return isListenerAdded
@@ -148,18 +151,18 @@ class StatsManager(metaclass=Singleton):
             logger.error("Listener provided is None")
             return False
         isListenerRemoved: bool = False
-        key: str = str(statId)
+        key: str = str(float(statId))
         if self.isStatHasListener(statId, listener):
             self._statListeners[key].remove(listener)
             isListenerRemoved = True
         if isListenerRemoved:
             logger.info(
-                f"Listener {listener.__annotations__} removed from stat with ID " + key
+                f"Listener {listener.__name__}{listener.__annotations__} removed from stat with ID "
+                + key
             )
         else:
-            logger.debug(f"listeners {self._statListeners} and key {key}")
             logger.error(
-                f"Listener {listener.__annotations__} could NOT be removed from stat with ID "
+                f"Listener {listener.__name__}{listener.__annotations__} could NOT be removed from stat with ID "
                 + key
             )
         return isListenerRemoved

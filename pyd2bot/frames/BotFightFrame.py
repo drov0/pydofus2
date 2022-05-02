@@ -210,20 +210,18 @@ class BotFightFrame(Frame, metaclass=Singleton):
         Kernel().getWorker().process(ccmsg)
 
     def fightRandomMove(self) -> None:
-        reachableCells: FightReachableCellsMaker = FightReachableCellsMaker(
+        reachableCellsMaker: FightReachableCellsMaker = FightReachableCellsMaker(
             FightEntitiesFrame.getCurrentInstance().getEntityInfos(
                 PlayedCharacterManager().id
             )
         )
-        if reachableCells.reachableCells:
+        logger.debug(f"found {len(reachableCellsMaker.reachableCells)} reachable cells")
+        if not reachableCellsMaker.reachableCells:
             self.nextTurnAction()
             return
         ccmsg: CellClickMessage = CellClickMessage()
-        ccmsg.cell = MapPoint.fromCellId(
-            reachableCells.reachableCells[
-                math.floor(len(reachableCells.reachableCells) * random.random())
-            ]
-        )
+        randomCell: int = random.choice(reachableCellsMaker.reachableCells)
+        ccmsg.cell = MapPoint.fromCellId(randomCell)
         ccmsg.cellId = ccmsg.cell.cellId
         ccmsg.id = MapDisplayManager().currentMapPoint.mapId
         Kernel().getWorker().process(ccmsg)

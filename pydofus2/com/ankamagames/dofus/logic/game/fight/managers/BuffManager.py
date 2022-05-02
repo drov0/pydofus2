@@ -179,7 +179,7 @@ class BuffManager(metaclass=Singleton):
 
     def synchronize(self) -> None:
         if GameDebugManager().buffsDebugActivated:
-            logger.debug("[BUFFS DEBUG] Annulation du disabled sur tous les buffs")
+            logger.debug("[BUFFS DEBUG] Canceling disabled of all buffs")
         for entityId in self._buffs:
             for buffItem in self._buffs[entityId]:
                 if buffItem.disabled:

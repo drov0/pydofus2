@@ -7,45 +7,52 @@ logger = Logger(__name__)
 
 class FightersStateManager(metaclass=Singleton):
     def __init__(self) -> None:
-        self._entityStates = dict()
+        self._entityStates = dict[float, dict[int, float]]()
 
     def addStateOnTarget(self, targetId: float, stateId: int, delta: int = 1) -> None:
-        if not self._entityStates.get(targetId):
-            self._entityStates[targetId] = dict()
+        targetKey = float(targetId)
+        statKey = int(stateId)
+        if not self._entityStates.get(targetKey):
+            self._entityStates[targetKey] = dict()
 
-        if not self._entityStates[targetId].get(stateId):
-            self._entityStates[targetId][stateId] = delta
+        if not self._entityStates[targetKey].get(statKey):
+            self._entityStates[targetKey][statKey] = delta
 
         else:
-            self._entityStates[targetId][stateId] += delta
+            self._entityStates[targetKey][statKey] += delta
 
     def removeStateOnTarget(
         self, targetId: float, stateId: int, delta: int = 1
     ) -> None:
-        if not self._entityStates.get(targetId):
-            logger.error("Can't find state list for " + targetId + " to remove state")
+        targetKey = float(targetId)
+        statKey = int(stateId)
+        if not self._entityStates.get(targetKey):
+            logger.error(f"Can't find state list for {targetKey} to remove state")
             return
 
-        if self._entityStates[targetId].get(stateId):
-            self._entityStates[targetId][stateId] -= delta
-            if self._entityStates[targetId][stateId] == 0:
-                del self._entityStates[targetId][stateId]
+        if self._entityStates[targetKey].get(statKey):
+            self._entityStates[targetKey][statKey] -= delta
+            if self._entityStates[targetKey][statKey] == 0:
+                del self._entityStates[targetKey][statKey]
 
     def hasState(self, targetId: float, stateId: int) -> bool:
-        if not self._entityStates.get(targetId) or not self._entityStates[targetId].get(
-            stateId
-        ):
+        targetKey = float(targetId)
+        statKey = int(stateId)
+        if not self._entityStates.get(targetKey) or not self._entityStates[
+            targetKey
+        ].get(statKey):
             return False
-        return self._entityStates[targetId][stateId] > 0
+        return self._entityStates[targetKey][statKey] > 0
 
     def getStates(self, targetId: float) -> list:
+        targetKey = float(targetId)
         stateId = None
         states: list = list()
-        if not self._entityStates.get(targetId):
+        if targetKey not in self._entityStates:
             return states
 
-        for stateId in self._entityStates[targetId]:
-            if self._entityStates[targetId][stateId] > 0:
+        for stateId in self._entityStates[targetKey]:
+            if self._entityStates[targetKey][stateId] > 0:
                 states.append(stateId)
 
         return states
@@ -53,12 +60,12 @@ class FightersStateManager(metaclass=Singleton):
     def getStatus(self, targetId: float) -> FighterStatus:
         from com.ankamagames.dofus.datacenter.spells.SpellState import SpellState
 
+        targetKey = float(targetId)
         stateId = None
         fighterstatus: FighterStatus = FighterStatus()
-        for stateId in self._entityStates.get(targetId, {}):
-
+        for stateId in self._entityStates.get(targetKey, {}):
             state = SpellState.getSpellStateById(stateId)
-            if state and self._entityStates[targetId][stateId] > 0:
+            if state and self._entityStates[targetKey][stateId] > 0:
                 if state.preventsSpellCast:
                     fighterstatus.cantUseSpells = True
 
@@ -77,8 +84,8 @@ class FightersStateManager(metaclass=Singleton):
                 if state.cantBeMoved:
                     fighterstatus.cantBeMoved = True
 
-                if state.cantBeappended:
-                    fighterstatus.cantBeappended = True
+                if state.cantBePushed:
+                    fighterstatus.cantBePushed = True
 
                 if state.cantSwitchPosition:
                     fighterstatus.cantSwitchPosition = True
@@ -98,4 +105,4 @@ class FightersStateManager(metaclass=Singleton):
         return fighterstatus
 
     def endFight(self) -> None:
-        self._entityStates = dict()
+        self._entityStates.clear()

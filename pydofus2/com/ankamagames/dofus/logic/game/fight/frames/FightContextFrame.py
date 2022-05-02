@@ -4,7 +4,12 @@ from com.ankamagames.atouin.managers.EntitiesManager import EntitiesManager
 import com.ankamagames.atouin.managers.MapDisplayManager as mdm
 from com.ankamagames.atouin.messages.MapLoadedMessage import MapLoadedMessage
 from com.ankamagames.atouin.utils.DataMapProvider import DataMapProvider
+from com.ankamagames.dofus.datacenter.monsters.Companion import Companion
 from com.ankamagames.dofus.datacenter.monsters.Monster import Monster
+from com.ankamagames.dofus.datacenter.npcs.TaxCollectorFirstname import (
+    TaxCollectorFirstname,
+)
+from com.ankamagames.dofus.datacenter.npcs.TaxCollectorName import TaxCollectorName
 import com.ankamagames.dofus.datacenter.spells.Spell as spellmod
 from com.ankamagames.dofus.datacenter.world.SubArea import SubArea
 from com.ankamagames.dofus.internalDatacenter.fight.FightResultEntryWrapper import (
@@ -135,6 +140,9 @@ from com.ankamagames.dofus.network.messages.game.context.roleplay.CurrentMapMess
 )
 from com.ankamagames.dofus.network.messages.game.context.roleplay.MapObstacleUpdateMessage import (
     MapObstacleUpdateMessage,
+)
+from com.ankamagames.dofus.network.messages.game.guild.tax.TaxCollectorListMessage import (
+    TaxCollectorListMessage,
 )
 from com.ankamagames.dofus.network.types.game.context.fight.FightResultFighterListEntry import (
     FightResultFighterListEntry,
@@ -350,14 +358,33 @@ class FightContextFrame(Frame):
         fighterInfos = self.getFighterInfos(fighterId)
         if not fighterInfos:
             return "Unknown Fighter"
+
         if isinstance(fighterInfos, GameFightFighterNamedInformations):
             return fighterInfos.name
+
         if isinstance(fighterInfos, GameFightMonsterInformations):
-            return Monster.getMonsterById(fighterInfos.creatureGenericId)
+            return Monster.getMonsterById(fighterInfos.creatureGenericId).name
+
         if isinstance(fighterInfos, GameFightEntityInformation):
-            return "Companion"
+            compInfos = fighterInfos
+            genericName = Companion.getCompanionById(compInfos.entityModelId).name
+            if compInfos.masterId != PlayedCharacterManager().id:
+                masterName = self.getFighterName(compInfos.masterId)
+                name = I18n.getUiText("ui.common.belonging", [genericName, masterName])
+            else:
+                name = genericName
+            return name
+
         if isinstance(fighterInfos, GameFightTaxCollectorInformations):
-            return "Tax collector"
+            taxInfos = fighterInfos
+            return (
+                TaxCollectorFirstname.getTaxCollectorFirstnameById(
+                    taxInfos.firstNameId
+                ).firstname
+                + " "
+                + TaxCollectorName.getTaxCollectorNameById(taxInfos.lastNameId).name
+            )
+
         else:
             return "Unknown Fighter Type"
 
@@ -367,28 +394,28 @@ class FightContextFrame(Frame):
             return 0
         if isinstance(fighterInfos, GameFightMutantInformations):
             return fighterInfos.powerLevel
+
         if isinstance(fighterInfos, GameFightCharacterInformations):
             return fighterInfos.level
+
         if isinstance(fighterInfos, GameFightEntityInformation):
             return fighterInfos.level
+
         if isinstance(fighterInfos, GameFightMonsterInformations):
             if self.fightType == FightTypeEnum.FIGHT_TYPE_BREACH:
                 minLevel = float("inf")
                 for entity in self._entitiesFrame.entities.values():
                     if isinstance(
-                        self._entitiesFrame.entities[entity],
+                        entity,
                         GameFightMonsterInformations,
                     ):
-                        creatureLevel = self._entitiesFrame.entities[
-                            entity
-                        ].creatureLevel
+                        creatureLevel = entity.creatureLevel
                     if (
-                        fighterInfos.creatureGenericId
-                        == self._entitiesFrame.entities[entity].creatureGenericId
-                        and self._entitiesFrame.entities[entity]
+                        fighterInfos.creatureGenericId == entity.creatureGenericId
+                        and entity.stats.summoned
                     ):
                         return creatureLevel
-                    if not self._entitiesFrame.entities[entity]:
+                    if not entity.stats.summoned:
                         if minLevel > creatureLevel:
                             minLevel = creatureLevel
                 return minLevel
@@ -436,8 +463,6 @@ class FightContextFrame(Frame):
 
         if isinstance(msg, CurrentMapMessage):
             mcmsg = msg
-            ConnectionsHandler.pause()
-            Kernel().getWorker().pause()
             if isinstance(mcmsg, CurrentMapInstanceMessage):
                 mdm.MapDisplayManager().mapInstanceId = mcmsg.instantiatedMapId
             else:
@@ -456,8 +481,6 @@ class FightContextFrame(Frame):
             gcrmsg = GameContextReadyMessage()
             gcrmsg.init(mdm.MapDisplayManager().currentMapPoint.mapId)
             ConnectionsHandler.getConnection().send(gcrmsg)
-            Kernel().getWorker().resume()
-            ConnectionsHandler.resume()
             return True
 
         if isinstance(msg, GameFightResumeMessage):

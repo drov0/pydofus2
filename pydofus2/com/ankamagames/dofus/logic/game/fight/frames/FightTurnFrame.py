@@ -382,7 +382,7 @@ class FightTurnFrame(Frame):
         playerInfos: GameFightFighterInformations = entitiesFrame.getEntityInfos(
             self._playerEntity.id
         )
-        tackle: float = TackleUtil.getTackle(entitiesFrame, playerInfos, playerPosition)
+        tackle: float = TackleUtil.getTackle(playerInfos, playerPosition)
         self._tackleByCellId = dict()
         self._tackleByCellId[playerPosition.cellId] = tackle
         mpLost: int = int(movementPoints * (1 - tackle) + 0.5)
@@ -410,12 +410,10 @@ class FightTurnFrame(Frame):
         if not self._playerEntity:
             self.removePath()
             return
-        # characteristics: CharacterCharacteristicsInformations = (
-        #     CurrentPlayedFighterManager().getCharacteristicsInformations()
-        # )
         stats: EntityStats = CurrentPlayedFighterManager().getStats()
         movementPoints: int = stats.getStatTotalValue(StatIds.MOVEMENT_POINTS)
         actionPoints: int = stats.getStatTotalValue(StatIds.ACTION_POINTS)
+        logger.debug(f"MP : {movementPoints}, AP : {actionPoints}")
         if (
             self._playerEntity.isMoving
             or self._playerEntity.position.distanceToCell(destCell) > movementPoints

@@ -9,7 +9,7 @@ logger = Logger(__name__)
 
 class EntityStats:
     _entityId: float = None
-    _stats: dict
+    _stats: dict[str, Stat] = {}
 
     def __init__(self, entityId: float):
         super().__init__()
@@ -38,14 +38,19 @@ class EntityStats:
         self._stats[str(stat.id)] = stat
 
     def getStat(self, statId: float) -> Stat:
-        if not (statId in self._stats):
+        if str(statId) not in self._stats:
+            logger.error(
+                self.getFormattedMessage(
+                    "Stat ID " + str(statId) + " not found in stats"
+                )
+            )
             return None
         return self._stats[str(statId)]
 
     def deleteStat(self, statId: float) -> None:
-        if not (statId in self._stats):
-            return
         statKey: str = str(statId)
+        if statKey not in self._stats:
+            return
         stat: Stat = self._stats[statKey]
         stat.reset()
         del self._stats[statKey]
@@ -55,7 +60,7 @@ class EntityStats:
             stat.reset()
         self._stats = dict()
 
-    def getStatsfloat(self) -> float:
+    def getStatsNumber(self) -> float:
         counter: float = 0
         for _ in self._stats:
             counter += 1
@@ -66,63 +71,63 @@ class EntityStats:
 
     def getStatTotalValue(self, statId: float) -> float:
         key: str = str(statId)
-        if not (statId in self._stats):
+        if key not in self._stats:
             return 0
         stat: Stat = self._stats.get(key)
-        return stat is not float(stat.totalValue) if None else float(0)
+        return float(stat.totalValue) if stat is not None else float(0)
 
     def getStatBaseValue(self, statId: float) -> float:
         key: str = str(statId)
-        if not (statId in self._stats):
+        if key not in self._stats:
             return 0
         stat: Stat = self._stats[key]
         if isinstance(stat, DetailedStat):
-            return stat
+            return stat.baseValue
         return 0
 
     def getStatAdditionalValue(self, statId: float) -> float:
         key: str = str(statId)
-        if not (statId in self._stats):
+        if key not in self._stats:
             return 0
         stat: Stat = self._stats[key]
         if isinstance(stat, DetailedStat):
-            return stat
+            return stat.additionalValue
         return 0
 
     def getStatObjectsAndMountBonusValue(self, statId: float) -> float:
         key: str = str(statId)
-        if not (statId in self._stats):
+        if key not in self._stats:
             return 0
         stat: Stat = self._stats[key]
         if isinstance(stat, DetailedStat):
-            return stat
+            return stat.objectsAndMountBonusValue
         return 0
 
     def getStatAlignGiftBonusValue(self, statId: float) -> float:
         key: str = str(statId)
-        if not (statId in self._stats):
+        if key not in self._stats:
             return 0
         stat: Stat = self._stats[key]
         if isinstance(stat, DetailedStat):
-            return stat
+            return stat.alignGiftBonusValue
         return 0
 
     def getStatContextModifValue(self, statId: float) -> float:
         key: str = str(statId)
-        if not (statId in self._stats):
+        if key not in self._stats:
             return 0
         stat: Stat = self._stats[key]
         if isinstance(stat, DetailedStat):
-            return stat
+            return stat.contextModifValue
         return 0
 
     def getStatUsedValue(self, statId: float) -> float:
         key: str = str(statId)
-        if not (statId in self._stats):
+        if key not in self._stats:
             return 0
         stat: Stat = self._stats[key]
         if isinstance(stat, UsableStat):
-            return stat
+            return stat.usedValue
         return 0
 
     def __str__(self) -> str:
@@ -148,7 +153,6 @@ class EntityStats:
         )
 
     def getMaxHealthPoints(self) -> float:
-        detailedVitalityStat: DetailedStat = None
         vitalityStat: Stat = self.getStat(StatIds.VITALITY)
         effectiveVitality: float = 0
         if isinstance(vitalityStat, DetailedStat):

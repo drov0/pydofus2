@@ -2,6 +2,7 @@ from typing import TYPE_CHECKING
 from com.ankamagames.dofus.datacenter.monsters.AnimFunMonsterData import (
     AnimFunMonsterData,
 )
+from com.ankamagames.jerakine.data.I18n import I18n
 
 if TYPE_CHECKING:
     from com.ankamagames.dofus.datacenter.monsters.MonsterDrop import MonsterDrop
@@ -101,9 +102,9 @@ class Monster:
 
     characRatios: list[list[float]]
 
-    _name: str
+    _name: str = None
 
-    _undiatricalName: str
+    _undiatricalName: str = None
 
     @property
     def type(self) -> "MonsterRace":
@@ -141,3 +142,15 @@ class Monster:
             if characId == int(charac[0]):
                 return charac[1]
         return 1
+
+    @property
+    def name(self) -> str:
+        if not self._name:
+            self._name = I18n.getText(self.nameId)
+        return self._name
+
+    @property
+    def undiatricalName(self) -> str:
+        if not self._undiatricalName:
+            self._undiatricalName = I18n.getUnDiacriticalText(self.nameId)
+        return self._undiatricalName

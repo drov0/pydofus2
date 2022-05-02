@@ -97,7 +97,7 @@ class BasicBuff:
             Kernel().getWorker().getFrame("FightBattleFrame")
         )
         currentPlayerId: float = fightBattleFrame.currentPlayerId
-        isPlayerId = currentPlayerId is not 0
+        isPlayerId = currentPlayerId != 0
         fighterInfo: GameFightFighterInformations = None
         if isPlayerId:
             entitiesFrame = Kernel().getWorker().getFrame("FightEntitiesFrame")
@@ -130,13 +130,13 @@ class BasicBuff:
     @property
     def param1(self) -> Any:
         if isinstance(self._effect, EffectInstanceDice):
-            return self._effect.param1
+            return self._effect.diceNum
         return None
 
     @property
     def param2(self) -> Any:
         if isinstance(self._effect, EffectInstanceDice):
-            return self._effect.param2
+            return self._effect.diceSide
         return None
 
     @property
@@ -233,8 +233,8 @@ class BasicBuff:
             self._effect.effectUid = self.dataUid
             self._effect.effectId = self.actionId
             self._effect.duration = self.duration
-            self._effect.param1 = param1
-            self._effect.param2 = param2
+            self._effect.diceNum = param1
+            self._effect.diceSide = param2
             self._effect.param3 = value
             self._effect.trigger = self.trigger
         else:

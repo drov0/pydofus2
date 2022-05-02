@@ -372,7 +372,7 @@ class FightEventsHelper(metaclass=Singleton):
                                 break
                             buffStackCount += 1
                             tmpparam1 += int(event.buff.rawParam1)
-                    EffectInstanceDice(tmpEffect).param1 = tmpparam1
+                    EffectInstanceDice(tmpEffect).diceNum = tmpparam1
                 evt.params[1] = tmpEffect.description
             team = self.groupEntitiesByTeam(
                 playerTeamId,

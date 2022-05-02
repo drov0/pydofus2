@@ -161,14 +161,10 @@ class ItemCriterion(IItemCriterion):
     def getCriterion(self) -> int:
         criterion: int = 0
         player: PlayedCharacterManager = PlayedCharacterManager()
-        statsManager: statsManager = StatsManager()
 
-        if statsManager == None:
-            return 0
+        stats: EntityStats = StatsManager().getStats(player.id)
 
-        stats: EntityStats = statsManager.getStats(player.id)
-
-        if stats == None:
+        if stats is None:
             return 0
 
         elif self._criterionRef == "Ca":

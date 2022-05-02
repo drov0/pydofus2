@@ -3,8 +3,6 @@ import random
 from threading import Timer
 from types import FunctionType
 from com.ankamagames.jerakine.logger.Logger import Logger
-from whistle import Event
-from com.ankamagames.atouin.managers.EntitiesManager import EntitiesManager
 from com.ankamagames.atouin.managers.MapDisplayManager import MapDisplayManager
 from com.ankamagames.atouin.messages.CellClickMessage import CellClickMessage
 from com.ankamagames.atouin.messages.MapLoadedMessage import MapLoadedMessage
@@ -24,9 +22,6 @@ from com.ankamagames.dofus.logic.game.fight.miscs.FightReachableCellsMaker impor
 )
 from com.ankamagames.dofus.logic.game.roleplay.frames.RoleplayEntitiesFrame import (
     RoleplayEntitiesFrame,
-)
-from com.ankamagames.dofus.network.messages.authorized.AdminQuietCommandMessage import (
-    AdminQuietCommandMessage,
 )
 from com.ankamagames.dofus.network.messages.common.basic.BasicPingMessage import (
     BasicPingMessage,
@@ -58,9 +53,6 @@ from com.ankamagames.dofus.network.messages.game.context.fight.character.GameFig
 from com.ankamagames.dofus.network.messages.game.context.roleplay.MapComplementaryInformationsDataMessage import (
     MapComplementaryInformationsDataMessage,
 )
-from com.ankamagames.dofus.network.messages.game.context.roleplay.MapFightCountMessage import (
-    MapFightCountMessage,
-)
 from com.ankamagames.dofus.network.types.game.context.fight.GameFightMonsterInformations import (
     GameFightMonsterInformations,
 )
@@ -74,6 +66,15 @@ from com.ankamagames.jerakine.messages.Message import Message
 from com.ankamagames.jerakine.metaclasses.Singleton import Singleton
 from com.ankamagames.jerakine.types.enums.Priority import Priority
 from com.ankamagames.jerakine.types.positions.MapPoint import MapPoint
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from com.ankamagames.dofus.logic.game.fight.frames.FightTurnFrame import (
+        FightTurnFrame,
+    )
+    from com.ankamagames.dofus.logic.game.fight.frames.FightContextFrame import (
+        FightContextFrame,
+    )
 
 logger = Logger(__name__)
 
@@ -117,7 +118,7 @@ class BotFightFrame(Frame, metaclass=Singleton):
 
     @property
     def priority(self) -> int:
-        return Priority.ULTIMATE_HIGHEST_DEPTH_OF_DOOM
+        return Priority.LOW
 
     @property
     def fightCount(self) -> int:
@@ -128,15 +129,19 @@ class BotFightFrame(Frame, metaclass=Singleton):
         if isinstance(msg, GameFightJoinMessage):
             self._fightCount += 1
             self._inFight = True
+            return True
 
         if isinstance(msg, GameFightEndMessage):
             self._inFight = False
+            return True
 
         if isinstance(msg, MapComplementaryInformationsDataMessage):
             self._wait = False
+            return True
 
         if isinstance(msg, MapLoadedMessage):
             self._wait = True
+            return True
 
         if isinstance(msg, GameFightShowFighterMessage):
             self._turnPlayed = 0
@@ -144,6 +149,7 @@ class BotFightFrame(Frame, metaclass=Singleton):
             startFightMsg = GameFightReadyMessage()
             startFightMsg.init(True)
             ConnectionsHandler.getConnection().send(startFightMsg)
+            return True
 
         if isinstance(msg, GameFightTurnStartMessage):
             turnStartMsg = msg
@@ -156,9 +162,11 @@ class BotFightFrame(Frame, metaclass=Singleton):
                 self.nextTurnAction()
             else:
                 self._myTurn = False
+            return True
 
         if isinstance(msg, SequenceEndMessage):
             self.nextTurnAction()
+            return True
 
         return False
 
@@ -216,15 +224,11 @@ class BotFightFrame(Frame, metaclass=Singleton):
             )
         )
         logger.debug(f"found {len(reachableCellsMaker.reachableCells)} reachable cells")
-        if not reachableCellsMaker.reachableCells:
+        if len(reachableCellsMaker.reachableCells) == 0:
             self.nextTurnAction()
             return
-        ccmsg: CellClickMessage = CellClickMessage()
         randomCell: int = random.choice(reachableCellsMaker.reachableCells)
-        ccmsg.cell = MapPoint.fromCellId(randomCell)
-        ccmsg.cellId = ccmsg.cell.cellId
-        ccmsg.id = MapDisplayManager().currentMapPoint.mapId
-        Kernel().getWorker().process(ccmsg)
+        self.moveToCell(MapPoint.fromCellId(randomCell))
 
     def castSpell(self, spellId: int, onMySelf: bool) -> None:
         cellId: int = 0
@@ -253,3 +257,22 @@ class BotFightFrame(Frame, metaclass=Singleton):
             cellId = avaibleCells[math.floor(len(avaibleCells) * random.random())]
         gafcrmsg.init(spellId, cellId)
         ConnectionsHandler.getConnection().send(gafcrmsg)
+
+    def moveToCell(self, cell: MapPoint) -> None:
+        if not self._myTurn:
+            logger.debug("Wants to move when it's not its turn yet")
+            return False
+        fightTurnFrame: "FightTurnFrame" = (
+            Kernel().getWorker().getFrame("FightTurnFrame")
+        )
+        if not fightTurnFrame:
+            logger.debug(
+                "Wants to move inside fight but 'FightTurnFrame' not found in kernel"
+            )
+            return False
+        logger.debug(
+            f"Current cell {fightTurnFrame._playerEntity.position.cellId} moving to cell {cell.cellId}"
+        )
+        fightTurnFrame.drawPath(cell)
+        fightTurnFrame.askMoveTo(cell)
+        return True

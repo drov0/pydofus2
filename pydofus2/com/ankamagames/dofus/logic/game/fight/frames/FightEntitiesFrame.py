@@ -295,7 +295,7 @@ class FightEntitiesFrame(AbstractEntitiesFrame, Frame):
                 gfsfmsg.informations.contextualId
             ):
                 pass
-            return True
+            return False
 
         if isinstance(msg, GameFightHumanReadyStateMessage):
             gfhrsmsg = msg

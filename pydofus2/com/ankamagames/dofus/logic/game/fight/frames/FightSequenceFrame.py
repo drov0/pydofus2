@@ -1649,7 +1649,7 @@ class FightSequenceFrame(Frame, ISpellCastProvider):
             if e != None:
                 description = e.description
             logger.debug(
-                "\r[BUFFS DEBUG] Message de nouveau buff '"
+                "\r[BUFFS DEBUG] New Buff '"
                 + description
                 + "' ("
                 + str(gaftbmsg.actionId)
@@ -1876,26 +1876,24 @@ class FightSequenceFrame(Frame, ISpellCastProvider):
         self, fighterId: float, actionId: int, delta: int
     ) -> None:
         step: IFightStep = None
-        if actionId == ActionIdProtocol.ACTION_CHARACTER_ACTION_POINTS_USE:
-            step = FightActionPointsVariationStep(fighterId, delta, True)
-        elif (
-            actionId == ActionIds.ACTION_CHARACTER_ACTION_POINTS_LOST
-            or actionId == ActionIds.ACTION_CHARACTER_ACTION_POINTS_WIN
-        ):
+        if actionId in [
+            ActionIdProtocol.ACTION_CHARACTER_ACTION_POINTS_USE,
+            ActionIds.ACTION_CHARACTER_ACTION_POINTS_LOST,
+            ActionIds.ACTION_CHARACTER_ACTION_POINTS_WIN,
+        ]:
             step = FightActionPointsVariationStep(fighterId, delta, False)
-        elif actionId == ActionIdProtocol.ACTION_CHARACTER_MOVEMENT_POINTS_USE:
-            step = FightMovementPointsVariationStep(fighterId, delta, True)
-        elif (
-            actionId == ActionIds.ACTION_CHARACTER_MOVEMENT_POINTS_LOST
-            or actionId == ActionIds.ACTION_CHARACTER_MOVEMENT_POINTS_WIN
-        ):
+        elif actionId in [
+            ActionIdProtocol.ACTION_CHARACTER_MOVEMENT_POINTS_USE,
+            ActionIds.ACTION_CHARACTER_MOVEMENT_POINTS_LOST,
+            ActionIds.ACTION_CHARACTER_MOVEMENT_POINTS_WIN,
+        ]:
             step = FightMovementPointsVariationStep(fighterId, delta, False)
         else:
             logger.warn(
                 f"Points variation with unsupported action ({actionId}), skipping."
             )
             return
-        if self.castingSpell != None:
+        if self.castingSpell is not None:
             step.castingSpellId = self.castingSpell.castingSpellId
         self._stepsBuffer.append(step)
 

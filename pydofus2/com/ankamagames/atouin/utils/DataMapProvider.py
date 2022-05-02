@@ -17,13 +17,13 @@ logger = Logger(__name__)
 
 class DataMapProvider(IDataMapProvider, metaclass=Singleton):
     TOLERANCE_ELEVATION: int = 11
+    obstaclesCells = list[int]()
+    _updatedCell = dict()
+    _specialEffects = dict()
+    _playerobject = None
+    isInFight = False
 
     def __init__(self):
-        self.obstaclesCells = list[int]()
-        self._updatedCell = dict()
-        self._specialEffects = dict()
-        self._playerobject = None
-        self.isInFight = False
         super().__init__()
 
     def init(self, playerobject: object):
@@ -66,7 +66,7 @@ class DataMapProvider(IDataMapProvider, metaclass=Singleton):
         bAllowTroughEntity: bool = True,
         previousCellId: int = -1,
         endCellId: int = -1,
-        aNoneObstacles: bool = True,
+        avoidObstacles: bool = True,
         dataMap=None,
     ) -> bool:
         if MapPoint.isInMap(x, y):
@@ -75,17 +75,15 @@ class DataMapProvider(IDataMapProvider, metaclass=Singleton):
             useNewSystem = dataMap.isUsingNewMovementSystem
             cellId = MapTools.getCellIdByCoord(x, y)
             cellData = dataMap.cells[cellId]
-            mov = cellData.mov and (
-                not self.isInFight or not cellData.nonWalkableDuringFight
-            )
+            # logger.debug(
+            #     f"IsInFight : {self.isInFight}, cellData.nonWalkableDuringRP : {cellData.nonWalkableDuringRP}, useNewSystem : {useNewSystem}"
+            # )
+            mov = cellData.mov and not (self.isInFight and cellData.nonWalkableDuringFight)
+            # logger.debug(f"mov : {mov}")
             if self._updatedCell.get(cellId) != None:
                 mov = self._updatedCell[cellId]
-            if (
-                mov
-                and useNewSystem
-                and previousCellId != -1
-                and previousCellId != cellId
-            ):
+            # logger.debug(f"mov : {mov}")
+            if mov and useNewSystem and previousCellId != -1 and previousCellId != cellId:
                 previousCellData = dataMap.cells[previousCellId]
                 dif = abs(abs(cellData.floor) - abs(previousCellData.floor))
                 if (
@@ -96,21 +94,15 @@ class DataMapProvider(IDataMapProvider, metaclass=Singleton):
                     and dif > self.TOLERANCE_ELEVATION
                 ):
                     mov = False
+                    # logger.debug(f"mov : {mov}")
             if not bAllowTroughEntity:
-                for e in EntitiesManager().entities:
-                    if (
-                        e
-                        and isinstance(e, IObstacle)
-                        and e.position
-                        and e.position.cellId == cellId
-                    ):
+                for e in EntitiesManager().entities.values():
+                    if isinstance(e, IObstacle) and e.position and e.position.cellId == cellId:
                         o = e
                         if not (endCellId == cellId and o.canWalkTo()):
-                            if not o.canWalkThrough():
+                            if not o.canWalkThrough:
                                 return False
-                if aNoneObstacles and (
-                    cellId not in self.obstaclesCells and cellId != endCellId
-                ):
+                if avoidObstacles and (cellId in self.obstaclesCells and cellId != endCellId):
                     return False
         else:
             mov = False
@@ -119,13 +111,9 @@ class DataMapProvider(IDataMapProvider, metaclass=Singleton):
     def pointCanStop(self, x: int, y: int, bAllowTroughEntity: bool = True) -> bool:
         cellId: int = MapTools.getCellIdByCoord(x, y)
         cellData: "Cell" = mdmm.MapDisplayManager().currentDataMap.cells[cellId]
-        return self.pointMov(x, y, bAllowTroughEntity) and (
-            self.isInFight or not cellData.nonWalkableDuringRP
-        )
+        return self.pointMov(x, y, bAllowTroughEntity) and (self.isInFight or not cellData.nonWalkableDuringRP)
 
-    def fillEntityOnCelllist(
-        self, v: list[bool], allowThroughEntity: bool
-    ) -> list[bool]:
+    def fillEntityOnCellArray(self, v: list[bool], allowThroughEntity: bool) -> list[bool]:
         for e in EntitiesManager().entities.values():
             if (
                 isinstance(e, self._playerobject)
@@ -148,36 +136,25 @@ class DataMapProvider(IDataMapProvider, metaclass=Singleton):
             if entity:
                 weight = 20
             else:
+                if EntitiesManager().getEntityOnCell(cellId, self._playerobject) is not None:
+                    weight += 0.3
                 if (
-                    EntitiesManager().getEntityOnCell(cellId, self._playerobject)
+                    EntitiesManager().getEntityOnCell(MapTools.getCellIdByCoord(x + 1, y), self._playerobject)
                     is not None
                 ):
                     weight += 0.3
                 if (
-                    EntitiesManager().getEntityOnCell(
-                        MapTools.getCellIdByCoord(x + 1, y), self._playerobject
-                    )
+                    EntitiesManager().getEntityOnCell(MapTools.getCellIdByCoord(x, y + 1), self._playerobject)
                     is not None
                 ):
                     weight += 0.3
                 if (
-                    EntitiesManager().getEntityOnCell(
-                        MapTools.getCellIdByCoord(x, y + 1), self._playerobject
-                    )
+                    EntitiesManager().getEntityOnCell(MapTools.getCellIdByCoord(x - 1, y), self._playerobject)
                     is not None
                 ):
                     weight += 0.3
                 if (
-                    EntitiesManager().getEntityOnCell(
-                        MapTools.getCellIdByCoord(x - 1, y), self._playerobject
-                    )
-                    is not None
-                ):
-                    weight += 0.3
-                if (
-                    EntitiesManager().getEntityOnCell(
-                        MapTools.getCellIdByCoord(x, y - 1), self._playerobject
-                    )
+                    EntitiesManager().getEntityOnCell(MapTools.getCellIdByCoord(x, y - 1), self._playerobject)
                     is not None
                 ):
                     weight += 0.3
@@ -204,14 +181,10 @@ class DataMapProvider(IDataMapProvider, metaclass=Singleton):
 
     def hasEntity(self, x: int, y: int, bAllowTroughEntity: bool = False) -> bool:
         o: IObstacle = None
-        cellEntities: list = EntitiesManager().getEntitiesOnCell(
-            MapTools.getCellIdByCoord(x, y), IObstacle
-        )
+        cellEntities: list = EntitiesManager().getEntitiesOnCell(MapTools.getCellIdByCoord(x, y), IObstacle)
         if len(cellEntities):
             for o in cellEntities:
-                if not IObstacle(o).canWalkTo() and (
-                    not bAllowTroughEntity or not o.canSeeThrough()
-                ):
+                if not IObstacle(o).canWalkTo() and (not bAllowTroughEntity or not o.canSeeThrough()):
                     return True
         return False
 

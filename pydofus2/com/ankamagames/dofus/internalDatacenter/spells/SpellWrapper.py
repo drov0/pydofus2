@@ -681,8 +681,7 @@ class SpellWrapper(ISlotData, ICellZoneProvider, IDataCenter):
             entityId = SpellWrapper.getEntityId()
             if areModifiers and (
                 effectInstance.category == DataEnum.ACTION_TYPE_DAMAGES
-                and SpellWrapper.BASE_DAMAGE_EFFECT_IDS.find(effectInstance.effectId)
-                != -1
+                and effectInstance.effectId in SpellWrapper.BASE_DAMAGE_EFFECT_IDS
             ):
                 damageBaseSpellModifier = (
                     spellmm.SpellModifiersManager().getSpellModifier(
@@ -691,7 +690,9 @@ class SpellWrapper(ISlotData, ICellZoneProvider, IDataCenter):
                         CharacterSpellModificationTypeEnum.BASE_DAMAGE,
                     )
                 )
-                if damageBaseSpellModifier and effectInstance is EffectInstanceDice:
+                if damageBaseSpellModifier and isinstance(
+                    effectInstance, EffectInstanceDice
+                ):
                     modif = (
                         damageBaseSpellModifier.totalValue
                         - damageBaseSpellModifier.additionalValue
@@ -719,8 +720,7 @@ class SpellWrapper(ISlotData, ICellZoneProvider, IDataCenter):
             effectInstance = effectInstance.clone()
             if areModifiers and (
                 effectInstance.category == DataEnum.ACTION_TYPE_DAMAGES
-                and SpellWrapper.BASE_DAMAGE_EFFECT_IDS.find(effectInstance.effectId)
-                != -1
+                and effectInstance.effectId in SpellWrapper.BASE_DAMAGE_EFFECT_IDS
             ):
                 damageBaseSpellModifier = (
                     spellmm.SpellModifiersManager().getSpellModifier(
@@ -729,7 +729,9 @@ class SpellWrapper(ISlotData, ICellZoneProvider, IDataCenter):
                         CharacterSpellModificationTypeEnum.BASE_DAMAGE,
                     )
                 )
-                if damageBaseSpellModifier and effectInstance is EffectInstanceDice:
+                if damageBaseSpellModifier and isinstance(
+                    effectInstance, EffectInstanceDice
+                ):
                     effectInstanceDice = effectInstance
                     modif = (
                         damageBaseSpellModifier.totalValue

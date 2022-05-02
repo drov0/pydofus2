@@ -741,7 +741,7 @@ class FightSpellCastFrame(Frame):
                     "ui.fightAutomsg.targetcast.available", [spellName, targetName]
                 )
             ccmmsg = ChatClientMultiMessage()
-            ccmmsg.init(text, ChatActivableChannelsEnum.CHANNEL_TEAM)
+            ccmmsg.init(content_=text, channel_=ChatActivableChannelsEnum.CHANNEL_TEAM)
             ConnectionsHandler.getConnection().send(ccmmsg)
             return
         if forceCheckForRange and self._spellLevel["maximalRange"] < 63:

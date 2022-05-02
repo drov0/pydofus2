@@ -45,7 +45,7 @@ class StatBuff(basicBuff.BasicBuff):
     @property
     def delta(self) -> int:
         if isinstance(self._effect, EffectInstanceDice):
-            return self._effect.param1 if self._isABoost else -self._effect.param1
+            return self._effect.diceNum if self._isABoost else -self._effect.diceNum
         return 0
 
     def onReenable(self) -> None:

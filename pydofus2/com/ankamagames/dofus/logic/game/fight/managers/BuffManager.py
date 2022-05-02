@@ -8,8 +8,8 @@ from com.ankamagames.dofus.datacenter.spells.SpellLevel import SpellLevel
 from com.ankamagames.dofus.enums.ActionIds import ActionIds
 from com.ankamagames.dofus.internalDatacenter.spells.SpellWrapper import SpellWrapper
 from com.ankamagames.dofus.kernel.Kernel import Kernel
-import com.ankamagames.dofus.logic.game.fight.fightEvents.FightEventsHelper as fightEventsHelper
-import com.ankamagames.dofus.logic.game.fight.frames.FightEntitiesFrame as fightEntitiesFrame
+import com.ankamagames.dofus.logic.game.fight.fightEvents.FightEventsHelper as fevth
+import com.ankamagames.dofus.logic.game.fight.frames.FightEntitiesFrame as fenf
 from com.ankamagames.dofus.logic.game.fight.managers.CurrentPlayedFighterManager import (
     CurrentPlayedFighterManager,
 )
@@ -244,7 +244,7 @@ class BuffManager(metaclass=Singleton):
                         newBuffs[buffItem.targetId] = []
                     newBuffs[buffItem.targetId].append(buffItem)
         self._buffs = newBuffs
-        fightEventsHelper.FightEventsHelper().sendAllFightEvent(True)
+        fevth.FightEventsHelper().sendAllFightEvent(True)
 
     def markFinishingBuffs(
         self, targetId: float, currentTurnIsEnding: bool = True
@@ -426,7 +426,7 @@ class BuffManager(metaclass=Singleton):
     ) -> None:
         if GameDebugManager().buffsDebugActivated:
             logger.debug(
-                "[BUFFS DEBUG] Desenvoutement de tous les buffs de " + targetId
+                f"[BUFFS DEBUG] Desenvotment of all buffs belongin to {targetId}"
             )
         newBuffs: list = []
         for buff in self._buffs[targetId]:
@@ -439,7 +439,9 @@ class BuffManager(metaclass=Singleton):
                 buff.onRemoved()
             else:
                 if GameDebugManager().buffsDebugActivated:
-                    logger.debug("[BUFFS DEBUG]      Buff " + str(buff.uid) + " reste")
+                    logger.debug(
+                        "[BUFFS DEBUG]      Buff " + str(buff.uid) + " remains"
+                    )
                 newBuffs.append(buff)
         self._buffs[targetId] = newBuffs
 
@@ -657,7 +659,7 @@ class BuffManager(metaclass=Singleton):
         return None
 
     @property
-    def fightEntitiesFrame(self) -> fightEntitiesFrame.FightEntitiesFrame:
+    def fightEntitiesFrame(self) -> fenf.FightEntitiesFrame:
         return Kernel().getWorker().getFrame("FightEntitiesFrame")
 
     def getBuffIndex(self, targetId: float, buffId: int) -> int:

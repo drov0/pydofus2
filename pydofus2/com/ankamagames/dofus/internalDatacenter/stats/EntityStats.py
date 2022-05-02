@@ -34,18 +34,18 @@ class EntityStats:
         )
 
     def setStat(self, stat: Stat, isBulkUpdate: bool = True) -> None:
+        # logger.debug(f"Set stat {stat} for entity {self._entityId}")
         stat.entityId = float(self._entityId)
         self._stats[str(stat.id)] = stat
 
     def getStat(self, statId: float) -> Stat:
-        if str(statId) not in self._stats:
+        statKey = str(statId)
+        if statKey not in self._stats:
             logger.error(
-                self.getFormattedMessage(
-                    "Stat ID " + str(statId) + " not found in stats"
-                )
+                self.getFormattedMessage("Stat ID " + statKey + " not found in stats")
             )
             return None
-        return self._stats[str(statId)]
+        return self._stats[statKey]
 
     def deleteStat(self, statId: float) -> None:
         statKey: str = str(statId)
@@ -131,17 +131,11 @@ class EntityStats:
         return 0
 
     def __str__(self) -> str:
-        statId: float = None
         statsDump: str = ""
-        statIds = list[float]()
-        stat: Stat = None
-        for stat in self._stats:
-            statIds.append(stat.id)
-        statIds.sort()
-        for statId in statIds:
-            stat = str(self._stats[statId])
+        for stat in self._stats.values():
             statsDump += "\n\t" + str(stat)
         if not statsDump:
+            logger.debug(self._stats)
             statsDump = "\n\tNo stats to display."
         return self.getFormattedMessage(statsDump)
 

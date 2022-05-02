@@ -97,7 +97,7 @@ class DetailedStat(Stat):
             self._additionalValue
         ) = (
             self._objectsAndMountBonusValue
-        ) = self._alignGiftBonusValue = self._contextModifValue = _totalValue = 0
+        ) = self._alignGiftBonusValue = self._contextModifValue = self._totalValue = 0
 
     def updateTotal(self) -> None:
         self._totalValue = (

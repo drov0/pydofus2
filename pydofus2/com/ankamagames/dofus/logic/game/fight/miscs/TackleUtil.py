@@ -62,30 +62,22 @@ class TackleUtil:
 
             if MapPoint.isInMap(x - 1, y):
                 entities.append(
-                    cls.getTacklerOnCell(
-                        entitiesFrame, MapTools.getCellIdByCoord(x - 1, y)
-                    )
+                    cls.getTacklerOnCell(MapTools.getCellIdByCoord(x - 1, y))
                 )
 
             if MapPoint.isInMap(x + 1, y):
                 entities.append(
-                    cls.getTacklerOnCell(
-                        entitiesFrame, MapTools.getCellIdByCoord(x + 1, y)
-                    )
+                    cls.getTacklerOnCell(MapTools.getCellIdByCoord(x + 1, y))
                 )
 
             if MapPoint.isInMap(x, y - 1):
                 entities.append(
-                    cls.getTacklerOnCell(
-                        entitiesFrame, MapTools.getCellIdByCoord(x, y - 1)
-                    )
+                    cls.getTacklerOnCell(MapTools.getCellIdByCoord(x, y - 1))
                 )
 
             if MapPoint.isInMap(x, y + 1):
                 entities.append(
-                    cls.getTacklerOnCell(
-                        entitiesFrame, MapTools.getCellIdByCoord(x, y + 1)
-                    )
+                    cls.getTacklerOnCell(MapTools.getCellIdByCoord(x, y + 1))
                 )
 
             evadePercent = 1
@@ -120,7 +112,7 @@ class TackleUtil:
             return 1
         if not cls.canBeTackler(tackler, tackled):
             return 1
-        tackledStats: EntityStats = StatsManager.getStats(tackled.contextualId)
+        tackledStats: EntityStats = StatsManager().getStats(tackled.contextualId)
         evade: int = (
             int(tackledStats.getStatTotalValue(StatIds.TACKLE_EVADE))
             if tackledStats is not None
@@ -128,7 +120,7 @@ class TackleUtil:
         )
         if evade < 0:
             evade = 0
-        tacklerStats: EntityStats = StatsManager.getStats(tackler.contextualId)
+        tacklerStats: EntityStats = StatsManager().getStats(tackler.contextualId)
         tackle: int = (
             int(tacklerStats.getStatTotalValue(StatIds.TACKLE_BLOCK))
             if tacklerStats is not None
@@ -153,7 +145,7 @@ class TackleUtil:
                 entity.id
             )
             if infos and isinstance(
-                infos.disposition, "FightEntityDispositionInformations"
+                infos.disposition, FightEntityDispositionInformations
             ):
                 if not FightersStateManager().hasState(
                     entity.id, DataEnum.SPELL_STATE_CARRIED
@@ -233,7 +225,7 @@ class TackleUtil:
         pTackler: GameFightFighterInformations,
         pPlayerPath: MovementPath,
     ) -> bool:
-        stats: EntityStats = StatsManager.getStats(pPlayer.contextualId)
+        stats: EntityStats = StatsManager().getStats(pPlayer.contextualId)
         tackleEvadeStat: Stat = stats.getStat(StatIds.TACKLE_EVADE)
         evade: int = (
             int(tackleEvadeStat.totalValue) if tackleEvadeStat is not None else 0

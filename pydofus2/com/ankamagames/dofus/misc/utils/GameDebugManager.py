@@ -3,7 +3,7 @@ from com.ankamagames.jerakine.metaclasses.Singleton import Singleton
 
 class GameDebugManager(metaclass=Singleton):
 
-    buffsDebugActivated: bool = True
+    buffsDebugActivated: bool = False
 
     haxeGenerateTestFromNextSpellCast: bool = True
 

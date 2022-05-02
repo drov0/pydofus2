@@ -22,7 +22,7 @@ if TYPE_CHECKING:
 logger = Logger(__name__)
 
 
-class AutoTripFrame(Frame):
+class BotAutoTripFrame(Frame):
     dstMapId = None
     nextStepIndex = None
     path = None

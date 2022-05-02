@@ -39,7 +39,7 @@ from com.ankamagames.jerakine.types.enums.Priority import Priority
 from typing import TYPE_CHECKING, Tuple
 
 from pyd2bot.apis.FarmAPI import FarmAPI
-from pyd2bot.frames.AutoTripFrame import AutoTripFrame
+from pyd2bot.frames.BotAutoTripFrame import BotAutoTripFrame
 from pyd2bot.models.FarmParcours import FarmParcours
 
 if TYPE_CHECKING:
@@ -98,6 +98,10 @@ class BotFarmPathFrame(Frame):
         return True
 
     def process(self, msg: Message) -> bool:
+        if self._worker.contains("FightContextFrame") or self._worker.contains(
+            "AutoTripFrame"
+        ):
+            return False
 
         if isinstance(msg, InteractiveUseErrorMessage):
             logger.error(
@@ -141,10 +145,8 @@ class BotFarmPathFrame(Frame):
 
         elif isinstance(msg, MapComplementaryInformationsDataMessage):
             logger.debug("-" * 100)
-            if self._worker.contains("AutoTripFrame"):
-                return False
             if self.currMapCoords not in self.parcours.path:
-                self._worker.addFrame(AutoTripFrame(self.parcours.startMapId))
+                self._worker.addFrame(BotAutoTripFrame(self.parcours.startMapId))
                 return False
             else:
                 self._dstMapId = -1
@@ -171,8 +173,6 @@ class BotFarmPathFrame(Frame):
             return True
 
     def doFarm(self):
-        if self._worker.contains("FightContextFrame"):
-            return
         self._currentRequestedElementId = FarmAPI().collectResource(
             skills=self.parcours.skills
         )

@@ -42,5 +42,5 @@ class IDataMapProvider:
     def getCellSpeed(self, param1: int) -> int:
         pass
 
-    def fillEntityOnCelllist(self, param1: list[bool], param2: bool) -> list[bool]:
+    def fillEntityOnCellArray(self, param1: list[bool], param2: bool) -> list[bool]:
         pass

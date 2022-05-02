@@ -171,7 +171,7 @@ class SpellLevel(ICellZoneProvider, IDataCenter):
                 or effect.effectId == ActionIds.ACTION_FIGHT_KILL_AND_SUMMON
                 or effect.effectId == ActionIds.ACTION_FIGHT_KILL_AND_SUMMON_SLAVE
             ):
-                summonId = effect.param1
+                summonId = effect.diceNum
                 monsterS = Monster.getMonsterById(summonId)
                 if monsterS and monsterS.useSummonSlot:
                     return True
@@ -190,7 +190,7 @@ class SpellLevel(ICellZoneProvider, IDataCenter):
                 or effect.effectId == ActionIds.ACTION_FIGHT_KILL_AND_SUMMON
                 or effect.effectId == ActionIds.ACTION_FIGHT_KILL_AND_SUMMON_SLAVE
             ):
-                summonId = effect.param1
+                summonId = effect.diceNum
                 monsterS = Monster.getMonsterById(summonId)
                 if monsterS and monsterS.useBombSlot:
                     return True

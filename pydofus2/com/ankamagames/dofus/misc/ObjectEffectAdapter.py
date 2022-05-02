@@ -108,8 +108,8 @@ class ObjectEffectAdapter:
                 effect.max = oe.max
             if isinstance(oe, ObjectEffectDice):
                 effect = EffectInstanceDice()
-                effect.param1 = oe.param1
-                effect.param2 = oe.param2
+                effect.diceNum = oe.param1
+                effect.diceSide = oe.param2
                 effect.param3 = oe.diceConst
             if isinstance(oe, ObjectEffectDate):
                 effect = EffectInstanceDate()

@@ -9,7 +9,7 @@ from com.ankamagames.dofus.logic.game.fight.fightEvents.FightEventsHelper import
 from com.ankamagames.dofus.logic.game.fight.frames.FightEntitiesFrame import (
     FightEntitiesFrame,
 )
-import com.ankamagames.dofus.logic.game.fight.managers.BuffManager as buffManager
+import com.ankamagames.dofus.logic.game.fight.managers.BuffManager as bffm
 from com.ankamagames.dofus.logic.game.fight.steps.IFightStep import IFightStep
 from com.ankamagames.dofus.logic.game.fight.types.FightEventEnum import FightEventEnum
 from com.ankamagames.dofus.network.types.game.context.fight.GameFightFighterInformations import (
@@ -88,9 +88,9 @@ class FightDeathStep(AbstractSequencable, IFightStep):
         if fightBattleFrame:
             fightBattleFrame.deadFightersList.append(self._entityId)
         self._needToWarn = True
-        buffManager.BuffManager().dispell(dyingEntity.id, False, False, True)
-        buffManager.BuffManager().removeLinkedBuff(dyingEntity.id, False, True)
-        buffManager.BuffManager().reaffectBuffs(dyingEntity.id)
+        bffm.BuffManager().dispell(dyingEntity.id, False, False, True)
+        bffm.BuffManager().removeLinkedBuff(dyingEntity.id, False, True)
+        bffm.BuffManager().reaffectBuffs(dyingEntity.id)
         fighterStats.setStat(Stat(StatIds.CUR_PERMANENT_DAMAGE, 0))
         fighterStats.setStat(
             Stat(

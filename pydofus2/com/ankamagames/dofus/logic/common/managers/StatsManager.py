@@ -20,6 +20,7 @@ from com.ankamagames.jerakine.managers.StoreDataManager import StoreDataManager
 from com.ankamagames.jerakine.metaclasses.Singleton import Singleton
 from com.ankamagames.jerakine.types.DataStoreType import DataStoreType
 from com.ankamagames.jerakine.types.enums.DataStoreEnum import DataStoreEnum
+from damageCalculation.tools.StatIds import StatIds
 
 logger = Logger(__name__)
 
@@ -48,7 +49,9 @@ class StatsManager(metaclass=Singleton):
         )
 
     def setStats(self, stats: EntityStats) -> bool:
-        logger.info("Setting stats for entity with ID " + str(stats.entityId))
+        # logger.info(
+        #     f"Setting stats {stats.__dict__} for entity with ID '{stats.entityId}'"
+        # )
         if stats is None:
             logger.error("Tried to set None stats. Aborting")
             return False
@@ -58,17 +61,26 @@ class StatsManager(metaclass=Singleton):
 
     def getStats(self, entityId: float) -> EntityStats:
         key = str(float(entityId))
-        logger.info(f"Getting stats for entity with ID {entityId}")
+        logger.info(f"Getting stats for entity with ID {key}")
         return self._entityStats.get(key)
 
     def addRawStats(
         self, entityId: float, rawStats: list[CharacterCharacteristic]
     ) -> None:
-        key = str(float(entityId))
-        entityStats: EntityStats = self._entityStats.get(key)
+        # logger.debug(
+        #     f"Adding rawStats count {len(rawStats)} for entity with ID {entityId}"
+        # )
+        entityKey = str(float(entityId))
+        entityStats: EntityStats = self._entityStats.get(entityKey)
+        isCurLifeStatOnly: bool = (
+            len(rawStats) == 1
+            and rawStats[0] is not None
+            and rawStats[0].characteristicId == StatIds.CUR_LIFE
+        )
         if entityStats is None:
             entityStats = EntityStats(float(entityId))
             self.setStats(entityStats)
+
         for rawStat in rawStats:
             if isinstance(rawStat, CharacterUsableCharacteristicDetailed):
                 rawUsableStat = rawStat
@@ -93,8 +105,10 @@ class StatsManager(metaclass=Singleton):
                 )
             else:
                 if not isinstance(rawStat, CharacterCharacteristicValue):
+                    logger.debug(f"Skipping rawStat {rawStat} of type {type(rawStat)}")
                     continue
-                entityStat = Stat(rawStat.characteristicId, rawStat.total)
+                else:
+                    entityStat = Stat(rawStat.characteristicId, rawStat.total)
             entityStats.setStat(entityStat, False)
 
     def deleteStats(self, entityId: float) -> bool:

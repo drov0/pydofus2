@@ -38,7 +38,7 @@ from com.ankamagames.dofus.logic.game.fight.actions.ChallengeTargetsListRequestA
 from com.ankamagames.dofus.logic.game.fight.actions.UpdateSpellModifierAction import (
     UpdateSpellModifierAction,
 )
-import com.ankamagames.dofus.logic.game.fight.fightEvents.FightEventsHelper as fightEventsHelper
+import com.ankamagames.dofus.logic.game.fight.fightEvents.FightEventsHelper as fevth
 from com.ankamagames.dofus.logic.game.fight.frames.FightBattleFrame import (
     FightBattleFrame,
 )
@@ -283,10 +283,7 @@ class FightContextFrame(Frame):
         self.fightResultIds.append(key)
         if len(self.fightResultIds) > self.MAX_FIGHT_RESULT:
             resultsToDeleteKey = self.fightResultIds.pop(0)
-            if (
-                resultsToDeleteKey is not None
-                and resultsToDeleteKey in self.fightResults
-            ):
+            if resultsToDeleteKey is not None and resultsToDeleteKey in self.fightResults:
                 del self.fightResults[resultsToDeleteKey]
         return key
 
@@ -378,9 +375,7 @@ class FightContextFrame(Frame):
         if isinstance(fighterInfos, GameFightTaxCollectorInformations):
             taxInfos = fighterInfos
             return (
-                TaxCollectorFirstname.getTaxCollectorFirstnameById(
-                    taxInfos.firstNameId
-                ).firstname
+                TaxCollectorFirstname.getTaxCollectorFirstnameById(taxInfos.firstNameId).firstname
                 + " "
                 + TaxCollectorName.getTaxCollectorNameById(taxInfos.lastNameId).name
             )
@@ -410,10 +405,7 @@ class FightContextFrame(Frame):
                         GameFightMonsterInformations,
                     ):
                         creatureLevel = entity.creatureLevel
-                    if (
-                        fighterInfos.creatureGenericId == entity.creatureGenericId
-                        and entity.stats.summoned
-                    ):
+                    if fighterInfos.creatureGenericId == entity.creatureGenericId and entity.stats.summoned:
                         return creatureLevel
                     if not entity.stats.summoned:
                         if minLevel > creatureLevel:
@@ -431,7 +423,7 @@ class FightContextFrame(Frame):
 
         if isinstance(msg, GameFightStartingMessage):
             gfsmsg = msg
-            fightEventsHelper.FightEventsHelper().reset()
+            fevth.FightEventsHelper().reset()
             self.fightType = gfsmsg.fightType
             self._fightAttackerId = gfsmsg.attackerId
             PlayedCharacterManager().fightId = gfsmsg.fightId
@@ -471,9 +463,7 @@ class FightContextFrame(Frame):
             EntitiesManager().clearEntities()
             self._currentMapRenderId = mdm.MapDisplayManager().loadMap(mcmsg.mapId)
             PlayedCharacterManager().currentMap = wp
-            PlayedCharacterManager().currentSubArea = SubArea.getSubAreaByMapId(
-                mcmsg.mapId
-            )
+            PlayedCharacterManager().currentSubArea = SubArea.getSubAreaByMapId(mcmsg.mapId)
             return False
 
         if isinstance(msg, MapLoadedMessage):
@@ -486,12 +476,8 @@ class FightContextFrame(Frame):
         if isinstance(msg, GameFightResumeMessage):
             gfrmsg = msg
             playerId = PlayedCharacterManager().id
-            CurrentPlayedFighterManager().setCurrentSummonedCreature(
-                gfrmsg.summonCount, playerId
-            )
-            CurrentPlayedFighterManager().setCurrentSummonedBomb(
-                gfrmsg.bombCount, playerId
-            )
+            CurrentPlayedFighterManager().setCurrentSummonedCreature(gfrmsg.summonCount, playerId)
+            CurrentPlayedFighterManager().setCurrentSummonedBomb(gfrmsg.bombCount, playerId)
             self._battleFrame.turnsCount = gfrmsg.gameTurn
             self._fightIdols = gfrmsg.idols
             if isinstance(msg, GameFightResumeWithSlavesMessage):
@@ -505,18 +491,12 @@ class FightContextFrame(Frame):
             cooldownInfos.insert(0, playerCoolDownInfo)
             playedFighterManager = CurrentPlayedFighterManager()
             for cd in cooldownInfos:
-                spellCastManager = playedFighterManager.getSpellCastManagerById(
-                    cd.slaveId
-                )
+                spellCastManager = playedFighterManager.getSpellCastManagerById(cd.slaveId)
                 spellCastManager.currentTurn = gfrmsg.gameTurn
                 spellCastManager.updateCooldowns(cd.spellCooldowns)
                 if cd.slaveId != playerId:
-                    CurrentPlayedFighterManager().setCurrentSummonedCreature(
-                        cd.summonCount, cd.slaveId
-                    )
-                    CurrentPlayedFighterManager().setCurrentSummonedBomb(
-                        cd.bombCount, cd.slaveId
-                    )
+                    CurrentPlayedFighterManager().setCurrentSummonedCreature(cd.summonCount, cd.slaveId)
+                    CurrentPlayedFighterManager().setCurrentSummonedBomb(cd.bombCount, cd.slaveId)
             castingSpellPool = dict()
             for buff in gfrmsg.effects:
                 if not castingSpellPool.get(buff.effect.targetId):
@@ -529,13 +509,9 @@ class FightContextFrame(Frame):
                 if not castingSpell:
                     castingSpell = CastingSpell()
                     castingSpell.casterId = buff.sourceId
-                    castingSpell.spell = spellmod.Spell.getSpellById(
-                        buff.effect.spellId
-                    )
+                    castingSpell.spell = spellmod.Spell.getSpellById(buff.effect.spellId)
                     durationPool[buff.effect.spellId] = castingSpell
-                buffTmp = BuffManager.makeBuffFromEffect(
-                    buff.effect, castingSpell, buff.actionId
-                )
+                buffTmp = BuffManager.makeBuffFromEffect(buff.effect, castingSpell, buff.actionId)
                 BuffManager().addBuff(buffTmp)
             Kernel().getWorker().addSingleTreatment(self, self.stopReconnection, [])
             return True
@@ -577,7 +553,7 @@ class FightContextFrame(Frame):
             #         ExternalNotificationTypeEnum.KOLO_JOIN
             #     ):
             #         pass
-            return True
+            return False
 
         if isinstance(msg, GameFightStartMessage):
             gfsm = msg
@@ -631,8 +607,9 @@ class FightContextFrame(Frame):
 
         if isinstance(msg, GameFightEndMessage):
             gfemsg = msg
+            hardcoreLoots = None
             CurrentPlayedFighterManager().resetPlayerSpellList()
-            fightEventsHelper.FightEventsHelper().sendAllFightEvent(True)
+            fevth.FightEventsHelper().sendAllFightEvent(True)
             PlayedCharacterManager().isFighting = False
             PlayedCharacterManager().fightId = -1
             SpellWrapper.removeAllSpellWrapperBut(PlayedCharacterManager().id, None)
@@ -644,7 +621,7 @@ class FightContextFrame(Frame):
                 fightEnding = FightEndingMessage()
                 fightEnding.init()
                 Kernel().getWorker().process(fightEnding)
-                results = list[FightResultEntryWrapper]()
+                results = list[FightResultEntryWrapper](len(gfemsg.results) * [None])
                 resultIndex = 0
                 winners = list[FightResultEntryWrapper]()
                 temp = []
@@ -655,9 +632,7 @@ class FightContextFrame(Frame):
                     resultEntry = temp[i]
                     if isinstance(resultEntry, FightResultPlayerListEntry):
                         id = resultEntry.id
-                        frew = FightResultEntryWrapper(
-                            resultEntry, self._entitiesFrame.getEntityInfos(id)
-                        )
+                        frew = FightResultEntryWrapper(resultEntry, self._entitiesFrame.getEntityInfos(id))
                         frew.alive = resultEntry.alive
                     if isinstance(resultEntry, FightResultTaxCollectorListEntry):
                         id = resultEntry.id
@@ -691,9 +666,8 @@ class FightContextFrame(Frame):
                     else:
                         if resultEntry.outcome == FightOutcomeEnum.RESULT_VICTORY:
                             winners.append(frew)
-                        _loc116_ = resultIndex
+                        results[resultIndex] = frew
                         resultIndex += 1
-                        results[_loc116_] = frew
                         if frew.id == PlayedCharacterManager().id:
                             isSpectator = False
 
@@ -739,15 +713,13 @@ class FightContextFrame(Frame):
                 resultsRecap["idols"] = idols
                 resultsKey = self.saveResults(resultsRecap)
                 if not PlayedCharacterManager().isSpectator:
-                    fightEventsHelper.FightEventsHelper().sendFightEvent(
-                        FightEventEnum.FIGHT_END, [resultsKey], 0, -1, True
-                    )
+                    fevth.FightEventsHelper().sendFightEvent(FightEventEnum.FIGHT_END, [resultsKey], 0, -1, True)
 
                 if PlayerManager().kisServerPort > 0:
                     pass
 
             Kernel().getWorker().removeFrame(self)
-            return True
+            return False
 
         if isinstance(msg, ChallengeTargetsListRequestAction):
             ctlra = msg
@@ -776,9 +748,7 @@ class FightContextFrame(Frame):
         if isinstance(msg, MapObstacleUpdateMessage):
             moumsg = msg
             for mo in moumsg.obstacles:
-                DataMapProvider().updateCellMovLov(
-                    mo.obstacleCellId, mo.state == MapObstacleStateEnum.OBSTACLE_OPENED
-                )
+                DataMapProvider().updateCellMovLov(mo.obstacleCellId, mo.state == MapObstacleStateEnum.OBSTACLE_OPENED)
             return True
 
         if isinstance(msg, GameActionFightNoSpellCastMessage):
@@ -839,9 +809,7 @@ class FightContextFrame(Frame):
         if self._timerMovementRange:
             self._timerMovementRange.cancel()
         self._currentFighterInfo = None
-        simf: "SpellInventoryManagementFrame" = (
-            Kernel().getWorker().getFrame("SpellInventoryManagementFrame")
-        )
+        simf: "SpellInventoryManagementFrame" = Kernel().getWorker().getFrame("SpellInventoryManagementFrame")
         if simf:
             simf.deleteSpellsGlobalCoolDownsData()
         PlayedCharacterManager().isSpectator = False
@@ -857,14 +825,10 @@ class FightContextFrame(Frame):
 
     def initFighterPositionHistory(self, pFighterId: float) -> None:
         if not self._fightersPositionsHistory.get(pFighterId):
-            fightContextFrame: "FightContextFrame" = (
-                Kernel().getWorker().getFrame("FightContextFrame")
-            )
+            fightContextFrame: "FightContextFrame" = Kernel().getWorker().getFrame("FightContextFrame")
             self._fightersPositionsHistory[pFighterId] = [
                 {
-                    "cellId": fightContextFrame.entitiesFrame.getEntityInfos(
-                        pFighterId
-                    ).disposition.cellId,
+                    "cellId": fightContextFrame.entitiesFrame.getEntityInfos(pFighterId).disposition.cellId,
                     "lives": 2,
                 }
             ]
@@ -881,9 +845,7 @@ class FightContextFrame(Frame):
 
     def saveFighterPosition(self, pFighterId: float, pCellId: int) -> None:
         self.initFighterPositionHistory(pFighterId)
-        self._fightersPositionsHistory[pFighterId].append(
-            {"cellId": pCellId, "lives": 2}
-        )
+        self._fightersPositionsHistory[pFighterId].append({"cellId": pCellId, "lives": 2})
 
     def getFighterRoundStartPosition(self, pFighterId: float) -> int:
         return self._fightersRoundStartPosition[pFighterId]
@@ -905,4 +867,4 @@ class FightContextFrame(Frame):
         Kernel().beingInReconection = False
 
     def sendFightEvents(self) -> None:
-        fightEventsHelper.FightEventsHelper().sendAllFightEvent()
+        fevth.FightEventsHelper().sendAllFightEvent()

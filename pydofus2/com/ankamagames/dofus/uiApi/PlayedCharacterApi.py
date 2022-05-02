@@ -251,7 +251,7 @@ class PlayedCharacterApi(IApi, metaclass=Singleton):
         return Kernel().getWorker().getFrame("TinselFrame").titlesOrnamentsAskedBefore
 
     def getEntityInfos(self) -> GameRolePlayCharacterInformations:
-        import com.ankamagames.dofus.logic.game.fight.frames.FightEntitiesFrame as fightEntitiesFrame
+        import com.ankamagames.dofus.logic.game.fight.frames.FightEntitiesFrame as fenf
 
         entitiesFrame: AbstractEntitiesFrame = None
         if self.isInFight():

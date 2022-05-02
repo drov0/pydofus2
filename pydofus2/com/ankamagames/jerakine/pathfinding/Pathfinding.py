@@ -18,7 +18,7 @@ class Pathfinding:
 
     HEURISTIC_COST: int = 10
 
-    INFINITE_COST: int = 99999999
+    INFINITE_COST: int = float("inf")
 
     _isInit: bool = False
 
@@ -44,8 +44,62 @@ class Pathfinding:
         cls._parentOfCell = MapTools.mapCountCell * [None]
         cls._isCellClosed = MapTools.mapCountCell * [None]
         cls._isEntityOnCell = MapTools.mapCountCell * [None]
-        cls._openList = list()
+        cls._openList = list(40 * [-1])
         cls._isInit = True
+
+    @classmethod
+    def isChild(
+        cls,
+        mapData: IDataMapProvider,
+        cellId: int,
+        x,
+        y,
+        endCellId,
+        parentId,
+        parentX,
+        parentY,
+        bAllowTroughEntity: bool,
+        allowDiag: bool,
+        avoidObstacles: bool,
+    ) -> bool:
+        canMoveFromParentToEnd = mapData.pointMov(
+            x,
+            y,
+            bAllowTroughEntity,
+            parentId,
+            endCellId,
+            avoidObstacles,
+        )
+        # logger.debug(f"can move from parent {parentId} -> curr {cellId} -> to end {endCellId}: {canMoveFromParentToEnd}")
+        return (
+            cellId != MapTools.INVALID_CELL_ID
+            and not cls._isCellClosed[cellId]
+            and cellId != parentId
+            and canMoveFromParentToEnd
+            and (
+                y == parentY
+                or x == parentX
+                or allowDiag
+                and (
+                    mapData.pointMov(
+                        parentX,
+                        y,
+                        bAllowTroughEntity,
+                        parentId,
+                        endCellId,
+                        avoidObstacles,
+                    )
+                    or mapData.pointMov(
+                        x,
+                        parentY,
+                        bAllowTroughEntity,
+                        parentId,
+                        endCellId,
+                        avoidObstacles,
+                    )
+                )
+            )
+        )
 
     @classmethod
     def findPath(
@@ -55,14 +109,17 @@ class Pathfinding:
         end: MapPoint,
         allowDiag: bool = True,
         bAllowTroughEntity: bool = True,
-        aNoneObstacles: bool = True,
+        avoidObstacles: bool = True,
     ) -> MovementPath:
+        itt = 0
         endCellId: int = end.cellId
         startCellId: int = start.cellId
+        logger.debug(f"Looking for path from {startCellId} to {endCellId}")
         endX: int = end.x
         endY: int = end.y
         endCellAuxId: int = startCellId
         distanceToEnd: int = MapTools.getDistance(startCellId, endCellId)
+        logger.debug("distanceToEnd : " + str(distanceToEnd))
         if not cls._isInit:
             cls.init()
         for i in range(MapTools.mapCountCell):
@@ -70,10 +127,11 @@ class Pathfinding:
             cls._isCellClosed[i] = False
             cls._isEntityOnCell[i] = False
         cls._openList.clear()
-        mapData.fillEntityOnCelllist(cls._isEntityOnCell, bAllowTroughEntity)
+        mapData.fillEntityOnCellArray(cls._isEntityOnCell, bAllowTroughEntity)
         cls._costOfCell[startCellId] = 0
         cls._openList.append(startCellId)
-        while len(cls._openList) > 0 and cls._isCellClosed[endCellId] == False:
+        while len(cls._openList) > 0 and not cls._isCellClosed[endCellId]:
+            # logger.debug(f"iteration : {itt}")
             minimum = cls.INFINITE_COST
             smallestCostIndex = 0
             for i in range(len(cls._openList)):
@@ -89,53 +147,23 @@ class Pathfinding:
             for y in range(parentY - 1, parentY + 2):
                 for x in range(parentX - 1, parentX + 2):
                     cellId = MapTools.getCellIdByCoord(x, y)
-                    if (
-                        cellId != MapTools.INVALID_CELL_ID
-                        and cls._isCellClosed[cellId] == False
-                        and cellId != parentId
-                        and mapData.pointMov(
-                            x,
-                            y,
-                            bAllowTroughEntity,
-                            parentId,
-                            endCellId,
-                            aNoneObstacles,
-                        )
-                        and (
-                            y == parentY
-                            or x == parentX
-                            or allowDiag
-                            and (
-                                mapData.pointMov(
-                                    parentX,
-                                    y,
-                                    bAllowTroughEntity,
-                                    parentId,
-                                    endCellId,
-                                    aNoneObstacles,
-                                )
-                                or mapData.pointMov(
-                                    x,
-                                    parentY,
-                                    bAllowTroughEntity,
-                                    parentId,
-                                    endCellId,
-                                    aNoneObstacles,
-                                )
-                            )
-                        )
+                    if cls.isChild(
+                        mapData,
+                        cellId,
+                        x,
+                        y,
+                        endCellId,
+                        parentId,
+                        parentX,
+                        parentY,
+                        bAllowTroughEntity,
+                        allowDiag,
+                        avoidObstacles,
                     ):
-                        pointWeight = cls.getMapPointWeight(
-                            mapData, cellId, endCellId, x, y, bAllowTroughEntity
-                        )
+                        pointWeight = cls.getMapPointWeight(mapData, cellId, endCellId, x, y, bAllowTroughEntity)
                         movementCost = (
                             cls._costOfCell[parentId]
-                            + (
-                                cls.HV_COST
-                                if y == parentY or x == parentX
-                                else cls.DIAG_COST
-                            )
-                            * pointWeight
+                            + (cls.HV_COST if y == parentY or x == parentX else cls.DIAG_COST) * pointWeight
                         )
                         if bAllowTroughEntity:
                             cellOnEndColumn = x + y == endX + endY
@@ -149,9 +177,7 @@ class Pathfinding:
                                 and not cellOnStartLine
                             ):
                                 movementCost += MapTools.getDistance(cellId, endCellId)
-                                movementCost += MapTools.getDistance(
-                                    cellId, startCellId
-                                )
+                                movementCost += MapTools.getDistance(cellId, startCellId)
                             if x == endX or y == endY:
                                 movementCost -= 3
                             if (
@@ -181,6 +207,7 @@ class Pathfinding:
                             cls._openListWeights[cellId] = heuristic + movementCost
                             if cellId not in cls._openList:
                                 cls._openList.append(cellId)
+            itt += 1
         movPath: MovementPath = MovementPath()
         movPath.start = start
         if cls._parentOfCell[endCellId] == MapTools.INVALID_CELL_ID:
@@ -209,13 +236,8 @@ class Pathfinding:
                 )
                 kX = MapTools.getCellIdXCoord(cursor)
                 kY = MapTools.getCellIdYCoord(cursor)
-                if (
-                    grandParent != MapTools.INVALID_CELL_ID
-                    and MapTools.getDistance(cursor, grandParent) == 1
-                ):
-                    if mapData.pointMov(
-                        kX, kY, bAllowTroughEntity, grandParent, endCellId
-                    ):
+                if grandParent != MapTools.INVALID_CELL_ID and MapTools.getDistance(cursor, grandParent) == 1:
+                    if mapData.pointMov(kX, kY, bAllowTroughEntity, grandParent, endCellId):
                         cls._parentOfCell[cursor] = grandParent
                 elif (
                     grandGrandParent != MapTools.INVALID_CELL_ID
@@ -226,18 +248,11 @@ class Pathfinding:
                     interX = kX + round((nextX - kX) / 2)
                     interY = kY + round((nextY - kY) / 2)
                     if (
-                        mapData.pointMov(
-                            interX, interY, bAllowTroughEntity, cursor, endCellId
-                        )
+                        mapData.pointMov(interX, interY, bAllowTroughEntity, cursor, endCellId)
                         and mapData.pointWeight(interX, interY) < 2
                     ):
-                        cls._parentOfCell[cursor] = MapTools.getCellIdByCoord(
-                            interX, interY
-                        )
-                elif (
-                    grandParent != MapTools.INVALID_CELL_ID
-                    and MapTools.getDistance(cursor, grandParent) == 2
-                ):
+                        cls._parentOfCell[cursor] = MapTools.getCellIdByCoord(interX, interY)
+                elif grandParent != MapTools.INVALID_CELL_ID and MapTools.getDistance(cursor, grandParent) == 2:
                     nextX = MapTools.getCellIdXCoord(grandParent)
                     nextY = MapTools.getCellIdYCoord(grandParent)
                     interX = MapTools.getCellIdXCoord(parent)
@@ -272,24 +287,16 @@ class Pathfinding:
                         kX == nextX
                         and kX != interX
                         and mapData.pointWeight(kX, interY) < 2
-                        and mapData.pointMov(
-                            kX, interY, bAllowTroughEntity, cursor, endCellId
-                        )
+                        and mapData.pointMov(kX, interY, bAllowTroughEntity, cursor, endCellId)
                     ):
-                        cls._parentOfCell[cursor] = MapTools.getCellIdByCoord(
-                            kX, interY
-                        )
+                        cls._parentOfCell[cursor] = MapTools.getCellIdByCoord(kX, interY)
                     elif (
                         kY == nextY
                         and kY != interY
                         and mapData.pointWeight(interX, kY) < 2
-                        and mapData.pointMov(
-                            interX, kY, bAllowTroughEntity, cursor, endCellId
-                        )
+                        and mapData.pointMov(interX, kY, bAllowTroughEntity, cursor, endCellId)
                     ):
-                        cls._parentOfCell[cursor] = MapTools.getCellIdByCoord(
-                            interX, kY
-                        )
+                        cls._parentOfCell[cursor] = MapTools.getCellIdByCoord(interX, kY)
             movPath.addPoint(
                 PathElement(
                     MapPoint.fromCellId(cls._parentOfCell[cursor]),
@@ -298,13 +305,10 @@ class Pathfinding:
             )
             cursor = cls._parentOfCell[cursor]
         movPath.path.reverse()
-        # logger.debug("Path found : " + str(movPath))
         return movPath
 
     @classmethod
-    def getMapPointWeight(
-        cls, mapData: IDataMapProvider, cellId, endCellId, x, y, bAllowTroughEntity
-    ):
+    def getMapPointWeight(cls, mapData: IDataMapProvider, cellId, endCellId, x, y, bAllowTroughEntity):
         pointWeight = 0
         if cellId == endCellId:
             pointWeight = 1
@@ -321,25 +325,13 @@ class Pathfinding:
                 pointWeight = 1
                 if cls._isEntityOnCell[cellId]:
                     pointWeight += 0.3
-                if (
-                    MapTools.isValidCoord(x + 1, y)
-                    and cls._isEntityOnCell[MapTools.getCellIdByCoord(x + 1, y)]
-                ):
+                if MapTools.isValidCoord(x + 1, y) and cls._isEntityOnCell[MapTools.getCellIdByCoord(x + 1, y)]:
                     pointWeight += 0.3
-                if (
-                    MapTools.isValidCoord(x, y + 1)
-                    and cls._isEntityOnCell[MapTools.getCellIdByCoord(x, y + 1)]
-                ):
+                if MapTools.isValidCoord(x, y + 1) and cls._isEntityOnCell[MapTools.getCellIdByCoord(x, y + 1)]:
                     pointWeight += 0.3
-                if (
-                    MapTools.isValidCoord(x - 1, y)
-                    and cls._isEntityOnCell[MapTools.getCellIdByCoord(x - 1, y)]
-                ):
+                if MapTools.isValidCoord(x - 1, y) and cls._isEntityOnCell[MapTools.getCellIdByCoord(x - 1, y)]:
                     pointWeight += 0.3
-                if (
-                    MapTools.isValidCoord(x, y - 1)
-                    and cls._isEntityOnCell[MapTools.getCellIdByCoord(x, y - 1)]
-                ):
+                if MapTools.isValidCoord(x, y - 1) and cls._isEntityOnCell[MapTools.getCellIdByCoord(x, y - 1)]:
                     pointWeight += 0.3
                 if mapData.pointSpecialEffects(x, y) & 2 == 2:
                     pointWeight += 0.2

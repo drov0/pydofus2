@@ -110,7 +110,7 @@ class AbstractEntitiesFrame(Frame):
         if not self._entities.get(entityId):
             if entityId <= EntitiesManager.RANDOM_ENTITIES_ID_START:
                 return None
-            # logger.error(f"Entity {entityId} is unknown.")
+            logger.error(f"Entity {entityId} is unknown.")
             return None
         return self._entities.get(entityId)
 

@@ -1,12 +1,12 @@
-from abc import ABC
-
-
-class IObstacle(ABC):
+class IObstacle:
+    @property
     def canSeeThrough(self) -> bool:
-        pass
+        raise NotImplementedError()
 
+    @property
     def canWalkThrough(self) -> bool:
-        pass
+        raise NotImplementedError()
 
+    @property
     def canWalkTo(self) -> bool:
-        pass
+        raise NotImplementedError()

@@ -13,7 +13,7 @@ class Stat:
     _entityId: float = None
     _id: float = StatIds.UNKNOWN
     _totalValue: float = 0
-    _name: str = ""
+    _name: str = None
 
     def __init__(self, id: float, totalValue: float):
         self._id = id
@@ -47,7 +47,7 @@ class Stat:
         self._totalValue = value
 
     def __str__(self) -> str:
-        return self.getFormattedMessage("total: " + self._totalValue.__str__())
+        return self.getFormattedMessage("total: " + str(self._totalValue))
 
     def reset(self) -> None:
         self._totalValue = 0

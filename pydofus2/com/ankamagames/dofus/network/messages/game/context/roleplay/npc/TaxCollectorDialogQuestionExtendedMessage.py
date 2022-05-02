@@ -28,6 +28,5 @@ class TaxCollectorDialogQuestionExtendedMessage(TaxCollectorDialogQuestionBasicM
         self.pods = pods_
         self.itemsValue = itemsValue_
         
-        super().__init__(guildInfo_)
-    
+        super().init(guildInfo_)
     

@@ -12,4 +12,3 @@ class GameFightSpellCooldown(NetworkMessage):
         
         super().__init__()
     
-    

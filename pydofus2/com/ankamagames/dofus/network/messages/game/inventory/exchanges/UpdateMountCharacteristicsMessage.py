@@ -16,4 +16,3 @@ class UpdateMountCharacteristicsMessage(NetworkMessage):
         
         super().__init__()
     
-    

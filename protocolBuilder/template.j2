@@ -24,6 +24,9 @@ class {{cls.name}}({% if parent != None %}{{parent.name}}{% else %}NetworkMessag
         {% for arg in init_args -%}
         self.{{arg.name}} = {{arg.name}}_
         {% endfor %}
+        {% if parent.name == NetworkMessage -%}
+        super().__init__()
+        {%- else -%}
         super().init({%for arg in super_args%}{{arg.name}}_{% if not loop.last %}, {% endif %}{% endfor %})
-    
+        {%- endif %}
     

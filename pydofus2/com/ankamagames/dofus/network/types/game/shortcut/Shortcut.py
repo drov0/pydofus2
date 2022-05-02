@@ -10,4 +10,3 @@ class Shortcut(NetworkMessage):
         
         super().__init__()
     
-    

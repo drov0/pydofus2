@@ -8,6 +8,5 @@ class ShowCellSpectatorMessage(ShowCellMessage):
     def init(self, playerName_:str, sourceId_:int, cellId_:int):
         self.playerName = playerName_
         
-        super().__init__(sourceId_, cellId_)
-    
+        super().init(sourceId_, cellId_)
     

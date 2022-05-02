@@ -10,4 +10,3 @@ class RefreshFollowedQuestsOrderRequestMessage(NetworkMessage):
         
         super().__init__()
     
-    

@@ -12,6 +12,5 @@ class GuildListApplicationAnswerMessage(PaginationAnswerAbstractMessage):
     def init(self, applies_:list['GuildApplicationInformation'], offset_:int, count_:int, total_:int):
         self.applies = applies_
         
-        super().__init__(offset_, count_, total_)
-    
+        super().init(offset_, count_, total_)
     

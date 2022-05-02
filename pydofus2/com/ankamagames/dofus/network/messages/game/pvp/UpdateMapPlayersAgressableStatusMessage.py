@@ -12,4 +12,3 @@ class UpdateMapPlayersAgressableStatusMessage(NetworkMessage):
         
         super().__init__()
     
-    

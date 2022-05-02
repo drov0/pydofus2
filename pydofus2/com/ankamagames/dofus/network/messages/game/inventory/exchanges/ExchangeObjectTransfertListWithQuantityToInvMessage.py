@@ -12,4 +12,3 @@ class ExchangeObjectTransfertListWithQuantityToInvMessage(NetworkMessage):
         
         super().__init__()
     
-    

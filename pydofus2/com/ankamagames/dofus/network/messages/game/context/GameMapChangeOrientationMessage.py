@@ -14,4 +14,3 @@ class GameMapChangeOrientationMessage(NetworkMessage):
         
         super().__init__()
     
-    

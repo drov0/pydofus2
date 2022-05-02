@@ -14,4 +14,3 @@ class SimpleCharacterCharacteristicForPreset(NetworkMessage):
         
         super().__init__()
     
-    

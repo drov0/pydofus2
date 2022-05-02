@@ -24,6 +24,5 @@ class GameFightFighterNamedInformations(GameFightFighterInformations):
         self.ladderPosition = ladderPosition_
         self.hiddenInPrefight = hiddenInPrefight_
         
-        super().__init__(spawnInfo_, wave_, stats_, previousPositions_, look_, contextualId_, disposition_)
-    
+        super().init(spawnInfo_, wave_, stats_, previousPositions_, look_, contextualId_, disposition_)
     

@@ -14,4 +14,3 @@ class TextInformationMessage(NetworkMessage):
         
         super().__init__()
     
-    

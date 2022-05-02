@@ -10,4 +10,3 @@ class KnownZaapListMessage(NetworkMessage):
         
         super().__init__()
     
-    

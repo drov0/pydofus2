@@ -12,4 +12,3 @@ class TreasureHuntAvailableRetryCountUpdateMessage(NetworkMessage):
         
         super().__init__()
     
-    

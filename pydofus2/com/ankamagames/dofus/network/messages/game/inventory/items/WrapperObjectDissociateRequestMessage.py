@@ -12,4 +12,3 @@ class WrapperObjectDissociateRequestMessage(NetworkMessage):
         
         super().__init__()
     
-    

@@ -10,4 +10,3 @@ class ExchangeErrorMessage(NetworkMessage):
         
         super().__init__()
     
-    

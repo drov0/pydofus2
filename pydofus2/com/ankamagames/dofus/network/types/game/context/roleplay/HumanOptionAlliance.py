@@ -14,6 +14,5 @@ class HumanOptionAlliance(HumanOption):
         self.allianceInformations = allianceInformations_
         self.aggressable = aggressable_
         
-        super().__init__()
-    
+        super().init()
     

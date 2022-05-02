@@ -24,6 +24,5 @@ class PaddockContentInformations(PaddockInformations):
         self.abandonned = abandonned_
         self.mountsInformations = mountsInformations_
         
-        super().__init__(maxOutdoorMount_, maxItems_)
-    
+        super().init(maxOutdoorMount_, maxItems_)
     

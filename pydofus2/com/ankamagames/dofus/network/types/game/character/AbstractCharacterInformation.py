@@ -10,4 +10,3 @@ class AbstractCharacterInformation(NetworkMessage):
         
         super().__init__()
     
-    

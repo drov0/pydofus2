@@ -10,4 +10,3 @@ class CharacterNameSuggestionFailureMessage(NetworkMessage):
         
         super().__init__()
     
-    

@@ -14,6 +14,5 @@ class AchievementFinishedInformationMessage(AchievementFinishedMessage):
         self.name = name_
         self.playerId = playerId_
         
-        super().__init__(achievement_)
-    
+        super().init(achievement_)
     

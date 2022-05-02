@@ -16,6 +16,5 @@ class GameRolePlayArenaUpdatePlayerInfosAllQueuesMessage(GameRolePlayArenaUpdate
         self.team = team_
         self.duel = duel_
         
-        super().__init__(solo_)
-    
+        super().init(solo_)
     

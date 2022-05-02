@@ -18,4 +18,3 @@ class DecraftedItemStackInfo(NetworkMessage):
         
         super().__init__()
     
-    

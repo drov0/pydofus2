@@ -10,4 +10,3 @@ class ChallengeTargetsListRequestMessage(NetworkMessage):
         
         super().__init__()
     
-    

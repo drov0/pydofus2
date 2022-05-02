@@ -8,4 +8,3 @@ class ExchangeStartAsVendorMessage(NetworkMessage):
         
         super().__init__()
     
-    

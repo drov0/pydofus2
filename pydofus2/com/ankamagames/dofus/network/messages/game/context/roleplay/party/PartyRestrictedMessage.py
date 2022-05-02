@@ -8,6 +8,5 @@ class PartyRestrictedMessage(AbstractPartyMessage):
     def init(self, restricted_:bool, partyId_:int):
         self.restricted = restricted_
         
-        super().__init__(partyId_)
-    
+        super().init(partyId_)
     

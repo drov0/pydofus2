@@ -10,4 +10,3 @@ class GameActionSpamMessage(NetworkMessage):
         
         super().__init__()
     
-    

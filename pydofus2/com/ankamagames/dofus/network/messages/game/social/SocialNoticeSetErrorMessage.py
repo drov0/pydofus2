@@ -10,4 +10,3 @@ class SocialNoticeSetErrorMessage(NetworkMessage):
         
         super().__init__()
     
-    

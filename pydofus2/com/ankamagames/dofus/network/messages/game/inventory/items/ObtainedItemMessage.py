@@ -12,4 +12,3 @@ class ObtainedItemMessage(NetworkMessage):
         
         super().__init__()
     
-    

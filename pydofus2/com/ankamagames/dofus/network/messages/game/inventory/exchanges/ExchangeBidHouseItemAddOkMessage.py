@@ -14,4 +14,3 @@ class ExchangeBidHouseItemAddOkMessage(NetworkMessage):
         
         super().__init__()
     
-    

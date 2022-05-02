@@ -17,4 +17,3 @@ class GuildLogbookInformationMessage(NetworkMessage):
         
         super().__init__()
     
-    

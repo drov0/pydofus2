@@ -8,6 +8,5 @@ class ExchangeStartOkCraftWithInformationMessage(ExchangeStartOkCraftMessage):
     def init(self, skillId_:int):
         self.skillId = skillId_
         
-        super().__init__()
-    
+        super().init()
     

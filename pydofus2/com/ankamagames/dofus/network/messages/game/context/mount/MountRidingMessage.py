@@ -14,4 +14,3 @@ class MountRidingMessage(NetworkMessage):
         
         super().__init__()
     
-    

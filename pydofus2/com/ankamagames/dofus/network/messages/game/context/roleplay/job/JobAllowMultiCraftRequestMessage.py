@@ -10,4 +10,3 @@ class JobAllowMultiCraftRequestMessage(NetworkMessage):
         
         super().__init__()
     
-    

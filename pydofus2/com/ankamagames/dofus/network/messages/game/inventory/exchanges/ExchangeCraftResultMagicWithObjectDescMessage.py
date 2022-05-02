@@ -12,6 +12,5 @@ class ExchangeCraftResultMagicWithObjectDescMessage(ExchangeCraftResultWithObjec
     def init(self, magicPoolStatus_:int, objectInfo_:'ObjectItemNotInContainer', craftResult_:int):
         self.magicPoolStatus = magicPoolStatus_
         
-        super().__init__(objectInfo_, craftResult_)
-    
+        super().init(objectInfo_, craftResult_)
     

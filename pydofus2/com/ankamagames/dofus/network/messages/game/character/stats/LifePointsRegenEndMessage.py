@@ -8,6 +8,5 @@ class LifePointsRegenEndMessage(UpdateLifePointsMessage):
     def init(self, lifePointsGained_:int, lifePoints_:int, maxLifePoints_:int):
         self.lifePointsGained = lifePointsGained_
         
-        super().__init__(lifePoints_, maxLifePoints_)
-    
+        super().init(lifePoints_, maxLifePoints_)
     

@@ -10,4 +10,3 @@ class KamasUpdateMessage(NetworkMessage):
         
         super().__init__()
     
-    

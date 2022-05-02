@@ -12,4 +12,3 @@ class EntityMovementInformations(NetworkMessage):
         
         super().__init__()
     
-    

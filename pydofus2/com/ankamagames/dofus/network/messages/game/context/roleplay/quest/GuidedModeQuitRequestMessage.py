@@ -8,4 +8,3 @@ class GuidedModeQuitRequestMessage(NetworkMessage):
         
         super().__init__()
     
-    

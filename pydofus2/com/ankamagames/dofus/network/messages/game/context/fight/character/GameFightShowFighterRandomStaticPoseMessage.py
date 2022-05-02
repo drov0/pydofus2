@@ -10,6 +10,5 @@ class GameFightShowFighterRandomStaticPoseMessage(GameFightShowFighterMessage):
 
     def init(self, informations_:'GameFightFighterInformations'):
         
-        super().__init__(informations_)
-    
+        super().init(informations_)
     

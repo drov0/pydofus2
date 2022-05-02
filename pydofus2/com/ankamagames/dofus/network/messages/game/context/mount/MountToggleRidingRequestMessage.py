@@ -8,4 +8,3 @@ class MountToggleRidingRequestMessage(NetworkMessage):
         
         super().__init__()
     
-    

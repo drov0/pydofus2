@@ -10,4 +10,3 @@ class ExchangeMoneyMovementInformationMessage(NetworkMessage):
         
         super().__init__()
     
-    

@@ -10,4 +10,3 @@ class LockableStateUpdateAbstractMessage(NetworkMessage):
         
         super().__init__()
     
-    

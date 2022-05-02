@@ -14,4 +14,3 @@ class GuildVersatileInfoListMessage(NetworkMessage):
         
         super().__init__()
     
-    

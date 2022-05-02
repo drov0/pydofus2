@@ -10,4 +10,3 @@ class GameContextKickMessage(NetworkMessage):
         
         super().__init__()
     
-    

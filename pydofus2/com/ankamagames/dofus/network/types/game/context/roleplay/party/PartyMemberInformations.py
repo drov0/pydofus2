@@ -36,6 +36,5 @@ class PartyMemberInformations(CharacterBaseInformations):
         self.status = status_
         self.entities = entities_
         
-        super().__init__(sex_, entityLook_, breed_, level_, name_, id_)
-    
+        super().init(sex_, entityLook_, breed_, level_, name_, id_)
     

@@ -12,4 +12,3 @@ class MimicryObjectEraseRequestMessage(NetworkMessage):
         
         super().__init__()
     
-    

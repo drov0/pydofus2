@@ -14,4 +14,3 @@ class GameRolePlayArenaSwitchToFightServerMessage(NetworkMessage):
         
         super().__init__()
     
-    

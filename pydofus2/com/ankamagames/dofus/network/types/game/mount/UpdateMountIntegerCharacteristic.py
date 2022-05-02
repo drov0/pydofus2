@@ -8,6 +8,5 @@ class UpdateMountIntegerCharacteristic(UpdateMountCharacteristic):
     def init(self, value_:int, type_:int):
         self.value = value_
         
-        super().__init__(type_)
-    
+        super().init(type_)
     

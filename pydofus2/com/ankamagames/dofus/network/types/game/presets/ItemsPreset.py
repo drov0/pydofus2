@@ -17,6 +17,5 @@ class ItemsPreset(Preset):
         self.mountEquipped = mountEquipped_
         self.look = look_
         
-        super().__init__(id_)
-    
+        super().init(id_)
     

@@ -10,4 +10,3 @@ class GameFightSpectatePlayerRequestMessage(NetworkMessage):
         
         super().__init__()
     
-    

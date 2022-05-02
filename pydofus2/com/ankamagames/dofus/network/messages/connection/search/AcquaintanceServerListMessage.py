@@ -10,4 +10,3 @@ class AcquaintanceServerListMessage(NetworkMessage):
         
         super().__init__()
     
-    

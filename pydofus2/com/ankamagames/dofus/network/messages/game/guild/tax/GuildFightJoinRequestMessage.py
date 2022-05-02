@@ -10,4 +10,3 @@ class GuildFightJoinRequestMessage(NetworkMessage):
         
         super().__init__()
     
-    

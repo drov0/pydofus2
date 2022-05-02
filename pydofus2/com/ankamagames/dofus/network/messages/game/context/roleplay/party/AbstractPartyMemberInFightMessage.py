@@ -18,6 +18,5 @@ class AbstractPartyMemberInFightMessage(AbstractPartyMessage):
         self.fightId = fightId_
         self.timeBeforeFightStart = timeBeforeFightStart_
         
-        super().__init__(partyId_)
-    
+        super().init(partyId_)
     

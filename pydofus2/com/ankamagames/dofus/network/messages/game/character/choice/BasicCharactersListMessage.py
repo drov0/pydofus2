@@ -14,4 +14,3 @@ class BasicCharactersListMessage(NetworkMessage):
         
         super().__init__()
     
-    

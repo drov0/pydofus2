@@ -12,6 +12,5 @@ class ObjectItemToSellInBid(ObjectItemToSell):
     def init(self, unsoldDelay_:int, objectGID_:int, effects_:list['ObjectEffect'], objectUID_:int, quantity_:int, objectPrice_:int):
         self.unsoldDelay = unsoldDelay_
         
-        super().__init__(objectGID_, effects_, objectUID_, quantity_, objectPrice_)
-    
+        super().init(objectGID_, effects_, objectUID_, quantity_, objectPrice_)
     

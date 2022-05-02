@@ -8,4 +8,3 @@ class GuildPlayerApplicationAbstractMessage(NetworkMessage):
         
         super().__init__()
     
-    

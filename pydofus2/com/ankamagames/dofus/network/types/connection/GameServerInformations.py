@@ -28,4 +28,3 @@ class GameServerInformations(NetworkMessage):
         
         super().__init__()
     
-    

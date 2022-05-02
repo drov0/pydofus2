@@ -14,4 +14,3 @@ class MapRunningFightListMessage(NetworkMessage):
         
         super().__init__()
     
-    

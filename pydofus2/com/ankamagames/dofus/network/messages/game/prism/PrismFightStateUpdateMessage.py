@@ -10,4 +10,3 @@ class PrismFightStateUpdateMessage(NetworkMessage):
         
         super().__init__()
     
-    

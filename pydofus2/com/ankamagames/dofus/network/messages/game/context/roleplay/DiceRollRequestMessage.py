@@ -14,4 +14,3 @@ class DiceRollRequestMessage(NetworkMessage):
         
         super().__init__()
     
-    

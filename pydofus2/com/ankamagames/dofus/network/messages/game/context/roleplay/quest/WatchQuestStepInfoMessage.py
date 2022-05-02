@@ -12,6 +12,5 @@ class WatchQuestStepInfoMessage(QuestStepInfoMessage):
     def init(self, playerId_:int, infos_:'QuestActiveInformations'):
         self.playerId = playerId_
         
-        super().__init__(infos_)
-    
+        super().init(infos_)
     

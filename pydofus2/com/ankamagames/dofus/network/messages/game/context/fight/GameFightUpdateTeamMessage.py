@@ -16,4 +16,3 @@ class GameFightUpdateTeamMessage(NetworkMessage):
         
         super().__init__()
     
-    

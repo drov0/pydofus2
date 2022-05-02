@@ -15,6 +15,5 @@ class PartyInvitationDungeonDetailsMessage(PartyInvitationDetailsMessage):
         self.dungeonId = dungeonId_
         self.playersDungeonReady = playersDungeonReady_
         
-        super().__init__(partyType_, partyName_, fromId_, fromName_, leaderId_, members_, guests_, partyId_)
-    
+        super().init(partyType_, partyName_, fromId_, fromName_, leaderId_, members_, guests_, partyId_)
     

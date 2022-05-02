@@ -14,4 +14,3 @@ class TeleportToBuddyAnswerMessage(NetworkMessage):
         
         super().__init__()
     
-    

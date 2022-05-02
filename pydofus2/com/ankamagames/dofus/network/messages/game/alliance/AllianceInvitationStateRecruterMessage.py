@@ -12,4 +12,3 @@ class AllianceInvitationStateRecruterMessage(NetworkMessage):
         
         super().__init__()
     
-    

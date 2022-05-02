@@ -10,4 +10,3 @@ class GameFightPlacementSwapPositionsAcceptMessage(NetworkMessage):
         
         super().__init__()
     
-    

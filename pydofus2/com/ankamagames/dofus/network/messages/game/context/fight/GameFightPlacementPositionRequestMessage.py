@@ -10,4 +10,3 @@ class GameFightPlacementPositionRequestMessage(NetworkMessage):
         
         super().__init__()
     
-    

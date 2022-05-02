@@ -10,4 +10,3 @@ class TitleLostMessage(NetworkMessage):
         
         super().__init__()
     
-    

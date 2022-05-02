@@ -18,4 +18,3 @@ class ExchangeStartOkNpcShopMessage(NetworkMessage):
         
         super().__init__()
     
-    

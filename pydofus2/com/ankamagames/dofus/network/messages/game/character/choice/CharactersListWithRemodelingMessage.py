@@ -13,6 +13,5 @@ class CharactersListWithRemodelingMessage(CharactersListMessage):
     def init(self, charactersToRemodel_:list['CharacterToRemodelInformations'], hasStartupActions_:bool, characters_:list['CharacterBaseInformations']):
         self.charactersToRemodel = charactersToRemodel_
         
-        super().__init__(hasStartupActions_, characters_)
-    
+        super().init(hasStartupActions_, characters_)
     

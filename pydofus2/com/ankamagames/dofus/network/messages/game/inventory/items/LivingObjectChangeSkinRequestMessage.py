@@ -14,4 +14,3 @@ class LivingObjectChangeSkinRequestMessage(NetworkMessage):
         
         super().__init__()
     
-    

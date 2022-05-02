@@ -16,6 +16,5 @@ class ObjectItemQuantityPriceDateEffects(ObjectItemGenericQuantity):
         self.effects = effects_
         self.date = date_
         
-        super().__init__(objectGID_, quantity_)
-    
+        super().init(objectGID_, quantity_)
     

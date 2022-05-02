@@ -10,4 +10,3 @@ class GameMapSpeedMovementMessage(NetworkMessage):
         
         super().__init__()
     
-    

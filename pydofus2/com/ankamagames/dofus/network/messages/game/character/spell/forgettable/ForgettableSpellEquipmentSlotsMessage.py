@@ -10,4 +10,3 @@ class ForgettableSpellEquipmentSlotsMessage(NetworkMessage):
         
         super().__init__()
     
-    

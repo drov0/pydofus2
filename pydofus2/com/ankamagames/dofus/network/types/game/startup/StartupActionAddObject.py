@@ -26,4 +26,3 @@ class StartupActionAddObject(NetworkMessage):
         
         super().__init__()
     
-    

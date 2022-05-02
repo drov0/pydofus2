@@ -16,4 +16,3 @@ class UpdateSpellModifierMessage(NetworkMessage):
         
         super().__init__()
     
-    

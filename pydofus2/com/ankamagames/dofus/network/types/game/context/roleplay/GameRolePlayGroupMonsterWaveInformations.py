@@ -17,6 +17,5 @@ class GameRolePlayGroupMonsterWaveInformations(GameRolePlayGroupMonsterInformati
         self.nbWaves = nbWaves_
         self.alternatives = alternatives_
         
-        super().__init__(staticInfos_, lootShare_, alignmentSide_, keyRingBonus_, hasHardcoreDrop_, hasAVARewardToken_, look_, contextualId_, disposition_)
-    
+        super().init(staticInfos_, lootShare_, alignmentSide_, keyRingBonus_, hasHardcoreDrop_, hasAVARewardToken_, look_, contextualId_, disposition_)
     

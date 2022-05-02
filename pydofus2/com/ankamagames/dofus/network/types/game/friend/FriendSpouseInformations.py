@@ -31,4 +31,3 @@ class FriendSpouseInformations(NetworkMessage):
         
         super().__init__()
     
-    

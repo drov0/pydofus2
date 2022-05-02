@@ -12,4 +12,3 @@ class GuildLogbookEntryBasicInformation(NetworkMessage):
         
         super().__init__()
     
-    

@@ -14,4 +14,3 @@ class ExchangeStartOkMountWithOutPaddockMessage(NetworkMessage):
         
         super().__init__()
     
-    

@@ -10,4 +10,3 @@ class PortalUseRequestMessage(NetworkMessage):
         
         super().__init__()
     
-    

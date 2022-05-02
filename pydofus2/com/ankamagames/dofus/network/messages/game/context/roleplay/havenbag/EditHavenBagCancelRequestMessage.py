@@ -8,4 +8,3 @@ class EditHavenBagCancelRequestMessage(NetworkMessage):
         
         super().__init__()
     
-    

@@ -16,4 +16,3 @@ class MountFeedRequestMessage(NetworkMessage):
         
         super().__init__()
     
-    

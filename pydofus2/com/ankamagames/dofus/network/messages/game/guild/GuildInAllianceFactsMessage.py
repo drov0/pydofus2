@@ -14,6 +14,5 @@ class GuildInAllianceFactsMessage(GuildFactsMessage):
     def init(self, allianceInfos_:'BasicNamedAllianceInformations', infos_:'GuildFactSheetInformations', creationDate_:int, nbTaxCollectors_:int, members_:list['CharacterMinimalGuildPublicInformations']):
         self.allianceInfos = allianceInfos_
         
-        super().__init__(infos_, creationDate_, nbTaxCollectors_, members_)
-    
+        super().init(infos_, creationDate_, nbTaxCollectors_, members_)
     

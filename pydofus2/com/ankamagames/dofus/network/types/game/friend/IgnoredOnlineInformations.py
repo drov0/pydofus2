@@ -18,6 +18,5 @@ class IgnoredOnlineInformations(IgnoredInformations):
         self.breed = breed_
         self.sex = sex_
         
-        super().__init__(accountId_, accountTag_)
-    
+        super().init(accountId_, accountTag_)
     

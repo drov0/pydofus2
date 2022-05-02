@@ -16,4 +16,3 @@ class JobLevelUpMessage(NetworkMessage):
         
         super().__init__()
     
-    

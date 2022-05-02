@@ -14,4 +14,3 @@ class HouseSellRequestMessage(NetworkMessage):
         
         super().__init__()
     
-    

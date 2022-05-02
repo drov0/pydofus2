@@ -16,4 +16,3 @@ class DungeonPartyFinderRoomContentMessage(NetworkMessage):
         
         super().__init__()
     
-    

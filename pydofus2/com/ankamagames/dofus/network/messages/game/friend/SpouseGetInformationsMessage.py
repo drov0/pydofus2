@@ -8,4 +8,3 @@ class SpouseGetInformationsMessage(NetworkMessage):
         
         super().__init__()
     
-    

@@ -10,6 +10,5 @@ class GuildBulletinSetRequestMessage(SocialNoticeSetRequestMessage):
         self.content = content_
         self.notifyMembers = notifyMembers_
         
-        super().__init__()
-    
+        super().init()
     

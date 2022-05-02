@@ -12,4 +12,3 @@ class PaddockMoveItemRequestMessage(NetworkMessage):
         
         super().__init__()
     
-    

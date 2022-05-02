@@ -8,6 +8,5 @@ class SkillActionDescriptionCraft(SkillActionDescription):
     def init(self, probability_:int, skillId_:int):
         self.probability = probability_
         
-        super().__init__(skillId_)
-    
+        super().init(skillId_)
     

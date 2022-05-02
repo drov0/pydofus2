@@ -12,4 +12,3 @@ class ChannelEnablingChangeMessage(NetworkMessage):
         
         super().__init__()
     
-    

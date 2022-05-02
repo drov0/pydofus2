@@ -10,4 +10,3 @@ class SubscriptionZoneMessage(NetworkMessage):
         
         super().__init__()
     
-    

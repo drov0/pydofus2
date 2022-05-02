@@ -10,4 +10,3 @@ class FightTeamMemberInformations(NetworkMessage):
         
         super().__init__()
     
-    

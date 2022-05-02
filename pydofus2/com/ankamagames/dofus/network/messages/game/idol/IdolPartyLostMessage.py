@@ -10,4 +10,3 @@ class IdolPartyLostMessage(NetworkMessage):
         
         super().__init__()
     
-    

@@ -10,4 +10,3 @@ class CharacterSelectedForceMessage(NetworkMessage):
         
         super().__init__()
     
-    

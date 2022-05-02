@@ -16,4 +16,3 @@ class SocialNoticeMessage(NetworkMessage):
         
         super().__init__()
     
-    

@@ -8,6 +8,5 @@ class GameActionFightDispellSpellMessage(GameActionFightDispellMessage):
     def init(self, spellId_:int, targetId_:int, verboseCast_:bool, actionId_:int, sourceId_:int):
         self.spellId = spellId_
         
-        super().__init__(targetId_, verboseCast_, actionId_, sourceId_)
-    
+        super().init(targetId_, verboseCast_, actionId_, sourceId_)
     

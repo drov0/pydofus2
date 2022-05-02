@@ -10,4 +10,3 @@ class BasicPongMessage(NetworkMessage):
         
         super().__init__()
     
-    

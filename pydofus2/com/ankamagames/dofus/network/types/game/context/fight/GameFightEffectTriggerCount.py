@@ -14,4 +14,3 @@ class GameFightEffectTriggerCount(NetworkMessage):
         
         super().__init__()
     
-    

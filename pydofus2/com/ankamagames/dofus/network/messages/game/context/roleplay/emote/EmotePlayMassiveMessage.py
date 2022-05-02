@@ -8,6 +8,5 @@ class EmotePlayMassiveMessage(EmotePlayAbstractMessage):
     def init(self, actorIds_:list[int], emoteId_:int, emoteStartTime_:int):
         self.actorIds = actorIds_
         
-        super().__init__(emoteId_, emoteStartTime_)
-    
+        super().init(emoteId_, emoteStartTime_)
     

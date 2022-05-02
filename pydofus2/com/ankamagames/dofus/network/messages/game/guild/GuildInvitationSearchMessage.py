@@ -14,4 +14,3 @@ class GuildInvitationSearchMessage(NetworkMessage):
         
         super().__init__()
     
-    

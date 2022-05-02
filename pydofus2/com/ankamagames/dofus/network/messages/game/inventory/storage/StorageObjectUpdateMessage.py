@@ -14,4 +14,3 @@ class StorageObjectUpdateMessage(NetworkMessage):
         
         super().__init__()
     
-    

@@ -16,4 +16,3 @@ class ActorAlignmentInformations(NetworkMessage):
         
         super().__init__()
     
-    

@@ -18,6 +18,5 @@ class PartyInvitationMessage(AbstractPartyMessage):
         self.fromName = fromName_
         self.toId = toId_
         
-        super().__init__(partyId_)
-    
+        super().init(partyId_)
     

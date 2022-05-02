@@ -10,4 +10,3 @@ class DungeonPartyFinderRegisterRequestMessage(NetworkMessage):
         
         super().__init__()
     
-    

@@ -16,4 +16,3 @@ class TitlesAndOrnamentsListMessage(NetworkMessage):
         
         super().__init__()
     
-    

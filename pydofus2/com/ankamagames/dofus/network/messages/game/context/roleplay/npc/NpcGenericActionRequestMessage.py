@@ -14,4 +14,3 @@ class NpcGenericActionRequestMessage(NetworkMessage):
         
         super().__init__()
     
-    

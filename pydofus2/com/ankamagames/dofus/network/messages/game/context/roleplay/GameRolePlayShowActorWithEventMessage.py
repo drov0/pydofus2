@@ -12,6 +12,5 @@ class GameRolePlayShowActorWithEventMessage(GameRolePlayShowActorMessage):
     def init(self, actorEventId_:int, informations_:'GameRolePlayActorInformations'):
         self.actorEventId = actorEventId_
         
-        super().__init__(informations_)
-    
+        super().init(informations_)
     

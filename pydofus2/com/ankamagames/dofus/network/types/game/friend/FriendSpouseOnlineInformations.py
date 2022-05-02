@@ -21,6 +21,5 @@ class FriendSpouseOnlineInformations(FriendSpouseInformations):
         self.inFight = inFight_
         self.followSpouse = followSpouse_
         
-        super().__init__(spouseAccountId_, spouseId_, spouseName_, spouseLevel_, breed_, sex_, spouseEntityLook_, guildInfo_, alignmentSide_)
-    
+        super().init(spouseAccountId_, spouseId_, spouseName_, spouseLevel_, breed_, sex_, spouseEntityLook_, guildInfo_, alignmentSide_)
     

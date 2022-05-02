@@ -8,6 +8,5 @@ class PartyMemberEjectedMessage(PartyMemberRemoveMessage):
     def init(self, kickerId_:int, leavingPlayerId_:int, partyId_:int):
         self.kickerId = kickerId_
         
-        super().__init__(leavingPlayerId_, partyId_)
-    
+        super().init(leavingPlayerId_, partyId_)
     

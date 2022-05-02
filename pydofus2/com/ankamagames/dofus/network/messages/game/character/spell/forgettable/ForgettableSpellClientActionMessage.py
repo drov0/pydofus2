@@ -12,4 +12,3 @@ class ForgettableSpellClientActionMessage(NetworkMessage):
         
         super().__init__()
     
-    

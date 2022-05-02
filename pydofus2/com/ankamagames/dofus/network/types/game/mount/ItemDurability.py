@@ -12,4 +12,3 @@ class ItemDurability(NetworkMessage):
         
         super().__init__()
     
-    

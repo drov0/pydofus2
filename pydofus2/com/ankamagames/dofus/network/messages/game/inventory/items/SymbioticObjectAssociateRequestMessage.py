@@ -16,4 +16,3 @@ class SymbioticObjectAssociateRequestMessage(NetworkMessage):
         
         super().__init__()
     
-    

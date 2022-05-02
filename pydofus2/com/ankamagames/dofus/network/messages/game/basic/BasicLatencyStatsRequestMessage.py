@@ -8,4 +8,3 @@ class BasicLatencyStatsRequestMessage(NetworkMessage):
         
         super().__init__()
     
-    

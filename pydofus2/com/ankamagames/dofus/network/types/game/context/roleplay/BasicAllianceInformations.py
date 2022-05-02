@@ -10,6 +10,5 @@ class BasicAllianceInformations(AbstractSocialGroupInfos):
         self.allianceId = allianceId_
         self.allianceTag = allianceTag_
         
-        super().__init__()
-    
+        super().init()
     

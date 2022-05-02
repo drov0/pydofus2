@@ -8,4 +8,3 @@ class GuildCreationStartedMessage(NetworkMessage):
         
         super().__init__()
     
-    

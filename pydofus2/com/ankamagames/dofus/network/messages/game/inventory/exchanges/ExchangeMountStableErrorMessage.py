@@ -8,4 +8,3 @@ class ExchangeMountStableErrorMessage(NetworkMessage):
         
         super().__init__()
     
-    

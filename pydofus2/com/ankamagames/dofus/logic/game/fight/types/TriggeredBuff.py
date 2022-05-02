@@ -26,46 +26,46 @@ class TriggeredBuff(BasicBuff):
                 effect,
                 castingSpell,
                 actionId,
-                effect.diceNum,
-                effect.diceSide,
-                effect.value,
+                effect.param1,
+                effect.param2,
+                effect.param3,
             )
-            self.initParam(effect.diceNum, effect.diceSide, effect.value)
+            self.initParam(effect.param1, effect.param2, effect.param3)
             self.delay = effect.delay
             self._effect.delay = self.delay
             self.triggerCount = 0
 
     @property
-    def diceNum(self):
+    def param1(self):
         return self._effect.parameter0
 
     @property
-    def diceSide(self):
+    def param2(self):
         return self._effect.parameter1
 
     @property
-    def value(self):
+    def param3(self):
         return self._effect.parameter2
 
-    def initParam(self, diceNum: int, diceSide: int, value: int) -> None:
+    def initParam(self, param1: int, param2: int, param3: int) -> None:
         min: int = 0
         max: int = 0
-        super().initParam(diceNum, diceSide, value)
+        super().initParam(param1, param2, param3)
         e: Effect = Effect.getEffectById(self.actionId)
         if e and e.forceMinMax and isinstance(self._effect, EffectInstanceDice):
-            min = value + diceNum
-            max = diceNum * diceSide + value
+            min = param3 + param1
+            max = param1 * param2 + param3
             if min == max:
-                self.diceNum = min
+                self.param1 = min
                 self.value = 0
-                self.diceSide = 0
+                self.param2 = 0
             elif min > max:
-                self.diceNum = max
-                self.diceSide = min
+                self.param1 = max
+                self.param2 = min
                 self.value = 0
             else:
-                self.diceNum = min
-                self.diceSide = max
+                self.param1 = min
+                self.param2 = max
                 self.value = 0
 
     def clone(self, id: int = 0) -> BasicBuff:
@@ -82,7 +82,7 @@ class TriggeredBuff(BasicBuff):
         tb.aliveSource = self.aliveSource
         tb.sourceJustReaffected = self.sourceJustReaffected
         tb.parentBoostUid = self.parentBoostUid
-        tb.initParam(self.diceNum, self.diceSide, self.value)
+        tb.initParam(self.param1, self.param2, self.value)
         tb.delay = self.delay
         tb._effect.delay = self.delay
         return tb

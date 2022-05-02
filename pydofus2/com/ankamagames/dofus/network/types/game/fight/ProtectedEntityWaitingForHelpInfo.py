@@ -14,4 +14,3 @@ class ProtectedEntityWaitingForHelpInfo(NetworkMessage):
         
         super().__init__()
     
-    

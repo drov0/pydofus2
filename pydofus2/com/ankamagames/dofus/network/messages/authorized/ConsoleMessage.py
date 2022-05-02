@@ -12,4 +12,3 @@ class ConsoleMessage(NetworkMessage):
         
         super().__init__()
     
-    

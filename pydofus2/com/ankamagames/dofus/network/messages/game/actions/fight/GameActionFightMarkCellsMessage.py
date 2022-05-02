@@ -12,6 +12,5 @@ class GameActionFightMarkCellsMessage(AbstractGameActionMessage):
     def init(self, mark_:'GameActionMark', actionId_:int, sourceId_:int):
         self.mark = mark_
         
-        super().__init__(actionId_, sourceId_)
-    
+        super().init(actionId_, sourceId_)
     

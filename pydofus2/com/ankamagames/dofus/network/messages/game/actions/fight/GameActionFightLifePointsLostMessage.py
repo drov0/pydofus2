@@ -14,6 +14,5 @@ class GameActionFightLifePointsLostMessage(AbstractGameActionMessage):
         self.permanentDamages = permanentDamages_
         self.elementId = elementId_
         
-        super().__init__(actionId_, sourceId_)
-    
+        super().init(actionId_, sourceId_)
     

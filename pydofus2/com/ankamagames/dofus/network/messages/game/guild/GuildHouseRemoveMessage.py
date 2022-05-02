@@ -14,4 +14,3 @@ class GuildHouseRemoveMessage(NetworkMessage):
         
         super().__init__()
     
-    

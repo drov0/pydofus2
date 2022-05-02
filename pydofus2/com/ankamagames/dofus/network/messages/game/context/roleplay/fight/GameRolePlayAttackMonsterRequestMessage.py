@@ -10,4 +10,3 @@ class GameRolePlayAttackMonsterRequestMessage(NetworkMessage):
         
         super().__init__()
     
-    

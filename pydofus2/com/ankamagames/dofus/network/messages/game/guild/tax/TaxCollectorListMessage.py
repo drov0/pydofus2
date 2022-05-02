@@ -17,6 +17,5 @@ class TaxCollectorListMessage(AbstractTaxCollectorListMessage):
         self.fightersInformations = fightersInformations_
         self.infoType = infoType_
         
-        super().__init__(informations_)
-    
+        super().init(informations_)
     

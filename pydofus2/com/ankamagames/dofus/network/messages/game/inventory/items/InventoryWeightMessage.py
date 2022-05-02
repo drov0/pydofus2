@@ -14,4 +14,3 @@ class InventoryWeightMessage(NetworkMessage):
         
         super().__init__()
     
-    

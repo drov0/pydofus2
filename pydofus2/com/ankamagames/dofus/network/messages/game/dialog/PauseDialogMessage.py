@@ -10,4 +10,3 @@ class PauseDialogMessage(NetworkMessage):
         
         super().__init__()
     
-    

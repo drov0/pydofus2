@@ -28,6 +28,5 @@ class HouseInformationsForGuild(HouseInformations):
         self.skillListIds = skillListIds_
         self.guildshareParams = guildshareParams_
         
-        super().__init__(houseId_, modelId_)
-    
+        super().init(houseId_, modelId_)
     

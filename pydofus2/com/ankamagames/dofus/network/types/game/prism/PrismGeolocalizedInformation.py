@@ -18,6 +18,5 @@ class PrismGeolocalizedInformation(PrismSubareaEmptyInfo):
         self.mapId = mapId_
         self.prism = prism_
         
-        super().__init__(subAreaId_, allianceId_)
-    
+        super().init(subAreaId_, allianceId_)
     

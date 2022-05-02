@@ -12,4 +12,3 @@ class RecycleResultMessage(NetworkMessage):
         
         super().__init__()
     
-    

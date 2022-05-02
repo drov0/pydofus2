@@ -10,6 +10,5 @@ class QuestObjectiveInformationsWithCompletion(QuestObjectiveInformations):
         self.curCompletion = curCompletion_
         self.maxCompletion = maxCompletion_
         
-        super().__init__(objectiveId_, objectiveStatus_, dialogParams_)
-    
+        super().init(objectiveId_, objectiveStatus_, dialogParams_)
     

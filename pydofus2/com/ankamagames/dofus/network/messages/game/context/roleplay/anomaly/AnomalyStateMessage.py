@@ -14,4 +14,3 @@ class AnomalyStateMessage(NetworkMessage):
         
         super().__init__()
     
-    

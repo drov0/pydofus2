@@ -10,4 +10,3 @@ class CharacterCanBeCreatedResultMessage(NetworkMessage):
         
         super().__init__()
     
-    

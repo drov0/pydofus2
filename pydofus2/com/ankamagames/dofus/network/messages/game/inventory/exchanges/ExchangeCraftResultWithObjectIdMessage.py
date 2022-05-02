@@ -8,6 +8,5 @@ class ExchangeCraftResultWithObjectIdMessage(ExchangeCraftResultMessage):
     def init(self, objectGenericId_:int, craftResult_:int):
         self.objectGenericId = objectGenericId_
         
-        super().__init__(craftResult_)
-    
+        super().init(craftResult_)
     

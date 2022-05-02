@@ -18,4 +18,3 @@ class SubEntity(NetworkMessage):
         
         super().__init__()
     
-    

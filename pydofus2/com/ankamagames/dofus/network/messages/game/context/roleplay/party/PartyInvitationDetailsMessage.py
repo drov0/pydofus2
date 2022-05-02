@@ -25,6 +25,5 @@ class PartyInvitationDetailsMessage(AbstractPartyMessage):
         self.members = members_
         self.guests = guests_
         
-        super().__init__(partyId_)
-    
+        super().init(partyId_)
     

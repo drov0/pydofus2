@@ -8,6 +8,5 @@ class MapCoordinatesAndId(MapCoordinates):
     def init(self, mapId_:int, worldX_:int, worldY_:int):
         self.mapId = mapId_
         
-        super().__init__(worldX_, worldY_)
-    
+        super().init(worldX_, worldY_)
     

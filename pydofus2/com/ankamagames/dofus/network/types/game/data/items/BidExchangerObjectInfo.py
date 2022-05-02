@@ -22,4 +22,3 @@ class BidExchangerObjectInfo(NetworkMessage):
         
         super().__init__()
     
-    

@@ -10,4 +10,3 @@ class TeleportBuddiesAnswerMessage(NetworkMessage):
         
         super().__init__()
     
-    

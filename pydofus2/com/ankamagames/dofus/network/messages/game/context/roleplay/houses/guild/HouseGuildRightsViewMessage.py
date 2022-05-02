@@ -12,4 +12,3 @@ class HouseGuildRightsViewMessage(NetworkMessage):
         
         super().__init__()
     
-    

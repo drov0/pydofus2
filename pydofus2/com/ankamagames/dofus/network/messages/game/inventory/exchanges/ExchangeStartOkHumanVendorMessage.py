@@ -16,4 +16,3 @@ class ExchangeStartOkHumanVendorMessage(NetworkMessage):
         
         super().__init__()
     
-    

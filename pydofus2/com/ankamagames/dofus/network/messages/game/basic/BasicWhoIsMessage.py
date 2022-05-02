@@ -39,4 +39,3 @@ class BasicWhoIsMessage(NetworkMessage):
         
         super().__init__()
     
-    

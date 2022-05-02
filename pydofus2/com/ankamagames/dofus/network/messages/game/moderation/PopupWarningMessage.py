@@ -14,4 +14,3 @@ class PopupWarningMessage(NetworkMessage):
         
         super().__init__()
     
-    

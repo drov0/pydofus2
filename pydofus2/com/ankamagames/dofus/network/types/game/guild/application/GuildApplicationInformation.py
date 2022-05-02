@@ -18,4 +18,3 @@ class GuildApplicationInformation(NetworkMessage):
         
         super().__init__()
     
-    

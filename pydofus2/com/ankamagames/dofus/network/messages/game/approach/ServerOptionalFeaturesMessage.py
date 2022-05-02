@@ -10,4 +10,3 @@ class ServerOptionalFeaturesMessage(NetworkMessage):
         
         super().__init__()
     
-    

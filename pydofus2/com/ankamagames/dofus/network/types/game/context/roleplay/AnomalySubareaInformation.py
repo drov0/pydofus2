@@ -16,4 +16,3 @@ class AnomalySubareaInformation(NetworkMessage):
         
         super().__init__()
     
-    

@@ -10,6 +10,5 @@ class ExchangeBidPriceForSellerMessage(ExchangeBidPriceMessage):
         self.allIdentical = allIdentical_
         self.minimalPrices = minimalPrices_
         
-        super().__init__(genericId_, averagePrice_)
-    
+        super().init(genericId_, averagePrice_)
     

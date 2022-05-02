@@ -14,4 +14,3 @@ class GameRolePlayFightRequestCanceledMessage(NetworkMessage):
         
         super().__init__()
     
-    

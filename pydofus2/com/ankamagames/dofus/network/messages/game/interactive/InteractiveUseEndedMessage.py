@@ -12,4 +12,3 @@ class InteractiveUseEndedMessage(NetworkMessage):
         
         super().__init__()
     
-    

@@ -14,4 +14,3 @@ class TreasureHuntFlagRequestAnswerMessage(NetworkMessage):
         
         super().__init__()
     
-    

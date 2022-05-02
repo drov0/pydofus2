@@ -8,6 +8,5 @@ class ObjectUseMultipleMessage(ObjectUseMessage):
     def init(self, quantity_:int, objectUID_:int):
         self.quantity = quantity_
         
-        super().__init__(objectUID_)
-    
+        super().init(objectUID_)
     

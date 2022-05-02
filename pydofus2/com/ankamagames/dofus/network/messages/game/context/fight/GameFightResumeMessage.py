@@ -20,6 +20,5 @@ class GameFightResumeMessage(GameFightSpectateMessage):
         self.summonCount = summonCount_
         self.bombCount = bombCount_
         
-        super().__init__(effects_, marks_, gameTurn_, fightStart_, idols_, fxTriggerCounts_)
-    
+        super().init(effects_, marks_, gameTurn_, fightStart_, idols_, fxTriggerCounts_)
     

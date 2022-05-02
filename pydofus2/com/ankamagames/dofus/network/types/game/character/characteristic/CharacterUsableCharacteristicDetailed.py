@@ -8,6 +8,5 @@ class CharacterUsableCharacteristicDetailed(CharacterCharacteristicDetailed):
     def init(self, used_:int, base_:int, additional_:int, objectsAndMountBonus_:int, alignGiftBonus_:int, contextModif_:int, characteristicId_:int):
         self.used = used_
         
-        super().__init__(base_, additional_, objectsAndMountBonus_, alignGiftBonus_, contextModif_, characteristicId_)
-    
+        super().init(base_, additional_, objectsAndMountBonus_, alignGiftBonus_, contextModif_, characteristicId_)
     

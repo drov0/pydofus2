@@ -8,6 +8,5 @@ class GameContextRemoveElementWithEventMessage(GameContextRemoveElementMessage):
     def init(self, elementEventId_:int, id_:int):
         self.elementEventId = elementEventId_
         
-        super().__init__(id_)
-    
+        super().init(id_)
     

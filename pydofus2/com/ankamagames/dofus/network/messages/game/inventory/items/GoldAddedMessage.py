@@ -14,4 +14,3 @@ class GoldAddedMessage(NetworkMessage):
         
         super().__init__()
     
-    

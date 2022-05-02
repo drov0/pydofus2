@@ -10,4 +10,3 @@ class MountSterilizedMessage(NetworkMessage):
         
         super().__init__()
     
-    

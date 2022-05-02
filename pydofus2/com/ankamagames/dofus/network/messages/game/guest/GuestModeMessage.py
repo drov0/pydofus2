@@ -10,4 +10,3 @@ class GuestModeMessage(NetworkMessage):
         
         super().__init__()
     
-    

@@ -17,4 +17,3 @@ class AllianceModificationStartedMessage(NetworkMessage):
         
         super().__init__()
     
-    

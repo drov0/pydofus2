@@ -16,4 +16,3 @@ class GuildJoinedMessage(NetworkMessage):
         
         super().__init__()
     
-    

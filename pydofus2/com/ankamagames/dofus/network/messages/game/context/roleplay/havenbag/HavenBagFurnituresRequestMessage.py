@@ -14,4 +14,3 @@ class HavenBagFurnituresRequestMessage(NetworkMessage):
         
         super().__init__()
     
-    

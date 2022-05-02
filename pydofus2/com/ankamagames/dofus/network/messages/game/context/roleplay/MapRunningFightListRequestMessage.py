@@ -8,4 +8,3 @@ class MapRunningFightListRequestMessage(NetworkMessage):
         
         super().__init__()
     
-    

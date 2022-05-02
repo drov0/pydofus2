@@ -10,4 +10,3 @@ class PaddockRemoveItemRequestMessage(NetworkMessage):
         
         super().__init__()
     
-    

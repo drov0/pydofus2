@@ -8,6 +8,5 @@ class PartyMemberRemoveMessage(AbstractPartyEventMessage):
     def init(self, leavingPlayerId_:int, partyId_:int):
         self.leavingPlayerId = leavingPlayerId_
         
-        super().__init__(partyId_)
-    
+        super().init(partyId_)
     

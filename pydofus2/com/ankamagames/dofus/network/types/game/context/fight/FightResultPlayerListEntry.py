@@ -15,6 +15,5 @@ class FightResultPlayerListEntry(FightResultFighterListEntry):
         self.level = level_
         self.additional = additional_
         
-        super().__init__(id_, alive_, outcome_, wave_, rewards_)
-    
+        super().init(id_, alive_, outcome_, wave_, rewards_)
     

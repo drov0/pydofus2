@@ -14,4 +14,3 @@ class StatsUpgradeRequestMessage(NetworkMessage):
         
         super().__init__()
     
-    

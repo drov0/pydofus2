@@ -10,4 +10,3 @@ class GuestLimitationMessage(NetworkMessage):
         
         super().__init__()
     
-    

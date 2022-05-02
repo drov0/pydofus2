@@ -10,4 +10,3 @@ class NpcDialogReplyMessage(NetworkMessage):
         
         super().__init__()
     
-    

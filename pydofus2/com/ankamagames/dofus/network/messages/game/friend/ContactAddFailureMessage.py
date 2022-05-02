@@ -10,4 +10,3 @@ class ContactAddFailureMessage(NetworkMessage):
         
         super().__init__()
     
-    

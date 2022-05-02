@@ -10,4 +10,3 @@ class ShortcutBarRemoveErrorMessage(NetworkMessage):
         
         super().__init__()
     
-    

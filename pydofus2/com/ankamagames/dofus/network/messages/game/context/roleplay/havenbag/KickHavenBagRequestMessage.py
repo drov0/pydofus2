@@ -10,4 +10,3 @@ class KickHavenBagRequestMessage(NetworkMessage):
         
         super().__init__()
     
-    

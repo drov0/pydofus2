@@ -10,4 +10,3 @@ class GameDataPlayFarmObjectAnimationMessage(NetworkMessage):
         
         super().__init__()
     
-    

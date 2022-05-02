@@ -10,4 +10,3 @@ class ShowCellRequestMessage(NetworkMessage):
         
         super().__init__()
     
-    

@@ -12,4 +12,3 @@ class RecycledItem(NetworkMessage):
         
         super().__init__()
     
-    

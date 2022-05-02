@@ -14,4 +14,3 @@ class SpouseInformationsMessage(NetworkMessage):
         
         super().__init__()
     
-    

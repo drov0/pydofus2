@@ -10,4 +10,3 @@ class GuildSpellUpgradeRequestMessage(NetworkMessage):
         
         super().__init__()
     
-    

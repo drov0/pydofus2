@@ -12,6 +12,5 @@ class AlliancePrismInformation(PrismInformation):
     def init(self, alliance_:'AllianceInformations', typeId_:int, state_:int, nextVulnerabilityDate_:int, placementDate_:int, rewardTokenCount_:int):
         self.alliance = alliance_
         
-        super().__init__(typeId_, state_, nextVulnerabilityDate_, placementDate_, rewardTokenCount_)
-    
+        super().init(typeId_, state_, nextVulnerabilityDate_, placementDate_, rewardTokenCount_)
     

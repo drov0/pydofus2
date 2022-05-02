@@ -12,4 +12,3 @@ class FinishMoveInformations(NetworkMessage):
         
         super().__init__()
     
-    

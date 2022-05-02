@@ -16,4 +16,3 @@ class ExchangeMountSterilizeFromPaddockMessage(NetworkMessage):
         
         super().__init__()
     
-    

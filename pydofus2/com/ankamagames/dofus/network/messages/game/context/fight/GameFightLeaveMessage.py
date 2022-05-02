@@ -10,4 +10,3 @@ class GameFightLeaveMessage(NetworkMessage):
         
         super().__init__()
     
-    

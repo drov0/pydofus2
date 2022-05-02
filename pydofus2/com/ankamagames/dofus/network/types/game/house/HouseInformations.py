@@ -12,4 +12,3 @@ class HouseInformations(NetworkMessage):
         
         super().__init__()
     
-    

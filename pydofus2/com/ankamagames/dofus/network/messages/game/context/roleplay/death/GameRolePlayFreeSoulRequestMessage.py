@@ -8,4 +8,3 @@ class GameRolePlayFreeSoulRequestMessage(NetworkMessage):
         
         super().__init__()
     
-    

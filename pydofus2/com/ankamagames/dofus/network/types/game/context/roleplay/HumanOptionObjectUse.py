@@ -12,6 +12,5 @@ class HumanOptionObjectUse(HumanOption):
         self.delayEndTime = delayEndTime_
         self.objectGID = objectGID_
         
-        super().__init__()
-    
+        super().init()
     

@@ -22,4 +22,3 @@ class AbstractFightDispellableEffect(NetworkMessage):
         
         super().__init__()
     
-    

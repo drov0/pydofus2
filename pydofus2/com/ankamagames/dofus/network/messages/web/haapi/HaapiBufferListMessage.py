@@ -14,4 +14,3 @@ class HaapiBufferListMessage(NetworkMessage):
         
         super().__init__()
     
-    

@@ -16,4 +16,3 @@ class ForgettableSpellListUpdateMessage(NetworkMessage):
         
         super().__init__()
     
-    

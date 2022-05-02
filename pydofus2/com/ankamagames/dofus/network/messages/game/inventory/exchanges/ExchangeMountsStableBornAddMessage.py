@@ -10,6 +10,5 @@ class ExchangeMountsStableBornAddMessage(ExchangeMountsStableAddMessage):
 
     def init(self, mountDescription_:list['MountClientData']):
         
-        super().__init__(mountDescription_)
-    
+        super().init(mountDescription_)
     

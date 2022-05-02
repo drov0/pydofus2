@@ -21,6 +21,5 @@ class GameFightFighterInformations(GameContextActorInformations):
         self.stats = stats_
         self.previousPositions = previousPositions_
         
-        super().__init__(look_, contextualId_, disposition_)
-    
+        super().init(look_, contextualId_, disposition_)
     

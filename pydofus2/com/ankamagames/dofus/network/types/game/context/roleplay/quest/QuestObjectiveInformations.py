@@ -14,4 +14,3 @@ class QuestObjectiveInformations(NetworkMessage):
         
         super().__init__()
     
-    

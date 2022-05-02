@@ -12,4 +12,3 @@ class QuestObjectiveValidationMessage(NetworkMessage):
         
         super().__init__()
     
-    

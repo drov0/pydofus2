@@ -12,4 +12,3 @@ class UpdateSelfAgressableStatusMessage(NetworkMessage):
         
         super().__init__()
     
-    

@@ -26,4 +26,3 @@ class TaxCollectorAttackedMessage(NetworkMessage):
         
         super().__init__()
     
-    

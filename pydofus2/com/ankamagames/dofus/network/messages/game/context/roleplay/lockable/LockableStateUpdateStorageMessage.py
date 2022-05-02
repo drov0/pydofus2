@@ -10,6 +10,5 @@ class LockableStateUpdateStorageMessage(LockableStateUpdateAbstractMessage):
         self.mapId = mapId_
         self.elementId = elementId_
         
-        super().__init__(locked_)
-    
+        super().init(locked_)
     

@@ -8,4 +8,3 @@ class CharacterCanBeCreatedRequestMessage(NetworkMessage):
         
         super().__init__()
     
-    

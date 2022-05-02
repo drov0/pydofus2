@@ -14,4 +14,3 @@ class GuildModificationStartedMessage(NetworkMessage):
         
         super().__init__()
     
-    

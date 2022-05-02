@@ -8,6 +8,5 @@ class PortalDialogCreationMessage(NpcDialogCreationMessage):
     def init(self, type_:int, mapId_:int, npcId_:int):
         self.type = type_
         
-        super().__init__(mapId_, npcId_)
-    
+        super().init(mapId_, npcId_)
     

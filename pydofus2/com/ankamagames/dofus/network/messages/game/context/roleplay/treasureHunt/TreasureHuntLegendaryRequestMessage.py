@@ -10,4 +10,3 @@ class TreasureHuntLegendaryRequestMessage(NetworkMessage):
         
         super().__init__()
     
-    

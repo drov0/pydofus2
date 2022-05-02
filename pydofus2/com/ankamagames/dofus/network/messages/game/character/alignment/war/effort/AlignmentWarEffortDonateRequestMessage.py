@@ -10,4 +10,3 @@ class AlignmentWarEffortDonateRequestMessage(NetworkMessage):
         
         super().__init__()
     
-    

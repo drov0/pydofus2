@@ -20,4 +20,3 @@ class FightOptionsInformations(NetworkMessage):
         
         super().__init__()
     
-    

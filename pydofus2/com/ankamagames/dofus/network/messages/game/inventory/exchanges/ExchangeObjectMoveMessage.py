@@ -12,4 +12,3 @@ class ExchangeObjectMoveMessage(NetworkMessage):
         
         super().__init__()
     
-    

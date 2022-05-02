@@ -18,4 +18,3 @@ class GuildInvitedMessage(NetworkMessage):
         
         super().__init__()
     
-    

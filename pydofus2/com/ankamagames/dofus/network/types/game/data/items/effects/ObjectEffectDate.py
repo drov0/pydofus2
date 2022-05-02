@@ -16,6 +16,5 @@ class ObjectEffectDate(ObjectEffect):
         self.hour = hour_
         self.minute = minute_
         
-        super().__init__(actionId_)
-    
+        super().init(actionId_)
     

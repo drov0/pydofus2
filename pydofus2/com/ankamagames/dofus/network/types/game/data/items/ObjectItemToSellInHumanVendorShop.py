@@ -22,6 +22,5 @@ class ObjectItemToSellInHumanVendorShop(Item):
         self.objectPrice = objectPrice_
         self.publicPrice = publicPrice_
         
-        super().__init__()
-    
+        super().init()
     

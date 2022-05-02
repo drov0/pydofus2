@@ -12,4 +12,3 @@ class InteractiveUseErrorMessage(NetworkMessage):
         
         super().__init__()
     
-    

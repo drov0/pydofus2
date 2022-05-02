@@ -10,4 +10,3 @@ class HaapiShopApiKeyMessage(NetworkMessage):
         
         super().__init__()
     
-    

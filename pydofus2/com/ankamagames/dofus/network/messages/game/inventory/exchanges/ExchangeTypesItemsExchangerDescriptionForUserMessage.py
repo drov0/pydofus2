@@ -18,4 +18,3 @@ class ExchangeTypesItemsExchangerDescriptionForUserMessage(NetworkMessage):
         
         super().__init__()
     
-    

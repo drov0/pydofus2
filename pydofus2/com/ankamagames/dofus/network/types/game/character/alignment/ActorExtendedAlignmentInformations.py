@@ -14,6 +14,5 @@ class ActorExtendedAlignmentInformations(ActorAlignmentInformations):
         self.honorNextGradeFloor = honorNextGradeFloor_
         self.aggressable = aggressable_
         
-        super().__init__(alignmentSide_, alignmentValue_, alignmentGrade_, characterPower_)
-    
+        super().init(alignmentSide_, alignmentValue_, alignmentGrade_, characterPower_)
     

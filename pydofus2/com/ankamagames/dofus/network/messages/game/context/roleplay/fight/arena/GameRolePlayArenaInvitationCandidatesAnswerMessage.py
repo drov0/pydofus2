@@ -14,4 +14,3 @@ class GameRolePlayArenaInvitationCandidatesAnswerMessage(NetworkMessage):
         
         super().__init__()
     
-    

@@ -19,4 +19,3 @@ class TaxCollectorFightersInformation(NetworkMessage):
         
         super().__init__()
     
-    

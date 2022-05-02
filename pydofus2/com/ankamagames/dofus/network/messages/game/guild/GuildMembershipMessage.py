@@ -10,6 +10,5 @@ class GuildMembershipMessage(GuildJoinedMessage):
 
     def init(self, guildInfo_:'GuildInformations', rankId_:int):
         
-        super().__init__(guildInfo_, rankId_)
-    
+        super().init(guildInfo_, rankId_)
     

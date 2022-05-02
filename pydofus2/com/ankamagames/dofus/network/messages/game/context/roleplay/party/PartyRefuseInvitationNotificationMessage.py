@@ -8,6 +8,5 @@ class PartyRefuseInvitationNotificationMessage(AbstractPartyEventMessage):
     def init(self, guestId_:int, partyId_:int):
         self.guestId = guestId_
         
-        super().__init__(partyId_)
-    
+        super().init(partyId_)
     

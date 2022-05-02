@@ -10,4 +10,3 @@ class MigratedServerListMessage(NetworkMessage):
         
         super().__init__()
     
-    

@@ -18,4 +18,3 @@ class FightResultListEntry(NetworkMessage):
         
         super().__init__()
     
-    

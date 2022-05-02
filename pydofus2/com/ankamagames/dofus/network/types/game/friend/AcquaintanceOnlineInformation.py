@@ -19,6 +19,5 @@ class AcquaintanceOnlineInformation(AcquaintanceInformation):
         self.moodSmileyId = moodSmileyId_
         self.status = status_
         
-        super().__init__(playerState_, accountId_, accountTag_)
-    
+        super().init(playerState_, accountId_, accountTag_)
     

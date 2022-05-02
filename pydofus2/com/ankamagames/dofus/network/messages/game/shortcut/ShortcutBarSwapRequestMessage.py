@@ -14,4 +14,3 @@ class ShortcutBarSwapRequestMessage(NetworkMessage):
         
         super().__init__()
     
-    

@@ -18,4 +18,3 @@ class PaddockToSellFilterMessage(NetworkMessage):
         
         super().__init__()
     
-    

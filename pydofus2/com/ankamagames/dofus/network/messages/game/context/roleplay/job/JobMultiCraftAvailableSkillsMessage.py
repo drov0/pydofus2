@@ -10,6 +10,5 @@ class JobMultiCraftAvailableSkillsMessage(JobAllowMultiCraftRequestMessage):
         self.playerId = playerId_
         self.skills = skills_
         
-        super().__init__(enabled_)
-    
+        super().init(enabled_)
     

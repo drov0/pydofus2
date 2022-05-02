@@ -10,4 +10,3 @@ class JobBookSubscribeRequestMessage(NetworkMessage):
         
         super().__init__()
     
-    

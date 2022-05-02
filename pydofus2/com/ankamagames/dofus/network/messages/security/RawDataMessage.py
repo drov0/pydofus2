@@ -10,4 +10,3 @@ class RawDataMessage(NetworkMessage):
         
         super().__init__()
     
-    

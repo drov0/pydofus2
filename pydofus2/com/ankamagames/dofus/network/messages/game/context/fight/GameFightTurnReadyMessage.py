@@ -10,4 +10,3 @@ class GameFightTurnReadyMessage(NetworkMessage):
         
         super().__init__()
     
-    

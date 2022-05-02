@@ -10,4 +10,3 @@ class ObjectGroundRemovedMessage(NetworkMessage):
         
         super().__init__()
     
-    

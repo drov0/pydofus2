@@ -12,9 +12,9 @@ logger = Logger(__name__)
 
 class EffectInstanceDice(EffectInstanceInteger):
 
-    diceNum: int
+    param1: int
 
-    diceSide: int
+    param2: int
 
     def __init__(self):
         super().__init__()
@@ -27,8 +27,8 @@ class EffectInstanceDice(EffectInstanceInteger):
         o.order = self.order
         o.duration = self.duration
         o.delay = self.delay
-        o.diceNum = self.diceNum
-        o.diceSide = self.diceSide
+        o.param1 = self.param1
+        o.param2 = self.param2
         o.value = self.value
         o.random = self.random
         o.group = self.group
@@ -48,11 +48,11 @@ class EffectInstanceDice(EffectInstanceInteger):
 
     @property
     def parameter0(self) -> object:
-        return self.diceNum if self.diceNum != 0 else None
+        return self.param1 if self.param1 != 0 else None
 
     @property
     def parameter1(self) -> object:
-        return self.diceSide if self.diceSide != 0 else None
+        return self.param2 if self.param2 != 0 else None
 
     @property
     def parameter2(self) -> object:
@@ -60,28 +60,26 @@ class EffectInstanceDice(EffectInstanceInteger):
 
     def setParameter(self, paramIndex: int, value) -> None:
         if paramIndex == 0:
-            self.diceNum = int(value)
+            self.param1 = int(value)
 
         if paramIndex == 1:
-            self.diceSide = int(value)
+            self.param2 = int(value)
 
         if paramIndex == 2:
             self.value = int(value)
 
     def add(self, term) -> "EffectInstance":
         if isinstance(term, EffectInstanceDice):
-            if self.diceSide == 0:
-                self.diceSide = self.diceNum
-            self.diceNum += term.diceNum
-            self.diceSide += term.diceSide if term.diceSide != 0 else term.diceNum
-            if self.diceNum == self.diceSide:
-                self.diceSide = 0
+            if self.param2 == 0:
+                self.param2 = self.param1
+            self.param1 += term.param1
+            self.param2 += term.param2 if term.param2 != 0 else term.param1
+            if self.param1 == self.param2:
+                self.param2 = 0
             self.forceDescriptionRefresh()
         elif isinstance(term, EffectInstanceInteger):
-            self.diceNum += term.value
-            self.diceSide = (
-                int(self.diceSide + term.value) if self.diceSide != 0 else int(0)
-            )
+            self.param1 += term.value
+            self.param2 = int(self.param2 + term.value) if self.param2 != 0 else int(0)
             self.forceDescriptionRefresh()
         else:
             logger.error(term + " cannot be added to EffectInstanceDice.")

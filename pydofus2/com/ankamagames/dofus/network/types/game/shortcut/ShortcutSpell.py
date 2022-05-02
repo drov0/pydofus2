@@ -8,6 +8,5 @@ class ShortcutSpell(Shortcut):
     def init(self, spellId_:int, slot_:int):
         self.spellId = spellId_
         
-        super().__init__(slot_)
-    
+        super().init(slot_)
     

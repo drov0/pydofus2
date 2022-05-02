@@ -8,4 +8,3 @@ class GuildDeleteApplicationRequestMessage(NetworkMessage):
         
         super().__init__()
     
-    

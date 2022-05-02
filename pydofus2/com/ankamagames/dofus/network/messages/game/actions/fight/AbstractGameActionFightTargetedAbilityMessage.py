@@ -18,6 +18,5 @@ class AbstractGameActionFightTargetedAbilityMessage(AbstractGameActionMessage):
         self.silentCast = silentCast_
         self.verboseCast = verboseCast_
         
-        super().__init__(actionId_, sourceId_)
-    
+        super().init(actionId_, sourceId_)
     

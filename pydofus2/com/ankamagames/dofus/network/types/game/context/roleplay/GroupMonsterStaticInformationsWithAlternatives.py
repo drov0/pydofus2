@@ -14,6 +14,5 @@ class GroupMonsterStaticInformationsWithAlternatives(GroupMonsterStaticInformati
     def init(self, alternatives_:list['AlternativeMonstersInGroupLightInformations'], mainCreatureLightInfos_:'MonsterInGroupLightInformations', underlings_:list['MonsterInGroupInformations']):
         self.alternatives = alternatives_
         
-        super().__init__(mainCreatureLightInfos_, underlings_)
-    
+        super().init(mainCreatureLightInfos_, underlings_)
     

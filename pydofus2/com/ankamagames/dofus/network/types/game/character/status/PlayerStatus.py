@@ -10,4 +10,3 @@ class PlayerStatus(NetworkMessage):
         
         super().__init__()
     
-    

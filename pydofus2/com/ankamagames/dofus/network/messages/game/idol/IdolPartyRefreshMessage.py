@@ -14,4 +14,3 @@ class IdolPartyRefreshMessage(NetworkMessage):
         
         super().__init__()
     
-    

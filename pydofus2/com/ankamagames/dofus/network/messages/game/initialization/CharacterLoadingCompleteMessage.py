@@ -8,4 +8,3 @@ class CharacterLoadingCompleteMessage(NetworkMessage):
         
         super().__init__()
     
-    

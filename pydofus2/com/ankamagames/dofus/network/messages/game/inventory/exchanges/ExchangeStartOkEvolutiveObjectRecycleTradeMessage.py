@@ -8,4 +8,3 @@ class ExchangeStartOkEvolutiveObjectRecycleTradeMessage(NetworkMessage):
         
         super().__init__()
     
-    

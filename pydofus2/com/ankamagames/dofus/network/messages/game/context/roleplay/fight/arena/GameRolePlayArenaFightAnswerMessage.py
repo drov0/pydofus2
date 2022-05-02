@@ -12,4 +12,3 @@ class GameRolePlayArenaFightAnswerMessage(NetworkMessage):
         
         super().__init__()
     
-    

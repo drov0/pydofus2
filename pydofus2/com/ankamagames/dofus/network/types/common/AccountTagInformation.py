@@ -12,4 +12,3 @@ class AccountTagInformation(NetworkMessage):
         
         super().__init__()
     
-    

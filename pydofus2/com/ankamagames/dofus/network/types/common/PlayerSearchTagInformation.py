@@ -12,6 +12,5 @@ class PlayerSearchTagInformation(AbstractPlayerSearchInformation):
     def init(self, tag_:'AccountTagInformation'):
         self.tag = tag_
         
-        super().__init__()
-    
+        super().init()
     

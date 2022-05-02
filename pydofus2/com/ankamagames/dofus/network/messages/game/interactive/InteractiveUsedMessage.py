@@ -18,4 +18,3 @@ class InteractiveUsedMessage(NetworkMessage):
         
         super().__init__()
     
-    

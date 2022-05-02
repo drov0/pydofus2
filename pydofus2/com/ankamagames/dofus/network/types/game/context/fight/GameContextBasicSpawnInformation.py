@@ -18,4 +18,3 @@ class GameContextBasicSpawnInformation(NetworkMessage):
         
         super().__init__()
     
-    

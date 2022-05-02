@@ -10,4 +10,3 @@ class GameMapMovementCancelMessage(NetworkMessage):
         
         super().__init__()
     
-    

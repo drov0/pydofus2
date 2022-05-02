@@ -10,4 +10,3 @@ class NumericWhoIsRequestMessage(NetworkMessage):
         
         super().__init__()
     
-    

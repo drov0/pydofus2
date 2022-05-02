@@ -12,4 +12,3 @@ class ShortcutBarRemoveRequestMessage(NetworkMessage):
         
         super().__init__()
     
-    

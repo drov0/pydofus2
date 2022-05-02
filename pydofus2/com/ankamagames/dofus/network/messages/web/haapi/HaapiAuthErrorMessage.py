@@ -10,4 +10,3 @@ class HaapiAuthErrorMessage(NetworkMessage):
         
         super().__init__()
     
-    

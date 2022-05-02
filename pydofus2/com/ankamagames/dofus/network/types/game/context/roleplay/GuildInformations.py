@@ -12,6 +12,5 @@ class GuildInformations(BasicGuildInformations):
     def init(self, guildEmblem_:'GuildEmblem', guildId_:int, guildName_:str, guildLevel_:int):
         self.guildEmblem = guildEmblem_
         
-        super().__init__(guildId_, guildName_, guildLevel_)
-    
+        super().init(guildId_, guildName_, guildLevel_)
     

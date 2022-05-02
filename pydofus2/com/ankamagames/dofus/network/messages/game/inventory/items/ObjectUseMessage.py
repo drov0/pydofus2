@@ -10,4 +10,3 @@ class ObjectUseMessage(NetworkMessage):
         
         super().__init__()
     
-    

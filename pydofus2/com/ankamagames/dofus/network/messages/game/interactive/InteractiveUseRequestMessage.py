@@ -12,4 +12,3 @@ class InteractiveUseRequestMessage(NetworkMessage):
         
         super().__init__()
     
-    

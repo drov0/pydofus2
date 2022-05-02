@@ -14,6 +14,5 @@ class QuestActiveDetailedInformations(QuestActiveInformations):
         self.stepId = stepId_
         self.objectives = objectives_
         
-        super().__init__(questId_)
-    
+        super().init(questId_)
     

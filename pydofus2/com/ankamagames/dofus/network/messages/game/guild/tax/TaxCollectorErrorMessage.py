@@ -10,4 +10,3 @@ class TaxCollectorErrorMessage(NetworkMessage):
         
         super().__init__()
     
-    

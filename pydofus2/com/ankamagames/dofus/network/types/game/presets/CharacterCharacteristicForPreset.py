@@ -8,6 +8,5 @@ class CharacterCharacteristicForPreset(SimpleCharacterCharacteristicForPreset):
     def init(self, stuff_:int, keyword_:str, base_:int, additionnal_:int):
         self.stuff = stuff_
         
-        super().__init__(keyword_, base_, additionnal_)
-    
+        super().init(keyword_, base_, additionnal_)
     

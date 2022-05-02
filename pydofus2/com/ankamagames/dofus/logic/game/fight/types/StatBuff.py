@@ -45,7 +45,7 @@ class StatBuff(basicBuff.BasicBuff):
     @property
     def delta(self) -> int:
         if isinstance(self._effect, EffectInstanceDice):
-            return self._effect.diceNum if self._isABoost else -self._effect.diceNum
+            return self._effect.param1 if self._isABoost else -self._effect.param1
         return 0
 
     def onReenable(self) -> None:
@@ -70,5 +70,5 @@ class StatBuff(basicBuff.BasicBuff):
         sb.aliveSource = self.aliveSource
         sb.sourceJustReaffected = self.sourceJustReaffected
         sb.parentBoostUid = self.parentBoostUid
-        sb.initParam(self.diceNum, self.diceSide, self.value)
+        sb.initParam(self.param1, self.param2, self.value)
         return sb

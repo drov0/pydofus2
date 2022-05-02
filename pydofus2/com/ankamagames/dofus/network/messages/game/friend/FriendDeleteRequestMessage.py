@@ -10,4 +10,3 @@ class FriendDeleteRequestMessage(NetworkMessage):
         
         super().__init__()
     
-    

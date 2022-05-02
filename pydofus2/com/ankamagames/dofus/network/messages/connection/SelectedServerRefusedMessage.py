@@ -14,4 +14,3 @@ class SelectedServerRefusedMessage(NetworkMessage):
         
         super().__init__()
     
-    

@@ -10,4 +10,3 @@ class AlmanachCalendarDateMessage(NetworkMessage):
         
         super().__init__()
     
-    

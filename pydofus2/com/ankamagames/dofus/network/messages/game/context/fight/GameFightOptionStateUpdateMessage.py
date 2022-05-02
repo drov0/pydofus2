@@ -16,4 +16,3 @@ class GameFightOptionStateUpdateMessage(NetworkMessage):
         
         super().__init__()
     
-    

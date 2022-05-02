@@ -12,6 +12,5 @@ class LockableStateUpdateHouseDoorMessage(LockableStateUpdateAbstractMessage):
         self.instanceId = instanceId_
         self.secondHand = secondHand_
         
-        super().__init__(locked_)
-    
+        super().init(locked_)
     

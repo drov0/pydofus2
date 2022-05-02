@@ -12,4 +12,3 @@ class SpellForPreset(NetworkMessage):
         
         super().__init__()
     
-    

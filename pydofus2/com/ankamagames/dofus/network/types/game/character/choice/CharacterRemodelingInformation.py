@@ -16,6 +16,5 @@ class CharacterRemodelingInformation(AbstractCharacterInformation):
         self.cosmeticId = cosmeticId_
         self.colors = colors_
         
-        super().__init__(id_)
-    
+        super().init(id_)
     

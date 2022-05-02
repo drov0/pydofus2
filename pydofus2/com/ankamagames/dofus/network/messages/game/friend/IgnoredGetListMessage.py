@@ -8,4 +8,3 @@ class IgnoredGetListMessage(NetworkMessage):
         
         super().__init__()
     
-    

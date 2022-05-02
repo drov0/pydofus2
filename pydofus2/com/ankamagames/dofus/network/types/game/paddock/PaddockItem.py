@@ -12,6 +12,5 @@ class PaddockItem(ObjectItemInRolePlay):
     def init(self, durability_:'ItemDurability', cellId_:int, objectGID_:int):
         self.durability = durability_
         
-        super().__init__(cellId_, objectGID_)
-    
+        super().init(cellId_, objectGID_)
     

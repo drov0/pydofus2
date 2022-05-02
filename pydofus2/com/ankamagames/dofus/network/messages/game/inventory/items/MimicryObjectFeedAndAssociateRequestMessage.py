@@ -12,6 +12,5 @@ class MimicryObjectFeedAndAssociateRequestMessage(SymbioticObjectAssociateReques
         self.foodPos = foodPos_
         self.preview = preview_
         
-        super().__init__(symbioteUID_, symbiotePos_, hostUID_, hostPos_)
-    
+        super().init(symbioteUID_, symbiotePos_, hostUID_, hostPos_)
     

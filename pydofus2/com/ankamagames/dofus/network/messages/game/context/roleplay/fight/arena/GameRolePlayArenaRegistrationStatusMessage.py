@@ -14,4 +14,3 @@ class GameRolePlayArenaRegistrationStatusMessage(NetworkMessage):
         
         super().__init__()
     
-    

@@ -14,4 +14,3 @@ class PrismFightDefenderLeaveMessage(NetworkMessage):
         
         super().__init__()
     
-    

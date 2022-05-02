@@ -14,6 +14,5 @@ class ObjectItemToSellInNpcShop(ObjectItemMinimalInformation):
         self.objectPrice = objectPrice_
         self.buyCriterion = buyCriterion_
         
-        super().__init__(objectGID_, effects_)
-    
+        super().init(objectGID_, effects_)
     

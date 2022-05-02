@@ -14,4 +14,3 @@ class GuildModificationEmblemValidMessage(NetworkMessage):
         
         super().__init__()
     
-    

@@ -8,4 +8,3 @@ class NicknameRegistrationMessage(NetworkMessage):
         
         super().__init__()
     
-    

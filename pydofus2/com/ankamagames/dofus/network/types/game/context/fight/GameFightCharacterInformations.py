@@ -23,6 +23,5 @@ class GameFightCharacterInformations(GameFightFighterNamedInformations):
         self.breed = breed_
         self.sex = sex_
         
-        super().__init__(name_, status_, leagueId_, ladderPosition_, hiddenInPrefight_, spawnInfo_, wave_, stats_, previousPositions_, look_, contextualId_, disposition_)
-    
+        super().init(name_, status_, leagueId_, ladderPosition_, hiddenInPrefight_, spawnInfo_, wave_, stats_, previousPositions_, look_, contextualId_, disposition_)
     

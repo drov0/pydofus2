@@ -8,4 +8,3 @@ class ResetCharacterStatsRequestMessage(NetworkMessage):
         
         super().__init__()
     
-    

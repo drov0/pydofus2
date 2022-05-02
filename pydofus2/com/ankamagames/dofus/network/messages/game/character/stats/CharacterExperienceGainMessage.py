@@ -16,4 +16,3 @@ class CharacterExperienceGainMessage(NetworkMessage):
         
         super().__init__()
     
-    

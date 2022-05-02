@@ -10,4 +10,3 @@ class ExchangeStartOkNpcTradeMessage(NetworkMessage):
         
         super().__init__()
     
-    

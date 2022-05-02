@@ -10,4 +10,3 @@ class ExchangeCrafterJobLevelupMessage(NetworkMessage):
         
         super().__init__()
     
-    

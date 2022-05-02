@@ -10,6 +10,5 @@ class SpellItem(Item):
         self.spellId = spellId_
         self.spellLevel = spellLevel_
         
-        super().__init__()
-    
+        super().init()
     

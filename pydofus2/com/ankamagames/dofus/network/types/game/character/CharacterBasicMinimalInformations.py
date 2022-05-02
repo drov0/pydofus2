@@ -8,6 +8,5 @@ class CharacterBasicMinimalInformations(AbstractCharacterInformation):
     def init(self, name_:str, id_:int):
         self.name = name_
         
-        super().__init__(id_)
-    
+        super().init(id_)
     

@@ -18,4 +18,3 @@ class HaapiConfirmationMessage(NetworkMessage):
         
         super().__init__()
     
-    

@@ -12,4 +12,3 @@ class ExchangeReplyTaxVendorMessage(NetworkMessage):
         
         super().__init__()
     
-    

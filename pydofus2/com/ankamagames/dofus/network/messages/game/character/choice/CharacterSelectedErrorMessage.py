@@ -8,4 +8,3 @@ class CharacterSelectedErrorMessage(NetworkMessage):
         
         super().__init__()
     
-    

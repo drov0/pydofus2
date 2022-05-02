@@ -8,4 +8,3 @@ class NetworkDataContainerMessage(NetworkMessage):
         
         super().__init__()
     
-    

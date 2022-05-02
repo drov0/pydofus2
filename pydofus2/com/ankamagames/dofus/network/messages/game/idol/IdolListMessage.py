@@ -18,4 +18,3 @@ class IdolListMessage(NetworkMessage):
         
         super().__init__()
     
-    

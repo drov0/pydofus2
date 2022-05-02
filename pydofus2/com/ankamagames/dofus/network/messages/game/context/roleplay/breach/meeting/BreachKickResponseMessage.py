@@ -16,4 +16,3 @@ class BreachKickResponseMessage(NetworkMessage):
         
         super().__init__()
     
-    

@@ -10,4 +10,3 @@ class ChatSmileyRequestMessage(NetworkMessage):
         
         super().__init__()
     
-    

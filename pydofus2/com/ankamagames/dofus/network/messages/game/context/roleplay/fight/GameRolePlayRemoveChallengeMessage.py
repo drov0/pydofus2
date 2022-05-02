@@ -10,4 +10,3 @@ class GameRolePlayRemoveChallengeMessage(NetworkMessage):
         
         super().__init__()
     
-    

@@ -10,6 +10,5 @@ class IgnoredInformations(AbstractContactInformations):
 
     def init(self, accountId_:int, accountTag_:'AccountTagInformation'):
         
-        super().__init__(accountId_, accountTag_)
-    
+        super().init(accountId_, accountTag_)
     

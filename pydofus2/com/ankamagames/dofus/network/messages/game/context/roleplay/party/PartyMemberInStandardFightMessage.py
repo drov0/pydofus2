@@ -12,6 +12,5 @@ class PartyMemberInStandardFightMessage(AbstractPartyMemberInFightMessage):
     def init(self, fightMap_:'MapCoordinatesExtended', reason_:int, memberId_:int, memberAccountId_:int, memberName_:str, fightId_:int, timeBeforeFightStart_:int, partyId_:int):
         self.fightMap = fightMap_
         
-        super().__init__(reason_, memberId_, memberAccountId_, memberName_, fightId_, timeBeforeFightStart_, partyId_)
-    
+        super().init(reason_, memberId_, memberAccountId_, memberName_, fightId_, timeBeforeFightStart_, partyId_)
     

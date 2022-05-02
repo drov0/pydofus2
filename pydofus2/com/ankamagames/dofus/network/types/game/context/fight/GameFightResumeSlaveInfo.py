@@ -20,4 +20,3 @@ class GameFightResumeSlaveInfo(NetworkMessage):
         
         super().__init__()
     
-    

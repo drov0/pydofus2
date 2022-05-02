@@ -14,4 +14,3 @@ class GameFightSynchronizeMessage(NetworkMessage):
         
         super().__init__()
     
-    

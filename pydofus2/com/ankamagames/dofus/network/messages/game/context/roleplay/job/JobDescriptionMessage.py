@@ -14,4 +14,3 @@ class JobDescriptionMessage(NetworkMessage):
         
         super().__init__()
     
-    

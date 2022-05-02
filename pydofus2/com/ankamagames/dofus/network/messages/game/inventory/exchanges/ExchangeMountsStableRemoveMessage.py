@@ -10,4 +10,3 @@ class ExchangeMountsStableRemoveMessage(NetworkMessage):
         
         super().__init__()
     
-    

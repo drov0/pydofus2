@@ -12,4 +12,3 @@ class EntityDispositionInformations(NetworkMessage):
         
         super().__init__()
     
-    

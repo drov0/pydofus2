@@ -16,4 +16,3 @@ class GameRolePlayMonsterAngryAtPlayerMessage(NetworkMessage):
         
         super().__init__()
     
-    

@@ -14,6 +14,5 @@ class SpawnCompanionInformation(SpawnInformation):
         self.summonerId = summonerId_
         self.ownerId = ownerId_
         
-        super().__init__()
-    
+        super().init()
     

@@ -8,4 +8,3 @@ class SequenceNumberRequestMessage(NetworkMessage):
         
         super().__init__()
     
-    

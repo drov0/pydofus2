@@ -12,4 +12,3 @@ class AlignmentRankUpdateMessage(NetworkMessage):
         
         super().__init__()
     
-    

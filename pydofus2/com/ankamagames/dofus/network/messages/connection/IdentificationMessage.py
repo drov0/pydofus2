@@ -33,4 +33,3 @@ class IdentificationMessage(NetworkMessage):
         
         super().__init__()
     
-    

@@ -14,6 +14,5 @@ class ObjectItemMinimalInformation(Item):
         self.objectGID = objectGID_
         self.effects = effects_
         
-        super().__init__()
-    
+        super().init()
     

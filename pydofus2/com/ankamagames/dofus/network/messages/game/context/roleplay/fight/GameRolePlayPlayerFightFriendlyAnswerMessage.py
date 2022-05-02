@@ -12,4 +12,3 @@ class GameRolePlayPlayerFightFriendlyAnswerMessage(NetworkMessage):
         
         super().__init__()
     
-    

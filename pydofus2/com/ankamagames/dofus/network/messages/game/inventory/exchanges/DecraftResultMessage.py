@@ -14,4 +14,3 @@ class DecraftResultMessage(NetworkMessage):
         
         super().__init__()
     
-    

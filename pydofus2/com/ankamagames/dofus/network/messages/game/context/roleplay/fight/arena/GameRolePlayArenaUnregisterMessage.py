@@ -8,4 +8,3 @@ class GameRolePlayArenaUnregisterMessage(NetworkMessage):
         
         super().__init__()
     
-    

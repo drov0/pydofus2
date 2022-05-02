@@ -10,4 +10,3 @@ class MountInformationInPaddockRequestMessage(NetworkMessage):
         
         super().__init__()
     
-    

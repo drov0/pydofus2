@@ -30,4 +30,3 @@ class HouseInstanceInformations(NetworkMessage):
         
         super().__init__()
     
-    

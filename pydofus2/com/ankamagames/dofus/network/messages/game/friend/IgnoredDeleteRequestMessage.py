@@ -12,4 +12,3 @@ class IgnoredDeleteRequestMessage(NetworkMessage):
         
         super().__init__()
     
-    

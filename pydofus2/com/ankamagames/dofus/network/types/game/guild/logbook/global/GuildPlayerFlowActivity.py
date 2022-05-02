@@ -12,6 +12,5 @@ class GuildPlayerFlowActivity(GuildLogbookEntryBasicInformation):
         self.playerName = playerName_
         self.playerFlowEventType = playerFlowEventType_
         
-        super().__init__(id_, date_)
-    
+        super().init(id_, date_)
     

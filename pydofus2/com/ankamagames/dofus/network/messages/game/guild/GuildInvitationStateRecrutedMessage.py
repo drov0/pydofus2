@@ -10,4 +10,3 @@ class GuildInvitationStateRecrutedMessage(NetworkMessage):
         
         super().__init__()
     
-    

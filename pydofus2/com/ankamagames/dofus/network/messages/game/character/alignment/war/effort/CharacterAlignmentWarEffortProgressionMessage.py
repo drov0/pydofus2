@@ -14,4 +14,3 @@ class CharacterAlignmentWarEffortProgressionMessage(NetworkMessage):
         
         super().__init__()
     
-    

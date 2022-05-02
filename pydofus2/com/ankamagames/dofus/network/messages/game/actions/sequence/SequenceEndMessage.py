@@ -14,4 +14,3 @@ class SequenceEndMessage(NetworkMessage):
         
         super().__init__()
     
-    

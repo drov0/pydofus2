@@ -10,4 +10,3 @@ class GameRolePlayArenaRegisterMessage(NetworkMessage):
         
         super().__init__()
     
-    

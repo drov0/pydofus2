@@ -10,6 +10,5 @@ class ShortcutObjectItem(ShortcutObject):
         self.itemUID = itemUID_
         self.itemGID = itemGID_
         
-        super().__init__(slot_)
-    
+        super().init(slot_)
     

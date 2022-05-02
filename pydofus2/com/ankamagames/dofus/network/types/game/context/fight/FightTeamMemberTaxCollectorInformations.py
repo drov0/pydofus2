@@ -16,6 +16,5 @@ class FightTeamMemberTaxCollectorInformations(FightTeamMemberInformations):
         self.guildId = guildId_
         self.uid = uid_
         
-        super().__init__(id_)
-    
+        super().init(id_)
     

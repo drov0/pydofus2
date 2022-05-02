@@ -10,4 +10,3 @@ class SpouseStatusMessage(NetworkMessage):
         
         super().__init__()
     
-    

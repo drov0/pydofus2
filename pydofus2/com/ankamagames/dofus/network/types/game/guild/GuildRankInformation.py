@@ -14,6 +14,5 @@ class GuildRankInformation(GuildRankMinimalInformation):
         self.modifiable = modifiable_
         self.rights = rights_
         
-        super().__init__(id_, name_)
-    
+        super().init(id_, name_)
     

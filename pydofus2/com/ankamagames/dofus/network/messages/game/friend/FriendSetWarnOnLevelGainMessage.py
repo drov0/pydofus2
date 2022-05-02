@@ -10,4 +10,3 @@ class FriendSetWarnOnLevelGainMessage(NetworkMessage):
         
         super().__init__()
     
-    

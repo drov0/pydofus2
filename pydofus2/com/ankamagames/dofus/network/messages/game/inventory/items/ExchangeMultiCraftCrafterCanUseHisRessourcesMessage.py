@@ -10,4 +10,3 @@ class ExchangeMultiCraftCrafterCanUseHisRessourcesMessage(NetworkMessage):
         
         super().__init__()
     
-    

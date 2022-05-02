@@ -12,6 +12,5 @@ class BasicGuildInformations(AbstractSocialGroupInfos):
         self.guildName = guildName_
         self.guildLevel = guildLevel_
         
-        super().__init__()
-    
+        super().init()
     

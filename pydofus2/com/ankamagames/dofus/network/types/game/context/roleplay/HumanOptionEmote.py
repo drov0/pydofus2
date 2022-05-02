@@ -10,6 +10,5 @@ class HumanOptionEmote(HumanOption):
         self.emoteId = emoteId_
         self.emoteStartTime = emoteStartTime_
         
-        super().__init__()
-    
+        super().init()
     

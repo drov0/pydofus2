@@ -19,6 +19,5 @@ class GameFightEntityInformation(GameFightFighterInformations):
         self.level = level_
         self.masterId = masterId_
         
-        super().__init__(spawnInfo_, wave_, stats_, previousPositions_, look_, contextualId_, disposition_)
-    
+        super().init(spawnInfo_, wave_, stats_, previousPositions_, look_, contextualId_, disposition_)
     

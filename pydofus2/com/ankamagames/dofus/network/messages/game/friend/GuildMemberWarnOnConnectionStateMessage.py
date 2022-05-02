@@ -10,4 +10,3 @@ class GuildMemberWarnOnConnectionStateMessage(NetworkMessage):
         
         super().__init__()
     
-    

@@ -16,4 +16,3 @@ class ExchangeStartedTaxCollectorShopMessage(NetworkMessage):
         
         super().__init__()
     
-    

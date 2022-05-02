@@ -14,6 +14,5 @@ class PartyFollowStatusUpdateMessage(AbstractPartyMessage):
         self.success = success_
         self.isFollowed = isFollowed_
         
-        super().__init__(partyId_)
-    
+        super().init(partyId_)
     

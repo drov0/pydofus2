@@ -446,10 +446,10 @@ class ItemWrapper(Item, ISlotData, ICellZoneProvider, IDataCenter):
                             and effect.bonusType == 1
                         ):
                             boostedEffect = effect.clone()
-                            boostedEffect.value = math.floor(
-                                boostedEffect.value * itbt.favoriteSubAreasBonus / 100
+                            boostedeffect.param3 = math.floor(
+                                boostedeffect.param3 * itbt.favoriteSubAreasBonus / 100
                             )
-                            if boostedEffect.value:
+                            if boostedeffect.param3:
                                 result.append(boostedEffect)
         return result
 
@@ -647,21 +647,21 @@ class ItemWrapper(Item, ISlotData, ICellZoneProvider, IDataCenter):
             self.livingobjectFoodDate = effect.description
 
         elif effect.effectId == ActionIds.ACTION_ITEM_LIVING_ID:
-            self.livingobjectId = effect.value
+            self.livingobjectId = effect.param3
 
         elif effect.effectId == ActionIds.ACTION_ITEM_LIVING_MOOD:
-            self.livingobjectMood = effect.value
+            self.livingobjectMood = effect.param3
 
         elif effect.effectId == ActionIds.ACTION_ITEM_LIVING_SKIN:
-            self.livingobjectSkin = effect.value
+            self.livingobjectSkin = effect.param3
 
         elif effect.effectId == ActionIds.ACTION_ITEM_LIVING_CATEGORY:
-            self.livingobjectCategory = effect.value
+            self.livingobjectCategory = effect.param3
 
         elif effect.effectId == ActionIds.ACTION_ITEM_LIVING_LEVEL:
-            self.livingobjectLevel = self.getLivingobjectLevel(effect.value)
+            self.livingobjectLevel = self.getLivingobjectLevel(effect.param3)
             self.livingobjectXp = (
-                effect.value - self.LEVEL_STEP[self.livingobjectLevel - 1]
+                effect.param3 - self.LEVEL_STEP[self.livingobjectLevel - 1]
             )
             self.livingobjectMaxXp = (
                 self.LEVEL_STEP[self.livingobjectLevel]

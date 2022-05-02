@@ -10,4 +10,3 @@ class StorageObjectRemoveMessage(NetworkMessage):
         
         super().__init__()
     
-    

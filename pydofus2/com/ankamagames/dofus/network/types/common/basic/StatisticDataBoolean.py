@@ -8,6 +8,5 @@ class StatisticDataBoolean(StatisticData):
     def init(self, value_:bool):
         self.value = value_
         
-        super().__init__()
-    
+        super().init()
     

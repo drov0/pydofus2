@@ -8,4 +8,3 @@ class FriendSpouseJoinRequestMessage(NetworkMessage):
         
         super().__init__()
     
-    

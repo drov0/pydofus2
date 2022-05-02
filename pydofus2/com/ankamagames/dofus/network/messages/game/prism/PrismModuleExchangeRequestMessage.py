@@ -8,4 +8,3 @@ class PrismModuleExchangeRequestMessage(NetworkMessage):
         
         super().__init__()
     
-    

@@ -16,4 +16,3 @@ class InventoryContentMessage(NetworkMessage):
         
         super().__init__()
     
-    

@@ -8,6 +8,5 @@ class UpdateMountBooleanCharacteristic(UpdateMountCharacteristic):
     def init(self, value_:bool, type_:int):
         self.value = value_
         
-        super().__init__(type_)
-    
+        super().init(type_)
     

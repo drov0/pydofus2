@@ -12,4 +12,3 @@ class MountInformationRequestMessage(NetworkMessage):
         
         super().__init__()
     
-    

@@ -18,4 +18,3 @@ class GuildListApplicationModifiedMessage(NetworkMessage):
         
         super().__init__()
     
-    

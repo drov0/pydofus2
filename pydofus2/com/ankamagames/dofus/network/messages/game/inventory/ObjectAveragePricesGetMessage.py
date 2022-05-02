@@ -8,4 +8,3 @@ class ObjectAveragePricesGetMessage(NetworkMessage):
         
         super().__init__()
     
-    

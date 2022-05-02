@@ -12,4 +12,3 @@ class AllianceModificationNameAndTagValidMessage(NetworkMessage):
         
         super().__init__()
     
-    

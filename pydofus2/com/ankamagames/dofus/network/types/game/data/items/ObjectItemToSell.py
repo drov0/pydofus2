@@ -20,6 +20,5 @@ class ObjectItemToSell(Item):
         self.quantity = quantity_
         self.objectPrice = objectPrice_
         
-        super().__init__()
-    
+        super().init()
     

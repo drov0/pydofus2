@@ -14,6 +14,5 @@ class HumanOptionOrnament(HumanOption):
         self.leagueId = leagueId_
         self.ladderPosition = ladderPosition_
         
-        super().__init__()
-    
+        super().init()
     

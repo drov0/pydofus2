@@ -10,6 +10,5 @@ class PartyNewMemberMessage(PartyUpdateMessage):
 
     def init(self, memberInformations_:'PartyMemberInformations', partyId_:int):
         
-        super().__init__(memberInformations_, partyId_)
-    
+        super().init(memberInformations_, partyId_)
     

@@ -8,6 +8,5 @@ class ContactLookRequestByNameMessage(ContactLookRequestMessage):
     def init(self, playerName_:str, requestId_:int, contactType_:int):
         self.playerName = playerName_
         
-        super().__init__(requestId_, contactType_)
-    
+        super().init(requestId_, contactType_)
     

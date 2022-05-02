@@ -14,4 +14,3 @@ class GuildRanksMessage(NetworkMessage):
         
         super().__init__()
     
-    

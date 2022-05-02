@@ -18,4 +18,3 @@ class HousePropertiesMessage(NetworkMessage):
         
         super().__init__()
     
-    

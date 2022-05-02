@@ -10,4 +10,3 @@ class ObjectsDeletedMessage(NetworkMessage):
         
         super().__init__()
     
-    

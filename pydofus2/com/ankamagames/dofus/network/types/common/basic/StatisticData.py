@@ -8,4 +8,3 @@ class StatisticData(NetworkMessage):
         
         super().__init__()
     
-    

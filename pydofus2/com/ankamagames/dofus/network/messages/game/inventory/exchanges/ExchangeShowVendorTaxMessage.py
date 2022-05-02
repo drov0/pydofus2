@@ -8,4 +8,3 @@ class ExchangeShowVendorTaxMessage(NetworkMessage):
         
         super().__init__()
     
-    

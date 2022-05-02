@@ -41,6 +41,5 @@ class FightResultExperienceData(FightResultAdditionalData):
         self.showExperienceForMount = showExperienceForMount_
         self.isIncarnationExperience = isIncarnationExperience_
         
-        super().__init__()
-    
+        super().init()
     

@@ -12,4 +12,3 @@ class GuildMemberOnlineStatusMessage(NetworkMessage):
         
         super().__init__()
     
-    

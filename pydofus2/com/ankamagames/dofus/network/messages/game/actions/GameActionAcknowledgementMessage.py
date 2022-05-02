@@ -12,4 +12,3 @@ class GameActionAcknowledgementMessage(NetworkMessage):
         
         super().__init__()
     
-    

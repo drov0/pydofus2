@@ -408,7 +408,7 @@ class BuffManager(metaclass=Singleton):
             return False
         self._buffs[targetId][i].onRemoved()
         self._buffs[targetId][i].updateParam(
-            buff.diceNum, buff.diceSide, buff.value, buff.id
+            buff.param1, buff.param2, buff.value, buff.id
         )
         oldBuff = self._buffs[targetId][i]
         if not oldBuff:
@@ -501,19 +501,19 @@ class BuffManager(metaclass=Singleton):
                 buff.onRemoved()
                 isState = False
                 if buff.actionId == ActionIds.ACTION_BOOST_SPELL_BASE_DMG:
-                    buff.diceNum = buff.stack[0].diceNum
-                    buff.diceSide -= buff.stack[0].diceSide
+                    buff.param1 = buff.stack[0].param1
+                    buff.param2 -= buff.stack[0].param2
                     buff.value -= buff.stack[0].value
                 if buff.actionId == ActionIds.ACTION_CHARACTER_PUNISHMENT:
-                    buff.diceNum -= buff.stack[0].diceSide
+                    buff.param1 -= buff.stack[0].param2
                 if (
                     buff.actionId == ActionIds.ACTION_FIGHT_SET_STATE
                     or buff.actionId == ActionIds.ACTION_FIGHT_UNSET_STATE
                 ):
                     isState = True
                 else:
-                    buff.diceNum -= buff.stack[0].diceNum
-                    buff.diceSide -= buff.stack[0].diceSide
+                    buff.param1 -= buff.stack[0].param1
+                    buff.param2 -= buff.stack[0].param2
                     buff.value -= buff.stack[0].value
                 buff.stack.pop(0)
                 buff.refreshDescription()

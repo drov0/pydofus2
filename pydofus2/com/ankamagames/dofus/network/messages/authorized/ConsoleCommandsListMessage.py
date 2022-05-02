@@ -14,4 +14,3 @@ class ConsoleCommandsListMessage(NetworkMessage):
         
         super().__init__()
     
-    

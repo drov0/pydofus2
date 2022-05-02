@@ -12,4 +12,3 @@ class SpellVariantActivationMessage(NetworkMessage):
         
         super().__init__()
     
-    

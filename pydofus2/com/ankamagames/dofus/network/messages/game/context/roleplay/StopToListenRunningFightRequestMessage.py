@@ -8,4 +8,3 @@ class StopToListenRunningFightRequestMessage(NetworkMessage):
         
         super().__init__()
     
-    

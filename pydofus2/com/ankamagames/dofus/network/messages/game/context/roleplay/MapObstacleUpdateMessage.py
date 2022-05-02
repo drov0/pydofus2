@@ -14,4 +14,3 @@ class MapObstacleUpdateMessage(NetworkMessage):
         
         super().__init__()
     
-    

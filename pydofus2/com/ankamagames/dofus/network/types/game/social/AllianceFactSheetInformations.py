@@ -18,6 +18,5 @@ class AllianceFactSheetInformations(AllianceInformations):
         self.nbMembers = nbMembers_
         self.nbSubarea = nbSubarea_
         
-        super().__init__(allianceEmblem_, allianceName_, allianceId_, allianceTag_)
-    
+        super().init(allianceEmblem_, allianceName_, allianceId_, allianceTag_)
     

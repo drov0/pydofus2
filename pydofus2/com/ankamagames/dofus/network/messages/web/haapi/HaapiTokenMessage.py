@@ -10,4 +10,3 @@ class HaapiTokenMessage(NetworkMessage):
         
         super().__init__()
     
-    

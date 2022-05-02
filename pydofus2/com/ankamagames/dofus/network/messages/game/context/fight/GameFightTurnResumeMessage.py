@@ -8,6 +8,5 @@ class GameFightTurnResumeMessage(GameFightTurnStartMessage):
     def init(self, remainingTime_:int, id_:int, waitTime_:int):
         self.remainingTime = remainingTime_
         
-        super().__init__(id_, waitTime_)
-    
+        super().init(id_, waitTime_)
     

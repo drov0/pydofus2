@@ -12,4 +12,3 @@ class FightLoot(NetworkMessage):
         
         super().__init__()
     
-    

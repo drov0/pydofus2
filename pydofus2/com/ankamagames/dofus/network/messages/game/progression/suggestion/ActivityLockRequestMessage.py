@@ -12,4 +12,3 @@ class ActivityLockRequestMessage(NetworkMessage):
         
         super().__init__()
     
-    

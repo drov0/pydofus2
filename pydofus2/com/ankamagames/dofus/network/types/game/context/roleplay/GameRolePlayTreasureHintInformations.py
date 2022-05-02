@@ -13,6 +13,5 @@ class GameRolePlayTreasureHintInformations(GameRolePlayActorInformations):
     def init(self, npcId_:int, look_:'EntityLook', contextualId_:int, disposition_:'EntityDispositionInformations'):
         self.npcId = npcId_
         
-        super().__init__(look_, contextualId_, disposition_)
-    
+        super().init(look_, contextualId_, disposition_)
     

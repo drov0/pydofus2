@@ -10,4 +10,3 @@ class MountXpRatioMessage(NetworkMessage):
         
         super().__init__()
     
-    

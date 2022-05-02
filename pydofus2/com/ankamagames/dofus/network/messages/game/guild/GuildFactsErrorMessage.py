@@ -10,4 +10,3 @@ class GuildFactsErrorMessage(NetworkMessage):
         
         super().__init__()
     
-    

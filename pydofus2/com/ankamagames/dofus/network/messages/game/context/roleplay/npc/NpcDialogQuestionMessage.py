@@ -14,4 +14,3 @@ class NpcDialogQuestionMessage(NetworkMessage):
         
         super().__init__()
     
-    

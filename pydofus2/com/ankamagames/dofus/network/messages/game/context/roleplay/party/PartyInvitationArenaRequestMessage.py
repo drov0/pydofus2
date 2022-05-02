@@ -10,6 +10,5 @@ class PartyInvitationArenaRequestMessage(PartyInvitationRequestMessage):
 
     def init(self, target_:'AbstractPlayerSearchInformation'):
         
-        super().__init__(target_)
-    
+        super().init(target_)
     

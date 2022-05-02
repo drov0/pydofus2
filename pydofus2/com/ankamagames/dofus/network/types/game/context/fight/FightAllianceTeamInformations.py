@@ -12,6 +12,5 @@ class FightAllianceTeamInformations(FightTeamInformations):
     def init(self, relation_:int, teamMembers_:list['FightTeamMemberInformations'], teamId_:int, leaderId_:int, teamSide_:int, teamTypeId_:int, nbWaves_:int):
         self.relation = relation_
         
-        super().__init__(teamMembers_, teamId_, leaderId_, teamSide_, teamTypeId_, nbWaves_)
-    
+        super().init(teamMembers_, teamId_, leaderId_, teamSide_, teamTypeId_, nbWaves_)
     

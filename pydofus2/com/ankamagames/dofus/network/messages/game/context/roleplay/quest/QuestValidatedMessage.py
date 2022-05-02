@@ -10,4 +10,3 @@ class QuestValidatedMessage(NetworkMessage):
         
         super().__init__()
     
-    

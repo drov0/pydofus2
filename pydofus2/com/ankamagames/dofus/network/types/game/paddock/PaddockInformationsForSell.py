@@ -22,4 +22,3 @@ class PaddockInformationsForSell(NetworkMessage):
         
         super().__init__()
     
-    

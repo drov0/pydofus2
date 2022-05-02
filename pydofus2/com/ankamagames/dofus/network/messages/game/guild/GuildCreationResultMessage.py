@@ -10,4 +10,3 @@ class GuildCreationResultMessage(NetworkMessage):
         
         super().__init__()
     
-    

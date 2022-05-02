@@ -8,4 +8,3 @@ class Item(NetworkMessage):
         
         super().__init__()
     
-    

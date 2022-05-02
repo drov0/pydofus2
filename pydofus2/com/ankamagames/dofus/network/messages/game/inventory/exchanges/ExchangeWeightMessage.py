@@ -12,4 +12,3 @@ class ExchangeWeightMessage(NetworkMessage):
         
         super().__init__()
     
-    

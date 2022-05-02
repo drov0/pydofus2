@@ -10,4 +10,3 @@ class ExchangeBidHouseGenericItemRemovedMessage(NetworkMessage):
         
         super().__init__()
     
-    

@@ -25,6 +25,5 @@ class MapComplementaryInformationsDataInHavenBagMessage(MapComplementaryInformat
         self.roomId = roomId_
         self.maxRoomId = maxRoomId_
         
-        super().__init__(subAreaId_, mapId_, houses_, actors_, interactiveElements_, statedElements_, obstacles_, fights_, hasAggressiveMonsters_, fightStartPositions_)
-    
+        super().init(subAreaId_, mapId_, houses_, actors_, interactiveElements_, statedElements_, obstacles_, fights_, hasAggressiveMonsters_, fightStartPositions_)
     

@@ -10,4 +10,3 @@ class ExchangeCraftResultMessage(NetworkMessage):
         
         super().__init__()
     
-    

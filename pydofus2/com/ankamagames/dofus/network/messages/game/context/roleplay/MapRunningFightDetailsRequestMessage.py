@@ -10,4 +10,3 @@ class MapRunningFightDetailsRequestMessage(NetworkMessage):
         
         super().__init__()
     
-    

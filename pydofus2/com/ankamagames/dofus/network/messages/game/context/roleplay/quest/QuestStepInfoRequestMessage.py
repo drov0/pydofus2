@@ -10,4 +10,3 @@ class QuestStepInfoRequestMessage(NetworkMessage):
         
         super().__init__()
     
-    

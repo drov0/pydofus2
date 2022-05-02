@@ -8,4 +8,3 @@ class OpenHavenBagFurnitureSequenceRequestMessage(NetworkMessage):
         
         super().__init__()
     
-    

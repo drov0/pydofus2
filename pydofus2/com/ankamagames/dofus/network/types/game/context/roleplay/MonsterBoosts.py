@@ -14,4 +14,3 @@ class MonsterBoosts(NetworkMessage):
         
         super().__init__()
     
-    

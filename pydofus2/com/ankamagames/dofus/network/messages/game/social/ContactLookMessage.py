@@ -20,4 +20,3 @@ class ContactLookMessage(NetworkMessage):
         
         super().__init__()
     
-    

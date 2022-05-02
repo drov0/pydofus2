@@ -6,6 +6,5 @@ class TreasureHuntStepDig(TreasureHuntStep):
 
     def init(self):
         
-        super().__init__()
-    
+        super().init()
     

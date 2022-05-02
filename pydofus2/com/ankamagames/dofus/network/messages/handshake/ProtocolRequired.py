@@ -10,4 +10,3 @@ class ProtocolRequired(NetworkMessage):
         
         super().__init__()
     
-    

@@ -14,4 +14,3 @@ class TaxCollectorDialogQuestionBasicMessage(NetworkMessage):
         
         super().__init__()
     
-    

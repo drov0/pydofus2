@@ -8,4 +8,3 @@ class AlliancePrismDialogQuestionMessage(NetworkMessage):
         
         super().__init__()
     
-    

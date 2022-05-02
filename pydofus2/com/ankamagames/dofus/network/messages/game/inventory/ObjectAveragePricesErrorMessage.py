@@ -8,4 +8,3 @@ class ObjectAveragePricesErrorMessage(NetworkMessage):
         
         super().__init__()
     
-    

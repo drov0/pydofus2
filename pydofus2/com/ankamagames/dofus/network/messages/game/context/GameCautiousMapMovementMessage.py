@@ -6,6 +6,5 @@ class GameCautiousMapMovementMessage(GameMapMovementMessage):
 
     def init(self, keyMovements_:list[int], forcedDirection_:int, actorId_:int):
         
-        super().__init__(keyMovements_, forcedDirection_, actorId_)
-    
+        super().init(keyMovements_, forcedDirection_, actorId_)
     

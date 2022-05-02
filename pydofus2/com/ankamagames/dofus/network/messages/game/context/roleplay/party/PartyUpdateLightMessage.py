@@ -16,6 +16,5 @@ class PartyUpdateLightMessage(AbstractPartyEventMessage):
         self.prospecting = prospecting_
         self.regenRate = regenRate_
         
-        super().__init__(partyId_)
-    
+        super().init(partyId_)
     

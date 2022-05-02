@@ -10,4 +10,3 @@ class GameFightNewRoundMessage(NetworkMessage):
         
         super().__init__()
     
-    

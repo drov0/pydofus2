@@ -10,4 +10,3 @@ class ContactLookErrorMessage(NetworkMessage):
         
         super().__init__()
     
-    

@@ -16,4 +16,3 @@ class HouseGuildShareRequestMessage(NetworkMessage):
         
         super().__init__()
     
-    

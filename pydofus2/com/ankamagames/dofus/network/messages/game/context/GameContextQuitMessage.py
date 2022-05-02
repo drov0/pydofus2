@@ -8,4 +8,3 @@ class GameContextQuitMessage(NetworkMessage):
         
         super().__init__()
     
-    

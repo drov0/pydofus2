@@ -16,6 +16,5 @@ class AllianceSummaryRequestMessage(PaginationRequestAbstractMessage):
         self.sortType = sortType_
         self.sortDescending = sortDescending_
         
-        super().__init__(offset_, count_)
-    
+        super().init(offset_, count_)
     

@@ -8,4 +8,3 @@ class GameContextDestroyMessage(NetworkMessage):
         
         super().__init__()
     
-    

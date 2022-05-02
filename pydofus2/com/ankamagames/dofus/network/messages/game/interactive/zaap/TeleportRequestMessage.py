@@ -14,4 +14,3 @@ class TeleportRequestMessage(NetworkMessage):
         
         super().__init__()
     
-    

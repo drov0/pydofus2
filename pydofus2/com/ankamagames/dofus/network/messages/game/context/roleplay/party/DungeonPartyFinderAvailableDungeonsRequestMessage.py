@@ -8,4 +8,3 @@ class DungeonPartyFinderAvailableDungeonsRequestMessage(NetworkMessage):
         
         super().__init__()
     
-    

@@ -12,6 +12,5 @@ class PaddockInstancesInformations(PaddockInformations):
     def init(self, paddocks_:list['PaddockBuyableInformations'], maxOutdoorMount_:int, maxItems_:int):
         self.paddocks = paddocks_
         
-        super().__init__(maxOutdoorMount_, maxItems_)
-    
+        super().init(maxOutdoorMount_, maxItems_)
     

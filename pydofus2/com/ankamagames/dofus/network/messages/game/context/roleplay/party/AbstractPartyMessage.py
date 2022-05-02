@@ -10,4 +10,3 @@ class AbstractPartyMessage(NetworkMessage):
         
         super().__init__()
     
-    

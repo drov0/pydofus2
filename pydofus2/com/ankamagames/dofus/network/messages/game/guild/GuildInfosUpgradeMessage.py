@@ -28,4 +28,3 @@ class GuildInfosUpgradeMessage(NetworkMessage):
         
         super().__init__()
     
-    

@@ -10,4 +10,3 @@ class ExchangeCraftPaymentModifiedMessage(NetworkMessage):
         
         super().__init__()
     
-    

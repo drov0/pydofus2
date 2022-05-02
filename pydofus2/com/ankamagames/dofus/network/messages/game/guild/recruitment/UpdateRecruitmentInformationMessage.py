@@ -14,4 +14,3 @@ class UpdateRecruitmentInformationMessage(NetworkMessage):
         
         super().__init__()
     
-    

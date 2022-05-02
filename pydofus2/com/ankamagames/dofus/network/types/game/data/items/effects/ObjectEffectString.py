@@ -8,6 +8,5 @@ class ObjectEffectString(ObjectEffect):
     def init(self, value_:str, actionId_:int):
         self.value = value_
         
-        super().__init__(actionId_)
-    
+        super().init(actionId_)
     

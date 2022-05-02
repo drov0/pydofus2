@@ -12,4 +12,3 @@ class BasicStatMessage(NetworkMessage):
         
         super().__init__()
     
-    

@@ -30,4 +30,3 @@ class ApplicationPlayerInformation(NetworkMessage):
         
         super().__init__()
     
-    

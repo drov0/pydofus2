@@ -12,4 +12,3 @@ class ReloginTokenStatusMessage(NetworkMessage):
         
         super().__init__()
     
-    

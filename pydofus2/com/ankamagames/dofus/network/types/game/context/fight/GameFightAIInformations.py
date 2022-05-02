@@ -13,6 +13,5 @@ class GameFightAIInformations(GameFightFighterInformations):
 
     def init(self, spawnInfo_:'GameContextBasicSpawnInformation', wave_:int, stats_:'GameFightCharacteristics', previousPositions_:list[int], look_:'EntityLook', contextualId_:int, disposition_:'EntityDispositionInformations'):
         
-        super().__init__(spawnInfo_, wave_, stats_, previousPositions_, look_, contextualId_, disposition_)
-    
+        super().init(spawnInfo_, wave_, stats_, previousPositions_, look_, contextualId_, disposition_)
     

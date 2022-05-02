@@ -10,4 +10,3 @@ class GuildInvitationMessage(NetworkMessage):
         
         super().__init__()
     
-    

@@ -12,4 +12,3 @@ class DungeonKeyRingUpdateMessage(NetworkMessage):
         
         super().__init__()
     
-    

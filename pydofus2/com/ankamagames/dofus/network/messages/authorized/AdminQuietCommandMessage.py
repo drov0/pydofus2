@@ -6,6 +6,5 @@ class AdminQuietCommandMessage(AdminCommandMessage):
 
     def init(self, content_:str):
         
-        super().__init__(content_)
-    
+        super().init(content_)
     

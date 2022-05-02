@@ -12,4 +12,3 @@ class ChangeMapMessage(NetworkMessage):
         
         super().__init__()
     
-    

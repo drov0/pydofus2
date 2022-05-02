@@ -8,4 +8,3 @@ class CharacterNameSuggestionRequestMessage(NetworkMessage):
         
         super().__init__()
     
-    

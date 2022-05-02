@@ -8,4 +8,3 @@ class PlayerStatusUpdateErrorMessage(NetworkMessage):
         
         super().__init__()
     
-    

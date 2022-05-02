@@ -74,18 +74,18 @@ class ObjectEffectAdapter:
             and oe.actionId == ActionIds.ACTION_INCARNATION
         ):
             effect = EffectInstanceDate()
-            effect.year = oe.diceNum
-            effect.month = oe.diceSide * 32768 + oe.diceConst
+            effect.year = oe.param1
+            effect.month = oe.param2 * 32768 + oe.diceConst
             level = 1
             while True:
                 incLevel = IncarnationLevel.getIncarnationLevelByIdAndLevel(
-                    oe.diceNum, level
+                    oe.param1, level
                 )
                 if incLevel:
                     floor = incLevel.requiredXp
                 level += 1
                 incLevelPlusOne = IncarnationLevel.getIncarnationLevelByIdAndLevel(
-                    oe.diceNum, level
+                    oe.param1, level
                 )
                 if incLevelPlusOne:
                     nextFloor = incLevelPlusOne.requiredXp
@@ -101,16 +101,16 @@ class ObjectEffectAdapter:
                 effect.text = oe.value
             if isinstance(oe, ObjectEffectInteger):
                 effect = EffectInstanceInteger()
-                effect.value = oe.value
+                effect.param3 = oe.value
             if isinstance(oe, ObjectEffectMinMax):
                 effect = EffectInstanceMinMax()
                 effect.min = oe.min
                 effect.max = oe.max
             if isinstance(oe, ObjectEffectDice):
                 effect = EffectInstanceDice()
-                effect.diceNum = oe.diceNum
-                effect.diceSide = oe.diceSide
-                effect.value = oe.diceConst
+                effect.param1 = oe.param1
+                effect.param2 = oe.param2
+                effect.param3 = oe.diceConst
             if isinstance(oe, ObjectEffectDate):
                 effect = EffectInstanceDate()
                 effect.year = oe.year
@@ -147,7 +147,7 @@ class ObjectEffectAdapter:
                 clientEffects = list[EffectInstanceInteger]()
                 for serverEffect in oe:
                     intEffect = EffectInstanceInteger()
-                    intEffect.value = serverEffect.value
+                    inteffect.param3 = servereffect.param3
                     intEffect.effectId = serverEffect.actionId
                     intEffect.duration = 0
                     clientEffects.append(intEffect)

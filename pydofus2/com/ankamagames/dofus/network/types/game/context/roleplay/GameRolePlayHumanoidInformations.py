@@ -16,6 +16,5 @@ class GameRolePlayHumanoidInformations(GameRolePlayNamedActorInformations):
         self.humanoidInfo = humanoidInfo_
         self.accountId = accountId_
         
-        super().__init__(name_, look_, contextualId_, disposition_)
-    
+        super().init(name_, look_, contextualId_, disposition_)
     

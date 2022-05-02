@@ -8,4 +8,3 @@ class GameFightPlacementSwapPositionsErrorMessage(NetworkMessage):
         
         super().__init__()
     
-    

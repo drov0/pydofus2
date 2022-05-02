@@ -14,4 +14,3 @@ class ExchangeShopStockMovementUpdatedMessage(NetworkMessage):
         
         super().__init__()
     
-    

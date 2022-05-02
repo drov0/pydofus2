@@ -12,4 +12,3 @@ class GuildUpdateNoteMessage(NetworkMessage):
         
         super().__init__()
     
-    

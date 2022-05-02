@@ -14,4 +14,3 @@ class EvolutiveObjectRecycleResultMessage(NetworkMessage):
         
         super().__init__()
     
-    

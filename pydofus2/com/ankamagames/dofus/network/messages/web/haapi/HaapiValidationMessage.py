@@ -12,4 +12,3 @@ class HaapiValidationMessage(NetworkMessage):
         
         super().__init__()
     
-    

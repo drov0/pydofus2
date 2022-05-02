@@ -10,4 +10,3 @@ class HavenBagPermissionsUpdateMessage(NetworkMessage):
         
         super().__init__()
     
-    

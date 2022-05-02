@@ -10,6 +10,5 @@ class PrismsListUpdateMessage(PrismsListMessage):
 
     def init(self, prisms_:list['PrismSubareaEmptyInfo']):
         
-        super().__init__(prisms_)
-    
+        super().init(prisms_)
     

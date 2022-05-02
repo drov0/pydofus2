@@ -8,6 +8,5 @@ class CharacterCharacteristicValue(CharacterCharacteristic):
     def init(self, total_:int, characteristicId_:int):
         self.total = total_
         
-        super().__init__(characteristicId_)
-    
+        super().init(characteristicId_)
     

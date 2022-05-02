@@ -10,6 +10,5 @@ class GameActionFightInvisibilityMessage(AbstractGameActionMessage):
         self.targetId = targetId_
         self.state = state_
         
-        super().__init__(actionId_, sourceId_)
-    
+        super().init(actionId_, sourceId_)
     

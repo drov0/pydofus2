@@ -10,6 +10,5 @@ class WatchInventoryContentMessage(InventoryContentMessage):
 
     def init(self, objects_:list['ObjectItem'], kamas_:int):
         
-        super().__init__(objects_, kamas_)
-    
+        super().init(objects_, kamas_)
     

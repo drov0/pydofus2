@@ -16,4 +16,3 @@ class SetCharacterRestrictionsMessage(NetworkMessage):
         
         super().__init__()
     
-    

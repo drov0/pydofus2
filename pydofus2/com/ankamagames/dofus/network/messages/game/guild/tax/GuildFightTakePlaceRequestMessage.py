@@ -8,6 +8,5 @@ class GuildFightTakePlaceRequestMessage(GuildFightJoinRequestMessage):
     def init(self, replacedCharacterId_:int, taxCollectorId_:int):
         self.replacedCharacterId = replacedCharacterId_
         
-        super().__init__(taxCollectorId_)
-    
+        super().init(taxCollectorId_)
     

@@ -18,4 +18,3 @@ class CharacterCreationRequestMessage(NetworkMessage):
         
         super().__init__()
     
-    

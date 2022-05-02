@@ -10,6 +10,5 @@ class AlliancePartialListMessage(AllianceListMessage):
 
     def init(self, alliances_:list['AllianceFactSheetInformations']):
         
-        super().__init__(alliances_)
-    
+        super().init(alliances_)
     

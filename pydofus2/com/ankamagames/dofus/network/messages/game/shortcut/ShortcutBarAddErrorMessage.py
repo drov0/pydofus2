@@ -10,4 +10,3 @@ class ShortcutBarAddErrorMessage(NetworkMessage):
         
         super().__init__()
     
-    

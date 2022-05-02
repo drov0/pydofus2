@@ -21,6 +21,5 @@ class GuildFactSheetInformations(GuildInformations):
         self.recruitment = recruitment_
         self.nbPendingApply = nbPendingApply_
         
-        super().__init__(guildEmblem_, guildId_, guildName_, guildLevel_)
-    
+        super().init(guildEmblem_, guildId_, guildName_, guildLevel_)
     

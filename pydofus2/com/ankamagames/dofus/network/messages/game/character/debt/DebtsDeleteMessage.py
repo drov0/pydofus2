@@ -12,4 +12,3 @@ class DebtsDeleteMessage(NetworkMessage):
         
         super().__init__()
     
-    

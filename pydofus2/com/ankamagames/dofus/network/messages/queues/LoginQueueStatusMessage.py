@@ -12,4 +12,3 @@ class LoginQueueStatusMessage(NetworkMessage):
         
         super().__init__()
     
-    

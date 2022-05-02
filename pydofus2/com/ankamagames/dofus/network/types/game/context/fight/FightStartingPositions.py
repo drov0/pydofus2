@@ -12,4 +12,3 @@ class FightStartingPositions(NetworkMessage):
         
         super().__init__()
     
-    

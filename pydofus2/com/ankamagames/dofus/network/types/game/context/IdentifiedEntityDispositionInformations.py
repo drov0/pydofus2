@@ -8,6 +8,5 @@ class IdentifiedEntityDispositionInformations(EntityDispositionInformations):
     def init(self, id_:int, cellId_:int, direction_:int):
         self.id = id_
         
-        super().__init__(cellId_, direction_)
-    
+        super().init(cellId_, direction_)
     

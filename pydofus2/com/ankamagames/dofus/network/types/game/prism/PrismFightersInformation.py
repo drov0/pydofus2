@@ -22,4 +22,3 @@ class PrismFightersInformation(NetworkMessage):
         
         super().__init__()
     
-    

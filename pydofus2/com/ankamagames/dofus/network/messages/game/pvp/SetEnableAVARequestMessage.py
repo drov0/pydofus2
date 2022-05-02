@@ -10,4 +10,3 @@ class SetEnableAVARequestMessage(NetworkMessage):
         
         super().__init__()
     
-    

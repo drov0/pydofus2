@@ -20,6 +20,5 @@ class PartyEntityMemberInformation(PartyEntityBaseInformation):
         self.prospecting = prospecting_
         self.regenRate = regenRate_
         
-        super().__init__(indexId_, entityModelId_, entityLook_)
-    
+        super().init(indexId_, entityModelId_, entityLook_)
     

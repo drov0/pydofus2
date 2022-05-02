@@ -6,6 +6,5 @@ class WrapperObjectAssociatedMessage(SymbioticObjectAssociatedMessage):
 
     def init(self, hostUID_:int):
         
-        super().__init__(hostUID_)
-    
+        super().init(hostUID_)
     

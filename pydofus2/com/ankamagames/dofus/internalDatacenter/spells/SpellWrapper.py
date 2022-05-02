@@ -696,9 +696,9 @@ class SpellWrapper(ISlotData, ICellZoneProvider, IDataCenter):
                         damageBaseSpellModifier.totalValue
                         - damageBaseSpellModifier.additionalValue
                     )
-                    effectInstance.diceNum += modif
-                    if effectInstance.diceSide > 0:
-                        effectInstance.diceSide += modif
+                    effectInstance.param1 += modif
+                    if effectInstance.param2 > 0:
+                        effectInstance.param2 += modif
                 damageSpellModifier = spellmm.SpellModifiersManager().getSpellModifier(
                     entityId, self.id, CharacterSpellModificationTypeEnum.DAMAGE
                 )
@@ -735,9 +735,9 @@ class SpellWrapper(ISlotData, ICellZoneProvider, IDataCenter):
                         damageBaseSpellModifier.totalValue
                         - damageBaseSpellModifier.additionalValue
                     )
-                    effectInstanceDice.diceNum += modif
-                    if effectInstanceDice.diceSide > 0:
-                        effectInstanceDice.diceSide += modif
+                    effectInstanceDice.param1 += modif
+                    if effectInstanceDice.param2 > 0:
+                        effectInstanceDice.param2 += modif
                 damageSpellModifier = spellmm.SpellModifiersManager().getSpellModifier(
                     entityId, self.id, CharacterSpellModificationTypeEnum.DAMAGE
                 )

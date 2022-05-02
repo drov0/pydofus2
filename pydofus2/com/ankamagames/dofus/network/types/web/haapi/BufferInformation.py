@@ -12,4 +12,3 @@ class BufferInformation(NetworkMessage):
         
         super().__init__()
     
-    

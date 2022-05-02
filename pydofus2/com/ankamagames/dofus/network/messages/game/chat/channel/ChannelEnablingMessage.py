@@ -12,4 +12,3 @@ class ChannelEnablingMessage(NetworkMessage):
         
         super().__init__()
     
-    

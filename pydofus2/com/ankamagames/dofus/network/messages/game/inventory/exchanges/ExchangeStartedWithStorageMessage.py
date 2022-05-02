@@ -8,6 +8,5 @@ class ExchangeStartedWithStorageMessage(ExchangeStartedMessage):
     def init(self, storageMaxSlot_:int, exchangeType_:int):
         self.storageMaxSlot = storageMaxSlot_
         
-        super().__init__(exchangeType_)
-    
+        super().init(exchangeType_)
     

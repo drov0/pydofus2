@@ -8,4 +8,3 @@ class ExchangeBidSearchOkMessage(NetworkMessage):
         
         super().__init__()
     
-    

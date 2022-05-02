@@ -12,4 +12,3 @@ class NpcDialogCreationMessage(NetworkMessage):
         
         super().__init__()
     
-    

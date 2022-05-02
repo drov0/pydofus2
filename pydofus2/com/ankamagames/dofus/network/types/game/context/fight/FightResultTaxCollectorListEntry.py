@@ -17,6 +17,5 @@ class FightResultTaxCollectorListEntry(FightResultFighterListEntry):
         self.guildInfo = guildInfo_
         self.experienceForGuild = experienceForGuild_
         
-        super().__init__(id_, alive_, outcome_, wave_, rewards_)
-    
+        super().init(id_, alive_, outcome_, wave_, rewards_)
     

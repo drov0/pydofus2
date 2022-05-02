@@ -10,4 +10,3 @@ class CharacterLevelUpMessage(NetworkMessage):
         
         super().__init__()
     
-    

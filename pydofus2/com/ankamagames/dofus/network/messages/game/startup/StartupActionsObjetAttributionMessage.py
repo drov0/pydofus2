@@ -12,4 +12,3 @@ class StartupActionsObjetAttributionMessage(NetworkMessage):
         
         super().__init__()
     
-    

@@ -18,4 +18,3 @@ class RemodelingInformation(NetworkMessage):
         
         super().__init__()
     
-    

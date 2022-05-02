@@ -14,4 +14,3 @@ class PresetsMessage(NetworkMessage):
         
         super().__init__()
     
-    

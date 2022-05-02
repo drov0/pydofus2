@@ -10,6 +10,5 @@ class CharacterToRemodelInformations(CharacterRemodelingInformation):
         self.possibleChangeMask = possibleChangeMask_
         self.mandatoryChangeMask = mandatoryChangeMask_
         
-        super().__init__(name_, breed_, sex_, cosmeticId_, colors_, id_)
-    
+        super().init(name_, breed_, sex_, cosmeticId_, colors_, id_)
     

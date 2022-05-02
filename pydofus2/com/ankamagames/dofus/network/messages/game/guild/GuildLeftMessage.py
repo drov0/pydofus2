@@ -8,4 +8,3 @@ class GuildLeftMessage(NetworkMessage):
         
         super().__init__()
     
-    

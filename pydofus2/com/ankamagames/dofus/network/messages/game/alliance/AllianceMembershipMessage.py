@@ -10,6 +10,5 @@ class AllianceMembershipMessage(AllianceJoinedMessage):
 
     def init(self, allianceInfo_:'AllianceInformations', enabled_:bool, leadingGuildId_:int):
         
-        super().__init__(allianceInfo_, enabled_, leadingGuildId_)
-    
+        super().init(allianceInfo_, enabled_, leadingGuildId_)
     

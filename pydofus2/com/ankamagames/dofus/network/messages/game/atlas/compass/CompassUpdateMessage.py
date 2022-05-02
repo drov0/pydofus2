@@ -16,4 +16,3 @@ class CompassUpdateMessage(NetworkMessage):
         
         super().__init__()
     
-    

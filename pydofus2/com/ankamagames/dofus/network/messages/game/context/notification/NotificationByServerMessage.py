@@ -14,4 +14,3 @@ class NotificationByServerMessage(NetworkMessage):
         
         super().__init__()
     
-    

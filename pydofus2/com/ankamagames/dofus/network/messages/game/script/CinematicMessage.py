@@ -10,4 +10,3 @@ class CinematicMessage(NetworkMessage):
         
         super().__init__()
     
-    

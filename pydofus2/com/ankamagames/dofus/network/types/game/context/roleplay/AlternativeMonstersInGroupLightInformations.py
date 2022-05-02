@@ -16,4 +16,3 @@ class AlternativeMonstersInGroupLightInformations(NetworkMessage):
         
         super().__init__()
     
-    

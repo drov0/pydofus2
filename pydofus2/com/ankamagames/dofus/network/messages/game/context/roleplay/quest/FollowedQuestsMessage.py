@@ -14,4 +14,3 @@ class FollowedQuestsMessage(NetworkMessage):
         
         super().__init__()
     
-    

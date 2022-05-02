@@ -8,4 +8,3 @@ class ArenaFighterIdleMessage(NetworkMessage):
         
         super().__init__()
     
-    

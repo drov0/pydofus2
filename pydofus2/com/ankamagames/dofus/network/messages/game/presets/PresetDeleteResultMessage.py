@@ -12,4 +12,3 @@ class PresetDeleteResultMessage(NetworkMessage):
         
         super().__init__()
     
-    

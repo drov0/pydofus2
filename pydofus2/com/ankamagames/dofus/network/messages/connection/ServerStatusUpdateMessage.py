@@ -14,4 +14,3 @@ class ServerStatusUpdateMessage(NetworkMessage):
         
         super().__init__()
     
-    

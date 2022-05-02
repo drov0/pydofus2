@@ -12,4 +12,3 @@ class GameRolePlayAggressionMessage(NetworkMessage):
         
         super().__init__()
     
-    

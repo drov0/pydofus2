@@ -14,4 +14,3 @@ class JobCrafterDirectorySettingsMessage(NetworkMessage):
         
         super().__init__()
     
-    

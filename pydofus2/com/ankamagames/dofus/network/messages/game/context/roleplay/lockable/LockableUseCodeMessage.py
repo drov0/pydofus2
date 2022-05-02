@@ -10,4 +10,3 @@ class LockableUseCodeMessage(NetworkMessage):
         
         super().__init__()
     
-    

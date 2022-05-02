@@ -8,4 +8,3 @@ class TaxCollectorComplementaryInformations(NetworkMessage):
         
         super().__init__()
     
-    

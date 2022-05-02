@@ -16,6 +16,5 @@ class FightResultPvpData(FightResultAdditionalData):
         self.honor = honor_
         self.honorDelta = honorDelta_
         
-        super().__init__()
-    
+        super().init()
     

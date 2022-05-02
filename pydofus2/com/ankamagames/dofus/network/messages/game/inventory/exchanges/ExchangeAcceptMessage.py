@@ -8,4 +8,3 @@ class ExchangeAcceptMessage(NetworkMessage):
         
         super().__init__()
     
-    

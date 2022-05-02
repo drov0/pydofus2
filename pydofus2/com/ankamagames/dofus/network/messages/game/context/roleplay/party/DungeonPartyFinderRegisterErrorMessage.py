@@ -8,4 +8,3 @@ class DungeonPartyFinderRegisterErrorMessage(NetworkMessage):
         
         super().__init__()
     
-    

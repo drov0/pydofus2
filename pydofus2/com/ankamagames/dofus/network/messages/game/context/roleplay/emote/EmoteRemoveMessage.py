@@ -10,4 +10,3 @@ class EmoteRemoveMessage(NetworkMessage):
         
         super().__init__()
     
-    

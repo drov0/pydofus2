@@ -12,4 +12,3 @@ class TaxCollectorStateUpdateMessage(NetworkMessage):
         
         super().__init__()
     
-    

@@ -14,4 +14,3 @@ class GameMapMovementMessage(NetworkMessage):
         
         super().__init__()
     
-    

@@ -8,4 +8,3 @@ class AllianceLeftMessage(NetworkMessage):
         
         super().__init__()
     
-    

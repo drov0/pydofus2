@@ -12,4 +12,3 @@ class ExchangeObjectUseInWorkshopMessage(NetworkMessage):
         
         super().__init__()
     
-    

@@ -10,4 +10,3 @@ class GuildGetInformationsMessage(NetworkMessage):
         
         super().__init__()
     
-    

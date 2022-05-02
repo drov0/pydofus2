@@ -20,6 +20,5 @@ class AccountHouseInformations(HouseInformations):
         self.mapId = mapId_
         self.subAreaId = subAreaId_
         
-        super().__init__(houseId_, modelId_)
-    
+        super().init(houseId_, modelId_)
     

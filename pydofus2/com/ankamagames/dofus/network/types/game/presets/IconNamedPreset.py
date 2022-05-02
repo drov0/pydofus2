@@ -14,6 +14,5 @@ class IconNamedPreset(PresetsContainerPreset):
         self.iconId = iconId_
         self.name = name_
         
-        super().__init__(presets_, id_)
-    
+        super().init(presets_, id_)
     

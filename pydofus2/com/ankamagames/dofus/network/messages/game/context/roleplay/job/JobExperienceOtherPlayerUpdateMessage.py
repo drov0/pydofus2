@@ -12,6 +12,5 @@ class JobExperienceOtherPlayerUpdateMessage(JobExperienceUpdateMessage):
     def init(self, playerId_:int, experiencesUpdate_:'JobExperience'):
         self.playerId = playerId_
         
-        super().__init__(experiencesUpdate_)
-    
+        super().init(experiencesUpdate_)
     

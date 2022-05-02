@@ -12,4 +12,3 @@ class TrustCertificate(NetworkMessage):
         
         super().__init__()
     
-    

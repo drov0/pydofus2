@@ -8,4 +8,3 @@ class CharactersListRequestMessage(NetworkMessage):
         
         super().__init__()
     
-    

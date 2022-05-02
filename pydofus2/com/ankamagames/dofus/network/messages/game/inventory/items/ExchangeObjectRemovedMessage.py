@@ -8,6 +8,5 @@ class ExchangeObjectRemovedMessage(ExchangeObjectMessage):
     def init(self, objectUID_:int, remote_:bool):
         self.objectUID = objectUID_
         
-        super().__init__(remote_)
-    
+        super().init(remote_)
     

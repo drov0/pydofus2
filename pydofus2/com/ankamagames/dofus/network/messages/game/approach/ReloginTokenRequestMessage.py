@@ -8,4 +8,3 @@ class ReloginTokenRequestMessage(NetworkMessage):
         
         super().__init__()
     
-    

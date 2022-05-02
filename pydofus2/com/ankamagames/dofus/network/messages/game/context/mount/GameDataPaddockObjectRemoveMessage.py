@@ -10,4 +10,3 @@ class GameDataPaddockObjectRemoveMessage(NetworkMessage):
         
         super().__init__()
     
-    

@@ -14,4 +14,3 @@ class PrismsInfoValidMessage(NetworkMessage):
         
         super().__init__()
     
-    

@@ -18,4 +18,3 @@ class IdolSelectErrorMessage(NetworkMessage):
         
         super().__init__()
     
-    

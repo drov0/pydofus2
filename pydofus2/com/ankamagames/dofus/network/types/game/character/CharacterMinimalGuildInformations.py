@@ -13,6 +13,5 @@ class CharacterMinimalGuildInformations(CharacterMinimalPlusLookInformations):
     def init(self, guild_:'BasicGuildInformations', entityLook_:'EntityLook', breed_:int, level_:int, name_:str, id_:int):
         self.guild = guild_
         
-        super().__init__(entityLook_, breed_, level_, name_, id_)
-    
+        super().init(entityLook_, breed_, level_, name_, id_)
     

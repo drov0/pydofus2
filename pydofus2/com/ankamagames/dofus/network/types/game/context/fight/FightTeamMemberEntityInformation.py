@@ -12,6 +12,5 @@ class FightTeamMemberEntityInformation(FightTeamMemberInformations):
         self.level = level_
         self.masterId = masterId_
         
-        super().__init__(id_)
-    
+        super().init(id_)
     

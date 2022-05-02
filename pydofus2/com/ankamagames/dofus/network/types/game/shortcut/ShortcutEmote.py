@@ -8,6 +8,5 @@ class ShortcutEmote(Shortcut):
     def init(self, emoteId_:int, slot_:int):
         self.emoteId = emoteId_
         
-        super().__init__(slot_)
-    
+        super().init(slot_)
     

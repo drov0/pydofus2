@@ -30,4 +30,3 @@ class GameActionMark(NetworkMessage):
         
         super().__init__()
     
-    

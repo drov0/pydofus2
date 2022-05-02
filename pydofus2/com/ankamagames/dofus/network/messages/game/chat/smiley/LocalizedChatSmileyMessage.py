@@ -8,6 +8,5 @@ class LocalizedChatSmileyMessage(ChatSmileyMessage):
     def init(self, cellId_:int, entityId_:int, smileyId_:int, accountId_:int):
         self.cellId = cellId_
         
-        super().__init__(entityId_, smileyId_, accountId_)
-    
+        super().init(entityId_, smileyId_, accountId_)
     

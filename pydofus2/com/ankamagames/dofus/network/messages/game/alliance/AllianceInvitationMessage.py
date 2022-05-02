@@ -10,4 +10,3 @@ class AllianceInvitationMessage(NetworkMessage):
         
         super().__init__()
     
-    

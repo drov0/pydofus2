@@ -14,4 +14,3 @@ class FriendsListMessage(NetworkMessage):
         
         super().__init__()
     
-    

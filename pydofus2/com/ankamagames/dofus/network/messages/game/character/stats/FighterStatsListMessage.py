@@ -14,4 +14,3 @@ class FighterStatsListMessage(NetworkMessage):
         
         super().__init__()
     
-    

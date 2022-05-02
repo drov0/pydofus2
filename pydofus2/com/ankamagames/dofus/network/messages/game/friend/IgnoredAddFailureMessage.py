@@ -10,4 +10,3 @@ class IgnoredAddFailureMessage(NetworkMessage):
         
         super().__init__()
     
-    

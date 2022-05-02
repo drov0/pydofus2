@@ -6,6 +6,5 @@ class GameCautiousMapMovementRequestMessage(GameMapMovementRequestMessage):
 
     def init(self, keyMovements_:list[int], mapId_:int):
         
-        super().__init__(keyMovements_, mapId_)
-    
+        super().init(keyMovements_, mapId_)
     

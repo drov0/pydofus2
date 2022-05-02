@@ -14,4 +14,3 @@ class FriendJoinRequestMessage(NetworkMessage):
         
         super().__init__()
     
-    

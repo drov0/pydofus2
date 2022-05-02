@@ -8,4 +8,3 @@ class QuestListRequestMessage(NetworkMessage):
         
         super().__init__()
     
-    

@@ -17,6 +17,5 @@ class GameRolePlayNpcInformations(GameRolePlayActorInformations):
         self.sex = sex_
         self.specialArtworkId = specialArtworkId_
         
-        super().__init__(look_, contextualId_, disposition_)
-    
+        super().init(look_, contextualId_, disposition_)
     

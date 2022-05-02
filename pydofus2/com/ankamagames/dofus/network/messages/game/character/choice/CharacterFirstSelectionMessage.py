@@ -8,6 +8,5 @@ class CharacterFirstSelectionMessage(CharacterSelectionMessage):
     def init(self, doTutorial_:bool, id_:int):
         self.doTutorial = doTutorial_
         
-        super().__init__(id_)
-    
+        super().init(id_)
     

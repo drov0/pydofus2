@@ -14,4 +14,3 @@ class Idol(NetworkMessage):
         
         super().__init__()
     
-    

@@ -14,4 +14,3 @@ class IconPresetSaveRequestMessage(NetworkMessage):
         
         super().__init__()
     
-    

@@ -10,6 +10,5 @@ class ObjectItemGenericQuantity(Item):
         self.objectGID = objectGID_
         self.quantity = quantity_
         
-        super().__init__()
-    
+        super().init()
     

@@ -8,4 +8,3 @@ class CredentialsAcknowledgementMessage(NetworkMessage):
         
         super().__init__()
     
-    

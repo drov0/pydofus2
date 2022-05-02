@@ -16,4 +16,3 @@ class GuildVersatileInformations(NetworkMessage):
         
         super().__init__()
     
-    

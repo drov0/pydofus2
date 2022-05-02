@@ -8,4 +8,3 @@ class BreachTeleportRequestMessage(NetworkMessage):
         
         super().__init__()
     
-    

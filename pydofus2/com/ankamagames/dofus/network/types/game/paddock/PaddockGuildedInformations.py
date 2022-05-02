@@ -14,6 +14,5 @@ class PaddockGuildedInformations(PaddockBuyableInformations):
         self.deserted = deserted_
         self.guildInfo = guildInfo_
         
-        super().__init__(price_, locked_)
-    
+        super().init(price_, locked_)
     

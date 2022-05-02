@@ -12,4 +12,3 @@ class AllianceChangeGuildRightsMessage(NetworkMessage):
         
         super().__init__()
     
-    

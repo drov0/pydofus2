@@ -13,6 +13,5 @@ class GameRolePlayNamedActorInformations(GameRolePlayActorInformations):
     def init(self, name_:str, look_:'EntityLook', contextualId_:int, disposition_:'EntityDispositionInformations'):
         self.name = name_
         
-        super().__init__(look_, contextualId_, disposition_)
-    
+        super().init(look_, contextualId_, disposition_)
     

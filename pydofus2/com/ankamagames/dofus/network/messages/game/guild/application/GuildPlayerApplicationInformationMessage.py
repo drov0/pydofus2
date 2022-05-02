@@ -15,6 +15,5 @@ class GuildPlayerApplicationInformationMessage(GuildPlayerApplicationAbstractMes
         self.guildInformation = guildInformation_
         self.apply = apply_
         
-        super().__init__()
-    
+        super().init()
     

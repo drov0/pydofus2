@@ -14,4 +14,3 @@ class AllianceModificationEmblemValidMessage(NetworkMessage):
         
         super().__init__()
     
-    

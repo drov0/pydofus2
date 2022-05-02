@@ -8,4 +8,3 @@ class PrismInfoCloseMessage(NetworkMessage):
         
         super().__init__()
     
-    

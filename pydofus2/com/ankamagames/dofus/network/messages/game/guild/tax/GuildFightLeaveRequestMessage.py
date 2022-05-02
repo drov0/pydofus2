@@ -12,4 +12,3 @@ class GuildFightLeaveRequestMessage(NetworkMessage):
         
         super().__init__()
     
-    

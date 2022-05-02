@@ -42,6 +42,5 @@ class ObjectEffectMount(ObjectEffect):
         self.isFeconded = isFeconded_
         self.isFecondationReady = isFecondationReady_
         
-        super().__init__(actionId_)
-    
+        super().init(actionId_)
     

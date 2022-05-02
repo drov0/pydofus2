@@ -21,4 +21,3 @@ class GuildFactsMessage(NetworkMessage):
         
         super().__init__()
     
-    

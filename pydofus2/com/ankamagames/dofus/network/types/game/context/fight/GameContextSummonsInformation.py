@@ -25,4 +25,3 @@ class GameContextSummonsInformation(NetworkMessage):
         
         super().__init__()
     
-    

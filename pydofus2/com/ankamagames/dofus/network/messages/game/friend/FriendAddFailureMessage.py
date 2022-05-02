@@ -10,4 +10,3 @@ class FriendAddFailureMessage(NetworkMessage):
         
         super().__init__()
     
-    

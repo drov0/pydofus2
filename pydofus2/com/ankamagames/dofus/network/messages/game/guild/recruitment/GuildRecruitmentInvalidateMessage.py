@@ -8,4 +8,3 @@ class GuildRecruitmentInvalidateMessage(NetworkMessage):
         
         super().__init__()
     
-    

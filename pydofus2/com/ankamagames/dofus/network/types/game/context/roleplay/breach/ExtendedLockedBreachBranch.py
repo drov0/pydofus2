@@ -14,6 +14,5 @@ class ExtendedLockedBreachBranch(ExtendedBreachBranch):
     def init(self, unlockPrice_:int, rewards_:list['BreachReward'], modifier_:int, prize_:int, room_:int, element_:int, bosses_:list['MonsterInGroupLightInformations'], map_:int, score_:int, relativeScore_:int, monsters_:list['MonsterInGroupLightInformations']):
         self.unlockPrice = unlockPrice_
         
-        super().__init__(rewards_, modifier_, prize_, room_, element_, bosses_, map_, score_, relativeScore_, monsters_)
-    
+        super().init(rewards_, modifier_, prize_, room_, element_, bosses_, map_, score_, relativeScore_, monsters_)
     

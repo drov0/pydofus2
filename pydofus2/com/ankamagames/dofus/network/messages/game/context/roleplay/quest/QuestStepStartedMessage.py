@@ -12,4 +12,3 @@ class QuestStepStartedMessage(NetworkMessage):
         
         super().__init__()
     
-    

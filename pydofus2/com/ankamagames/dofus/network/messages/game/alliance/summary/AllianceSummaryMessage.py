@@ -12,6 +12,5 @@ class AllianceSummaryMessage(PaginationAnswerAbstractMessage):
     def init(self, alliances_:list['AllianceFactSheetInformations'], offset_:int, count_:int, total_:int):
         self.alliances = alliances_
         
-        super().__init__(offset_, count_, total_)
-    
+        super().init(offset_, count_, total_)
     

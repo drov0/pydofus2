@@ -12,4 +12,3 @@ class PrismFightSwapRequestMessage(NetworkMessage):
         
         super().__init__()
     
-    

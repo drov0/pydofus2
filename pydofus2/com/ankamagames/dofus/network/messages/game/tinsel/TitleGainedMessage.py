@@ -10,4 +10,3 @@ class TitleGainedMessage(NetworkMessage):
         
         super().__init__()
     
-    

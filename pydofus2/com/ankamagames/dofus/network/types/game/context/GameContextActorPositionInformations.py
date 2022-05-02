@@ -16,4 +16,3 @@ class GameContextActorPositionInformations(NetworkMessage):
         
         super().__init__()
     
-    

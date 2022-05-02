@@ -18,4 +18,3 @@ class PrismInformation(NetworkMessage):
         
         super().__init__()
     
-    

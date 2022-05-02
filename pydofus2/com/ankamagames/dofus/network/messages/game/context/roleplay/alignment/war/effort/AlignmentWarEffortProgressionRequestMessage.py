@@ -8,4 +8,3 @@ class AlignmentWarEffortProgressionRequestMessage(NetworkMessage):
         
         super().__init__()
     
-    

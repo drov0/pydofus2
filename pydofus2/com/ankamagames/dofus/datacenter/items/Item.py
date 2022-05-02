@@ -365,7 +365,8 @@ class Item(IPostInit, IDataCenter):
             self._basicExperienceAsFood = experienceInt / 100000
         return self._basicExperienceAsFood
 
-    def copy(self, src: "Item", to: "Item") -> None:
+    @classmethod
+    def copy(cls, src: "Item", to: "Item") -> None:
         to.id = src.id
         to.nameId = src.nameId
         to.typeId = src.typeId

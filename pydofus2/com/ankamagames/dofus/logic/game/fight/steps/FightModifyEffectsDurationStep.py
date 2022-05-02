@@ -31,7 +31,7 @@ class FightModifyEffectsDurationStep(AbstractSequencable, IFightStep):
         BuffManager().incrementDuration(
             self._targetId, self._delta, True, BuffManager.INCREMENT_MODE_TARGET
         )
-        FightEventsHelper.sendFightEvent(
+        FightEventsHelper().sendFightEvent(
             FightEventEnum.FIGHTER_EFFECTS_MODIFY_DURATION,
             [self._sourceId, self._targetId, self._delta],
             self._targetId,

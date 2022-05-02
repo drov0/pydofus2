@@ -11,8 +11,9 @@ class StatBuffFactory:
     def __init__(self):
         super().__init__()
 
+    @classmethod
     def createStatBuff(
-        self,
+        cls,
         pEffect: FightTemporaryBoostEffect,
         pCastingSpell: CastingSpell,
         pActionId: int,

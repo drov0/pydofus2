@@ -151,16 +151,16 @@ class CurrentPlayedFighterManager(metaclass=Singleton):
         return None
 
     def getSpellCastManager(self) -> scifm.SpellCastInFightManager:
-        scm: scifm.SpellCastInFightManager = self._spellCastInFightManagerList[
+        scm: scifm.SpellCastInFightManager = self._spellCastInFightManagerList.get(
             self._currentFighterId
-        ]
+        )
         if not scm:
             scm = scifm.SpellCastInFightManager(self._currentFighterId)
             self._spellCastInFightManagerList[self._currentFighterId] = scm
         return scm
 
     def getSpellCastManagerById(self, id: float) -> scifm.SpellCastInFightManager:
-        scm: scifm.SpellCastInFightManager = self._spellCastInFightManagerList[id]
+        scm: scifm.SpellCastInFightManager = self._spellCastInFightManagerList.get(id)
         if not scm:
             scm = scifm.SpellCastInFightManager(id)
             self._spellCastInFightManagerList[id] = scm

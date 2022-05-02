@@ -768,7 +768,7 @@ class ActionIdHelper:
 
     @classmethod
     def getActionIdStatName(cls, actionId: int) -> str:
-        return cls.actionIdToStatNameMap[str(actionId)]
+        return cls.actionIdToStatNameMap.get(str(actionId), "undefined")
 
     @classmethod
     def isPercentStatBoostActionId(cls, actionId: int) -> bool:

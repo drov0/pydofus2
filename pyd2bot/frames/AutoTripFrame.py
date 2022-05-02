@@ -17,7 +17,7 @@ from com.ankamagames.jerakine.types.enums.Priority import Priority
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
-    from pyd2bot.examples.predefinedPathFarming.BotFarmPathFrame import BotFarmPathFrame
+    from pyd2bot.frames.BotFarmPathFrame import BotFarmPathFrame
 
 logger = Logger(__name__)
 
@@ -40,6 +40,7 @@ class AutoTripFrame(Frame):
 
     def pushed(self) -> bool:
         self._worker = Kernel().getWorker()
+        self.walkToNextStep()
         return True
 
     def pulled(self) -> bool:
@@ -58,14 +59,14 @@ class AutoTripFrame(Frame):
             Kernel().getWorker().getFrame("RoleplayMovementFrame").askMapChange()
 
     def walkToNextStep(self):
-        logger.debug("Next step index: %s", self.nextStepIndex)
         if self.nextStepIndex is not None:
+            logger.debug(f"Next step index: {self.nextStepIndex}/{len(self.path)}")
             if self.nextStepIndex == len(self.path):
                 logger.info("Arrived at destination")
-                Kernel().getWorker().removeFrame(self)
-                if Kernel().getWorker().contains("BotFarmPathFrame"):
+                self._worker.removeFrame(self)
+                if self._worker.contains("BotFarmPathFrame"):
                     bfpf: "BotFarmPathFrame" = (
-                        Kernel().getWorker().contains("BotFarmPathFrame")
+                        Kernel().getWorker().getFrame("BotFarmPathFrame")
                     )
                     bfpf.doFarm()
                 return True

@@ -77,15 +77,17 @@ class MapDisplayManager(metaclass=Singleton):
         return self._identifiedElementPosition.get(identifier)
 
     def mapDisplayed(self) -> None:
-        InteractiveCellManager().updateInteractiveCell(self.currentDataMap)
+        pass
 
-    def loadMap(self, mapId: int, forceReloadWithoutCache: bool = False) -> None:
+    def loadMap(
+        self, mapId: int, forceReloadWithoutCache: bool = False, decryptionKey=None
+    ) -> None:
         from com.ankamagames.dofus.kernel.Kernel import Kernel
 
         self.lastDataMap = self.currentDataMap
         self._forceReloadWithoutCache = forceReloadWithoutCache
         self._nMapLoadStart = perf_counter()
-        map = self._loader.load(mapId)
+        map = self._loader.load(mapId, key=decryptionKey)
         self._nMapLoadEnd = perf_counter()
         logger.debug(
             f"Map {map.id} loaded in "

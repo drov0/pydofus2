@@ -50,7 +50,7 @@ class FightSpellCastStep(AbstractSequencable, IFightStep):
 
     def start(self) -> None:
         if Spell.getSpellById(self._spellId).verbose_cast and self._verboseCast:
-            FightEventsHelper.sendFightEvent(
+            FightEventsHelper().sendFightEvent(
                 FightEventEnum.FIGHTER_CASTED_SPELL,
                 [
                     self._fighterId,

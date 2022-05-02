@@ -119,7 +119,7 @@ class FightCarryCharacterStep(AbstractSequencable, IFightStep):
         carriedAnimatedEntity: AnimatedCharacter = None
         carriedEntity: IEntity = DofusEntities.getEntity(self._carriedId)
         carryingEntity = DofusEntities.getEntity(self._fighterId)
-        FightEventsHelper.sendFightEvent(
+        FightEventsHelper().sendFightEvent(
             FightEventEnum.FIGHTER_CARRY,
             [self._fighterId, self._carriedId],
             0,

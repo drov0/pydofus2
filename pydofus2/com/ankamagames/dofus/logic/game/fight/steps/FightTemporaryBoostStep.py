@@ -43,7 +43,7 @@ class FightTemporaryBoostStep(AbstractSequencable, IFightStep):
         return "temporaryBoost"
 
     def start(self) -> None:
-        FightEventsHelper.sendFightEvent(
+        FightEventsHelper().sendFightEvent(
             FightEventEnum.FIGHTER_TEMPORARY_BOOSTED,
             [
                 self._fighterId,

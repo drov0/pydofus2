@@ -74,21 +74,21 @@ class EffectInstance(IDataCenter):
 
     dispellable: int = 1
 
-    zoneSize: object
+    zoneSize: object = None
 
-    zoneShape: int
+    zoneShape: int = None
 
-    zoneMinSize: object
+    zoneMinSize: object = None
 
-    zoneEfficiencyPercent: object
+    zoneEfficiencyPercent: object = None
 
-    zoneMaxEfficiency: object
+    zoneMaxEfficiency: object = None
 
-    zoneStopAtTarget: object
+    zoneStopAtTarget: object = None
 
-    effectElement: int
+    effectElement: int = None
 
-    spellId: int
+    spellId: int = None
 
     _effectData: Effect = None
 
@@ -122,6 +122,17 @@ class EffectInstance(IDataCenter):
 
     def __init__(self):
         super().__init__()
+
+    @property
+    def description(self) -> str:
+        #  if self._description == self.UNDEFINED_DESCRIPTION:
+        #     if not self._effectData:
+        #        self._effectData = Effect.getEffectById(self.effectId)
+        #     if not self._effectData:
+        #        self._description = None
+        #        return None
+        #     self._description = self.prepareDescription(self._effectData.description, self.effectId)
+        return self._description
 
     @property
     def rawZone(self) -> str:
@@ -343,3 +354,27 @@ class EffectInstance(IDataCenter):
                     self.zoneMaxEfficiency = None
         else:
             logger.error("Zone incorrect (" + self.rawZone + ")")
+
+    @property
+    def parameter0():
+        return None
+
+    @property
+    def parameter1(self):
+        return None
+
+    @property
+    def parameter2(self):
+        return None
+
+    @property
+    def parameter3(self):
+        return None
+
+    @property
+    def parameter4(self):
+        return None
+
+    def forceDescriptionRefresh(self) -> None:
+        self._description = self.UNDEFINED_DESCRIPTION;
+        self._theoricDescription = self.UNDEFINED_DESCRIPTION;

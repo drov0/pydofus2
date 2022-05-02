@@ -6,16 +6,10 @@ from com.ankamagames.dofus.logic.game.common.misc.DofusEntities import DofusEnti
 from com.ankamagames.dofus.logic.game.fight.fightEvents.FightEventsHelper import (
     FightEventsHelper,
 )
-from com.ankamagames.dofus.logic.game.fight.frames.FightBattleFrame import (
-    FightBattleFrame,
-)
-from com.ankamagames.dofus.logic.game.fight.frames.FightContextFrame import (
-    FightContextFrame,
-)
 from com.ankamagames.dofus.logic.game.fight.frames.FightEntitiesFrame import (
     FightEntitiesFrame,
 )
-from com.ankamagames.dofus.logic.game.fight.managers.BuffManager import BuffManager
+import com.ankamagames.dofus.logic.game.fight.managers.BuffManager as buffManager
 from com.ankamagames.dofus.logic.game.fight.steps.IFightStep import IFightStep
 from com.ankamagames.dofus.logic.game.fight.types.FightEventEnum import FightEventEnum
 from com.ankamagames.dofus.network.types.game.context.fight.GameFightFighterInformations import (
@@ -28,7 +22,16 @@ from com.ankamagames.jerakine.sequencer.ISequencer import ISequencer
 from com.ankamagames.jerakine.types.events.SequencerEvent import SequencerEvent
 from damageCalculation.tools.StatIds import StatIds
 from whistle import Event
+from typing import TYPE_CHECKING
 
+if TYPE_CHECKING:
+    from com.ankamagames.dofus.logic.game.fight.frames.FightBattleFrame import (
+        FightBattleFrame,
+    )
+
+    from com.ankamagames.dofus.logic.game.fight.frames.FightContextFrame import (
+        FightContextFrame,
+    )
 logger = Logger(__name__)
 
 
@@ -85,9 +88,9 @@ class FightDeathStep(AbstractSequencable, IFightStep):
         if fightBattleFrame:
             fightBattleFrame.deadFightersList.append(self._entityId)
         self._needToWarn = True
-        BuffManager().dispell(dyingEntity.id, False, False, True)
-        BuffManager().removeLinkedBuff(dyingEntity.id, False, True)
-        BuffManager().reaffectBuffs(dyingEntity.id)
+        buffManager.BuffManager().dispell(dyingEntity.id, False, False, True)
+        buffManager.BuffManager().removeLinkedBuff(dyingEntity.id, False, True)
+        buffManager.BuffManager().reaffectBuffs(dyingEntity.id)
         fighterStats.setStat(Stat(StatIds.CUR_PERMANENT_DAMAGE, 0))
         fighterStats.setStat(
             Stat(
@@ -136,7 +139,7 @@ class FightDeathStep(AbstractSequencable, IFightStep):
             self._deathSubSequence = None
         if self._needToWarn:
             if self._naturalDeath:
-                FightEventsHelper.sendFightEvent(
+                FightEventsHelper().sendFightEvent(
                     FightEventEnum.FIGHTER_DEATH,
                     [self._entityId, self._targetName],
                     self._entityId,
@@ -144,7 +147,7 @@ class FightDeathStep(AbstractSequencable, IFightStep):
                     self._timeOut,
                 )
             else:
-                FightEventsHelper.sendFightEvent(
+                FightEventsHelper().sendFightEvent(
                     FightEventEnum.FIGHTER_LEAVE,
                     [self._entityId, self._targetName],
                     self._entityId,

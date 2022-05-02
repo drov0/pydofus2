@@ -3,7 +3,9 @@ from com.ankamagames.dofus.kernel.Kernel import Kernel
 from com.ankamagames.dofus.logic.game.common.misc.DofusEntities import DofusEntities
 from typing import TYPE_CHECKING
 from com.ankamagames.jerakine.logger.Logger import Logger
-
+from com.ankamagames.jerakine.sequencer.AbstractSequencable import (
+    AbstractSequencable,
+)
 if TYPE_CHECKING:
     from com.ankamagames.dofus.logic.game.fight.frames.FightContextFrame import (
         FightContextFrame,
@@ -15,9 +17,6 @@ if TYPE_CHECKING:
         FightSpellCastFrame,
     )
     from com.ankamagames.dofus.types.entities.AnimatedCharacter import AnimatedCharacter
-    from com.ankamagames.jerakine.sequencer.AbstractSequencable import (
-        AbstractSequencable,
-    )
     from com.ankamagames.jerakine.types.positions.MovementPath import MovementPath
 
 logger = Logger(__name__)

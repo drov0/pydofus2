@@ -10,7 +10,7 @@ class OptionalFeature(IDataCenter):
 
     MODULE: str = "OptionalFeatures"
 
-    _keywords: dict
+    _keywords: dict = {}
 
     id: int
 

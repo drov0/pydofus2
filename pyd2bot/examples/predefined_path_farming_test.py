@@ -1,8 +1,9 @@
-from pyd2bot.examples.predefinedPathFarming.BotFarmPathFrame import BotFarmPathFrame
-from pyd2bot.Bot import Bot
+from pyd2bot.frames.BotFarmPathFrame import BotFarmPathFrame
+from pyd2bot.DofusClient import DofusClient
 from com.ankamagames.jerakine.logger.Logger import Logger
+from pyd2bot.frames.BotFightFrame import BotFightFrame
 
-from pyd2bot.examples.predefinedPathFarming.FarmParcours import FarmParcours
+from pyd2bot.models.FarmParcours import FarmParcours
 
 logger = Logger(__name__)
 
@@ -30,11 +31,8 @@ goujon_incarnam = {
 
 if __name__ == "__main__":
     botName = "foobar"
-    bot = Bot(botName)
-    bot._worker.addFrame(
-        BotFarmPathFrame(
-            parcours=FarmParcours(**goujon_incarnam), skillsToUse=[FISHING_SKILL_ID]
-        )
-    )
-    bot.start()
-    bot.join()
+    dofus2 = DofusClient(botName)
+    dofus2.registerFrame(BotFarmPathFrame(FarmParcours(**goujon_incarnam)))
+    dofus2.registerFrame(BotFightFrame())
+    dofus2.start()
+    dofus2.join()

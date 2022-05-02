@@ -68,7 +68,7 @@ class FightTeleportStep(AbstractSequencable, IFightStep):
             if fightTurnFrame and fightTurnFrame.myTurn:
                 fightTurnFrame.drawPath()
         FightSpellCastFrame.updateRangeAndTarget()
-        FightEventsHelper.sendFightEvent(
+        FightEventsHelper().sendFightEvent(
             FightEventEnum.FIGHTER_TELEPORTED, [self._fighterId], 0, self.castingSpellId
         )
         self.executeCallbacks()

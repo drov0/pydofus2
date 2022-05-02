@@ -153,7 +153,8 @@ class FightSpellCastFrame(Frame):
     def isCurrentTargetTargetable(self) -> bool:
         return self._currentTargetIsTargetable
 
-    def updateRangeAndTarget(self) -> None:
+    @classmethod
+    def updateRangeAndTarget(cls) -> None:
         castFrame: "FightSpellCastFrame" = (
             Kernel().getWorker().getFrame("FightSpellCastFrame")
         )

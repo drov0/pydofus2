@@ -25,7 +25,7 @@ class FightStealingKamasStep(AbstractSequencable, IFightStep):
         return "stealingKamas"
 
     def start(self) -> None:
-        FightEventsHelper.sendFightEvent(
+        FightEventsHelper().sendFightEvent(
             FightEventEnum.FIGHTER_STEALING_KAMAS,
             [self._robberId, self._victimId, self._amount],
             self._victimId,

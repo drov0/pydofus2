@@ -22,7 +22,7 @@ class FightKillStep(AbstractSequencable, IFightStep):
         return "kill"
 
     def start(self) -> None:
-        FightEventsHelper.sendFightEvent(
+        FightEventsHelper().sendFightEvent(
             FightEventEnum.FIGHTER_GOT_KILLED,
             [self._killerId, self._fighterId],
             self._fighterId,

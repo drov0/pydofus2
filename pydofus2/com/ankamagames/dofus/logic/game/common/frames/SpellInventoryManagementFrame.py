@@ -1,4 +1,7 @@
 from com.ankamagames.dofus.datacenter.breeds.Breed import Breed
+from com.ankamagames.dofus.logic.game.common.managers.FeatureManager import (
+    FeatureManager,
+)
 from com.ankamagames.jerakine.metaclasses.Singleton import Singleton
 from com.ankamagames.dofus.datacenter.optionalFeatures.CustomModeBreedSpell import (
     CustomModeBreedSpell,
@@ -76,7 +79,7 @@ class SpellInventoryManagementFrame(Frame, metaclass=Singleton):
     _spellsGlobalCooldowns: dict[int, list[GameFightSpellCooldown]]()
 
     def __init__(self):
-        self._fullSpellList = list[GameFightSpellCooldown]()
+        self._fullSpellList = dict[int, list[SpellWrapper]]()
         self._spellsGlobalCooldowns = dict()
         super().__init__()
 
@@ -87,13 +90,12 @@ class SpellInventoryManagementFrame(Frame, metaclass=Singleton):
             return []
         customSpells: list = []
         playerBreed: int = playerApi.getPlayedCharacterInfo().breed
-        spellsInventory: list = playerApi.getSpellInventory()
+        spellsInventory: list[SpellWrapper] = playerApi.getSpellInventory()
         allSpellIds: list = playerApi.getCustomModeSpellIds()
-        spellWrapper: SpellWrapper = None
         customModeBreedSpell: CustomModeBreedSpell = None
         for spellWrapper in spellsInventory:
             spellId = spellWrapper.spell.id
-            if allSpellIds.find(spellId) is not -1:
+            if spellId in allSpellIds:
                 customModeBreedSpell = playerApi.getCustomModeBreedSpellById(spellId)
                 if not (
                     customModeBreedSpell == None
@@ -112,6 +114,9 @@ class SpellInventoryManagementFrame(Frame, metaclass=Singleton):
     def process(self, msg: Message) -> bool:
         if isinstance(msg, SpellListMessage):
             slmsg = msg
+            alternativeBreedSpells = FeatureManager().isFeatureWithKeywordEnabled(
+                "character.spell.breed.alternative"
+            )
             playerId = PlayedCharacterManager().id
             self._fullSpellList[playerId] = list()
             idsList = list()
@@ -250,7 +255,7 @@ class SpellInventoryManagementFrame(Frame, metaclass=Singleton):
                 CurrentPlayedFighterManager().getSpellCastManagerById(
                     slaveId
                 ).updateCooldowns()
-            sgcds = self._spellsGlobalCooldowns[slaveId]
+            sgcds = self._spellsGlobalCooldowns.get(slaveId)
             if sgcds:
                 for gfsc in sgcds:
                     gcdvalue = gfsc.cooldown

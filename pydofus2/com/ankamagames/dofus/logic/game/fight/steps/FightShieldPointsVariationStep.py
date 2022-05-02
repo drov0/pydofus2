@@ -81,18 +81,18 @@ class FightShieldPointsVariationStep(AbstractStatContextualStep, IFightStep):
         if not self._fighterInfo:
             super().executeCallbacks()
             return
-        EnterFrameDispatcher().worker.addSingleTreatment(StatsManager(), self.apply, [])
+        EnterFrameDispatcher().worker.addSingleTreatment(self, self.apply, [])
 
     def apply(self) -> None:
         if self._intValue < 0:
-            FightEventsHelper.sendFightEvent(
+            FightEventsHelper().sendFightEvent(
                 FightEventEnum.FIGHTER_SHIELD_LOSS,
                 [self._targetId, abs(self._intValue), self._elementId],
                 self._targetId,
                 self.castingSpellId,
             )
         elif self._intValue == 0:
-            FightEventsHelper.sendFightEvent(
+            FightEventsHelper().sendFightEvent(
                 FightEventEnum.FIGHTER_NO_CHANGE,
                 [self._targetId],
                 self._targetId,

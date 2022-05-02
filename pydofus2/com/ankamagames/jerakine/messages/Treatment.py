@@ -21,7 +21,7 @@ class Treatment:
         return self._object
 
     def process(self) -> bool:
-        self._calledFunction(self._object, self._params)
+        getattr(self._object, self._calledFunction.__name__)(*self._params)
         return True
 
     def isSameTreatment(self, object, func: FunctionType, params: list) -> bool:

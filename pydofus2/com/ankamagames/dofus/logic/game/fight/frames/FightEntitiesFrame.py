@@ -157,7 +157,7 @@ class FightEntitiesFrame(AbstractEntitiesFrame, Frame):
 
     _lastKnownPlayerStatus: dict
 
-    _realFightersLooks: dict
+    _realFightersLooks: dict = {}
 
     _mountsVisible: bool
 
@@ -170,7 +170,7 @@ class FightEntitiesFrame(AbstractEntitiesFrame, Frame):
     lastKilledDefenders: list[GameFightFighterInformations]
 
     def __init__(self):
-        self._ie = dict(True)
+        self._ie = dict()
         self._tempFighterList = []
         self._entitiesIconsToUpdate = list[float]()
         self.lastKilledChallengers = list[GameFightFighterInformations]()
@@ -291,9 +291,9 @@ class FightEntitiesFrame(AbstractEntitiesFrame, Frame):
             fightContextFrame: "FightContextFrame" = (
                 krnl.Kernel().getWorker().getFrame("FightContextFrame")
             )
-            if fightContextFrame.fightersPositionsHistory[
+            if fightContextFrame.fightersPositionsHistory.get(
                 gfsfmsg.informations.contextualId
-            ]:
+            ):
                 pass
             return True
 
@@ -478,7 +478,7 @@ class FightEntitiesFrame(AbstractEntitiesFrame, Frame):
     def setLastKnownEntityMovementPoint(
         self, id: float, value: int, add: bool = False
     ) -> None:
-        if id in self._lastKnownMovementPoint:
+        if id not in self._lastKnownMovementPoint:
             self._lastKnownMovementPoint[id] = 0
         if not add:
             self._lastKnownMovementPoint[id] = value
@@ -487,10 +487,8 @@ class FightEntitiesFrame(AbstractEntitiesFrame, Frame):
 
     def pulled(self) -> bool:
         self._tempFighterList = None
-        for obj in self._ie.values():
-            self.removeInteractive(obj["element"])
-        for fighterId in self._realFightersLooks:
-            del self._realFightersLooks[fighterId]
+        self._ie.clear()
+        self._realFightersLooks.clear()
         return super().pulled()
 
     def registerInteractive(self, ie: InteractiveElement, firstSkill: int) -> None:

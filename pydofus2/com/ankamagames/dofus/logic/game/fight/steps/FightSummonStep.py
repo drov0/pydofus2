@@ -11,9 +11,6 @@ from com.ankamagames.dofus.logic.game.common.misc.DofusEntities import DofusEnti
 from com.ankamagames.dofus.logic.game.fight.fightEvents.FightEventsHelper import (
     FightEventsHelper,
 )
-from com.ankamagames.dofus.logic.game.fight.frames.FightBattleFrame import (
-    FightBattleFrame,
-)
 from com.ankamagames.dofus.logic.game.fight.frames.FightEntitiesFrame import (
     FightEntitiesFrame,
 )
@@ -21,6 +18,7 @@ from com.ankamagames.dofus.logic.game.fight.managers.BuffManager import BuffMana
 from com.ankamagames.dofus.logic.game.fight.managers.CurrentPlayedFighterManager import (
     CurrentPlayedFighterManager,
 )
+from com.ankamagames.dofus.logic.game.fight.steps.IFightStep import IFightStep
 from com.ankamagames.dofus.logic.game.fight.types.BasicBuff import BasicBuff
 from com.ankamagames.dofus.logic.game.fight.types.FightEventEnum import FightEventEnum
 from com.ankamagames.dofus.logic.game.fight.types.StateBuff import StateBuff
@@ -32,6 +30,13 @@ from com.ankamagames.dofus.network.types.game.context.fight.GameFightFighterInfo
 )
 from com.ankamagames.jerakine.sequencer.AbstractSequencable import AbstractSequencable
 from damageCalculation.tools.StatIds import StatIds
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+
+    from com.ankamagames.dofus.logic.game.fight.frames.FightBattleFrame import (
+        FightBattleFrame,
+    )
 
 
 class FightSummonStep(AbstractSequencable, IFightStep):
@@ -126,7 +131,7 @@ class FightSummonStep(AbstractSequencable, IFightStep):
                     / 2,
                 )
             )
-        FightEventsHelper.sendFightEvent(
+        FightEventsHelper().sendFightEvent(
             FightEventEnum.FIGHTER_SUMMONED,
             [self._summonerId, self._summonInfos.contextualId],
             self._summonInfos.contextualId,

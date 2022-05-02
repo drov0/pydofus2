@@ -18,7 +18,8 @@ logger = Logger(__name__)
 
 
 class AStar:
-    DEBUG = True
+    DEBUG = False
+
     dest: MapPosition = None
 
     closedDic = dict()
@@ -50,8 +51,7 @@ class AStar:
     def search(
         cls, worldGraph: WorldGraph, src: Vertex, dst: Vertex, callback: FunctionType
     ) -> None:
-        if cls.DEBUG:
-            logger.debug(f"Searching path from {src} to {dst} ...")
+        logger.info(f"Searching path from {src} to {dst} ...")
         if cls.callback != None:
             raise Exception("Pathfinding already in progress")
         if src == dst:
@@ -84,9 +84,9 @@ class AStar:
 
     @classmethod
     def compute(cls, e: Event = None) -> None:
-        if cls.DEBUG:
-            logger.debug(f"Iteration {cls.iterations}")
         while cls.openList:
+            if cls.DEBUG:
+                logger.debug(f"Iteration {cls.iterations}")
             if cls.iterations > cls.MAX_ITERATION:
                 cls.callbackWithResult(None)
                 logger.error("Too many iterations, aborting A*")
@@ -95,7 +95,9 @@ class AStar:
             current = cls.openList.pop(0)
             cls.openDic[current.vertex] = None
             if current.vertex == cls.dst:
-                logger.debug("Goal reached with " + str(cls.iterations) + " iterations")
+                logger.info(
+                    "Goal reached within " + str(cls.iterations) + " iterations"
+                )
                 cls.callbackWithResult(cls.buildResultPath(cls.worldGraph, current))
                 return
             edges = cls.worldGraph.getOutgoingEdgesFromVertex(current.vertex)
@@ -144,6 +146,7 @@ class AStar:
         from com.ankamagames.dofus.datacenter.items.criterion.GroupItemCriterion import (
             GroupItemCriterion,
         )
+
         criterionWhiteList: list = [
             "Ad",
             "DM",

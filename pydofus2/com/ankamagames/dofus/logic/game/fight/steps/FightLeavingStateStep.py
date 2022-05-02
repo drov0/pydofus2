@@ -33,7 +33,7 @@ class FightLeavingStateStep(AbstractSequencable, IFightStep):
             and self._buff
             and self._buff.isVisibleInFightLog
         ):
-            FightEventsHelper.sendFightEvent(
+            FightEventsHelper().sendFightEvent(
                 FightEventEnum.FIGHTER_LEAVING_STATE,
                 [self._fighterId, self._stateId],
                 self._fighterId,

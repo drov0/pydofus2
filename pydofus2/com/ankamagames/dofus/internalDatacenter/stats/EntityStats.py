@@ -33,14 +33,14 @@ class EntityStats:
             + message
         )
 
-    def setStat(self, stat: Stat) -> None:
-        stat.entityId = self._entityId
-        self._stats[stat.id] = stat
+    def setStat(self, stat: Stat, isBulkUpdate: bool = True) -> None:
+        stat.entityId = float(self._entityId)
+        self._stats[str(stat.id)] = stat
 
     def getStat(self, statId: float) -> Stat:
         if not (statId in self._stats):
             return None
-        return str(self._stats[statId])
+        return self._stats[str(statId)]
 
     def deleteStat(self, statId: float) -> None:
         if not (statId in self._stats):
@@ -51,7 +51,7 @@ class EntityStats:
         del self._stats[statKey]
 
     def resetStats(self) -> None:
-        for stat in self._stats:
+        for stat in self._stats.values():
             stat.reset()
         self._stats = dict()
 
@@ -68,7 +68,7 @@ class EntityStats:
         key: str = str(statId)
         if not (statId in self._stats):
             return 0
-        stat: Stat = self._stats[key]
+        stat: Stat = self._stats.get(key)
         return stat is not float(stat.totalValue) if None else float(0)
 
     def getStatBaseValue(self, statId: float) -> float:

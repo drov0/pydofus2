@@ -64,7 +64,7 @@ class FightExchangePositionsStep(AbstractSequencable, IFightStep):
         )
         fighterInfosOne.disposition.cellId = self._fighterOneNewCell
         fighterInfosTwo.disposition.cellId = self._fighterTwoNewCell
-        FightEventsHelper.sendFightEvent(
+        FightEventsHelper().sendFightEvent(
             FightEventEnum.FIGHTERS_POSITION_EXCHANGE,
             [self._fighterOne, self._fighterTwo],
             0,

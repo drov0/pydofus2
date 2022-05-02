@@ -73,9 +73,9 @@ class WorldPoint(IDataCenter):
         self.setFromCoords()
 
     def setFromMapId(self) -> None:
-        self._worldId = (self._mapId & 1073479680) >> 18
-        self._x = self._mapId >> 9 & 511
-        self._y = self._mapId & 511
+        self._worldId = (int(self._mapId) & 1073479680) >> 18
+        self._x = int(self._mapId) >> 9 & 511
+        self._y = int(self._mapId) & 511
         if (self._x & 256) == 256:
             self._x = -(self._x & 255)
         if (self._y & 256) == 256:

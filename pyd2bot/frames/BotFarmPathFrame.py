@@ -7,6 +7,7 @@ from com.ankamagames.dofus.logic.game.common.managers.InventoryManager import (
 from com.ankamagames.dofus.logic.game.roleplay.actions.DeleteObjectAction import (
     DeleteObjectAction,
 )
+from pyd2bot.apis.InventoryAPI import InventoryAPI
 from pyd2bot.apis.MoveAPI import MoveAPI
 from com.ankamagames.dofus.datacenter.notifications.Notification import Notification
 from com.ankamagames.dofus.kernel.Kernel import Kernel
@@ -38,8 +39,8 @@ from com.ankamagames.jerakine.types.enums.Priority import Priority
 from typing import TYPE_CHECKING, Tuple
 
 from pyd2bot.apis.FarmAPI import FarmAPI
-from pyd2bot.examples.autotrip.AutoTripFrame import AutoTripFrame
-from pyd2bot.examples.predefinedPathFarming.FarmParcours import FarmParcours
+from pyd2bot.frames.AutoTripFrame import AutoTripFrame
+from pyd2bot.models.FarmParcours import FarmParcours
 
 if TYPE_CHECKING:
     from com.ankamagames.dofus.logic.game.roleplay.frames.RoleplayInteractivesFrame import (
@@ -84,11 +85,12 @@ class BotFarmPathFrame(Frame):
         return Kernel().getWorker().getFrame("RoleplayInteractivesFrame")
 
     @property
-    def currPathStep(self):
+    def nextPathMapCoords(self):
         if self.currMapCoords in self.parcours.path:
-            return (self.parcours.path.index(self.currMapCoords) + 1) % len(
+            index = (self.parcours.path.index(self.currMapCoords) + 1) % len(
                 self.parcours.path
             )
+            return self.parcours.path[index]
         return None
 
     def pushed(self) -> bool:
@@ -113,11 +115,9 @@ class BotFarmPathFrame(Frame):
 
         elif isinstance(msg, InteractiveUsedMessage):
             if PlayedCharacterManager().id == msg.entityId and msg.duration > 0:
-                pourcentt = (
-                    PlayedCharacterManager().inventoryWeight
-                    / PlayedCharacterManager().inventoryWeightMax
-                ) * 100
-                logger.debug(f"[BotFarmFrame] Inventory weight {pourcentt:.2f}%")
+                logger.debug(
+                    f"[BotFarmFrame] Inventory weight {InventoryAPI.getWeightPourcent():.2f}%"
+                )
                 logger.debug(
                     f"[BotFarmFrame] Started using interactive element {msg.elemId} ...."
                 )
@@ -133,32 +133,31 @@ class BotFarmPathFrame(Frame):
                 logger.debug(
                     f"[BotFarmFrame] Interactive element {msg.elemId} use ended"
                 )
-                logger.debug(
-                    "***********************************************************************"
-                )
+                logger.debug("*" * 100)
                 self._usingInteractive = False
                 self.doFarm()
             del self._entities[msg.elemId]
             return True
 
         elif isinstance(msg, MapComplementaryInformationsDataMessage):
-            logger.debug(
-                "-----------------------------------------------------------------------------"
-            )
-            if not Kernel().getWorker().contains("AutoTripFrame"):
+            logger.debug("-" * 100)
+            if self._worker.contains("AutoTripFrame"):
+                return False
+            if self.currMapCoords not in self.parcours.path:
+                self._worker.addFrame(AutoTripFrame(self.parcours.startMapId))
+                return False
+            else:
                 self._dstMapId = -1
                 self._mapIdDiscard.clear()
-                self.getCurrStep(msg.mapId)
                 self.doFarm()
-            return True
+                return True
 
         elif isinstance(msg, MapChangeFailedMessage):
             logger.debug(
                 f"[BotFarmFrame] Map change to {self._dstMapId} failed will discard that destination"
             )
             self._mapIdDiscard.append(msg.mapId)
-            x, y = self.parcours.path[self.pathIndex]
-            MoveAPI.changeMapToDstCoords(x, y)
+            MoveAPI.changeMapToDstCoords(self.nextPathMapCoords)
             return True
 
         elif isinstance(msg, NotificationByServerMessage):
@@ -167,27 +166,18 @@ class BotFarmPathFrame(Frame):
                 logger.debug(
                     "[BotFarmFrame] Full pod reached will destroy all items in inventory"
                 )
-                for iw in InventoryManager().realInventory:
-                    doa = DeleteObjectAction.create(iw.objectUID, iw.quantity)
-                    Kernel().getWorker().process(doa)
+                InventoryAPI.destroyAllItems()
                 self.doFarm()
             return True
 
-    def getCurrStep(self, mapId):
-        if self.currMapCoords in self.parcours.path:
-            self.pathIndex = (self.parcours.path.index(self.currMapCoords) + 1) % len(
-                self.parcours.path
-            )
-        else:
-            if not Kernel().getWorker().contains("AutoTripFrame"):
-                Kernel().getWorker().addFrame(AutoTripFrame(self.parcours.startMapId))
-
     def doFarm(self):
+        if self._worker.contains("FightContextFrame"):
+            return
         self._currentRequestedElementId = FarmAPI().collectResource(
-            skills=self.parcours.skillIds
+            skills=self.parcours.skills
         )
         if self._currentRequestedElementId == -1 and self._dstMapId == -1:
-            x, y = self.parcours.path[self.pathIndex]
+            x, y = self.nextPathMapCoords
             logger.debug(
                 f"[BotFarmFrame] Current Map {self.currMapCoords} Moving to {x, y}"
             )

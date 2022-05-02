@@ -114,6 +114,8 @@ class NetworkMessage(INetworkMessage):
         raise Exception("Not implemented")
 
     def __eq__(self, __o: "NetworkMessage") -> bool:
+        if __o is None:
+            return False
         return self._instance_id == __o._instance_id
 
     def __ne__(self, __o: object) -> bool:

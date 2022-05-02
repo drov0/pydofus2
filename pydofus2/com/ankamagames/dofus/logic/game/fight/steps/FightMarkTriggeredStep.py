@@ -51,7 +51,7 @@ class FightMarkTriggeredStep(AbstractSequencable, IFightStep):
             evt = FightEventEnum.FIGHTER_TRIGGERED_PORTAL
         else:
             logger.warn("Unknown mark type triggered (" + str(mi.markType) + ").")
-        FightEventsHelper.sendFightEvent(
+        FightEventsHelper().sendFightEvent(
             evt,
             [self._fighterId, self._casterId, mi.associatedSpell.id],
             0,

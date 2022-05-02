@@ -151,7 +151,7 @@ class PlayedCharacterApi(IApi, metaclass=Singleton):
                 equipment.append(item)
         return equipment
 
-    def getSpellInventory(self) -> list:
+    def getSpellInventory(self) -> list["SpellWrapper"]:
         return PlayedCharacterManager().spellsInventory
 
     def getSpells(self, returnBreedSpells: bool) -> list:
@@ -191,7 +191,7 @@ class PlayedCharacterApi(IApi, metaclass=Singleton):
     def getCustomModeBreedSpellById(self, id: int) -> CustomModeBreedSpell:
         return CustomModeBreedSpell.getCustomModeBreedSpellById(id)
 
-    def getCustomModeSpellIds(self) -> list:
+    def getCustomModeSpellIds(self) -> list[int]:
         return CustomModeBreedSpell.getAllCustomModeBreedSpellIds()
 
     def getCustomModeBreedSpellList(self, breedId: int) -> list:

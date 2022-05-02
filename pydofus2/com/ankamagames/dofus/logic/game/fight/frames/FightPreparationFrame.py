@@ -131,7 +131,7 @@ class FightPreparationFrame(Frame):
 
     _defenderPositions: list[int]
 
-    _swapPositionRequests: list[SwapPositionRequest]
+    _swapPositionRequests: list[SwapPositionRequest] = []
 
     _fightersId: list[float]
 
@@ -150,7 +150,7 @@ class FightPreparationFrame(Frame):
     def pushed(self) -> bool:
         self._fightContextFrame.entitiesFrame.untargetableEntities = True
         DataMapProvider().isInFight = True
-        self._swapPositionRequests = list[SwapPositionRequest](0)
+        self._swapPositionRequests = list[SwapPositionRequest]()
         self._fightersId = list[float]()
         return True
 
@@ -252,7 +252,7 @@ class FightPreparationFrame(Frame):
         if isinstance(msg, GameEntitiesDispositionMessage) or isinstance(
             msg, GameFightPlacementSwapPositionsMessage
         ):
-            for iedi in msg["dispositions"]:
+            for iedi in msg.dispositions:
                 entitySwapPositionsRequests = self.getPlayerSwapPositionRequests(
                     iedi.id
                 )
@@ -430,7 +430,7 @@ class FightPreparationFrame(Frame):
         self, pPlayerId: float
     ) -> list[SwapPositionRequest]:
         swapPositionRequest: SwapPositionRequest = None
-        swapPositionRequests: list[SwapPositionRequest] = list[SwapPositionRequest](0)
+        swapPositionRequests: list[SwapPositionRequest] = list[SwapPositionRequest]()
         for swapPositionRequest in self._swapPositionRequests:
             if (
                 swapPositionRequest.requesterId == pPlayerId

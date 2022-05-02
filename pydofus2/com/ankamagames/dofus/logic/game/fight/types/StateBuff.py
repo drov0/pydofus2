@@ -4,9 +4,12 @@ from com.ankamagames.dofus.kernel.Kernel import Kernel
 from com.ankamagames.dofus.logic.game.fight.fightEvents.FightEventsHelper import (
     FightEventsHelper,
 )
-from com.ankamagames.dofus.logic.game.fight.frames.FightBattleFrame import (
-    FightBattleFrame,
-)
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from com.ankamagames.dofus.logic.game.fight.frames.FightBattleFrame import (
+        FightBattleFrame,
+    )
 from com.ankamagames.dofus.logic.game.fight.managers.FightersStateManager import (
     FightersStateManager,
 )
@@ -115,7 +118,7 @@ class StateBuff(BasicBuff):
             self.targetId, self.stateId
         )
         chatLog: bool = False
-        fbf: FightBattleFrame = Kernel().getWorker().getFrame(FightBattleFrame)
+        fbf: "FightBattleFrame" = Kernel().getWorker().getFrame("FightBattleFrame")
         if (
             fbf
             and not fbf.executingSequence
@@ -126,7 +129,7 @@ class StateBuff(BasicBuff):
         if not stateActivated:
             self.removeStateIcon()
             if statePreviouslyActivated and chatLog and self._isVisibleInFightLog:
-                FightEventsHelper.sendFightEvent(
+                FightEventsHelper().sendFightEvent(
                     FightEventEnum.FIGHTER_LEAVING_STATE,
                     [self.targetId, self.stateId],
                     self.targetId,
@@ -136,7 +139,7 @@ class StateBuff(BasicBuff):
                 )
         elif not statePreviouslyActivated and stateActivated:
             if chatLog and self._isVisibleInFightLog:
-                FightEventsHelper.sendFightEvent(
+                FightEventsHelper().sendFightEvent(
                     FightEventEnum.FIGHTER_ENTERING_STATE,
                     [self.targetId, self.stateId],
                     self.targetId,

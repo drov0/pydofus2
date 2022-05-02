@@ -256,7 +256,7 @@ class Worker(EventDispatcher, MessageHandler):
             return
         logger.info("Worker is resuming, processing all queued messages.")
         self._paused = False
-        self._messagesQueue = self._messagesQueue.extend(self._pausedQueue)
+        self._messagesQueue += self._pausedQueue
         self._pausedQueue = list[Message]()
         self.processFramesInAndOut()
         self.processQueues()
@@ -306,14 +306,9 @@ class Worker(EventDispatcher, MessageHandler):
             )
 
     def pullFrame(self, frame: Frame) -> None:
-        index: int = 0
         if frame.pulled():
-            try:
-                index = self._framesList.index(frame)
-            except:
-                index = -1
-            if index > -1:
-                del self._framesList[index]
+            if frame in self._framesList:
+                self._framesList.remove(frame)
                 del self._currentFrameTypesCache[frame.__class__.__name__]
                 if frame in self._framesBeingDeleted:
                     del self._framesBeingDeleted[frame]

@@ -48,9 +48,9 @@ class Effect(IDataCenter):
 
     elementId: int
 
-    _description: str
+    _description: str = ""
 
-    _theoricDescription: str
+    _theoricDescription: str = ""
 
     def __init__(self):
         super().__init__()

@@ -427,39 +427,39 @@ class FightSequenceFrame(Frame, ISpellCastProvider):
 
     _lastCastingSpell: CastingSpell
 
-    _currentInstanceId: int
+    _currentInstanceId: int = 0
 
     FIGHT_SEQUENCERS_CATEGORY: str = "FightSequencer"
 
-    _castingSpell: CastingSpell
+    _castingSpell: CastingSpell = None
 
-    _castingSpells: list[CastingSpell]
+    _castingSpells: list[CastingSpell] = []
 
-    _stepsBuffer: list[ISequencable]
+    _stepsBuffer: list[ISequencable] = []
 
     mustAck: bool
 
     ackIdent: int
 
-    _sequenceEndCallback: FunctionType
+    _sequenceEndCallback: FunctionType = None
 
     _subSequenceWaitingCount: int = 0
 
-    _scriptInit: bool
+    _scriptInit: bool = False
 
-    _sequencer: SerialSequencer
+    _sequencer: SerialSequencer = None
 
-    _parent: "FightSequenceFrame"
+    _parent: "FightSequenceFrame" = None
 
-    _fightBattleFrame: "FightBattleFrame"
+    _fightBattleFrame: "FightBattleFrame" = None
 
-    _fightEntitiesFrame: FightEntitiesFrame
+    _fightEntitiesFrame: FightEntitiesFrame = None
 
-    _instanceId: int
+    _instanceId: int = 0
 
-    _teleportThroughPortal: bool
+    _teleportThroughPortal: bool = False
 
-    _updateMovementAreaAtSequenceEnd: bool
+    _updateMovementAreaAtSequenceEnd: bool = None
 
     _playSpellScriptStep: FightPlaySpellScriptStep
 
@@ -469,8 +469,8 @@ class FightSequenceFrame(Frame, ISpellCastProvider):
         self, pFightBattleFrame: "FightBattleFrame", parent: "FightSequenceFrame" = None
     ):
         super().__init__()
-        self._instanceId = self._currentInstanceId
-        self._currentInstanceId += 1
+        self._instanceId = FightSequenceFrame._currentInstanceId
+        FightSequenceFrame._currentInstanceId += 1
         self._fightBattleFrame = pFightBattleFrame
         self._parent = parent
         self.clearBuffer()
@@ -538,7 +538,7 @@ class FightSequenceFrame(Frame, ISpellCastProvider):
         self._stepsBuffer.append(ParallelStartSequenceStep([sequence], False))
 
     def process(self, msg: Message) -> bool:
-
+        closeCombatWeaponId = 0
         if isinstance(msg, GameFightRefreshFighterMessage):
             gfrfmsg = msg
             self.keepInMindToUpdateMovementArea()
@@ -601,11 +601,11 @@ class FightSequenceFrame(Frame, ISpellCastProvider):
                     + tempCastingSpell.spell.name
                     + " ("
                     + str(gafscmsg.spellId)
-                    + ") lance par "
+                    + ") casted by "
                     + str(gafscmsg.sourceId)
-                    + " sur "
+                    + " on "
                     + str(gafscmsg.targetId)
-                    + " (cellule "
+                    + " (cell "
                     + str(gafscmsg.destinationCellId)
                     + ")"
                 )
@@ -1018,9 +1018,9 @@ class FightSequenceFrame(Frame, ISpellCastProvider):
             gafdiemsg = msg
             if GameDebugManager().buffsDebugActivated:
                 logger.debug(
-                    "[BUFFS DEBUG] Message de retrait du buff "
+                    "[BUFFS DEBUG] Message of the retrieval of buff "
                     + str(gafdiemsg.boostUID)
-                    + " de "
+                    + " belonging to "
                     + str(gafdiemsg.targetId)
                 )
             self.pushStep(
@@ -1653,7 +1653,7 @@ class FightSequenceFrame(Frame, ISpellCastProvider):
                 + description
                 + "' ("
                 + str(gaftbmsg.actionId)
-                + ") lanc� par "
+                + ") lanched by "
                 + str(gaftbmsg.sourceId)
                 + " sur "
                 + str(gaftbmsg.effect.targetId)
@@ -1661,7 +1661,7 @@ class FightSequenceFrame(Frame, ISpellCastProvider):
                 + str(gaftbmsg.effect.uid)
                 + ", sort "
                 + str(gaftbmsg.effect.spellId)
-                + ", dur�e "
+                + ", duration "
                 + str(gaftbmsg.effect.turnDuration)
                 + ", desenvoutable "
                 + str(gaftbmsg.effect.dispelable)
@@ -1737,11 +1737,12 @@ class FightSequenceFrame(Frame, ISpellCastProvider):
             self.pushStep(FightDisplayBuffStep(buff))
 
     def executeBuffer(self, callback: FunctionType) -> None:
+        step = None
         removed: bool = False
         deathNumber: int = 0
         cleanedBuffer: list = []
         deathStepRef: dict = dict()
-        loseLifeStep: dict = dict(True)
+        loseLifeStep: dict = dict()
         startStep = []
         endStep = []
         entityAttaqueAnimWait = dict()
@@ -1750,71 +1751,76 @@ class FightSequenceFrame(Frame, ISpellCastProvider):
         shieldLoseSum = dict()
         shieldLoseLastStep = dict()
         deathNumber = 0
-        for i in range(len(self._stepsBuffer), 0, -1):
+        allowHitAnim = False
+        allowSpellEffects = False
+        for i in range(len(self._stepsBuffer) - 1, -1, -1):
             if removed and step:
                 step.clear()
             removed = True
             step = self._stepsBuffer[i]
-
             if isinstance(step, FightDeathStep):
                 deathStep = step
                 deathStepRef[deathStep.entityId] = True
-                deadEntityIndex = -1
-                if deathStep.entityId in self._entities:
-                    deadEntityIndex = self._fightBattleFrame.targetedEntities.index(
-                        deathStep.entityId
-                    )
-                if deadEntityIndex != -1:
-                    self._fightBattleFrame.targetedEntities.splice(deadEntityIndex, 1)
+                if deathStep.entityId in self._fightBattleFrame.targetedEntities:
+                    self._fightBattleFrame.targetedEntities.remove(deathStep.entityId)
                 deathNumber += 1
-
-            if isinstance(step, FightActionPointsVariationStep):
+            elif isinstance(step, FightActionPointsVariationStep):
                 fapvs = step
-                if not fapvs.voluntarlyUsed:
+                if fapvs.voluntarlyUsed:
                     startStep.append(fapvs)
-                removed = False
-                continue
-
-            if isinstance(step, FightShieldPointsVariationStep):
+                    removed = False
+            elif isinstance(step, FightShieldPointsVariationStep):
                 fspvs = step
                 fspvsTarget = fspvs.target
-                if fspvsTarget == None:
-                    break
-                if fspvs.value < 0:
-                    fspvs.virtual = True
-                    if shieldLoseSum.get(fspvsTarget) is None:
-                        shieldLoseSum[fspvsTarget] = 0
-                    shieldLoseSum[fspvsTarget] += fspvs.value
-                    shieldLoseLastStep[fspvsTarget] = fspvs
-
-            if isinstance(step, FightLifeVariationStep):
+                if fspvsTarget is None:
+                    pass
+                else:
+                    if fspvs.value < 0:
+                        fspvs.virtual = True
+                        if shieldLoseSum.get(fspvsTarget) is None:
+                            shieldLoseSum[fspvsTarget] = 0
+                        shieldLoseSum[fspvsTarget] += fspvs.value
+                        shieldLoseLastStep[fspvsTarget] = fspvs
+            elif isinstance(step, FightLifeVariationStep):
                 flvs = step
                 flvsTarget = flvs.target
                 if flvsTarget is None:
-                    break
-                if flvs.delta < 0:
-                    loseLifeStep[flvsTarget] = flvs
-                if lifeLoseSum[flvsTarget] == None:
-                    lifeLoseSum[flvsTarget] = 0
-                lifeLoseSum[flvsTarget] += flvs.delta
-                lifeLoseLastStep[flvsTarget] = flvs
-
+                    pass
+                else:
+                    if flvs.delta < 0:
+                        loseLifeStep[flvsTarget] = flvs
+                    if flvsTarget not in lifeLoseSum:
+                        lifeLoseSum[flvsTarget] = 0
+                    lifeLoseSum[flvsTarget] += flvs.delta
+                    lifeLoseLastStep[flvsTarget] = flvs
             removed = False
             cleanedBuffer.insert(0, step)
+
         self._fightBattleFrame.deathPlayingNumber = deathNumber
+        for b in cleanedBuffer:
+            if (
+                isinstance(b, FightLifeVariationStep)
+                and lifeLoseSum[b.target] == 0
+                and shieldLoseSum.get(b.target) is not None
+            ):
+                b.skipTextEvent = True
+
         for index in lifeLoseSum:
             lifeLoseLastStep[index] = -1
             lifeLoseSum[index] = 0
+
         for index in shieldLoseSum:
             shieldLoseLastStep[index] = -1
             shieldLoseSum[index] = 0
+
         for waitStep in entityAttaqueAnimWait:
             endStep.append(waitStep)
+
         cleanedBuffer = startStep + cleanedBuffer + endStep
         for step in cleanedBuffer:
             self._sequencer.addStep(step)
         self.clearBuffer()
-        if callback != None and not self._parent:
+        if callback is not None and not self._parent:
             self._sequenceEndCallback = callback
             self._sequencer.add_listener(
                 SequencerEvent.SEQUENCE_END, self.onSequenceEnd
@@ -1872,14 +1878,14 @@ class FightSequenceFrame(Frame, ISpellCastProvider):
         step: IFightStep = None
         if actionId == ActionIdProtocol.ACTION_CHARACTER_ACTION_POINTS_USE:
             step = FightActionPointsVariationStep(fighterId, delta, True)
-        if (
+        elif (
             actionId == ActionIds.ACTION_CHARACTER_ACTION_POINTS_LOST
             or actionId == ActionIds.ACTION_CHARACTER_ACTION_POINTS_WIN
         ):
             step = FightActionPointsVariationStep(fighterId, delta, False)
-        if actionId == ActionIdProtocol.ACTION_CHARACTER_MOVEMENT_POINTS_USE:
+        elif actionId == ActionIdProtocol.ACTION_CHARACTER_MOVEMENT_POINTS_USE:
             step = FightMovementPointsVariationStep(fighterId, delta, True)
-        if (
+        elif (
             actionId == ActionIds.ACTION_CHARACTER_MOVEMENT_POINTS_LOST
             or actionId == ActionIds.ACTION_CHARACTER_MOVEMENT_POINTS_WIN
         ):
@@ -1904,7 +1910,7 @@ class FightSequenceFrame(Frame, ISpellCastProvider):
         step: IFightStep = None
         if actionId == ActionIdProtocol.ACTION_FIGHT_SPELL_DODGED_PA:
             step = FightActionPointsLossDodgeStep(fighterId, amount)
-        if actionId == ActionIdProtocol.ACTION_FIGHT_SPELL_DODGED_PM:
+        elif actionId == ActionIdProtocol.ACTION_FIGHT_SPELL_DODGED_PM:
             step = FightMovementPointsLossDodgeStep(fighterId, amount)
         else:
             logger.warn(f"Points dodge with unsupported action ({actionId}), skipping.")

@@ -89,12 +89,12 @@ class EntitiesManager(metaclass=Singleton):
 
     def getEntitiesOnCell(self, cellId: int, oClass=None) -> list:
         useFilter = oClass != None
-        isMultiFilter: bool = useFilter and oClass is list
+        isMultiFilter: bool = useFilter and isinstance(oClass, list)
         result: list = []
-        for e in self._entities:
+        for e in self._entities.values():
             if e and e.position and e.position.cellId == cellId:
                 if not isMultiFilter:
-                    if not useFilter or not isMultiFilter and e is oClass:
+                    if not useFilter or not isMultiFilter and isinstance(e, oClass):
                         result.append(e)
                 else:
                     for cls in oClass:

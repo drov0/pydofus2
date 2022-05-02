@@ -21,7 +21,7 @@ class FightDispellStep(AbstractSequencable, IFightStep):
 
     def start(self) -> None:
         BuffManager().dispell(self._fighterId)
-        FightEventsHelper.sendFightEvent(
+        FightEventsHelper().sendFightEvent(
             FightEventEnum.FIGHTER_GOT_DISPELLED,
             [self._fighterId],
             self._fighterId,

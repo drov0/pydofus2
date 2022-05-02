@@ -39,7 +39,7 @@ class FightTackledStep(AbstractSequencable, IFightStep, ISequencableListener):
             return
 
     def stepFinished(self, step: ISequencable, withTimout: bool = False) -> None:
-        FightEventsHelper.sendFightEvent(
+        FightEventsHelper().sendFightEvent(
             FightEventEnum.FIGHTER_GOT_TACKLED,
             [self._fighterId],
             0,

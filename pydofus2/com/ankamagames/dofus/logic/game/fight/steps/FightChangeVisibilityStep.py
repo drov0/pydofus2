@@ -7,9 +7,7 @@ from com.ankamagames.dofus.logic.game.fight.actions.RemoveEntityAction import (
 from com.ankamagames.dofus.logic.game.fight.fightEvents.FightEventsHelper import (
     FightEventsHelper,
 )
-from com.ankamagames.dofus.logic.game.fight.frames.FightContextFrame import (
-    FightContextFrame,
-)
+
 from com.ankamagames.dofus.logic.game.fight.frames.FightEntitiesFrame import (
     FightEntitiesFrame,
 )
@@ -29,6 +27,12 @@ from com.ankamagames.jerakine.entities.interfaces.IDisplayable import IDisplayab
 from com.ankamagames.jerakine.entities.interfaces.IEntity import IEntity
 from com.ankamagames.jerakine.sequencer.AbstractSequencable import AbstractSequencable
 from com.ankamagames.jerakine.types.positions.MapPoint import MapPoint
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from com.ankamagames.dofus.logic.game.fight.frames.FightContextFrame import (
+        FightContextFrame,
+    )
 
 
 class FightChangeVisibilityStep(AbstractSequencable, IFightStep):
@@ -102,13 +106,13 @@ class FightChangeVisibilityStep(AbstractSequencable, IFightStep):
                 dispatchedState = GameActionFightInvisibilityStateEnum.INVISIBLE
             self.unspawnEntity()
 
-        FightEventsHelper.sendFightEvent(
+        FightEventsHelper().sendFightEvent(
             FightEventEnum.FIGHTER_VISIBILITY_CHANGED,
             [self._entityId, dispatchedState],
             self._entityId,
             self.castingSpellId,
         )
-        fcf: 'FightContextFrame' = Kernel().getWorker().getFrame('FightContextFrame')
+        fcf: "FightContextFrame" = Kernel().getWorker().getFrame("FightContextFrame")
         if self._visibilityState == GameActionFightInvisibilityStateEnum.INVISIBLE:
             fcf.addToHiddenEntities(self._entityId)
         else:
@@ -132,19 +136,17 @@ class FightChangeVisibilityStep(AbstractSequencable, IFightStep):
         if animatedEntity:
             animatedEntity.hide()
 
-    def respawnEntity(self) -> DisplayObject:
-        tiphonSprite: TiphonSprite = DofusEntities.getEntity(self._entityId)
+    def respawnEntity(self) -> IEntity:
+        tiphonSprite = DofusEntities.getEntity(self._entityId)
         if tiphonSprite and tiphonSprite.parentSprite:
-            fightEntitiesFrame = Kernel().getWorker().getFrame(FightEntitiesFrame)
+            fightEntitiesFrame: "FightEntitiesFrame" = (
+                Kernel().getWorker().getFrame("FightEntitiesFrame")
+            )
             if fightEntitiesFrame:
                 fightEntitiesFrame.addOrUpdateActor(
                     fightEntitiesFrame.getEntityInfos(self._entityId)
                 )
             return tiphonSprite
         if FightEntitiesHolder().getEntity(self._entityId):
-            entity = DofusEntities.getEntity(self._entityId)
-            animatedEntity = entity
-            if animatedEntity:
-                animatedEntity.show()
             FightEntitiesHolder().unholdEntity(self._entityId)
         return DofusEntities.getEntity(self._entityId)

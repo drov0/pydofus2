@@ -35,7 +35,7 @@ class FightEnteringStateStep(AbstractSequencable, IFightStep):
     def start(self) -> None:
         spell: SpellState = SpellState.getSpellStateById(self._stateId)
         if spell and not spell.isSilent and self._buff.isVisibleInFightLog:
-            FightEventsHelper.sendFightEvent(
+            FightEventsHelper().sendFightEvent(
                 FightEventEnum.FIGHTER_ENTERING_STATE,
                 [self._fighterId, self._stateId, self._durationString],
                 self._fighterId,

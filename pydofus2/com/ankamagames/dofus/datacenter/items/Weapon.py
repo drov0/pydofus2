@@ -29,6 +29,16 @@ class Weapon(Item, IDataCenter):
     criticalFailureProbability: int
 
     def __init__(self):
+        self.apCost: int = None
+        self.minRange: int = None
+        self.range: int = None
+        self.maxCastPerTurn: int = None
+        self.castInLine: bool = None
+        self.castInDiagonal: bool = None
+        self.castTestLos: bool = None
+        self.criticalHitProbability: int = None
+        self.criticalHitBonus: int = None
+        self.criticalFailureProbability: int = None
         super().__init__()
 
     @classmethod
@@ -53,8 +63,9 @@ class Weapon(Item, IDataCenter):
     @property
     def isWeapon(self) -> bool:
         return True
-    
-    def copy(self, src: Item, to: Item) -> None:
+
+    @classmethod
+    def copy(cls, src: Item, to: Item) -> None:
         super().copy(src, to)
         if hasattr(to, "apCost") and hasattr(src, "apCost"):
             to.apCost = src.apCost

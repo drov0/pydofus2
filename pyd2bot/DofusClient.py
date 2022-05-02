@@ -9,6 +9,9 @@ import com.ankamagames.dofus.kernel.net.ConnectionsHandler as connh
 from com.ankamagames.dofus.logic.game.common.frames.InventoryManagementFrame import (
     InventoryManagementFrame,
 )
+from com.ankamagames.dofus.logic.game.common.frames.SpellInventoryManagementFrame import (
+    SpellInventoryManagementFrame,
+)
 from com.ankamagames.dofus.modules.utils.pathFinding.world.WorldPathFinder import (
     WorldPathFinder,
 )
@@ -21,13 +24,13 @@ if TYPE_CHECKING:
     from com.ankamagames.jerakine.network.ServerConnection import ServerConnection
 from launcher.Launcher import Haapi
 from pyd2bot.managers.BotsDataManager import BotsDataManager
-from pyd2bot.frames.BotGameApproach import BotGameApproach
+from pyd2bot.frames.BotGameApproachFrame import BotGameApproach
 from com.ankamagames.atouin.utils.DataMapProvider import DataMapProvider
 
 logger = Logger(__name__)
 
 
-class Bot:
+class DofusClient:
     def __init__(self, name):
         self.name = name
         botCreds = BotsDataManager.getEntry(self.name)
@@ -41,6 +44,7 @@ class Bot:
         self._gameApproachFrame = BotGameApproach(self.CHARACTER_ID)
         self._worker.addFrame(self._gameApproachFrame)
         self._worker.addFrame(InventoryManagementFrame())
+        self._worker.addFrame(SpellInventoryManagementFrame())
         I18nFileAccessor().init()
         DataMapProvider().init(AnimatedCharacter)
         WorldPathFinder().init()
@@ -62,8 +66,11 @@ class Bot:
                 if self.mainConn is None:
                     sys.exit(0)
             except KeyboardInterrupt:
-                if self.mainConn is not None:
-                    self.mainConn.close()
+                try:
+                    if self.mainConn is not None:
+                        self.mainConn.close()
+                except Exception:
+                    pass
                 sys.exit(0)
 
     def start(self):

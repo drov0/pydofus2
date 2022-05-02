@@ -137,7 +137,9 @@ class AbstractEntitiesFrame(Frame):
             self._entitiesTotal += 1
         self._entities[actorId] = infos
         if isinstance(infos, GameFightFighterInformations):
-            StatsManager().addRawStats(actorId, infos)
+            StatsManager().addRawStats(
+                actorId, infos.stats.characteristics.characteristics
+            )
 
     def unregisterActor(self, actorId: float) -> None:
         entity: IEntity = None
@@ -155,12 +157,14 @@ class AbstractEntitiesFrame(Frame):
         characterEntity: AnimatedCharacter = DofusEntities.getEntity(infos.contextualId)
         self.registerActor(infos)
         if isinstance(infos, GameFightFighterInformations):
-            StatsManager().addRawStats(infos.contextualId, infos)
+            StatsManager().addRawStats(
+                infos.contextualId, infos.stats.characteristics.characteristics
+            )
         if characterEntity is None:
             characterEntity = AnimatedCharacter(infos.contextualId)
             if isinstance(infos, GameFightMonsterInformations):
                 characterEntity.speedAdjust = Monster.getMonsterById(
-                    GameFightMonsterInformations(infos).creatureGenericId
+                    infos.creatureGenericId
                 ).speedAdjust
             EntitiesManager().addAnimatedEntity(
                 int(infos.contextualId), characterEntity

@@ -17,7 +17,7 @@ class FightActionPointsLossDodgeStep(AbstractDodgePointLossStep, IFightStep):
         return "actionPointsLossDodge"
 
     def start(self) -> None:
-        FightEventsHelper.sendFightEvent(
+        FightEventsHelper().sendFightEvent(
             FightEventEnum.FIGHTER_AP_LOSS_DODGED,
             [self._fighterId, self._amount],
             self._fighterId,

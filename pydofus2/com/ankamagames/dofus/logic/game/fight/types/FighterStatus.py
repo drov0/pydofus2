@@ -1,16 +1,13 @@
 class FighterStatus:
-    cantUseSpells: bool
-    cantUseCloseQuarterAttack: bool
-    cantDealDamage: bool
-    invulnerable: bool
-    incurable: bool
-    cantBeMoved: bool
-    cantBePushed: bool
-    cantSwitchPosition: bool
-    invulnerableMelee: bool
-    invulnerableRange: bool
-    cantTackle: bool
-    cantBeTackled: bool
-
-    def __init__(self):
-        super().__init__()
+    cantUseSpells: bool = None
+    cantUseCloseQuarterAttack: bool = None
+    cantDealDamage: bool = None
+    invulnerable: bool = None
+    incurable: bool = None
+    cantBeMoved: bool = None
+    cantBePushed: bool = None
+    cantSwitchPosition: bool = None
+    invulnerableMelee: bool = None
+    invulnerableRange: bool = None
+    cantTackle: bool = None
+    cantBeTackled: bool = None

@@ -19,7 +19,7 @@ class FightSpellImmunityStep(AbstractSequencable, IFightStep):
         return "spellImmunity"
 
     def start(self) -> None:
-        FightEventsHelper.sendFightEvent(
+        FightEventsHelper().sendFightEvent(
             FightEventEnum.FIGHTER_SPELL_IMMUNITY,
             [self._fighterId],
             0,

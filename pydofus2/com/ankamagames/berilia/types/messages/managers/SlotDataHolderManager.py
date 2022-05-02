@@ -7,12 +7,12 @@ logger = Logger(__name__)
 
 class SlotDataHolderManager:
 
-    _weakHolderReference: dict
+    _weakHolderReference: dict = dict()
 
-    _linkedSlotsData: list[ISlotData]
+    _linkedSlotsData: list[ISlotData] = []
 
     def __init__(self, linkedSlotData: ISlotData):
-        self._weakHolderReference = dict()
+        self._weakHolderReference = dict[ISlotDataHolder, bool]()
         super().__init__()
         self._linkedSlotsData = list[ISlotData]()
         self._linkedSlotsData.append(linkedSlotData)
@@ -32,8 +32,9 @@ class SlotDataHolderManager:
     def getHolders(self) -> list:
         return list(self._weakHolderReference.keys())
 
-    def refreshAll(self) -> None:
-        for h in self._weakHolderReference:
-            for linkedSlotData in self._linkedSlotsData:
+    @classmethod
+    def refreshAll(cls) -> None:
+        for h in cls._weakHolderReference:
+            for linkedSlotData in cls._linkedSlotsData:
                 if h and ISlotDataHolder(h).data == linkedSlotData:
                     h.refresh()

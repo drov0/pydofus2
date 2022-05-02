@@ -63,13 +63,13 @@ class FightActionPointsVariationStep(AbstractStatContextualStep, IFightStep):
         return self._voluntarlyUsed
 
     def start(self) -> None:
-        EnterFrameDispatcher().worker.addSingleTreatment(StatsManager(), self.apply, [])
+        EnterFrameDispatcher().worker.addSingleTreatment(self, self.apply, [])
 
     def apply(self) -> None:
         SpellWrapper.refreshAllPlayerSpellHolder(self._targetId)
         if self._showChatmessage:
             if self._intValue > 0:
-                FightEventsHelper.sendFightEvent(
+                FightEventsHelper().sendFightEvent(
                     FightEventEnum.FIGHTER_AP_GAINED,
                     [self._targetId, abs(self._intValue)],
                     self._targetId,
@@ -79,7 +79,7 @@ class FightActionPointsVariationStep(AbstractStatContextualStep, IFightStep):
                 )
             elif self._intValue < 0:
                 if self._voluntarlyUsed:
-                    FightEventsHelper.sendFightEvent(
+                    FightEventsHelper().sendFightEvent(
                         FightEventEnum.FIGHTER_AP_USED,
                         [self._targetId, abs(self._intValue)],
                         self._targetId,
@@ -88,7 +88,7 @@ class FightActionPointsVariationStep(AbstractStatContextualStep, IFightStep):
                         2,
                     )
                 else:
-                    FightEventsHelper.sendFightEvent(
+                    FightEventsHelper().sendFightEvent(
                         FightEventEnum.FIGHTER_AP_LOST,
                         [self._targetId, abs(self._intValue)],
                         self._targetId,

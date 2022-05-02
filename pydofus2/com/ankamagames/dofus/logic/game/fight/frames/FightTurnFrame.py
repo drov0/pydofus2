@@ -88,12 +88,13 @@ from damageCalculation.tools.StatIds import StatIds
 from threading import Timer
 from typing import TYPE_CHECKING
 
+from com.ankamagames.dofus.logic.game.fight.frames.FightEntitiesFrame import (
+    FightEntitiesFrame,
+)
+
 if TYPE_CHECKING:
     from com.ankamagames.dofus.logic.game.fight.frames.FightBattleFrame import (
         FightBattleFrame,
-    )
-    from com.ankamagames.dofus.logic.game.fight.frames.FightEntitiesFrame import (
-        FightEntitiesFrame,
     )
     from com.ankamagames.jerakine.entities.interfaces.IMovable import IMovable
 logger = Logger(__name__)
@@ -369,7 +370,7 @@ class FightTurnFrame(Frame):
         return True
 
     def drawMovementArea(self) -> list[int]:
-        if not self._playerEntity or IMovable(self._playerEntity).isMoving:
+        if not self._playerEntity or self._playerEntity.isMoving:
             return []
         playerPosition: MapPoint = self._playerEntity.position
         stats: EntityStats = CurrentPlayedFighterManager().getStats()
@@ -381,7 +382,7 @@ class FightTurnFrame(Frame):
         playerInfos: GameFightFighterInformations = entitiesFrame.getEntityInfos(
             self._playerEntity.id
         )
-        tackle: float = TackleUtil.getTackle(playerInfos, playerPosition)
+        tackle: float = TackleUtil.getTackle(entitiesFrame, playerInfos, playerPosition)
         self._tackleByCellId = dict()
         self._tackleByCellId[playerPosition.cellId] = tackle
         mpLost: int = int(movementPoints * (1 - tackle) + 0.5)

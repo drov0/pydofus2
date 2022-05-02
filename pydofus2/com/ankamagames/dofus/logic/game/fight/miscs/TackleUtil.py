@@ -41,7 +41,7 @@ class TackleUtil:
         playerInfos: GameFightFighterInformations,
         position: MapPoint,
     ) -> float:
-        stats: EntityStats = StatsManager.getStats(playerInfos.contextualId)
+        stats: EntityStats = StatsManager().getStats(playerInfos.contextualId)
         if Constants.DETERMINIST_TACKLE:
             if not cls.canBeTackled(playerInfos, position):
                 return 1
@@ -57,22 +57,30 @@ class TackleUtil:
 
             if MapPoint.isInMap(x - 1, y):
                 entities.append(
-                    cls.getTacklerOnCell(MapTools.getCellIdByCoord(x - 1, y))
+                    cls.getTacklerOnCell(
+                        entitiesFrame, MapTools.getCellIdByCoord(x - 1, y)
+                    )
                 )
 
             if MapPoint.isInMap(x + 1, y):
                 entities.append(
-                    cls.getTacklerOnCell(MapTools.getCellIdByCoord(x + 1, y))
+                    cls.getTacklerOnCell(
+                        entitiesFrame, MapTools.getCellIdByCoord(x + 1, y)
+                    )
                 )
 
             if MapPoint.isInMap(x, y - 1):
                 entities.append(
-                    cls.getTacklerOnCell(MapTools.getCellIdByCoord(x, y - 1))
+                    cls.getTacklerOnCell(
+                        entitiesFrame, MapTools.getCellIdByCoord(x, y - 1)
+                    )
                 )
 
             if MapPoint.isInMap(x, y + 1):
                 entities.append(
-                    cls.getTacklerOnCell(MapTools.getCellIdByCoord(x, y + 1))
+                    cls.getTacklerOnCell(
+                        entitiesFrame, MapTools.getCellIdByCoord(x, y + 1)
+                    )
                 )
 
             evadePercent = 1

@@ -9,12 +9,6 @@ from com.ankamagames.dofus.logic.game.common.misc.DofusEntities import DofusEnti
 from com.ankamagames.dofus.logic.game.fight.fightEvents.FightEventsHelper import (
     FightEventsHelper,
 )
-from com.ankamagames.dofus.logic.game.fight.frames.FightBattleFrame import (
-    FightBattleFrame,
-)
-from com.ankamagames.dofus.logic.game.fight.frames.FightEntitiesFrame import (
-    FightEntitiesFrame,
-)
 from com.ankamagames.dofus.logic.game.fight.frames.FightSpellCastFrame import (
     FightSpellCastFrame,
 )
@@ -34,7 +28,6 @@ from com.ankamagames.dofus.network.types.game.context.fight.GameFightFighterInfo
 )
 from com.ankamagames.jerakine.entities.interfaces.IEntity import IEntity
 from com.ankamagames.jerakine.sequencer.AbstractSequencable import AbstractSequencable
-from com.ankamagames.jerakine.sequencer.ISequencer import ISequencer
 from com.ankamagames.jerakine.sequencer.SerialSequencer import SerialSequencer
 from com.ankamagames.jerakine.types.positions.MapPoint import MapPoint
 
@@ -50,8 +43,6 @@ class FightThrowCharacterStep(AbstractSequencable, IFightStep):
     _carriedId: float
 
     _cellId: int
-
-    _throwSubSequence: ISequencer
 
     _isCreature: bool
 
@@ -87,9 +78,6 @@ class FightThrowCharacterStep(AbstractSequencable, IFightStep):
             logger.error(
                 f"Attention, l'entit� [{self._fighterId}] ne porte pas [{self._carriedId}]"
             )
-            self._throwSubSequence = SerialSequencer(
-                FightBattleFrame.FIGHT_SEQUENCER_NAME
-            )
             if carriedEntity:
                 del carriedEntity
             self.throwFinished()
@@ -121,7 +109,6 @@ class FightThrowCharacterStep(AbstractSequencable, IFightStep):
         )
         if not invisibility:
             FightEntitiesHolder().unholdEntity(self._carriedId)
-        self._throwSubSequence = SerialSequencer(FightBattleFrame.FIGHT_SEQUENCER_NAME)
         if carryingFighterExist:
             if self._cellId == -1 or invisibility:
                 self.throwFinished()
@@ -136,7 +123,7 @@ class FightThrowCharacterStep(AbstractSequencable, IFightStep):
         return [self._carriedId]
 
     def throwFinished(self, e: Event = None) -> None:
-        FightEventsHelper.sendFightEvent(
+        FightEventsHelper().sendFightEvent(
             FightEventEnum.FIGHTER_THROW,
             [self._fighterId, self._carriedId, self._cellId],
             0,

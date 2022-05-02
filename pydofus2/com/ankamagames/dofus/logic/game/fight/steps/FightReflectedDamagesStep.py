@@ -19,7 +19,7 @@ class FightReflectedDamagesStep(AbstractSequencable, IFightStep):
         return "reflectedDamages"
 
     def start(self) -> None:
-        FightEventsHelper.sendFightEvent(
+        FightEventsHelper().sendFightEvent(
             FightEventEnum.FIGHTER_REFLECTED_DAMAGES,
             [self._fighterId],
             self._fighterId,

@@ -1,3 +1,4 @@
+from com.ankamagames.jerakine.metaclasses.Singleton import Singleton
 from whistle import Event
 from com.ankamagames.dofus.datacenter.effects.EffectInstance import EffectInstance
 from com.ankamagames.dofus.datacenter.effects.instances.EffectInstanceDice import (
@@ -31,7 +32,7 @@ from com.ankamagames.jerakine.utils.display.EnterFrameDispatcher import (
 logger = Logger(__name__)
 
 
-class FightEventsHelper:
+class FightEventsHelper(metaclass=Singleton):
 
     _fightEvents: list[FightEvent] = list[FightEvent]()
 
@@ -59,9 +60,8 @@ class FightEventsHelper:
         self._joinedEvents = list[FightEvent]()
         self._lastSpellId = -1
 
-    @classmethod
     def sendFightEvent(
-        cls,
+        self,
         name: str,
         params: list,
         fighterId: float,
@@ -77,7 +77,7 @@ class FightEventsHelper:
             fighterId,
             checkParams,
             pCastingSpellId,
-            len(cls._fightEvents),
+            len(self._fightEvents),
             pFirstParamToCheck,
             buff,
         )
@@ -85,33 +85,34 @@ class FightEventsHelper:
             pass
         else:
             if name:
-                cls._fightEvents[0] = fightEvent
-            if cls._joinedEvents and len(cls._joinedEvents) > 0:
-                if cls._joinedEvents[0].name == FightEventEnum.FIGHTER_GOT_TACKLED:
+                self._fightEvents.insert(0, fightEvent)
+            if self._joinedEvents and len(self._joinedEvents) > 0:
+                if self._joinedEvents[0].name == FightEventEnum.FIGHTER_GOT_TACKLED:
                     if (
                         name == FightEventEnum.FIGHTER_MP_LOST
                         or name == FightEventEnum.FIGHTER_AP_LOST
                     ):
-                        cls._joinedEvents[0] = fightEvent
+                        self._joinedEvents[0] = fightEvent
                         return
                     if name != FightEventEnum.FIGHTER_VISIBILITY_CHANGED:
-                        feTackle = cls._joinedEvents.pop(0)
-                        for fe in cls._joinedEvents:
+                        feTackle = self._joinedEvents.pop(0)
+                        for fe in self._joinedEvents:
                             if fe.name == FightEventEnum.FIGHTER_AP_LOST:
                                 feTackle.params[1] = fe.params[1]
                             else:
                                 feTackle.params[2] = fe.params[1]
-                        cls.addFightText(feTackle)
-                        cls._joinedEvents = None
+                        self.addFightText(feTackle)
+                        self._joinedEvents = None
             elif name == FightEventEnum.FIGHTER_GOT_TACKLED:
-                cls._joinedEvents = list[FightEvent]()
-                cls._joinedEvents.append(fightEvent)
+                self._joinedEvents = list[FightEvent]()
+                self._joinedEvents.append(fightEvent)
                 return
             if name:
-                cls.addFightText(fightEvent)
+                self.addFightText(fightEvent)
 
     def addFightText(self, fightEvent: FightEvent) -> None:
         num: int = len(self._events)
+        targetEvent = None
         groupByType = fightEvent.name not in self.NOT_GROUPABLE_BY_TYPE_EVENTS
         if GameDebugManager().detailedFightLog_unGroupEffects:
             groupByType = False
@@ -179,6 +180,7 @@ class FightEventsHelper:
         deadTargets: dict = deadTargetsDescr["deadTargets"]
         lastDamageMap: dict = deadTargetsDescr["lastDamageMap"]
         eventsGroupedByTarget: dict = dict()
+        groupedByElementsEventList = None
         while self._events:
             eventList = self._events[0]
             if eventList == None or len(eventList) == 0:
@@ -187,7 +189,7 @@ class FightEventsHelper:
                 eventBase = eventList[0]
                 targetsId = self.extractTargetsId(eventList)
                 eventsGroupedByTarget = self.groupFightEventsByTarget(eventList)
-                eventsGroupedTargets = list[str](0)
+                eventsGroupedTargets = list[str]()
                 for targetEvents in eventsGroupedByTarget:
                     if len(eventsGroupedByTarget[targetEvents]):
                         eventsGroupedTargets.insert(0, targetEvents)
@@ -197,7 +199,7 @@ class FightEventsHelper:
                 for i in range(numTargets):
                     targetEvents = eventsGroupedTargets[i]
                     eventBase = eventsGroupedByTarget[targetEvents][0]
-                    if eventsGroupedByTarget[targetEvents].length > 1 and (
+                    if len(eventsGroupedByTarget[targetEvents]) > 1 and (
                         eventBase.name == FightEventEnum.FIGHTER_LIFE_LOSS
                         or eventBase.name == FightEventEnum.FIGHTER_LIFE_GAIN
                         or eventBase.name == FightEventEnum.FIGHTER_SHIELD_LOSS
@@ -273,7 +275,7 @@ class FightEventsHelper:
         event: FightEvent = None
         dico: dict = dict[str, list]()
         for event in eventList:
-            if dico[str(event.targetId)] == None:
+            if dico.get(str(event.targetId)) is None:
                 dico[str(event.targetId)] = list()
             dico[str(event.targetId)].append(event)
         return dico
@@ -286,12 +288,12 @@ class FightEventsHelper:
             for fightEvent in eventList:
                 if (
                     fightEvent.name == FightEventEnum.FIGHTER_LIFE_LOSS
-                    and not deadTargets[fightEvent.targetId]
+                    and not deadTargets.get(fightEvent.targetId)
                 ):
                     lastDamageMap[fightEvent.targetId] = fightEvent.id
                 elif fightEvent.name == FightEventEnum.FIGHTER_DEATH:
                     deadTargets[fightEvent.targetId] = True
-            return {"deadTargets": deadTargets, "lastDamageMap": lastDamageMap}
+        return {"deadTargets": deadTargets, "lastDamageMap": lastDamageMap}
 
     def groupByElements(
         self,
@@ -337,7 +339,7 @@ class FightEventsHelper:
     ) -> bool:
         if len(pEventList) == 0:
             return False
-        tmpEventList: list[FightEvent] = pEventList.extend()
+        tmpEventList: list[FightEvent] = pEventList
         while tmpEventList:
             listToConcat = self.getGroupedListEvent(tmpEventList)
             if len(listToConcat) <= 1:
@@ -493,10 +495,12 @@ class FightEventsHelper:
                 return False
         return True
 
-    def sendAllFightEvents(self) -> None:
-        for fightEvent in self._fightEvents.reverse():
-            if fightEvent:
-                pass
+    def sendAllFightEvents(self, now: bool = False) -> None:
+        if now:
+            self.sendEvents()
+            for fightEvent in reversed(self._fightEvents):
+                if fightEvent:
+                    pass
         self.clearData()
 
     def clearData(self) -> None:

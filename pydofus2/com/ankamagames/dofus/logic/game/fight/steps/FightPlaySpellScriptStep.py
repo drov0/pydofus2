@@ -5,7 +5,6 @@ from com.ankamagames.dofus.logic.game.common.misc.ISpellCastProvider import (
     ISpellCastProvider,
 )
 from com.ankamagames.dofus.logic.game.fight.steps.IFightStep import IFightStep
-from com.ankamagames.dofus.scripts.SpellScriptManager import SpellScriptManager
 from com.ankamagames.jerakine.logger.Logger import Logger
 from com.ankamagames.jerakine.sequencer.AbstractSequencable import AbstractSequencable
 from com.ankamagames.jerakine.types.Callback import Callback
@@ -57,24 +56,14 @@ class FightPlaySpellScriptStep(AbstractSequencable, IFightStep):
         if self._spellCastProvider.castingSpell.spell:
             logger.info(
                 "Executing SpellScript"
-                + self._fxScriptId
+                + str(self._fxScriptId)
                 + " for spell '"
                 + self._spellCastProvider.castingSpell.spell.name
                 + "' ("
                 + str(self._spellCastProvider.castingSpell.spell.id)
                 + ")"
             )
-        else:
-            logger.info(
-                "Executing SpellScript" + self._fxScriptId + " for unknown spell"
-            )
-        self._scriptStarted = perf_counter()
-        SpellScriptManager().runSpellScript(
-            self._fxScriptId,
-            self._spellCastProvider,
-            Callback(self.scriptEnd, True),
-            Callback(self.scriptEnd, False),
-        )
+        logger.debug("Script successfuly executed")
 
     @property
     def stepType(self) -> str:
@@ -86,14 +75,3 @@ class FightPlaySpellScriptStep(AbstractSequencable, IFightStep):
     @property
     def targets(self) -> list[float]:
         return [self._fighterId]
-
-    def scriptEnd(self, scriptSuccess: bool = False) -> None:
-        scriptTook: int = perf_counter() - self._scriptStarted
-        if not scriptSuccess:
-            logger.warn(
-                "Script failed during a fight sequence, but still took "
-                + scriptTook
-                + "ms."
-            )
-        else:
-            logger.info("Script successfuly executed in " + scriptTook + "ms.")

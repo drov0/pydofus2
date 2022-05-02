@@ -101,7 +101,7 @@ class Spell(IDataCenter):
         if not self._spellVariant:
             allSpellVariants = SpellVariant.getSpellVariants()
             for variant in allSpellVariants:
-                if variant.spellIds.find(self.id) != -1:
+                if self.id in variant.spellIds:
                     self._spellVariant = variant
                     return self._spellVariant
         return self._spellVariant
@@ -119,9 +119,9 @@ class Spell(IDataCenter):
 
         if not self._spellLevels or len(self._spellLevels) != len(self.spellLevels):
             levelCount = len(self.spellLevels)
+            self._spellLevels = [None] * levelCount
             for i in range(levelCount):
                 self._spellLevels[i] = SpellLevel.getLevelById(self.spellLevels[i])
-                i += 1
         return self._spellLevels
 
     def getScriptId(self, critical: bool = False) -> int:

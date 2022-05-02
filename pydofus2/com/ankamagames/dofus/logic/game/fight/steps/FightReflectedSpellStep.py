@@ -19,7 +19,7 @@ class FightReflectedSpellStep(AbstractSequencable, IFightStep):
         return "reflectedSpell"
 
     def start(self) -> None:
-        FightEventsHelper.sendFightEvent(
+        FightEventsHelper().sendFightEvent(
             FightEventEnum.FIGHTER_REFLECTED_SPELL,
             [self._fighterId],
             self._fighterId,

@@ -41,7 +41,7 @@ class FightCloseCombatStep(AbstractSequencable, IFightStep):
 
     def start(self) -> None:
         if self._verboseCast:
-            FightEventsHelper.sendFightEvent(
+            FightEventsHelper().sendFightEvent(
                 FightEventEnum.FIGHTER_CLOSE_COMBAT,
                 [self._fighterId, self._weaponId, self._critical],
                 self._fighterId,

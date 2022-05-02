@@ -1,5 +1,11 @@
 from com.ankamagames.dofus.enums.ActionIds import ActionIds
 from com.ankamagames.dofus.logic.game.fight.managers.BuffManager import BuffManager
+from com.ankamagames.dofus.logic.game.fight.steps.FightEnteringStateStep import (
+    FightEnteringStateStep,
+)
+from com.ankamagames.dofus.logic.game.fight.steps.FightLeavingStateStep import (
+    FightLeavingStateStep,
+)
 from com.ankamagames.dofus.logic.game.fight.steps.IFightStep import IFightStep
 from com.ankamagames.dofus.logic.game.fight.types.BasicBuff import BasicBuff
 from com.ankamagames.dofus.logic.game.fight.types.StateBuff import StateBuff
@@ -10,11 +16,11 @@ from com.ankamagames.jerakine.sequencer.ISequencableListener import ISequencable
 
 class FightDispellEffectStep(AbstractSequencable, IFightStep, ISequencableListener):
 
-    _fighterId: float
+    _fighterId: float = None
 
-    _boostUID: int
+    _boostUID: int = None
 
-    _virtualStep: IFightStep
+    _virtualStep: IFightStep = None
 
     def __init__(self, fighterId: float, boostUID: int):
         super().__init__()

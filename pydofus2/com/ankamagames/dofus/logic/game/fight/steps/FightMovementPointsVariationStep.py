@@ -60,7 +60,7 @@ class FightMovementPointsVariationStep(AbstractStatContextualStep, IFightStep):
         return self._intValue
 
     def start(self) -> None:
-        EnterFrameDispatcher().worker.addSingleTreatment(StatsManager(), self.apply, [])
+        EnterFrameDispatcher().worker.addSingleTreatment(self, self.apply, [])
 
     def apply(self) -> None:
         if self._updateCharacteristicManager:
@@ -69,7 +69,7 @@ class FightMovementPointsVariationStep(AbstractStatContextualStep, IFightStep):
             )
         if self._showChatmessage:
             if self._intValue > 0:
-                FightEventsHelper.sendFightEvent(
+                FightEventsHelper().sendFightEvent(
                     FightEventEnum.FIGHTER_MP_GAINED,
                     [self._targetId, abs(self._intValue)],
                     self._targetId,
@@ -79,7 +79,7 @@ class FightMovementPointsVariationStep(AbstractStatContextualStep, IFightStep):
                 )
             elif self._intValue < 0:
                 if self._voluntarlyUsed:
-                    FightEventsHelper.sendFightEvent(
+                    FightEventsHelper().sendFightEvent(
                         FightEventEnum.FIGHTER_MP_USED,
                         [self._targetId, abs(self._intValue)],
                         self._targetId,
@@ -88,7 +88,7 @@ class FightMovementPointsVariationStep(AbstractStatContextualStep, IFightStep):
                         2,
                     )
                 else:
-                    FightEventsHelper.sendFightEvent(
+                    FightEventsHelper().sendFightEvent(
                         FightEventEnum.FIGHTER_MP_LOST,
                         [self._targetId, abs(self._intValue)],
                         self._targetId,

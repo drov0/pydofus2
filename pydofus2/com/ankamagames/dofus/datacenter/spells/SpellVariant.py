@@ -14,7 +14,7 @@ class SpellVariant(IDataCenter):
 
     spellIds: list[int]
 
-    _spells: list
+    _spells: list = []
 
     def __init__(self):
         super().__init__()

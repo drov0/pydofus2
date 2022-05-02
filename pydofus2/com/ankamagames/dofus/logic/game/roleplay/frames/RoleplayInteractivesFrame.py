@@ -242,7 +242,7 @@ class RoleplayInteractivesFrame(Frame):
                         rwf.cellClickEnabled = False
                 self._entities[iumsg.elemId] = iumsg.entityId
                 logger.debug(
-                    f"Interactive element {iumsg.elemId} is being used by the Entity {'CurrentPlayer' if iumsg.entityId == PlayedCharacterManager().id else {iumsg.entityId}}"
+                    f"[RolePlayInteractives] Interactive element {iumsg.elemId} is being used by the Entity '{'CurrentPlayer' if iumsg.entityId == PlayedCharacterManager().id else iumsg.entityId}'"
                 )
             return False
 
@@ -294,6 +294,7 @@ class RoleplayInteractivesFrame(Frame):
         self._currentUsages = list()
         self._nextInteractiveUsed = None
         self._interactiveActionTimers = dict()
+        self._collectableIe = dict[int, CollectableElement]()
         return True
 
     def enableWorldInteraction(self, pEnable: bool) -> None:

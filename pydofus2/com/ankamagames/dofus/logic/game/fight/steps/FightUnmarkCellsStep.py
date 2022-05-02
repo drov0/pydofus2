@@ -52,7 +52,7 @@ class FightUnmarkCellsStep(AbstractSequencable, IFightStep):
             pass
         else:
             logger.warn("Unknown mark type (" + mi.markType + ").")
-        FightEventsHelper.sendFightEvent(
+        FightEventsHelper().sendFightEvent(
             evt, [mi.associatedSpell.id], 0, self.castingSpellId
         )
         MarkedCellsManager().removeMark(self._markId)

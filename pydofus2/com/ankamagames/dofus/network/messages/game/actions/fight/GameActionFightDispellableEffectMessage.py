@@ -12,6 +12,5 @@ class GameActionFightDispellableEffectMessage(AbstractGameActionMessage):
     def init(self, effect_:'AbstractFightDispellableEffect', actionId_:int, sourceId_:int):
         self.effect = effect_
         
-        super().__init__(actionId_, sourceId_)
-    
+        super().init(actionId_, sourceId_)
     

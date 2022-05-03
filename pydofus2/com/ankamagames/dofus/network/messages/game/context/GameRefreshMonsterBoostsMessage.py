@@ -17,4 +17,3 @@ class GameRefreshMonsterBoostsMessage(NetworkMessage):
         
         super().__init__()
     
-    

@@ -34,4 +34,3 @@ class TaxCollectorInformations(NetworkMessage):
         
         super().__init__()
     
-    

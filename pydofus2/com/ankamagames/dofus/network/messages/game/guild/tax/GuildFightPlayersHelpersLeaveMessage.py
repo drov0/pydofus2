@@ -12,4 +12,3 @@ class GuildFightPlayersHelpersLeaveMessage(NetworkMessage):
         
         super().__init__()
     
-    

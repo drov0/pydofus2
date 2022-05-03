@@ -8,6 +8,5 @@ class PartyNameSetErrorMessage(AbstractPartyMessage):
     def init(self, result_:int, partyId_:int):
         self.result = result_
         
-        super().__init__(partyId_)
-    
+        super().init(partyId_)
     

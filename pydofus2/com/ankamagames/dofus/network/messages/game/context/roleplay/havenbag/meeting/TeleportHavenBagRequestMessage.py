@@ -10,4 +10,3 @@ class TeleportHavenBagRequestMessage(NetworkMessage):
         
         super().__init__()
     
-    

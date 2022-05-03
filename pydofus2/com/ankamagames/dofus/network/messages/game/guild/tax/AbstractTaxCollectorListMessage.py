@@ -14,4 +14,3 @@ class AbstractTaxCollectorListMessage(NetworkMessage):
         
         super().__init__()
     
-    

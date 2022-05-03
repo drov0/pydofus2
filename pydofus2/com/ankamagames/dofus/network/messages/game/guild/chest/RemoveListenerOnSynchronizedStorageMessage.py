@@ -10,4 +10,3 @@ class RemoveListenerOnSynchronizedStorageMessage(NetworkMessage):
         
         super().__init__()
     
-    

@@ -12,4 +12,3 @@ class NumericWhoIsMessage(NetworkMessage):
         
         super().__init__()
     
-    

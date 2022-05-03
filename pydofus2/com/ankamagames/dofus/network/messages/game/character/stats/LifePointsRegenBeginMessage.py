@@ -10,4 +10,3 @@ class LifePointsRegenBeginMessage(NetworkMessage):
         
         super().__init__()
     
-    

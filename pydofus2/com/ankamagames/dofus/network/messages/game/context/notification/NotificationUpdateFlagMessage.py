@@ -10,4 +10,3 @@ class NotificationUpdateFlagMessage(NetworkMessage):
         
         super().__init__()
     
-    

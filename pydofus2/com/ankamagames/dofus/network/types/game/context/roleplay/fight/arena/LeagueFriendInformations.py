@@ -26,6 +26,5 @@ class LeagueFriendInformations(AbstractContactInformations):
         self.totalLeaguePoints = totalLeaguePoints_
         self.ladderPosition = ladderPosition_
         
-        super().__init__(accountId_, accountTag_)
-    
+        super().init(accountId_, accountTag_)
     

@@ -17,4 +17,3 @@ class GroupMonsterStaticInformations(NetworkMessage):
         
         super().__init__()
     
-    

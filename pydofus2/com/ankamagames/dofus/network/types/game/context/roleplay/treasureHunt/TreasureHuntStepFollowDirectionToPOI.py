@@ -10,6 +10,5 @@ class TreasureHuntStepFollowDirectionToPOI(TreasureHuntStep):
         self.direction = direction_
         self.poiLabelId = poiLabelId_
         
-        super().__init__()
-    
+        super().init()
     

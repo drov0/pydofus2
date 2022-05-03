@@ -14,4 +14,3 @@ class InviteInHavenBagClosedMessage(NetworkMessage):
         
         super().__init__()
     
-    

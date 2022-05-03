@@ -10,6 +10,5 @@ class PartyMemberInBreachFightMessage(AbstractPartyMemberInFightMessage):
         self.floor = floor_
         self.room = room_
         
-        super().__init__(reason_, memberId_, memberAccountId_, memberName_, fightId_, timeBeforeFightStart_, partyId_)
-    
+        super().init(reason_, memberId_, memberAccountId_, memberName_, fightId_, timeBeforeFightStart_, partyId_)
     

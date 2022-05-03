@@ -6,6 +6,5 @@ class HouseLockFromInsideRequestMessage(LockableChangeCodeMessage):
 
     def init(self, code_:str):
         
-        super().__init__(code_)
-    
+        super().init(code_)
     

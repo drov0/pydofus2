@@ -6,6 +6,5 @@ class WrapperObjectErrorMessage(SymbioticObjectErrorMessage):
 
     def init(self, errorCode_:int, reason_:int):
         
-        super().__init__(errorCode_, reason_)
-    
+        super().init(errorCode_, reason_)
     

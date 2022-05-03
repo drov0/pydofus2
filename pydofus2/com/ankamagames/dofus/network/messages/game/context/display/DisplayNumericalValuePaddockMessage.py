@@ -14,4 +14,3 @@ class DisplayNumericalValuePaddockMessage(NetworkMessage):
         
         super().__init__()
     
-    

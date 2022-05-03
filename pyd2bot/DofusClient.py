@@ -1,6 +1,7 @@
 import sys
 from time import sleep
 import com.ankamagames.dofus.kernel.Kernel as krnl
+from com.ankamagames.dofus.logic.common.frames.MiscFrame import MiscFrame
 from com.ankamagames.dofus.logic.connection.actions.LoginValidationWithTokenAction import (
     LoginValidationWithTokenAction,
 )
@@ -9,6 +10,7 @@ import com.ankamagames.dofus.kernel.net.ConnectionsHandler as connh
 from com.ankamagames.dofus.logic.game.common.frames.InventoryManagementFrame import (
     InventoryManagementFrame,
 )
+from com.ankamagames.dofus.logic.game.common.frames.JobsFrame import JobsFrame
 from com.ankamagames.dofus.logic.game.common.frames.SpellInventoryManagementFrame import (
     SpellInventoryManagementFrame,
 )
@@ -45,6 +47,8 @@ class DofusClient:
         self._worker.addFrame(self._gameApproachFrame)
         self._worker.addFrame(InventoryManagementFrame())
         self._worker.addFrame(SpellInventoryManagementFrame())
+        self._worker.addFrame(JobsFrame())
+        self._worker.addFrame(MiscFrame())
         I18nFileAccessor().init()
         DataMapProvider().init(AnimatedCharacter)
         WorldPathFinder().init()
@@ -54,9 +58,7 @@ class DofusClient:
 
     def connect(self):
         self._worker.processImmediately(
-            LoginValidationWithTokenAction.create(
-                autoSelectServer=True, serverId=self.SERVER_ID
-            )
+            LoginValidationWithTokenAction.create(autoSelectServer=True, serverId=self.SERVER_ID)
         )
 
     def join(self):

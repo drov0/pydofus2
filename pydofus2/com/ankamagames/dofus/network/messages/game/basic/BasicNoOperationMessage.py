@@ -8,4 +8,3 @@ class BasicNoOperationMessage(NetworkMessage):
         
         super().__init__()
     
-    

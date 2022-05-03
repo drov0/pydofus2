@@ -10,4 +10,3 @@ class AccessoryPreviewErrorMessage(NetworkMessage):
         
         super().__init__()
     
-    

@@ -14,6 +14,5 @@ class TaxCollectorLootInformations(TaxCollectorComplementaryInformations):
         self.pods = pods_
         self.itemsValue = itemsValue_
         
-        super().__init__()
-    
+        super().init()
     

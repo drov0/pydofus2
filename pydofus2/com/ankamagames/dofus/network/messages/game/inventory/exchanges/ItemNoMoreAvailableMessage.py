@@ -8,4 +8,3 @@ class ItemNoMoreAvailableMessage(NetworkMessage):
         
         super().__init__()
     
-    

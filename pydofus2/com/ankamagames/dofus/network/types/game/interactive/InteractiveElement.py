@@ -23,4 +23,3 @@ class InteractiveElement(NetworkMessage):
         
         super().__init__()
     
-    

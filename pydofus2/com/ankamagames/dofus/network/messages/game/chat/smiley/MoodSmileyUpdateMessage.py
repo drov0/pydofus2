@@ -14,4 +14,3 @@ class MoodSmileyUpdateMessage(NetworkMessage):
         
         super().__init__()
     
-    

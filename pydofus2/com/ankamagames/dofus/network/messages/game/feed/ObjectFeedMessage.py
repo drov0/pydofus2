@@ -16,4 +16,3 @@ class ObjectFeedMessage(NetworkMessage):
         
         super().__init__()
     
-    

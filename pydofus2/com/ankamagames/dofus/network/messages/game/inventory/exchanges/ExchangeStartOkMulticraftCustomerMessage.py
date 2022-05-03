@@ -12,4 +12,3 @@ class ExchangeStartOkMulticraftCustomerMessage(NetworkMessage):
         
         super().__init__()
     
-    

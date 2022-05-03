@@ -8,4 +8,3 @@ class AcquaintancesGetListMessage(NetworkMessage):
         
         super().__init__()
     
-    

@@ -10,4 +10,3 @@ class IdentificationFailedMessage(NetworkMessage):
         
         super().__init__()
     
-    

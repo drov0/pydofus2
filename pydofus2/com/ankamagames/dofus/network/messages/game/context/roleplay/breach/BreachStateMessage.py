@@ -21,4 +21,3 @@ class BreachStateMessage(NetworkMessage):
         
         super().__init__()
     
-    

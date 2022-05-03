@@ -14,4 +14,3 @@ class AccountHouseMessage(NetworkMessage):
         
         super().__init__()
     
-    

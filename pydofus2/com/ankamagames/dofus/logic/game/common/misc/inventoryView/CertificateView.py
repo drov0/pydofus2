@@ -27,24 +27,19 @@ class CertificateView(IInventoryView):
     def content(self) -> list[ItemWrapper]:
         return self._content
 
-    def addItem(
-        self, item: ItemWrapper, invisible: int, needUpdateView: bool = True
-    ) -> None:
+    def addItem(self, item: ItemWrapper, invisible: int, needUpdateView: bool = True) -> None:
         self._content.unshift(item)
         if needUpdateView:
             self.updateView()
 
     def removeItem(self, item: ItemWrapper, invisible: int) -> None:
-        idx: int = self.content.find(item)
-        if idx == -1:
+        if item not in self.content:
             logger.warn("L'item qui doit �tre supprim� n'est pas pr�sent dans la liste")
             return
-        self.content.splice(idx, 1)
+        self.content.remove(item)
         self.updateView()
 
-    def modifyItem(
-        self, item: ItemWrapper, oldItem: ItemWrapper, invisible: int
-    ) -> None:
+    def modifyItem(self, item: ItemWrapper, oldItem: ItemWrapper, invisible: int) -> None:
         self.updateView()
 
     def isListening(self, item: ItemWrapper) -> bool:

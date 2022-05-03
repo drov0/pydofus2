@@ -14,4 +14,3 @@ class ObjectModifiedMessage(NetworkMessage):
         
         super().__init__()
     
-    

@@ -10,4 +10,3 @@ class EmotePlayErrorMessage(NetworkMessage):
         
         super().__init__()
     
-    

@@ -10,4 +10,3 @@ class CharacterReplayRequestMessage(NetworkMessage):
         
         super().__init__()
     
-    

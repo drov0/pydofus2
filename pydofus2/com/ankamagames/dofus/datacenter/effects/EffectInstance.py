@@ -144,12 +144,8 @@ class EffectInstance(IDataCenter):
         self.parseZone()
 
     @property
-    def durationstr(self) -> str:
-        if (
-            not self._durationstr
-            or self._durationstrValue != self.duration
-            or self._delaystrValue != self.delay
-        ):
+    def durationString(self) -> str:
+        if not self._durationstr or self._durationstrValue != self.duration or self._delaystrValue != self.delay:
             self._durationstrValue = self.duration
             self._delaystrValue = self.delay
             self._durationstr = self.getTurnCountStr(False)
@@ -160,9 +156,7 @@ class EffectInstance(IDataCenter):
         if self._category == self.UNDEFINED_CATEGORY:
             if not self._effectData:
                 self._effectData = Effect.getEffectById(self.effectId)
-            self._category = (
-                int(self._effectData.category) if not not self._effectData else -1
-            )
+            self._category = int(self._effectData.category) if not not self._effectData else -1
         return self._category
 
     @property
@@ -170,9 +164,7 @@ class EffectInstance(IDataCenter):
         if self._bonusType == -2:
             if not self._effectData:
                 self._effectData = Effect.getEffectById(self.effectId)
-            self._bonusType = (
-                int(self._effectData.bonusType) if not not self._effectData else -2
-            )
+            self._bonusType = int(self._effectData.bonusType) if not not self._effectData else -2
         return self._bonusType
 
     @property
@@ -186,9 +178,7 @@ class EffectInstance(IDataCenter):
         if self._oppositeId == -1:
             if not self._effectData:
                 self._effectData = Effect.getEffectById(self.effectId)
-            self._oppositeId = (
-                int(self._effectData.oppositeId) if not not self._effectData else -1
-            )
+            self._oppositeId = int(self._effectData.oppositeId) if not not self._effectData else -1
         return self._oppositeId
 
     @property
@@ -196,11 +186,7 @@ class EffectInstance(IDataCenter):
         if self._priority == 0:
             if not self._effectData:
                 self._effectData = Effect.getEffectById(self.effectId)
-            self._priority = (
-                int(self._effectData.effectPriority)
-                if not not self._effectData
-                else int(0)
-            )
+            self._priority = int(self._effectData.effectPriority) if not not self._effectData else int(0)
         return self._priority
 
     def clone(self) -> "EffectInstance":
@@ -244,11 +230,7 @@ class EffectInstance(IDataCenter):
     @staticmethod
     def getMonsterGrade(pId: int, pGrade: int) -> str:
         m: Monster = Monster.getMonsterById(pId)
-        return (
-            str(m.getMonsterGrade(pGrade).level)
-            if not m
-            else EffectInstance.UNKNOWN_NAME
-        )
+        return str(m.getMonsterGrade(pGrade).level) if not m else EffectInstance.UNKNOWN_NAME
 
     @staticmethod
     def getSpellName(id: int) -> str:
@@ -258,27 +240,13 @@ class EffectInstance(IDataCenter):
     @staticmethod
     def getSpellLevelName(id: int) -> str:
         o: spellLevelmod.SpellLevel = spellLevelmod.SpellLevel.getLevelById(id)
-        name: str = (
-            EffectInstance.getSpellName(o.spellId)
-            if not o
-            else EffectInstance.UNKNOWN_NAME
-        )
-        return (
-            EffectInstance.getSpellName(o.spellId)
-            if not o
-            else EffectInstance.UNKNOWN_NAME
-        )
+        name: str = EffectInstance.getSpellName(o.spellId) if not o else EffectInstance.UNKNOWN_NAME
+        return EffectInstance.getSpellName(o.spellId) if not o else EffectInstance.UNKNOWN_NAME
 
     @staticmethod
     def getLegendaryPowerCategoryName(id: int) -> str:
-        powerCategory: LegendaryPowerCategory = (
-            LegendaryPowerCategory.getLegendaryPowerCategoryById(id)
-        )
-        return (
-            powerCategory.categoryName
-            if not powerCategory
-            else EffectInstance.UNKNOWN_NAME
-        )
+        powerCategory: LegendaryPowerCategory = LegendaryPowerCategory.getLegendaryPowerCategoryById(id)
+        return powerCategory.categoryName if not powerCategory else EffectInstance.UNKNOWN_NAME
 
     @staticmethod
     def getJobName(id: int) -> str:
@@ -376,5 +344,5 @@ class EffectInstance(IDataCenter):
         return None
 
     def forceDescriptionRefresh(self) -> None:
-        self._description = self.UNDEFINED_DESCRIPTION;
-        self._theoricDescription = self.UNDEFINED_DESCRIPTION;
+        self._description = self.UNDEFINED_DESCRIPTION
+        self._theoricDescription = self.UNDEFINED_DESCRIPTION

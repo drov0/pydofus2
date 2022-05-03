@@ -8,4 +8,3 @@ class ExchangeStartOkCraftMessage(NetworkMessage):
         
         super().__init__()
     
-    

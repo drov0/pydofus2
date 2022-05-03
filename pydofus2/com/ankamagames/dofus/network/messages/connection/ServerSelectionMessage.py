@@ -10,4 +10,3 @@ class ServerSelectionMessage(NetworkMessage):
         
         super().__init__()
     
-    

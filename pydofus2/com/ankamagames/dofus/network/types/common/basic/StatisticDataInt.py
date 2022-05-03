@@ -8,6 +8,5 @@ class StatisticDataInt(StatisticData):
     def init(self, value_:int):
         self.value = value_
         
-        super().__init__()
-    
+        super().init()
     

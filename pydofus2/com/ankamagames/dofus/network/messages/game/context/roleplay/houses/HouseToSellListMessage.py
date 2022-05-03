@@ -18,4 +18,3 @@ class HouseToSellListMessage(NetworkMessage):
         
         super().__init__()
     
-    

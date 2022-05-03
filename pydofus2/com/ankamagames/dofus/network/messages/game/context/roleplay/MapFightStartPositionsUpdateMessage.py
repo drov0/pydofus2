@@ -16,4 +16,3 @@ class MapFightStartPositionsUpdateMessage(NetworkMessage):
         
         super().__init__()
     
-    

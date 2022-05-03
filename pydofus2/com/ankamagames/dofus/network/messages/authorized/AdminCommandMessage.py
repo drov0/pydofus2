@@ -10,4 +10,3 @@ class AdminCommandMessage(NetworkMessage):
         
         super().__init__()
     
-    

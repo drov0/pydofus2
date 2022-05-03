@@ -145,7 +145,7 @@ class FightEntitiesFrame(AbstractEntitiesFrame, Frame):
 
     _ie: dict
 
-    _tempFighterList: list[GameContextActorInformations]
+    _tempFighterList: list[GameContextActorInformations] = []
 
     _illusionEntities: dict
 
@@ -198,14 +198,10 @@ class FightEntitiesFrame(AbstractEntitiesFrame, Frame):
         )
         index: int = 0
         if not isinstance(entity, GameFightFighterNamedInformations):
-            while index < len(listKilled) and isinstance(
-                listKilled[index], GameFightFighterNamedInformations
-            ):
+            while index < len(listKilled) and isinstance(listKilled[index], GameFightFighterNamedInformations):
                 index += 1
             if not isinstance(entity, GameFightEntityInformation):
-                while index < len(listKilled) and isinstance(
-                    listKilled[index] is GameFightEntityInformation
-                ):
+                while index < len(listKilled) and isinstance(listKilled[index] is GameFightEntityInformation):
                     index += 1
         if entity.spawnInfo.teamId == TeamEnum.TEAM_CHALLENGER:
             self.lastKilledChallengers.insert(index, entity)
@@ -213,15 +209,9 @@ class FightEntitiesFrame(AbstractEntitiesFrame, Frame):
             self.lastKilledDefenders.insert(index, entity)
 
     def removeSpecificKilledAlly(self, infos: GameFightFighterInformations) -> None:
-        if (
-            infos.spawnInfo.teamId == TeamEnum.TEAM_CHALLENGER
-            and len(self.lastKilledChallengers) > 0
-        ):
+        if infos.spawnInfo.teamId == TeamEnum.TEAM_CHALLENGER and len(self.lastKilledChallengers) > 0:
             self.lastKilledChallengers.pop(self.lastKilledChallengers.index(infos))
-        elif (
-            infos.spawnInfo.teamId == TeamEnum.TEAM_DEFENDER
-            and len(self.lastKilledDefenders) > 0
-        ):
+        elif infos.spawnInfo.teamId == TeamEnum.TEAM_DEFENDER and len(self.lastKilledDefenders) > 0:
             self.lastKilledDefenders.pop(self.lastKilledDefenders.index(infos))
 
     def removeLastKilledAlly(self, teamId: int) -> None:
@@ -230,14 +220,10 @@ class FightEntitiesFrame(AbstractEntitiesFrame, Frame):
         elif teamId == TeamEnum.TEAM_DEFENDER and len(self.lastKilledDefenders) > 0:
             self.lastKilledDefenders.pop(0)
 
-    def addOrUpdateActor(
-        self, infos: GameContextActorInformations
-    ) -> AnimatedCharacter:
+    def addOrUpdateActor(self, infos: GameContextActorInformations) -> AnimatedCharacter:
         res = super().addOrUpdateActor(infos)
         if infos.disposition.cellId != -1:
-            self.setLastKnownEntityPosition(
-                infos.contextualId, infos.disposition.cellId
-            )
+            self.setLastKnownEntityPosition(infos.contextualId, infos.disposition.cellId)
         if infos.contextualId > 0:
             pass
         if CurrentPlayedFighterManager().currentFighterId == infos.contextualId:
@@ -255,13 +241,9 @@ class FightEntitiesFrame(AbstractEntitiesFrame, Frame):
             if fullInfos != None:
                 fullInfos.disposition = gfrfmsg.informations.disposition
                 fullInfos.look = gfrfmsg.informations.look
-                self._realFightersLooks[
-                    gfrfmsg.informations.contextualId
-                ] = gfrfmsg.informations.look
+                self._realFightersLooks[gfrfmsg.informations.contextualId] = gfrfmsg.informations.look
                 if (
-                    krnl.Kernel()
-                    .getWorker()
-                    .contains(fightPreparationFrame.FightPreparationFrame)
+                    krnl.Kernel().getWorker().contains(fightPreparationFrame.FightPreparationFrame)
                     and gfrfmsg.informations.disposition.cellId == -1
                 ):
                     self.registerActor(gfrfmsg.informations)
@@ -273,9 +255,7 @@ class FightEntitiesFrame(AbstractEntitiesFrame, Frame):
 
         if isinstance(msg, GameFightShowFighterMessage):
             gfsfmsg = msg
-            self._realFightersLooks[
-                gfsfmsg.informations.contextualId
-            ] = gfsfmsg.informations.look
+            self._realFightersLooks[gfsfmsg.informations.contextualId] = gfsfmsg.informations.look
             if isinstance(msg, GameFightShowFighterRandomStaticPoseMessage):
                 self.updateFighter(gfsfmsg.informations)
                 self._illusionEntities[gfsfmsg.informations.contextualId] = True
@@ -288,22 +268,15 @@ class FightEntitiesFrame(AbstractEntitiesFrame, Frame):
                 else:
                     self.updateFighter(gfsfmsg.informations)
                 self._illusionEntities[gfsfmsg.informations.contextualId] = False
-            fightContextFrame: "FightContextFrame" = (
-                krnl.Kernel().getWorker().getFrame("FightContextFrame")
-            )
-            if fightContextFrame.fightersPositionsHistory.get(
-                gfsfmsg.informations.contextualId
-            ):
+            fightContextFrame: "FightContextFrame" = krnl.Kernel().getWorker().getFrame("FightContextFrame")
+            if fightContextFrame.fightersPositionsHistory.get(gfsfmsg.informations.contextualId):
                 pass
-            return True
+            return False
 
         if isinstance(msg, GameFightHumanReadyStateMessage):
             gfhrsmsg = msg
             fighterInfoToBeReady = self.getEntityInfos(gfhrsmsg.characterId)
-            if (
-                not fighterInfoToBeReady
-                or fighterInfoToBeReady.disposition.cellId == -1
-            ):
+            if not fighterInfoToBeReady or fighterInfoToBeReady.disposition.cellId == -1:
                 return True
             ac2 = self.addOrUpdateActor(fighterInfoToBeReady)
             if gfhrsmsg.isReady:
@@ -311,9 +284,7 @@ class FightEntitiesFrame(AbstractEntitiesFrame, Frame):
             else:
                 if gfhrsmsg.characterId == pcm.PlayedCharacterManager().id:
                     pass
-            fightPreparationFrame = (
-                krnl.Kernel().getWorker().getFrame("FightPreparationFrame")
-            )
+            fightPreparationFrame = krnl.Kernel().getWorker().getFrame("FightPreparationFrame")
             if fightPreparationFrame:
                 pass
             return True
@@ -337,8 +308,7 @@ class FightEntitiesFrame(AbstractEntitiesFrame, Frame):
                 fighterInfos = self.getEntityInfos(disposition.id)
                 if (
                     fighterInfos
-                    and fighterInfos.stats.invisibilityState
-                    != GameActionFightInvisibilityStateEnum.INVISIBLE
+                    and fighterInfos.stats.invisibilityState != GameActionFightInvisibilityStateEnum.INVISIBLE
                 ):
                     self.updateActorDisposition(disposition.id, disposition)
             return True
@@ -368,19 +338,12 @@ class FightEntitiesFrame(AbstractEntitiesFrame, Frame):
                     pass
                 pcm.PlayedCharacterManager().isInHouse = False
                 pcm.PlayedCharacterManager().isInHisHouse = False
-                pcm.PlayedCharacterManager().currentMap.setOutdoorCoords(
-                    mciwcmsg.worldX, mciwcmsg.worldY
-                )
-                self._worldPoint = WorldPointWrapper(
-                    mciwcmsg.mapId, True, mciwcmsg.worldX, mciwcmsg.worldY
-                )
+                pcm.PlayedCharacterManager().currentMap.setOutdoorCoords(mciwcmsg.worldX, mciwcmsg.worldY)
+                self._worldPoint = WorldPointWrapper(mciwcmsg.mapId, True, mciwcmsg.worldX, mciwcmsg.worldY)
 
             elif isinstance(msg, MapComplementaryInformationsDataInHouseMessage):
                 mcidihmsg = msg
-                isPlayerHouse = (
-                    PlayerManager().nickname
-                    == mcidihmsg.currentHouse.houseInfos.ownerTag.nickname
-                )
+                isPlayerHouse = PlayerManager().nickname == mcidihmsg.currentHouse.houseInfos.ownerTag.nickname
                 pcm.PlayedCharacterManager().isInHouse = True
                 if isPlayerHouse:
                     pcm.PlayedCharacterManager().isInHisHouse = True
@@ -411,9 +374,7 @@ class FightEntitiesFrame(AbstractEntitiesFrame, Frame):
                 for ent in self._entities:
                     if ent.contextualId == gafccmsg.targetId:
                         ent.disposition.carryingCharacterId = gafccmsg.sourceId
-                        self._tempFighterList.append(
-                            TmpFighterInfos(ent.contextualId, gafccmsg.sourceId)
-                        )
+                        self._tempFighterList.append(TmpFighterInfos(ent.contextualId, gafccmsg.sourceId))
             return True
 
         if isinstance(msg, GameActionFightThrowCharacterMessage):
@@ -441,11 +402,7 @@ class FightEntitiesFrame(AbstractEntitiesFrame, Frame):
             if ent.contextualId == targetId:
                 ent.disposition.carryingCharacterId = None
                 index = self.getTmpFighterInfoIndex(ent.contextualId)
-                if (
-                    self._tempFighterList != None
-                    and len(self._tempFighterList) != 0
-                    and index != -1
-                ):
+                if self._tempFighterList != None and len(self._tempFighterList) != 0 and index != -1:
                     self._tempFighterList.splice(index, 1)
                 return
 
@@ -469,15 +426,9 @@ class FightEntitiesFrame(AbstractEntitiesFrame, Frame):
         self._lastKnownPosition[id] = value
 
     def getLastKnownEntityMovementPoint(self, id: float) -> int:
-        return (
-            int(self._lastKnownMovementPoint[id])
-            if id in self._lastKnownMovementPoint
-            else 0
-        )
+        return int(self._lastKnownMovementPoint[id]) if id in self._lastKnownMovementPoint else 0
 
-    def setLastKnownEntityMovementPoint(
-        self, id: float, value: int, add: bool = False
-    ) -> None:
+    def setLastKnownEntityMovementPoint(self, id: float, value: int, add: bool = False) -> None:
         if id not in self._lastKnownMovementPoint:
             self._lastKnownMovementPoint[id] = 0
         if not add:
@@ -493,11 +444,7 @@ class FightEntitiesFrame(AbstractEntitiesFrame, Frame):
 
     def registerInteractive(self, ie: InteractiveElement, firstSkill: int) -> None:
         if not MapDisplayManager().isIdentifiedElement(ie.elementId):
-            logger.error(
-                "Unknown identified element "
-                + str(ie.elementId)
-                + ", unable to register it as interactive."
-            )
+            logger.error("Unknown identified element " + str(ie.elementId) + ", unable to register it as interactive.")
             return
         found: bool = False
         for s, cie in enumerate(self.interactiveElements):
@@ -506,9 +453,7 @@ class FightEntitiesFrame(AbstractEntitiesFrame, Frame):
                 self.interactiveElements[int(s)] = ie
         if not found:
             self.interactiveElements.append(ie)
-        worldPos: MapPoint = MapDisplayManager().getIdentifiedElementPosition(
-            ie.elementId
-        )
+        worldPos: MapPoint = MapDisplayManager().getIdentifiedElementPosition(ie.elementId)
         self._ie[ie.elementId] = {
             "element": ie,
             "position": worldPos,
@@ -542,10 +487,7 @@ class FightEntitiesFrame(AbstractEntitiesFrame, Frame):
         for id in entitiesIds:
             entityInfo = self.getEntityInfos(id)
             if entityInfo:
-                if (
-                    isinstance(entityInfo, GameFightFighterNamedInformations)
-                    and entityInfo.hiddenInPrefight
-                ):
+                if isinstance(entityInfo, GameFightFighterNamedInformations) and entityInfo.hiddenInPrefight:
                     hiddenGuys.append(id)
                 else:
                     stats = StatsManager().getStats(entityInfo.contextualId)
@@ -574,18 +516,10 @@ class FightEntitiesFrame(AbstractEntitiesFrame, Frame):
                                 }
                             )
                             goodInit += initiative * lifePoints / maxLifePoints
-        badGuys.sort(
-            key=lambda e: (e["init"], e["monsterId"], e["fighterId"]), reverse=True
-        )
-        goodGuys.sort(
-            key=lambda e: (e["init"], e["monsterId"], e["fighterId"]), reverse=True
-        )
+        badGuys.sort(key=lambda e: (e["init"], e["monsterId"], e["fighterId"]), reverse=True)
+        goodGuys.sort(key=lambda e: (e["init"], e["monsterId"], e["fighterId"]), reverse=True)
         badStart = True
-        if (
-            len(badGuys) == 0
-            or len(goodGuys) == 0
-            or badInit / len(badGuys) < goodInit / len(goodGuys)
-        ):
+        if len(badGuys) == 0 or len(goodGuys) == 0 or badInit / len(badGuys) < goodInit / len(goodGuys):
             badStart = False
         length: int = max(len(badGuys), len(goodGuys))
         for i in range(length):
@@ -607,9 +541,7 @@ class FightEntitiesFrame(AbstractEntitiesFrame, Frame):
         lastInvisibilityStat: int = 0
         fighterId: float = fighterInfos.contextualId
         if fighterInfos.spawnInfo.alive:
-            lastFighterInfo: GameFightFighterInformations = self._entities.get(
-                fighterId
-            )
+            lastFighterInfo: GameFightFighterInformations = self._entities.get(fighterId)
             if lastFighterInfo:
                 lastInvisibilityStat = lastFighterInfo.stats.invisibilityState
             ac = self.addOrUpdateActor(fighterInfos)
@@ -619,14 +551,10 @@ class FightEntitiesFrame(AbstractEntitiesFrame, Frame):
             ):
                 self.registerActor(fighterInfos)
                 return
-            if (
-                lastFighterInfo != fighterInfos
-                and fighterId == CurrentPlayedFighterManager().currentFighterId
-            ):
+            if lastFighterInfo != fighterInfos and fighterId == CurrentPlayedFighterManager().currentFighterId:
                 pass
             if (
-                fighterInfos.stats.invisibilityState
-                != GameActionFightInvisibilityStateEnum.VISIBLE
+                fighterInfos.stats.invisibilityState != GameActionFightInvisibilityStateEnum.VISIBLE
                 and fighterInfos.stats.invisibilityState != lastInvisibilityStat
             ):
                 pass
@@ -638,14 +566,9 @@ class FightEntitiesFrame(AbstractEntitiesFrame, Frame):
         if not self.hasEntity(entityId):
             return False
         entityInfo: GameContextActorInformations = self.getEntityInfos(entityId)
-        return (
-            isinstance(entityInfo, GameFightFighterInformations)
-            and entityInfo.spawnInfo.alive
-        )
+        return isinstance(entityInfo, GameFightFighterInformations) and entityInfo.spawnInfo.alive
 
-    def updateActor(
-        self, actorInfos: GameContextActorInformations, alive: bool = True
-    ) -> None:
+    def updateActor(self, actorInfos: GameContextActorInformations, alive: bool = True) -> None:
         if alive:
             self.addOrUpdateActor(actorInfos)
         else:
@@ -653,7 +576,7 @@ class FightEntitiesFrame(AbstractEntitiesFrame, Frame):
 
     def updateCarriedEntities(self, fighterInfos: GameContextActorInformations) -> None:
         fighterId: float = fighterInfos.contextualId
-        num: int = len(self._tempFighterList)
+        num: int = 0 if self._tempFighterList is None else len(self._tempFighterList)
         i: int = 0
         while i < num:
             infos = self._tempFighterList[i]
@@ -666,11 +589,7 @@ class FightEntitiesFrame(AbstractEntitiesFrame, Frame):
             if fedi.carryingCharacterId:
                 carryingEntity = DofusEntities.getEntity(fedi.carryingCharacterId)
                 if not carryingEntity:
-                    self._tempFighterList.append(
-                        TmpFighterInfos(
-                            fighterInfos.contextualId, fedi.carryingCharacterId
-                        )
-                    )
+                    self._tempFighterList.append(TmpFighterInfos(fighterInfos.contextualId, fedi.carryingCharacterId))
 
     def updateRemovedEntity(self, idEntity: float) -> None:
         self._entitiesNumber[idEntity] = None
@@ -694,9 +613,7 @@ class FightEntitiesFrame(AbstractEntitiesFrame, Frame):
         return self._mountsVisible
 
     def getEntityTeamId(self, entityId: float) -> float:
-        if (entityId not in self._entities) or not isinstance(
-            self._entities[entityId], GameFightFighterInformations
-        ):
+        if (entityId not in self._entities) or not isinstance(self._entities[entityId], GameFightFighterInformations):
             return -1
         entitiesInfo: GameContextActorPositionInformations = self._entities[entityId]
         if not isinstance(entitiesInfo, GameFightFighterInformations):
@@ -712,9 +629,7 @@ class FightEntitiesFrame(AbstractEntitiesFrame, Frame):
                 entityIds.append(entityInfo.contextualId)
         return entityIds
 
-    def updateActorDisposition(
-        self, actorId: float, newDisposition: EntityDispositionInformations
-    ) -> None:
+    def updateActorDisposition(self, actorId: float, newDisposition: EntityDispositionInformations) -> None:
         super().updateActorDisposition(actorId, newDisposition)
         if newDisposition.cellId == -1:
             actor = DofusEntities.getEntity(actorId)
@@ -727,7 +642,7 @@ class FightEntitiesFrame(AbstractEntitiesFrame, Frame):
         infos: TmpFighterInfos = None
         for infos in self._tempFighterList:
             if infos.contextualId == pId:
-                return self._tempFighterList.find(infos)
+                return -1 if infos not in self._tempFighterList else self._tempFighterList.index(infos)
         return -1
 
 

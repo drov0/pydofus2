@@ -10,6 +10,5 @@ class CharacterLevelUpInformationMessage(CharacterLevelUpMessage):
         self.name = name_
         self.id = id_
         
-        super().__init__(newLevel_)
-    
+        super().init(newLevel_)
     

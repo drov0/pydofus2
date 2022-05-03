@@ -12,4 +12,3 @@ class GameRolePlayPlayerLifeStatusMessage(NetworkMessage):
         
         super().__init__()
     
-    

@@ -10,4 +10,3 @@ class MountHarnessColorsUpdateRequestMessage(NetworkMessage):
         
         super().__init__()
     
-    

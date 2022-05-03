@@ -14,4 +14,3 @@ class PrismsListMessage(NetworkMessage):
         
         super().__init__()
     
-    

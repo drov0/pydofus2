@@ -14,4 +14,3 @@ class MapRewardRateMessage(NetworkMessage):
         
         super().__init__()
     
-    

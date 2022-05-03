@@ -25,6 +25,5 @@ class PartyJoinMessage(AbstractPartyMessage):
         self.restricted = restricted_
         self.partyName = partyName_
         
-        super().__init__(partyId_)
-    
+        super().init(partyId_)
     

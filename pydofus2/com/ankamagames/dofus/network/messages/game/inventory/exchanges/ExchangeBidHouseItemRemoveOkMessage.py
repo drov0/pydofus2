@@ -10,4 +10,3 @@ class ExchangeBidHouseItemRemoveOkMessage(NetworkMessage):
         
         super().__init__()
     
-    

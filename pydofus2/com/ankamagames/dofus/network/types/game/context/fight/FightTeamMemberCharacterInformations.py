@@ -10,6 +10,5 @@ class FightTeamMemberCharacterInformations(FightTeamMemberInformations):
         self.name = name_
         self.level = level_
         
-        super().__init__(id_)
-    
+        super().init(id_)
     

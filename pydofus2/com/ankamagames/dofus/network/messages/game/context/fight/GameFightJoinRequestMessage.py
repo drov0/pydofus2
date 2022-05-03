@@ -12,4 +12,3 @@ class GameFightJoinRequestMessage(NetworkMessage):
         
         super().__init__()
     
-    

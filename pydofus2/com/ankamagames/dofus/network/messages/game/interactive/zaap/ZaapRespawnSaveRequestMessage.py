@@ -8,4 +8,3 @@ class ZaapRespawnSaveRequestMessage(NetworkMessage):
         
         super().__init__()
     
-    

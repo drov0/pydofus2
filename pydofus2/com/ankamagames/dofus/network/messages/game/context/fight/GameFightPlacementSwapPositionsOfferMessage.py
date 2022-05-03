@@ -18,4 +18,3 @@ class GameFightPlacementSwapPositionsOfferMessage(NetworkMessage):
         
         super().__init__()
     
-    

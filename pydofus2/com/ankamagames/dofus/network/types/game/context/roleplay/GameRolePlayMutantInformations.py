@@ -16,6 +16,5 @@ class GameRolePlayMutantInformations(GameRolePlayHumanoidInformations):
         self.monsterId = monsterId_
         self.powerLevel = powerLevel_
         
-        super().__init__(humanoidInfo_, accountId_, name_, look_, contextualId_, disposition_)
-    
+        super().init(humanoidInfo_, accountId_, name_, look_, contextualId_, disposition_)
     

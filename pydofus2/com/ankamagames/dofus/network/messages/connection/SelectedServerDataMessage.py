@@ -18,4 +18,3 @@ class SelectedServerDataMessage(NetworkMessage):
         
         super().__init__()
     
-    

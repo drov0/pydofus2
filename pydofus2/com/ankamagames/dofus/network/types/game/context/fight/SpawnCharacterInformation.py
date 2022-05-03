@@ -10,6 +10,5 @@ class SpawnCharacterInformation(SpawnInformation):
         self.name = name_
         self.level = level_
         
-        super().__init__()
-    
+        super().init()
     

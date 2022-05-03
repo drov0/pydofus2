@@ -14,4 +14,3 @@ class JobExperienceUpdateMessage(NetworkMessage):
         
         super().__init__()
     
-    

@@ -10,4 +10,3 @@ class ExchangeStartOkJobIndexMessage(NetworkMessage):
         
         super().__init__()
     
-    

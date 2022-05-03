@@ -16,4 +16,3 @@ class ShortcutBarAddRequestMessage(NetworkMessage):
         
         super().__init__()
     
-    

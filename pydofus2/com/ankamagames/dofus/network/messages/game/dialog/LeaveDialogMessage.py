@@ -10,4 +10,3 @@ class LeaveDialogMessage(NetworkMessage):
         
         super().__init__()
     
-    

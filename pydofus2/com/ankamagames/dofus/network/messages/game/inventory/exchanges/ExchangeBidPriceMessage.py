@@ -12,4 +12,3 @@ class ExchangeBidPriceMessage(NetworkMessage):
         
         super().__init__()
     
-    

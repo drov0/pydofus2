@@ -12,4 +12,3 @@ class PlayerNote(NetworkMessage):
         
         super().__init__()
     
-    

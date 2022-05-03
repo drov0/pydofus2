@@ -8,6 +8,5 @@ class KamaDebtInformation(DebtInformation):
     def init(self, kamas_:int, id_:int, timestamp_:int):
         self.kamas = kamas_
         
-        super().__init__(id_, timestamp_)
-    
+        super().init(id_, timestamp_)
     

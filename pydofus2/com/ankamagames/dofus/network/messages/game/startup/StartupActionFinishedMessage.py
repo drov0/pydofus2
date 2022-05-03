@@ -16,4 +16,3 @@ class StartupActionFinishedMessage(NetworkMessage):
         
         super().__init__()
     
-    

@@ -10,6 +10,5 @@ class GameActionFightSpellImmunityMessage(AbstractGameActionMessage):
         self.targetId = targetId_
         self.spellId = spellId_
         
-        super().__init__(actionId_, sourceId_)
-    
+        super().init(actionId_, sourceId_)
     

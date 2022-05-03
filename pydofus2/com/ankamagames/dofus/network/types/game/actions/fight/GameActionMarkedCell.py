@@ -16,4 +16,3 @@ class GameActionMarkedCell(NetworkMessage):
         
         super().__init__()
     
-    

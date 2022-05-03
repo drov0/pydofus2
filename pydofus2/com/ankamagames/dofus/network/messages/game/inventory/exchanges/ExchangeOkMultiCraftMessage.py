@@ -14,4 +14,3 @@ class ExchangeOkMultiCraftMessage(NetworkMessage):
         
         super().__init__()
     
-    

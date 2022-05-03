@@ -12,4 +12,3 @@ class MapCoordinates(NetworkMessage):
         
         super().__init__()
     
-    

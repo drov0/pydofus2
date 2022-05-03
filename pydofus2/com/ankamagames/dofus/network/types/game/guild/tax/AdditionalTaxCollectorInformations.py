@@ -12,4 +12,3 @@ class AdditionalTaxCollectorInformations(NetworkMessage):
         
         super().__init__()
     
-    

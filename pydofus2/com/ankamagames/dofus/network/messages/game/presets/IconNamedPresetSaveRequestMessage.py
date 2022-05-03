@@ -10,6 +10,5 @@ class IconNamedPresetSaveRequestMessage(IconPresetSaveRequestMessage):
         self.name = name_
         self.type = type_
         
-        super().__init__(presetId_, symbolId_, updateData_)
-    
+        super().init(presetId_, symbolId_, updateData_)
     

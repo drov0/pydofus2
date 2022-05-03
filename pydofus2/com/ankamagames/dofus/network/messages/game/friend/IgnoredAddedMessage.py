@@ -16,4 +16,3 @@ class IgnoredAddedMessage(NetworkMessage):
         
         super().__init__()
     
-    

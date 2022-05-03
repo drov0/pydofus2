@@ -62,7 +62,7 @@ class PlayedCharacterManager(IDestroyable, metaclass=Singleton):
         self.previousMap: "WorldPointWrapper" = None
         self.previousSubArea: "SubArea" = None
         self.previousWorldMapId: int = 0
-        self.jobs = list()
+        self.jobs = dict()
         self.isInExchange = False
         self.isInHisHouse = False
         self.isInHouse = False
@@ -215,9 +215,7 @@ class PlayedCharacterManager(IDestroyable, metaclass=Singleton):
         )
         from com.ankamagames.dofus.kernel.Kernel import Kernel
 
-        fightContextFrame: FightContextFrame = (
-            Kernel().getWorker().getFrame("FightContextFrame")
-        )
+        fightContextFrame: FightContextFrame = Kernel().getWorker().getFrame("FightContextFrame")
         return fightContextFrame and fightContextFrame.isKolossium
 
     @property
@@ -264,8 +262,7 @@ class PlayedCharacterManager(IDestroyable, metaclass=Singleton):
                 if (
                     rpBuffs[i]
                     and rpBuffs[i].typeId == DataEnum.ITEM_TYPE_MUTATIONS
-                    and rpBuffs[i].position
-                    == CharacterInventoryPositionEnum.INVENTORY_POSITION_MUTATION
+                    and rpBuffs[i].position == CharacterInventoryPositionEnum.INVENTORY_POSITION_MUTATION
                 ):
                     return True
         return False
@@ -306,9 +303,7 @@ class PlayedCharacterManager(IDestroyable, metaclass=Singleton):
             elif not self.isInHavenbag:
                 self._currentMap.setOutdoorCoords(map.outdoorX, map.outdoorY)
             else:
-                self._currentMap.setOutdoorCoords(
-                    self.previousMap.outdoorX, self.previousMap.outdoorY
-                )
+                self._currentMap.setOutdoorCoords(self.previousMap.outdoorX, self.previousMap.outdoorY)
         else:
             self._currentMap = map
 
@@ -376,14 +371,14 @@ class PlayedCharacterManager(IDestroyable, metaclass=Singleton):
     def jobsLevel(self) -> int:
         job: "KnownJobWrapper" = None
         jobsLevel: int = 0
-        for job in self.jobs:
+        for job in self.jobs.values():
             jobsLevel += job.jobLevel
         return jobsLevel
 
     def jobsfloat(self, onlyLevelOne: bool = False) -> int:
         job: "KnownJobWrapper" = None
         length: int = 0
-        for job in self.jobs:
+        for job in self.jobs.values():
             if not (job.jobLevel != 1 and onlyLevelOne):
                 length += 1
         return length
@@ -395,3 +390,11 @@ class PlayedCharacterManager(IDestroyable, metaclass=Singleton):
         if self._knownZaapMapIds == None or len(self._knownZaapMapIds) <= 0:
             return False
         return mapId in self._knownZaapMapIds
+
+    def jobsNumber(self, onlyLevelOne: bool = False) -> int:
+        job: KnownJobWrapper = None
+        length: int = 0
+        for job in self.jobs.values():
+            if not (job.jobLevel != 1 and onlyLevelOne):
+                length += 1
+        return length

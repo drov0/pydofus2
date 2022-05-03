@@ -17,6 +17,5 @@ class GuildInsiderFactSheetInformations(GuildFactSheetInformations):
         self.nbConnectedMembers = nbConnectedMembers_
         self.nbTaxCollectors = nbTaxCollectors_
         
-        super().__init__(leaderId_, nbMembers_, lastActivityDay_, recruitment_, nbPendingApply_, guildEmblem_, guildId_, guildName_, guildLevel_)
-    
+        super().init(leaderId_, nbMembers_, lastActivityDay_, recruitment_, nbPendingApply_, guildEmblem_, guildId_, guildName_, guildLevel_)
     

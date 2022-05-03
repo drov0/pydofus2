@@ -14,4 +14,3 @@ class CharacterCharacteristics(NetworkMessage):
         
         super().__init__()
     
-    

@@ -16,6 +16,5 @@ class CharacterHardcoreOrEpicInformations(CharacterBaseInformations):
         self.deathCount = deathCount_
         self.deathMaxLevel = deathMaxLevel_
         
-        super().__init__(sex_, entityLook_, breed_, level_, name_, id_)
-    
+        super().init(sex_, entityLook_, breed_, level_, name_, id_)
     

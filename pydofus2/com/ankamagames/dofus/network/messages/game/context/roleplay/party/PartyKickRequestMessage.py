@@ -8,6 +8,5 @@ class PartyKickRequestMessage(AbstractPartyMessage):
     def init(self, playerId_:int, partyId_:int):
         self.playerId = playerId_
         
-        super().__init__(partyId_)
-    
+        super().init(partyId_)
     

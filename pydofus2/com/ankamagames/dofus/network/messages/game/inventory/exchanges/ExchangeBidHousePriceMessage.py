@@ -10,4 +10,3 @@ class ExchangeBidHousePriceMessage(NetworkMessage):
         
         super().__init__()
     
-    

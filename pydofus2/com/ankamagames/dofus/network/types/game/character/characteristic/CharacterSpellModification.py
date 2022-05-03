@@ -18,4 +18,3 @@ class CharacterSpellModification(NetworkMessage):
         
         super().__init__()
     
-    

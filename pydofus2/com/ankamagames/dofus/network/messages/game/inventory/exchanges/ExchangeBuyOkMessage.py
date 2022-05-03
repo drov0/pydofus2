@@ -8,4 +8,3 @@ class ExchangeBuyOkMessage(NetworkMessage):
         
         super().__init__()
     
-    

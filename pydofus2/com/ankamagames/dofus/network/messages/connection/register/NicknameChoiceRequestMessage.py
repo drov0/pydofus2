@@ -10,4 +10,3 @@ class NicknameChoiceRequestMessage(NetworkMessage):
         
         super().__init__()
     
-    

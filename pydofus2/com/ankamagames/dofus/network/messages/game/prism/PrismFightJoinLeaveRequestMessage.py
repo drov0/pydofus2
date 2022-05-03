@@ -12,4 +12,3 @@ class PrismFightJoinLeaveRequestMessage(NetworkMessage):
         
         super().__init__()
     
-    

@@ -10,4 +10,3 @@ class OrnamentSelectedMessage(NetworkMessage):
         
         super().__init__()
     
-    

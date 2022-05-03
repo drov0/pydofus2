@@ -8,4 +8,3 @@ class FriendsGetListMessage(NetworkMessage):
         
         super().__init__()
     
-    

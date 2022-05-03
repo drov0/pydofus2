@@ -22,4 +22,3 @@ class GameFightFighterLightInformations(NetworkMessage):
         
         super().__init__()
     
-    

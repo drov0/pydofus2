@@ -10,4 +10,3 @@ class BreachTeleportResponseMessage(NetworkMessage):
         
         super().__init__()
     
-    

@@ -8,4 +8,3 @@ class NotificationResetMessage(NetworkMessage):
         
         super().__init__()
     
-    

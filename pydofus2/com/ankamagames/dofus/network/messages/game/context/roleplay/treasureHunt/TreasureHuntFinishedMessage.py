@@ -10,4 +10,3 @@ class TreasureHuntFinishedMessage(NetworkMessage):
         
         super().__init__()
     
-    

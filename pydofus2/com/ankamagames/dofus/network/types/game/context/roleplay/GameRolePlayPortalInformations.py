@@ -14,6 +14,5 @@ class GameRolePlayPortalInformations(GameRolePlayActorInformations):
     def init(self, portal_:'PortalInformation', look_:'EntityLook', contextualId_:int, disposition_:'EntityDispositionInformations'):
         self.portal = portal_
         
-        super().__init__(look_, contextualId_, disposition_)
-    
+        super().init(look_, contextualId_, disposition_)
     

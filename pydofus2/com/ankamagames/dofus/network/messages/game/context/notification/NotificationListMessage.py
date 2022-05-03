@@ -10,4 +10,3 @@ class NotificationListMessage(NetworkMessage):
         
         super().__init__()
     
-    

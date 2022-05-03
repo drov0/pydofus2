@@ -8,6 +8,5 @@ class ObjectEffectLadder(ObjectEffectCreature):
     def init(self, monsterCount_:int, monsterFamilyId_:int, actionId_:int):
         self.monsterCount = monsterCount_
         
-        super().__init__(monsterFamilyId_, actionId_)
-    
+        super().init(monsterFamilyId_, actionId_)
     

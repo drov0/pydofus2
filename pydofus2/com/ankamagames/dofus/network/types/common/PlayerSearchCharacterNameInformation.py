@@ -8,6 +8,5 @@ class PlayerSearchCharacterNameInformation(AbstractPlayerSearchInformation):
     def init(self, name_:str):
         self.name = name_
         
-        super().__init__()
-    
+        super().init()
     

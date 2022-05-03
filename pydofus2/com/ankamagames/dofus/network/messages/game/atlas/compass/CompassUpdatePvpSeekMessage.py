@@ -14,6 +14,5 @@ class CompassUpdatePvpSeekMessage(CompassUpdateMessage):
         self.memberId = memberId_
         self.memberName = memberName_
         
-        super().__init__(type_, coords_)
-    
+        super().init(type_, coords_)
     

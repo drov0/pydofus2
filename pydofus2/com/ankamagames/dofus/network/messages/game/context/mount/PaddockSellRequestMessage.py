@@ -12,4 +12,3 @@ class PaddockSellRequestMessage(NetworkMessage):
         
         super().__init__()
     
-    

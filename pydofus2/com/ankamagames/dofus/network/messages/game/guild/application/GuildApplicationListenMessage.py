@@ -10,4 +10,3 @@ class GuildApplicationListenMessage(NetworkMessage):
         
         super().__init__()
     
-    

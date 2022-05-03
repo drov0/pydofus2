@@ -12,4 +12,3 @@ class ExchangeStartOkRecycleTradeMessage(NetworkMessage):
         
         super().__init__()
     
-    

@@ -16,4 +16,3 @@ class ExchangeMountsTakenFromPaddockMessage(NetworkMessage):
         
         super().__init__()
     
-    

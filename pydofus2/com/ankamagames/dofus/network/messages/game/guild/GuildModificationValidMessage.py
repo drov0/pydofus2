@@ -16,4 +16,3 @@ class GuildModificationValidMessage(NetworkMessage):
         
         super().__init__()
     
-    

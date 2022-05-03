@@ -18,4 +18,3 @@ class JobExperience(NetworkMessage):
         
         super().__init__()
     
-    

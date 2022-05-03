@@ -14,6 +14,5 @@ class ChatServerMessage(ChatAbstractServerMessage):
         self.prefix = prefix_
         self.senderAccountId = senderAccountId_
         
-        super().__init__(channel_, content_, timestamp_, fingerprint_)
-    
+        super().init(channel_, content_, timestamp_, fingerprint_)
     

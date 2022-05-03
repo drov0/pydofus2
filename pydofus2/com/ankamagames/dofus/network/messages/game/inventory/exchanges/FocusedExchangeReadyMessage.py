@@ -8,6 +8,5 @@ class FocusedExchangeReadyMessage(ExchangeReadyMessage):
     def init(self, focusActionId_:int, ready_:bool, step_:int):
         self.focusActionId = focusActionId_
         
-        super().__init__(ready_, step_)
-    
+        super().init(ready_, step_)
     

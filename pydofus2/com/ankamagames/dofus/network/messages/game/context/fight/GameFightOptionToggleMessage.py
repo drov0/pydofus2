@@ -10,4 +10,3 @@ class GameFightOptionToggleMessage(NetworkMessage):
         
         super().__init__()
     
-    

@@ -12,6 +12,5 @@ class StatsPreset(Preset):
     def init(self, stats_:list['SimpleCharacterCharacteristicForPreset'], id_:int):
         self.stats = stats_
         
-        super().__init__(id_)
-    
+        super().init(id_)
     

@@ -19,4 +19,3 @@ class Achievement(NetworkMessage):
         
         super().__init__()
     
-    

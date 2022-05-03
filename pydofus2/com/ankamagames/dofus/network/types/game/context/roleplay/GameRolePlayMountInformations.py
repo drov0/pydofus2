@@ -15,6 +15,5 @@ class GameRolePlayMountInformations(GameRolePlayNamedActorInformations):
         self.ownerName = ownerName_
         self.level = level_
         
-        super().__init__(name_, look_, contextualId_, disposition_)
-    
+        super().init(name_, look_, contextualId_, disposition_)
     

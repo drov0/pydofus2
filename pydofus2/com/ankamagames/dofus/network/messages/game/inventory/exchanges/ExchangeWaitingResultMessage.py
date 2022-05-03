@@ -10,4 +10,3 @@ class ExchangeWaitingResultMessage(NetworkMessage):
         
         super().__init__()
     
-    

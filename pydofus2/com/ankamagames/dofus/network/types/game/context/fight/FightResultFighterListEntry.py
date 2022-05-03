@@ -14,6 +14,5 @@ class FightResultFighterListEntry(FightResultListEntry):
         self.id = id_
         self.alive = alive_
         
-        super().__init__(outcome_, wave_, rewards_)
-    
+        super().init(outcome_, wave_, rewards_)
     

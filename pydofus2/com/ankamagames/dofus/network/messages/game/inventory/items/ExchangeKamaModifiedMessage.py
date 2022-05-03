@@ -8,6 +8,5 @@ class ExchangeKamaModifiedMessage(ExchangeObjectMessage):
     def init(self, quantity_:int, remote_:bool):
         self.quantity = quantity_
         
-        super().__init__(remote_)
-    
+        super().init(remote_)
     

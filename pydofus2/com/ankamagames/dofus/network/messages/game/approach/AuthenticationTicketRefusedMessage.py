@@ -8,4 +8,3 @@ class AuthenticationTicketRefusedMessage(NetworkMessage):
         
         super().__init__()
     
-    

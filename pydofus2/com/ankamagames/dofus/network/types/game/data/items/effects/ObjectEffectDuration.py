@@ -12,6 +12,5 @@ class ObjectEffectDuration(ObjectEffect):
         self.hours = hours_
         self.minutes = minutes_
         
-        super().__init__(actionId_)
-    
+        super().init(actionId_)
     

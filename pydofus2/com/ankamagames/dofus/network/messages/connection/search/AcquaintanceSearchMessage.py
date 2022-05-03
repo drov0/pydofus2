@@ -14,4 +14,3 @@ class AcquaintanceSearchMessage(NetworkMessage):
         
         super().__init__()
     
-    

@@ -16,6 +16,5 @@ class GuildPlayerRankUpdateActivity(GuildLogbookEntryBasicInformation):
         self.playerId = playerId_
         self.playerName = playerName_
         
-        super().__init__(id_, date_)
-    
+        super().init(id_, date_)
     

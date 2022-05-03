@@ -14,6 +14,5 @@ class GameActionFightTriggerGlyphTrapMessage(AbstractGameActionMessage):
         self.triggeringCharacterId = triggeringCharacterId_
         self.triggeredSpellId = triggeredSpellId_
         
-        super().__init__(actionId_, sourceId_)
-    
+        super().init(actionId_, sourceId_)
     

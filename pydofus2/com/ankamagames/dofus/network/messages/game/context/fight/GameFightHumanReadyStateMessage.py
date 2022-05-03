@@ -12,4 +12,3 @@ class GameFightHumanReadyStateMessage(NetworkMessage):
         
         super().__init__()
     
-    

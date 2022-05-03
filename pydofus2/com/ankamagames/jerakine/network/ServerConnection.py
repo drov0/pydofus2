@@ -51,9 +51,7 @@ class ServerConnection(IServerConnection):
 
     MESSAGE_SIZE_ASYNC_THRESHOLD: int = 300 * 1024
 
-    def __init__(
-        self, host: str = None, port: int = 0, id: str = "", secure: bool = False
-    ):
+    def __init__(self, host: str = None, port: int = 0, id: str = "", secure: bool = False):
         self._latencyBuffer = []
         self._asyncMessages = list[INetworkMessage]()
         self._asyncTrees = list[FuncTree]()
@@ -92,9 +90,7 @@ class ServerConnection(IServerConnection):
             EnterFrameDispatcher().removeEventListener(self.onEnterFrame)
             self._socket.close()
         elif not self.checkClosed():
-            logger.warn(
-                f"[{self._id}] Tried to close a socket while it had already been disconnected."
-            )
+            logger.warn(f"[{self._id}] Tried to close a socket while it had already been disconnected.")
             EnterFrameDispatcher().removeEventListener(self.onEnterFrame)
 
     @property
@@ -125,7 +121,7 @@ class ServerConnection(IServerConnection):
         total: int = 0
         for latency in self._latencyBuffer:
             total += latency
-        return total / len(self._latencyBuffer)
+        return int(total / len(self._latencyBuffer))
 
     @property
     def latencySamplesCount(self) -> int:
@@ -178,9 +174,7 @@ class ServerConnection(IServerConnection):
             self._socket.connect(host, port)
         except Exception as e:
             logger.error(
-                "["
-                + str(self._id)
-                + "] Could not establish connection to the serveur!\n",
+                "[" + str(self._id) + "] Could not establish connection to the serveur!\n",
                 exc_info=True,
             )
 
@@ -197,9 +191,7 @@ class ServerConnection(IServerConnection):
 
     def send(self, msg: INetworkMessage, connectionId: str = "") -> None:
         if self.DEBUG_DATA:
-            logger.debug(
-                f"[{self._id}] [SND] > {msg.__class__.__name__ if self.DEBUG_VERBOSE else msg}"
-            )
+            logger.debug(f"[{self._id}] [SND] > {msg.__class__.__name__ if self.DEBUG_VERBOSE else msg}")
         if self.disabled or self.disabledOut:
             return
         if not self._socket.connected:
@@ -212,29 +204,13 @@ class ServerConnection(IServerConnection):
 
     def __str__(self) -> str:
         status = "Server connection status:\n"
-        status += (
-            "  Connected:       " + ("Yes" if self._socket.connected else "No") + "\n"
-        )
+        status += "  Connected:       " + ("Yes" if self._socket.connected else "No") + "\n"
         if self._socket.connected:
-            status += (
-                "  Connected to:    "
-                + self._remoteSrvHost
-                + ":"
-                + self._remoteSrvPort
-                + "\n"
-            )
+            status += "  Connected to:    " + self._remoteSrvHost + ":" + self._remoteSrvPort + "\n"
         else:
-            status += (
-                "  Connecting:      " + ("Yes" if self._connecting else "No") + "\n"
-            )
+            status += "  Connecting:      " + ("Yes" if self._connecting else "No") + "\n"
         if self._connecting:
-            status += (
-                "  Connecting to:   "
-                + self._remoteSrvHost
-                + ":"
-                + self._remoteSrvPort
-                + "\n"
-            )
+            status += "  Connecting to:   " + self._remoteSrvHost + ":" + self._remoteSrvPort + "\n"
         status += "  Raw parser:      " + self.rawParser + "\n"
         status += "  Message handler: " + self.handler + "\n"
         if self._outputBuffer:
@@ -255,12 +231,7 @@ class ServerConnection(IServerConnection):
         while len(self._pauseBuffer) and not self._pause:
             msg = self._pauseBuffer.pop(0)
             if self.DEBUG_DATA:
-                logger.debug(
-                    "["
-                    + str(self._id)
-                    + "] [RCV] (after Resume) "
-                    + msg.__class__.__name__
-                )
+                logger.debug("[" + str(self._id) + "] [RCV] (after Resume) " + msg.__class__.__name__)
             self._handler.process(msg)
         self._pauseBuffer = []
 
@@ -277,9 +248,7 @@ class ServerConnection(IServerConnection):
         priority: int = 0,
         useWeakReference: bool = False,
     ) -> None:
-        self._socket.addEventListener(
-            type, listener, useCapture, priority, useWeakReference
-        )
+        self._socket.addEventListener(type, listener, useCapture, priority, useWeakReference)
 
     def dispatchEvent(self, event: Event) -> bool:
         return self._socket.dispatchEvent(event)
@@ -287,9 +256,7 @@ class ServerConnection(IServerConnection):
     def hasEventListener(self, type: str) -> bool:
         return self._socket.hasEventListener(type)
 
-    def removeEventListener(
-        self, type: str, listener: FunctionType, useCapture: bool = False
-    ) -> None:
+    def removeEventListener(self, type: str, listener: FunctionType, useCapture: bool = False) -> None:
         self._socket.removeEventListener(type, listener, useCapture)
 
     def willTrigger(self, type: str) -> bool:
@@ -303,9 +270,7 @@ class ServerConnection(IServerConnection):
         self._socket.addEventListener(SocketEvent.CONNECT, self.onConnect, 0)
         self._socket.addEventListener(SocketEvent.CLOSE, self.onClose, float("inf"))
         self._socket.addEventListener(IOErrorEvent.IO_ERROR, self.onSocketError, 0)
-        EnterFrameDispatcher().addEventListener(
-            self.onEnterFrame, EnterFrameConst.SERVER_CONNECTION
-        )
+        EnterFrameDispatcher().addEventListener(self.onEnterFrame, EnterFrameConst.SERVER_CONNECTION)
 
     def removeListeners(self) -> None:
         self._socket.removeEventListener(ProgressEvent.SOCKET_DATA, self.onSocketData)
@@ -323,9 +288,7 @@ class ServerConnection(IServerConnection):
                             f"[{self._id}] Handling data, byte available : {input.remaining()}  trigger by a timer"
                         )
                     else:
-                        logger.info(
-                            f"[{self._id}] Handling data, byte available : {input.remaining()}"
-                        )
+                        logger.info(f"[{self._id}] Handling data, byte available : {input.remaining()}")
                 msg: NetworkMessage = self.lowReceive(input)
                 while msg is not None:
                     if self._lagometer:
@@ -337,9 +300,7 @@ class ServerConnection(IServerConnection):
                         self._asyncNetworkDataContainerMessage != None
                         and self._asyncNetworkDataContainerMessage.content.remaining()
                     ):
-                        msg = self.lowReceive(
-                            self._asyncNetworkDataContainerMessage.content
-                        )
+                        msg = self.lowReceive(self._asyncNetworkDataContainerMessage.content)
                     else:
                         if self.checkClosed() and not self._socket.connected:
                             break
@@ -347,9 +308,7 @@ class ServerConnection(IServerConnection):
                             break
                         msg = self.lowReceive(input)
         except Exception as e:
-            logger.error(
-                "[" + str(self._id) + "] Error while reading socket. \n", exc_info=True
-            )
+            logger.error("[" + str(self._id) + "] Error while reading socket. \n", exc_info=True)
             self.close()
 
     def checkClosed(self) -> bool:
@@ -394,9 +353,7 @@ class ServerConnection(IServerConnection):
             6608,
         ]:
             data = msg.pack()
-            logger.debug(
-                "[{self._id}] [SND] > {msg} ---" + str(base64.encodebytes(data)) + "---"
-            )
+            logger.debug("[{self._id}] [SND] > {msg} ---" + str(base64.encodebytes(data)) + "---")
         self._socket.send(msg.pack())
         self._latestSent = perf_counter()
         self._lastSent = perf_counter()
@@ -435,9 +392,7 @@ class ServerConnection(IServerConnection):
 
                     if self.getUnpackMode(messageId, messageLength) == UnpackMode.ASYNC:
                         self._input = src.read(messageLength)
-                        msg = self._rawParser.parseAsync(
-                            self._input, messageId, messageLength, self.computeMessage
-                        )
+                        msg = self._rawParser.parseAsync(self._input, messageId, messageLength, self.computeMessage)
                         if self.DEBUG_LOW_LEVEL_VERBOSE and msg != None:
                             logger.info(
                                 f"[{self._id}] Async {self.getType(msg)} parsing, message length : {messageLength})"
@@ -478,16 +433,11 @@ class ServerConnection(IServerConnection):
             self._staticHeader = -1
 
         if src.remaining() + len(self._inputBuffer) >= self._splittedPacketLength:
-            self._inputBuffer = self._inputBuffer + src.read(
-                self._splittedPacketLength - len(self._inputBuffer)
-            )
+            self._inputBuffer = self._inputBuffer + src.read(self._splittedPacketLength - len(self._inputBuffer))
             self._inputBuffer.position = 0
             self.updateLatency()
 
-            if (
-                self.getUnpackMode(self._splittedPacketId, self._splittedPacketLength)
-                == UnpackMode.ASYNC
-            ):
+            if self.getUnpackMode(self._splittedPacketId, self._splittedPacketLength) == UnpackMode.ASYNC:
                 msg = self._rawParser.parseAsync(
                     self._inputBuffer,
                     self._splittedPacketId,
@@ -522,9 +472,7 @@ class ServerConnection(IServerConnection):
             return result
         if messageLength > self.MESSAGE_SIZE_ASYNC_THRESHOLD:
             result = UnpackMode.ASYNC
-            logger.info(
-                f"Handling too heavy message of id {messageId} asynchronously (size : {messageLength})"
-            )
+            logger.info(f"Handling too heavy message of id {messageId} asynchronously (size : {messageLength})")
         else:
             result = UnpackMode.SYNC
         return result
@@ -535,9 +483,7 @@ class ServerConnection(IServerConnection):
             return
         self._asyncMessages.append(msg)
         self._asyncTrees.append(tree)
-        EnterFrameDispatcher().addEventListener(
-            self.onEnterFrame, EnterFrameConst.SERVER_CONNECTION
-        )
+        EnterFrameDispatcher().addEventListener(self.onEnterFrame, EnterFrameConst.SERVER_CONNECTION)
 
     def onEnterFrame(self) -> None:
         start = perf_counter()
@@ -547,9 +493,7 @@ class ServerConnection(IServerConnection):
             while True:
                 if not self._asyncTrees[0].next():
                     if self.DEBUG_LOW_LEVEL_VERBOSE:
-                        logger.info(
-                            f"[{self._id}] Async {self.getType(self._asyncMessages[0])} parsing complete"
-                        )
+                        logger.info(f"[{self._id}] Async {self.getType(self._asyncMessages[0])} parsing complete")
                     self._asyncTrees.pop(0)
                     self._asyncMessages[0].unpacked = True
                     self.process(self._asyncMessages.pop(0))
@@ -608,9 +552,7 @@ class ServerConnection(IServerConnection):
 
     def onSocketData(self, pe: ProgressEvent) -> None:
         if self.DEBUG_LOW_LEVEL_VERBOSE:
-            logger.info(
-                f"[{self._id}] Receive Event, byte available : {self._socket.buff.remaining()}"
-            )
+            logger.info(f"[{self._id}] Receive Event, byte available : {self._socket.buff.remaining()}")
         self.receive(self._socket.buff)
 
     def onSocketError(self, e: IOErrorEvent) -> None:
@@ -626,14 +568,10 @@ class ServerConnection(IServerConnection):
         self._connecting = False
         if self._firstConnectionTry:
             logger.error(
-                "["
-                + str(self._id)
-                + "] Failure while opening socket, timeout, but WWJD ? Give a second chance !"
+                "[" + str(self._id) + "] Failure while opening socket, timeout, but WWJD ? Give a second chance !"
             )
             self.connect(self._remoteSrvHost, self._remoteSrvPort)
             self._firstConnectionTry = False
         else:
-            logger.error(
-                "[" + str(self._id) + "] Failure while opening socket, timeout."
-            )
+            logger.error("[" + str(self._id) + "] Failure while opening socket, timeout.")
             self._handler.process(ServerConnectionFailedMessage(self, "timeout"))

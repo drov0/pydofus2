@@ -12,4 +12,3 @@ class PaginationRequestAbstractMessage(NetworkMessage):
         
         super().__init__()
     
-    

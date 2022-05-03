@@ -12,4 +12,3 @@ class PaddockInformations(NetworkMessage):
         
         super().__init__()
     
-    

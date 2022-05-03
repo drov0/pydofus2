@@ -8,6 +8,5 @@ class PlayerStatusExtended(PlayerStatus):
     def init(self, message_:str, statusId_:int):
         self.message = message_
         
-        super().__init__(statusId_)
-    
+        super().init(statusId_)
     

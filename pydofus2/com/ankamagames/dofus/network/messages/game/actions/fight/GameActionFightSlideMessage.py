@@ -12,6 +12,5 @@ class GameActionFightSlideMessage(AbstractGameActionMessage):
         self.startCellId = startCellId_
         self.endCellId = endCellId_
         
-        super().__init__(actionId_, sourceId_)
-    
+        super().init(actionId_, sourceId_)
     

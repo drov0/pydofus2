@@ -12,6 +12,5 @@ class ExchangeObjectsModifiedMessage(ExchangeObjectMessage):
     def init(self, object_:list['ObjectItem'], remote_:bool):
         self.object = object_
         
-        super().__init__(remote_)
-    
+        super().init(remote_)
     

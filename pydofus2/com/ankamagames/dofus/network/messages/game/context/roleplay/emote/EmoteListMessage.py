@@ -10,4 +10,3 @@ class EmoteListMessage(NetworkMessage):
         
         super().__init__()
     
-    

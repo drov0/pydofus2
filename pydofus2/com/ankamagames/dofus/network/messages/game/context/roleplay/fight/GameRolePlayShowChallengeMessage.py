@@ -14,4 +14,3 @@ class GameRolePlayShowChallengeMessage(NetworkMessage):
         
         super().__init__()
     
-    

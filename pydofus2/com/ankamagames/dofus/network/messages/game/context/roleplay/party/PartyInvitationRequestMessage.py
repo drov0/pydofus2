@@ -14,4 +14,3 @@ class PartyInvitationRequestMessage(NetworkMessage):
         
         super().__init__()
     
-    

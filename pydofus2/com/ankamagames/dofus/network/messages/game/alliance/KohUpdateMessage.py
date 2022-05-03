@@ -29,4 +29,3 @@ class KohUpdateMessage(NetworkMessage):
         
         super().__init__()
     
-    

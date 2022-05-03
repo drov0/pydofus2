@@ -14,4 +14,3 @@ class ListMapNpcsQuestStatusUpdateMessage(NetworkMessage):
         
         super().__init__()
     
-    

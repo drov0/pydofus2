@@ -10,6 +10,5 @@ class ChatServerCopyMessage(ChatAbstractServerMessage):
         self.receiverId = receiverId_
         self.receiverName = receiverName_
         
-        super().__init__(channel_, content_, timestamp_, fingerprint_)
-    
+        super().init(channel_, content_, timestamp_, fingerprint_)
     

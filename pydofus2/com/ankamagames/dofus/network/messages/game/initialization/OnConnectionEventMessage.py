@@ -10,4 +10,3 @@ class OnConnectionEventMessage(NetworkMessage):
         
         super().__init__()
     
-    

@@ -97,10 +97,7 @@ class SpellInventoryManagementFrame(Frame, metaclass=Singleton):
             spellId = spellWrapper.spell.id
             if spellId in allSpellIds:
                 customModeBreedSpell = playerApi.getCustomModeBreedSpellById(spellId)
-                if not (
-                    customModeBreedSpell == None
-                    or customModeBreedSpell.breedId is not playerBreed
-                ):
+                if not (customModeBreedSpell == None or customModeBreedSpell.breedId is not playerBreed):
                     customSpells.append([spellWrapper])
         return customSpells
 
@@ -114,9 +111,7 @@ class SpellInventoryManagementFrame(Frame, metaclass=Singleton):
     def process(self, msg: Message) -> bool:
         if isinstance(msg, SpellListMessage):
             slmsg = msg
-            alternativeBreedSpells = FeatureManager().isFeatureWithKeywordEnabled(
-                "character.spell.breed.alternative"
-            )
+            alternativeBreedSpells = FeatureManager().isFeatureWithKeywordEnabled("character.spell.breed.alternative")
             playerId = PlayedCharacterManager().id
             self._fullSpellList[playerId] = list()
             idsList = list()
@@ -160,10 +155,8 @@ class SpellInventoryManagementFrame(Frame, metaclass=Singleton):
                         idsList.append(spellInVariantData.id)
             if slmsg.spellPrevisualization:
                 if alternativeBreedSpells:
-                    customModeBreedSpells = (
-                        CustomModeBreedSpell.getCustomModeBreedSpellList(
-                            PlayedCharacterManager().infos.breed
-                        )
+                    customModeBreedSpells = CustomModeBreedSpell.getCustomModeBreedSpellList(
+                        PlayedCharacterManager().infos.breed
                     )
                     for index in range(len(customModeBreedSpells)):
                         spellId = customModeBreedSpells[index].id
@@ -203,16 +196,12 @@ class SpellInventoryManagementFrame(Frame, metaclass=Singleton):
                                             )
                                         )
                 else:
-                    playerBreed = Breed.getBreedById(
-                        PlayedCharacterManager().infos.breed
-                    )
+                    playerBreed = Breed.getBreedById(PlayedCharacterManager().infos.breed)
                     for spellVariant in playerBreed.breedSpellVariants:
                         for swBreed in spellVariant.spells:
                             if swBreed.id not in idsList:
                                 self._fullSpellList[playerId].append(
-                                    SpellWrapper.create(
-                                        swBreed.id, 0, True, PlayedCharacterManager().id
-                                    )
+                                    SpellWrapper.create(swBreed.id, 0, True, PlayedCharacterManager().id)
                                 )
             PlayedCharacterManager().spellsInventory = self._fullSpellList[playerId]
             PlayedCharacterManager().playerSpellList = self._fullSpellList[playerId]
@@ -221,40 +210,24 @@ class SpellInventoryManagementFrame(Frame, metaclass=Singleton):
         elif isinstance(msg, SlaveSwitchContextMessage):
             sscmsg = msg
             slaveId = sscmsg.slaveId
-            spellCastManager = CurrentPlayedFighterManager().getSpellCastManagerById(
-                slaveId
-            )
+            spellCastManager = CurrentPlayedFighterManager().getSpellCastManagerById(slaveId)
             spellCastManager.currentTurn = sscmsg.slaveTurn
             self._fullSpellList[slaveId] = []
             for spellInvoc in sscmsg.slaveSpells:
-                spellWrapper: SpellWrapper = SpellWrapper.getSpellWrapperById(
-                    spellInvoc.spellId, slaveId
-                )
+                spellWrapper: SpellWrapper = SpellWrapper.getSpellWrapperById(spellInvoc.spellId, slaveId)
                 if (
                     spellWrapper == None
                     or spellWrapper.spellLevel is not spellInvoc.spellLevel
                     or spellWrapper.playerId != slaveId
                 ):
-                    spellWrapper = SpellWrapper.create(
-                        spellInvoc.spellId, spellInvoc.spellLevel, True, slaveId
-                    )
+                    spellWrapper = SpellWrapper.create(spellInvoc.spellId, spellInvoc.spellLevel, True, slaveId)
                 self._fullSpellList[slaveId].append(spellWrapper)
             PlayedCharacterManager().spellsInventory = self._fullSpellList[slaveId]
-            CurrentPlayedFighterManager().setCharacteristicsInformations(
-                slaveId, sscmsg.slaveStats
-            )
+            CurrentPlayedFighterManager().setCharacteristicsInformations(slaveId, sscmsg.slaveStats)
             StatsManager().addRawStats(slaveId, sscmsg.slaveStats.characteristics)
-            SpellModifiersManager().setRawSpellsModifiers(
-                slaveId, sscmsg.slaveStats.spellModifications
-            )
-            if (
-                CurrentPlayedFighterManager()
-                .getSpellCastManagerById(slaveId)
-                .needCooldownUpdate
-            ):
-                CurrentPlayedFighterManager().getSpellCastManagerById(
-                    slaveId
-                ).updateCooldowns()
+            SpellModifiersManager().setRawSpellsModifiers(slaveId, sscmsg.slaveStats.spellModifications)
+            if CurrentPlayedFighterManager().getSpellCastManagerById(slaveId).needCooldownUpdate:
+                CurrentPlayedFighterManager().getSpellCastManagerById(slaveId).updateCooldowns()
             sgcds = self._spellsGlobalCooldowns.get(slaveId)
             if sgcds:
                 for gfsc in sgcds:
@@ -268,17 +241,11 @@ class SpellInventoryManagementFrame(Frame, metaclass=Singleton):
                                 gcdvalue = sw.spellLevelInfos.minCastInterval
                     if spellKnown:
                         if not spellCastManager.getSpellManagerBySpellId(gfsc.spellId):
-                            spellCastManager.castSpell(
-                                gfsc.spellId, spellLevel, [], False
-                            )
-                            spellManager = spellCastManager.getSpellManagerBySpellId(
-                                gfsc.spellId
-                            )
+                            spellCastManager.castSpell(gfsc.spellId, spellLevel, [], False)
+                            spellManager = spellCastManager.getSpellManagerBySpellId(gfsc.spellId)
                             spellManager.forceCooldown(gcdvalue)
                         else:
-                            spellManager = spellCastManager.getSpellManagerBySpellId(
-                                gfsc.spellId
-                            )
+                            spellManager = spellCastManager.getSpellManagerBySpellId(gfsc.spellId)
                             if spellManager.cooldown <= gcdvalue:
                                 spellManager.forceCooldown(gcdvalue)
                 sgcds.clear()
@@ -289,24 +256,16 @@ class SpellInventoryManagementFrame(Frame, metaclass=Singleton):
                 spellLevelInfo = spellWrapper.spellLevelInfos
                 if spellLevelInfo.initialCooldown > 0:
                     if spellLevelInfo.initialCooldown > spellCastManager.currentTurn:
-                        spellManager = spellCastManager.getSpellManagerBySpellId(
-                            spellWrapper.id
-                        )
+                        spellManager = spellCastManager.getSpellManagerBySpellId(spellWrapper.id)
                         if spellManager == None:
                             spellManager = spellCastManager.getSpellManagerBySpellId(
                                 spellWrapper.id, True, spellWrapper.spellLevel
                             )
-                            spellManager.resetInitialCooldown(
-                                spellCastManager.currentTurn
-                            )
+                            spellManager.resetInitialCooldown(spellCastManager.currentTurn)
             if Kernel().getWorker().contains("FightSpellCastFrame"):
-                Kernel().getWorker().removeFrame(
-                    Kernel().getWorker().getFrame("FightSpellCastFrame")
-                )
+                Kernel().getWorker().removeFrame(Kernel().getWorker().getFrame("FightSpellCastFrame"))
             imf = Kernel().getWorker().getFrame("InventoryManagementFrame")
-            InventoryManager().shortcutBarSpells = imf.getWrappersFromShortcuts(
-                sscmsg.shortcuts
-            )
+            InventoryManager().shortcutBarSpells = imf.getWrappersFromShortcuts(sscmsg.shortcuts)
             return False
 
         elif isinstance(msg, SpellVariantActivationRequestAction):
@@ -376,9 +335,7 @@ class SpellInventoryManagementFrame(Frame, metaclass=Singleton):
     def getFullSpellListByOwnerId(self, ownerId: float) -> list:
         return self._fullSpellList[ownerId]
 
-    def addSpellGlobalCoolDownInfo(
-        self, pEntityId: float, pGameFightSpellCooldown: GameFightSpellCooldown
-    ) -> None:
+    def addSpellGlobalCoolDownInfo(self, pEntityId: float, pGameFightSpellCooldown: GameFightSpellCooldown) -> None:
         if not self._spellsGlobalCooldowns[pEntityId]:
             self._spellsGlobalCooldowns[pEntityId] = list[GameFightSpellCooldown](0)
         self._spellsGlobalCooldowns[pEntityId].append(pGameFightSpellCooldown)
@@ -396,19 +353,13 @@ class SpellInventoryManagementFrame(Frame, metaclass=Singleton):
                         if gcdvalue == -1:
                             gcdvalue = sw.spellLevelInfos.minCastInterval
                 if spellKnown:
-                    spellCastManager = (
-                        CurrentPlayedFighterManager().getSpellCastManagerById(pEntityId)
-                    )
+                    spellCastManager = CurrentPlayedFighterManager().getSpellCastManagerById(pEntityId)
                     if not spellCastManager.getSpellManagerBySpellId(gfsc.spellId):
                         spellCastManager.castSpell(gfsc.spellId, spellLevel, [], False)
-                        spellManager = spellCastManager.getSpellManagerBySpellId(
-                            gfsc.spellId
-                        )
+                        spellManager = spellCastManager.getSpellManagerBySpellId(gfsc.spellId)
                         spellManager.forceCooldown(gcdvalue)
                     else:
-                        spellManager = spellCastManager.getSpellManagerBySpellId(
-                            gfsc.spellId
-                        )
+                        spellManager = spellCastManager.getSpellManagerBySpellId(gfsc.spellId)
                         if spellManager.cooldown <= gcdvalue:
                             spellManager.forceCooldown(gcdvalue)
             sgcds.clear()
@@ -434,12 +385,12 @@ class SpellInventoryManagementFrame(Frame, metaclass=Singleton):
         spellWrappersById: dict = dict(True)
         processedVariantIds: list = list()
         for spellWrapper in spellsInventory:
-            if breedSpellsId.find(spellWrapper.spell.id) != -1:
+            if spellWrapper.spell.id in breedSpellsId:
                 spellWrappersById[spellWrapper.id] = spellWrapper
                 spellVariant = spellWrapper.spell.spellVariant
                 if spellVariant:
                     firstSpellId = spellVariant.spellIds[0]
-                    if processedVariantIds.find(firstSpellId) == -1:
+                    if firstSpellId not in processedVariantIds:
                         processedVariantIds.append(firstSpellId)
                         variantIdsPacks.append(spellVariant.spellIds)
                 else:
@@ -462,9 +413,7 @@ class SpellInventoryManagementFrame(Frame, metaclass=Singleton):
         #     "character.spell.forgettable"
         # )
         if _isForgettableSpellsUi:
-            breedSpellsId = CustomModeBreedSpell.getCustomModeBreedSpellIds(
-                playerBreedId
-            )
+            breedSpellsId = CustomModeBreedSpell.getCustomModeBreedSpellIds(playerBreedId)
         else:
             breedData = Breed.getBreedById(playerBreedId)
             breedSpellsId = breedData.allSpellsId
@@ -474,13 +423,8 @@ class SpellInventoryManagementFrame(Frame, metaclass=Singleton):
         spellWrappersById: dict = dict(True)
         processedVariantIds: list = list()
         for spellWrapper in spellsInventory:
-            isForgettableSpell = (
-                _isForgettableSpellsUi
-                and SpellManager.isForgettableSpell(spellWrapper.spell.id)
-            )
-            if not (
-                breedSpellsId.find(spellWrapper.spell.id) != -1 or isForgettableSpell
-            ):
+            isForgettableSpell = _isForgettableSpellsUi and SpellManager.isForgettableSpell(spellWrapper.spell.id)
+            if not (spellWrapper.spell.id in breedSpellsId or isForgettableSpell):
                 spellWrappersById[spellWrapper.id] = spellWrapper
                 spellVariant = spellWrapper.spell.spellVariant
                 if spellVariant:

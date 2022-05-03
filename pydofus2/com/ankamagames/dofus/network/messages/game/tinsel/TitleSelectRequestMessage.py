@@ -10,4 +10,3 @@ class TitleSelectRequestMessage(NetworkMessage):
         
         super().__init__()
     
-    

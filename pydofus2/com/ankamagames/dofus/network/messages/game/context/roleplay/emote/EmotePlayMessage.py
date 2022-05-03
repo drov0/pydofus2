@@ -10,6 +10,5 @@ class EmotePlayMessage(EmotePlayAbstractMessage):
         self.actorId = actorId_
         self.accountId = accountId_
         
-        super().__init__(emoteId_, emoteStartTime_)
-    
+        super().init(emoteId_, emoteStartTime_)
     

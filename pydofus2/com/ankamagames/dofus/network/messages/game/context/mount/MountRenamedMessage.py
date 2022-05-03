@@ -12,4 +12,3 @@ class MountRenamedMessage(NetworkMessage):
         
         super().__init__()
     
-    

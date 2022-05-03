@@ -10,4 +10,3 @@ class ServerExperienceModificatorMessage(NetworkMessage):
         
         super().__init__()
     
-    

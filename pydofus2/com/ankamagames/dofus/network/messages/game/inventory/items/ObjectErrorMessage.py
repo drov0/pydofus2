@@ -10,4 +10,3 @@ class ObjectErrorMessage(NetworkMessage):
         
         super().__init__()
     
-    

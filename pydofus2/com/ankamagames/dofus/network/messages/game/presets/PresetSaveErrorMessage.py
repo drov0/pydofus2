@@ -12,4 +12,3 @@ class PresetSaveErrorMessage(NetworkMessage):
         
         super().__init__()
     
-    

@@ -14,4 +14,3 @@ class ObjectQuantityMessage(NetworkMessage):
         
         super().__init__()
     
-    

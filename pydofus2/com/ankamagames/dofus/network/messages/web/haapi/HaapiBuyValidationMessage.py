@@ -10,6 +10,5 @@ class HaapiBuyValidationMessage(HaapiValidationMessage):
         self.amount = amount_
         self.email = email_
         
-        super().__init__(action_, code_)
-    
+        super().init(action_, code_)
     

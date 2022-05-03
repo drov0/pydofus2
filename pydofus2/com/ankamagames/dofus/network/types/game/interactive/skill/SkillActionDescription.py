@@ -10,4 +10,3 @@ class SkillActionDescription(NetworkMessage):
         
         super().__init__()
     
-    

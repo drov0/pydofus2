@@ -8,4 +8,3 @@ class BreachRoomLockedMessage(NetworkMessage):
         
         super().__init__()
     
-    

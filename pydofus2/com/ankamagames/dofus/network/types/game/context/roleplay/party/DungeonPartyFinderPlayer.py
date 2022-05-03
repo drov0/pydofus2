@@ -18,4 +18,3 @@ class DungeonPartyFinderPlayer(NetworkMessage):
         
         super().__init__()
     
-    

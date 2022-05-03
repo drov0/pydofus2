@@ -12,4 +12,3 @@ class LockableShowCodeDialogMessage(NetworkMessage):
         
         super().__init__()
     
-    

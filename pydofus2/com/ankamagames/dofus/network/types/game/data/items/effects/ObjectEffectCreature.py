@@ -8,6 +8,5 @@ class ObjectEffectCreature(ObjectEffect):
     def init(self, monsterFamilyId_:int, actionId_:int):
         self.monsterFamilyId = monsterFamilyId_
         
-        super().__init__(actionId_)
-    
+        super().init(actionId_)
     

@@ -18,6 +18,5 @@ class ExtendedBreachBranch(BreachBranch):
         self.modifier = modifier_
         self.prize = prize_
         
-        super().__init__(room_, element_, bosses_, map_, score_, relativeScore_, monsters_)
-    
+        super().init(room_, element_, bosses_, map_, score_, relativeScore_, monsters_)
     

@@ -14,4 +14,3 @@ class SystemMessageDisplayMessage(NetworkMessage):
         
         super().__init__()
     
-    

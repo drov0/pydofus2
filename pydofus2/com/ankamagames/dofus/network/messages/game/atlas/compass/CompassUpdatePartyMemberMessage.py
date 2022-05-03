@@ -14,6 +14,5 @@ class CompassUpdatePartyMemberMessage(CompassUpdateMessage):
         self.memberId = memberId_
         self.active = active_
         
-        super().__init__(type_, coords_)
-    
+        super().init(type_, coords_)
     

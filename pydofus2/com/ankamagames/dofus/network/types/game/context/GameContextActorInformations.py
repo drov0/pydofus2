@@ -13,6 +13,5 @@ class GameContextActorInformations(GameContextActorPositionInformations):
     def init(self, look_:'EntityLook', contextualId_:int, disposition_:'EntityDispositionInformations'):
         self.look = look_
         
-        super().__init__(contextualId_, disposition_)
-    
+        super().init(contextualId_, disposition_)
     

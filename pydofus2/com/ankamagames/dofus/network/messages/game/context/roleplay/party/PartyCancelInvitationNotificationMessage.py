@@ -10,6 +10,5 @@ class PartyCancelInvitationNotificationMessage(AbstractPartyEventMessage):
         self.cancelerId = cancelerId_
         self.guestId = guestId_
         
-        super().__init__(partyId_)
-    
+        super().init(partyId_)
     

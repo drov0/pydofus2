@@ -20,4 +20,3 @@ class HouseToSellFilterMessage(NetworkMessage):
         
         super().__init__()
     
-    

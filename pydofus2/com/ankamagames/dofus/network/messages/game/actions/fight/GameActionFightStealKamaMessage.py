@@ -10,6 +10,5 @@ class GameActionFightStealKamaMessage(AbstractGameActionMessage):
         self.targetId = targetId_
         self.amount = amount_
         
-        super().__init__(actionId_, sourceId_)
-    
+        super().init(actionId_, sourceId_)
     

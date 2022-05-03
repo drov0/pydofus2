@@ -97,7 +97,7 @@ class BasicBuff:
             Kernel().getWorker().getFrame("FightBattleFrame")
         )
         currentPlayerId: float = fightBattleFrame.currentPlayerId
-        isPlayerId = currentPlayerId is not 0
+        isPlayerId = currentPlayerId != 0
         fighterInfo: GameFightFighterInformations = None
         if isPlayerId:
             entitiesFrame = Kernel().getWorker().getFrame("FightEntitiesFrame")
@@ -128,13 +128,13 @@ class BasicBuff:
         return "BasicBuff"
 
     @property
-    def diceNum(self) -> Any:
+    def param1(self) -> Any:
         if isinstance(self._effect, EffectInstanceDice):
             return self._effect.diceNum
         return None
 
     @property
-    def diceSide(self) -> Any:
+    def param2(self) -> Any:
         if isinstance(self._effect, EffectInstanceDice):
             return self._effect.diceSide
         return None
@@ -142,15 +142,15 @@ class BasicBuff:
     @property
     def value(self) -> Any:
         if isinstance(self._effect, EffectInstanceInteger):
-            return self._effect.value
+            return self._effect.param3
         return None
 
-    @diceNum.setter
-    def diceNum(self, v) -> None:
+    @param1.setter
+    def param1(self, v) -> None:
         self._effect.setParameter(0, None if v == 0 else v)
 
-    @diceSide.setter
-    def diceSide(self, v) -> None:
+    @param2.setter
+    def param2(self, v) -> None:
         self._effect.setParameter(1, None if v == 0 else v)
 
     @value.setter
@@ -217,7 +217,7 @@ class BasicBuff:
     def disabled(self) -> bool:
         return self._disabled
 
-    def initParam(self, diceNum: int, diceSide: int, value: int) -> None:
+    def initParam(self, param1: int, param2: int, value: int) -> None:
         sl: SpellLevel = None
         slId: int = 0
         foundEi: EffectInstanceDice = None
@@ -225,17 +225,17 @@ class BasicBuff:
         forceBuffsShowInFightLog: bool = (
             GameDebugManager().detailedFightLog_showEverything
         )
-        if diceNum and diceNum != 0 or diceSide and diceSide != 0:
-            self._rawParam1 = diceNum
-            self._rawParam2 = diceSide
+        if param1 and param1 != 0 or param2 and param2 != 0:
+            self._rawParam1 = param1
+            self._rawParam2 = param2
             self._rawParam3 = value
             self._effect = EffectInstanceDice()
             self._effect.effectUid = self.dataUid
             self._effect.effectId = self.actionId
             self._effect.duration = self.duration
-            self._effect.diceNum = diceNum
-            self._effect.diceSide = diceSide
-            self._effect.value = value
+            self._effect.diceNum = param1
+            self._effect.diceSide = param2
+            self._effect.param3 = value
             self._effect.trigger = self.trigger
         else:
             self._rawParam3 = value
@@ -244,7 +244,7 @@ class BasicBuff:
             self._effect.effectUid = self.dataUid
             self._effect.effectId = self.actionId
             self._effect.duration = self.duration
-            self._effect.value = value
+            self._effect.param3 = value
             self._effect.trigger = self.trigger
         for slId in self.castingSpell.spell.spellLevels:
             sl = SpellLevel.getLevelById(slId)
@@ -351,7 +351,7 @@ class BasicBuff:
         ):
             return False
         if self.actionId == ActionIds.ACTION_CHARACTER_PUNISHMENT:
-            if self.diceNum != other.diceNum:
+            if self.param1 != other.param1:
                 return False
         elif (
             self.actionId == ActionIds.ACTION_BOOST_SPELL_RANGE_MAX
@@ -382,7 +382,7 @@ class BasicBuff:
             or self.actionId == ActionIds.ACTION_CHARACTER_PROTECTION_FROM_SPELL
             or self.actionId == ActionIds.ACTION_CHARACTER_SET_SPELL_COOLDOWN
         ):
-            if self.diceNum != other.diceNum:
+            if self.param1 != other.param1:
                 return False
         else:
             if (
@@ -430,18 +430,22 @@ class BasicBuff:
             ActionIds.ACTION_DEBOOST_SPELL_RANGE_MAX,
             ActionIds.ACTION_DEBOOST_SPELL_RANGE_MIN,
         ]:
-            additionDetails += f"\rparam2 : {self.diceSide}  & {(str(self.diceSide) + str(buff.diceSide))}"
+            additionDetails += (
+                f"\rparam2 : {self.param2}  & {(str(self.param2) + str(buff.param2))}"
+            )
             additionDetails += (
                 f"\rparam3 : {self.value}  & {(str(self.value) + str(buff.value))}"
             )
-            self.diceNum = buff.diceNum
-            if self.diceSide:
-                self.diceSide += buff.diceSide
+            self.param1 = buff.param1
+            if self.param2:
+                self.param2 += buff.param2
             if self.value:
                 self.value += buff.value
         if self.actionId == ActionIds.ACTION_CHARACTER_PUNISHMENT:
-            additionDetails += f"\rparam1 : {self.diceNum}  &  {(str(self.diceNum) + str(buff.diceSide))}"
-            self.diceNum += buff.diceSide
+            additionDetails += (
+                f"\rparam1 : {self.param1}  &  {(str(self.param1) + str(buff.param2))}"
+            )
+            self.param1 += buff.param2
 
         if self.actionId in [
             ActionIds.ACTION_FIGHT_SET_STATE,
@@ -454,15 +458,17 @@ class BasicBuff:
 
         else:
             additionDetails += (
-                f"\rparam1 : {self.diceNum} à {str(self.diceNum) + str(buff.diceNum)}"
+                f"\rparam1 : {self.param1} à {str(self.param1) + str(buff.param1)}"
             )
-            additionDetails += f"\rparam2 : {self.diceSide} à {str(self.diceSide) + str(buff.diceSide)}"
+            additionDetails += (
+                f"\rparam2 : {self.param2} à {str(self.param2) + str(buff.param2)}"
+            )
             additionDetails += (
                 f"\rparam3 : {self.value} à {str(self.value) + str(buff.value)}"
             )
-            self.diceNum += buff.diceNum
-            if self.diceSide:
-                self.diceSide += buff.diceSide
+            self.param1 += buff.param1
+            if self.param2:
+                self.param2 += buff.param2
             if self.value:
                 self.value += buff.value
         if GameDebugManager().buffsDebugActivated:
@@ -514,18 +520,18 @@ class BasicBuff:
                     ]:
                         break
                     else:
-                        stackBuff.diceNum = value1
-                        stackBuff.diceSide = value2
+                        stackBuff.param1 = value1
+                        stackBuff.param2 = value2
                         stackBuff.value = value3
-                    p1 += stackBuff.diceNum
-                    p2 += stackBuff.diceSide
+                    p1 += stackBuff.param1
+                    p2 += stackBuff.param2
                     p3 += stackBuff.value
         else:
             p1 = value1
             p2 = value2
             p3 = value3
         if self.actionId == ActionIds.ACTION_CHARACTER_PUNISHMENT:
-            self.diceNum = p2
+            self.param1 = p2
         if self.actionId in [
             ActionIds.ACTION_FIGHT_SET_STATE,
             ActionIds.ACTION_FIGHT_UNSET_STATE,
@@ -533,17 +539,17 @@ class BasicBuff:
         ]:
             pass
         else:
-            self.diceNum = p1
-            self.diceSide = p2
+            self.param1 = p1
+            self.param2 = p2
             self.value = p3
         if GameDebugManager().buffsDebugActivated:
             logger.debug(
                 "[BUFFS DEBUG] Buff "
                 + self.id
                 + " rafraichissement des params "
-                + self.diceNum
+                + self.param1
                 + ", "
-                + self.diceSide
+                + self.param2
                 + ", "
                 + self.value
             )
@@ -600,7 +606,7 @@ class BasicBuff:
         bb.aliveSource = self.aliveSource
         bb.sourceJustReaffected = self.sourceJustReaffected
         bb.parentBoostUid = self.parentBoostUid
-        bb.initParam(self.diceNum, self.diceSide, self.value)
+        bb.initParam(self.param1, self.param2, self.value)
         return bb
 
     def __str__(self) -> str:

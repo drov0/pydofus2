@@ -38,4 +38,3 @@ class MapComplementaryInformationsDataMessage(NetworkMessage):
         
         super().__init__()
     
-    

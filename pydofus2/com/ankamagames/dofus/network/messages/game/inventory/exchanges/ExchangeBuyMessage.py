@@ -12,4 +12,3 @@ class ExchangeBuyMessage(NetworkMessage):
         
         super().__init__()
     
-    

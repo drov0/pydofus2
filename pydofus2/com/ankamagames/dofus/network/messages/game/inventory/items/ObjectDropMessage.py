@@ -12,4 +12,3 @@ class ObjectDropMessage(NetworkMessage):
         
         super().__init__()
     
-    

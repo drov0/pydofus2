@@ -10,4 +10,3 @@ class BreachRoomUnlockRequestMessage(NetworkMessage):
         
         super().__init__()
     
-    

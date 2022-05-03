@@ -8,6 +8,5 @@ class MimicryObjectErrorMessage(SymbioticObjectErrorMessage):
     def init(self, preview_:bool, errorCode_:int, reason_:int):
         self.preview = preview_
         
-        super().__init__(errorCode_, reason_)
-    
+        super().init(errorCode_, reason_)
     

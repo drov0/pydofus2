@@ -18,4 +18,3 @@ class FightDispellableEffectExtendedInformations(NetworkMessage):
         
         super().__init__()
     
-    

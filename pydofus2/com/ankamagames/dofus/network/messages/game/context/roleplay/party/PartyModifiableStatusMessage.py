@@ -8,6 +8,5 @@ class PartyModifiableStatusMessage(AbstractPartyMessage):
     def init(self, enabled_:bool, partyId_:int):
         self.enabled = enabled_
         
-        super().__init__(partyId_)
-    
+        super().init(partyId_)
     

@@ -10,4 +10,3 @@ class SubscriptionLimitationMessage(NetworkMessage):
         
         super().__init__()
     
-    

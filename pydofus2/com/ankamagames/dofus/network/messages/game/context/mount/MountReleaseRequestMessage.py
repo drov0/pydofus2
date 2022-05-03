@@ -8,4 +8,3 @@ class MountReleaseRequestMessage(NetworkMessage):
         
         super().__init__()
     
-    

@@ -34,6 +34,5 @@ class FriendOnlineInformations(FriendInformations):
         self.sex = sex_
         self.havenBagShared = havenBagShared_
         
-        super().__init__(playerState_, lastConnection_, achievementPoints_, leagueId_, ladderPosition_, accountId_, accountTag_)
-    
+        super().init(playerState_, lastConnection_, achievementPoints_, leagueId_, ladderPosition_, accountId_, accountTag_)
     

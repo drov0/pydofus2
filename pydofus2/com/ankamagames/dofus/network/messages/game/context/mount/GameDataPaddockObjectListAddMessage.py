@@ -14,4 +14,3 @@ class GameDataPaddockObjectListAddMessage(NetworkMessage):
         
         super().__init__()
     
-    

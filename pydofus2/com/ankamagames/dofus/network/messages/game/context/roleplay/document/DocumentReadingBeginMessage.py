@@ -10,4 +10,3 @@ class DocumentReadingBeginMessage(NetworkMessage):
         
         super().__init__()
     
-    

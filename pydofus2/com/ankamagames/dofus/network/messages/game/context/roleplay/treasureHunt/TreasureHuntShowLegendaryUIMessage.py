@@ -10,4 +10,3 @@ class TreasureHuntShowLegendaryUIMessage(NetworkMessage):
         
         super().__init__()
     
-    

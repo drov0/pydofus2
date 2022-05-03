@@ -8,6 +8,5 @@ class BasicNamedAllianceInformations(BasicAllianceInformations):
     def init(self, allianceName_:str, allianceId_:int, allianceTag_:str):
         self.allianceName = allianceName_
         
-        super().__init__(allianceId_, allianceTag_)
-    
+        super().init(allianceId_, allianceTag_)
     

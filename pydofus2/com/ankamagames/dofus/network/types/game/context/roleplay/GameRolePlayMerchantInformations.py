@@ -16,6 +16,5 @@ class GameRolePlayMerchantInformations(GameRolePlayNamedActorInformations):
         self.sellType = sellType_
         self.options = options_
         
-        super().__init__(name_, look_, contextualId_, disposition_)
-    
+        super().init(name_, look_, contextualId_, disposition_)
     

@@ -10,6 +10,5 @@ class ObjectItemQuantity(Item):
         self.objectUID = objectUID_
         self.quantity = quantity_
         
-        super().__init__()
-    
+        super().init()
     

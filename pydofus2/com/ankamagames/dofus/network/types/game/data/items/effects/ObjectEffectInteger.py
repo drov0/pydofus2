@@ -8,6 +8,5 @@ class ObjectEffectInteger(ObjectEffect):
     def init(self, value_:int, actionId_:int):
         self.value = value_
         
-        super().__init__(actionId_)
-    
+        super().init(actionId_)
     

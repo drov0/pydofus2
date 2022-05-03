@@ -10,4 +10,3 @@ class SpellVariantActivationRequestMessage(NetworkMessage):
         
         super().__init__()
     
-    

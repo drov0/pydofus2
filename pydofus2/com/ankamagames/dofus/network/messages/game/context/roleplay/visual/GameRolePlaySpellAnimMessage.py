@@ -18,4 +18,3 @@ class GameRolePlaySpellAnimMessage(NetworkMessage):
         
         super().__init__()
     
-    

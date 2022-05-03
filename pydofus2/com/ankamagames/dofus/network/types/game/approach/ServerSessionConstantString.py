@@ -8,6 +8,5 @@ class ServerSessionConstantString(ServerSessionConstant):
     def init(self, value_:str, id_:int):
         self.value = value_
         
-        super().__init__(id_)
-    
+        super().init(id_)
     

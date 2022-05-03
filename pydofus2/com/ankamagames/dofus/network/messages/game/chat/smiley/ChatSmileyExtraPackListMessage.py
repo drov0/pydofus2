@@ -10,4 +10,3 @@ class ChatSmileyExtraPackListMessage(NetworkMessage):
         
         super().__init__()
     
-    

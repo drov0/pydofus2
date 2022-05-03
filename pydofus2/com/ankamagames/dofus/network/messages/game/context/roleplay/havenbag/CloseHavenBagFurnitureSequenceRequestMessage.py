@@ -8,4 +8,3 @@ class CloseHavenBagFurnitureSequenceRequestMessage(NetworkMessage):
         
         super().__init__()
     
-    

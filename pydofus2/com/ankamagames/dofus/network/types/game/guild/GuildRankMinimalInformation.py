@@ -12,4 +12,3 @@ class GuildRankMinimalInformation(NetworkMessage):
         
         super().__init__()
     
-    

@@ -14,4 +14,3 @@ class MimicryObjectPreviewMessage(NetworkMessage):
         
         super().__init__()
     
-    

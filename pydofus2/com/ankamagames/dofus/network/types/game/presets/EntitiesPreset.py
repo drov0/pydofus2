@@ -10,6 +10,5 @@ class EntitiesPreset(Preset):
         self.iconId = iconId_
         self.entityIds = entityIds_
         
-        super().__init__(id_)
-    
+        super().init(id_)
     

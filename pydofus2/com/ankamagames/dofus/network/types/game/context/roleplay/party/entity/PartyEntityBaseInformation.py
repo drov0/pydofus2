@@ -18,4 +18,3 @@ class PartyEntityBaseInformation(NetworkMessage):
         
         super().__init__()
     
-    

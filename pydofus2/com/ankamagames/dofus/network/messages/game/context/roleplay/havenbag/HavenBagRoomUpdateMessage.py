@@ -16,4 +16,3 @@ class HavenBagRoomUpdateMessage(NetworkMessage):
         
         super().__init__()
     
-    

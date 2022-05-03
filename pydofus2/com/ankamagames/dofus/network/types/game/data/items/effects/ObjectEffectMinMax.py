@@ -10,6 +10,5 @@ class ObjectEffectMinMax(ObjectEffect):
         self.min = min_
         self.max = max_
         
-        super().__init__(actionId_)
-    
+        super().init(actionId_)
     

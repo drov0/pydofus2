@@ -10,4 +10,3 @@ class CheckIntegrityMessage(NetworkMessage):
         
         super().__init__()
     
-    

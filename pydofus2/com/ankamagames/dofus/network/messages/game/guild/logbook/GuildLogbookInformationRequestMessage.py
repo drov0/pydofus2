@@ -8,4 +8,3 @@ class GuildLogbookInformationRequestMessage(NetworkMessage):
         
         super().__init__()
     
-    

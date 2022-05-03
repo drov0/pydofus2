@@ -16,4 +16,3 @@ class DebtsUpdateMessage(NetworkMessage):
         
         super().__init__()
     
-    

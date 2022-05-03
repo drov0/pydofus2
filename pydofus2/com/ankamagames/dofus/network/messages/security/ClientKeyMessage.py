@@ -10,4 +10,3 @@ class ClientKeyMessage(NetworkMessage):
         
         super().__init__()
     
-    

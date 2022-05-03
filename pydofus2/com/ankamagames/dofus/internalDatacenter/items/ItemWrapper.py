@@ -156,9 +156,7 @@ class ItemWrapper(Item, ISlotData, ICellZoneProvider, IDataCenter):
         item: ItemWrapper = None
         effect: "EffectInstance" = None
         refItem: Item = Item.getItemById(objectGID)
-        cachedItem: ItemWrapper = (
-            cls._cache.get(objectUID) if objectUID > 0 else cls._cacheGId.get(objectGID)
-        )
+        cachedItem: ItemWrapper = cls._cache.get(objectUID) if objectUID > 0 else cls._cacheGId.get(objectGID)
         if not cachedItem or not useCache:
             if refItem.isWeapon:
                 from com.ankamagames.dofus.internalDatacenter.items.WeaponWrapper import (
@@ -200,9 +198,7 @@ class ItemWrapper(Item, ISlotData, ICellZoneProvider, IDataCenter):
                 item.givenExperienceAsSuperFood += effect
         return item
 
-    def createFromServer(
-        self, itemFromServer: ObjectItem, useCache: bool = True
-    ) -> "ItemWrapper":
+    def createFromServer(self, itemFromServer: ObjectItem, useCache: bool = True) -> "ItemWrapper":
         item: ItemWrapper = None
         refItem: Item = Item.getItemById(itemFromServer.objectGID)
         cachedItem: ItemWrapper = (
@@ -230,9 +226,7 @@ class ItemWrapper(Item, ISlotData, ICellZoneProvider, IDataCenter):
         self.MEMORY_LOG[item] = 1
         item._nameWithoutAccent = StringUtils.noAccent(refItem.name)
         item.effectsList = itemFromServer.effects
-        item.isPresetobject = (
-            itemFromServer.objectGID == DataEnum.ITEM_GID_PRESET_SHORTCUT
-        )
+        item.isPresetobject = itemFromServer.objectGID == DataEnum.ITEM_GID_PRESET_SHORTCUT
         if item.objectGID != itemFromServer.objectGID:
             item._uri = None
             item._uriPngMode = None
@@ -362,11 +356,7 @@ class ItemWrapper(Item, ISlotData, ICellZoneProvider, IDataCenter):
 
     @property
     def castZoneInLine(self) -> bool:
-        return (
-            bool(self["castInLine"])
-            if not self.hasOwnProperty("castInLine")
-            else bool(0)
-        )
+        return bool(self["castInLine"]) if not self.hasOwnProperty("castInLine") else bool(0)
 
     @castZoneInLine.setter
     def castZoneInLine(self, pCastInLine: bool) -> None:
@@ -374,11 +364,7 @@ class ItemWrapper(Item, ISlotData, ICellZoneProvider, IDataCenter):
 
     @property
     def castZoneInDiagonal(self) -> bool:
-        return (
-            bool(self["castInDiagonal"])
-            if not self.hasOwnProperty("castInDiagonal")
-            else bool(0)
-        )
+        return bool(self["castInDiagonal"]) if not self.hasOwnProperty("castInDiagonal") else bool(0)
 
     @castZoneInDiagonal.setter
     def castZoneInDiagonal(self, pCastInDiagonal: bool) -> None:
@@ -434,22 +420,13 @@ class ItemWrapper(Item, ISlotData, ICellZoneProvider, IDataCenter):
         if PlayedCharacterManager() and self.objectGID > 0:
             saO = PlayedCharacterManager().currentSubArea
             itbt = Item.getItemById(self.objectGID)
-            if saO and itbt.favoriteSubAreas.find(saO.id) != -1:
-                if (
-                    itbt.favoriteSubAreas
-                    and len(itbt.favoriteSubAreas)
-                    and itbt.favoriteSubAreasBonus
-                ):
+            if saO and saO.id in itbt.favoriteSubAreas:
+                if itbt.favoriteSubAreas and len(itbt.favoriteSubAreas) and itbt.favoriteSubAreasBonus:
                     for effect in self.effects:
-                        if (
-                            isinstance(effect, EffectInstanceInteger)
-                            and effect.bonusType == 1
-                        ):
+                        if isinstance(effect, EffectInstanceInteger) and effect.bonusType == 1:
                             boostedEffect = effect.clone()
-                            boostedEffect.value = math.floor(
-                                boostedEffect.value * itbt.favoriteSubAreasBonus / 100
-                            )
-                            if boostedEffect.value:
+                            boostedEffect.param3 = math.floor(boostedEffect.param3 * itbt.favoriteSubAreasBonus / 100)
+                            if boostedEffect.param3:
                                 result.append(boostedEffect)
         return result
 
@@ -462,23 +439,11 @@ class ItemWrapper(Item, ISlotData, ICellZoneProvider, IDataCenter):
         if self.shortName == super().name:
             return super().name
         if self.objectGID == DataEnum.ITEM_GID_SOULSTONE_MINIBOSS:
-            return (
-                I18n.getUiText("ui.item.miniboss")
-                + I18n.getUiText("ui.common.colon")
-                + self.shortName
-            )
+            return I18n.getUiText("ui.item.miniboss") + I18n.getUiText("ui.common.colon") + self.shortName
         elif self.objectGID == DataEnum.ITEM_GID_SOULSTONE_BOSS:
-            return (
-                I18n.getUiText("ui.item.boss")
-                + I18n.getUiText("ui.common.colon")
-                + self.shortName
-            )
+            return I18n.getUiText("ui.item.boss") + I18n.getUiText("ui.common.colon") + self.shortName
         elif self.objectGID == DataEnum.ITEM_GID_SOULSTONE:
-            return (
-                I18n.getUiText("ui.item.soul")
-                + I18n.getUiText("ui.common.colon")
-                + self.shortName
-            )
+            return I18n.getUiText("ui.item.soul") + I18n.getUiText("ui.common.colon") + self.shortName
         else:
             return super().name
 
@@ -557,10 +522,7 @@ class ItemWrapper(Item, ISlotData, ICellZoneProvider, IDataCenter):
                 pass
             elif self.objectGID == DataEnum.ITEM_GID_SOULSTONE_MINIBOSS:
                 for effect in self.effectsList:
-                    if (
-                        effect.actionId
-                        == ActionIds.ACTION_CHARACTER_SUMMON_MONSTER_GROUP
-                    ):
+                    if effect.actionId == ActionIds.ACTION_CHARACTER_SUMMON_MONSTER_GROUP:
                         monster = Monster.getMonsterById(effect.diceConst)
                         if monster:
                             self._searchContent += monster.undiatricalName
@@ -573,10 +535,7 @@ class ItemWrapper(Item, ISlotData, ICellZoneProvider, IDataCenter):
             return False
         mimicryItem: Item = Item.getItemById(self._mimicryItemSkinGID)
         for effectInstance in mimicryItem.possibleEffects:
-            if (
-                effectInstance.effectId
-                == ActionIds.ACTION_ITEM_WRAPPER_COMPATIBLE_OBJ_TYPE
-            ):
+            if effectInstance.effectId == ActionIds.ACTION_ITEM_WRAPPER_COMPATIBLE_OBJ_TYPE:
                 return True
         return False
 
@@ -647,25 +606,22 @@ class ItemWrapper(Item, ISlotData, ICellZoneProvider, IDataCenter):
             self.livingobjectFoodDate = effect.description
 
         elif effect.effectId == ActionIds.ACTION_ITEM_LIVING_ID:
-            self.livingobjectId = effect.value
+            self.livingobjectId = effect.param3
 
         elif effect.effectId == ActionIds.ACTION_ITEM_LIVING_MOOD:
-            self.livingobjectMood = effect.value
+            self.livingobjectMood = effect.param3
 
         elif effect.effectId == ActionIds.ACTION_ITEM_LIVING_SKIN:
-            self.livingobjectSkin = effect.value
+            self.livingobjectSkin = effect.param3
 
         elif effect.effectId == ActionIds.ACTION_ITEM_LIVING_CATEGORY:
-            self.livingobjectCategory = effect.value
+            self.livingobjectCategory = effect.param3
 
         elif effect.effectId == ActionIds.ACTION_ITEM_LIVING_LEVEL:
-            self.livingobjectLevel = self.getLivingobjectLevel(effect.value)
-            self.livingobjectXp = (
-                effect.value - self.LEVEL_STEP[self.livingobjectLevel - 1]
-            )
+            self.livingobjectLevel = self.getLivingobjectLevel(effect.param3)
+            self.livingobjectXp = effect.param3 - self.LEVEL_STEP[self.livingobjectLevel - 1]
             self.livingobjectMaxXp = (
-                self.LEVEL_STEP[self.livingobjectLevel]
-                - self.LEVEL_STEP[self.livingobjectLevel - 1]
+                self.LEVEL_STEP[self.livingobjectLevel] - self.LEVEL_STEP[self.livingobjectLevel - 1]
             )
 
     def updatePresets(self, effect: "EffectInstance") -> None:
@@ -702,28 +658,20 @@ class ItemWrapper(Item, ISlotData, ICellZoneProvider, IDataCenter):
             self.updatePresets(effectInstance)
             if multiUseCheck != -1 and (
                 effectInstance.effectId == ActionIds.ACTION_CHARACTER_ENERGY_POINTS_WIN
-                or effectInstance.effectId
-                == ActionIds.ACTION_CHARACTER_BOOST_LIFE_POINTS
+                or effectInstance.effectId == ActionIds.ACTION_CHARACTER_BOOST_LIFE_POINTS
                 or effectInstance.effectId == ActionIds.ACTION_CHARACTER_GAIN_XP
-                or effectInstance.effectId
-                == ActionIds.ACTION_CHARACTER_INVENTORY_GAIN_KAMAS
-                or effectInstance.effectId
-                == ActionIdProtocol.ACTION_CHARACTER_INVENTORY_ADD_ITEM_NOCHECK
+                or effectInstance.effectId == ActionIds.ACTION_CHARACTER_INVENTORY_GAIN_KAMAS
+                or effectInstance.effectId == ActionIdProtocol.ACTION_CHARACTER_INVENTORY_ADD_ITEM_NOCHECK
             ):
                 multiUseCheck = 1
             if (
                 multiUseCheck != -1
-                and effectInstance.effectId
-                != ActionIds.ACTION_CHARACTER_ENERGY_POINTS_WIN
-                and effectInstance.effectId
-                != ActionIds.ACTION_CHARACTER_BOOST_LIFE_POINTS
+                and effectInstance.effectId != ActionIds.ACTION_CHARACTER_ENERGY_POINTS_WIN
+                and effectInstance.effectId != ActionIds.ACTION_CHARACTER_BOOST_LIFE_POINTS
                 and effectInstance.effectId != ActionIds.ACTION_CHARACTER_GAIN_XP
-                and effectInstance.effectId
-                != ActionIds.ACTION_CHARACTER_INVENTORY_GAIN_KAMAS
-                and effectInstance.effectId
-                != ActionIdProtocol.ACTION_CHARACTER_INVENTORY_ADD_ITEM_NOCHECK
-                and effectInstance.effectId
-                != ActionIds.ACTION_MARK_NEVER_TRADABLE_STRONG
+                and effectInstance.effectId != ActionIds.ACTION_CHARACTER_INVENTORY_GAIN_KAMAS
+                and effectInstance.effectId != ActionIdProtocol.ACTION_CHARACTER_INVENTORY_ADD_ITEM_NOCHECK
+                and effectInstance.effectId != ActionIds.ACTION_MARK_NEVER_TRADABLE_STRONG
                 and effectInstance.effectId != ActionIds.ACTION_MARK_NEVER_TRADABLE
                 and effectInstance.effectId != ActionIds.ACTION_MARK_NOT_TRADABLE
             ):
@@ -735,10 +683,7 @@ class ItemWrapper(Item, ISlotData, ICellZoneProvider, IDataCenter):
                 or effectInstance.effectId == ActionIds.ACTION_MARK_NEVER_TRADABLE
             ):
                 exchangeable = False
-            if (
-                effectInstance.effectId
-                == ActionIds.ACTION_ITEM_WRAPPER_COMPATIBLE_OBJ_TYPE
-            ):
+            if effectInstance.effectId == ActionIds.ACTION_ITEM_WRAPPER_COMPATIBLE_OBJ_TYPE:
                 self.wrapperobjectCategory = EffectInstanceInteger(effectInstance).value
             if effectInstance.effectId == ActionIds.ACTION_EVOLUTIVE_OBJECT_EXPERIENCE:
                 self.experiencePoints = EffectInstanceDice(effectInstance).value
@@ -778,7 +723,7 @@ class ItemWrapper(Item, ISlotData, ICellZoneProvider, IDataCenter):
             if effect.effectId == ActionIds.ACTION_CAST_STARTING_SPELL:
                 categories = LegendaryPowerCategory.getLegendaryPowersCategories()
                 for cat in categories:
-                    if cat.categorySpells.find(effect) != -1:
+                    if effect in cat.categorySpells:
                         return not cat.categoryOverridable
         return False
 

@@ -8,4 +8,3 @@ class BreachExitRequestMessage(NetworkMessage):
         
         super().__init__()
     
-    

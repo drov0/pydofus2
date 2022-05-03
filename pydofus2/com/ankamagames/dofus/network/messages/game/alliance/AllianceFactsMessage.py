@@ -23,4 +23,3 @@ class AllianceFactsMessage(NetworkMessage):
         
         super().__init__()
     
-    

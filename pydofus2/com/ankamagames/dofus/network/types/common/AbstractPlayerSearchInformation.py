@@ -8,4 +8,3 @@ class AbstractPlayerSearchInformation(NetworkMessage):
         
         super().__init__()
     
-    

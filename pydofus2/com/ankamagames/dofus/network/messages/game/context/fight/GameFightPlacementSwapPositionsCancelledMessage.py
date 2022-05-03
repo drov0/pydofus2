@@ -12,4 +12,3 @@ class GameFightPlacementSwapPositionsCancelledMessage(NetworkMessage):
         
         super().__init__()
     
-    

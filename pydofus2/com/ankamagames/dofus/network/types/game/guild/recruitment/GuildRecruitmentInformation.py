@@ -40,4 +40,3 @@ class GuildRecruitmentInformation(NetworkMessage):
         
         super().__init__()
     
-    

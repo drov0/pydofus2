@@ -12,6 +12,5 @@ class PartyInvitationDungeonRequestMessage(PartyInvitationRequestMessage):
     def init(self, dungeonId_:int, target_:'AbstractPlayerSearchInformation'):
         self.dungeonId = dungeonId_
         
-        super().__init__(target_)
-    
+        super().init(target_)
     

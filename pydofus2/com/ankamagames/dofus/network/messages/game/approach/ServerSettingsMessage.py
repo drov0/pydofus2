@@ -24,4 +24,3 @@ class ServerSettingsMessage(NetworkMessage):
         
         super().__init__()
     
-    

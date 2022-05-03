@@ -10,4 +10,3 @@ class MapInformationsRequestMessage(NetworkMessage):
         
         super().__init__()
     
-    

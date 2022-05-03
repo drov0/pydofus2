@@ -14,4 +14,3 @@ class GameActionUpdateEffectTriggerCountMessage(NetworkMessage):
         
         super().__init__()
     
-    

@@ -14,4 +14,3 @@ class AccountLoggingKickedMessage(NetworkMessage):
         
         super().__init__()
     
-    

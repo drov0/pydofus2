@@ -12,6 +12,5 @@ class GameActionFightExchangePositionsMessage(AbstractGameActionMessage):
         self.casterCellId = casterCellId_
         self.targetCellId = targetCellId_
         
-        super().__init__(actionId_, sourceId_)
-    
+        super().init(actionId_, sourceId_)
     

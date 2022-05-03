@@ -6,6 +6,5 @@ class TreasureHuntStepFight(TreasureHuntStep):
 
     def init(self):
         
-        super().__init__()
-    
+        super().init()
     

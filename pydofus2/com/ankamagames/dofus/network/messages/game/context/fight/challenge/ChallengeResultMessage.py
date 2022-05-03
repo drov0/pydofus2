@@ -12,4 +12,3 @@ class ChallengeResultMessage(NetworkMessage):
         
         super().__init__()
     
-    

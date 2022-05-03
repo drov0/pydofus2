@@ -10,4 +10,3 @@ class ClientUIOpenedMessage(NetworkMessage):
         
         super().__init__()
     
-    

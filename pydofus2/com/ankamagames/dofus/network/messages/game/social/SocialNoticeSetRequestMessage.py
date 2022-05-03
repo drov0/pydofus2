@@ -8,4 +8,3 @@ class SocialNoticeSetRequestMessage(NetworkMessage):
         
         super().__init__()
     
-    

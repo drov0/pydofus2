@@ -8,4 +8,3 @@ class HaapiConsumeBufferRequestMessage(NetworkMessage):
         
         super().__init__()
     
-    

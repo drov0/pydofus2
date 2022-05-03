@@ -8,4 +8,3 @@ class GameContextCreateRequestMessage(NetworkMessage):
         
         super().__init__()
     
-    

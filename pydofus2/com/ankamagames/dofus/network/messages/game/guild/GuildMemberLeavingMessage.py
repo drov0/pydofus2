@@ -12,4 +12,3 @@ class GuildMemberLeavingMessage(NetworkMessage):
         
         super().__init__()
     
-    

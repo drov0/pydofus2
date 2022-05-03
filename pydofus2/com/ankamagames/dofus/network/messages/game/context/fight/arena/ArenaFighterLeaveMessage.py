@@ -14,4 +14,3 @@ class ArenaFighterLeaveMessage(NetworkMessage):
         
         super().__init__()
     
-    

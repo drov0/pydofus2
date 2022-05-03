@@ -12,4 +12,3 @@ class PrismSetSabotagedRefusedMessage(NetworkMessage):
         
         super().__init__()
     
-    

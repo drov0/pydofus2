@@ -14,4 +14,3 @@ class GuildPaddockBoughtMessage(NetworkMessage):
         
         super().__init__()
     
-    

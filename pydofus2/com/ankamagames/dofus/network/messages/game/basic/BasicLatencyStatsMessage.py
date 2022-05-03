@@ -14,4 +14,3 @@ class BasicLatencyStatsMessage(NetworkMessage):
         
         super().__init__()
     
-    

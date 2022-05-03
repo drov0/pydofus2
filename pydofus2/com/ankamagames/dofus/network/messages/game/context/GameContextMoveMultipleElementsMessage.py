@@ -14,4 +14,3 @@ class GameContextMoveMultipleElementsMessage(NetworkMessage):
         
         super().__init__()
     
-    

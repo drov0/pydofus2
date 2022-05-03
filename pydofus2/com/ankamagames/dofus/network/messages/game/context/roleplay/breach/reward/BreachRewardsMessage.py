@@ -14,4 +14,3 @@ class BreachRewardsMessage(NetworkMessage):
         
         super().__init__()
     
-    

@@ -14,4 +14,3 @@ class GameRolePlayShowActorMessage(NetworkMessage):
         
         super().__init__()
     
-    

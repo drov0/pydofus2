@@ -22,4 +22,3 @@ class HouseSellingUpdateMessage(NetworkMessage):
         
         super().__init__()
     
-    

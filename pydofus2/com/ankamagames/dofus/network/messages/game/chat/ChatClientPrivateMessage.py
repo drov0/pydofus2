@@ -12,6 +12,5 @@ class ChatClientPrivateMessage(ChatAbstractClientMessage):
     def init(self, receiver_:'AbstractPlayerSearchInformation', content_:str):
         self.receiver = receiver_
         
-        super().__init__(content_)
-    
+        super().init(content_)
     

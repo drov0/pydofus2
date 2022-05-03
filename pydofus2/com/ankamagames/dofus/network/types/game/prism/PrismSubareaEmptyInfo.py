@@ -12,4 +12,3 @@ class PrismSubareaEmptyInfo(NetworkMessage):
         
         super().__init__()
     
-    

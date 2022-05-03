@@ -20,6 +20,5 @@ class AllianceInsiderPrismInformation(PrismInformation):
         self.lastTimeSlotModificationAuthorName = lastTimeSlotModificationAuthorName_
         self.modulesObjects = modulesObjects_
         
-        super().__init__(typeId_, state_, nextVulnerabilityDate_, placementDate_, rewardTokenCount_)
-    
+        super().init(typeId_, state_, nextVulnerabilityDate_, placementDate_, rewardTokenCount_)
     

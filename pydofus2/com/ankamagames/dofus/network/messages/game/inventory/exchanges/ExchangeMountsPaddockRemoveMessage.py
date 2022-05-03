@@ -10,4 +10,3 @@ class ExchangeMountsPaddockRemoveMessage(NetworkMessage):
         
         super().__init__()
     
-    

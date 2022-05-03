@@ -12,4 +12,3 @@ class PresetUseResultMessage(NetworkMessage):
         
         super().__init__()
     
-    

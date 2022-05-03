@@ -16,4 +16,3 @@ class GameContextRefreshEntityLookMessage(NetworkMessage):
         
         super().__init__()
     
-    

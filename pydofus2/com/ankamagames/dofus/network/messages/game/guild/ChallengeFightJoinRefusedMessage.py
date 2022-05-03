@@ -12,4 +12,3 @@ class ChallengeFightJoinRefusedMessage(NetworkMessage):
         
         super().__init__()
     
-    

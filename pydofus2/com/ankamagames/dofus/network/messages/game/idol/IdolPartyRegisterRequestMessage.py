@@ -10,4 +10,3 @@ class IdolPartyRegisterRequestMessage(NetworkMessage):
         
         super().__init__()
     
-    

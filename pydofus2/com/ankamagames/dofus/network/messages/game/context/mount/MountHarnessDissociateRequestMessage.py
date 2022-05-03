@@ -8,4 +8,3 @@ class MountHarnessDissociateRequestMessage(NetworkMessage):
         
         super().__init__()
     
-    

@@ -14,4 +14,3 @@ class GuildChangeMemberParametersMessage(NetworkMessage):
         
         super().__init__()
     
-    

@@ -10,4 +10,3 @@ class MountDataErrorMessage(NetworkMessage):
         
         super().__init__()
     
-    

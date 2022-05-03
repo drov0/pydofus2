@@ -358,7 +358,7 @@ class FightEventsHelper(metaclass=Singleton):
                 tmpEffect = evt.buff.effect.clone()
                 if isinstance(tmpEffect, EffectInstanceDice):
                     buffStackCount = 1
-                    tmpDiceNum = int(evt.buff.rawParam1)
+                    tmpparam1 = int(evt.buff.rawParam1)
                     for event in listToConcat:
                         if (
                             event.targetId == evt.targetId
@@ -371,8 +371,8 @@ class FightEventsHelper(metaclass=Singleton):
                             ):
                                 break
                             buffStackCount += 1
-                            tmpDiceNum += int(event.buff.rawParam1)
-                    EffectInstanceDice(tmpEffect).diceNum = tmpDiceNum
+                            tmpparam1 += int(event.buff.rawParam1)
+                    EffectInstanceDice(tmpEffect).diceNum = tmpparam1
                 evt.params[1] = tmpEffect.description
             team = self.groupEntitiesByTeam(
                 playerTeamId,

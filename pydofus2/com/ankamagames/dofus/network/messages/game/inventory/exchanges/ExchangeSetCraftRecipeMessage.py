@@ -10,4 +10,3 @@ class ExchangeSetCraftRecipeMessage(NetworkMessage):
         
         super().__init__()
     
-    

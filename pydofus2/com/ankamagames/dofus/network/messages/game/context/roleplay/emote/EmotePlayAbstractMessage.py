@@ -12,4 +12,3 @@ class EmotePlayAbstractMessage(NetworkMessage):
         
         super().__init__()
     
-    

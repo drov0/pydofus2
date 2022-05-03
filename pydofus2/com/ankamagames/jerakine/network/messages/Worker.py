@@ -74,9 +74,7 @@ class Worker(EventDispatcher, MessageHandler):
         self.run()
         return True
 
-    def addSingleTreatmentAtPos(
-        self, object, func: FunctionType, params: list, pos: int
-    ) -> None:
+    def addSingleTreatmentAtPos(self, object, func: FunctionType, params: list, pos: int) -> None:
         if len(self._treatmentsQueue) == 0:
             efd.EnterFrameDispatcher().addWorker(self)
         self._treatmentsQueue.insert(pos, Treatment(object, func, params))
@@ -86,33 +84,23 @@ class Worker(EventDispatcher, MessageHandler):
             efd.EnterFrameDispatcher().addWorker(self)
         self._treatmentsQueue.append(Treatment(object, func, params))
 
-    def addUniqueSingleTreatment(
-        self, object, func: FunctionType, params: list
-    ) -> None:
+    def addUniqueSingleTreatment(self, object, func: FunctionType, params: list) -> None:
         if len(self._treatmentsQueue) == 0:
             efd.EnterFrameDispatcher().addWorker(self)
         if not self.hasSingleTreatment(object, func, params):
             self._treatmentsQueue.append(Treatment(object, func, params))
 
-    def addForTreatment(
-        self, object, func: FunctionType, params: list, iterations: int
-    ) -> None:
+    def addForTreatment(self, object, func: FunctionType, params: list, iterations: int) -> None:
         if iterations == 0:
             return
         if len(self._treatmentsQueue) == 0:
             efd.EnterFrameDispatcher().addWorker(self)
-        self._treatmentsQueue.append(
-            ForTreatment(object, func, params, iterations, self)
-        )
+        self._treatmentsQueue.append(ForTreatment(object, func, params, iterations, self))
 
-    def addForeachTreatment(
-        self, object, func: FunctionType, params: list, iterable
-    ) -> None:
+    def addForeachTreatment(self, object, func: FunctionType, params: list, iterable) -> None:
         if len(self._treatmentsQueue) == 0:
             efd.EnterFrameDispatcher().addWorker(self)
-        self._treatmentsQueue.append(
-            ForeachTreatment(object, func, params, iterable, self)
-        )
+        self._treatmentsQueue.append(ForeachTreatment(object, func, params, iterable, self))
 
     def addWhileTreatment(self, object, func: FunctionType, params: list) -> None:
         if len(self._treatmentsQueue) == 0:
@@ -137,7 +125,7 @@ class Worker(EventDispatcher, MessageHandler):
     def deleteTreatments(self, treatments: list) -> None:
         treatment: Treatment = None
         for treatment in treatments:
-            del self._treatmentsQueue[self._treatmentsQueue.find(treatment)]
+            del self._treatmentsQueue[self._treatmentsQueue.index(treatment)]
 
     def processImmediately(self, msg: Message) -> bool:
         if self._terminated:
@@ -177,11 +165,7 @@ class Worker(EventDispatcher, MessageHandler):
         if self.DEBUG_FRAMES:
             logger.info("Adding frame: " + frame.__class__.__name__)
 
-        if (
-            self._processingMessage
-            or len(self._framesToRemove) > 0
-            or len(self._framesToAdd) > 0
-        ):
+        if self._processingMessage or len(self._framesToRemove) > 0 or len(self._framesToAdd) > 0:
             isAlreadyIn = False
             for f in self._framesToAdd:
                 if f.__class__.__name__ == frame.__class__.__name__:
@@ -229,15 +213,11 @@ class Worker(EventDispatcher, MessageHandler):
     def getFrame(self, frameClassName: str) -> Frame:
         return self._currentFrameTypesCache.get(frameClassName)
 
-    def pause(
-        self, targetobject: object = None, unstoppableMsgobjectList: list = None
-    ) -> None:
+    def pause(self, targetobject: object = None, unstoppableMsgobjectList: list = None) -> None:
         logger.info("Worker is paused, all queueable messages will be queued : ")
         self._paused = True
         if unstoppableMsgobjectList:
-            self._unstoppableMsgobjectList = self._unstoppableMsgobjectList.extend(
-                unstoppableMsgobjectList
-            )
+            self._unstoppableMsgobjectList = self._unstoppableMsgobjectList.extend(unstoppableMsgobjectList)
 
     def clearUnstoppableMsgobjectList(self) -> None:
         self._unstoppableMsgobjectList = []
@@ -297,13 +277,9 @@ class Worker(EventDispatcher, MessageHandler):
             self._framesList.sort(key=lambda x: x.priority.value, reverse=True)
             self._currentFrameTypesCache[frame.__class__.__name__] = frame
             if self.has_listeners(FramePushedEvent.EVENT_FRAME_PUSHED):
-                self.dispatch(
-                    FramePushedEvent.EVENT_FRAME_PUSHED, FramePushedEvent(frame)
-                )
+                self.dispatch(FramePushedEvent.EVENT_FRAME_PUSHED, FramePushedEvent(frame))
         else:
-            logger.warn(
-                "Frame " + frame.__class__.__name__ + " refused to be.appended."
-            )
+            logger.warn("Frame " + frame.__class__.__name__ + " refused to be.appended.")
 
     def pullFrame(self, frame: Frame) -> None:
         if frame.pulled():
@@ -313,9 +289,7 @@ class Worker(EventDispatcher, MessageHandler):
                 if frame in self._framesBeingDeleted:
                     del self._framesBeingDeleted[frame]
             if self.has_listeners(FramePulledEvent.EVENT_FRAME_PULLED):
-                self.dispatch(
-                    FramePulledEvent.EVENT_FRAME_PULLED, FramePulledEvent(frame)
-                )
+                self.dispatch(FramePulledEvent.EVENT_FRAME_PULLED, FramePulledEvent(frame))
         else:
             logger.warn(f"Frame {frame.__class__.__name__} refused to be pulled.")
 
@@ -331,11 +305,7 @@ class Worker(EventDispatcher, MessageHandler):
             else:
                 msg = self._messagesQueue.pop(0)
                 if not isinstance(msg, CancelableMessage) or msg.cancel:
-                    if (
-                        self._paused
-                        and isinstance(msg, QueueableMessage)
-                        and not self.msgIsUnstoppable(msg)
-                    ):
+                    if self._paused and isinstance(msg, QueueableMessage) and not self.msgIsUnstoppable(msg):
                         self._pausedQueue.append(msg)
                         logger.warn("Queued message: " + msg.__class__.__name__)
                     else:
@@ -363,7 +333,7 @@ class Worker(EventDispatcher, MessageHandler):
                     toClean.append(self._messagesQueue[i])
             if count > 10:
                 for i in range(len(toClean)):
-                    del self._messagesQueue[self._messagesQueue.find(toClean[i])]
+                    del self._messagesQueue[self._messagesQueue.index(toClean[i])]
                 return True
         return False
 
@@ -373,19 +343,14 @@ class Worker(EventDispatcher, MessageHandler):
         for frame in self._framesList:
             if self.DEBUG_FRAMES_PROCESSING:
                 logger.debug(
-                    "Processing message: "
-                    + msg.__class__.__name__
-                    + " in frame: "
-                    + frame.__class__.__name__
+                    "Processing message: " + msg.__class__.__name__ + " in frame: " + frame.__class__.__name__
                 )
             if frame.process(msg):
                 processed = True
                 break
         self._processingMessage = False
         if not processed and not isinstance(msg, DiscardableMessage):
-            logger.debug(
-                f"Discarded message: {msg.__class__.__name__} (at frame {FrameIdManager().frameId})"
-            )
+            logger.debug(f"Discarded message: {msg.__class__.__name__} (at frame {FrameIdManager().frameId})")
 
     def processFramesInAndOut(self) -> None:
         if len(self._framesToRemove) > 0:
@@ -396,3 +361,17 @@ class Worker(EventDispatcher, MessageHandler):
             for frameToAdd in self._framesToAdd:
                 self.pushFrame(frameToAdd)
             del self._framesToAdd[0 : len(self._framesToAdd)]
+
+    def avoidFlood(self, messageName:str) -> bool:
+        if len(self._messagesQueue) > self.LONG_MESSAGE_QUEUE:
+            count = 0;
+            toClean = []
+            for i in range(len(self._messagesQueue)):
+                if self._messagesQueue[i].__class__.__name__  == messageName:
+                    count+=1
+                    toClean.append(self._messagesQueue[i])
+            if count > 10:
+                for i in range(len(toClean)):
+                    self._messagesQueue.remove(toClean[i])
+                return True
+        return False

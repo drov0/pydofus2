@@ -16,4 +16,3 @@ class ExchangeMountFreeFromPaddockMessage(NetworkMessage):
         
         super().__init__()
     
-    

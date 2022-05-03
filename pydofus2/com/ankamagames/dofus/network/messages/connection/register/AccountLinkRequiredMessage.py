@@ -8,4 +8,3 @@ class AccountLinkRequiredMessage(NetworkMessage):
         
         super().__init__()
     
-    

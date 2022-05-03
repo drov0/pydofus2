@@ -8,4 +8,3 @@ class PopupWarningClosedMessage(NetworkMessage):
         
         super().__init__()
     
-    

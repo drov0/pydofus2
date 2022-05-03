@@ -8,6 +8,5 @@ class AchievementStartedObjective(AchievementObjective):
     def init(self, value_:int, id_:int, maxValue_:int):
         self.value = value_
         
-        super().__init__(id_, maxValue_)
-    
+        super().init(id_, maxValue_)
     

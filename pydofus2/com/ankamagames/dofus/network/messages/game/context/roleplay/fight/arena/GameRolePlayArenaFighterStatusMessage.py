@@ -14,4 +14,3 @@ class GameRolePlayArenaFighterStatusMessage(NetworkMessage):
         
         super().__init__()
     
-    

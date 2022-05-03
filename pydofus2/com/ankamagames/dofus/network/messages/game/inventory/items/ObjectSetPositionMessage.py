@@ -14,4 +14,3 @@ class ObjectSetPositionMessage(NetworkMessage):
         
         super().__init__()
     
-    

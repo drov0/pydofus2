@@ -12,4 +12,3 @@ class GuildFightPlayersEnemyRemoveMessage(NetworkMessage):
         
         super().__init__()
     
-    

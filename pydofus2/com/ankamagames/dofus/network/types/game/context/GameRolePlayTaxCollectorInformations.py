@@ -18,6 +18,5 @@ class GameRolePlayTaxCollectorInformations(GameRolePlayActorInformations):
         self.guildLevel = guildLevel_
         self.taxCollectorAttack = taxCollectorAttack_
         
-        super().__init__(look_, contextualId_, disposition_)
-    
+        super().init(look_, contextualId_, disposition_)
     

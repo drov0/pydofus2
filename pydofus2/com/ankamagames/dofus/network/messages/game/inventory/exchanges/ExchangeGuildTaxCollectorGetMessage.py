@@ -34,4 +34,3 @@ class ExchangeGuildTaxCollectorGetMessage(NetworkMessage):
         
         super().__init__()
     
-    

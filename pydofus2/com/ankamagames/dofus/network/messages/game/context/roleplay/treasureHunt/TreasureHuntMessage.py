@@ -29,4 +29,3 @@ class TreasureHuntMessage(NetworkMessage):
         
         super().__init__()
     
-    

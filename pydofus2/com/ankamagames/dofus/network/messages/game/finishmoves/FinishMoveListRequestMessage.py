@@ -8,4 +8,3 @@ class FinishMoveListRequestMessage(NetworkMessage):
         
         super().__init__()
     
-    

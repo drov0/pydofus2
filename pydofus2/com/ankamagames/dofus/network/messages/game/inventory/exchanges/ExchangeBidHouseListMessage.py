@@ -12,4 +12,3 @@ class ExchangeBidHouseListMessage(NetworkMessage):
         
         super().__init__()
     
-    

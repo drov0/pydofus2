@@ -12,4 +12,3 @@ class FollowQuestObjectiveRequestMessage(NetworkMessage):
         
         super().__init__()
     
-    

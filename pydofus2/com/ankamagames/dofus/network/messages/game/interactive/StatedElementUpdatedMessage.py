@@ -14,4 +14,3 @@ class StatedElementUpdatedMessage(NetworkMessage):
         
         super().__init__()
     
-    

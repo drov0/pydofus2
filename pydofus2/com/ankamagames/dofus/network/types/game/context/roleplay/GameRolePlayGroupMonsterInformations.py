@@ -27,6 +27,5 @@ class GameRolePlayGroupMonsterInformations(GameRolePlayActorInformations):
         self.hasHardcoreDrop = hasHardcoreDrop_
         self.hasAVARewardToken = hasAVARewardToken_
         
-        super().__init__(look_, contextualId_, disposition_)
-    
+        super().init(look_, contextualId_, disposition_)
     

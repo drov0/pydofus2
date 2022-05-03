@@ -10,4 +10,3 @@ class WarnOnPermaDeathStateMessage(NetworkMessage):
         
         super().__init__()
     
-    

@@ -16,4 +16,3 @@ class RefreshCharacterStatsMessage(NetworkMessage):
         
         super().__init__()
     
-    

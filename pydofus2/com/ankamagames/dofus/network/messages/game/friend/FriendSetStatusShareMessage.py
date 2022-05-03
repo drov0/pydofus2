@@ -10,4 +10,3 @@ class FriendSetStatusShareMessage(NetworkMessage):
         
         super().__init__()
     
-    

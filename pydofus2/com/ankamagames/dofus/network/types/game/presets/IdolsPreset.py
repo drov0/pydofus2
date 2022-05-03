@@ -10,6 +10,5 @@ class IdolsPreset(Preset):
         self.iconId = iconId_
         self.idolIds = idolIds_
         
-        super().__init__(id_)
-    
+        super().init(id_)
     

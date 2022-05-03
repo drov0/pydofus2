@@ -8,6 +8,5 @@ class SkillActionDescriptionTimed(SkillActionDescription):
     def init(self, time_:int, skillId_:int):
         self.time = time_
         
-        super().__init__(skillId_)
-    
+        super().init(skillId_)
     

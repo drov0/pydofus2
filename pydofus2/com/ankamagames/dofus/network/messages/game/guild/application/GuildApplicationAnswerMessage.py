@@ -12,4 +12,3 @@ class GuildApplicationAnswerMessage(NetworkMessage):
         
         super().__init__()
     
-    

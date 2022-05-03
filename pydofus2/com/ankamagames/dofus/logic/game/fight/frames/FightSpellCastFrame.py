@@ -3,6 +3,7 @@ from com.ankamagames.atouin.AtouinConstants import AtouinConstants
 from com.ankamagames.atouin.data.map.Cell import Cell
 from com.ankamagames.atouin.managers.MapDisplayManager import MapDisplayManager
 from com.ankamagames.atouin.types.Selection import Selection
+from com.ankamagames.atouin.utils.CellUtil import CellUtil
 from com.ankamagames.dofus.enums.ActionIds import ActionIds
 from com.ankamagames.atouin.managers.EntitiesManager import EntitiesManager
 from com.ankamagames.atouin.types.GraphicCell import GraphicCell
@@ -32,6 +33,7 @@ from com.ankamagames.dofus.network.enums.ChatActivableChannelsEnum import (
 from com.ankamagames.dofus.network.enums.GameActionFightInvisibilityStateEnum import (
     GameActionFightInvisibilityStateEnum,
 )
+from com.ankamagames.dofus.network.enums.GameActionMarkTypeEnum import GameActionMarkTypeEnum
 from com.ankamagames.dofus.network.messages.game.actions.fight.GameActionFightCastOnTargetRequestMessage import (
     GameActionFightCastOnTargetRequestMessage,
 )
@@ -45,6 +47,7 @@ from com.ankamagames.dofus.network.types.game.context.fight.GameFightFighterInfo
     GameFightFighterInformations,
 )
 from com.ankamagames.dofus.types.entities.AnimatedCharacter import AnimatedCharacter
+from com.ankamagames.dofus.types.entities.Glyph import Glyph
 from com.ankamagames.jerakine.benchmark.BenchmarkTimer import BenchmarkTimer
 from com.ankamagames.jerakine.data.I18n import I18n
 from com.ankamagames.jerakine.entities.interfaces.IEntity import IEntity
@@ -155,9 +158,7 @@ class FightSpellCastFrame(Frame):
 
     @classmethod
     def updateRangeAndTarget(cls) -> None:
-        castFrame: "FightSpellCastFrame" = (
-            Kernel().getWorker().getFrame("FightSpellCastFrame")
-        )
+        castFrame: "FightSpellCastFrame" = Kernel().getWorker().getFrame("FightSpellCastFrame")
         if castFrame:
             castFrame.removeRange()
             castFrame.drawRange()
@@ -180,10 +181,8 @@ class FightSpellCastFrame(Frame):
             character = DofusEntities.getEntity(fighterInfos.contextualId)
             if (
                 character
-                and fighterInfos.contextualId
-                != CurrentPlayedFighterManager().currentFighterId
-                and fighterInfos.stats.invisibilityState
-                == GameActionFightInvisibilityStateEnum.DETECTED
+                and fighterInfos.contextualId != CurrentPlayedFighterManager().currentFighterId
+                and fighterInfos.stats.invisibilityState == GameActionFightInvisibilityStateEnum.DETECTED
             ):
                 character.canSeeThrough = True
                 character.canWalkThrough = False
@@ -194,9 +193,7 @@ class FightSpellCastFrame(Frame):
             if PlayedCharacterManager().currentWeapon:
                 self._usedWrapper = PlayedCharacterManager().currentWeapon
             else:
-                self._usedWrapper = SpellWrapper.create(
-                    0, 1, False, PlayedCharacterManager().id
-                )
+                self._usedWrapper = SpellWrapper.create(0, 1, False, PlayedCharacterManager().id)
         else:
             self._usedWrapper = SpellWrapper.getSpellWrapperById(
                 self._spellId, CurrentPlayedFighterManager().currentFighterId
@@ -219,9 +216,7 @@ class FightSpellCastFrame(Frame):
 
         elif isinstance(msg, CellOutMessage):
             comsg = msg
-            cellEntity = EntitiesManager().getEntityOnCell(
-                comsg.cellId, AnimatedCharacter
-            )
+            cellEntity = EntitiesManager().getEntityOnCell(comsg.cellId, AnimatedCharacter)
             self.removeTeleportationPreview()
             self.removeSummoningPreview()
             self.clearTarget()
@@ -236,11 +231,7 @@ class FightSpellCastFrame(Frame):
         elif isinstance(msg, TimelineEntityOverAction):
             teoa = msg
             timelineEntity = DofusEntities.getEntity(teoa.targetId)
-            if (
-                timelineEntity
-                and timelineEntity.position
-                and timelineEntity.position.cellId > -1
-            ):
+            if timelineEntity and timelineEntity.position and timelineEntity.position.cellId > -1:
                 FightContextFrame.currentCell = timelineEntity.position.cellId
                 self.refreshTarget()
             return False
@@ -259,10 +250,7 @@ class FightSpellCastFrame(Frame):
 
         elif isinstance(msg, EntityClickMessage):
             ecmsg = msg
-            if (
-                self._fightTeleportationPreview
-                and self._fightTeleportationPreview.isPreview(ecmsg.entity.id)
-            ):
+            if self._fightTeleportationPreview and self._fightTeleportationPreview.isPreview(ecmsg.entity.id):
                 self.castSpell(ecmsg.entity.position.cellId)
             else:
                 self.castSpell(ecmsg.entity.position.cellId, ecmsg.entity.id)
@@ -283,8 +271,7 @@ class FightSpellCastFrame(Frame):
 
         elif isinstance(msg, MouseClickMessage):
             if KeyPoll().isDown(Keyboard.ALTERNATE) and not (
-                isinstance(msg.target, GraphicCell)
-                and self.isValidCell(msg.target.cellId)
+                isinstance(msg.target, GraphicCell) and self.isValidCell(msg.target.cellId)
             ):
                 self.cancelCast()
                 self._cancelTimer.start()
@@ -296,19 +283,15 @@ class FightSpellCastFrame(Frame):
     def pulled(self) -> bool:
         fbf: "FightBattleFrame" = Kernel().getWorker().getFrame("FightBattleFrame")
         if fbf:
-            fef: "FightEntitiesFrame" = (
-                Kernel().getWorker().getFrame("FightEntitiesFrame")
-            )
+            fef: "FightEntitiesFrame" = Kernel().getWorker().getFrame("FightEntitiesFrame")
             fighters = fef.entities
             for actorInfos in fighters:
                 fighterInfos = actorInfos
                 character = DofusEntities.getEntity(actorInfos.contextualId)
                 if (
                     character
-                    and actorInfos.contextualId
-                    != CurrentPlayedFighterManager().currentFighterId
-                    and fighterInfos.stats.invisibilityState
-                    == GameActionFightInvisibilityStateEnum.VISIBLE
+                    and actorInfos.contextualId != CurrentPlayedFighterManager().currentFighterId
+                    and fighterInfos.stats.invisibilityState == GameActionFightInvisibilityStateEnum.VISIBLE
                 ):
                     character.canSeeThrough = False
                     character.canWalkThrough = False
@@ -326,10 +309,7 @@ class FightSpellCastFrame(Frame):
             self.removeSummoningPreview()
             if self._fightTeleportationPreview:
                 self.removeTeleportationPreview()
-        elif (
-            self._fightTeleportationPreview
-            and self._fightTeleportationPreview.getEntitiesIds().find(pEntityId) != -1
-        ):
+        elif self._fightTeleportationPreview and pEntityId in self._fightTeleportationPreview.getEntitiesIds():
             self.removeTeleportationPreview()
 
     def refreshTarget(self, force: bool = False) -> None:
@@ -352,22 +332,14 @@ class FightSpellCastFrame(Frame):
                 target = newTarget
         self.removeSummoningPreview()
         self.removeTeleportationPreview()
-        if not force and (
-            self._currentCell == target and self._currentCell != newTarget
-        ):
+        if not force and (self._currentCell == target and self._currentCell != newTarget):
             if self._targetSelection and self.isValidCell(target):
                 self.showTargetsTooltips()
             return
         self._currentCell = target
-        entitiesOnCell: list = EntitiesManager().getEntitiesOnCell(
-            self._currentCell, AnimatedCharacter
-        )
-        self._currentCellEntity = (
-            self.getParentEntity(entitiesOnCell[0]) if len(entitiesOnCell) > 0 else None
-        )
-        fightTurnFrame: "FightTurnFrame" = (
-            Kernel().getWorker().getFrame("FightTurnFrame")
-        )
+        entitiesOnCell: list = EntitiesManager().getEntitiesOnCell(self._currentCell, AnimatedCharacter)
+        self._currentCellEntity = self.getParentEntity(entitiesOnCell[0]) if len(entitiesOnCell) > 0 else None
+        fightTurnFrame: "FightTurnFrame" = Kernel().getWorker().getFrame("FightTurnFrame")
         if not fightTurnFrame:
             return
         myTurn: bool = fightTurnFrame.myTurn
@@ -381,43 +353,28 @@ class FightSpellCastFrame(Frame):
                 if spellShape == SpellShapeEnum.l:
                     ignoreMaxSize = False
                 self._targetCenterSelection.zone = Cross(0, 0, DataMapProvider())
-                SelectionManager().addSelection(
-                    self._targetCenterSelection, self.SELECTION_CENTER_TARGET
-                )
-                SelectionManager().addSelection(
-                    self._targetSelection, self.SELECTION_TARGET
-                )
+                SelectionManager().addSelection(self._targetCenterSelection, self.SELECTION_CENTER_TARGET)
+                SelectionManager().addSelection(self._targetSelection, self.SELECTION_TARGET)
             if not self._targetSelection.zone or self._targetSelection.zone is Custom:
-                entityInfo = FightEntitiesFrame.getCurrentInstance().getEntityInfos(
-                    self._spellLevel["playerId"]
-                )
+                entityInfo = FightEntitiesFrame.getCurrentInstance().getEntityInfos(self._spellLevel["playerId"])
                 if entityInfo:
                     cellId = entityInfo.disposition.cellId
-                    spellZone = SpellZoneManager().getSpellZone(
-                        self._spellLevel, True, ignoreMaxSize, target, cellId
-                    )
+                    spellZone = SpellZoneManager().getSpellZone(self._spellLevel, True, ignoreMaxSize, target, cellId)
                     self._spellmaximumRange = spellZone.radius
                     self._targetSelection.zone = spellZone
             currentFighterId = CurrentPlayedFighterManager().currentFighterId
-            entityInfos = FightEntitiesFrame.getCurrentInstance().getEntityInfos(
-                currentFighterId
-            )
+            entityInfos = FightEntitiesFrame.getCurrentInstance().getEntityInfos(currentFighterId)
             if entityInfos:
                 if self._targetingThroughPortal:
                     self._targetSelection.zone.direction = MapPoint(
                         MapPoint.fromCellId(entityInfos.disposition.cellId)
-                    ).advancedOrientationTo(
-                        MapPoint.fromCellId(FightContextFrame.currentCell), False
-                    )
+                    ).advancedOrientationTo(MapPoint.fromCellId(FightContextFrame.currentCell), False)
                 else:
                     self._targetSelection.zone.direction = MapPoint(
                         MapPoint.fromCellId(entityInfos.disposition.cellId)
                     ).advancedOrientationTo(MapPoint.fromCellId(target), False)
             renderer = self._targetSelection.renderer
-            if (
-                Atouin().options.getOption("transparentOverlayMode")
-                and self._spellmaximumRange != 63
-            ):
+            if Atouin().options.getOption("transparentOverlayMode") and self._spellmaximumRange != 63:
                 renderer.currentStrata = PlacementStrataEnums.STRATA_NO_Z_ORDER
                 SelectionManager().update(SELECTION_TARGET, target, True)
                 SelectionManager().update(SELECTION_CENTER_TARGET, target, True)
@@ -432,25 +389,18 @@ class FightSpellCastFrame(Frame):
                 self._lastTargetStatus = True
             else:
                 if self._lastTargetStatus:
-                    LinkedCursorSpriteManager().addItem(
-                        FORBIDDEN_CURSOR_NAME, self._cursorData, True
-                    )
+                    LinkedCursorSpriteManager().addItem(FORBIDDEN_CURSOR_NAME, self._cursorData, True)
                 self._lastTargetStatus = False
             self.showTargetsTooltips()
         else:
             if self._lastTargetStatus:
-                LinkedCursorSpriteManager().addItem(
-                    FORBIDDEN_CURSOR_NAME, self._cursorData, True
-                )
+                LinkedCursorSpriteManager().addItem(FORBIDDEN_CURSOR_NAME, self._cursorData, True)
             self.removeTarget()
             self._lastTargetStatus = False
             self.hideTargetsTooltips()
 
     def isTeleportationPreviewEntity(self, pEntityId: float) -> bool:
-        return (
-            self._fightTeleportationPreview
-            and self._fightTeleportationPreview.isPreview(pEntityId)
-        )
+        return self._fightTeleportationPreview and self._fightTeleportationPreview.isPreview(pEntityId)
 
     def isSummoningPreviewEntity(self, pEntityId: float) -> bool:
         return self._summoningPreview and self._summoningPreview.isPreview(pEntityId)
@@ -464,20 +414,16 @@ class FightSpellCastFrame(Frame):
         if self._spellLevel == None:
             return
         currentFighterId: float = CurrentPlayedFighterManager().currentFighterId
-        entityInfos: GameFightFighterInformations = (
-            FightEntitiesFrame.getCurrentInstance().getEntityInfos(currentFighterId)
+        entityInfos: GameFightFighterInformations = FightEntitiesFrame.getCurrentInstance().getEntityInfos(
+            currentFighterId
         )
         origin: int = entityInfos.disposition.cellId
         playerStats: EntityStats = CurrentPlayedFighterManager().getStats()
         range: int = self._spellLevel["range"]
         minRange: int = self._spellLevel["minRange"]
         spellShape: int = self.getSpellShape()
-        castInLine: bool = (
-            self._spellLevel["castInLine"] or spellShape == SpellShapeEnum.l
-        )
-        mpWithPortals: list[MapPoint] = MarkedCellsManager().getMarksMapPoint(
-            GameActionMarkTypeEnum.PORTAL
-        )
+        castInLine: bool = self._spellLevel["castInLine"] or spellShape == SpellShapeEnum.l
+        mpWithPortals: list[MapPoint] = MarkedCellsManager().getMarksMapPoint(GameActionMarkTypeEnum.PORTAL)
         if (
             not castInLine
             and not self._spellLevel["castInDiagonal"]
@@ -490,9 +436,7 @@ class FightSpellCastFrame(Frame):
         else:
             self._isInfiniteTarget = False
         if self._spellLevel["rangeCanBeBoosted"]:
-            range += playerStats.getStatTotalValue(
-                StatIds.RANGE
-            ) - playerStats.getStatAdditionalValue(StatIds.RANGE)
+            range += playerStats.getStatTotalValue(StatIds.RANGE) - playerStats.getStatAdditionalValue(StatIds.RANGE)
         if range < minRange:
             range = minRange
         range = min(range, AtouinConstants.MAP_WIDTH * AtouinConstants.MAP_HEIGHT)
@@ -517,11 +461,7 @@ class FightSpellCastFrame(Frame):
         if not self._spellLevel["castTestLos"]:
             losSelection.zone = Custom(allCells)
         else:
-            losSelection.zone = Custom(
-                LosDetector.getCell(
-                    DataMapProvider(), allCells, MapPoint.fromCellId(origin)
-                )
-            )
+            losSelection.zone = Custom(LosDetector.getCell(DataMapProvider(), allCells, MapPoint.fromCellId(origin)))
             noLosRangeCell = rangeSelection.zone.getCells(origin)
             losRangeCell = losSelection.zone.getCells(origin)
             num = len(noLosRangeCell)
@@ -538,28 +478,20 @@ class FightSpellCastFrame(Frame):
                     self._targetingThroughPortal = True
                     if self.isValidCell(cAfterPortal, True):
                         if self._spellLevel["castTestLos"]:
-                            entryMarkPortal = MarkedCellsManager().getMarkAtCellId(
-                                c, GameActionMarkTypeEnum.PORTAL
-                            )
+                            entryMarkPortal = MarkedCellsManager().getMarkAtCellId(c, GameActionMarkTypeEnum.PORTAL)
                             teamPortals = MarkedCellsManager().getMarksMapPoint(
                                 GameActionMarkTypeEnum.PORTAL, entryMarkPortal.teamId
                             )
-                            portalsCellIds = LinkedCellsManager().getLinks(
-                                MapPoint.fromCellId(c), teamPortals
-                            )
+                            portalsCellIds = LinkedCellsManager().getLinks(MapPoint.fromCellId(c), teamPortals)
                             exitPortal = portalsCellIds.pop()
                             lastPortalMp = MapPoint.fromCellId(exitPortal)
                             newTargetMp = MapPoint.fromCellId(cAfterPortal)
-                            cellsFromLine = Dofus2Line.getLine(
-                                lastPortalMp.cellId, newTargetMp.cellId
-                            )
+                            cellsFromLine = Dofus2Line.getLine(lastPortalMp.cellId, newTargetMp.cellId)
                             for cellFromLine in cellsFromLine:
                                 mp = MapPoint.fromCoords(cellFromLine.x, cellFromLine.y)
                                 cells.append(mp.cellId)
-                            cellsWithLosOk = LosDetector.getCell(
-                                DataMapProvider(), cells, lastPortalMp
-                            )
-                            if cellsWithLosOk.find(cAfterPortal) > -1:
+                            cellsWithLosOk = LosDetector.getCell(DataMapProvider(), cells, lastPortalMp)
+                            if cAfterPortal in cellsWithLosOk:
                                 portalUsableCells.append(c)
                             else:
                                 untargetableCells.append(c)
@@ -590,20 +522,14 @@ class FightSpellCastFrame(Frame):
         SelectionManager().addSelection(losSelection, self.SELECTION_LOS, origin)
         if len(untargetableCells) > 0:
             rangeSelection.zone = Custom(untargetableCells)
-            SelectionManager().addSelection(
-                rangeSelection, self.SELECTION_RANGE, origin
-            )
+            SelectionManager().addSelection(rangeSelection, self.SELECTION_RANGE, origin)
         else:
             rangeSelection.zone = Custom(list[int]())
-            SelectionManager().addSelection(
-                rangeSelection, self.SELECTION_RANGE, origin
-            )
+            SelectionManager().addSelection(rangeSelection, self.SELECTION_RANGE, origin)
         if len(portalUsableCells) > 0:
             self._portalsSelection = Selection()
             self._portalsSelection.zone = Custom(portalUsableCells)
-            SelectionManager().addSelection(
-                self._portalsSelection, self.SELECTION_PORTALS, origin
-            )
+            SelectionManager().addSelection(self._portalsSelection, self.SELECTION_PORTALS, origin)
 
     def removeTeleportationPreview(self, destroy: bool = False) -> None:
         if self._fightTeleportationPreview:
@@ -628,32 +554,24 @@ class FightSpellCastFrame(Frame):
                 if effect.effectId == ActionIds.ACTION_FIGHT_DISABLE_PORTAL:
                     return target
         currentFighterId: float = CurrentPlayedFighterManager().currentFighterId
-        entityInfos: GameFightFighterInformations = (
-            FightEntitiesFrame.getCurrentInstance().getEntityInfos(currentFighterId)
+        entityInfos: GameFightFighterInformations = FightEntitiesFrame.getCurrentInstance().getEntityInfos(
+            currentFighterId
         )
         if not entityInfos:
             return target
         markedCellsManager: MarkedCellsManager = MarkedCellsManager()
-        mpWithPortals: list[MapPoint] = markedCellsManager.getMarksMapPoint(
-            GameActionMarkTypeEnum.PORTAL
-        )
+        mpWithPortals: list[MapPoint] = markedCellsManager.getMarksMapPoint(GameActionMarkTypeEnum.PORTAL)
         if not mpWithPortals or len(mpWithPortals) < 2:
             return target
         for portalp in mpWithPortals:
-            portalMark = markedCellsManager.getMarkAtCellId(
-                portalp.cellId, GameActionMarkTypeEnum.PORTAL
-            )
+            portalMark = markedCellsManager.getMarkAtCellId(portalp.cellId, GameActionMarkTypeEnum.PORTAL)
             if portalMark and portalMark.active:
                 if portalp.cellId == target:
                     targetPortal = portalp
         if not targetPortal:
             return target
-        mpWithPortals = markedCellsManager.getMarksMapPoint(
-            GameActionMarkTypeEnum.PORTAL, portalMark.teamId
-        )
-        portalsCellIds: list[int] = LinkedCellsManager().getLinks(
-            targetPortal, mpWithPortals
-        )
+        mpWithPortals = markedCellsManager.getMarksMapPoint(GameActionMarkTypeEnum.PORTAL, portalMark.teamId)
+        portalsCellIds: list[int] = LinkedCellsManager().getLinks(targetPortal, mpWithPortals)
         exitPoint: MapPoint = MapPoint.fromCellId(portalsCellIds.pop())
         fighterPoint: MapPoint = MapPoint.fromCellId(entityInfos.disposition.cellId)
         if not fighterPoint:
@@ -676,106 +594,40 @@ class FightSpellCastFrame(Frame):
     def checkSpellCostAndPlayerAp(self) -> int:
         spell: SpellWrapper = None
         for spell in PlayedCharacterManager().spellsInventory:
-            if (
-                spell.spellId == self._spellLevel["spellId"]
-                and spell.apCost != self._spellLevel["apCost"]
-            ):
+            if spell.spellId == self._spellLevel["spellId"] and spell.apCost != self._spellLevel["apCost"]:
                 self._spellLevel["apCost"] = spell.apCost
-        return (
-            CurrentPlayedFighterManager()
-            .getStats()
-            .getStatTotalValue(StatIds.ACTION_POINTS)
-        )
+        return CurrentPlayedFighterManager().getStats().getStatTotalValue(StatIds.ACTION_POINTS)
 
-    def castSpell(
-        self, cell: int, targetId: float = 0, forceCheckForRange: bool = False
-    ) -> None:
-        fightTurnFrame: "FightTurnFrame" = (
-            Kernel().getWorker().getFrame("FightTurnFrame")
-        )
+    def castSpell(self, cell: int, targetId: float = 0, forceCheckForRange: bool = False) -> None:
+        fightTurnFrame: "FightTurnFrame" = Kernel().getWorker().getFrame("FightTurnFrame")
         if not fightTurnFrame:
             return
         apCurrent: int = self.checkSpellCostAndPlayerAp()
         if apCurrent < self._spellLevel["apCost"]:
-            return
-        if KeyPoll().isDown(Keyboard.ALTERNATE):
-            if cell == 0 and targetId != 0:
-                entity = DofusEntities.getEntity(targetId)
-                if entity and entity.position:
-                    cell = entity.position.cellId
-            if targetId == 0 and cell > 0:
-                cellEntity = EntitiesManager().getEntityOnCell(cell, AnimatedCharacter)
-                if cellEntity:
-                    targetId = cellEntity.id
-            if targetId != 0 and not entity:
-                fighter = FightEntitiesFrame.getCurrentInstance().getEntityInfos(
-                    targetId
-                )
-            if fighter and fighter.disposition.cellId:
-                targetName = "{entity," + str(targetId) + "," + 1 + "}"
-            else:
-                targetName = I18n.getUiText(
-                    "ui.fightAutomsg.cellTarget",
-                    ["{cell," + str(cell) + "::" + str(cell) + "}"],
-                )
-            if self._spellId == 0:
-                spellName = self._spellLevel["name"]
-            else:
-                spellName = (
-                    "{spell,"
-                    + str(self._spellId)
-                    + ","
-                    + str(self._spellLevel["spellLevel"])
-                    + "}"
-                )
-            if SelectionManager().isInside(cell, self.SELECTION_RANGE):
-                text = I18n.getUiText(
-                    "ui.fightAutomsg.targetcast.noLineOfSight", [spellName, targetName]
-                )
-            elif not SelectionManager().isInside(cell, self.SELECTION_LOS):
-                text = I18n.getUiText(
-                    "ui.fightAutomsg.targetcast.outsideRange", [spellName, targetName]
-                )
-            else:
-                text = I18n.getUiText(
-                    "ui.fightAutomsg.targetcast.available", [spellName, targetName]
-                )
-            ccmmsg = ChatClientMultiMessage()
-            ccmmsg.init(text, ChatActivableChannelsEnum.CHANNEL_TEAM)
-            ConnectionsHandler.getConnection().send(ccmmsg)
             return
         if forceCheckForRange and self._spellLevel["maximalRange"] < 63:
             if cell == 0 and targetId != 0:
                 entity = DofusEntities.getEntity(targetId)
                 if entity and entity.position:
                     cell = entity.position.cellId
-            if SelectionManager().isInside(
-                cell, self.SELECTION_RANGE
-            ) or not SelectionManager().isInside(cell, self.SELECTION_LOS):
+            if SelectionManager().isInside(cell, self.SELECTION_RANGE) or not SelectionManager().isInside(
+                cell, self.SELECTION_LOS
+            ):
                 return
         if not fightTurnFrame.myTurn:
             return
-        fightBattleFrame: FightBattleFrame = (
-            Kernel().getWorker().getFrame(FightBattleFrame)
-        )
+        fightBattleFrame: FightBattleFrame = Kernel().getWorker().getFrame(FightBattleFrame)
         if fightBattleFrame and fightBattleFrame.fightIsPaused:
             self.cancelCast()
             return
         if (
             targetId != 0
             and not FightEntitiesFrame.getCurrentInstance().entityIsIllusion(targetId)
-            and not (
-                self._fightTeleportationPreview
-                and self._fightTeleportationPreview.isPreview(targetId)
-            )
-            and CurrentPlayedFighterManager().canCastThisSpell(
-                self._spellId, self._spellLevel["spellLevel"], targetId
-            )
+            and not (self._fightTeleportationPreview and self._fightTeleportationPreview.isPreview(targetId))
+            and CurrentPlayedFighterManager().canCastThisSpell(self._spellId, self._spellLevel["spellLevel"], targetId)
         ):
             gafcotrmsg = GameActionFightCastOnTargetRequestMessage()
-            gafcotrmsg.initGameActionFightCastOnTargetRequestMessage(
-                self._spellId, targetId
-            )
+            gafcotrmsg.init(self._spellId, targetId)
             ConnectionsHandler.getConnection().send(gafcotrmsg)
         elif self.isValidCell(cell):
             self.removeSummoningPreview()
@@ -788,7 +640,7 @@ class FightSpellCastFrame(Frame):
     def cancelCast(self, *args) -> None:
         self.removeSummoningPreview()
         self.removeTeleportationPreview(True)
-        self._cancelTimer.reset()
+        self._cancelTimer.cancel()
         Kernel().getWorker().removeFrame(self)
 
     def removeRange(self) -> None:
@@ -851,22 +703,15 @@ class FightSpellCastFrame(Frame):
             spellLevel = self._spellLevel["spellLevelInfos"]
             entities = EntitiesManager().getEntitiesOnCell(cell)
             for entity in entities:
-                if not (
-                    self.isTeleportationPreviewEntity(entity.id)
-                    or self.isSummoningPreviewEntity(entity.id)
-                ):
+                if not (self.isTeleportationPreviewEntity(entity.id) or self.isSummoningPreviewEntity(entity.id)):
                     if not CurrentPlayedFighterManager().canCastThisSpell(
                         self._spellLevel["spellId"],
                         self._spellLevel["spellLevel"],
                         entity.id,
                     ):
                         return False
-                    isGlyph = entity is Glyph
-                    if (
-                        spellLevel.needFreeTrapCell
-                        and isGlyph
-                        and entity.glyphType == GameActionMarkTypeEnum.TRAP
-                    ):
+                    isGlyph = isinstance(entity, Glyph)
+                    if spellLevel.needFreeTrapCell and isGlyph and entity.glyphType == GameActionMarkTypeEnum.TRAP:
                         return False
                     if self.sespellLevel["needFreeCell"] and not isGlyph:
                         return False
@@ -887,10 +732,7 @@ class FightSpellCastFrame(Frame):
             if spellEffect.zoneShape != 0 and (
                 spellEffect.zoneSize > 0
                 or spellEffect.zoneSize == 0
-                and (
-                    spellEffect.zoneShape == SpellShapeEnum.P
-                    or spellEffect.zoneMinSize < 0
-                )
+                and (spellEffect.zoneShape == SpellShapeEnum.P or spellEffect.zoneMinSize < 0)
             ):
                 spellShape = spellEffect.zoneShape
         return spellShape

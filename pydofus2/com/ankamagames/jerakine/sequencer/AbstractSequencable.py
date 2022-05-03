@@ -8,7 +8,7 @@ logger = Logger(__name__)
 
 class AbstractSequencable(IPausableSequencable):
 
-    DEFAULT_TIMEOUT: int = 5000
+    DEFAULT_TIMEOUT: int = 2
 
     _listeners: dict = None
 
@@ -17,6 +17,8 @@ class AbstractSequencable(IPausableSequencable):
     _castingSpellId: int = -1
 
     _timeoutMax: int = None
+
+    _timeoutInterval = -1
 
     _withTimeOut: bool = False
 
@@ -49,7 +51,7 @@ class AbstractSequencable(IPausableSequencable):
     def timeout(self, value: int) -> None:
         self._timeoutMax = value
         if self._timeOut and value != -1:
-            self._timeOut.interval = value
+            self._timeoutInterval = value
 
     @property
     def hasDefaultTimeout(self) -> bool:
@@ -57,7 +59,7 @@ class AbstractSequencable(IPausableSequencable):
 
     def pause(self) -> None:
         if self._timeOut:
-            self._timeOut.stop()
+            self._timeOut.cancel()
         self._paused = True
 
     def resume(self) -> None:
@@ -112,11 +114,11 @@ class AbstractSequencable(IPausableSequencable):
     def isTimeout(self) -> bool:
         return self._withTimeOut
 
-    def onTimeOut(self, e) -> None:
+    def onTimeOut(self) -> None:
         logger.error(f"Time out sur la step {self} ({self._timeOut}")
         self._withTimeOut = True
         if self._timeOut:
-            self._timeOut.stop()
+            self._timeOut.cancel()
         self._timeOut = None
         self.executeCallbacks()
         self._listeners = None

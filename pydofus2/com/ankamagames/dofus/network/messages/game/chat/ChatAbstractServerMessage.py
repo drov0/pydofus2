@@ -16,4 +16,3 @@ class ChatAbstractServerMessage(NetworkMessage):
         
         super().__init__()
     
-    

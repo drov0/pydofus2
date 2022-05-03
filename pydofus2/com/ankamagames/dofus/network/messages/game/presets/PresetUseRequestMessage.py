@@ -10,4 +10,3 @@ class PresetUseRequestMessage(NetworkMessage):
         
         super().__init__()
     
-    

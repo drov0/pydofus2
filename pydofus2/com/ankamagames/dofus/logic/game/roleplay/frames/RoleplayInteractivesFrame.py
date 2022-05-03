@@ -226,7 +226,7 @@ class RoleplayInteractivesFrame(Frame):
                 )
             else:
                 self.removeInteractive(ieumsg.interactiveElement)
-            return False
+            return True
 
         if isinstance(msg, InteractiveUsedMessage):
             iumsg = msg
@@ -263,7 +263,7 @@ class RoleplayInteractivesFrame(Frame):
         if isinstance(msg, StatedElementUpdatedMessage):
             seumsg = msg
             self.updateStatedElement(seumsg.statedElement)
-            return False
+            return True
 
         if isinstance(msg, MapObstacleUpdateMessage):
             moumsg = msg

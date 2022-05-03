@@ -12,6 +12,5 @@ class HumanOptionGuild(HumanOption):
     def init(self, guildInformations_:'GuildInformations'):
         self.guildInformations = guildInformations_
         
-        super().__init__()
-    
+        super().init()
     

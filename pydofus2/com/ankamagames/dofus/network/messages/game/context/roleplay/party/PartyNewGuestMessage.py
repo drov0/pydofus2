@@ -12,6 +12,5 @@ class PartyNewGuestMessage(AbstractPartyEventMessage):
     def init(self, guest_:'PartyGuestInformations', partyId_:int):
         self.guest = guest_
         
-        super().__init__(partyId_)
-    
+        super().init(partyId_)
     

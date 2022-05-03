@@ -8,6 +8,7 @@ from com.ankamagames.dofus.kernel.Kernel import Kernel
 from com.ankamagames.dofus.logic.game.common.managers.PlayedCharacterManager import (
     PlayedCharacterManager,
 )
+from com.ankamagames.dofus.logic.game.common.misc.DofusEntities import DofusEntities
 import com.ankamagames.dofus.logic.game.roleplay.frames.RoleplayEntitiesFrame as ref
 import com.ankamagames.dofus.logic.game.roleplay.frames.RoleplayInteractivesFrame as rif
 from com.ankamagames.dofus.logic.game.roleplay.frames.RoleplayMovementFrame import (
@@ -23,6 +24,7 @@ from com.ankamagames.dofus.network.messages.game.context.roleplay.CurrentMapInst
 from com.ankamagames.dofus.network.messages.game.context.roleplay.CurrentMapMessage import (
     CurrentMapMessage,
 )
+from com.ankamagames.dofus.network.messages.game.inventory.items.ObtainedItemMessage import ObtainedItemMessage
 from com.ankamagames.jerakine.logger.Logger import Logger
 from com.ankamagames.jerakine.messages.Frame import Frame
 from com.ankamagames.jerakine.messages.Message import Message
@@ -112,6 +114,9 @@ class RoleplayContextFrame(Frame):
 
         elif isinstance(msg, GameContextDestroyMessage):
             Kernel().getWorker().removeFrame(self)
+            return True
+
+        elif isinstance(msg, ObtainedItemMessage):
             return True
 
         return False

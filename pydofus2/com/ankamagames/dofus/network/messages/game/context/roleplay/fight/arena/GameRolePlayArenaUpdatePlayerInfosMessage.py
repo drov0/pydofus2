@@ -14,4 +14,3 @@ class GameRolePlayArenaUpdatePlayerInfosMessage(NetworkMessage):
         
         super().__init__()
     
-    

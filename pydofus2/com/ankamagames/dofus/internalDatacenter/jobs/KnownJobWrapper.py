@@ -1,3 +1,4 @@
+from com.ankamagames.dofus.datacenter.jobs.Job import Job
 from com.ankamagames.dofus.network.types.game.context.roleplay.job.JobDescription import (
     JobDescription,
 )
@@ -27,8 +28,9 @@ class KnownJobWrapper(IDataCenter):
     def __init__(self):
         super().__init__()
 
-    def create(self, id: int) -> "KnownJobWrapper":
-        obj: KnownJobWrapper = KnownJobWrapper()
+    @classmethod
+    def create(cls, id: int) -> "KnownJobWrapper":
+        obj: KnownJobWrapper = cls()
         obj.id = id
         job: Job = Job.getJobById(id)
         if job:

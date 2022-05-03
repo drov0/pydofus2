@@ -8,4 +8,3 @@ class ExitHavenBagRequestMessage(NetworkMessage):
         
         super().__init__()
     
-    

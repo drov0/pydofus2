@@ -8,4 +8,3 @@ class GuildRanksRequestMessage(NetworkMessage):
         
         super().__init__()
     
-    

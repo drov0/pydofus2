@@ -1,3 +1,17 @@
+from com.ankamagames.dofus.datacenter.items.criterion.IItemCriterion import (
+    IItemCriterion,
+)
+from com.ankamagames.dofus.datacenter.items.criterion.ItemCriterion import ItemCriterion
+from com.ankamagames.dofus.datacenter.monsters.Monster import Monster
+from com.ankamagames.dofus.internalDatacenter.DataEnum import DataEnum
+from com.ankamagames.dofus.internalDatacenter.items.ItemWrapper import ItemWrapper
+from com.ankamagames.dofus.logic.game.common.managers.InventoryManager import (
+    InventoryManager,
+)
+from com.ankamagames.jerakine.data.I18n import I18n
+from com.ankamagames.jerakine.interfaces.IDataCenter import IDataCenter
+
+
 class SoulStoneItemCriterion(ItemCriterion, IDataCenter):
 
     ID_SOUL_STONE: list = [
@@ -14,13 +28,13 @@ class SoulStoneItemCriterion(ItemCriterion, IDataCenter):
 
     def __init__(self, pCriterion: str):
         super().__init__(pCriterion)
-        arrayParams: list = str(_criterionValueText).split(",")
+        arrayParams: list = str(self._criterionValueText).split(",")
         if arrayParams and len(arrayParams) > 0:
             if len(arrayParams) <= 2:
                 self._monsterId = int(arrayParams[0])
                 self._quantityMonster = int(arrayParams[1])
         else:
-            self._monsterId = int(_criterionValue)
+            self._monsterId = int(self._criterionValue)
         self._monsterName = Monster.getMonsterById(self._monsterId).name
 
     @property
@@ -28,7 +42,7 @@ class SoulStoneItemCriterion(ItemCriterion, IDataCenter):
         iw: ItemWrapper = None
         soulStoneId: int = 0
         for iw in InventoryManager().realInventory:
-            for soulStoneId in ID_SOUL_STONE:
+            for soulStoneId in self.ID_SOUL_STONE:
                 if iw.objectGID == soulStoneId:
                     return True
         return False

@@ -8,6 +8,5 @@ class PartyFollowThisMemberRequestMessage(PartyFollowMemberRequestMessage):
     def init(self, enabled_:bool, playerId_:int, partyId_:int):
         self.enabled = enabled_
         
-        super().__init__(playerId_, partyId_)
-    
+        super().init(playerId_, partyId_)
     

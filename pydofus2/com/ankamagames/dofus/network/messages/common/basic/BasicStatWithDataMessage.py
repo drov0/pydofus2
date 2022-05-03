@@ -12,6 +12,5 @@ class BasicStatWithDataMessage(BasicStatMessage):
     def init(self, datas_:list['StatisticData'], timeSpent_:int, statId_:int):
         self.datas = datas_
         
-        super().__init__(timeSpent_, statId_)
-    
+        super().init(timeSpent_, statId_)
     

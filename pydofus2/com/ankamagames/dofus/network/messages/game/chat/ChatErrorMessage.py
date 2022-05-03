@@ -10,4 +10,3 @@ class ChatErrorMessage(NetworkMessage):
         
         super().__init__()
     
-    

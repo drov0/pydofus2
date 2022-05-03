@@ -12,4 +12,3 @@ class AlignmentWarEffortInformation(NetworkMessage):
         
         super().__init__()
     
-    

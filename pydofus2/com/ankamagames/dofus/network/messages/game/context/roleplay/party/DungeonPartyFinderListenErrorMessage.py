@@ -10,4 +10,3 @@ class DungeonPartyFinderListenErrorMessage(NetworkMessage):
         
         super().__init__()
     
-    

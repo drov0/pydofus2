@@ -8,6 +8,5 @@ class PartyNameSetRequestMessage(AbstractPartyMessage):
     def init(self, partyName_:str, partyId_:int):
         self.partyName = partyName_
         
-        super().__init__(partyId_)
-    
+        super().init(partyId_)
     

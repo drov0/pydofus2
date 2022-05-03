@@ -12,4 +12,3 @@ class ExchangeIsReadyMessage(NetworkMessage):
         
         super().__init__()
     
-    

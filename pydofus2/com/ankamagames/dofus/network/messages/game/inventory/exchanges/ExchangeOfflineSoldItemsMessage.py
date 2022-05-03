@@ -17,4 +17,3 @@ class ExchangeOfflineSoldItemsMessage(NetworkMessage):
         
         super().__init__()
     
-    

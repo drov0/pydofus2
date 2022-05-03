@@ -8,6 +8,5 @@ class AbstractGameActionWithAckMessage(AbstractGameActionMessage):
     def init(self, waitAckId_:int, actionId_:int, sourceId_:int):
         self.waitAckId = waitAckId_
         
-        super().__init__(actionId_, sourceId_)
-    
+        super().init(actionId_, sourceId_)
     

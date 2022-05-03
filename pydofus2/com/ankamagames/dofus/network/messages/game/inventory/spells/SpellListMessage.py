@@ -16,4 +16,3 @@ class SpellListMessage(NetworkMessage):
         
         super().__init__()
     
-    

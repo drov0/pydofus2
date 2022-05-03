@@ -10,6 +10,5 @@ class GameActionFightActivateGlyphTrapMessage(AbstractGameActionMessage):
         self.markId = markId_
         self.active = active_
         
-        super().__init__(actionId_, sourceId_)
-    
+        super().init(actionId_, sourceId_)
     

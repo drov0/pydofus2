@@ -6,6 +6,5 @@ class HouseSellFromInsideRequestMessage(HouseSellRequestMessage):
 
     def init(self, instanceId_:int, amount_:int, forSale_:bool):
         
-        super().__init__(instanceId_, amount_, forSale_)
-    
+        super().init(instanceId_, amount_, forSale_)
     

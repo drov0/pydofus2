@@ -10,4 +10,3 @@ class AllianceFactsErrorMessage(NetworkMessage):
         
         super().__init__()
     
-    

@@ -16,4 +16,3 @@ class ItemForPresetUpdateMessage(NetworkMessage):
         
         super().__init__()
     
-    

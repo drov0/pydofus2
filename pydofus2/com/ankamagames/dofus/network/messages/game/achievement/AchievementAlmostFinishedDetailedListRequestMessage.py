@@ -8,4 +8,3 @@ class AchievementAlmostFinishedDetailedListRequestMessage(NetworkMessage):
         
         super().__init__()
     
-    

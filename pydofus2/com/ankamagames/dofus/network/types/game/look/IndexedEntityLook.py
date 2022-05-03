@@ -16,4 +16,3 @@ class IndexedEntityLook(NetworkMessage):
         
         super().__init__()
     
-    

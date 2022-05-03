@@ -12,4 +12,3 @@ class InteractiveElementSkill(NetworkMessage):
         
         super().__init__()
     
-    

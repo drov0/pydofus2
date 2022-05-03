@@ -8,6 +8,5 @@ class GameActionFightTackledMessage(AbstractGameActionMessage):
     def init(self, tacklersIds_:list[int], actionId_:int, sourceId_:int):
         self.tacklersIds = tacklersIds_
         
-        super().__init__(actionId_, sourceId_)
-    
+        super().init(actionId_, sourceId_)
     

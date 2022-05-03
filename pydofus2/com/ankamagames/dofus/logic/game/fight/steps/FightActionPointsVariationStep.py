@@ -9,9 +9,12 @@ from com.ankamagames.dofus.logic.game.fight.steps.abstract.AbstractStatContextua
 )
 from com.ankamagames.dofus.logic.game.fight.types.FightEventEnum import FightEventEnum
 from com.ankamagames.dofus.network.enums.GameContextEnum import GameContextEnum
+from com.ankamagames.jerakine.logger.Logger import Logger
 from com.ankamagames.jerakine.utils.display.EnterFrameDispatcher import (
     EnterFrameDispatcher,
 )
+
+logger = Logger(__name__)
 
 
 class FightActionPointsVariationStep(AbstractStatContextualStep, IFightStep):

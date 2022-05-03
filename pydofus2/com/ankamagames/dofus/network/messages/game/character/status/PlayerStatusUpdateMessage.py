@@ -18,4 +18,3 @@ class PlayerStatusUpdateMessage(NetworkMessage):
         
         super().__init__()
     
-    

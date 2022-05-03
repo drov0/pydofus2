@@ -1,7 +1,4 @@
-from enum import Enum
-
-
-class CharacterSpellModificationTypeEnum(Enum):
+class CharacterSpellModificationTypeEnum:
 
     INVALID_MODIFICATION: int = 0
 

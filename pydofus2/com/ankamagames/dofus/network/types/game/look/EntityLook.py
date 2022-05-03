@@ -22,4 +22,3 @@ class EntityLook(NetworkMessage):
         
         super().__init__()
     
-    

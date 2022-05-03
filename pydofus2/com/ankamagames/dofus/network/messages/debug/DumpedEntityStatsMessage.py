@@ -16,4 +16,3 @@ class DumpedEntityStatsMessage(NetworkMessage):
         
         super().__init__()
     
-    

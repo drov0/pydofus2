@@ -8,6 +8,5 @@ class GuildLevelUpActivity(GuildLogbookEntryBasicInformation):
     def init(self, newGuildLevel_:int, id_:int, date_:int):
         self.newGuildLevel = newGuildLevel_
         
-        super().__init__(id_, date_)
-    
+        super().init(id_, date_)
     

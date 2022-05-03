@@ -16,4 +16,3 @@ class AbstractContactInformations(NetworkMessage):
         
         super().__init__()
     
-    

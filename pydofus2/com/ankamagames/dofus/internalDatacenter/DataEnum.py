@@ -1,7 +1,4 @@
-from enum import Enum
-
-
-class DataEnum(Enum):
+class DataEnum:
 
     BREED_PANDAWA: int = 12
 

@@ -16,4 +16,3 @@ class IdolFightPreparationUpdateMessage(NetworkMessage):
         
         super().__init__()
     
-    

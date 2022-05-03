@@ -10,4 +10,3 @@ class BreachSavedMessage(NetworkMessage):
         
         super().__init__()
     
-    

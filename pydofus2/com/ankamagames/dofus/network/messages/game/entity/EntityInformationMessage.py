@@ -14,4 +14,3 @@ class EntityInformationMessage(NetworkMessage):
         
         super().__init__()
     
-    

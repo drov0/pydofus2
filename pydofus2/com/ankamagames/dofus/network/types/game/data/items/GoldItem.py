@@ -8,6 +8,5 @@ class GoldItem(Item):
     def init(self, sum_:int):
         self.sum = sum_
         
-        super().__init__()
-    
+        super().init()
     

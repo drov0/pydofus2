@@ -10,4 +10,3 @@ class FriendGuildWarnOnAchievementCompleteStateMessage(NetworkMessage):
         
         super().__init__()
     
-    

@@ -12,4 +12,3 @@ class UnfollowQuestObjectiveRequestMessage(NetworkMessage):
         
         super().__init__()
     
-    

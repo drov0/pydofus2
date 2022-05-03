@@ -10,6 +10,5 @@ class ExchangePlayerMultiCraftRequestMessage(ExchangeRequestMessage):
         self.target = target_
         self.skillId = skillId_
         
-        super().__init__(exchangeType_)
-    
+        super().init(exchangeType_)
     

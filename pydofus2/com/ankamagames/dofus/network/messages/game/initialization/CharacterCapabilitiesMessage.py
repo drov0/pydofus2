@@ -10,4 +10,3 @@ class CharacterCapabilitiesMessage(NetworkMessage):
         
         super().__init__()
     
-    

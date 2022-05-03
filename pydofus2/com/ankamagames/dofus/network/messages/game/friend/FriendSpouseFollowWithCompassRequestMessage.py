@@ -10,4 +10,3 @@ class FriendSpouseFollowWithCompassRequestMessage(NetworkMessage):
         
         super().__init__()
     
-    

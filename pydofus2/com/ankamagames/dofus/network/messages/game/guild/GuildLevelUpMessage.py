@@ -10,4 +10,3 @@ class GuildLevelUpMessage(NetworkMessage):
         
         super().__init__()
     
-    

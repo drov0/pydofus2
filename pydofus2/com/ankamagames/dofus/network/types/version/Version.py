@@ -18,4 +18,3 @@ class Version(NetworkMessage):
         
         super().__init__()
     
-    

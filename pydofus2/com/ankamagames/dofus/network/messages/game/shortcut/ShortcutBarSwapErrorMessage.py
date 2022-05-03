@@ -10,4 +10,3 @@ class ShortcutBarSwapErrorMessage(NetworkMessage):
         
         super().__init__()
     
-    

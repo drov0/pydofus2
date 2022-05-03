@@ -8,6 +8,5 @@ class StatisticDataString(StatisticData):
     def init(self, value_:str):
         self.value = value_
         
-        super().__init__()
-    
+        super().init()
     

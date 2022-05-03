@@ -10,4 +10,3 @@ class PrismSetSabotagedRequestMessage(NetworkMessage):
         
         super().__init__()
     
-    

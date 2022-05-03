@@ -12,4 +12,3 @@ class ArenaRanking(NetworkMessage):
         
         super().__init__()
     
-    

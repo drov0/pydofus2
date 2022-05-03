@@ -12,4 +12,3 @@ class SlaveNoLongerControledMessage(NetworkMessage):
         
         super().__init__()
     
-    

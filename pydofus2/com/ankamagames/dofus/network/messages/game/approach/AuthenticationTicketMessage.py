@@ -12,4 +12,3 @@ class AuthenticationTicketMessage(NetworkMessage):
         
         super().__init__()
     
-    

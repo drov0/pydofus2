@@ -10,4 +10,3 @@ class ZaapRespawnUpdatedMessage(NetworkMessage):
         
         super().__init__()
     
-    

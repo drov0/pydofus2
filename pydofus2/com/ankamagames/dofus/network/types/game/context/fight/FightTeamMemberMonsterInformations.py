@@ -10,6 +10,5 @@ class FightTeamMemberMonsterInformations(FightTeamMemberInformations):
         self.monsterId = monsterId_
         self.grade = grade_
         
-        super().__init__(id_)
-    
+        super().init(id_)
     

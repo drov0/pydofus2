@@ -12,9 +12,6 @@ from com.ankamagames.atouin.managers.EntitiesManager import EntitiesManager
 from com.ankamagames.dofus.logic.game.fight.frames.FightEntitiesFrame import (
     FightEntitiesFrame,
 )
-from com.ankamagames.dofus.network.messages.game.context.EntityDispositionInformations import (
-    EntityDispositionInformations,
-)
 from com.ankamagames.dofus.network.types.game.context.fight.GameFightFighterInformations import (
     GameFightFighterInformations,
 )
@@ -195,27 +192,28 @@ class FightReachableCellsMaker:
         self._waitingCells = list[_ReachableCellData]()
         self._watchedCells = list[_ReachableCellData]()
         self.markNode(self._mapPoint.x, self._mapPoint.y, mp, untacledMp)
-        if self._waitingCells:
-            tmpCells = self._waitingCells.copy()
-            self._waitingCells.clear()
-        else:
-            tmpCells = self._watchedCells.copy()
-            self._watchedCells.clear()
+        while self._watchedCells or self._waitingCells:
+            if self._waitingCells:
+                tmpCells = self._waitingCells.copy()
+                self._waitingCells.clear()
+            else:
+                tmpCells = self._watchedCells.copy()
+                self._watchedCells.clear()
 
-        for node in tmpCells:
-            mp = int(node.bestRemainingMp * node.evadePercent + 0.49) - 1
-            untacledMp = node.bestRemainingMpNoTackle - 1
-            if MapPoint.isInMap(node.mapPoint.x - 1, node.mapPoint.y):
-                self.markNode(node.mapPoint.x - 1, node.mapPoint.y, mp, untacledMp)
+            for node in tmpCells:
+                mp = int(node.bestRemainingMp * node.evadePercent + 0.49) - 1
+                untacledMp = node.bestRemainingMpNoTackle - 1
+                if MapPoint.isInMap(node.mapPoint.x - 1, node.mapPoint.y):
+                    self.markNode(node.mapPoint.x - 1, node.mapPoint.y, mp, untacledMp)
 
-            if MapPoint.isInMap(node.mapPoint.x + 1, node.mapPoint.y):
-                self.markNode(node.mapPoint.x + 1, node.mapPoint.y, mp, untacledMp)
+                if MapPoint.isInMap(node.mapPoint.x + 1, node.mapPoint.y):
+                    self.markNode(node.mapPoint.x + 1, node.mapPoint.y, mp, untacledMp)
 
-            if MapPoint.isInMap(node.mapPoint.x, node.mapPoint.y - 1):
-                self.markNode(node.mapPoint.x, node.mapPoint.y - 1, mp, untacledMp)
+                if MapPoint.isInMap(node.mapPoint.x, node.mapPoint.y - 1):
+                    self.markNode(node.mapPoint.x, node.mapPoint.y - 1, mp, untacledMp)
 
-            if MapPoint.isInMap(node.mapPoint.x, node.mapPoint.y + 1):
-                self.markNode(node.mapPoint.x, node.mapPoint.y + 1, mp, untacledMp)
+                if MapPoint.isInMap(node.mapPoint.x, node.mapPoint.y + 1):
+                    self.markNode(node.mapPoint.x, node.mapPoint.y + 1, mp, untacledMp)
 
     def markNode(self, x: int, y: int, mp: int, untackledMp: int) -> None:
         xTab: int = x - self._mapPoint.x + self._mp

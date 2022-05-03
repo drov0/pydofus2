@@ -8,4 +8,3 @@ class GameEntityDispositionErrorMessage(NetworkMessage):
         
         super().__init__()
     
-    

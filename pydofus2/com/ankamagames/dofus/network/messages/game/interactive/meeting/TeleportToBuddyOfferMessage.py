@@ -14,4 +14,3 @@ class TeleportToBuddyOfferMessage(NetworkMessage):
         
         super().__init__()
     
-    

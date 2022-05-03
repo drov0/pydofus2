@@ -10,4 +10,3 @@ class ChangeThemeRequestMessage(NetworkMessage):
         
         super().__init__()
     
-    

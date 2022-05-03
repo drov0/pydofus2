@@ -10,6 +10,5 @@ class HumanOptionTitle(HumanOption):
         self.titleId = titleId_
         self.titleParam = titleParam_
         
-        super().__init__()
-    
+        super().init()
     

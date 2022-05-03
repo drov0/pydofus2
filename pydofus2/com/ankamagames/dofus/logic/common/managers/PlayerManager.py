@@ -12,11 +12,9 @@ from com.ankamagames.dofus.network.types.game.havenbag.HavenBagRoomPreviewInform
     HavenBagRoomPreviewInformation,
 )
 from com.ankamagames.jerakine.interfaces.IDestroyable import IDestroyable
-from com.ankamagames.jerakine.utils.errors.SingletonError import SingletonError
 
 
-class PlayerManager(IDestroyable):
-    __metaclasse__ = Singleton
+class PlayerManager(IDestroyable, metaclass=Singleton):
 
     TAG_PREFIX: str = "#"
 
@@ -132,13 +130,9 @@ class PlayerManager(IDestroyable):
         subscriptionSinceConnection: float = None
         if self.subscriptionEndDate > self._subscriptionEndDateUpdateTime:
             now = time.time()
-            subscriptionSinceConnection = (
-                min(self.subscriptionEndDate, now) - self._subscriptionEndDateUpdateTime
-            )
+            subscriptionSinceConnection = min(self.subscriptionEndDate, now) - self._subscriptionEndDateUpdateTime
             if subscriptionSinceConnection > 0:
-                return self._subscriptionDurationElapsed + math.floor(
-                    subscriptionSinceConnection / 1000
-                )
+                return self._subscriptionDurationElapsed + math.floor(subscriptionSinceConnection / 1000)
         return self._subscriptionDurationElapsed
 
     @subscriptionDurationElapsed.setter
@@ -164,31 +158,16 @@ class PlayerManager(IDestroyable):
     ) -> str:
         displayedTag: str = (
             self.TAG_ADMINS
-            if name.find("[") == 0
-            and name.find("]") == len(name) - 1
-            and name != self.nickname
-            and not forceRealTag
+            if name.find("[") == 0 and name.find("]") == len(name) - 1 and name != self.nickname and not forceRealTag
             else tag
         )
         if withStyle:
             return (
                 self.addTagStyleToText("nameStyle", name)
-                + (
-                    self.addTagStyleToText("tagStyle", self.TAG_PREFIX + displayedTag)
-                    if not tag
-                    else ""
-                )
-                + (
-                    self.addTagStyleToText("other", " (" + other + ")")
-                    if not other
-                    else ""
-                )
+                + (self.addTagStyleToText("tagStyle", self.TAG_PREFIX + displayedTag) if not tag else "")
+                + (self.addTagStyleToText("other", " (" + other + ")") if not other else "")
             )
-        return (
-            name
-            + (self.TAG_PREFIX + displayedTag if not tag else "")
-            + (" (" + other + ")" if not other else "")
-        )
+        return name + (self.TAG_PREFIX + displayedTag if not tag else "") + (" (" + other + ")" if not other else "")
 
     def addTagStyleToText(self, tagStyleName: str, text: str) -> str:
         return '<span class="' + tagStyleName + '">' + text + "</span>"

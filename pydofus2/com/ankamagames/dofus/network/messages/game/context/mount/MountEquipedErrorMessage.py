@@ -10,4 +10,3 @@ class MountEquipedErrorMessage(NetworkMessage):
         
         super().__init__()
     
-    

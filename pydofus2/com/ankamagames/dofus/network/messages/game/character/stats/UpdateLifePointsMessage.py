@@ -12,4 +12,3 @@ class UpdateLifePointsMessage(NetworkMessage):
         
         super().__init__()
     
-    

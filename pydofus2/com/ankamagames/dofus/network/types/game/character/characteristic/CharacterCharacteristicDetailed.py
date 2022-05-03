@@ -16,6 +16,5 @@ class CharacterCharacteristicDetailed(CharacterCharacteristic):
         self.alignGiftBonus = alignGiftBonus_
         self.contextModif = contextModif_
         
-        super().__init__(characteristicId_)
-    
+        super().init(characteristicId_)
     

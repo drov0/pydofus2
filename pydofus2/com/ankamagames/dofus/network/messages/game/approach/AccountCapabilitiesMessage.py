@@ -22,4 +22,3 @@ class AccountCapabilitiesMessage(NetworkMessage):
         
         super().__init__()
     
-    

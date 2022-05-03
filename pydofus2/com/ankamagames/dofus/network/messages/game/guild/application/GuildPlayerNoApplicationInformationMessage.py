@@ -6,6 +6,5 @@ class GuildPlayerNoApplicationInformationMessage(GuildPlayerApplicationAbstractM
 
     def init(self):
         
-        super().__init__()
-    
+        super().init()
     

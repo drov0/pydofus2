@@ -16,6 +16,5 @@ class HouseInformationsInside(HouseInformations):
         self.worldX = worldX_
         self.worldY = worldY_
         
-        super().__init__(houseId_, modelId_)
-    
+        super().init(houseId_, modelId_)
     

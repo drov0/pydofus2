@@ -12,6 +12,5 @@ class ZaapDestinationsMessage(TeleportDestinationsMessage):
     def init(self, spawnMapId_:int, type_:int, destinations_:list['TeleportDestination']):
         self.spawnMapId = spawnMapId_
         
-        super().__init__(type_, destinations_)
-    
+        super().init(type_, destinations_)
     

@@ -68,4 +68,3 @@ class ActorRestrictionsInformations(NetworkMessage):
         
         super().__init__()
     
-    

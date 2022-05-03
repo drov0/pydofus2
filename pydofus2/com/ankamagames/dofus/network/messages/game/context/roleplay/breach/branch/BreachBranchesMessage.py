@@ -14,4 +14,3 @@ class BreachBranchesMessage(NetworkMessage):
         
         super().__init__()
     
-    

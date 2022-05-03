@@ -10,4 +10,3 @@ class NicknameRefusedMessage(NetworkMessage):
         
         super().__init__()
     
-    

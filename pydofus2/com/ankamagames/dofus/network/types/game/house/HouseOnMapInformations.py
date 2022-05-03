@@ -14,6 +14,5 @@ class HouseOnMapInformations(HouseInformations):
         self.doorsOnMap = doorsOnMap_
         self.houseInstances = houseInstances_
         
-        super().__init__(houseId_, modelId_)
-    
+        super().init(houseId_, modelId_)
     

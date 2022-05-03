@@ -14,4 +14,3 @@ class GameFightNewWaveMessage(NetworkMessage):
         
         super().__init__()
     
-    

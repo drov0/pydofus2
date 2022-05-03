@@ -14,4 +14,3 @@ class GameEntityDispositionMessage(NetworkMessage):
         
         super().__init__()
     
-    

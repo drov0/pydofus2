@@ -8,4 +8,3 @@ class SpawnInformation(NetworkMessage):
         
         super().__init__()
     
-    

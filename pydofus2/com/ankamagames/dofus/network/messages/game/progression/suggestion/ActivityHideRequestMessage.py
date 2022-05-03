@@ -10,4 +10,3 @@ class ActivityHideRequestMessage(NetworkMessage):
         
         super().__init__()
     
-    

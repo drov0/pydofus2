@@ -10,4 +10,3 @@ class PresetDeleteRequestMessage(NetworkMessage):
         
         super().__init__()
     
-    

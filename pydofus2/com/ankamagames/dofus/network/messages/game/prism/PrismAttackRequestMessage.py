@@ -8,4 +8,3 @@ class PrismAttackRequestMessage(NetworkMessage):
         
         super().__init__()
     
-    

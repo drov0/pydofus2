@@ -10,4 +10,3 @@ class ExchangeObjectMoveKamaMessage(NetworkMessage):
         
         super().__init__()
     
-    

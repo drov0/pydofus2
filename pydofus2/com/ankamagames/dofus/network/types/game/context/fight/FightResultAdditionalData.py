@@ -8,4 +8,3 @@ class FightResultAdditionalData(NetworkMessage):
         
         super().__init__()
     
-    

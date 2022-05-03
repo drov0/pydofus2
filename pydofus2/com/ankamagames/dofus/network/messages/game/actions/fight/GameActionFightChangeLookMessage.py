@@ -14,6 +14,5 @@ class GameActionFightChangeLookMessage(AbstractGameActionMessage):
         self.targetId = targetId_
         self.entityLook = entityLook_
         
-        super().__init__(actionId_, sourceId_)
-    
+        super().init(actionId_, sourceId_)
     

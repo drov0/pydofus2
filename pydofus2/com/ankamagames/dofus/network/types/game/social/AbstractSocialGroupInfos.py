@@ -8,4 +8,3 @@ class AbstractSocialGroupInfos(NetworkMessage):
         
         super().__init__()
     
-    

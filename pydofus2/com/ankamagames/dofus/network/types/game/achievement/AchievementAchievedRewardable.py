@@ -8,6 +8,5 @@ class AchievementAchievedRewardable(AchievementAchieved):
     def init(self, finishedlevel_:int, id_:int, achievedBy_:int):
         self.finishedlevel = finishedlevel_
         
-        super().__init__(id_, achievedBy_)
-    
+        super().init(id_, achievedBy_)
     

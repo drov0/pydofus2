@@ -12,6 +12,5 @@ class CharacterSelectionWithRemodelMessage(CharacterSelectionMessage):
     def init(self, remodel_:'RemodelingInformation', id_:int):
         self.remodel = remodel_
         
-        super().__init__(id_)
-    
+        super().init(id_)
     

@@ -1,5 +1,5 @@
-from pyd2bot.frames.BotFarmPathFrame import BotFarmPathFrame
 from pyd2bot.DofusClient import DofusClient
+from pyd2bot.frames.BotFarmPathFrame import BotFarmPathFrame
 from com.ankamagames.jerakine.logger.Logger import Logger
 from pyd2bot.frames.BotFightFrame import BotFightFrame
 
@@ -34,5 +34,8 @@ if __name__ == "__main__":
     dofus2 = DofusClient(botName)
     dofus2.registerFrame(BotFarmPathFrame(FarmParcours(**goujon_incarnam)))
     dofus2.registerFrame(BotFightFrame())
-    dofus2.start()
+    try:
+        dofus2.start()
+    except Exception as e:
+        logger.error(e, exc_info=True)
     dofus2.join()

@@ -14,4 +14,3 @@ class TrustStatusMessage(NetworkMessage):
         
         super().__init__()
     
-    

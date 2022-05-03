@@ -12,4 +12,3 @@ class CheckFileRequestMessage(NetworkMessage):
         
         super().__init__()
     
-    

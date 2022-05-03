@@ -10,4 +10,3 @@ class PaddockToSellListRequestMessage(NetworkMessage):
         
         super().__init__()
     
-    

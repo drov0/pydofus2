@@ -10,4 +10,3 @@ class HouseKickRequestMessage(NetworkMessage):
         
         super().__init__()
     
-    

@@ -14,4 +14,3 @@ class CharacterStatsListMessage(NetworkMessage):
         
         super().__init__()
     
-    

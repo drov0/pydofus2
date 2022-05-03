@@ -10,4 +10,3 @@ class BreachBudgetMessage(NetworkMessage):
         
         super().__init__()
     
-    

@@ -12,4 +12,3 @@ class MountEmoteIconUsedOkMessage(NetworkMessage):
         
         super().__init__()
     
-    

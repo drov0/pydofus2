@@ -14,4 +14,3 @@ class AtlasPointInformationsMessage(NetworkMessage):
         
         super().__init__()
     
-    

@@ -20,4 +20,3 @@ class PurchasableDialogMessage(NetworkMessage):
         
         super().__init__()
     
-    

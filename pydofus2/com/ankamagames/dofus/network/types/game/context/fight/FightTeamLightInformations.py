@@ -25,6 +25,5 @@ class FightTeamLightInformations(AbstractFightTeamInformations):
         self.hasGroupMember = hasGroupMember_
         self.hasMyTaxCollector = hasMyTaxCollector_
         
-        super().__init__(teamId_, leaderId_, teamSide_, teamTypeId_, nbWaves_)
-    
+        super().init(teamId_, leaderId_, teamSide_, teamTypeId_, nbWaves_)
     

@@ -10,4 +10,3 @@ class TreasureHuntGiveUpRequestMessage(NetworkMessage):
         
         super().__init__()
     
-    

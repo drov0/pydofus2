@@ -12,4 +12,3 @@ class DebugInClientMessage(NetworkMessage):
         
         super().__init__()
     
-    

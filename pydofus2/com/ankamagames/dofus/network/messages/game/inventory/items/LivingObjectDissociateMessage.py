@@ -12,4 +12,3 @@ class LivingObjectDissociateMessage(NetworkMessage):
         
         super().__init__()
     
-    

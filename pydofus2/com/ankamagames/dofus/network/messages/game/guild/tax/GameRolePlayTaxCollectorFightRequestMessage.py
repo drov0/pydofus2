@@ -8,4 +8,3 @@ class GameRolePlayTaxCollectorFightRequestMessage(NetworkMessage):
         
         super().__init__()
     
-    

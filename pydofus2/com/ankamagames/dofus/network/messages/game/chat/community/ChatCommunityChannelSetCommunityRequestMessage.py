@@ -10,4 +10,3 @@ class ChatCommunityChannelSetCommunityRequestMessage(NetworkMessage):
         
         super().__init__()
     
-    

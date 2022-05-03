@@ -12,6 +12,5 @@ class FightTeamInformations(AbstractFightTeamInformations):
     def init(self, teamMembers_:list['FightTeamMemberInformations'], teamId_:int, leaderId_:int, teamSide_:int, teamTypeId_:int, nbWaves_:int):
         self.teamMembers = teamMembers_
         
-        super().__init__(teamId_, leaderId_, teamSide_, teamTypeId_, nbWaves_)
-    
+        super().init(teamId_, leaderId_, teamSide_, teamTypeId_, nbWaves_)
     

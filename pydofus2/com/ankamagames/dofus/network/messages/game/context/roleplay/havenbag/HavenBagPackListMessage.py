@@ -10,4 +10,3 @@ class HavenBagPackListMessage(NetworkMessage):
         
         super().__init__()
     
-    

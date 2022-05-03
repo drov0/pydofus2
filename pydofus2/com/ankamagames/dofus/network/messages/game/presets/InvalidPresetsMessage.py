@@ -10,4 +10,3 @@ class InvalidPresetsMessage(NetworkMessage):
         
         super().__init__()
     
-    

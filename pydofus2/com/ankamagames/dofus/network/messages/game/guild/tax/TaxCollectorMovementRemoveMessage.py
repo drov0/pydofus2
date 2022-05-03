@@ -10,4 +10,3 @@ class TaxCollectorMovementRemoveMessage(NetworkMessage):
         
         super().__init__()
     
-    

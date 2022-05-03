@@ -8,6 +8,5 @@ class CharacterMinimalInformations(CharacterBasicMinimalInformations):
     def init(self, level_:int, name_:str, id_:int):
         self.level = level_
         
-        super().__init__(name_, id_)
-    
+        super().init(name_, id_)
     

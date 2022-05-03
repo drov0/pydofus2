@@ -18,4 +18,3 @@ class PartyMemberGeoPosition(NetworkMessage):
         
         super().__init__()
     
-    

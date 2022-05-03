@@ -19,6 +19,5 @@ class GameFightTaxCollectorInformations(GameFightAIInformations):
         self.lastNameId = lastNameId_
         self.level = level_
         
-        super().__init__(spawnInfo_, wave_, stats_, previousPositions_, look_, contextualId_, disposition_)
-    
+        super().init(spawnInfo_, wave_, stats_, previousPositions_, look_, contextualId_, disposition_)
     

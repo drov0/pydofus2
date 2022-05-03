@@ -85,4 +85,3 @@ class MountClientData(NetworkMessage):
         
         super().__init__()
     
-    

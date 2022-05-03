@@ -8,4 +8,3 @@ class ExchangeRequestOnShopStockMessage(NetworkMessage):
         
         super().__init__()
     
-    

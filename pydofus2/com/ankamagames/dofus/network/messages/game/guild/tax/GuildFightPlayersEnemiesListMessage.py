@@ -16,4 +16,3 @@ class GuildFightPlayersEnemiesListMessage(NetworkMessage):
         
         super().__init__()
     
-    

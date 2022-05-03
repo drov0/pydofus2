@@ -18,4 +18,3 @@ class AllianceJoinedMessage(NetworkMessage):
         
         super().__init__()
     
-    

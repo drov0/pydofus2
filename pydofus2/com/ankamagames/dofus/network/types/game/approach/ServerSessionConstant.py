@@ -10,4 +10,3 @@ class ServerSessionConstant(NetworkMessage):
         
         super().__init__()
     
-    

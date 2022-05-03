@@ -14,4 +14,3 @@ class JobBookSubscriptionMessage(NetworkMessage):
         
         super().__init__()
     
-    

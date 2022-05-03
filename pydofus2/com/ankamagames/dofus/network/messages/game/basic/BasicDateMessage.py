@@ -14,4 +14,3 @@ class BasicDateMessage(NetworkMessage):
         
         super().__init__()
     
-    

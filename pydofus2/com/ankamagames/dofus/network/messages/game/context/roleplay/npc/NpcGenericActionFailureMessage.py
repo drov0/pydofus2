@@ -8,4 +8,3 @@ class NpcGenericActionFailureMessage(NetworkMessage):
         
         super().__init__()
     
-    

@@ -10,4 +10,3 @@ class AddListenerOnSynchronizedStorageMessage(NetworkMessage):
         
         super().__init__()
     
-    

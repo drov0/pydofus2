@@ -10,4 +10,3 @@ class ExchangeItemAutoCraftStopedMessage(NetworkMessage):
         
         super().__init__()
     
-    

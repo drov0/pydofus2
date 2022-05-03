@@ -15,6 +15,5 @@ class GameRolePlayCharacterInformations(GameRolePlayHumanoidInformations):
     def init(self, alignmentInfos_:'ActorAlignmentInformations', humanoidInfo_:'HumanInformations', accountId_:int, name_:str, look_:'EntityLook', contextualId_:int, disposition_:'EntityDispositionInformations'):
         self.alignmentInfos = alignmentInfos_
         
-        super().__init__(humanoidInfo_, accountId_, name_, look_, contextualId_, disposition_)
-    
+        super().init(humanoidInfo_, accountId_, name_, look_, contextualId_, disposition_)
     

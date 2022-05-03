@@ -8,4 +8,3 @@ class ExchangeReplayStopMessage(NetworkMessage):
         
         super().__init__()
     
-    

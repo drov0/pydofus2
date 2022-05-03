@@ -14,4 +14,3 @@ class LivingObjectMessageRequestMessage(NetworkMessage):
         
         super().__init__()
     
-    

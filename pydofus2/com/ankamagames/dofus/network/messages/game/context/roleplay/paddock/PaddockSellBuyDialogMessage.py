@@ -14,4 +14,3 @@ class PaddockSellBuyDialogMessage(NetworkMessage):
         
         super().__init__()
     
-    

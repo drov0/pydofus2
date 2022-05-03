@@ -14,4 +14,3 @@ class MountSetMessage(NetworkMessage):
         
         super().__init__()
     
-    

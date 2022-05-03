@@ -20,4 +20,3 @@ class GameFightCharacteristics(NetworkMessage):
         
         super().__init__()
     
-    

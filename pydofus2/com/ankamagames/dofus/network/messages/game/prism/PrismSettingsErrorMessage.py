@@ -8,4 +8,3 @@ class PrismSettingsErrorMessage(NetworkMessage):
         
         super().__init__()
     
-    

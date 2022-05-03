@@ -12,4 +12,3 @@ class ExchangeOnHumanVendorRequestMessage(NetworkMessage):
         
         super().__init__()
     
-    

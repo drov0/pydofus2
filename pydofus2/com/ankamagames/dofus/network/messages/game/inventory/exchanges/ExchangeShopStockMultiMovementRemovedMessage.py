@@ -10,4 +10,3 @@ class ExchangeShopStockMultiMovementRemovedMessage(NetworkMessage):
         
         super().__init__()
     
-    

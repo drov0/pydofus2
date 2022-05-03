@@ -14,4 +14,3 @@ class StatedMapUpdateMessage(NetworkMessage):
         
         super().__init__()
     
-    

@@ -8,4 +8,3 @@ class ExchangeStartOkRunesTradeMessage(NetworkMessage):
         
         super().__init__()
     
-    

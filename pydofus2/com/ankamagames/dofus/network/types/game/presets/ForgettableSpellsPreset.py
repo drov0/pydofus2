@@ -15,6 +15,5 @@ class ForgettableSpellsPreset(Preset):
         self.baseSpellsPreset = baseSpellsPreset_
         self.forgettableSpells = forgettableSpells_
         
-        super().__init__(id_)
-    
+        super().init(id_)
     

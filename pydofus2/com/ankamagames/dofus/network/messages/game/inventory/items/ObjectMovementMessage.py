@@ -12,4 +12,3 @@ class ObjectMovementMessage(NetworkMessage):
         
         super().__init__()
     
-    

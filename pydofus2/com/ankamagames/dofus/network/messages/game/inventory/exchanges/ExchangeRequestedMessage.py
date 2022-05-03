@@ -10,4 +10,3 @@ class ExchangeRequestedMessage(NetworkMessage):
         
         super().__init__()
     
-    

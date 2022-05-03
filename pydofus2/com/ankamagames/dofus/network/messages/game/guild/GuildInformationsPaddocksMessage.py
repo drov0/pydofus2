@@ -16,4 +16,3 @@ class GuildInformationsPaddocksMessage(NetworkMessage):
         
         super().__init__()
     
-    

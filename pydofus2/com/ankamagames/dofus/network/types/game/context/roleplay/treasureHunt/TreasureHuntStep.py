@@ -8,4 +8,3 @@ class TreasureHuntStep(NetworkMessage):
         
         super().__init__()
     
-    

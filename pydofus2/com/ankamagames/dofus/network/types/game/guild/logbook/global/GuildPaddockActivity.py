@@ -20,6 +20,5 @@ class GuildPaddockActivity(GuildLogbookEntryBasicInformation):
         self.farmId = farmId_
         self.paddockEventType = paddockEventType_
         
-        super().__init__(id_, date_)
-    
+        super().init(id_, date_)
     

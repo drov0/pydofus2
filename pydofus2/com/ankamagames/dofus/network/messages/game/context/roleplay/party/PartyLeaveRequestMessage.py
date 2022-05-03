@@ -6,6 +6,5 @@ class PartyLeaveRequestMessage(AbstractPartyMessage):
 
     def init(self, partyId_:int):
         
-        super().__init__(partyId_)
-    
+        super().init(partyId_)
     

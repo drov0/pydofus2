@@ -41,6 +41,5 @@ class GuildMember(CharacterMinimalInformations):
         self.sex = sex_
         self.havenBagShared = havenBagShared_
         
-        super().__init__(level_, name_, id_)
-    
+        super().init(level_, name_, id_)
     

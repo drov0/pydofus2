@@ -10,4 +10,3 @@ class AreaFightModificatorUpdateMessage(NetworkMessage):
         
         super().__init__()
     
-    

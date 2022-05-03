@@ -10,6 +10,5 @@ class ExchangePodsModifiedMessage(ExchangeObjectMessage):
         self.currentWeight = currentWeight_
         self.maxWeight = maxWeight_
         
-        super().__init__(remote_)
-    
+        super().init(remote_)
     

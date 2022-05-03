@@ -137,6 +137,10 @@ from com.ankamagames.jerakine.messages.Frame import Frame
 from com.ankamagames.jerakine.messages.Message import Message
 from com.ankamagames.jerakine.types.enums.Priority import Priority
 from damageCalculation.tools import StatIds
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from com.ankamagames.dofus.logic.game.fight.frames.FightBattleFrame import FightBattleFrame
 
 logger = Logger(__name__)
 
@@ -181,9 +185,7 @@ class PlayedCharacterUpdatesFrame(Frame):
             scrmsg = msg
             if scrmsg.actorId == pcm.PlayedCharacterManager().id:
                 pcm.PlayedCharacterManager().restrictions = scrmsg.restrictions
-            rpEntitiesFrame = (
-                krnl.Kernel().getWorker().getFrame("RoleplayEntitiesFrame")
-            )
+            rpEntitiesFrame = krnl.Kernel().getWorker().getFrame("RoleplayEntitiesFrame")
             if rpEntitiesFrame:
                 infos = rpEntitiesFrame.getEntityInfos(scrmsg.actorId)
                 if infos and infos.humanoidInfo:
@@ -192,24 +194,22 @@ class PlayedCharacterUpdatesFrame(Frame):
 
         if isinstance(msg, ServerExperienceModificatorMessage):
             semsg = msg
-            pcm.PlayedCharacterManager().experiencePercent = (
-                semsg.experiencePercent - 100
-            )
+            pcm.PlayedCharacterManager().experiencePercent = semsg.experiencePercent - 100
             return True
 
         if isinstance(msg, CharacterStatsListMessage):
-            # cslmsg = msg
-            # fightBattleFrame = krnl.Kernel().getWorker().getFrame("FightBattleFrame")
-            # if fightBattleFrame is not None and fightBattleFrame.executingSequence:
-            #    fightBattleFrame.delayCharacterStatsList(cslmsg)
-            # else:
-            #    self.updateCharacterStatsList(cslmsg.stats)
-            # if self.roleplayContextFrame and self.roleplayContextFrame.entitiesFrame:
-            #    playerInfos = self.roleplayContextFrame.entitiesFrame.getEntityInfos(pcm.PlayedCharacterManager().id)
-            #    if playerInfos:
-            #       playerInfos.alignmentInfos = cslmsg.stats.alignmentInfos
+            cslmsg = msg
+            fightBattleFrame: "FightBattleFrame" = krnl.Kernel().getWorker().getFrame("FightBattleFrame")
+            if fightBattleFrame is not None and fightBattleFrame.executingSequence:
+                fightBattleFrame.delayCharacterStatsList(cslmsg)
+            else:
+                self.updateCharacterStatsList(cslmsg.stats)
+            if self.roleplayContextFrame and self.roleplayContextFrame.entitiesFrame:
+                playerInfos = self.roleplayContextFrame.entitiesFrame.getEntityInfos(pcm.PlayedCharacterManager().id)
+                if playerInfos:
+                    playerInfos.alignmentInfos = cslmsg.stats.alignmentInfos
             # if krnl.Kernel().getWorker().getFrame("QuestFrame").achievmentsListProcessed == False:
-            #    krnl.Kernel().getWorker().getFrame("QuestFrame")
+            #     krnl.Kernel().getWorker().getFrame("QuestFrame")
             return True
 
         if isinstance(msg, MapComplementaryInformationsDataMessage):
@@ -220,9 +220,7 @@ class PlayedCharacterUpdatesFrame(Frame):
                     pcm.PlayedCharacterManager().infos.entityLook = grpci.look
                     for opt in grpci.humanoidInfo.options:
                         if isinstance(opt, HumanOptionAlliance):
-                            pcm.PlayedCharacterManager().characteristics.alignmentInfos.aggressable = (
-                                opt.aggressable
-                            )
+                            pcm.PlayedCharacterManager().characteristics.alignmentInfos.aggressable = opt.aggressable
 
             # if not (pcm.PlayedCharacterManager().characteristics.alignmentInfos.aggressable == AggressableStatusEnum.AvA_DISQUALIFIED or\
             #     pcm.PlayedCharacterManager().characteristics.alignmentInfos.aggressable == AggressableStatusEnum.AvA_ENABLED_AGGRESSABLE or\
@@ -392,9 +390,7 @@ class PlayedCharacterUpdatesFrame(Frame):
                 memberId = CompassUpdatePartyMemberMessage(msg).memberId
                 active = CompassUpdatePartyMemberMessage(msg).active
                 if memberId == 0 and not active:
-                    for (
-                        followingPlayerId
-                    ) in pcm.PlayedCharacterManager().followingPlayerIds:
+                    for followingPlayerId in pcm.PlayedCharacterManager().followingPlayerIds:
                         pass
                     pcm.PlayedCharacterManager().followingPlayerIds = []
                 else:
@@ -437,14 +433,9 @@ class PlayedCharacterUpdatesFrame(Frame):
             btmsg = msg
             receptionDelay = perf_counter() - btmsg.receptionTime
             TimeManager().serverTimeLag = (
-                btmsg.timestamp
-                + btmsg.timezoneOffset * 60 * 1000
-                - datetime.now().timestamp()
-                + receptionDelay
+                btmsg.timestamp + btmsg.timezoneOffset * 60 * 1000 - datetime.now().timestamp() + receptionDelay
             )
-            TimeManager().serverUtcTimeLag = (
-                btmsg.timestamp - datetime.now().timestamp() + receptionDelay
-            )
+            TimeManager().serverUtcTimeLag = btmsg.timestamp - datetime.now().timestamp() + receptionDelay
             return True
 
         if isinstance(msg, StartupActionsListMessage):
@@ -582,40 +573,30 @@ class PlayedCharacterUpdatesFrame(Frame):
                 DofusEntities.getEntity(pcm.PlayedCharacterManager().id) is not None
                 and self.roleplayContextFrame is not None
             ):
-                DofusEntities.getEntity(
-                    pcm.PlayedCharacterManager().id
-                ).speedAdjust = newSpeedAjust
+                DofusEntities.getEntity(pcm.PlayedCharacterManager().id).speedAdjust = newSpeedAjust
             return True
 
         return False
 
-    def updateCharacterStatsList(
-        self, stats: CharacterCharacteristicsInformations
-    ) -> None:
+    def updateCharacterStatsList(self, stats: CharacterCharacteristicsInformations) -> None:
         playerId: float = pcm.PlayedCharacterManager().id
         statsManager: StatsManager = StatsManager()
         playerStats: EntityStats = statsManager.getStats(playerId)
         if playerStats is not None:
             oldEnergyPoints = playerStats.getStatTotalValue(StatIds.ENERGY_POINTS)
         statsManager.addRawStats(playerId, stats.characteristics)
-        SpellModifiersManager().setRawSpellsModifiers(
-            playerId, stats.spellModifications
-        )
+        SpellModifiersManager().setRawSpellsModifiers(playerId, stats.spellModifications)
         if stats.kamas != InventoryManager().inventory.kamas:
             InventoryManager().inventory.kamas = stats.kamas
         pcm.PlayedCharacterManager().characteristics = stats
         if pcm.PlayedCharacterManager().isFighting:
             if CurrentPlayedFighterManager().isRealPlayer():
                 pass
-            spellWrapper.SpellWrapper.refreshAllPlayerSpellHolder(
-                pcm.PlayedCharacterManager().id
-            )
+            spellWrapper.SpellWrapper.refreshAllPlayerSpellHolder(pcm.PlayedCharacterManager().id)
         else:
             pass
 
-    def updateSpellModifier(
-        self, targetId: float, spellId: float, statId: float
-    ) -> None:
+    def updateSpellModifier(self, targetId: float, spellId: float, statId: float) -> None:
         playerId: float = pcm.PlayedCharacterManager().id
         if playerId is not targetId:
             return

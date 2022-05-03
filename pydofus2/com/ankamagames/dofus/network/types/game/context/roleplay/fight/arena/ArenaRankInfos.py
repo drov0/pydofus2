@@ -23,4 +23,3 @@ class ArenaRankInfos(NetworkMessage):
         
         super().__init__()
     
-    

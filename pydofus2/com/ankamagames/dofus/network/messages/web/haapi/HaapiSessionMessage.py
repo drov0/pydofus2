@@ -12,4 +12,3 @@ class HaapiSessionMessage(NetworkMessage):
         
         super().__init__()
     
-    

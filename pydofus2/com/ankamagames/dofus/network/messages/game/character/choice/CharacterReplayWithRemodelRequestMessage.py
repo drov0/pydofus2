@@ -12,6 +12,5 @@ class CharacterReplayWithRemodelRequestMessage(CharacterReplayRequestMessage):
     def init(self, remodel_:'RemodelingInformation', characterId_:int):
         self.remodel = remodel_
         
-        super().__init__(characterId_)
-    
+        super().init(characterId_)
     

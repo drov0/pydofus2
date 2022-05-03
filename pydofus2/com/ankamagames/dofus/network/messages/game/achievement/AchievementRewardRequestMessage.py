@@ -10,4 +10,3 @@ class AchievementRewardRequestMessage(NetworkMessage):
         
         super().__init__()
     
-    

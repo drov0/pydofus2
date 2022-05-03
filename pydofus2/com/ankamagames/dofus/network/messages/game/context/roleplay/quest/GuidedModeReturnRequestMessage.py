@@ -8,4 +8,3 @@ class GuidedModeReturnRequestMessage(NetworkMessage):
         
         super().__init__()
     
-    

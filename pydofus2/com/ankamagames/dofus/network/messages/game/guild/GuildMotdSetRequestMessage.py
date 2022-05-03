@@ -8,6 +8,5 @@ class GuildMotdSetRequestMessage(SocialNoticeSetRequestMessage):
     def init(self, content_:str):
         self.content = content_
         
-        super().__init__()
-    
+        super().init()
     

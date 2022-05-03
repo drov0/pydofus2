@@ -12,4 +12,3 @@ class ObjectGroundListAddedMessage(NetworkMessage):
         
         super().__init__()
     
-    

@@ -14,4 +14,3 @@ class GuildHouseUpdateInformationMessage(NetworkMessage):
         
         super().__init__()
     
-    

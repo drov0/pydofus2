@@ -10,4 +10,3 @@ class BreachInvitationAnswerMessage(NetworkMessage):
         
         super().__init__()
     
-    

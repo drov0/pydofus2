@@ -35,10 +35,7 @@ class StorageSmithMagicFilterView(StorageGenericView):
         return (
             self._parent.isListening(item)
             and super().isListening(item)
-            and (
-                self._skill.modifiableItemTypeIds.find(item.typeId) != -1
-                or self._listeningItemTypes.find(item.typeId) != -1
-            )
+            and (item.typeId in self._skill.modifiableItemTypeIds or item.typeId in self._listeningItemTypes)
             or item.objectGID == DataEnum.ITEM_GID_SIGNATURE_RUNE
         )
 

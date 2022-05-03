@@ -10,4 +10,3 @@ class PrismInfoJoinLeaveRequestMessage(NetworkMessage):
         
         super().__init__()
     
-    

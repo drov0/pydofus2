@@ -16,4 +16,3 @@ class GameRolePlayArenaLeagueRewardsMessage(NetworkMessage):
         
         super().__init__()
     
-    

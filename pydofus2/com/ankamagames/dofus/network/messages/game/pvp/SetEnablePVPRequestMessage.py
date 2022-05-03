@@ -10,4 +10,3 @@ class SetEnablePVPRequestMessage(NetworkMessage):
         
         super().__init__()
     
-    

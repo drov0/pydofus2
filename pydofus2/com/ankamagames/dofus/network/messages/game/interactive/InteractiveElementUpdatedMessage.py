@@ -14,4 +14,3 @@ class InteractiveElementUpdatedMessage(NetworkMessage):
         
         super().__init__()
     
-    

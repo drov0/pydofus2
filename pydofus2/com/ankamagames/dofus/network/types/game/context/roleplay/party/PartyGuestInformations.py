@@ -30,4 +30,3 @@ class PartyGuestInformations(NetworkMessage):
         
         super().__init__()
     
-    

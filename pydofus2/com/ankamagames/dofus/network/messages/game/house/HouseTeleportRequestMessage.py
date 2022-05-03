@@ -12,4 +12,3 @@ class HouseTeleportRequestMessage(NetworkMessage):
         
         super().__init__()
     
-    

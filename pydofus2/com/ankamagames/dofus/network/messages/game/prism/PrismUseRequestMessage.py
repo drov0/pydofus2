@@ -10,4 +10,3 @@ class PrismUseRequestMessage(NetworkMessage):
         
         super().__init__()
     
-    

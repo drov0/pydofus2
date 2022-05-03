@@ -14,6 +14,5 @@ class GuildRankActivity(GuildLogbookEntryBasicInformation):
         self.rankActivityType = rankActivityType_
         self.guildRankMinimalInfos = guildRankMinimalInfos_
         
-        super().__init__(id_, date_)
-    
+        super().init(id_, date_)
     

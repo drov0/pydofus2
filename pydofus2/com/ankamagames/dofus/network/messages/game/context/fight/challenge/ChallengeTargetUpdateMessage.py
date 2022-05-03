@@ -12,4 +12,3 @@ class ChallengeTargetUpdateMessage(NetworkMessage):
         
         super().__init__()
     
-    

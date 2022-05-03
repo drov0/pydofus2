@@ -10,4 +10,3 @@ class ChangeHavenBagRoomRequestMessage(NetworkMessage):
         
         super().__init__()
     
-    

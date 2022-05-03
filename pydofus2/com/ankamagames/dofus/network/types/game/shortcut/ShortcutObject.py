@@ -6,6 +6,5 @@ class ShortcutObject(Shortcut):
 
     def init(self, slot_:int):
         
-        super().__init__(slot_)
-    
+        super().init(slot_)
     

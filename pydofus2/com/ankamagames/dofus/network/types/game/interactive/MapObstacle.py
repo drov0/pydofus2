@@ -12,4 +12,3 @@ class MapObstacle(NetworkMessage):
         
         super().__init__()
     
-    

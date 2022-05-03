@@ -16,4 +16,3 @@ class NamedPartyTeamWithOutcome(NetworkMessage):
         
         super().__init__()
     
-    

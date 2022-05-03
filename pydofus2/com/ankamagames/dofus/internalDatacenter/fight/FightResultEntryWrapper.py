@@ -62,7 +62,7 @@ class FightResultEntryWrapper(IDataCenter):
 
     outcome: int
 
-    id: float
+    id: float = None
 
     name: str
 

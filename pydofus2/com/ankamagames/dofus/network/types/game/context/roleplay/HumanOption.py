@@ -8,4 +8,3 @@ class HumanOption(NetworkMessage):
         
         super().__init__()
     
-    

@@ -10,4 +10,3 @@ class QuestStartRequestMessage(NetworkMessage):
         
         super().__init__()
     
-    

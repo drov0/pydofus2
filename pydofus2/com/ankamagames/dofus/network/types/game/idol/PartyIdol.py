@@ -8,6 +8,5 @@ class PartyIdol(Idol):
     def init(self, ownersIds_:list[int], id_:int, xpBonusPercent_:int, dropBonusPercent_:int):
         self.ownersIds = ownersIds_
         
-        super().__init__(id_, xpBonusPercent_, dropBonusPercent_)
-    
+        super().init(id_, xpBonusPercent_, dropBonusPercent_)
     

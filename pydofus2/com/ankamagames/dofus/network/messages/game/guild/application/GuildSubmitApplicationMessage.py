@@ -34,4 +34,3 @@ class GuildSubmitApplicationMessage(NetworkMessage):
         
         super().__init__()
     
-    

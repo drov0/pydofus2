@@ -26,4 +26,3 @@ class SlaveSwitchContextMessage(NetworkMessage):
         
         super().__init__()
     
-    

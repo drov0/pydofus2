@@ -10,4 +10,3 @@ class GameActionFightNoSpellCastMessage(NetworkMessage):
         
         super().__init__()
     
-    

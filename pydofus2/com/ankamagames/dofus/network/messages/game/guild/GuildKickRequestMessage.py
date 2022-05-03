@@ -10,4 +10,3 @@ class GuildKickRequestMessage(NetworkMessage):
         
         super().__init__()
     
-    

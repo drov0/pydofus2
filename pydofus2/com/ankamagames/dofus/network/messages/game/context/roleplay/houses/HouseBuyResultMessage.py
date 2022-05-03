@@ -20,4 +20,3 @@ class HouseBuyResultMessage(NetworkMessage):
         
         super().__init__()
     
-    

@@ -10,4 +10,3 @@ class GameContextRemoveElementMessage(NetworkMessage):
         
         super().__init__()
     
-    

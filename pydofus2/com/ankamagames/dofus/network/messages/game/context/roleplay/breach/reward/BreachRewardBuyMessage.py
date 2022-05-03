@@ -10,4 +10,3 @@ class BreachRewardBuyMessage(NetworkMessage):
         
         super().__init__()
     
-    

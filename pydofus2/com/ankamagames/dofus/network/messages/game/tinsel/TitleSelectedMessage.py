@@ -10,4 +10,3 @@ class TitleSelectedMessage(NetworkMessage):
         
         super().__init__()
     
-    

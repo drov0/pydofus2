@@ -18,4 +18,3 @@ class AbstractFightTeamInformations(NetworkMessage):
         
         super().__init__()
     
-    

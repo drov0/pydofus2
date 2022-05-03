@@ -14,4 +14,3 @@ class GameFightRemoveTeamMemberMessage(NetworkMessage):
         
         super().__init__()
     
-    

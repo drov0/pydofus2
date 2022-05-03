@@ -14,4 +14,3 @@ class GameRolePlayArenaPlayerBehavioursMessage(NetworkMessage):
         
         super().__init__()
     
-    

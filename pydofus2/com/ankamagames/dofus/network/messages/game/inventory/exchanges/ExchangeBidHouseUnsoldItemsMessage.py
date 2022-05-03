@@ -14,4 +14,3 @@ class ExchangeBidHouseUnsoldItemsMessage(NetworkMessage):
         
         super().__init__()
     
-    

@@ -25,4 +25,3 @@ class FightExternalInformations(NetworkMessage):
         
         super().__init__()
     
-    

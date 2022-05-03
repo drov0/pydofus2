@@ -12,4 +12,3 @@ class TreasureHuntFlagRemoveRequestMessage(NetworkMessage):
         
         super().__init__()
     
-    

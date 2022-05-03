@@ -12,4 +12,3 @@ class GameRolePlayDelayedActionFinishedMessage(NetworkMessage):
         
         super().__init__()
     
-    

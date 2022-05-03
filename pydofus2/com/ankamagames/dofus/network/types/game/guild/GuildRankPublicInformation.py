@@ -10,6 +10,5 @@ class GuildRankPublicInformation(GuildRankMinimalInformation):
         self.order = order_
         self.gfxId = gfxId_
         
-        super().__init__(id_, name_)
-    
+        super().init(id_, name_)
     

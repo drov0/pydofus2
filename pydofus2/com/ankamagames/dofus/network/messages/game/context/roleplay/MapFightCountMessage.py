@@ -10,4 +10,3 @@ class MapFightCountMessage(NetworkMessage):
         
         super().__init__()
     
-    

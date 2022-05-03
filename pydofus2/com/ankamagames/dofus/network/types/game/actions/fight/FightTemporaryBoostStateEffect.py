@@ -8,6 +8,5 @@ class FightTemporaryBoostStateEffect(FightTemporaryBoostEffect):
     def init(self, stateId_:int, delta_:int, uid_:int, targetId_:int, turnDuration_:int, dispelable_:int, spellId_:int, effectId_:int, parentBoostUid_:int):
         self.stateId = stateId_
         
-        super().__init__(delta_, uid_, targetId_, turnDuration_, dispelable_, spellId_, effectId_, parentBoostUid_)
-    
+        super().init(delta_, uid_, targetId_, turnDuration_, dispelable_, spellId_, effectId_, parentBoostUid_)
     

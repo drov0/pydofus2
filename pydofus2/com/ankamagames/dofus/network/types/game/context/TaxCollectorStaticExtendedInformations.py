@@ -13,6 +13,5 @@ class TaxCollectorStaticExtendedInformations(TaxCollectorStaticInformations):
     def init(self, allianceIdentity_:'AllianceInformations', firstNameId_:int, lastNameId_:int, guildIdentity_:'GuildInformations', callerId_:int):
         self.allianceIdentity = allianceIdentity_
         
-        super().__init__(firstNameId_, lastNameId_, guildIdentity_, callerId_)
-    
+        super().init(firstNameId_, lastNameId_, guildIdentity_, callerId_)
     

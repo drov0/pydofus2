@@ -12,4 +12,3 @@ class TreasureHuntDigRequestAnswerMessage(NetworkMessage):
         
         super().__init__()
     
-    

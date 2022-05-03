@@ -12,4 +12,3 @@ class StatsUpgradeResultMessage(NetworkMessage):
         
         super().__init__()
     
-    

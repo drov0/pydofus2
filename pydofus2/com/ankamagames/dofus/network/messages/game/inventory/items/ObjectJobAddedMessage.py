@@ -10,4 +10,3 @@ class ObjectJobAddedMessage(NetworkMessage):
         
         super().__init__()
     
-    

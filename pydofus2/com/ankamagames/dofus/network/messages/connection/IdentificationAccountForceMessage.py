@@ -12,6 +12,5 @@ class IdentificationAccountForceMessage(IdentificationMessage):
     def init(self, forcerAccountLogin_:str, version_:'Version', lang_:str, credentials_:list[int], serverId_:int, sessionOptionalSalt_:int, failedAttempts_:list[int], autoconnect_:bool, useCertificate_:bool, useLoginToken_:bool):
         self.forcerAccountLogin = forcerAccountLogin_
         
-        super().__init__(version_, lang_, credentials_, serverId_, sessionOptionalSalt_, failedAttempts_, autoconnect_, useCertificate_, useLoginToken_)
-    
+        super().init(version_, lang_, credentials_, serverId_, sessionOptionalSalt_, failedAttempts_, autoconnect_, useCertificate_, useLoginToken_)
     

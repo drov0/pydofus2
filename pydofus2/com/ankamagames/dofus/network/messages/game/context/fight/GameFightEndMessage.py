@@ -23,4 +23,3 @@ class GameFightEndMessage(NetworkMessage):
         
         super().__init__()
     
-    

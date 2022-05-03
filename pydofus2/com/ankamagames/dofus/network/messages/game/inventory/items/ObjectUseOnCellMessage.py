@@ -8,6 +8,5 @@ class ObjectUseOnCellMessage(ObjectUseMessage):
     def init(self, cells_:int, objectUID_:int):
         self.cells = cells_
         
-        super().__init__(objectUID_)
-    
+        super().init(objectUID_)
     

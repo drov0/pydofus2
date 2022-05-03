@@ -18,6 +18,5 @@ class ExchangeStartedWithPodsMessage(ExchangeStartedMessage):
         self.secondCharacterCurrentWeight = secondCharacterCurrentWeight_
         self.secondCharacterMaxWeight = secondCharacterMaxWeight_
         
-        super().__init__(exchangeType_)
-    
+        super().init(exchangeType_)
     

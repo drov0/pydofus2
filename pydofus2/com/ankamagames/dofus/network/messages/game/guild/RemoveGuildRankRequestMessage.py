@@ -12,4 +12,3 @@ class RemoveGuildRankRequestMessage(NetworkMessage):
         
         super().__init__()
     
-    

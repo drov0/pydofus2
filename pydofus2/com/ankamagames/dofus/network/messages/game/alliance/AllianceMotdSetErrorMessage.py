@@ -6,6 +6,5 @@ class AllianceMotdSetErrorMessage(SocialNoticeSetErrorMessage):
 
     def init(self, reason_:int):
         
-        super().__init__(reason_)
-    
+        super().init(reason_)
     

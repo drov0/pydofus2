@@ -14,4 +14,3 @@ class BreachInvitationCloseMessage(NetworkMessage):
         
         super().__init__()
     
-    

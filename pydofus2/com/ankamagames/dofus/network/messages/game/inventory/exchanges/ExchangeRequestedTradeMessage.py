@@ -10,6 +10,5 @@ class ExchangeRequestedTradeMessage(ExchangeRequestedMessage):
         self.source = source_
         self.target = target_
         
-        super().__init__(exchangeType_)
-    
+        super().init(exchangeType_)
     

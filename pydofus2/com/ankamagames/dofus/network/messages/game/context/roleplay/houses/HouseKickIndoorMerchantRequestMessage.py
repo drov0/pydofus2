@@ -10,4 +10,3 @@ class HouseKickIndoorMerchantRequestMessage(NetworkMessage):
         
         super().__init__()
     
-    

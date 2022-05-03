@@ -14,4 +14,3 @@ class RecruitmentInformationMessage(NetworkMessage):
         
         super().__init__()
     
-    

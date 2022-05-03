@@ -14,4 +14,3 @@ class ObjectEffects(NetworkMessage):
         
         super().__init__()
     
-    

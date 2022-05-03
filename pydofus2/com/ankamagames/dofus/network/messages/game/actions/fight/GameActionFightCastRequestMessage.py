@@ -12,4 +12,3 @@ class GameActionFightCastRequestMessage(NetworkMessage):
         
         super().__init__()
     
-    

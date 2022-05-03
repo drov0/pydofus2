@@ -36,4 +36,3 @@ class JobCrafterDirectoryEntryPlayerInfo(NetworkMessage):
         
         super().__init__()
     
-    

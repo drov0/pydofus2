@@ -12,6 +12,5 @@ class FightTeamMemberWithAllianceCharacterInformations(FightTeamMemberCharacterI
     def init(self, allianceInfos_:'BasicAllianceInformations', name_:str, level_:int, id_:int):
         self.allianceInfos = allianceInfos_
         
-        super().__init__(name_, level_, id_)
-    
+        super().init(name_, level_, id_)
     

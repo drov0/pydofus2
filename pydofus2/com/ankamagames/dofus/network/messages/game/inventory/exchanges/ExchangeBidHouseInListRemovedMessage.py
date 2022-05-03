@@ -14,4 +14,3 @@ class ExchangeBidHouseInListRemovedMessage(NetworkMessage):
         
         super().__init__()
     
-    

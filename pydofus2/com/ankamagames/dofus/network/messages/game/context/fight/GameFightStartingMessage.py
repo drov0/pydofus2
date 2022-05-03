@@ -18,4 +18,3 @@ class GameFightStartingMessage(NetworkMessage):
         
         super().__init__()
     
-    

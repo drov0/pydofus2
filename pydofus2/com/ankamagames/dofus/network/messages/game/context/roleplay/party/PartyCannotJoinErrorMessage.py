@@ -8,6 +8,5 @@ class PartyCannotJoinErrorMessage(AbstractPartyMessage):
     def init(self, reason_:int, partyId_:int):
         self.reason = reason_
         
-        super().__init__(partyId_)
-    
+        super().init(partyId_)
     

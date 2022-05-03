@@ -10,4 +10,3 @@ class CharacterSelectionMessage(NetworkMessage):
         
         super().__init__()
     
-    

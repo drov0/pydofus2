@@ -10,4 +10,3 @@ class TitleSelectErrorMessage(NetworkMessage):
         
         super().__init__()
     
-    

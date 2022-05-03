@@ -12,4 +12,3 @@ class AllianceGuildLeavingMessage(NetworkMessage):
         
         super().__init__()
     
-    

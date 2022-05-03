@@ -10,4 +10,3 @@ class MountReleasedMessage(NetworkMessage):
         
         super().__init__()
     
-    

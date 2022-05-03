@@ -14,4 +14,3 @@ class InteractiveMapUpdateMessage(NetworkMessage):
         
         super().__init__()
     
-    

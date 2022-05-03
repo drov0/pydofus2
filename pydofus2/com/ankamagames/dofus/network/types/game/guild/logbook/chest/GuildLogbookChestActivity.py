@@ -20,6 +20,5 @@ class GuildLogbookChestActivity(GuildLogbookEntryBasicInformation):
         self.quantity = quantity_
         self.object = object_
         
-        super().__init__(id_, date_)
-    
+        super().init(id_, date_)
     

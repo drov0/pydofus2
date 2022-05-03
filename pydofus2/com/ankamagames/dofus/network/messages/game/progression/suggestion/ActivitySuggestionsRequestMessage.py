@@ -18,4 +18,3 @@ class ActivitySuggestionsRequestMessage(NetworkMessage):
         
         super().__init__()
     
-    

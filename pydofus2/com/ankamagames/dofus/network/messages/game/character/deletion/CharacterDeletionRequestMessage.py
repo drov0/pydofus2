@@ -12,4 +12,3 @@ class CharacterDeletionRequestMessage(NetworkMessage):
         
         super().__init__()
     
-    

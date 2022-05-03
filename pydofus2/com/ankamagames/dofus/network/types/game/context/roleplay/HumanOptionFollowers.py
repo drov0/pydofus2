@@ -12,6 +12,5 @@ class HumanOptionFollowers(HumanOption):
     def init(self, followingCharactersLook_:list['IndexedEntityLook']):
         self.followingCharactersLook = followingCharactersLook_
         
-        super().__init__()
-    
+        super().init()
     

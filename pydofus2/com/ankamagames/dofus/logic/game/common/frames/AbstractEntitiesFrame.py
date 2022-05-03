@@ -81,6 +81,11 @@ class AbstractEntitiesFrame(Frame):
 
         super().__init__()
 
+    def pulled(self) -> bool:
+        self._entities = None
+        self._entitiesTotal = 0
+        return True
+
     @property
     def entities(self):
         return self._entities
@@ -108,9 +113,9 @@ class AbstractEntitiesFrame(Frame):
         if not self._entities or not self._entitiesTotal:
             return None
         if not self._entities.get(entityId):
+            logger.error(f"Entity {entityId} is unknown. Available actor Ids are {list(self._entities.keys())}")
             if entityId <= EntitiesManager.RANDOM_ENTITIES_ID_START:
                 return None
-            # logger.error(f"Entity {entityId} is unknown.")
             return None
         return self._entities.get(entityId)
 
@@ -119,27 +124,19 @@ class AbstractEntitiesFrame(Frame):
         return entitiesList
 
     def hasEntity(self, entityId: float) -> bool:
-        return (
-            self._entities is not None
-            and self._entitiesTotal > 0
-            and entityId in self._entities
-        )
+        return self._entities is not None and self._entitiesTotal > 0 and entityId in self._entities
 
     def registerActor(self, infos: GameContextActorInformations) -> None:
         self.registerActorWithId(infos, infos.contextualId)
 
-    def registerActorWithId(
-        self, infos: GameContextActorInformations, actorId: float
-    ) -> None:
+    def registerActorWithId(self, infos: GameContextActorInformations, actorId: float) -> None:
         if self._entities is None:
             self._entities = dict[int, GameContextActorInformations]()
         if not self._entities.get(actorId):
             self._entitiesTotal += 1
         self._entities[actorId] = infos
         if isinstance(infos, GameFightFighterInformations):
-            StatsManager().addRawStats(
-                actorId, infos.stats.characteristics.characteristics
-            )
+            StatsManager().addRawStats(actorId, infos.stats.characteristics.characteristics)
 
     def unregisterActor(self, actorId: float) -> None:
         entity: IEntity = None
@@ -151,43 +148,29 @@ class AbstractEntitiesFrame(Frame):
         del self._entities[actorId]
         StatsManager().deleteStats(actorId)
 
-    def addOrUpdateActor(
-        self, infos: GameContextActorInformations
-    ) -> AnimatedCharacter:
+    def addOrUpdateActor(self, infos: GameContextActorInformations) -> AnimatedCharacter:
         characterEntity: AnimatedCharacter = DofusEntities.getEntity(infos.contextualId)
         self.registerActor(infos)
         if isinstance(infos, GameFightFighterInformations):
-            StatsManager().addRawStats(
-                infos.contextualId, infos.stats.characteristics.characteristics
-            )
+            StatsManager().addRawStats(infos.contextualId, infos.stats.characteristics.characteristics)
         if characterEntity is None:
             characterEntity = AnimatedCharacter(infos.contextualId)
             if isinstance(infos, GameFightMonsterInformations):
-                characterEntity.speedAdjust = Monster.getMonsterById(
-                    infos.creatureGenericId
-                ).speedAdjust
-            EntitiesManager().addAnimatedEntity(
-                int(infos.contextualId), characterEntity
-            )
+                characterEntity.speedAdjust = Monster.getMonsterById(infos.creatureGenericId).speedAdjust
+            EntitiesManager().addAnimatedEntity(int(infos.contextualId), characterEntity)
         if isinstance(infos, GameRolePlayHumanoidInformations):
             humanoid = infos
             if infos.contextualId == pcm.PlayedCharacterManager().id:
-                pcm.PlayedCharacterManager().restrictions = (
-                    humanoid.humanoidInfo.restrictions
-                )
+                pcm.PlayedCharacterManager().restrictions = humanoid.humanoidInfo.restrictions
         if infos.disposition.cellId != -1:
             characterEntity.position = MapPoint.fromCellId(infos.disposition.cellId)
         return characterEntity
 
-    def updateActorDisposition(
-        self, actorId: float, newDisposition: EntityDispositionInformations
-    ) -> None:
+    def updateActorDisposition(self, actorId: float, newDisposition: EntityDispositionInformations) -> None:
         if self._entities.get(actorId):
             self._entities[actorId].disposition = newDisposition
         else:
-            logger.warn(
-                f"Cannot update unknown actor disposition ({actorId}) in informations."
-            )
+            logger.warn(f"Cannot update unknown actor disposition ({actorId}) in informations.")
 
     def removeActor(self, actorId: float) -> None:
         self.unregisterActor(actorId)

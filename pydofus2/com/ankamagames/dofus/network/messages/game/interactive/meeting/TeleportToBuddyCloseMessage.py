@@ -12,4 +12,3 @@ class TeleportToBuddyCloseMessage(NetworkMessage):
         
         super().__init__()
     
-    

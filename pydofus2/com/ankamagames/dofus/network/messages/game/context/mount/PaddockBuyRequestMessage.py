@@ -10,4 +10,3 @@ class PaddockBuyRequestMessage(NetworkMessage):
         
         super().__init__()
     
-    

@@ -12,6 +12,5 @@ class AllianceInformations(BasicNamedAllianceInformations):
     def init(self, allianceEmblem_:'GuildEmblem', allianceName_:str, allianceId_:int, allianceTag_:str):
         self.allianceEmblem = allianceEmblem_
         
-        super().__init__(allianceName_, allianceId_, allianceTag_)
-    
+        super().init(allianceName_, allianceId_, allianceTag_)
     

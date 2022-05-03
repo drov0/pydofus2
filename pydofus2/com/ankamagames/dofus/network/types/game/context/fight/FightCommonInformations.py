@@ -23,4 +23,3 @@ class FightCommonInformations(NetworkMessage):
         
         super().__init__()
     
-    

@@ -14,4 +14,3 @@ class ExchangeMountsStableAddMessage(NetworkMessage):
         
         super().__init__()
     
-    

@@ -12,4 +12,3 @@ class JobCrafterDirectoryRemoveMessage(NetworkMessage):
         
         super().__init__()
     
-    

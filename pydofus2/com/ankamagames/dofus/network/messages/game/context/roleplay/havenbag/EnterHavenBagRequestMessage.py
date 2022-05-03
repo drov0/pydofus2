@@ -10,4 +10,3 @@ class EnterHavenBagRequestMessage(NetworkMessage):
         
         super().__init__()
     
-    

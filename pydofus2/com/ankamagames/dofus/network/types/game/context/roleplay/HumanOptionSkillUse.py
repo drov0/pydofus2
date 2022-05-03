@@ -12,6 +12,5 @@ class HumanOptionSkillUse(HumanOption):
         self.skillId = skillId_
         self.skillEndTime = skillEndTime_
         
-        super().__init__()
-    
+        super().init()
     

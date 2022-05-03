@@ -8,4 +8,3 @@ class GameMapMovementConfirmMessage(NetworkMessage):
         
         super().__init__()
     
-    

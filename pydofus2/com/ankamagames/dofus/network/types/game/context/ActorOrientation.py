@@ -12,4 +12,3 @@ class ActorOrientation(NetworkMessage):
         
         super().__init__()
     
-    

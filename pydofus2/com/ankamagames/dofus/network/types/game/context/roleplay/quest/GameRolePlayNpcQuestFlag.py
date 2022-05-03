@@ -12,4 +12,3 @@ class GameRolePlayNpcQuestFlag(NetworkMessage):
         
         super().__init__()
     
-    

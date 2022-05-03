@@ -6,6 +6,5 @@ class GuildListApplicationRequestMessage(PaginationRequestAbstractMessage):
 
     def init(self, offset_:int, count_:int):
         
-        super().__init__(offset_, count_)
-    
+        super().init(offset_, count_)
     

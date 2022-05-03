@@ -14,4 +14,3 @@ class UpdateAllGuildRankRequestMessage(NetworkMessage):
         
         super().__init__()
     
-    

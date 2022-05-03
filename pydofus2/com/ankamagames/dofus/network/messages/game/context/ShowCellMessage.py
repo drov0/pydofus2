@@ -12,4 +12,3 @@ class ShowCellMessage(NetworkMessage):
         
         super().__init__()
     
-    

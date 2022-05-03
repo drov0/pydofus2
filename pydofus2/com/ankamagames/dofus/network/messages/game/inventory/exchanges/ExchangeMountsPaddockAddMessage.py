@@ -14,4 +14,3 @@ class ExchangeMountsPaddockAddMessage(NetworkMessage):
         
         super().__init__()
     
-    

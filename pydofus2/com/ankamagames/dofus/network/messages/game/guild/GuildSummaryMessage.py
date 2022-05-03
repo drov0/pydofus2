@@ -12,6 +12,5 @@ class GuildSummaryMessage(PaginationAnswerAbstractMessage):
     def init(self, guilds_:list['GuildFactSheetInformations'], offset_:int, count_:int, total_:int):
         self.guilds = guilds_
         
-        super().__init__(offset_, count_, total_)
-    
+        super().init(offset_, count_, total_)
     

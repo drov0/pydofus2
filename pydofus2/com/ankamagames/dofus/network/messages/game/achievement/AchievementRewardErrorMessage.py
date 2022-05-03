@@ -10,4 +10,3 @@ class AchievementRewardErrorMessage(NetworkMessage):
         
         super().__init__()
     
-    

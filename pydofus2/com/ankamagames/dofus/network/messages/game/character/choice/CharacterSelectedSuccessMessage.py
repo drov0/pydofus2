@@ -16,4 +16,3 @@ class CharacterSelectedSuccessMessage(NetworkMessage):
         
         super().__init__()
     
-    

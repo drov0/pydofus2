@@ -10,4 +10,3 @@ class BasicPingMessage(NetworkMessage):
         
         super().__init__()
     
-    

@@ -8,4 +8,3 @@ class ExchangeRequestOnTaxCollectorMessage(NetworkMessage):
         
         super().__init__()
     
-    

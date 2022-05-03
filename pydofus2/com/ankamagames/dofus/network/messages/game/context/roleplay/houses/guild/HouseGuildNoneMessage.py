@@ -14,4 +14,3 @@ class HouseGuildNoneMessage(NetworkMessage):
         
         super().__init__()
     
-    

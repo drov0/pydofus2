@@ -8,6 +8,5 @@ class SpawnScaledMonsterInformation(BaseSpawnMonsterInformation):
     def init(self, creatureLevel_:int, creatureGenericId_:int):
         self.creatureLevel = creatureLevel_
         
-        super().__init__(creatureGenericId_)
-    
+        super().init(creatureGenericId_)
     

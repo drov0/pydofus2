@@ -10,6 +10,5 @@ class GameFightFighterEntityLightInformation(GameFightFighterLightInformations):
         self.entityModelId = entityModelId_
         self.masterId = masterId_
         
-        super().__init__(id_, wave_, level_, breed_, sex_, alive_)
-    
+        super().init(id_, wave_, level_, breed_, sex_, alive_)
     

@@ -12,4 +12,3 @@ class UpdateGuildRightsMessage(NetworkMessage):
         
         super().__init__()
     
-    

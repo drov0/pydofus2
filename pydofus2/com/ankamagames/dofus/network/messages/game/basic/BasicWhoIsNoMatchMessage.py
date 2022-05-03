@@ -14,4 +14,3 @@ class BasicWhoIsNoMatchMessage(NetworkMessage):
         
         super().__init__()
     
-    

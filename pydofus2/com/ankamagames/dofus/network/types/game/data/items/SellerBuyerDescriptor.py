@@ -24,4 +24,3 @@ class SellerBuyerDescriptor(NetworkMessage):
         
         super().__init__()
     
-    

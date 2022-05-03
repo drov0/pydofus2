@@ -19,4 +19,3 @@ class HumanInformations(NetworkMessage):
         
         super().__init__()
     
-    

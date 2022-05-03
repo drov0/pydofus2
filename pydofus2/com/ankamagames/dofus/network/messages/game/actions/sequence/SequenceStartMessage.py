@@ -12,4 +12,3 @@ class SequenceStartMessage(NetworkMessage):
         
         super().__init__()
     
-    

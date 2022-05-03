@@ -12,4 +12,3 @@ class MountRenameRequestMessage(NetworkMessage):
         
         super().__init__()
     
-    

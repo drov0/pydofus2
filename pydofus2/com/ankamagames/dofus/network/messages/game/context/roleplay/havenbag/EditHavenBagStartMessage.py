@@ -8,4 +8,3 @@ class EditHavenBagStartMessage(NetworkMessage):
         
         super().__init__()
     
-    

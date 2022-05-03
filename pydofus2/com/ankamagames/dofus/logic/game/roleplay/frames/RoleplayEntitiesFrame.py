@@ -13,6 +13,7 @@ from com.ankamagames.dofus.kernel.Kernel import Kernel
 from com.ankamagames.dofus.kernel.net.ConnectionsHandler import ConnectionsHandler
 from com.ankamagames.dofus.logic.common.managers.PlayerManager import PlayerManager
 from com.ankamagames.dofus.logic.game.common.managers.TimerManager import TimeManager
+from com.ankamagames.dofus.logic.game.common.misc.DofusEntities import DofusEntities
 import com.ankamagames.dofus.logic.game.roleplay.frames.RoleplayContextFrame as rcf
 import com.ankamagames.dofus.logic.game.roleplay.frames.RoleplayInteractivesFrame as rif
 from com.ankamagames.dofus.logic.game.roleplay.messages.CharacterMovementStoppedMessage import (
@@ -22,8 +23,15 @@ from com.ankamagames.dofus.logic.game.roleplay.messages.DelayedActionMessage imp
     DelayedActionMessage,
 )
 from com.ankamagames.dofus.logic.game.roleplay.types.Fight import Fight
+from com.ankamagames.dofus.network.enums.AggressableStatusEnum import AggressableStatusEnum
 from com.ankamagames.dofus.network.enums.MapObstacleStateEnum import (
     MapObstacleStateEnum,
+)
+from com.ankamagames.dofus.network.messages.game.context.roleplay.GameRolePlayShowActorMessage import (
+    GameRolePlayShowActorMessage,
+)
+from com.ankamagames.dofus.network.messages.game.context.roleplay.GameRolePlayShowMultipleActorsMessage import (
+    GameRolePlayShowMultipleActorsMessage,
 )
 from com.ankamagames.dofus.network.messages.game.context.roleplay.MapComplementaryInformationsDataInHavenBagMessage import (
     MapComplementaryInformationsDataInHavenBagMessage,
@@ -74,9 +82,13 @@ from com.ankamagames.dofus.network.messages.game.context.roleplay.MapInformation
 from com.ankamagames.dofus.network.messages.game.context.roleplay.breach.MapComplementaryInformationsBreachMessage import (
     MapComplementaryInformationsBreachMessage,
 )
+from com.ankamagames.dofus.network.types.game.context.roleplay.GameRolePlayHumanoidInformations import (
+    GameRolePlayHumanoidInformations,
+)
 from com.ankamagames.dofus.network.types.game.context.roleplay.GameRolePlayMerchantInformations import (
     GameRolePlayMerchantInformations,
 )
+from com.ankamagames.dofus.network.types.game.context.roleplay.HumanInformations import HumanInformations
 from com.ankamagames.dofus.network.types.game.context.roleplay.HumanOptionObjectUse import (
     HumanOptionObjectUse,
 )
@@ -217,17 +229,13 @@ class RoleplayEntitiesFrame(AbstractEntitiesFrame, Frame):
             if isinstance(msg, MapComplementaryInformationsWithCoordsMessage):
                 mciwcmsg = msg
                 PlayedCharacterManager().isIndoor = True
-                self._worldPoint = WorldPointWrapper(
-                    mciwcmsg.mapId, True, mciwcmsg.worldX, mciwcmsg.worldY
-                )
+                self._worldPoint = WorldPointWrapper(mciwcmsg.mapId, True, mciwcmsg.worldX, mciwcmsg.worldY)
 
             elif isinstance(msg, MapComplementaryInformationsDataInHouseMessage):
                 mcidihmsg = msg
                 isPlayerHouse = (
-                    PlayerManager().nickname
-                    == mcidihmsg.currentHouse.houseInfos.ownerTag.nickname
-                    and PlayerManager().tag
-                    == mcidihmsg.currentHouse.houseInfos.ownerTag.tagNumber
+                    PlayerManager().nickname == mcidihmsg.currentHouse.houseInfos.ownerTag.nickname
+                    and PlayerManager().tag == mcidihmsg.currentHouse.houseInfos.ownerTag.tagNumber
                 )
                 PlayedCharacterManager().isInHouse = True
                 if isPlayerHouse:
@@ -251,9 +259,7 @@ class RoleplayEntitiesFrame(AbstractEntitiesFrame, Frame):
             # elif HavenbagTheme.isMapIdInHavenbag(mcidmsg.mapId):
             #     Atouin().showWorld(True)
 
-            roleplayContextFrame: rcf.RoleplayContextFrame = (
-                Kernel().getWorker().getFrame("RoleplayContextFrame")
-            )
+            roleplayContextFrame: rcf.RoleplayContextFrame = Kernel().getWorker().getFrame("RoleplayContextFrame")
             previousMap = PlayedCharacterManager().currentMap
             if (
                 roleplayContextFrame.newCurrentMapIsReceived
@@ -266,10 +272,7 @@ class RoleplayEntitiesFrame(AbstractEntitiesFrame, Frame):
                 # TODO: self.initNewMap()
 
             roleplayContextFrame.newCurrentMapIsReceived = False
-            if (
-                self._currentSubAreaId != mcidmsg.subAreaId
-                or not PlayedCharacterManager().currentSubArea
-            ):
+            if self._currentSubAreaId != mcidmsg.subAreaId or not PlayedCharacterManager().currentSubArea:
                 currentSubAreaHasChanged = True
                 self._currentSubAreaId = mcidmsg.subAreaId
                 newSubArea = SubArea.getSubAreaById(self._currentSubAreaId)
@@ -303,9 +306,7 @@ class RoleplayEntitiesFrame(AbstractEntitiesFrame, Frame):
                                 Kernel().getWorker().process(dam)
                             elif isinstance(option, HumanOptionSkillUse):
                                 hosu = option
-                                duration = (
-                                    hosu.skillEndTime - TimeManager().getUtcTimestamp()
-                                )
+                                duration = hosu.skillEndTime - TimeManager().getUtcTimestamp()
                                 duration /= 100
                                 if duration > 0:
                                     iumsg = InteractiveUsedMessage.from_json(
@@ -379,9 +380,7 @@ class RoleplayEntitiesFrame(AbstractEntitiesFrame, Frame):
                         mo.state == MapObstacleStateEnum.OBSTACLE_OPENED,
                     )
 
-            rpIntFrame: rif.RoleplayInteractivesFrame = (
-                Kernel().getWorker().getFrame("RoleplayInteractivesFrame")
-            )
+            rpIntFrame: rif.RoleplayInteractivesFrame = Kernel().getWorker().getFrame("RoleplayInteractivesFrame")
             imumsg = InteractiveMapUpdateMessage()
             imumsg.init(mcidmsg.interactiveElements)
             rpIntFrame.process(imumsg)
@@ -411,6 +410,31 @@ class RoleplayEntitiesFrame(AbstractEntitiesFrame, Frame):
 
         if isinstance(msg, CharacterMovementStoppedMessage):
             # TODO: notify bot here that he stopped moving for some usecases
+            return True
+
+        if isinstance(msg, GameRolePlayShowActorMessage):
+            if Kernel().getWorker().avoidFlood(msg.__class__.__name__):
+                return True
+            grpsamsg = msg
+            if grpsamsg.informations.contextualId == PlayedCharacterManager().id:
+                humi: HumanInformations = grpsamsg.informations.humanoidInfo
+                PlayedCharacterManager().restrictions = humi.restrictions
+                PlayedCharacterManager().infos.entityLook = grpsamsg.informations.look
+                infos: GameRolePlayHumanoidInformations = self.getEntityInfos(PlayedCharacterManager().id)
+                if infos:
+                    infos.humanoidInfo.restrictions = PlayedCharacterManager().restrictions
+            self.addOrUpdateActor(grpsamsg.informations)
+            if isinstance(grpsamsg.informations, GameRolePlayMerchantInformations):
+                self._merchantsList.append(grpsamsg.informations)
+                self._merchantsList.sort(lambda e: e.name)
+            return True
+
+        if isinstance(msg, GameRolePlayShowMultipleActorsMessage):
+            grpsmamsg = msg
+            for actorInformation in grpsmamsg.informationsList:
+                fakeShowActorMsg = GameRolePlayShowActorMessage()
+                fakeShowActorMsg.informations = actorInformation
+                self.process(fakeShowActorMsg)
             return True
 
     def isFight(self, entityId: int) -> bool:

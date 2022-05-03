@@ -10,4 +10,3 @@ class JobCrafterDirectoryListRequestMessage(NetworkMessage):
         
         super().__init__()
     
-    

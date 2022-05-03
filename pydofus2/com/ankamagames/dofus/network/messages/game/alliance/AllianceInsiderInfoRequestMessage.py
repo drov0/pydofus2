@@ -8,4 +8,3 @@ class AllianceInsiderInfoRequestMessage(NetworkMessage):
         
         super().__init__()
     
-    

@@ -8,4 +8,3 @@ class AlreadyConnectedMessage(NetworkMessage):
         
         super().__init__()
     
-    

@@ -10,4 +10,3 @@ class FriendSetWarnOnConnectionMessage(NetworkMessage):
         
         super().__init__()
     
-    

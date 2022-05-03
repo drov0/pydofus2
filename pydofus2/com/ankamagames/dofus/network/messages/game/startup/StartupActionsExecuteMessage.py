@@ -8,4 +8,3 @@ class StartupActionsExecuteMessage(NetworkMessage):
         
         super().__init__()
     
-    

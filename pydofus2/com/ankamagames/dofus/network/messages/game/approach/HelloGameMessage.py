@@ -8,4 +8,3 @@ class HelloGameMessage(NetworkMessage):
         
         super().__init__()
     
-    

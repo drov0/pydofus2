@@ -10,4 +10,3 @@ class ErrorMapNotFoundMessage(NetworkMessage):
         
         super().__init__()
     
-    

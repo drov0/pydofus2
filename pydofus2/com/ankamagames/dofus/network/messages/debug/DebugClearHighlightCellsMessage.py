@@ -8,4 +8,3 @@ class DebugClearHighlightCellsMessage(NetworkMessage):
         
         super().__init__()
     
-    

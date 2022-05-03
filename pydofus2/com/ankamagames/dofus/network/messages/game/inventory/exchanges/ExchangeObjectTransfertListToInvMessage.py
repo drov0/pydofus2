@@ -10,4 +10,3 @@ class ExchangeObjectTransfertListToInvMessage(NetworkMessage):
         
         super().__init__()
     
-    

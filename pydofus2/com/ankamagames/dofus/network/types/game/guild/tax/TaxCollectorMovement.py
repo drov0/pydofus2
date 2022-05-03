@@ -20,4 +20,3 @@ class TaxCollectorMovement(NetworkMessage):
         
         super().__init__()
     
-    

@@ -10,4 +10,3 @@ class GuildCharacsUpgradeRequestMessage(NetworkMessage):
         
         super().__init__()
     
-    

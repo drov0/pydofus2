@@ -10,4 +10,3 @@ class ExchangeCraftCountRequestMessage(NetworkMessage):
         
         super().__init__()
     
-    

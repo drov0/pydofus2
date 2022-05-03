@@ -8,4 +8,3 @@ class ExchangeObjectTransfertExistingToInvMessage(NetworkMessage):
         
         super().__init__()
     
-    

@@ -14,4 +14,3 @@ class TaxCollectorMovementsOfflineMessage(NetworkMessage):
         
         super().__init__()
     
-    

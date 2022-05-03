@@ -61,9 +61,7 @@ class MovementPath:
         for cell in cells:
             self._aPath.append(PathElement(MapPoint.fromCellId(cell)))
         for i in range(len(cells) - 1):
-            PathElement(self._aPath[i]).orientation = PathElement(
-                self._aPath[i]
-            ).step.orientationTo(PathElement(self._aPath[i + 1]).step)
+            self._aPath[i].orientation = self._aPath[i].step.orientationTo(self._aPath[i + 1].step)
         if self._aPath[0]:
             self._oStart = self._aPath[0].step
             self._oEnd = self._aPath[len(self._aPath) - 1].step
@@ -111,44 +109,28 @@ class MovementPath:
                     pe = PathElement()
                     pe.orientation = DirectionsEnum(self._aPath[elem].orientation)
                     if pe.orientation == DirectionsEnum.RIGHT:
-                        pe.step = MapPoint.fromCoords(
-                            self._aPath[elem].step.x + 1, self._aPath[elem].step.y + 1
-                        )
+                        pe.step = MapPoint.fromCoords(self._aPath[elem].step.x + 1, self._aPath[elem].step.y + 1)
 
                     elif pe.orientation == DirectionsEnum.DOWN_RIGHT:
-                        pe.step = MapPoint.fromCoords(
-                            self._aPath[elem].step.x + 1, self._aPath[elem].step.y
-                        )
+                        pe.step = MapPoint.fromCoords(self._aPath[elem].step.x + 1, self._aPath[elem].step.y)
 
                     elif pe.orientation == DirectionsEnum.DOWN:
-                        pe.step = MapPoint.fromCoords(
-                            self._aPath[elem].step.x + 1, self._aPath[elem].step.y - 1
-                        )
+                        pe.step = MapPoint.fromCoords(self._aPath[elem].step.x + 1, self._aPath[elem].step.y - 1)
 
                     elif pe.orientation == DirectionsEnum.DOWN_LEFT:
-                        pe.step = MapPoint.fromCoords(
-                            self._aPath[elem].step.x, self._aPath[elem].step.y - 1
-                        )
+                        pe.step = MapPoint.fromCoords(self._aPath[elem].step.x, self._aPath[elem].step.y - 1)
 
                     elif pe.orientation == DirectionsEnum.LEFT:
-                        pe.step = MapPoint.fromCoords(
-                            self._aPath[elem].step.x - 1, self._aPath[elem].step.y - 1
-                        )
+                        pe.step = MapPoint.fromCoords(self._aPath[elem].step.x - 1, self._aPath[elem].step.y - 1)
 
                     elif pe.orientation == DirectionsEnum.UP_LEFT:
-                        pe.step = MapPoint.fromCoords(
-                            self._aPath[elem].step.x - 1, self._aPath[elem].step.y
-                        )
+                        pe.step = MapPoint.fromCoords(self._aPath[elem].step.x - 1, self._aPath[elem].step.y)
 
                     elif pe.orientation == DirectionsEnum.UP:
-                        pe.step = MapPoint.fromCoords(
-                            self._aPath[elem].step.x - 1, self._aPath[elem].step.y + 1
-                        )
+                        pe.step = MapPoint.fromCoords(self._aPath[elem].step.x - 1, self._aPath[elem].step.y + 1)
 
                     elif pe.orientation == DirectionsEnum.UP_RIGHT:
-                        pe.step = MapPoint.fromCoords(
-                            self._aPath[elem].step.x, self._aPath[elem].step.y + 1
-                        )
+                        pe.step = MapPoint.fromCoords(self._aPath[elem].step.x, self._aPath[elem].step.y + 1)
 
                     else:
                         raise ValueError("Invalid orientation :" + str(pe.orientation))

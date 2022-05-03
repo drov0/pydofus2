@@ -14,6 +14,5 @@ class GuildInAllianceInformations(GuildInformations):
         self.nbMembers = nbMembers_
         self.joinDate = joinDate_
         
-        super().__init__(guildEmblem_, guildId_, guildName_, guildLevel_)
-    
+        super().init(guildEmblem_, guildId_, guildName_, guildLevel_)
     

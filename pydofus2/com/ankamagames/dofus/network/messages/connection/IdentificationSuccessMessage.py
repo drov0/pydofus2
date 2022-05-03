@@ -42,4 +42,3 @@ class IdentificationSuccessMessage(NetworkMessage):
         
         super().__init__()
     
-    

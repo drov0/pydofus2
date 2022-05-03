@@ -14,4 +14,3 @@ class AllianceListMessage(NetworkMessage):
         
         super().__init__()
     
-    

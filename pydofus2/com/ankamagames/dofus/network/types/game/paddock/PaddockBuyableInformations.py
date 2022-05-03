@@ -12,4 +12,3 @@ class PaddockBuyableInformations(NetworkMessage):
         
         super().__init__()
     
-    

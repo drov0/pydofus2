@@ -14,4 +14,3 @@ class PrismFightAttackerRemoveMessage(NetworkMessage):
         
         super().__init__()
     
-    

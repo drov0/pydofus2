@@ -453,7 +453,7 @@ class FightContextFrame(Frame):
             CurrentPlayedFighterManager().getSpellCastManager().currentTurn = 1
             return True
 
-        if isinstance(msg, CurrentMapMessage):
+        elif isinstance(msg, CurrentMapMessage):
             mcmsg = msg
             if isinstance(mcmsg, CurrentMapInstanceMessage):
                 mdm.MapDisplayManager().mapInstanceId = mcmsg.instantiatedMapId
@@ -466,14 +466,14 @@ class FightContextFrame(Frame):
             PlayedCharacterManager().currentSubArea = SubArea.getSubAreaByMapId(mcmsg.mapId)
             return False
 
-        if isinstance(msg, MapLoadedMessage):
+        elif isinstance(msg, MapLoadedMessage):
             logger.info("MapsLoadingCompleteMessage")
             gcrmsg = GameContextReadyMessage()
             gcrmsg.init(mdm.MapDisplayManager().currentMapPoint.mapId)
             ConnectionsHandler.getConnection().send(gcrmsg)
             return True
 
-        if isinstance(msg, GameFightResumeMessage):
+        elif isinstance(msg, GameFightResumeMessage):
             gfrmsg = msg
             playerId = PlayedCharacterManager().id
             CurrentPlayedFighterManager().setCurrentSummonedCreature(gfrmsg.summonCount, playerId)
@@ -516,18 +516,18 @@ class FightContextFrame(Frame):
             Kernel().getWorker().addSingleTreatment(self, self.stopReconnection, [])
             return True
 
-        if isinstance(msg, GameFightUpdateTeamMessage):
+        elif isinstance(msg, GameFightUpdateTeamMessage):
             gfutmsg = msg
             PlayedCharacterManager().teamId = gfutmsg.team.teamId
             return True
 
-        if isinstance(msg, GameFightSpectateMessage):
+        elif isinstance(msg, GameFightSpectateMessage):
             return True
 
-        if isinstance(msg, GameFightSpectatorJoinMessage):
+        elif isinstance(msg, GameFightSpectatorJoinMessage):
             return True
 
-        if isinstance(msg, GameFightJoinMessage):
+        elif isinstance(msg, GameFightJoinMessage):
             gfjmsg = msg
             preFightIsActive = not gfjmsg.isFightStarted
             self.fightType = gfjmsg.fightType
@@ -555,7 +555,7 @@ class FightContextFrame(Frame):
             #         pass
             return False
 
-        if isinstance(msg, GameFightStartMessage):
+        elif isinstance(msg, GameFightStartMessage):
             gfsm = msg
             preFightIsActive = False
             Kernel().getWorker().removeFrame(self._preparationFrame)
@@ -570,11 +570,11 @@ class FightContextFrame(Frame):
 
             return True
 
-        if isinstance(msg, GameContextDestroyMessage):
+        elif isinstance(msg, GameContextDestroyMessage):
             Kernel().getWorker().removeFrame(self)
             return True
 
-        if isinstance(msg, GameFightLeaveMessage):
+        elif isinstance(msg, GameFightLeaveMessage):
             gflmsg = msg
             return False
 
@@ -605,7 +605,7 @@ class FightContextFrame(Frame):
         #         Kernel().getWorker().addFrame(PointCellFrame())
         #     return True
 
-        if isinstance(msg, GameFightEndMessage):
+        elif isinstance(msg, GameFightEndMessage):
             gfemsg = msg
             hardcoreLoots = None
             CurrentPlayedFighterManager().resetPlayerSpellList()
@@ -721,37 +721,37 @@ class FightContextFrame(Frame):
             Kernel().getWorker().removeFrame(self)
             return False
 
-        if isinstance(msg, ChallengeTargetsListRequestAction):
+        elif isinstance(msg, ChallengeTargetsListRequestAction):
             ctlra = msg
             ctlrmsg = ChallengeTargetsListRequestMessage()
             ctlrmsg.init(ctlra.challengeId)
             ConnectionsHandler.getConnection().send(ctlrmsg)
             return True
 
-        if isinstance(msg, ChallengeTargetsListMessage):
+        elif isinstance(msg, ChallengeTargetsListMessage):
             ctlmsg = msg
             return True
 
-        if isinstance(msg, ChallengeInfoMessage):
+        elif isinstance(msg, ChallengeInfoMessage):
             cimsg = msg
             return True
 
-        if isinstance(msg, ChallengeTargetUpdateMessage):
+        elif isinstance(msg, ChallengeTargetUpdateMessage):
             return True
 
-        if isinstance(msg, ChallengeResultMessage):
+        elif isinstance(msg, ChallengeResultMessage):
             return True
 
-        if isinstance(msg, ArenaFighterLeaveMessage):
+        elif isinstance(msg, ArenaFighterLeaveMessage):
             return True
 
-        if isinstance(msg, MapObstacleUpdateMessage):
+        elif isinstance(msg, MapObstacleUpdateMessage):
             moumsg = msg
             for mo in moumsg.obstacles:
                 DataMapProvider().updateCellMovLov(mo.obstacleCellId, mo.state == MapObstacleStateEnum.OBSTACLE_OPENED)
             return True
 
-        if isinstance(msg, GameActionFightNoSpellCastMessage):
+        elif isinstance(msg, GameActionFightNoSpellCastMessage):
             return True
 
         # if isinstance(msg, BreachEnterMessage):
@@ -772,7 +772,7 @@ class FightContextFrame(Frame):
         #             )
         #     return True
 
-        if isinstance(msg, UpdateSpellModifierAction):
+        elif isinstance(msg, UpdateSpellModifierAction):
             usma = msg
             spellWrapper = SpellWrapper.getSpellWrapperById(usma.spellId, usma.entityId)
             if spellWrapper is not None:
@@ -789,7 +789,7 @@ class FightContextFrame(Frame):
                     pass
             return True
 
-        if isinstance(msg, ArenaFighterIdleMessage):
+        elif isinstance(msg, ArenaFighterIdleMessage):
             return True
 
         return False
@@ -801,8 +801,6 @@ class FightContextFrame(Frame):
             Kernel().getWorker().removeFrame(self._entitiesFrame)
         if self._preparationFrame:
             Kernel().getWorker().removeFrame(self._preparationFrame)
-        self._preparationFrame = None
-        self._battleFrame = None
         self._lastEffectEntity = None
         if self._timerFighterInfo:
             self._timerFighterInfo.cancel()
@@ -816,7 +814,7 @@ class FightContextFrame(Frame):
         return True
 
     def addToHiddenEntities(self, entityId: float) -> None:
-        if self._hiddenEntites.find(entityId) == -1:
+        if entityId not in self._hiddenEntites:
             self._hiddenEntites.append(entityId)
 
     def removeFromHiddenEntities(self, entityId: float) -> None:

@@ -379,7 +379,7 @@ class BuffManager(metaclass=Singleton):
         if GameDebugManager().buffsDebugActivated:
             logger.debug(f"[BUFFS DEBUG] Desenvotment of all buffs belongin to {targetId}")
         newBuffs: list = []
-        for buff in self._buffs[targetId]:
+        for buff in self._buffs.get(targetId, []):
             if buff.canBeDispell(forceUndispellable, -sys.maxsize + 1, dying):
                 if GameDebugManager().buffsDebugActivated:
                     logger.debug("[BUFFS DEBUG]      Buff " + str(buff.uid) + " doit �tre retir�")
@@ -475,16 +475,14 @@ class BuffManager(metaclass=Singleton):
         infos: GameFightFighterInformations = entitiesFrame.getEntityInfos(sourceId)
         if GameDebugManager().buffsDebugActivated:
             logger.debug("[BUFFS DEBUG] Retrait des buffs lanc�s par " + sourceId)
-        for buffList in self._buffs:
-            buffListCopy = []
-            for buff in buffList:
-                buffListCopy.append(buff)
+        for buffList in self._buffs.values():
+            buffListCopy = buffList.copy()
             for buff in buffListCopy:
                 if buff.source == sourceId:
                     if GameDebugManager().buffsDebugActivated:
-                        logger.debug("[BUFFS DEBUG]      Buff " + str(buff.uid) + " doit �tre retir�")
+                        logger.debug("[BUFFS DEBUG]      Buff " + str(buff.uid) + " must be retrieved")
                     self.dispellUniqueBuff(buff.targetId, buff.id, forceUndispellable, dying, False)
-                    if impactedTarget.find(buff.targetId) == -1:
+                    if buff.targetId not in impactedTarget:
                         impactedTarget.append(buff.targetId)
                     if dying and infos.stats.summoned and infos.stats.summoner != fightBattleFrame.currentPlayerId:
                         buff.aliveSource = infos.stats.summoner
@@ -492,7 +490,7 @@ class BuffManager(metaclass=Singleton):
                             logger.debug(
                                 "[BUFFS DEBUG]      Buff "
                                 + buff.uid
-                                + " doit �tre reaffect� � l'invocateur "
+                                + " must be reaffected to the summoner "
                                 + infos.stats.summoner
                             )
         return impactedTarget

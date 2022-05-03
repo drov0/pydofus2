@@ -465,6 +465,7 @@ class FightBattleFrame(Frame):
             self._currentSequenceFrame.mustAck = semsg.authorId == int(CurrentPlayedFighterManager().currentFighterId)
             self._currentSequenceFrame.ackIdent = semsg.actionId
             self._sequenceFrameSwitcher.currentFrame = None
+            logger.debug("Received sequence end for action id: " + str(semsg.actionId))
             if not self._currentSequenceFrame.parent:
                 krnl.Kernel().getWorker().removeFrame(self._sequenceFrameSwitcher)
                 self._sequenceFrameSwitcher = None
@@ -679,6 +680,7 @@ class FightBattleFrame(Frame):
         if self._sequenceFrameCached == None:
             return
         ack: GameActionAcknowledgementMessage = GameActionAcknowledgementMessage()
+        logger.debug(f"Sending acknowledgement for act id {self._sequenceFrameCached.ackIdent}")
         ack.init(True, self._sequenceFrameCached.ackIdent)
         self._sequenceFrameCached = None
         try:

@@ -112,9 +112,7 @@ patterns = {
     # "(\S+) is ([A-Z]+\S+)": r"isinstance(\1, \2)",
     # "(\S+) ? (\S+) : (^[:\s]+)": r"\2 if \1 else \3",
 }
-SWITCH_CASE_PATTERN = (
-    r"\s*(switch\(.*\)\s*\n?\{\s*(?:.|\n)+break;\s*\n\s*(?:default:)?(?:[^}]|\n)*\})"
-)
+SWITCH_CASE_PATTERN = r"\s*(switch\(.*\)\s*\n?\{\s*(?:.|\n)+break;\s*\n\s*(?:default:)?(?:[^}]|\n)*\})"
 CASE_PATTERN1 = "(?P<spaces>\s*)case (?P<testvar>\S+) is (?P<testvalue>\S+):"
 CASE_PATTERN2 = "(?P<spaces>\s*)case (?P<testvalue>\S+):"
 INDENT_SIZE = 4
@@ -145,25 +143,16 @@ def processCaseBlock(block, case_pattern, testvar=None):
                 firstCase = False
             if case_pattern == CASE_PATTERN1:
                 if firstCase:
-                    resLines.append(
-                        tab_size
-                        + f"{op} isinstance({m.group('testvar')}, {m.group('testvalue')}):"
-                    )
+                    resLines.append(tab_size + f"{op} isinstance({m.group('testvar')}, {m.group('testvalue')}):")
                 else:
                     resLines.append(
-                        tab_size[INDENT_SIZE:]
-                        + f"{op} isinstance({m.group('testvar')}, {m.group('testvalue')}):"
+                        tab_size[INDENT_SIZE:] + f"{op} isinstance({m.group('testvar')}, {m.group('testvalue')}):"
                     )
             elif case_pattern == CASE_PATTERN2:
                 if firstCase:
-                    resLines.append(
-                        tab_size + f"{op} {testvar} == {m.group('testvalue')}:"
-                    )
+                    resLines.append(tab_size + f"{op} {testvar} == {m.group('testvalue')}:")
                 else:
-                    resLines.append(
-                        tab_size[INDENT_SIZE:]
-                        + f"{op} {testvar} == {m.group('testvalue')}:"
-                    )
+                    resLines.append(tab_size[INDENT_SIZE:] + f"{op} {testvar} == {m.group('testvalue')}:")
             continue
         if "break;" in line:
             continue
@@ -183,9 +172,7 @@ def processSwitchCases(code):
             if testvar == "true":
                 processedSwitchCase = processCaseBlock(switch_case, CASE_PATTERN1)
             else:
-                processedSwitchCase = processCaseBlock(
-                    switch_case, CASE_PATTERN2, testvar
-                )
+                processedSwitchCase = processCaseBlock(switch_case, CASE_PATTERN2, testvar)
             code = code.replace(switch_case, processedSwitchCase)
         switch_cases = re.findall(SWITCH_CASE_PATTERN, code, flags=re.M)
     return code
@@ -204,14 +191,7 @@ def processCompressedIfELse(line):
         return line
     else:
         j = content.rfind(":")
-        return (
-            leftSide
-            + processCompressedIfELse(content[i + 1 : j])
-            + "if "
-            + content[:i]
-            + "else"
-            + content[j + 1 :]
-        )
+        return leftSide + processCompressedIfELse(content[i + 1 : j]) + "if " + content[:i] + "else" + content[j + 1 :]
 
 
 def processCompressedIfELseInAllCode(code):
@@ -274,9 +254,7 @@ def handleClassHeader(code):
         m = re.match(reg, line)
         if m:
             parents = m.group("parents").split(" ")
-            parents = [
-                p for p in parents if p != "" and p not in ["extends", "implements"]
-            ]
+            parents = [p for p in parents if p != "" and p not in ["extends", "implements"]]
             parents = f"({', '.join(parents)})" if len(parents) > 0 else ""
             line = f"{m.group('left')}class {m.group('name')}{parents}:"
         r.append(line)
@@ -287,9 +265,7 @@ def parseFolderFiles(in_dir, out_dir):
     if not os.path.exists(out_dir):
         os.makedirs(out_dir)
     for f in tqdm(pathlib.Path(in_dir).glob("**/*.as")):
-        parseFile(
-            f, pathlib.Path(out_dir) / f.relative_to(in_dir).name.replace(".as", ".py")
-        )
+        parseFile(f, pathlib.Path(out_dir) / f.relative_to(in_dir).name.replace(".as", ".py"))
 
 
 def getLineIndent(line):
@@ -356,5 +332,5 @@ ROOTDIR = pathlib.Path(os.path.dirname(__file__))
 # )
 
 t = perf_counter()
-parseFile(ROOTDIR / "target.as", ROOTDIR / "LatencyFrame.py")
+parseFile(ROOTDIR / "target.as", ROOTDIR / "MiscFrame.py")
 print("parsing took:", perf_counter() - t)

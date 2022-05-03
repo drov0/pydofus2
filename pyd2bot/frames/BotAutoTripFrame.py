@@ -49,7 +49,9 @@ class BotAutoTripFrame(Frame):
     def process(self, msg: Message) -> bool:
 
         if isinstance(msg, MapComplementaryInformationsDataMessage):
+            logger.debug(f"New map entered")
             self.walkToNextStep()
+            return True
 
         if isinstance(msg, MapChangeFailedMessage):
             if self.changeMapFails > 5:
@@ -65,9 +67,7 @@ class BotAutoTripFrame(Frame):
                 logger.info("Arrived at destination")
                 self._worker.removeFrame(self)
                 if self._worker.contains("BotFarmPathFrame"):
-                    bfpf: "BotFarmPathFrame" = (
-                        Kernel().getWorker().getFrame("BotFarmPathFrame")
-                    )
+                    bfpf: "BotFarmPathFrame" = Kernel().getWorker().getFrame("BotFarmPathFrame")
                     bfpf.doFarm()
                 return True
             e = self.path[self.nextStepIndex]

@@ -96,7 +96,7 @@ class BotFarmPathFrame(Frame):
         return True
 
     def process(self, msg: Message) -> bool:
-        if self._worker.contains("FightContextFrame") or self._worker.contains("AutoTripFrame"):
+        if self._worker.contains("FightContextFrame") or self._worker.contains("BotAutoTripFrame"):
             return False
 
         if isinstance(msg, InteractiveUseErrorMessage):
@@ -105,6 +105,7 @@ class BotFarmPathFrame(Frame):
             )
             logger.debug("***********************************************************************")
             if msg.elemId == self._currentRequestedElementId:
+                logger.debug("Will move on")
                 self._usingInteractive = False
                 del self.roleplayInteractivesFrame._ie[msg.elemId]
                 del self.roleplayInteractivesFrame._collectableIe[msg.elemId]

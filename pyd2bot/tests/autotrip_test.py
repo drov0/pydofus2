@@ -1,7 +1,7 @@
 from pyd2bot.frames.BotAutoTripFrame import (
     BotAutoTripFrame,
 )
-from pyd2bot.DofusClient import DofusClient
+from DofusClient import DofusClient
 from com.ankamagames.jerakine.logger.Logger import Logger
 
 logger = Logger(__name__)

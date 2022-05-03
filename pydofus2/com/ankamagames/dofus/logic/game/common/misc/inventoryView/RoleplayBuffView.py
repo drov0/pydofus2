@@ -31,42 +31,30 @@ class RoleplayBuffView(IInventoryView):
     def content(self) -> list[ItemWrapper]:
         return self._content
 
-    def addItem(
-        self, item: ItemWrapper, invisible: int, needUpdateView: bool = True
-    ) -> None:
+    def addItem(self, item: ItemWrapper, invisible: int, needUpdateView: bool = True) -> None:
         self._content.unshift(item)
         if needUpdateView:
             self.updateView()
 
     def removeItem(self, item: ItemWrapper, invisible: int) -> None:
-        idx: int = self.content.find(item)
-        if idx == -1:
+        if item not in self.content:
             logger.warn("L'item qui doit �tre supprim� n'est pas pr�sent dans la liste")
-        self.content.splice(idx, 1)
+        self.content.remove(item)
         self.updateView()
 
-    def modifyItem(
-        self, item: ItemWrapper, oldItem: ItemWrapper, invisible: int
-    ) -> None:
+    def modifyItem(self, item: ItemWrapper, oldItem: ItemWrapper, invisible: int) -> None:
         self.updateView()
 
     def isListening(self, item: ItemWrapper) -> bool:
         return (
             item.position == CharacterInventoryPositionEnum.INVENTORY_POSITION_MUTATION
-            or item.position
-            == CharacterInventoryPositionEnum.INVENTORY_POSITION_BOOST_FOOD
-            or item.position
-            == CharacterInventoryPositionEnum.INVENTORY_POSITION_FIRST_BONUS
-            or item.position
-            == CharacterInventoryPositionEnum.INVENTORY_POSITION_SECOND_BONUS
-            or item.position
-            == CharacterInventoryPositionEnum.INVENTORY_POSITION_FIRST_MALUS
-            or item.position
-            == CharacterInventoryPositionEnum.INVENTORY_POSITION_SECOND_MALUS
-            or item.position
-            == CharacterInventoryPositionEnum.INVENTORY_POSITION_ROLEPLAY_BUFFER
-            or item.position
-            == CharacterInventoryPositionEnum.INVENTORY_POSITION_FOLLOWER
+            or item.position == CharacterInventoryPositionEnum.INVENTORY_POSITION_BOOST_FOOD
+            or item.position == CharacterInventoryPositionEnum.INVENTORY_POSITION_FIRST_BONUS
+            or item.position == CharacterInventoryPositionEnum.INVENTORY_POSITION_SECOND_BONUS
+            or item.position == CharacterInventoryPositionEnum.INVENTORY_POSITION_FIRST_MALUS
+            or item.position == CharacterInventoryPositionEnum.INVENTORY_POSITION_SECOND_MALUS
+            or item.position == CharacterInventoryPositionEnum.INVENTORY_POSITION_ROLEPLAY_BUFFER
+            or item.position == CharacterInventoryPositionEnum.INVENTORY_POSITION_FOLLOWER
         )
 
     def updateView(self) -> None:

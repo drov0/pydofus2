@@ -1,5 +1,5 @@
 from pyd2bot.frames.BotFarmFrame import BotFarmFrame
-from pyd2bot.DofusClient import DofusClient
+from DofusClient import DofusClient
 from com.ankamagames.jerakine.logger.Logger import Logger
 
 logger = Logger(__name__)

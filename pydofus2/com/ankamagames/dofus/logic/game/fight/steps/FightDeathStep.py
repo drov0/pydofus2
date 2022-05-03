@@ -37,13 +37,13 @@ logger = Logger(__name__)
 
 class FightDeathStep(AbstractSequencable, IFightStep):
 
-    _entityId: float
+    _entityId: float = None
 
-    _deathSubSequence: ISequencer
+    _deathSubSequence: ISequencer = None
 
-    _naturalDeath: bool
+    _naturalDeath: bool = None
 
-    _targetName: str
+    _targetName: str = None
 
     _needToWarn: bool = True
 
@@ -53,9 +53,7 @@ class FightDeathStep(AbstractSequencable, IFightStep):
         super().__init__()
         self._entityId = entityId
         self._naturalDeath = naturalDeath
-        fightContexteFrame: "FightContextFrame" = (
-            Kernel().getWorker().getFrame("FightContextFrame")
-        )
+        fightContexteFrame: "FightContextFrame" = Kernel().getWorker().getFrame("FightContextFrame")
         if fightContexteFrame:
             self._targetName = fightContexteFrame.getFighterName(entityId)
         else:
@@ -72,19 +70,15 @@ class FightDeathStep(AbstractSequencable, IFightStep):
     def start(self) -> None:
         dyingEntity: IEntity = DofusEntities.getEntity(self._entityId)
         if not dyingEntity:
-            logger.warn(
-                "Unable to play death of an unexisting fighter " + self._entityId + "."
-            )
+            logger.warn("Unable to play death of an unexisting fighter " + self._entityId + ".")
             self._needToWarn = True
             self.deathFinished()
             return
-        fighterInfos: GameFightFighterInformations = (
-            FightEntitiesFrame.getCurrentInstance().getEntityInfos(self._entityId)
+        fighterInfos: GameFightFighterInformations = FightEntitiesFrame.getCurrentInstance().getEntityInfos(
+            self._entityId
         )
         fighterStats: EntityStats = StatsManager().getStats(fighterInfos.contextualId)
-        fightBattleFrame: "FightBattleFrame" = (
-            Kernel().getWorker().getFrame("FightBattleFrame")
-        )
+        fightBattleFrame: "FightBattleFrame" = Kernel().getWorker().getFrame("FightBattleFrame")
         if fightBattleFrame:
             fightBattleFrame.deadFightersList.append(self._entityId)
         self._needToWarn = True
@@ -95,10 +89,7 @@ class FightDeathStep(AbstractSequencable, IFightStep):
         fighterStats.setStat(
             Stat(
                 StatIds.CUR_LIFE,
-                -(
-                    fighterStats.getMaxHealthPoints()
-                    + fighterStats.getStatTotalValue(StatIds.CUR_PERMANENT_DAMAGE)
-                ),
+                -(fighterStats.getMaxHealthPoints() + fighterStats.getStatTotalValue(StatIds.CUR_PERMANENT_DAMAGE)),
             )
         )
         self.deathFinished()
@@ -120,22 +111,14 @@ class FightDeathStep(AbstractSequencable, IFightStep):
 
     def deathTimeOut(self, e: Event = None) -> None:
         if self._deathSubSequence:
-            self._deathSubSequence.removeEventListener(
-                SequencerEvent.SEQUENCE_END, self.deathFinished
-            )
-            self._deathSubSequence.removeEventListener(
-                SequencerEvent.SEQUENCE_TIMEOUT, self.deathTimeOut
-            )
+            self._deathSubSequence.removeEventListener(SequencerEvent.SEQUENCE_END, self.deathFinished)
+            self._deathSubSequence.removeEventListener(SequencerEvent.SEQUENCE_TIMEOUT, self.deathTimeOut)
         self._timeOut = True
 
     def deathFinished(self, e: Event = None) -> None:
         if self._deathSubSequence:
-            self._deathSubSequence.removeEventListener(
-                SequencerEvent.SEQUENCE_END, self.deathFinished
-            )
-            self._deathSubSequence.removeEventListener(
-                SequencerEvent.SEQUENCE_TIMEOUT, self.deathTimeOut
-            )
+            self._deathSubSequence.removeEventListener(SequencerEvent.SEQUENCE_END, self.deathFinished)
+            self._deathSubSequence.removeEventListener(SequencerEvent.SEQUENCE_TIMEOUT, self.deathTimeOut)
             self._deathSubSequence = None
         if self._needToWarn:
             if self._naturalDeath:

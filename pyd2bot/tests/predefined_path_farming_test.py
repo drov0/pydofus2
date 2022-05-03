@@ -1,5 +1,5 @@
-from pyd2bot.frames.BotFarmPathFrame import BotFarmPathFrame
 from pyd2bot.DofusClient import DofusClient
+from pyd2bot.frames.BotFarmPathFrame import BotFarmPathFrame
 from com.ankamagames.jerakine.logger.Logger import Logger
 from pyd2bot.frames.BotFightFrame import BotFightFrame
 

@@ -168,9 +168,7 @@ class FightPreparationFrame(Frame):
         swapPositionRequest: SwapPositionRequest = None
         for swapPositionRequest in self._swapPositionRequests:
             if swapPositionRequest.requestId == pRequestId:
-                del self._swapPositionRequests[
-                    self._swapPositionRequests.index(swapPositionRequest)
-                ]
+                del self._swapPositionRequests[self._swapPositionRequests.index(swapPositionRequest)]
 
     def isSwapPositionRequestValid(self, pRequestId: int) -> bool:
         swapPositionRequest: SwapPositionRequest = None
@@ -190,17 +188,13 @@ class FightPreparationFrame(Frame):
                 Kernel().getWorker().removeFrame(self)
                 gfemsg = GameFightEndMessage()
                 gfemsg.init()
-                fightContextFrame2: "FightContextFrame" = (
-                    Kernel().getWorker().getFrame("FightContextFrame")
-                )
+                fightContextFrame2: "FightContextFrame" = Kernel().getWorker().getFrame("FightContextFrame")
                 if fightContextFrame2:
                     fightContextFrame2.process(gfemsg)
                 else:
                     Kernel().getWorker().process(gfemsg)
                 return True
-            fighterSwapPositionRequests = self.getPlayerSwapPositionRequests(
-                gflmsg.charId
-            )
+            fighterSwapPositionRequests = self.getPlayerSwapPositionRequests(gflmsg.charId)
             for swapPositionRequest in fighterSwapPositionRequests:
                 swapPositionRequest.destroy()
             return False
@@ -218,15 +212,9 @@ class FightPreparationFrame(Frame):
             if cellEntity:
                 fighter = object()
                 fighter.name = self._fightContextFrame.getFighterName(cellEntity.id)
-                entitiesFrame: "FightEntitiesFrame" = (
-                    Kernel().getWorker().getFrame("FightEntitiesFrame")
-                )
-                fighterInfos: GameFightFighterInformations = (
-                    entitiesFrame.getEntityInfos(cellEntity.id)
-                )
-                playerInfos: GameFightFighterInformations = (
-                    entitiesFrame.getEntityInfos(PlayedCharacterManager().id)
-                )
+                entitiesFrame: "FightEntitiesFrame" = Kernel().getWorker().getFrame("FightEntitiesFrame")
+                fighterInfos: GameFightFighterInformations = entitiesFrame.getEntityInfos(cellEntity.id)
+                playerInfos: GameFightFighterInformations = entitiesFrame.getEntityInfos(PlayedCharacterManager().id)
                 if not (
                     fighterInfos.contextualId != playerInfos.contextualId
                     and fighterInfos.spawnInfo.teamId == playerInfos.spawnInfo.teamId
@@ -249,13 +237,9 @@ class FightPreparationFrame(Frame):
                 ConnectionsHandler.getConnection().send(gfpprmsg2)
             return True
 
-        if isinstance(msg, GameEntitiesDispositionMessage) or isinstance(
-            msg, GameFightPlacementSwapPositionsMessage
-        ):
+        if isinstance(msg, GameEntitiesDispositionMessage) or isinstance(msg, GameFightPlacementSwapPositionsMessage):
             for iedi in msg.dispositions:
-                entitySwapPositionsRequests = self.getPlayerSwapPositionRequests(
-                    iedi.id
-                )
+                entitySwapPositionsRequests = self.getPlayerSwapPositionRequests(iedi.id)
                 for swapPositionRequest in entitySwapPositionsRequests:
                     swapPositionRequest.destroy()
             return False
@@ -350,35 +334,24 @@ class FightPreparationFrame(Frame):
             for teamMember in gfutmsg.team.teamMembers:
                 if teamMember.id == gfutmsg_myId:
                     alreadyInTeam = True
-                if self._fightersId.find(teamMember.id) == -1:
+                if teamMember.id not in self._fightersId:
                     self._fightersId.append(teamMember.id)
-            if (
-                alreadyInTeam
-                or len(gfutmsg.team.teamMembers) >= 1
-                and gfutmsg.team.teamMembers[0].id == gfutmsg_myId
-            ):
+            if alreadyInTeam or len(gfutmsg.team.teamMembers) >= 1 and gfutmsg.team.teamMembers[0].id == gfutmsg_myId:
                 PlayedCharacterManager().teamId = gfutmsg.team.teamId
-                self._fightContextFrame.isFightLeader = (
-                    gfutmsg.team.leaderId == gfutmsg_myId
-                )
+                self._fightContextFrame.isFightLeader = gfutmsg.team.leaderId == gfutmsg_myId
             return True
 
         if isinstance(msg, GameFightRemoveTeamMemberMessage):
             gfrtmmsg = msg
-            self._fightContextFrame.entitiesFrame.process(
-                RemoveEntityAction.create(gfrtmmsg.charId)
-            )
-            indexOfCharToRemove = self._fightersId.find(gfrtmmsg.charId)
-            if indexOfCharToRemove != -1:
-                self._fightersId.splice(indexOfCharToRemove, 1)
+            self._fightContextFrame.entitiesFrame.process(RemoveEntityAction.create(gfrtmmsg.charId))
+            if gfrtmmsg.charId in self._fightersId:
+                self._fightersId.remove(gfrtmmsg.charId)
             return True
 
         if isinstance(msg, GameContextDestroyMessage):
             gfemsg2 = GameFightEndMessage()
             gfemsg2.init()
-            fightContextFrame: "FightContextFrame" = (
-                Kernel().getWorker().getFrame("FightContextFrame")
-            )
+            fightContextFrame: "FightContextFrame" = Kernel().getWorker().getFrame("FightContextFrame")
             if fightContextFrame:
                 fightContextFrame.process(gfemsg2)
             else:
@@ -426,15 +399,10 @@ class FightPreparationFrame(Frame):
                 return swapPositionRequest
         return None
 
-    def getPlayerSwapPositionRequests(
-        self, pPlayerId: float
-    ) -> list[SwapPositionRequest]:
+    def getPlayerSwapPositionRequests(self, pPlayerId: float) -> list[SwapPositionRequest]:
         swapPositionRequest: SwapPositionRequest = None
         swapPositionRequests: list[SwapPositionRequest] = list[SwapPositionRequest]()
         for swapPositionRequest in self._swapPositionRequests:
-            if (
-                swapPositionRequest.requesterId == pPlayerId
-                or swapPositionRequest.requestedId == pPlayerId
-            ):
+            if swapPositionRequest.requesterId == pPlayerId or swapPositionRequest.requestedId == pPlayerId:
                 swapPositionRequests.append(swapPositionRequest)
         return swapPositionRequests

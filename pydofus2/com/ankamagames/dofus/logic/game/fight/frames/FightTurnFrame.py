@@ -1,5 +1,6 @@
 from datetime import datetime
 import math
+from time import sleep
 from com.ankamagames.atouin.messages.CellClickMessage import CellClickMessage
 from com.ankamagames.atouin.messages.EntityMovementCompleteMessage import (
     EntityMovementCompleteMessage,
@@ -28,6 +29,8 @@ from com.ankamagames.dofus.logic.game.fight.actions.GameFightTurnFinishAction im
     GameFightTurnFinishAction,
 )
 from typing import TYPE_CHECKING
+
+from com.ankamagames.dofus.types.entities.AnimatedCharacter import AnimatedCharacter
 
 if TYPE_CHECKING:
     from com.ankamagames.dofus.logic.game.fight.frames.FightContextFrame import (
@@ -368,8 +371,9 @@ class FightTurnFrame(Frame):
 
     def drawPath(self, destCell: MapPoint = None) -> None:
         firstObstacle: PathElement = None
-        if self._cells is None:
-            self._cells = []
+        self._cells = []
+        self._cellsTackled = []
+        self._cellsUnreachable = []
         logger.debug(f"Drawing the move path to {destCell}")
         if Kernel().getWorker().contains("FightSpellCastFrame"):
             return
@@ -455,9 +459,7 @@ class FightTurnFrame(Frame):
                 else:
                     self._cellsUnreachable.append(pe.step.cellId)
             lastPe = pe
-        logger.debug(
-            f"cells : {self._cells}, cellsTackled : {self._cellsTackled}, cellsUnreachable : {self._cellsUnreachable}"
-        )
+
         tackle = TackleUtil.getTackle(playerInfos, lastPe.step)
         mpLost += int((movementPoints - mpCount) * (1 - tackle) + 0.5)
         if mpLost < 0:
@@ -478,6 +480,10 @@ class FightTurnFrame(Frame):
             movementPoints = len(path.path) - 1
         else:
             self._cellsUnreachable.append(path.end.cellId)
+
+        logger.debug(
+            f"cells : {self._cells}, cellsTackled : {self._cellsTackled}, cellsUnreachable : {self._cellsUnreachable}"
+        )
 
     def updatePath(self) -> None:
         self.drawPath(self._lastCell)
@@ -513,19 +519,20 @@ class FightTurnFrame(Frame):
             self._isRequestingMovement = False
             return False
         path: MovementPath = MovementPath()
-        cells: list[int] = self._cells if (self._cells and len(self._cells)) else self._cellsTackled
+        cells: list[int] = self._cells if (self._cells and len(self._cells) > 0) else self._cellsTackled
         cells.insert(0, self._playerEntity.position.cellId)
-        path.fillFromCellIds(cells[0 : len(cells) - 1])
+        path.fillFromCellIds(cells[0:-1])
         path.start = self._playerEntity.position
-        path.end = MapPoint.fromCellId(cells[len(cells) - 1])
-        path.path[len(path.path) - 1].orientation = path.path[len(path.path) - 1].step.orientationTo(path.end)
+        path.end = MapPoint.fromCellId(cells[-1])
+        path.path[-1].orientation = path.path[-1].step.orientationTo(path.end)
+        logger.debug(f"Path of movement {path}")
         fightBattleFrame: "FightBattleFrame" = Kernel().getWorker().getFrame("FightBattleFrame")
         if not fightBattleFrame or not fightBattleFrame.fightIsPaused:
             gmmrmsg = GameMapMovementRequestMessage()
-            gmmrmsg.init(
-                MapMovementAdapter.getServerMovement(path),
-                PlayedCharacterManager().currentMap.mapId,
-            )
+            keyMovements = MapMovementAdapter.getServerMovement(path)
+            currMapId = PlayedCharacterManager().currentMap.mapId
+            logger.debug(f"Sendings {keyMovements} to server, current map {currMapId}")
+            gmmrmsg.init(keyMovements, currMapId)
             ConnectionsHandler.getConnection().send(gmmrmsg)
         else:
             self._isRequestingMovement = False

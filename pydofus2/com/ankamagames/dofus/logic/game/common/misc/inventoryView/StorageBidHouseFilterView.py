@@ -35,7 +35,7 @@ class StorageBidHouseFilterView(StorageGenericView):
             self._parent.isListening(item)
             and super().isListening(item)
             and data.level <= self._maxItemLevel
-            and self._allowedTypes.find(data.typeId) != -1
+            and data.typeId in self._allowedTypes
         )
 
     def updateView(self) -> None:

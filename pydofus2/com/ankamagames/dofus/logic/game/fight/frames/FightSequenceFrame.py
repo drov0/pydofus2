@@ -599,8 +599,6 @@ class FightSequenceFrame(Frame, ISpellCastProvider):
             if gafscmsg.destinationCellId != -1:
                 tempCastingSpell.targetedCell = MapPoint.fromCellId(gafscmsg.destinationCellId)
             if gafscmsg and gafscmsg.actionId == ActionIds.ACTION_FINISH_MOVE:
-                fxScriptId = tempCastingSpell.spell.getScriptId(tempCastingSpell.isCriticalHit)
-                self._fightBattleFrame.isFightAboutToEnd = True
                 return True
             if self._castingSpell:
                 if closeCombatWeaponId != 0:

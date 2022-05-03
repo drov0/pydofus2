@@ -129,9 +129,7 @@ class SpellWrapper(ISlotData, ICellZoneProvider, IDataCenter):
         if useCache:
             if spellID in cls._cache and not playerId:
                 spell = cls._cache[spellID]
-            elif (
-                playerId in cls._playersCache and spellID in cls._playersCache[playerId]
-            ):
+            elif playerId in cls._playersCache and spellID in cls._playersCache[playerId]:
                 spell = cls._playersCache[playerId][spellID]
         if spellID == 0 and cls._cac != None:
             spell = cls._cac
@@ -166,9 +164,7 @@ class SpellWrapper(ISlotData, ICellZoneProvider, IDataCenter):
         return spell
 
     @classmethod
-    def getSpellWrapperById(
-        cls, spellId: int, playerID: float, forceCreate: bool = False
-    ) -> "SpellWrapper":
+    def getSpellWrapperById(cls, spellId: int, playerID: float, forceCreate: bool = False) -> "SpellWrapper":
         if forceCreate:
             return cls.create(spellId)
         if playerID != 0:
@@ -185,9 +181,7 @@ class SpellWrapper(ISlotData, ICellZoneProvider, IDataCenter):
 
     @classmethod
     def refreshAllPlayerSpellHolder(cls, playerId: float) -> None:
-        EnterFrameDispatcher().worker.addUniqueSingleTreatment(
-            SpellWrapper, cls.refreshSpellHolders, [playerId]
-        )
+        EnterFrameDispatcher().worker.addUniqueSingleTreatment(SpellWrapper, cls.refreshSpellHolders, [playerId])
 
     @classmethod
     def refreshSpellHolders(cls, playerID: float) -> None:
@@ -313,11 +307,7 @@ class SpellWrapper(ISlotData, ICellZoneProvider, IDataCenter):
     def active(self) -> bool:
         if not PlayedCharacterManager().isFighting:
             return True
-        return bool(
-            cpfm.CurrentPlayedFighterManager().canCastThisSpell(
-                self.spellId, self.spellLevel
-            )
-        )
+        return bool(cpfm.CurrentPlayedFighterManager().canCastThisSpell(self.spellId, self.spellLevel))
 
     @property
     def spell(self) -> Spell:
@@ -335,9 +325,7 @@ class SpellWrapper(ISlotData, ICellZoneProvider, IDataCenter):
     def playerCriticalRate(self) -> int:
         if self["isSpellWeapon"] and not self["isDefaultSpellWeapon"]:
             weaponCriticalHit = self.getWeaponProperty("criticalHitProbability")
-            currentCriticalHitProbability = (
-                float(55 - weaponCriticalHit) if weaponCriticalHit > 0 else float(0)
-            )
+            currentCriticalHitProbability = float(55 - weaponCriticalHit) if weaponCriticalHit > 0 else float(0)
         else:
             currentCriticalHitProbability = self.getCriticalHitProbability()
         spellModifier: SpellModifier = spellmm.SpellModifiersManager().getSpellModifier(
@@ -357,9 +345,9 @@ class SpellWrapper(ISlotData, ICellZoneProvider, IDataCenter):
             if entityId is not None:
                 stats = StatsManager().getStats(entityId)
             if stats is not None:
-                totalCriticalHit = stats.getStatTotalValue(
+                totalCriticalHit = stats.getStatTotalValue(StatIds.CRITICAL_HIT) - stats.getStatAdditionalValue(
                     StatIds.CRITICAL_HIT
-                ) - stats.getStatAdditionalValue(StatIds.CRITICAL_HIT)
+                )
                 criticalRate = currentCriticalHitProbability - totalCriticalHit
                 if criticalRate > 55:
                     criticalRate = 55
@@ -372,25 +360,17 @@ class SpellWrapper(ISlotData, ICellZoneProvider, IDataCenter):
         rangeBonus: float = None
         entityId: float = self.getEntityId()
         stats: EntityStats = StatsManager().getStats(entityId)
-        spellModifiers: "SpellModifiers" = (
-            spellmm.SpellModifiersManager().getSpellModifiers(entityId, self.id)
-        )
+        spellModifiers: "SpellModifiers" = spellmm.SpellModifiersManager().getSpellModifiers(entityId, self.id)
         boostableRange: bool = self.spellLevelInfos.rangeCanBeBoosted
         finalRange: float = self.maximalRange
         if spellModifiers is not None:
             if not boostableRange:
-                if spellModifiers.hasModifier(
-                    CharacterSpellModificationTypeEnum.RANGEABLE
-                ):
+                if spellModifiers.hasModifier(CharacterSpellModificationTypeEnum.RANGEABLE):
                     boostableRange = True
             if spellModifiers.hasModifier(CharacterSpellModificationTypeEnum.RANGE_MAX):
-                finalRange += spellModifiers.getModifierValue(
-                    CharacterSpellModificationTypeEnum.RANGE_MAX
-                )
+                finalRange += spellModifiers.getModifierValue(CharacterSpellModificationTypeEnum.RANGE_MAX)
         if boostableRange and stats is not None:
-            rangeBonus = stats.getStatTotalValue(
-                StatIds.RANGE
-            ) - stats.getStatAdditionalValue(StatIds.RANGE)
+            rangeBonus = stats.getStatTotalValue(StatIds.RANGE) - stats.getStatAdditionalValue(StatIds.RANGE)
             finalRange += rangeBonus
         if finalRange < self.minimalRange:
             finalRange = self.minimalRange
@@ -466,10 +446,7 @@ class SpellWrapper(ISlotData, ICellZoneProvider, IDataCenter):
                 CharacterSpellModificationTypeEnum.MAX_CAST_PER_TURN,
             )
             if spellModifier is not None:
-                numberToReturn += (
-                    spellModifier.contextModifValue
-                    + spellModifier.objectsAndMountBonusValue
-                )
+                numberToReturn += spellModifier.contextModifValue + spellModifier.objectsAndMountBonusValue
             return numberToReturn
         if str(name) == "range":
             numberToReturn = self.spellLevelInfos["range"]
@@ -479,10 +456,7 @@ class SpellWrapper(ISlotData, ICellZoneProvider, IDataCenter):
                 CharacterSpellModificationTypeEnum.RANGE_MAX,
             )
             if spellModifier is not None:
-                numberToReturn += (
-                    spellModifier.contextModifValue
-                    + spellModifier.objectsAndMountBonusValue
-                )
+                numberToReturn += spellModifier.contextModifValue + spellModifier.objectsAndMountBonusValue
             return numberToReturn
         if str(name) == "minRange":
             numberToReturn = self.spellLevelInfos["minRange"]
@@ -492,10 +466,7 @@ class SpellWrapper(ISlotData, ICellZoneProvider, IDataCenter):
                 CharacterSpellModificationTypeEnum.RANGE_MIN,
             )
             if spellModifier is not None:
-                numberToReturn += (
-                    spellModifier.contextModifValue
-                    + spellModifier.objectsAndMountBonusValue
-                )
+                numberToReturn += spellModifier.contextModifValue + spellModifier.objectsAndMountBonusValue
             return numberToReturn
         if str(name) == "maxCastPerTarget":
             numberToReturn = self.spellLevelInfos["maxCastPerTarget"]
@@ -505,10 +476,7 @@ class SpellWrapper(ISlotData, ICellZoneProvider, IDataCenter):
                 CharacterSpellModificationTypeEnum.MAX_CAST_PER_TARGET,
             )
             if spellModifier is not None:
-                numberToReturn += (
-                    spellModifier.contextModifValue
-                    + spellModifier.objectsAndMountBonusValue
-                )
+                numberToReturn += spellModifier.contextModifValue + spellModifier.objectsAndMountBonusValue
             return numberToReturn
         if str(name) == "castInLine":
             booleanToReturn = self.spellLevelInfos["castInLine"]
@@ -637,14 +605,10 @@ class SpellWrapper(ISlotData, ICellZoneProvider, IDataCenter):
 
     def getCriticalHitProbability(self) -> float:
         criticalHitProbability: float = self.spellLevelInfos["criticalHitProbability"]
-        return (
-            float(55 - criticalHitProbability) if criticalHitProbability > 0 else None
-        )
+        return float(55 - criticalHitProbability) if criticalHitProbability > 0 else None
 
     def clone(self) -> Any:
-        return SpellWrapper.create(
-            self.id, self.spellLevel, False, self.playerId, self.variantActivated
-        )
+        return SpellWrapper.create(self.id, self.spellLevel, False, self.playerId, self.variantActivated)
 
     def addHolder(self, h: ISlotDataHolder) -> None:
         self._slotDataHolderManager.addHolder(h)
@@ -683,20 +647,13 @@ class SpellWrapper(ISlotData, ICellZoneProvider, IDataCenter):
                 effectInstance.category == DataEnum.ACTION_TYPE_DAMAGES
                 and effectInstance.effectId in SpellWrapper.BASE_DAMAGE_EFFECT_IDS
             ):
-                damageBaseSpellModifier = (
-                    spellmm.SpellModifiersManager().getSpellModifier(
-                        entityId,
-                        self.id,
-                        CharacterSpellModificationTypeEnum.BASE_DAMAGE,
-                    )
+                damageBaseSpellModifier = spellmm.SpellModifiersManager().getSpellModifier(
+                    entityId,
+                    self.id,
+                    CharacterSpellModificationTypeEnum.BASE_DAMAGE,
                 )
-                if damageBaseSpellModifier and isinstance(
-                    effectInstance, EffectInstanceDice
-                ):
-                    modif = (
-                        damageBaseSpellModifier.totalValue
-                        - damageBaseSpellModifier.additionalValue
-                    )
+                if damageBaseSpellModifier and isinstance(effectInstance, EffectInstanceDice):
+                    modif = damageBaseSpellModifier.totalValue - damageBaseSpellModifier.additionalValue
                     effectInstance.param1 += modif
                     if effectInstance.param2 > 0:
                         effectInstance.param2 += modif
@@ -707,14 +664,9 @@ class SpellWrapper(ISlotData, ICellZoneProvider, IDataCenter):
                     entityId, self.id, CharacterSpellModificationTypeEnum.HEAL_BONUS
                 )
                 if damageSpellModifier:
-                    effectInstance.modificator = (
-                        damageSpellModifier.totalValue
-                        - damageSpellModifier.additionalValue
-                    )
+                    effectInstance.modificator = damageSpellModifier.totalValue - damageSpellModifier.additionalValue
                 elif healSpellModifier:
-                    effectInstance.modificator = (
-                        healSpellModifier.totalValue - healSpellModifier.additionalValue
-                    )
+                    effectInstance.modificator = healSpellModifier.totalValue - healSpellModifier.additionalValue
             self.effects.append(effectInstance)
         for effectInstance in self._spellLevel.criticalEffect:
             effectInstance = effectInstance.clone()
@@ -722,21 +674,14 @@ class SpellWrapper(ISlotData, ICellZoneProvider, IDataCenter):
                 effectInstance.category == DataEnum.ACTION_TYPE_DAMAGES
                 and effectInstance.effectId in SpellWrapper.BASE_DAMAGE_EFFECT_IDS
             ):
-                damageBaseSpellModifier = (
-                    spellmm.SpellModifiersManager().getSpellModifier(
-                        entityId,
-                        self.id,
-                        CharacterSpellModificationTypeEnum.BASE_DAMAGE,
-                    )
+                damageBaseSpellModifier = spellmm.SpellModifiersManager().getSpellModifier(
+                    entityId,
+                    self.id,
+                    CharacterSpellModificationTypeEnum.BASE_DAMAGE,
                 )
-                if damageBaseSpellModifier and isinstance(
-                    effectInstance, EffectInstanceDice
-                ):
+                if damageBaseSpellModifier and isinstance(effectInstance, EffectInstanceDice):
                     effectInstanceDice = effectInstance
-                    modif = (
-                        damageBaseSpellModifier.totalValue
-                        - damageBaseSpellModifier.additionalValue
-                    )
+                    modif = damageBaseSpellModifier.totalValue - damageBaseSpellModifier.additionalValue
                     effectInstanceDice.param1 += modif
                     if effectInstanceDice.param2 > 0:
                         effectInstanceDice.param2 += modif
@@ -747,15 +692,9 @@ class SpellWrapper(ISlotData, ICellZoneProvider, IDataCenter):
                     entityId, self.id, CharacterSpellModificationTypeEnum.HEAL_BONUS
                 )
                 if damageSpellModifier:
-                    effectInstance.modificator = (
-                        damageSpellModifier.totalValue
-                        - damageSpellModifier.additionalValue
-                    )
+                    effectInstance.modificator = damageSpellModifier.totalValue - damageSpellModifier.additionalValue
                 elif healSpellModifier:
-                    effectInstance.modificator = (
-                        damageSpellModifier.totalValue
-                        - damageSpellModifier.additionalValue
-                    )
+                    effectInstance.modificator = damageSpellModifier.totalValue - damageSpellModifier.additionalValue
             self.criticalEffect.append(effectInstance)
         llen = len(self._spellLevel.additionalEffectsZones)
         if llen > 0:

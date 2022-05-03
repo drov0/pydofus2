@@ -491,7 +491,7 @@ class FightSpellCastFrame(Frame):
                                 mp = MapPoint.fromCoords(cellFromLine.x, cellFromLine.y)
                                 cells.append(mp.cellId)
                             cellsWithLosOk = LosDetector.getCell(DataMapProvider(), cells, lastPortalMp)
-                            if cellsWithLosOk.find(cAfterPortal) > -1:
+                            if cAfterPortal in cellsWithLosOk:
                                 portalUsableCells.append(c)
                             else:
                                 untargetableCells.append(c)

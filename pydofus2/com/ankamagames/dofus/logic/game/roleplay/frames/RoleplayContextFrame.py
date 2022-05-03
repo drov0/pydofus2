@@ -117,7 +117,7 @@ class RoleplayContextFrame(Frame):
             return True
 
         elif isinstance(msg, ObtainedItemMessage):
-            pass
+            return True
 
         return False
 

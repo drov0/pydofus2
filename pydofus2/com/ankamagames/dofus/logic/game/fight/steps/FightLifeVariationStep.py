@@ -16,10 +16,13 @@ from com.ankamagames.dofus.network.enums.GameContextEnum import GameContextEnum
 from com.ankamagames.dofus.network.types.game.context.fight.GameFightFighterInformations import (
     GameFightFighterInformations,
 )
+from com.ankamagames.jerakine.logger.Logger import Logger
 from com.ankamagames.jerakine.utils.display.EnterFrameDispatcher import (
     EnterFrameDispatcher,
 )
 from damageCalculation.tools.StatIds import StatIds
+
+logger = Logger(__name__)
 
 
 class FightLifeVariationStep(AbstractStatContextualStep, IFightStep):
@@ -38,12 +41,8 @@ class FightLifeVariationStep(AbstractStatContextualStep, IFightStep):
 
     _fighterInfo: GameFightFighterInformations = None
 
-    def __init__(
-        self, entityId: float, delta: int, permanentDamages: int, elementId: int
-    ):
-        super().__init__(
-            self.COLOR, str(delta), entityId, GameContextEnum.FIGHT, self.BLOCKING
-        )
+    def __init__(self, entityId: float, delta: int, permanentDamages: int, elementId: int):
+        super().__init__(self.COLOR, str(delta), entityId, GameContextEnum.FIGHT, self.BLOCKING)
         self._virtual = True
         self._delta = delta
         self._permanentDamages = permanentDamages
@@ -70,10 +69,9 @@ class FightLifeVariationStep(AbstractStatContextualStep, IFightStep):
         return self._elementId
 
     def start(self) -> None:
-        self._fighterInfo = FightEntitiesFrame.getCurrentInstance().getEntityInfos(
-            self._targetId
-        )
+        self._fighterInfo = FightEntitiesFrame.getCurrentInstance().getEntityInfos(self._targetId)
         if not self._fighterInfo:
+            logger.error(f"Can't find fighter info for entity {self._targetId}")
             super().executeCallbacks()
             return
         EnterFrameDispatcher().worker.addSingleTreatment(self, self.apply, [])
@@ -81,23 +79,18 @@ class FightLifeVariationStep(AbstractStatContextualStep, IFightStep):
     def apply(self) -> None:
         stats: EntityStats = StatsManager().getStats(self._targetId)
         res: int = stats.getHealthPoints() + self._delta
-        maxLifePoints: float = max(
-            1, stats.getMaxHealthPoints() + self._permanentDamages
-        )
+        maxLifePoints: float = max(1, stats.getMaxHealthPoints() + self._permanentDamages)
         lifePoints: float = min(max(0, res), maxLifePoints)
         stats.setStat(
             Stat(
                 StatIds.CUR_PERMANENT_DAMAGE,
-                stats.getStatTotalValue(StatIds.CUR_PERMANENT_DAMAGE)
-                - self._permanentDamages,
+                stats.getStatTotalValue(StatIds.CUR_PERMANENT_DAMAGE) - self._permanentDamages,
             )
         )
         stats.setStat(
             Stat(
                 StatIds.CUR_LIFE,
-                lifePoints
-                - maxLifePoints
-                - stats.getStatTotalValue(StatIds.CUR_PERMANENT_DAMAGE),
+                lifePoints - maxLifePoints - stats.getStatTotalValue(StatIds.CUR_PERMANENT_DAMAGE),
             )
         )
         if self._delta < 0 or self._delta == 0 and not self.skipTextEvent:
@@ -127,3 +120,4 @@ class FightLifeVariationStep(AbstractStatContextualStep, IFightStep):
                 False,
                 2,
             )
+        super().start()

@@ -1,7 +1,9 @@
 import math
 import random
 from threading import Timer
+from time import sleep
 from types import FunctionType
+from com.ankamagames.dofus.logic.game.fight.frames.FightBattleFrame import FightBattleFrame
 from com.ankamagames.jerakine.logger.Logger import Logger
 from com.ankamagames.atouin.managers.MapDisplayManager import MapDisplayManager
 from com.ankamagames.atouin.messages.CellClickMessage import CellClickMessage
@@ -137,11 +139,11 @@ class BotFightFrame(Frame, metaclass=Singleton):
 
         if isinstance(msg, MapComplementaryInformationsDataMessage):
             self._wait = False
-            return True
+            return False
 
         if isinstance(msg, MapLoadedMessage):
             self._wait = True
-            return True
+            return False
 
         if isinstance(msg, GameFightShowFighterMessage):
             self._turnPlayed = 0
@@ -152,6 +154,9 @@ class BotFightFrame(Frame, metaclass=Singleton):
             return True
 
         if isinstance(msg, GameFightTurnStartMessage):
+            fbf: FightBattleFrame = Kernel().getWorker().getFrame("FightBattleFrame")
+            while fbf.executingSequence:
+                sleep(0.1)
             turnStartMsg = msg
             self._turnAction = []
             if turnStartMsg.id == PlayedCharacterManager().id:
@@ -197,17 +202,13 @@ class BotFightFrame(Frame, metaclass=Singleton):
         groupEntity: IEntity = None
         if self._inFight or self._wait:
             return
-        rpEF: "RoleplayEntitiesFrame" = (
-            Kernel().getWorker().getFrame("RoleplayEntitiesFrame")
-        )
+        rpEF: "RoleplayEntitiesFrame" = Kernel().getWorker().getFrame("RoleplayEntitiesFrame")
         if not rpEF:
             return
         avaibleCells: list = []
         for entity in rpEF.entities:
             if isinstance(entity, GameRolePlayGroupMonsterInformations):
-                groupEntity = DofusEntities.getEntity(
-                    GameRolePlayGroupMonsterInformations(entity).contextualId
-                )
+                groupEntity = DofusEntities.getEntity(GameRolePlayGroupMonsterInformations(entity).contextualId)
                 avaibleCells.append(MapPoint.fromCellId(groupEntity.position.cellId))
         if not avaibleCells or not len(avaibleCells):
             return
@@ -219,9 +220,7 @@ class BotFightFrame(Frame, metaclass=Singleton):
 
     def fightRandomMove(self) -> None:
         reachableCellsMaker: FightReachableCellsMaker = FightReachableCellsMaker(
-            FightEntitiesFrame.getCurrentInstance().getEntityInfos(
-                PlayedCharacterManager().id
-            )
+            FightEntitiesFrame.getCurrentInstance().getEntityInfos(PlayedCharacterManager().id)
         )
         logger.debug(f"found {len(reachableCellsMaker.reachableCells)} reachable cells")
         if len(reachableCellsMaker.reachableCells) == 0:
@@ -235,21 +234,15 @@ class BotFightFrame(Frame, metaclass=Singleton):
         avaibleCells: list = None
         entity = None
         monster: GameFightMonsterInformations = None
-        gafcrmsg: GameActionFightCastRequestMessage = (
-            GameActionFightCastRequestMessage()
-        )
+        gafcrmsg: GameActionFightCastRequestMessage = GameActionFightCastRequestMessage()
         if onMySelf:
             cellId = (
-                FightEntitiesFrame.getCurrentInstance()
-                .getEntityInfos(PlayedCharacterManager().id)
-                .disposition.cellId
+                FightEntitiesFrame.getCurrentInstance().getEntityInfos(PlayedCharacterManager().id).disposition.cellId
             )
         else:
             avaibleCells = []
             for entity in FightEntitiesFrame.getCurrentInstance().entities.values():
-                if entity.contextualId < 0 and isinstance(
-                    entity, GameFightMonsterInformations
-                ):
+                if entity.contextualId < 0 and isinstance(entity, GameFightMonsterInformations):
                     monster = entity
                     if monster.spawnInfo.alive:
                         avaibleCells.append(entity.disposition.cellId)
@@ -262,17 +255,11 @@ class BotFightFrame(Frame, metaclass=Singleton):
         if not self._myTurn:
             logger.debug("Wants to move when it's not its turn yet")
             return False
-        fightTurnFrame: "FightTurnFrame" = (
-            Kernel().getWorker().getFrame("FightTurnFrame")
-        )
+        fightTurnFrame: "FightTurnFrame" = Kernel().getWorker().getFrame("FightTurnFrame")
         if not fightTurnFrame:
-            logger.debug(
-                "Wants to move inside fight but 'FightTurnFrame' not found in kernel"
-            )
+            logger.debug("Wants to move inside fight but 'FightTurnFrame' not found in kernel")
             return False
-        logger.debug(
-            f"Current cell {fightTurnFrame._playerEntity.position.cellId} moving to cell {cell.cellId}"
-        )
+        logger.debug(f"Current cell {fightTurnFrame._playerEntity.position.cellId} moving to cell {cell.cellId}")
         fightTurnFrame.drawPath(cell)
         fightTurnFrame.askMoveTo(cell)
         return True

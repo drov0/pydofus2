@@ -11,7 +11,7 @@ class PlayerInventory(Inventory):
 
     @property
     def kamas(self):
-        raise RuntimeError("This property has no getter!")
+        return self._kamas
 
     @kamas.setter
     def kamas(self, value: float) -> None:

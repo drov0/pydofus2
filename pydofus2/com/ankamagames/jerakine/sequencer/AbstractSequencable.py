@@ -8,7 +8,7 @@ logger = Logger(__name__)
 
 class AbstractSequencable(IPausableSequencable):
 
-    DEFAULT_TIMEOUT: int = 5
+    DEFAULT_TIMEOUT: int = 2
 
     _listeners: dict = None
 
@@ -114,7 +114,7 @@ class AbstractSequencable(IPausableSequencable):
     def isTimeout(self) -> bool:
         return self._withTimeOut
 
-    def onTimeOut(self, e) -> None:
+    def onTimeOut(self) -> None:
         logger.error(f"Time out sur la step {self} ({self._timeOut}")
         self._withTimeOut = True
         if self._timeOut:

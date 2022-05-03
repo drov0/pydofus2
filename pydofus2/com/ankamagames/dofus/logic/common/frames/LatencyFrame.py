@@ -21,7 +21,7 @@ logger = Logger(__name__)
 
 class LatencyFrame(Frame):
 
-    pingRequested: int
+    pingRequested: int = 0
 
     def __init__(self):
         super().__init__()

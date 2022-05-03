@@ -17,10 +17,9 @@ class SequencerEvent(Event):
 
     _step: ISequencable
 
-    def __init__(
-        self, type: str, sequencer: ISequencer = None, step: ISequencable = None
-    ):
-        super().__init__(type, False, False)
+    def __init__(self, type: str, sequencer: ISequencer = None, step: ISequencable = None):
+        super().__init__()
+        self.type = type
         self._sequencer = sequencer
         self._step = step
 

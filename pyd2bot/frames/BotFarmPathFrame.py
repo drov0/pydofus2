@@ -145,8 +145,9 @@ class BotFarmPathFrame(Frame):
 
         elif isinstance(msg, MapChangeFailedMessage):
             logger.debug(f"[BotFarmFrame] Map change to {self._dstMapId} failed will discard that destination")
-            self._mapIdDiscard.append(msg.mapId)
-            MoveAPI.changeMapToDstCoords(*self.nextPathMapCoords)
+            if self._dstMapId != -1:
+                self._mapIdDiscard.append(self._dstMapId)
+                MoveAPI.changeMapToDstCoords(*self.nextPathMapCoords, discard=self._mapIdDiscard)
             return True
 
         elif isinstance(msg, NotificationByServerMessage):

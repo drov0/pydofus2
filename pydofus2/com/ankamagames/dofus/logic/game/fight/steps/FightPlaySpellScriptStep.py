@@ -63,7 +63,7 @@ class FightPlaySpellScriptStep(AbstractSequencable, IFightStep):
                 + str(self._spellCastProvider.castingSpell.spell.id)
                 + ")"
             )
-        logger.debug("Script successfuly executed")
+        # logger.debug("Script successfuly executed")
 
     @property
     def stepType(self) -> str:

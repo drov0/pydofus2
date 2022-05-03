@@ -1,4 +1,3 @@
-from ast import Is
 from types import FunctionType
 from typing import TYPE_CHECKING
 from com.ankamagames.dofus.enums.ElementEnum import ElementEnum
@@ -154,6 +153,7 @@ from com.ankamagames.dofus.network.enums.GameActionMarkTypeEnum import (
 )
 from com.ankamagames.dofus.types.enums.AnimationEnum import AnimationEnum
 from com.ankamagames.jerakine.entities.interfaces.IMovable import IMovable
+from com.ankamagames.jerakine.logger.Logger import Logger
 from com.ankamagames.jerakine.sequencer.CallbackStep import CallbackStep
 from com.ankamagames.jerakine.sequencer.ParallelStartSequenceStep import (
     ParallelStartSequenceStep,
@@ -371,12 +371,6 @@ from com.ankamagames.dofus.network.types.game.actions.fight.FightTemporaryBoostE
 from com.ankamagames.dofus.network.types.game.context.GameContextActorInformations import (
     GameContextActorInformations,
 )
-from com.ankamagames.dofus.network.types.game.context.fight.GameContextBasicSpawnInformation import (
-    GameContextBasicSpawnInformation,
-)
-from com.ankamagames.dofus.network.types.game.context.fight.GameContextSummonsInformation import (
-    GameContextSummonsInformation,
-)
 from com.ankamagames.dofus.network.types.game.context.fight.GameFightCharacterInformations import (
     GameFightCharacterInformations,
 )
@@ -409,7 +403,6 @@ from com.ankamagames.dofus.network.types.game.context.fight.SpawnScaledMonsterIn
 )
 from com.ankamagames.dofus.types.entities.AnimatedCharacter import AnimatedCharacter
 from com.ankamagames.jerakine.entities.interfaces.IEntity import IEntity
-from com.ankamagames.jerakine.logger.Logger import Logger
 from com.ankamagames.jerakine.messages.Frame import Frame
 from com.ankamagames.jerakine.messages.Message import Message
 from com.ankamagames.jerakine.sequencer.AbstractSequencable import AbstractSequencable
@@ -432,35 +425,35 @@ class FightSequenceFrame(Frame, ISpellCastProvider):
 
     FIGHT_SEQUENCERS_CATEGORY: str = "FightSequencer"
 
-    _castingSpell: CastingSpell = None
+    _castingSpell: CastingSpell
 
-    _castingSpells: list[CastingSpell] = []
+    _castingSpells: list[CastingSpell]
 
-    _stepsBuffer: list[ISequencable] = []
+    _stepsBuffer: list[ISequencable]
 
     mustAck: bool
 
     ackIdent: int
 
-    _sequenceEndCallback: FunctionType = None
+    _sequenceEndCallback: FunctionType
 
-    _subSequenceWaitingCount: int = 0
+    _subSequenceWaitingCount: int
 
-    _scriptInit: bool = False
+    _scriptInit: bool
 
-    _sequencer: SerialSequencer = None
+    _sequencer: SerialSequencer
 
-    _parent: "FightSequenceFrame" = None
+    _parent: "FightSequenceFrame"
 
-    _fightBattleFrame: "FightBattleFrame" = None
+    _fightBattleFrame: "FightBattleFrame"
 
     _fightEntitiesFrame: FightEntitiesFrame = None
 
     _instanceId: int = 0
 
-    _teleportThroughPortal: bool = False
+    _teleportThroughPortal: bool
 
-    _updateMovementAreaAtSequenceEnd: bool = None
+    _updateMovementAreaAtSequenceEnd: bool
 
     _playSpellScriptStep: FightPlaySpellScriptStep
 
@@ -472,7 +465,16 @@ class FightSequenceFrame(Frame, ISpellCastProvider):
         FightSequenceFrame._currentInstanceId += 1
         self._fightBattleFrame = pFightBattleFrame
         self._parent = parent
-        self.clearBuffer()
+        self._sequencer = None
+        self._stepsBuffer: list = []
+        self._castingSpell = None
+        self._castingSpells = list[CastingSpell]()
+        self._sequenceEndCallback = None
+        self._teleportThroughPortal = False
+        self._subSequenceWaitingCount = 0
+        self._updateMovementAreaAtSequenceEnd = False
+        self._scriptInit = True
+        self._activeSubSequenceCount = 0
 
     @property
     def lastCastingSpell(self) -> CastingSpell:
@@ -532,6 +534,7 @@ class FightSequenceFrame(Frame, ISpellCastProvider):
 
     def addSubSequence(self, sequence: ISequencer) -> None:
         self._subSequenceWaitingCount += 1
+        # logger.debug(f"Adding ParallelStartSequenceStep to sequence #{self._instanceId}")
         self._stepsBuffer.append(ParallelStartSequenceStep([sequence], False))
 
     def process(self, msg: Message) -> bool:
@@ -1118,13 +1121,17 @@ class FightSequenceFrame(Frame, ISpellCastProvider):
             return False
 
     def execute(self, callback: FunctionType = None) -> None:
+        logger.debug(f"[SEQ DEBUG] Executing sequence #{self._instanceId}")
         self._sequencer = SerialSequencer(self.FIGHT_SEQUENCERS_CATEGORY)
         self._sequencer.add_listener(SequencerEvent.SEQUENCE_STEP_FINISH, self.onStepEnd)
         if self._parent:
-            logger.info("Process sub sequence")
+            # logger.info(
+            #     f"Adding sequence #{self._instanceId} sequencer to parent #{self._parent.instanceId} subsequences"
+            # )
             self._parent.addSubSequence(self._sequencer)
         else:
-            logger.info("Execute sequence")
+            # logger.info(f"Executing the sequence #{self._instanceId} right the way")
+            pass
         self.executeBuffer(callback)
 
     def fighterHasBeenKilled(self, gafdmsg: GameActionFightDeathMessage) -> None:
@@ -1387,9 +1394,12 @@ class FightSequenceFrame(Frame, ISpellCastProvider):
     def fighterHasMoved(self, gmmmsg: GameMapMovementMessage) -> None:
         movementPath: MovementPath = MapMovementAdapter.getClientMovement(gmmmsg.keyMovements)
         movementPathCells: list[int] = movementPath.getCells()
+        logger.debug(f"Fighter {gmmmsg.actorId} has moved following the path {movementPathCells}")
         fightContextFrame: "FightContextFrame" = Kernel().getWorker().getFrame("FightContextFrame")
         movingEntity: IMovable = DofusEntities.getEntity(gmmmsg.actorId)
-        for mpcell in movementPathCells:
+        nbCells = len(movementPathCells)
+        for i in range(1, nbCells):
+            mpcell = movementPathCells[i]
             fightContextFrame.saveFighterPosition(gmmmsg.actorId, mpcell)
             carriedEntity = movingEntity.carriedEntity
             while carriedEntity:
@@ -1524,8 +1534,12 @@ class FightSequenceFrame(Frame, ISpellCastProvider):
                     self.pushStep(FightShieldPointsVariationStep(gaftbmsg.effect.targetId, buff))
             self.pushStep(FightDisplayBuffStep(buff))
 
+    def logBuffer(self):
+        bufferStepsNames = [_.__class__.__name__ for _ in self._stepsBuffer]
+        logger.debug(f"\r[SEQ DEBUG] Buffer {bufferStepsNames} of sequence #{self._instanceId}")
+
     def executeBuffer(self, callback: FunctionType) -> None:
-        step = None
+        step: ISequencable = None
         removed: bool = False
         deathNumber: int = 0
         cleanedBuffer: list = []
@@ -1546,6 +1560,7 @@ class FightSequenceFrame(Frame, ISpellCastProvider):
                 step.clear()
             removed = True
             step = self._stepsBuffer[i]
+            # logger.debug(f"\r[STEPS DEBUG] processing step {step.__class__.__name__} out of buffer")
             if isinstance(step, FightDeathStep):
                 deathStep = step
                 deathStepRef[deathStep.entityId] = True
@@ -1583,6 +1598,7 @@ class FightSequenceFrame(Frame, ISpellCastProvider):
                     lifeLoseLastStep[flvsTarget] = flvs
             removed = False
             cleanedBuffer.insert(0, step)
+            # logger.debug(f"\r[STEPS DEBUG] step {step.__class__.__name__} added to cleaned buffer first pos")
 
         self._fightBattleFrame.deathPlayingNumber = deathNumber
         for b in cleanedBuffer:
@@ -1605,22 +1621,33 @@ class FightSequenceFrame(Frame, ISpellCastProvider):
             endStep.append(waitStep)
 
         cleanedBuffer = startStep + cleanedBuffer + endStep
-        for step in cleanedBuffer:
+        for idx, step in enumerate(cleanedBuffer):
+            # logger.debug(
+            #     f"\r[SEQ DEBUG] Step {step.__class__.__name__} added to the sequencer of sequene #{self._instanceId} at pos {idx}"
+            # )
             self._sequencer.addStep(step)
         self.clearBuffer()
         if callback is not None and not self._parent:
             self._sequenceEndCallback = callback
+            # logger.debug(f"\r[SEQ DEBUG] Sequence #{self._instanceId} adding a sequencer listener for callback")
             self._sequencer.add_listener(SequencerEvent.SEQUENCE_END, self.onSequenceEnd)
         self._lastCastingSpell = self._castingSpell
         self._scriptInit = True
         if not self._parent:
             if not self._subSequenceWaitingCount:
+                # logger.debug(f"\r[SEQ DEBUG] starting sequencer cause no child subsequence waiting")
                 self._sequencer.start()
             else:
-                logger.warn(f"Waiting sub sequence init end ({self._subSequenceWaitingCount} seq)")
+                # logger.warn(f"Waiting sub sequence init end ({self._subSequenceWaitingCount} seq)")
+                pass
         else:
-            if callback != None:
+            # logger.debug(f"\r[SEQ DEBUG] Sequence has parent sequence #{self._parent.instanceId}")
+            if callback is not None:
+                # logger.debug(f"\r[SEQ DEBUG] Sequence #{self._instanceId} calling callback {callback.__name__}")
                 callback()
+            # else:
+            # logger.error(f"\r[SEQ DEBUG] Sequence #{self._instanceId} has no callback!!!!!!!!!!!!!!!!!!!!!!!")
+            # logger.debug(f"\r[SEQ DEBUG] will call parent sequence init done")
             self._parent.subSequenceInitDone()
 
     def onSequenceEnd(self, e: SequencerEvent) -> None:
@@ -1633,9 +1660,16 @@ class FightSequenceFrame(Frame, ISpellCastProvider):
 
     def subSequenceInitDone(self) -> None:
         self._subSequenceWaitingCount -= 1
+        # logger.debug(
+        #     f"\r[STEPS DEBUG] sequence #{self._instanceId} has {self._subSequenceWaitingCount} subsequences waiting and {self._scriptInit} script init"
+        # )
+        # logger.debug(f"\r[STEPS DEBUG] init subsequence isWaiting {self.isWaiting}, sequencer {self._sequencer}")
         if not self.isWaiting and self._sequencer and not self._sequencer.running:
-            logger.warn("Sub sequence init end -- Run main sequence")
+            # logger.warn("Sub sequence init end -- Run main sequence")
             self._sequencer.start()
+        else:
+            # logger.warn(f"warning did not start sequener of sequence #{self._instanceId}")
+            pass
 
     def pushTeleportStep(self, fighterId: float, destinationCell: int) -> None:
         if destinationCell != -1:
@@ -1676,8 +1710,11 @@ class FightSequenceFrame(Frame, ISpellCastProvider):
         self._stepsBuffer.append(step)
 
     def pushStep(self, step: AbstractSequencable) -> None:
-        if self.castingSpell != None:
+        if self.castingSpell is not None:
             step.castingSpellId = self.castingSpell.castingSpellId
+        logger.debug(
+            f"[SEQ DEBUG] Push step of type {step.__class__.__name__} to buffer of sequence #{self._instanceId}"
+        )
         self._stepsBuffer.append(step)
 
     def pushPointsLossDodgeStep(self, fighterId: float, actionId: int, amount: int) -> None:

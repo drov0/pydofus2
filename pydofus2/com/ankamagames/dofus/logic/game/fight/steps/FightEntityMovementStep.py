@@ -6,18 +6,22 @@ from com.ankamagames.jerakine.logger.Logger import Logger
 from com.ankamagames.jerakine.sequencer.AbstractSequencable import (
     AbstractSequencable,
 )
+
+from com.ankamagames.dofus.logic.game.fight.frames.FightEntitiesFrame import (
+    FightEntitiesFrame,
+)
+
+from com.ankamagames.dofus.logic.game.fight.frames.FightSpellCastFrame import (
+    FightSpellCastFrame,
+)
+
 if TYPE_CHECKING:
     from com.ankamagames.dofus.logic.game.fight.frames.FightContextFrame import (
         FightContextFrame,
     )
-    from com.ankamagames.dofus.logic.game.fight.frames.FightEntitiesFrame import (
-        FightEntitiesFrame,
-    )
-    from com.ankamagames.dofus.logic.game.fight.frames.FightSpellCastFrame import (
-        FightSpellCastFrame,
-    )
     from com.ankamagames.dofus.types.entities.AnimatedCharacter import AnimatedCharacter
     from com.ankamagames.jerakine.types.positions.MovementPath import MovementPath
+    from com.ankamagames.dofus.logic.game.fight.frames.FightTurnFrame import FightTurnFrame
 
 logger = Logger(__name__)
 
@@ -41,21 +45,27 @@ class FightEntityMovementStep(AbstractSequencable, IFightStep):
         self._entityId = entityId
         self._path = path
         self.timeout = len(path)
-        self._fightContextFrame: "FightContextFrame" = (
-            Kernel().getWorker().getFrame("FightContextFrame")
-        )
+        self._fightContextFrame: "FightContextFrame" = Kernel().getWorker().getFrame("FightContextFrame")
 
     @property
     def stepType(self) -> str:
         return "entityMovement"
 
     def start(self) -> None:
+        logger.debug("FightEntityMovementStep start step")
         self._entity = DofusEntities.getEntity(self._entityId)
         if self._entity:
-            fighterInfos = FightEntitiesFrame.getCurrentInstance().getEntityInfos(
-                self._entityId
+            fighterInfos = FightEntitiesFrame.getCurrentInstance().getEntityInfos(self._entityId)
+            logger.warn(
+                f"Entity {self._entityId} is moving from {fighterInfos.disposition.cellId} to {self._path.end.cellId}"
             )
+            ftf: "FightTurnFrame" = Kernel().getWorker().getFrame("FightTurnFrame")
+            ftf._playerEntity.position.cellId = self._path.end.cellId
             fighterInfos.disposition.cellId = self._path.end.cellId
+            logger.debug(f"New entity {self._entityId} cellId in fightTurnFrame {ftf._playerEntity.position.cellId}")
+            logger.debug(
+                f"New entity {self._entityId} cellId in fightEntitiesFrame {FightEntitiesFrame.getCurrentInstance().getEntityInfos(self._entityId).disposition.cellId}"
+            )
         else:
             logger.warn(f"Unable to move unknown entity {self._entityId}.")
         self.movementEnd()
@@ -65,9 +75,7 @@ class FightEntityMovementStep(AbstractSequencable, IFightStep):
         return [self._entityId]
 
     def updateCarriedEntitiesPosition(self) -> None:
-        entitiesFrame: "FightEntitiesFrame" = (
-            Kernel().getWorker().getFrame("FightEntitiesFrame")
-        )
+        entitiesFrame: "FightEntitiesFrame" = Kernel().getWorker().getFrame("FightEntitiesFrame")
         carriedEntity: "AnimatedCharacter" = self._entity.carriedEntity
         while carriedEntity:
             infos = entitiesFrame.getEntityInfos(carriedEntity.id)

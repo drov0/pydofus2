@@ -149,7 +149,7 @@ class FightBattleFrame(Frame):
 
     _currentSequenceFrame: fseqf.FightSequenceFrame = None
 
-    _sequenceFrames: list = []
+    _sequenceFrames: list[fseqf.FightSequenceFrame] = []
 
     _executingSequence: bool = False
 
@@ -408,7 +408,7 @@ class FightBattleFrame(Frame):
             ):
                 CurrentPlayedFighterManager().currentFighterId = gftsmsg.id
                 spellwrapper.SpellWrapper.refreshAllPlayerSpellHolder(gftsmsg.id)
-                logger.debug("Finaly turn for entityId: " + str(self._currentPlayerId) + " set to true")
+                # logger.debug("Finaly turn for entityId: " + str(self._currentPlayerId) + " set to true")
                 self._turnFrame.myTurn = True
             else:
                 self._turnFrame.myTurn = False
@@ -449,8 +449,10 @@ class FightBattleFrame(Frame):
             return True
 
         elif isinstance(msg, SequenceStartMessage):
+            logger.debug(f"[SEQ DEBUG] =================>> Received Sequence start author {msg.authorId}")
             self._autoEndTurn = False
             if not self._sequenceFrameSwitcher:
+                logger.debug(f"[SEQ DEBUG] Switcher is not set, creating new one")
                 self._sequenceFrameSwitcher = FightSequenceSwitcherFrame()
                 krnl.Kernel().getWorker().addFrame(self._sequenceFrameSwitcher)
             self._currentSequenceFrame = fseqf.FightSequenceFrame(self, self._currentSequenceFrame)
@@ -458,6 +460,7 @@ class FightBattleFrame(Frame):
             return True
 
         elif isinstance(msg, SequenceEndMessage):
+            self.logState()
             semsg = msg
             if not self._currentSequenceFrame:
                 logger.warn("Wow wow wow, I've got a Sequence End but no Sequence Start? What the hell?")
@@ -465,14 +468,22 @@ class FightBattleFrame(Frame):
             self._currentSequenceFrame.mustAck = semsg.authorId == int(CurrentPlayedFighterManager().currentFighterId)
             self._currentSequenceFrame.ackIdent = semsg.actionId
             self._sequenceFrameSwitcher.currentFrame = None
-            logger.debug("Received sequence end for action id: " + str(semsg.actionId))
+            logger.debug(
+                f"================>> Received sequence #{self._currentSequenceFrame._instanceId} end with id: {semsg.actionId} and author id: {semsg.authorId}"
+            )
             if not self._currentSequenceFrame.parent:
+                # logger.debug(
+                #     f"Sequence {self._currentSequenceFrame._instanceId} is root, removing it and executing next sequence"
+                # )
                 krnl.Kernel().getWorker().removeFrame(self._sequenceFrameSwitcher)
                 self._sequenceFrameSwitcher = None
                 self._sequenceFrames.append(self._currentSequenceFrame)
                 self._currentSequenceFrame = None
                 self.executeNextSequence()
             else:
+                logger.debug(
+                    f"Sequence #{self._currentSequenceFrame._instanceId} is not the last one, so we will wait for the end of the parent sequence"
+                )
                 self._currentSequenceFrame.execute()
                 self._sequenceFrameSwitcher.currentFrame = self._currentSequenceFrame.parent
                 self._currentSequenceFrame = self._currentSequenceFrame.parent
@@ -592,6 +603,32 @@ class FightBattleFrame(Frame):
         self._autoEndTurnTimer = None
         return True
 
+    def logState(self):
+        logger.debug(
+            "****************************************************************** Current Sequences state ***********************************************************"
+        )
+        logger.debug(f"Executing a sequence : {self._executingSequence}")
+        logger.debug(
+            f"Sequence cached : #{self._sequenceFrameCached._instanceId if self._sequenceFrameCached else 'None'}"
+        )
+        logger.debug(
+            f"Sequence current : #{self._currentSequenceFrame._instanceId if self._currentSequenceFrame else 'None'}"
+        )
+        res = []
+        seq = self._currentSequenceFrame
+        while seq:
+            res.insert(0, seq)
+            seq = seq._parent
+        padd = ""
+        for seq in res:
+            logger.debug(f"{padd}|---> Sequence #{seq._instanceId}")
+            for step in seq._stepsBuffer:
+                logger.debug(f"{padd}\t|---> {step.__class__.__name__}")
+            padd += "\t"
+        logger.debug(
+            "****************************************************************************************************************************************************************"
+        )
+
     def delayCharacterStatsList(self, msg: CharacterStatsListMessage) -> None:
         self._delayCslmsg = msg
 
@@ -650,9 +687,17 @@ class FightBattleFrame(Frame):
 
     def executeNextSequence(self) -> bool:
         if self._executingSequence:
-            return False
+            # logger.warn("We're already executing a sequence. We can't execute another one!.")
+            runningSequencesIds = [_._instanceId for _ in self._sequenceFrames]
+            # logger.debug(f"Currently running sequenes {runningSequencesIds}")
+            if len(runningSequencesIds) == 1:
+                # logger.error("There's one non treated sequence and its root will consider no sequence running")
+                pass
+            else:
+                return False
         if self._sequenceFrames:
             nextSequenceFrame: fseqf.FightSequenceFrame = self._sequenceFrames.pop(0)
+            # logger.debug(f"Executing next sequence #{nextSequenceFrame._instanceId}")
             self._executingSequence = True
             nextSequenceFrame.execute(self.finishSequence(nextSequenceFrame))
             return True

@@ -68,11 +68,8 @@ class DofusClient:
                 if self.mainConn is None:
                     sys.exit(0)
             except KeyboardInterrupt:
-                try:
-                    if self.mainConn is not None:
-                        self.mainConn.close()
-                except Exception:
-                    pass
+                if self.mainConn is not None:
+                    self.mainConn.close()
                 sys.exit(0)
 
     def start(self):

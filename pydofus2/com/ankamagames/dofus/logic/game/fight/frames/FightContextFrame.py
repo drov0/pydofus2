@@ -255,7 +255,7 @@ class FightContextFrame(Frame):
 
     _namedPartyTeams: list[NamedPartyTeam]
 
-    _fightersPositionsHistory: dict
+    _fightersPositionsHistory: dict[int, list]
 
     _fightersRoundStartPosition: dict
 

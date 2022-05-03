@@ -397,7 +397,9 @@ class FightTurnFrame(Frame):
         actionPoints: int = stats.getStatTotalValue(StatIds.ACTION_POINTS)
         logger.debug(f"MP : {movementPoints}, AP : {actionPoints}")
         if self._playerEntity.isMoving or self._playerEntity.position.distanceToCell(destCell) > movementPoints:
-            logger.debug("Player is moving or dest is too far abort")
+            logger.debug(
+                f"Player is moving {self._playerEntity.isMoving} or dest is too far {self._playerEntity.position.distanceToCell(destCell)} from {movementPoints} abort"
+            )
             self.removePath()
             return
         path: MovementPath = Pathfinding.findPath(

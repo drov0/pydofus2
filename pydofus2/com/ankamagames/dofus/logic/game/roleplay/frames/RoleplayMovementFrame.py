@@ -1,6 +1,6 @@
 from re import VERBOSE
 from threading import Timer
-from time import perf_counter
+from time import perf_counter, sleep
 from com.ankamagames.atouin.managers.EntitiesManager import EntitiesManager
 from com.ankamagames.atouin.messages.EntityMovementCompleteMessage import (
     EntityMovementCompleteMessage,
@@ -190,6 +190,7 @@ class RoleplayMovementFrame(Frame):
             if self._followingMonsterGroup:
                 self.requestMonsterFight(self._followingMonsterGroup.id)
                 self._followingMonsterGroup = None
+
             else:
                 gmnmm = msg
                 newPos = MapPoint.fromCoords(gmnmm.cellX, gmnmm.cellY)
@@ -199,6 +200,12 @@ class RoleplayMovementFrame(Frame):
                 if player.isMoving:
                     player.stop = True
                 player.position = newPos
+                if self._wantToChangeMap >= 0:
+                    mp = MapPoint.fromCellId(self._destinationPoint)
+                    if newPos == mp:
+                        self.askMapChange()
+                    else:
+                        self.askMoveTo(mp)
             return True
 
         if isinstance(msg, GameMapMovementMessage):
@@ -223,20 +230,17 @@ class RoleplayMovementFrame(Frame):
         elif isinstance(msg, EntityMovementCompleteMessage):
             emcmsg = msg
             if emcmsg.entity.id == PlayedCharacterManager().id:
-                if self.VERBOSE:
-                    logger.debug(
-                        f"[RolePlayMovement] Mouvement complete, arrived at {emcmsg.entity.position.cellId}, destination point {self._destinationPoint}, wants to change map to: {self._wantToChangeMap}, following: {self._followingIe}"
-                    )
+                logger.debug(
+                    f"[RolePlayMovement] Mouvement complete, arrived at {emcmsg.entity.position.cellId}, destination point {self._destinationPoint}"
+                )
                 gmmcmsg = GameMapMovementConfirmMessage()
                 ConnectionsHandler.getConnection().send(gmmcmsg)
                 if self._wantToChangeMap >= 0 and emcmsg.entity.position.cellId == self._destinationPoint:
-                    logger.debug(f"[RolePlayMovement] Player arrived at destination point and he wanted to change map")
+                    logger.debug(f"[RolePlayMovement] Wants to change map to {self._wantToChangeMap}")
                     self.askMapChange()
                     self._isRequestingMovement = False
                 if self._followingIe:
-                    logger.debug(
-                        f"[RolePlayMovement] Player arrived at destination point and he wanted to activate element {self._followingIe['ie'].elementId}"
-                    )
+                    logger.debug(f"[RolePlayMovement] Wants to activate element {self._followingIe['ie'].elementId}")
                     self._isRequestingMovement = False
                     self.activateSkill(
                         self._followingIe["skillInstanceId"],
@@ -373,12 +377,9 @@ class RoleplayMovementFrame(Frame):
             logger.debug("[RolePlayMovement] Already requesting movement, aborting")
             return False
         now: int = perf_counter()
-        if self._latestMovementRequest + self.CONSECUTIVE_MOVEMENT_DELAY > now:
-            logger.debug("[RolePlayMovement] Too soon to request movement, aborting")
-            Timer(
-                self._latestMovementRequest + self.CONSECUTIVE_MOVEMENT_DELAY - now, self.askMoveTo, args=(cell,)
-            ).start()
-            return False
+        nexPossibleMovementTime = self._latestMovementRequest + self.CONSECUTIVE_MOVEMENT_DELAY
+        if now < nexPossibleMovementTime:
+            sleep(self.CONSECUTIVE_MOVEMENT_DELAY)
         self._isRequestingMovement = True
         if playerEntity is None:
             logger.warn(

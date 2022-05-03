@@ -22,9 +22,6 @@ from com.ankamagames.dofus.logic.game.fight.managers.SpellModifiersManager impor
     SpellModifiersManager,
 )
 import com.ankamagames.dofus.logic.game.roleplay.frames.RoleplayContextFrame as rplCF
-from com.ankamagames.dofus.logic.game.roleplay.frames.RoleplayEntitiesFrame import (
-    RoleplayEntitiesFrame,
-)
 from com.ankamagames.dofus.network.enums.CompassTypeEnum import CompassTypeEnum
 from com.ankamagames.dofus.network.enums.PlayerLifeStatusEnum import (
     PlayerLifeStatusEnum,
@@ -141,6 +138,12 @@ from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
     from com.ankamagames.dofus.logic.game.fight.frames.FightBattleFrame import FightBattleFrame
+    from com.ankamagames.dofus.logic.game.roleplay.frames.RoleplayEntitiesFrame import (
+        RoleplayEntitiesFrame,
+    )
+    from com.ankamagames.dofus.network.types.game.context.roleplay.GameRolePlayHumanoidInformations import (
+        GameRolePlayHumanoidInformations,
+    )
 
 logger = Logger(__name__)
 
@@ -185,12 +188,12 @@ class PlayedCharacterUpdatesFrame(Frame):
             scrmsg = msg
             if scrmsg.actorId == pcm.PlayedCharacterManager().id:
                 pcm.PlayedCharacterManager().restrictions = scrmsg.restrictions
-            rpEntitiesFrame = krnl.Kernel().getWorker().getFrame("RoleplayEntitiesFrame")
+            rpEntitiesFrame: "RoleplayEntitiesFrame" = krnl.Kernel().getWorker().getFrame("RoleplayEntitiesFrame")
             if rpEntitiesFrame:
-                infos = rpEntitiesFrame.getEntityInfos(scrmsg.actorId)
+                infos: "GameRolePlayHumanoidInformations" = rpEntitiesFrame.getEntityInfos(scrmsg.actorId)
                 if infos and infos.humanoidInfo:
                     infos.humanoidInfo.restrictions = scrmsg.restrictions
-            return False
+            return True
 
         if isinstance(msg, ServerExperienceModificatorMessage):
             semsg = msg

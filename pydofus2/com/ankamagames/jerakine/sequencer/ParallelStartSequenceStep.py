@@ -32,12 +32,11 @@ class ParallelStartSequenceStep(AbstractSequencable, ISubSequenceSequencable):
 
     def start(self) -> None:
         for i in range(len(self._aSequence)):
-            self._aSequence[i].add_listener(
-                SequencerEvent.SEQUENCE_END, self.onSequenceEnd
-            )
+            self._aSequence[i].add_listener(SequencerEvent.SEQUENCE_END, self.onSequenceEnd)
+            # logger.debug(f"ParallelStartSequenceStep start sequencer {i} that has {self._aSequence[i].steps} steps")
             self._aSequence[i].start()
         if not self._waitAllSequenceEnd and not self._waitFirstEndSequence:
-            logger.debug("first executeCallbacks")
+            # logger.debug("first executeCallbacks")
             self.executeCallbacks()
 
     @property
@@ -46,12 +45,10 @@ class ParallelStartSequenceStep(AbstractSequencable, ISubSequenceSequencable):
 
     def onSequenceEnd(self, e: SequencerEvent) -> None:
         e.sequencer.remove_listener(SequencerEvent.SEQUENCE_END, self.onSequenceEnd)
-        ++self._sequenceEndCount
-        logger.debug("onSequenceEnd")
+        self._sequenceEndCount += 1
         if self._sequenceEndCount == len(self._aSequence):
-            logger.debug("onSequenceEnd executeCallbacks")
             self.executeCallbacks()
-            self.dispatch(SequencerEvent(SequencerEvent.SEQUENCE_END))
+            self.dispatch(SequencerEvent.SEQUENCE_END, SequencerEvent(SequencerEvent.SEQUENCE_END))
         elif not self._waitAllSequenceEnd:
             if self._sequenceEndCount == 1:
                 self.executeCallbacks()

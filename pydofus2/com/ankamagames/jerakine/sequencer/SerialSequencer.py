@@ -33,7 +33,7 @@ class SerialSequencer(ISequencer, EventDispatcher):
 
     _type: str = None
 
-    _activeSubSequenceCount: int = None
+    _activeSubSequenceCount: int
 
     _paused: bool = None
 
@@ -41,6 +41,7 @@ class SerialSequencer(ISequencer, EventDispatcher):
 
     def __init__(self, type: str = "SerialSequencerDefault"):
         self._aStep = list()
+        self._activeSubSequenceCount = 0
         super().__init__()
         if not self.SEQUENCERS.get(type):
             self.SEQUENCERS[type] = dict()
@@ -95,23 +96,24 @@ class SerialSequencer(ISequencer, EventDispatcher):
         if item:
             self.addStep(item)
         else:
-            logger.error(
-                "Tried to add a null step to the LUA script sequence, self step will be ignored"
-            )
+            logger.error("Tried to add a null step to the LUA script sequence, self step will be ignored")
 
     def addStep(self, item: ISequencable) -> None:
         self._aStep.append(item)
 
     def start(self) -> None:
+        if self._running:
+            logger.debug("[Sequencer] start asked but already running")
         if not self._running:
             self._running = len(self._aStep) != 0
             if self._running:
                 while len(self._aStep) > 0 and self._running:
+                    # logger.debug(f"[Sequencer] running on current step {self._currentStep}")
                     self.execute()
                     if (
                         self._currentStep
                         and isinstance(self._currentStep, AbstractSequencable)
-                        and not self._currentStep
+                        and not self._currentStep.finished
                     ):
                         self._running = False
                     if self._running and not EnterFrameDispatcher().remainsTime():
@@ -139,14 +141,15 @@ class SerialSequencer(ISequencer, EventDispatcher):
         self._running = False
 
     def __str__(self) -> str:
-        str: str = ""
+        res: str = ""
         for step in self._aStep:
-            str += str(step) + "\n"
-        return str
+            res += str(step) + "\n"
+        return res
 
     def execute(self) -> None:
         self._lastStep = self._currentStep
         self._currentStep = self._aStep.pop(0)
+        # logger.debug(f"[Sequencer] working on step {self._currentStep.__class__.__name__}")
         if not self._currentStep:
             return
         # FightProfiler().start()
@@ -154,27 +157,21 @@ class SerialSequencer(ISequencer, EventDispatcher):
         try:
             if isinstance(self._currentStep, ISubSequenceSequencable):
                 self._activeSubSequenceCount += 1
-                self._currentStep.addListener(
-                    SequencerEvent.SEQUENCE_END, self.onSubSequenceEnd
-                )
-            if (
-                self._defaultStepTimeout != -sys.maxsize + 1
-                and self._currentStep.hasDefaultTimeout
-            ):
+                self._currentStep.add_listener(SequencerEvent.SEQUENCE_END, self.onSubSequenceEnd)
+            if self._defaultStepTimeout != -sys.maxsize + 1 and self._currentStep.hasDefaultTimeout:
                 self._currentStep.timeout = self._defaultStepTimeout
             if self.has_listeners(SequencerEvent.SEQUENCE_STEP_START):
                 self.dispatch(
                     SequencerEvent.SEQUENCE_STEP_START,
                     SequencerEvent(self, self._currentStep),
                 )
+            # logger.debug(f"Sequencer starting step {self._currentStep.__class__.__name__}")
             self._currentStep.start()
         except Exception as e:
             if isinstance(self._currentStep, ISubSequenceSequencable):
                 self._activeSubSequenceCount -= 1
-                ISubSequenceSequencable(self._currentStep).remove_listener(
-                    SequencerEvent.SEQUENCE_END, self.onSubSequenceEnd
-                )
-            logger.error(f"Exception sur la step {self._currentStep}", exc_info=True)
+                self._currentStep.remove_listener(SequencerEvent.SEQUENCE_END, self.onSubSequenceEnd)
+            logger.error(f"Exception on step {self._currentStep}", exc_info=True)
             if isinstance(self._currentStep, AbstractSequencable):
                 self._currentStep.finished = True
             self.stepFinished(self._currentStep)
@@ -198,15 +195,9 @@ class SerialSequencer(ISequencer, EventDispatcher):
                     self._running = True
         else:
             if self.has_listeners(SequencerEvent.SEQUENCE_STEP_FINISH):
-                self.dispatch(
-                    SequencerEvent(
-                        SequencerEvent.SEQUENCE_STEP_FINISH, self, self._currentStep
-                    )
-                )
+                self.dispatch(SequencerEvent.SEQUENCE_STEP_FINISH, SequencerEvent(self, self._currentStep))
             worker = EnterFrameDispatcher().worker
-            worker.addSingleTreatmentAtPos(
-                self, self.start, [], len(worker.findTreatments(None, self.start, []))
-            )
+            worker.addSingleTreatmentAtPos(self, self.start, [], len(worker.findTreatments(None, self.start, [])))
 
     def onSubSequenceEnd(self, e: SequencerEvent) -> None:
         self._activeSubSequenceCount -= 1

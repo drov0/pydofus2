@@ -34,8 +34,5 @@ if __name__ == "__main__":
     dofus2 = DofusClient(botName)
     dofus2.registerFrame(BotFarmPathFrame(FarmParcours(**goujon_incarnam)))
     dofus2.registerFrame(BotFightFrame())
-    try:
-        dofus2.start()
-    except Exception as e:
-        logger.error(e, exc_info=True)
+    dofus2.start()
     dofus2.join()

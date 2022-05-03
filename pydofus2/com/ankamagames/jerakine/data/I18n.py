@@ -23,9 +23,7 @@ class I18n(AbstractDataManager):
         return cls.replaceParams(txt, params, replace)
 
     @classmethod
-    def getUnDiacriticalText(
-        cls, id: int, params: list = None, replace: str = "%"
-    ) -> str:
+    def getUnDiacriticalText(cls, id: int, params: list = None, replace: str = "%") -> str:
         if not id:
             return None
         txt: str = I18nFileAccessor().getUnDiacriticalText(id)
@@ -49,5 +47,5 @@ class I18n(AbstractDataManager):
         if not params or not len(params):
             return text
         for i in range(1, len(params) + 1):
-            text = text.replace(replace + str(i), params[i - 1])
+            text = text.replace(replace + str(i), str(params[i - 1]))
         return text

@@ -10,7 +10,7 @@ class AbstractSequencable(IPausableSequencable):
 
     DEFAULT_TIMEOUT: int = 2
 
-    _listeners: dict = None
+    _stepListeners: set = None
 
     _timeOut: Timer = None
 
@@ -27,7 +27,7 @@ class AbstractSequencable(IPausableSequencable):
     _finished: bool = False
 
     def __init__(self):
-        self._listeners = dict()
+        self._stepListeners = set()
         self._timeoutMax = self.DEFAULT_TIMEOUT
         super().__init__()
 
@@ -74,9 +74,9 @@ class AbstractSequencable(IPausableSequencable):
         if not self._timeOut and self._timeoutMax != -1:
             self._timeOut = Timer(self._timeoutMax, self.onTimeOut)
             self._timeOut.start()
-        if not self._listeners:
-            self._listeners = dict()
-        self._listeners[listener] = listener
+        if not self._stepListeners:
+            self._stepListeners = set()
+        self._stepListeners.add(listener)
 
     def executeCallbacks(self) -> None:
         # FightProfiler().stop()
@@ -84,14 +84,14 @@ class AbstractSequencable(IPausableSequencable):
             self._timeOut.cancel()
             self._timeOut = None
         self._finished = True
-        for listener in list(self._listeners.keys()):
+        for listener in self._stepListeners.copy():
             if listener:
                 listener.stepFinished(self, self._withTimeOut)
 
     def removeListener(self, listener: ISequencableListener) -> None:
-        if not self._listeners:
+        if not self._stepListeners:
             return
-        del self._listeners[listener]
+        self._stepListeners.remove(listener)
 
     def __str__(self) -> str:
         return self.__class__.__name__
@@ -100,7 +100,7 @@ class AbstractSequencable(IPausableSequencable):
         if self._timeOut:
             self._timeOut.stop()
         self._timeOut = None
-        self._listeners = None
+        self._stepListeners = None
 
     @property
     def castingSpellId(self) -> int:
@@ -121,4 +121,4 @@ class AbstractSequencable(IPausableSequencable):
             self._timeOut.cancel()
         self._timeOut = None
         self.executeCallbacks()
-        self._listeners = None
+        self._stepListeners = None

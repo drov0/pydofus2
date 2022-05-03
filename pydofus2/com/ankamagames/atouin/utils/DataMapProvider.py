@@ -99,7 +99,7 @@ class DataMapProvider(IDataMapProvider, metaclass=Singleton):
                 for e in EntitiesManager().entities.values():
                     if isinstance(e, IObstacle) and e.position and e.position.cellId == cellId:
                         o = e
-                        if not (endCellId == cellId and o.canWalkTo()):
+                        if not (endCellId == cellId and o.canWalkTo):
                             if not o.canWalkThrough:
                                 return False
                 if avoidObstacles and (cellId in self.obstaclesCells and cellId != endCellId):

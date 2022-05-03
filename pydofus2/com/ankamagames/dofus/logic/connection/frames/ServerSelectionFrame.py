@@ -58,9 +58,11 @@ class ServerSelectionFrame(Frame):
 
     _alreadyConnectedToServerId: int = 0
 
-    _serverSelectionAction: ServerSelectionAction
+    _serverSelectionAction: ServerSelectionAction = None
 
     _connexionPorts: list
+
+    _waitingServerOnline = False
 
     def __init__(self):
         self._serversTypeAvailableSlots = dict()
@@ -109,23 +111,25 @@ class ServerSelectionFrame(Frame):
             if not serverHasBeenUpdated:
                 self._serversList.append(ssumsg.server)
                 self._serversList.sort(key=lambda x: x.date)
-            logger.info(
-                f"Server {ssumsg.server.id} status changed to {ssumsg.server.status}."
-            )
+            logger.info(f"Server {ssumsg.server.id} status changed to {ServerStatusEnum(ssumsg.server.status).name}.")
+            if self._serverSelectionAction is not None and ssumsg.server.id == self._serverSelectionAction.serverId:
+                if ServerStatusEnum(ssumsg.server.status) != ServerStatusEnum.ONLINE:
+                    logger.debug(
+                        f"Waiting for my server {ssumsg.server.id} to be online current status {ServerStatusEnum(ssumsg.server.status)}."
+                    )
+                    self._waitingServerOnline = True
+                else:
+                    self._waitingServerOnline = False
+                    krnl.Kernel().getWorker().processImmediately(self._serverSelectionAction)
             self.broadcastServersListUpdate()
             return True
 
         elif isinstance(msg, ServerSelectionAction):
             ssaction = msg
 
-            if (
-                self._alreadyConnectedToServerId > 0
-                and ssaction.serverId != self._alreadyConnectedToServerId
-            ):
+            if self._alreadyConnectedToServerId > 0 and ssaction.serverId != self._alreadyConnectedToServerId:
                 self._serverSelectionAction = ssaction
-                self.serverAlreadyInName = Server.getServerById(
-                    self._alreadyConnectedToServerId
-                ).name
+                self.serverAlreadyInName = Server.getServerById(self._alreadyConnectedToServerId).name
                 self.serverSelectedName = Server.getServerById(ssaction.serverId).name
                 return True
 
@@ -162,24 +166,16 @@ class ServerSelectionFrame(Frame):
             escmsg = msg
             if escmsg.reason != DisconnectionReasonEnum.SWITCHING_TO_GAME_SERVER:
                 self._worker.process(
-                    WrongSocketClosureReasonMessage(
-                        DisconnectionReasonEnum.SWITCHING_TO_GAME_SERVER, escmsg.reason
-                    )
+                    WrongSocketClosureReasonMessage(DisconnectionReasonEnum.SWITCHING_TO_GAME_SERVER, escmsg.reason)
                 )
                 return True
             self._worker.addFrame(GameServerApproachFrame())
-            connh.ConnectionsHandler.connectToGameServer(
-                self._selectedServer.address, self._selectedServer.ports[0]
-            )
+            connh.ConnectionsHandler.connectToGameServer(self._selectedServer.address, self._selectedServer.ports[0])
             return True
 
-        if isinstance(
-            msg, (SelectedServerDataMessage, SelectedServerDataExtendedMessage)
-        ):
+        if isinstance(msg, (SelectedServerDataMessage, SelectedServerDataExtendedMessage)):
             ssdmsg: SelectedServerDataMessage = msg
-            connh.ConnectionsHandler.connectionGonnaBeClosed(
-                DisconnectionReasonEnum.SWITCHING_TO_GAME_SERVER
-            )
+            connh.ConnectionsHandler.connectionGonnaBeClosed(DisconnectionReasonEnum.SWITCHING_TO_GAME_SERVER)
             self._selectedServer = ssdmsg
             AuthentificationManager().gameServerTicket = (
                 AuthentificationManager().decodeWithAES(ssdmsg.ticket).decode()
@@ -187,9 +183,7 @@ class ServerSelectionFrame(Frame):
             PlayerManager().server = Server.getServerById(ssdmsg.serverId)
             PlayerManager().kisServerPort = 0
             self._connexionPorts = ssdmsg.ports
-            logger.debug(
-                f"Connection to game server using ports : {self._connexionPorts}"
-            )
+            logger.debug(f"Connection to game server using ports : {self._connexionPorts}")
 
             return True
 
@@ -221,9 +215,7 @@ class ServerSelectionFrame(Frame):
                 self._serversUsedList.append(server)
                 PlayerManager().serversList.append(server.id)
 
-    def getUpdateServerStatusFunction(
-        self, serverId: int, newStatus: int
-    ) -> FunctionType:
+    def getUpdateServerStatusFunction(self, serverId: int, newStatus: int) -> FunctionType:
         def function(
             element: GameServerInformations,
             index: int,

@@ -204,7 +204,7 @@ class FightTurnFrame(Frame):
         if self._myTurn and not scf:
             self.drawPath()
         else:
-            logger.debug(f"FightTurnFrame: not my turn {self._myTurn} or inside spell cast frame {scf}")
+            logger.debug(f"FightTurnFrame: my turn {self._myTurn}, inside spell cast frame {scf}")
 
     @property
     def turnDuration(self) -> int:
@@ -350,11 +350,9 @@ class FightTurnFrame(Frame):
         entitiesFrame: FightEntitiesFrame = FightEntitiesFrame.getCurrentInstance()
         playerInfos: GameFightFighterInformations = entitiesFrame.getEntityInfos(self._playerEntity.id)
         tackle: float = TackleUtil.getTackle(playerInfos, playerPosition)
-        logger.debug(f"tackle computed {tackle}")
         self._tackleByCellId = dict()
         self._tackleByCellId[playerPosition.cellId] = tackle
         mpLost: int = int(movementPoints * (1 - tackle) + 0.5)
-        logger.debug(f"mpLost {mpLost}")
         if mpLost < 0:
             mpLost = 0
         movementPoints -= mpLost
@@ -372,20 +370,20 @@ class FightTurnFrame(Frame):
         firstObstacle: PathElement = None
         if self._cells is None:
             self._cells = []
-        logger.debug("drawing the move path")
+        logger.debug(f"Drawing the move path to {destCell}")
         if Kernel().getWorker().contains("FightSpellCastFrame"):
             return
         fcf: "FightContextFrame" = Kernel().getWorker().getFrame("FightContextFrame")
         if self._isRequestingMovement:
-            logger.debug("requesting movement")
+            logger.debug("Already requesting movement abort")
             return
         if not destCell:
             if fcf.currentCell == -1:
-                logger.debug("no destination cell")
+                logger.debug("No current cell hovered to draw path")
                 return
             destCell = MapPoint.fromCellId(fcf.currentCell)
         if not self._playerEntity:
-            logger.debug("no player entity")
+            logger.debug("No player entity found")
             self.removePath()
             return
         stats: EntityStats = CurrentPlayedFighterManager().getStats()
@@ -395,16 +393,15 @@ class FightTurnFrame(Frame):
         actionPoints: int = stats.getStatTotalValue(StatIds.ACTION_POINTS)
         logger.debug(f"MP : {movementPoints}, AP : {actionPoints}")
         if self._playerEntity.isMoving or self._playerEntity.position.distanceToCell(destCell) > movementPoints:
-            logger.debug("player is moving or dest is too far")
+            logger.debug("Player is moving or dest is too far abort")
             self.removePath()
             return
         path: MovementPath = Pathfinding.findPath(
             DataMapProvider(), self._playerEntity.position, destCell, False, False, True
         )
-        logger.debug(
-            f"path found of length {len(path.path)}, having {len(DataMapProvider().obstaclesCells)} obstacles"
-        )
+        logger.debug(f"Found a path {path}")
         if len(DataMapProvider().obstaclesCells) > 0 and (len(path.path) == 0 or len(path.path) > movementPoints):
+            logger.debug("Path is empty because of obstacles or too long for the available move points")
             path = Pathfinding.findPath(
                 DataMapProvider(),
                 self._playerEntity.position,
@@ -413,9 +410,7 @@ class FightTurnFrame(Frame):
                 False,
                 False,
             )
-            logger.debug(
-                f"path found of length {len(path.path)}, having {len(DataMapProvider().obstaclesCells)} obstacles"
-            )
+            logger.debug(f"Path found {path}")
             if len(path.path) > 0:
                 pathLen = len(path.path)
                 for i in range(pathLen):
@@ -483,11 +478,6 @@ class FightTurnFrame(Frame):
             movementPoints = len(path.path) - 1
         else:
             self._cellsUnreachable.append(path.end.cellId)
-
-        mp: MapPoint = MapPoint()
-        mp.cellId = (
-            int(self._cells[len(self._cells) - 2]) if len(self._cells) > 1 else int(playerInfos.disposition.cellId)
-        )
 
     def updatePath(self) -> None:
         self.drawPath(self._lastCell)

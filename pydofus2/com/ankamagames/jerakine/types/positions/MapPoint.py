@@ -53,11 +53,7 @@ class MapPoint:
     def setFromCoords(self):
         if not MapPoint._bInit:
             MapPoint.init()
-        self._nCellId = (
-            (self._nX - self._nY) * MapPoint.MAP_WIDTH
-            + self._nY
-            + (self._nX - self._nY) // 2
-        )
+        self._nCellId = (self._nX - self._nY) * MapPoint.MAP_WIDTH + self._nY + (self._nX - self._nY) // 2
 
     @classmethod
     def fromCellId(cls, cellId: int):
@@ -79,12 +75,7 @@ class MapPoint:
 
     @staticmethod
     def isInMap(i1: int, i2: int):
-        return (
-            i1 + i2 >= 0
-            and i1 - i2 >= 0
-            and i1 - i2 < MapPoint.MAP_HEIGHT * 2
-            and i1 + i2 < MapPoint.MAP_WIDTH * 2
-        )
+        return i1 + i2 >= 0 and i1 - i2 >= 0 and i1 - i2 < MapPoint.MAP_HEIGHT * 2 and i1 + i2 < MapPoint.MAP_WIDTH * 2
 
     @classmethod
     def init(cls):
@@ -140,9 +131,9 @@ class MapPoint:
     def distanceToCell(self, mp: "MapPoint"):
         return abs(self.x - mp.x) + abs(self.y - mp.y)
 
-    def orientationTo(self, mp: "MapPoint") -> DirectionsEnum:
+    def orientationTo(self, mp: "MapPoint") -> int:
         if self._nX == mp._nX and self._nY == mp._nY:
-            return DirectionsEnum.DOWN_RIGHT
+            return DirectionsEnum.DOWN_RIGHT.value
         p = Point()
         p.x = 1 if mp._nX > self._nX else (-1 if mp._nX < self._nX else 0)
         p.y = 1 if mp._nY > self._nY else (-1 if mp._nY < self._nY else 0)
@@ -170,7 +161,7 @@ class MapPoint:
 
         elif p.x == self.VECTOR_UP_RIGHT.x and p.y == self.VECTOR_UP_RIGHT.y:
             nb = DirectionsEnum.UP_RIGHT
-        return nb
+        return nb.value
 
     def advancedOrientationTo(self, target: "MapPoint", fourDir: bool = True) -> int:
         if target is None:
@@ -180,12 +171,7 @@ class MapPoint:
         dist = math.sqrt(math.pow(xDiff, 2) + math.pow(yDiff, 2))
         if dist == 0:
             return 0
-        angle = (
-            math.acos(xDiff / dist)
-            * 180
-            / math.pi
-            * (-1 if target.y > self.y else 1)
-        )
+        angle = math.acos(xDiff / dist) * 180 / math.pi * (-1 if target.y > self.y else 1)
         if fourDir:
             angle = round(angle / 90) * 2 + 1
         else:
@@ -201,13 +187,9 @@ class MapPoint:
             return MapPoint.fromCoords(i1, i2)
         return None
 
-    def getNearestFreeCell(
-        self, mapProvider: IDataMapProvider, allowThoughEntity: bool = True
-    ) -> "MapPoint":
+    def getNearestFreeCell(self, mapProvider: IDataMapProvider, allowThoughEntity: bool = True) -> "MapPoint":
         for i in range(8):
-            mp = self.getNearestFreeCellInDirection(
-                i, mapProvider, False, allowThoughEntity
-            )
+            mp = self.getNearestFreeCellInDirection(i, mapProvider, False, allowThoughEntity)
             if mp:
                 return mp
 
@@ -251,31 +233,19 @@ class MapPoint:
             if mp is not None:
                 speed = mapProvider.getCellSpeed(mp.cellId)
                 if mp.cellId not in forbidenCellsId:
-                    if mapProvider.pointMov(
-                        mp._nX, mp._nY, allowThoughEntity, self.cellId
-                    ):
-                        weights[i] = MapPoint.getOrientationsDistance(
-                            i, orientation
-                        ) + (
-                            (5 - speed if speed >= 0 else 11 + abs(speed))
-                            if not ignoreSpeed
-                            else 0
+                    if mapProvider.pointMov(mp._nX, mp._nY, allowThoughEntity, self.cellId):
+                        weights[i] = MapPoint.getOrientationsDistance(i, orientation) + (
+                            (5 - speed if speed >= 0 else 11 + abs(speed)) if not ignoreSpeed else 0
                         )
                     else:
                         forbidenCellsId.append(mp.cellId)
                         weights[i] = -1
                 else:
-                    if mapProvider.pointMov(
-                        mp._nX, mp._nY, allowThoughEntity, self.cellId
-                    ):
+                    if mapProvider.pointMov(mp._nX, mp._nY, allowThoughEntity, self.cellId):
                         weights[i] = (
                             100
                             + MapPoint.getOrientationsDistance(i, orientation)
-                            + (
-                                (5 - speed if speed >= 0 else 11 + abs(speed))
-                                if not ignoreSpeed
-                                else 0
-                            )
+                            + ((5 - speed if speed >= 0 else 11 + abs(speed)) if not ignoreSpeed else 0)
                         )
                     else:
                         weights[i] = -1
@@ -291,11 +261,7 @@ class MapPoint:
             mp = cells[minWeightOrientation]
         else:
             mp = None
-        if (
-            mp is None
-            and allowItself
-            and mapProvider.pointMov(self._nX, self._nY, allowThoughEntity, self.cellId)
-        ):
+        if mp is None and allowItself and mapProvider.pointMov(self._nX, self._nY, allowThoughEntity, self.cellId):
             return self
         return mp
 

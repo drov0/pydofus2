@@ -1,4 +1,5 @@
 from time import sleep
+from com.ankamagames.dofus.logic.common.frames.LatencyFrame import LatencyFrame
 from com.ankamagames.dofus.logic.common.managers.StatsManager import StatsManager
 from com.ankamagames.dofus.logic.connection.managers.AuthentificationManager import (
     AuthentificationManager,
@@ -35,9 +36,7 @@ class Kernel(metaclass=Singleton):
         FrameIdManager()
         self._worker.clear()
         self.addInitialFrames(True)
-        logger.info(
-            f"Using protocole #{Metadata.PROTOCOL_BUILD}, built on {Metadata.PROTOCOL_DATE}"
-        )
+        logger.info(f"Using protocole #{Metadata.PROTOCOL_BUILD}, built on {Metadata.PROTOCOL_DATE}")
 
     def reset(
         self,
@@ -71,8 +70,10 @@ class Kernel(metaclass=Singleton):
         )
         from com.ankamagames.dofus.logic.common.frames.QueueFrame import QueueFrame
 
+        if not self._worker.contains("LatencyFrame"):
+            self._worker.addFrame(LatencyFrame())
         self._worker.addFrame(AuthentificationFrame())
         self._worker.addFrame(QueueFrame())
         self.getWorker().addFrame(dhF.DisconnectionHandlerFrame())
-        if not self._worker.contains(CleanupCrewFrame):
+        if not self._worker.contains("CleanupCrewFrame"):
             self._worker.addFrame(CleanupCrewFrame())

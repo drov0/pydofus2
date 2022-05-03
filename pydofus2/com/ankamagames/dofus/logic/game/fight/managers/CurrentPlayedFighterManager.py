@@ -1,4 +1,7 @@
 from typing import TYPE_CHECKING
+from com.ankamagames.dofus.datacenter.items.Item import Item
+from com.ankamagames.dofus.logic.game.fight.managers.SpellModifiersManager import SpellModifiersManager
+from com.ankamagames.dofus.network.enums.CharacterSpellModificationTypeEnum import CharacterSpellModificationTypeEnum
 
 if TYPE_CHECKING:
     from com.ankamagames.dofus.datacenter.spells.SpellLevel import SpellLevel
@@ -14,7 +17,6 @@ from com.ankamagames.dofus.logic.game.fight.types.castSpellManager.SpellManager 
 from com.ankamagames.dofus.network.types.game.character.characteristic.CharacterCharacteristicsInformations import (
     CharacterCharacteristicsInformations,
 )
-from com.ankamagames.dofus.network.types.game.data.items.Item import Item
 from com.ankamagames.jerakine.logger.Logger import Logger
 
 # from com.ankamagames.dofus.datacenter.items.criterion.Item import Item
@@ -71,9 +73,7 @@ class CurrentPlayedFighterManager(metaclass=Singleton):
             lastFighterEntity.canSeeThrough = False
             lastFighterEntity.canWalkThrough = False
             lastFighterEntity.canWalkTo = False
-        currentFighterEntity: AnimatedCharacter = DofusEntities.getEntity(
-            self._currentFighterId
-        )
+        currentFighterEntity: AnimatedCharacter = DofusEntities.getEntity(self._currentFighterId)
         if currentFighterEntity:
             currentFighterEntity.canSeeThrough = True
             currentFighterEntity.canWalkThrough = True
@@ -100,14 +100,10 @@ class CurrentPlayedFighterManager(metaclass=Singleton):
             # if knl.Kernel().getWorker().contains(FightSpellCastFrame):
             #    knl.Kernel().getWorker().removeFrame(knl.Kernel().getWorker().getFrame("FightSpellCastFrame)")
 
-    def setCharacteristicsInformations(
-        self, id: float, characteristics: CharacterCharacteristicsInformations
-    ) -> None:
+    def setCharacteristicsInformations(self, id: float, characteristics: CharacterCharacteristicsInformations) -> None:
         self._characteristicsInformationsList[id] = characteristics
 
-    def getCharacteristicsInformations(
-        self, id: float = 0
-    ) -> CharacterCharacteristicsInformations:
+    def getCharacteristicsInformations(self, id: float = 0) -> CharacterCharacteristicsInformations:
         player = pcm.PlayedCharacterManager()
         if id:
             if id == player.id:
@@ -138,9 +134,7 @@ class CurrentPlayedFighterManager(metaclass=Singleton):
             mpBase = stats.getStatBaseValue(StatIds.ACTION_POINTS)
             mpAdditional = stats.getStatBaseValue(StatIds.ACTION_POINTS)
             mpBonus = stats.getStatBaseValue(StatIds.ACTION_POINTS)
-            totalTurnDurationInSeconds += (
-                apBase + apAdditional + apBonus + mpBase + mpAdditional + mpBonus
-            )
+            totalTurnDurationInSeconds += apBase + apAdditional + apBonus + mpBase + mpAdditional + mpBonus
         return totalTurnDurationInSeconds
 
     def getSpellById(self, spellId: int) -> "SpellWrapper":
@@ -151,9 +145,7 @@ class CurrentPlayedFighterManager(metaclass=Singleton):
         return None
 
     def getSpellCastManager(self) -> scifm.SpellCastInFightManager:
-        scm: scifm.SpellCastInFightManager = self._spellCastInFightManagerList.get(
-            self._currentFighterId
-        )
+        scm: scifm.SpellCastInFightManager = self._spellCastInFightManagerList.get(self._currentFighterId)
         if not scm:
             scm = scifm.SpellCastInFightManager(self._currentFighterId)
             self._spellCastInFightManagerList[self._currentFighterId] = scm
@@ -166,9 +158,7 @@ class CurrentPlayedFighterManager(metaclass=Singleton):
             self._spellCastInFightManagerList[id] = scm
         return scm
 
-    def canCastThisSpell(
-        self, spellId: int, lvl: int, pTargetId: float = 0, result: list = None
-    ) -> bool:
+    def canCastThisSpell(self, spellId: int, lvl: int, pTargetId: float = 0, result: list = None) -> bool:
         from com.ankamagames.dofus.datacenter.spells.Spell import Spell
 
         spell: Spell = Spell.getSpellById(spellId)
@@ -188,6 +178,7 @@ class CurrentPlayedFighterManager(metaclass=Singleton):
             characteristics = self.getCharacteristicsInformations()
             if not characteristics:
                 return False
+        selfSpell = None
         for spellKnown in player.spellsInventory:
             if spellKnown and spellKnown.id == spellId:
                 selfSpell = spellKnown
@@ -195,11 +186,7 @@ class CurrentPlayedFighterManager(metaclass=Singleton):
         if not selfSpell:
             return False
         entityStats: EntityStats = StatsManager().getStats(self.currentFighterId)
-        currentPA: int = (
-            int(entityStats.getStatTotalValue(StatIds.ACTION_POINTS))
-            if entityStats is not None
-            else 0
-        )
+        currentPA: int = int(entityStats.getStatTotalValue(StatIds.ACTION_POINTS)) if entityStats is not None else 0
         if spellId == 0 and player.currentWeapon != None:
             weapon = Item.getItemById(player.currentWeapon.objectGID)
             if not weapon:
@@ -241,11 +228,7 @@ class CurrentPlayedFighterManager(metaclass=Singleton):
             if stateRequired not in states:
                 stateReq = SpellState.getSpellStateById(stateRequired)
                 return False
-        if (
-            not spell.bypassSummoningLimit
-            and spellLevel.canSummon
-            and not self.canSummon()
-        ):
+        if not spell.bypassSummoningLimit and spellLevel.canSummon and not self.canSummon():
             return False
         if spellLevel.canBomb and not self.canBomb():
             return False
@@ -262,22 +245,13 @@ class CurrentPlayedFighterManager(metaclass=Singleton):
             return False
         if pTargetId != 0:
             numberCastOnTarget = spellManager.getCastOnEntity(pTargetId)
-            spellModifiers = SpellModifiersManager().getSpellModifiers(
-                self.currentFighterId, spellId
-            )
+            spellModifiers = SpellModifiersManager().getSpellModifiers(self.currentFighterId, spellId)
             bonus = (
-                float(
-                    spellModifiers.getModifierValue(
-                        CharacterSpellModificationTypeEnum.MAX_CAST_PER_TARGET
-                    )
-                )
+                float(spellModifiers.getModifierValue(CharacterSpellModificationTypeEnum.MAX_CAST_PER_TARGET))
                 if not not spellModifiers
                 else float(0)
             )
-            if (
-                spellLevel.maxCastPerTarget + bonus <= numberCastOnTarget
-                and spellLevel.maxCastPerTarget > 0
-            ):
+            if spellLevel.maxCastPerTarget + bonus <= numberCastOnTarget and spellLevel.maxCastPerTarget > 0:
                 return False
         return True
 
@@ -326,9 +300,9 @@ class CurrentPlayedFighterManager(metaclass=Singleton):
         stats: EntityStats = self.getStats(id)
         if stats == None:
             return 0
-        return stats.getStatTotalValue(
+        return stats.getStatTotalValue(StatIds.MAX_SUMMONED_CREATURES_BOOST) - stats.getStatAdditionalValue(
             StatIds.MAX_SUMMONED_CREATURES_BOOST
-        ) - stats.getStatAdditionalValue(StatIds.MAX_SUMMONED_CREATURES_BOOST)
+        )
 
     def canSummon(self, id: float = None) -> bool:
         return self.getMaxSummonedCreature(id) > self.getCurrentSummonedCreature(id)

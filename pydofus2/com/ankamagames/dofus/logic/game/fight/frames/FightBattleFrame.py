@@ -379,7 +379,6 @@ class FightBattleFrame(Frame):
             self._turnFrame.turnDuration = gftsmsg.waitTime * 0.1
             isResumeMessage = isinstance(msg, GameFightTurnResumeMessage)
             if not isResumeMessage:
-                logger.debug("Resume turn for entityId: " + str(self._currentPlayerId))
                 bffm.BuffManager().decrementDuration(gftsmsg.id)
                 bffm.BuffManager().resetTriggerCount(gftsmsg.id)
             else:

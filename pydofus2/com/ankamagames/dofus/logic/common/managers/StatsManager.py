@@ -41,12 +41,8 @@ class StatsManager(metaclass=Singleton):
             DataStoreEnum.LOCATION_LOCAL,
             DataStoreEnum.BIND_COMPUTER,
         )
-        rawIsVerbose = StoreDataManager().getData(
-            self._dataStoreType, self.DATA_STORE_KEY_IS_VERBOSE
-        )
-        self._isVerbose = (
-            rawIsVerbose if isinstance(rawIsVerbose, bool) else self.DEFAULT_IS_VERBOSE
-        )
+        rawIsVerbose = StoreDataManager().getData(self._dataStoreType, self.DATA_STORE_KEY_IS_VERBOSE)
+        self._isVerbose = rawIsVerbose if isinstance(rawIsVerbose, bool) else self.DEFAULT_IS_VERBOSE
 
     def setStats(self, stats: EntityStats) -> bool:
         # logger.info(
@@ -61,21 +57,17 @@ class StatsManager(metaclass=Singleton):
 
     def getStats(self, entityId: float) -> EntityStats:
         key = str(float(entityId))
-        logger.info(f"Getting stats for entity with ID {key}")
+        # logger.info(f"Getting stats for entity with ID {key}")
         return self._entityStats.get(key)
 
-    def addRawStats(
-        self, entityId: float, rawStats: list[CharacterCharacteristic]
-    ) -> None:
+    def addRawStats(self, entityId: float, rawStats: list[CharacterCharacteristic]) -> None:
         # logger.debug(
         #     f"Adding rawStats count {len(rawStats)} for entity with ID {entityId}"
         # )
         entityKey = str(float(entityId))
         entityStats: EntityStats = self._entityStats.get(entityKey)
         isCurLifeStatOnly: bool = (
-            len(rawStats) == 1
-            and rawStats[0] is not None
-            and rawStats[0].characteristicId == StatIds.CUR_LIFE
+            len(rawStats) == 1 and rawStats[0] is not None and rawStats[0].characteristicId == StatIds.CUR_LIFE
         )
         if entityStats is None:
             entityStats = EntityStats(float(entityId))
@@ -114,11 +106,7 @@ class StatsManager(metaclass=Singleton):
     def deleteStats(self, entityId: float) -> bool:
         entityKey = str(float(entityId))
         if entityKey not in self._entityStats:
-            logger.error(
-                "Tried to del stats for entity with ID "
-                + entityKey
-                + ", but none were found. Aborting"
-            )
+            logger.error("Tried to del stats for entity with ID " + entityKey + ", but none were found. Aborting")
             return False
         del self._entityStats[entityKey]
         logger.info("Stats for entity with ID " + entityKey + " deleted")
@@ -149,14 +137,10 @@ class StatsManager(metaclass=Singleton):
             self._statListeners[key].append(listener)
             isListenerAdded = True
         if isListenerAdded:
-            logger.info(
-                f"Listener {listener.__name__}{listener.__annotations__} added to stat with ID "
-                + key
-            )
+            logger.info(f"Listener {listener.__name__}{listener.__annotations__} added to stat with ID " + key)
         else:
             logger.error(
-                f"Listener {listener.__name__}{listener.__annotations__} could NOT added to stat with ID "
-                + key
+                f"Listener {listener.__name__}{listener.__annotations__} could NOT added to stat with ID " + key
             )
         return isListenerAdded
 
@@ -170,13 +154,9 @@ class StatsManager(metaclass=Singleton):
             self._statListeners[key].remove(listener)
             isListenerRemoved = True
         if isListenerRemoved:
-            logger.info(
-                f"Listener {listener.__name__}{listener.__annotations__} removed from stat with ID "
-                + key
-            )
+            logger.info(f"Listener {listener.__name__}{listener.__annotations__} removed from stat with ID " + key)
         else:
             logger.error(
-                f"Listener {listener.__name__}{listener.__annotations__} could NOT be removed from stat with ID "
-                + key
+                f"Listener {listener.__name__}{listener.__annotations__} could NOT be removed from stat with ID " + key
             )
         return isListenerRemoved

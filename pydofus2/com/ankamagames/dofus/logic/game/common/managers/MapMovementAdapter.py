@@ -20,10 +20,10 @@ class MapMovementAdapter:
         moveCount: int = 0
         for pe in path.path:
             lastOrientation = pe.orientation
-            value = (lastOrientation & 7) << 12 | pe.step.cellId & 4095
+            value = (int(lastOrientation) & 7) << 12 | pe.step.cellId & 4095
             movement.append(value)
             moveCount += 1
-        lastValue = (lastOrientation & 7) << 12 | path.end.cellId & 4095
+        lastValue = (int(lastOrientation) & 7) << 12 | path.end.cellId & 4095
         movement.append(lastValue)
         if cls.DEBUG_ADAPTER:
             movStr = ""
@@ -43,9 +43,7 @@ class MapMovementAdapter:
             if moveCount == 0:
                 mp.start = destination
             else:
-                previousElement.orientation = previousElement.step.orientationTo(
-                    pe.step
-                )
+                previousElement.orientation = previousElement.step.orientationTo(pe.step)
             if moveCount == len(path) - 1:
                 mp.end = destination
                 break

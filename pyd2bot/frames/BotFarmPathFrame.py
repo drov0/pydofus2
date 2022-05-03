@@ -87,9 +87,7 @@ class BotFarmPathFrame(Frame):
     @property
     def nextPathMapCoords(self):
         if self.currMapCoords in self.parcours.path:
-            index = (self.parcours.path.index(self.currMapCoords) + 1) % len(
-                self.parcours.path
-            )
+            index = (self.parcours.path.index(self.currMapCoords) + 1) % len(self.parcours.path)
             return self.parcours.path[index]
         return None
 
@@ -98,18 +96,14 @@ class BotFarmPathFrame(Frame):
         return True
 
     def process(self, msg: Message) -> bool:
-        if self._worker.contains("FightContextFrame") or self._worker.contains(
-            "AutoTripFrame"
-        ):
+        if self._worker.contains("FightContextFrame") or self._worker.contains("AutoTripFrame"):
             return False
 
         if isinstance(msg, InteractiveUseErrorMessage):
             logger.error(
                 f"[BotFarmFrame] Error unable to use interactive element {msg.elemId} with the skill {msg.skillInstanceUid}"
             )
-            logger.debug(
-                "***********************************************************************"
-            )
+            logger.debug("***********************************************************************")
             if msg.elemId == self._currentRequestedElementId:
                 self._usingInteractive = False
                 del self.roleplayInteractivesFrame._ie[msg.elemId]
@@ -119,12 +113,8 @@ class BotFarmPathFrame(Frame):
 
         elif isinstance(msg, InteractiveUsedMessage):
             if PlayedCharacterManager().id == msg.entityId and msg.duration > 0:
-                logger.debug(
-                    f"[BotFarmFrame] Inventory weight {InventoryAPI.getWeightPourcent():.2f}%"
-                )
-                logger.debug(
-                    f"[BotFarmFrame] Started using interactive element {msg.elemId} ...."
-                )
+                logger.debug(f"[BotFarmFrame] Inventory weight {InventoryAPI.getWeightPourcent():.2f}%")
+                logger.debug(f"[BotFarmFrame] Started using interactive element {msg.elemId} ....")
                 if self._currentRequestedElementId == msg.elemId:
                     self._currentRequestedElementId = -1
                 if msg.duration > 0:
@@ -134,9 +124,7 @@ class BotFarmPathFrame(Frame):
 
         elif isinstance(msg, InteractiveUseEndedMessage):
             if self._entities[msg.elemId] == PlayedCharacterManager().id:
-                logger.debug(
-                    f"[BotFarmFrame] Interactive element {msg.elemId} use ended"
-                )
+                logger.debug(f"[BotFarmFrame] Interactive element {msg.elemId} use ended")
                 logger.debug("*" * 100)
                 self._usingInteractive = False
                 self.doFarm()
@@ -155,32 +143,24 @@ class BotFarmPathFrame(Frame):
                 return True
 
         elif isinstance(msg, MapChangeFailedMessage):
-            logger.debug(
-                f"[BotFarmFrame] Map change to {self._dstMapId} failed will discard that destination"
-            )
+            logger.debug(f"[BotFarmFrame] Map change to {self._dstMapId} failed will discard that destination")
             self._mapIdDiscard.append(msg.mapId)
-            MoveAPI.changeMapToDstCoords(self.nextPathMapCoords)
+            MoveAPI.changeMapToDstCoords(*self.nextPathMapCoords)
             return True
 
         elif isinstance(msg, NotificationByServerMessage):
             notification = Notification.getNotificationById(msg.id)
             if notification.titleId == 756273:
-                logger.debug(
-                    "[BotFarmFrame] Full pod reached will destroy all items in inventory"
-                )
+                logger.debug("[BotFarmFrame] Full pod reached will destroy all items in inventory")
                 InventoryAPI.destroyAllItems()
                 self.doFarm()
             return True
 
     def doFarm(self):
-        self._currentRequestedElementId = FarmAPI().collectResource(
-            skills=self.parcours.skills
-        )
+        self._currentRequestedElementId = FarmAPI().collectResource(skills=self.parcours.skills)
         if self._currentRequestedElementId == -1 and self._dstMapId == -1:
             x, y = self.nextPathMapCoords
-            logger.debug(
-                f"[BotFarmFrame] Current Map {self.currMapCoords} Moving to {x, y}"
-            )
+            logger.debug(f"[BotFarmFrame] Current Map {self.currMapCoords} Moving to {x, y}")
             dstMapId = MoveAPI.changeMapToDstCoords(x, y)
             if dstMapId == -1:
                 raise Exception(f"Unable to move to Map {x, y}")

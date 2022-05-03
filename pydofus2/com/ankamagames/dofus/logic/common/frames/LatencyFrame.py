@@ -47,19 +47,15 @@ class LatencyFrame(Frame):
             pongReceived = perf_counter()
             delay = pongReceived - self.pingRequested
             self.pingRequested = 0
-            msg = (
-                f'[LatencyMeter] Pong {delay}ms ! {datetime.now().strftime("%H:%M:%S")}'
-            )
+            msg = f'[LatencyMeter] Pong {delay}ms ! {datetime.now().strftime("%H:%M:%S")}'
             logger.debug(msg)
             return True
         elif isinstance(msg, BasicLatencyStatsRequestMessage):
             blsrmsg = msg
-            connection = ConnectionsHandler.getConnection().getSubConnection(
-                blsrmsg.sourceConnection
-            )
+            connection = ConnectionsHandler.getConnection().getSubConnection(blsrmsg.sourceConnection)
             blsmsg = BasicLatencyStatsMessage()
             blsmsg.init(
-                min(32767, connection.latencyAvg),
+                min(32767, int(connection.latencyAvg)),
                 connection.latencySamplesCount,
                 connection.latencySamplesMax,
             )

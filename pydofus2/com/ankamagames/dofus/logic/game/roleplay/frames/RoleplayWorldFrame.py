@@ -140,16 +140,12 @@ class RoleplayWorldFrame(Frame):
                 amcmsg = msg
                 playedEntity = DofusEntities.getEntity(PlayedCharacterManager().id)
                 if not playedEntity:
-                    logger.warn(
-                        "The player tried to move before its character was added to the scene. Aborting."
-                    )
+                    logger.warn("The player tried to move before its character was added to the scene. Aborting.")
                     return False
                 self.roleplayMovementFrame.setNextMoveMapChange(amcmsg.adjacentMapId)
                 if not playedEntity.position == MapPoint.fromCellId(amcmsg.cellId):
                     self.roleplayMovementFrame.setFollowingInteraction(None)
-                    self.roleplayMovementFrame.askMoveTo(
-                        MapPoint.fromCellId(amcmsg.cellId)
-                    )
+                    self.roleplayMovementFrame.askMoveTo(MapPoint.fromCellId(amcmsg.cellId))
                 else:
                     self.roleplayMovementFrame.setFollowingInteraction(None)
                     self.roleplayMovementFrame.askMapChange()
@@ -162,10 +158,7 @@ class RoleplayWorldFrame(Frame):
 
         if isinstance(msg, MapFightStartPositionsUpdateMessage):
             mfspmsg = msg
-            if (
-                PlayedCharacterManager().currentMap
-                and mfspmsg.mapId == PlayedCharacterManager().currentMap.mapId
-            ):
+            if PlayedCharacterManager().currentMap and mfspmsg.mapId == PlayedCharacterManager().currentMap.mapId:
                 self._fightPositions = mfspmsg.fightStartPositions
             return True
 
@@ -174,15 +167,11 @@ class RoleplayWorldFrame(Frame):
             entityc = ecmsg.entity
             if isinstance(entityc, AnimatedCharacter):
                 entityc = entityc
-            entityClickInfo = self.roleplayContextFrame.entitiesFrame.getEntityInfos(
-                entityc.id
-            )
+            entityClickInfo = self.roleplayContextFrame.entitiesFrame.getEntityInfos(entityc.id)
             # If entity clicked is a fight not yet started
             if self.roleplayContextFrame.entitiesFrame.isFight(entityc.id):
                 fightId = self.roleplayContextFrame.entitiesFrame.getFightId(entityc.id)
-                fightTeamLeader = (
-                    self.roleplayContextFrame.entitiesFrame.getFightLeaderId(entityc.id)
-                )
+                fightTeamLeader = self.roleplayContextFrame.entitiesFrame.getFightLeaderId(entityc.id)
                 gfjrmsg = GameFightJoinRequestMessage()
                 gfjrmsg.init(fightTeamLeader, fightId)
                 playerEntity3 = DofusEntities.getEntity(PlayedCharacterManager().id)
@@ -194,9 +183,9 @@ class RoleplayWorldFrame(Frame):
             # else if its not the current player
             elif entityc.id != PlayedCharacterManager().id:
                 self.roleplayMovementFrame.setFollowingInteraction(None)
-                if isinstance(
-                    entityClickInfo, GameRolePlayActorInformations
-                ) and isinstance(entityClickInfo, GameRolePlayGroupMonsterInformations):
+                if isinstance(entityClickInfo, GameRolePlayActorInformations) and isinstance(
+                    entityClickInfo, GameRolePlayGroupMonsterInformations
+                ):
                     self.roleplayMovementFrame.setFollowingMonsterFight(entityc)
                 self.roleplayMovementFrame.askMoveTo(entityc.position)
             return True
@@ -207,6 +196,8 @@ class RoleplayWorldFrame(Frame):
             interactiveFrame: riF.RoleplayInteractivesFrame = (
                 Kernel().getWorker().getFrame("RoleplayInteractivesFrame")
             )
+            if interactiveFrame.usingInteractive:
+                logger.debug("Interactive element already in use")
             if not (interactiveFrame and interactiveFrame.usingInteractive):
                 playerEntity = DofusEntities.getEntity(PlayedCharacterManager().id)
                 if not playerEntity:
@@ -225,12 +216,8 @@ class RoleplayWorldFrame(Frame):
                                 mp2 = mp.getNearestCellInDirection(j)
                                 if mp2 and (
                                     not dmp.pointMov(mp2.x, mp2.y, True, mp.cellId)
-                                    or not dmp.pointMov(
-                                        mp2.x - 1, mp2.y, True, mp.cellId
-                                    )
-                                    and not dmp.pointMov(
-                                        mp2.x, mp2.y - 1, True, mp.cellId
-                                    )
+                                    or not dmp.pointMov(mp2.x - 1, mp2.y, True, mp.cellId)
+                                    and not dmp.pointMov(mp2.x, mp2.y - 1, True, mp.cellId)
                                 ):
                                     numWalkableCells -= 1
                             if not numWalkableCells:
@@ -249,18 +236,12 @@ class RoleplayWorldFrame(Frame):
                             minimalRange = 1
                         elif skillData.range < minimalRange:
                             minimalRange = skillData.range
-                distanceElementToPlayer = ieamsg.position.distanceToCell(
-                    playerEntity.position
-                )
-                if distanceElementToPlayer <= minimalRange and (
-                    not ieCellData.mov or ieCellData.farmCell
-                ):
+                distanceElementToPlayer = ieamsg.position.distanceToCell(playerEntity.position)
+                if distanceElementToPlayer <= minimalRange and (not ieCellData.mov or ieCellData.farmCell):
                     nearestCell = MapPoint.fromCellId(playerEntity.position.cellId)
                 else:
                     nearestCell = ieamsg.position.getNearestFreeCellInDirection(
-                        ieamsg.position.advancedOrientationTo(
-                            playerEntity.position
-                        ),
+                        ieamsg.position.advancedOrientationTo(playerEntity.position),
                         DataMapProvider(),
                         True,
                         True,
@@ -271,24 +252,16 @@ class RoleplayWorldFrame(Frame):
                         for iRange in range(1, minimalRange):
                             forbiddenCellsIds.append(nearestCell.cellId)
                             nearestCell = nearestCell.getNearestFreeCellInDirection(
-                                nearestCell.advancedOrientationTo(
-                                    playerEntity.position, False
-                                ),
+                                nearestCell.advancedOrientationTo(playerEntity.position, False),
                                 DataMapProvider(),
                                 True,
                                 True,
                                 False,
                                 forbiddenCellsIds,
                             )
-                            if (
-                                not nearestCell
-                                or nearestCell.cellId == playerEntity.position.cellId
-                            ):
+                            if not nearestCell or nearestCell.cellId == playerEntity.position.cellId:
                                 iRange += 1
-                if (
-                    len(skills) == 1
-                    and skills[0].skillId == DataEnum.SKILL_POINT_OUT_EXIT
-                ):
+                if len(skills) == 1 and skills[0].skillId == DataEnum.SKILL_POINT_OUT_EXIT:
                     nearestCell.cellId = ieamsg.position.cellId
                     sendInteractiveUseRequest = False
                 if not nearestCell or nearestCell.cellId not in forbiddenCellsIds:
@@ -316,13 +289,9 @@ class RoleplayWorldFrame(Frame):
         )
 
         if isinstance(pEvent.frame, RoleplayEntitiesFrame):
-            pEvent.currentTarget.removeEventListener(
-                FramePushedEvent.EVENT_FRAME_PUSHED, self.onFramePushed
-            )
+            pEvent.currentTarget.removeEventListener(FramePushedEvent.EVENT_FRAME_PUSHED, self.onFramePushed)
 
     def onMerchantPlayerBuyClick(self, vendorId: float, vendorCellId: int) -> None:
-        eohvrmsg: ExchangeOnHumanVendorRequestMessage = (
-            ExchangeOnHumanVendorRequestMessage()
-        )
+        eohvrmsg: ExchangeOnHumanVendorRequestMessage = ExchangeOnHumanVendorRequestMessage()
         eohvrmsg.initExchangeOnHumanVendorRequestMessage(vendorId, vendorCellId)
         ConnectionsHandler.getConnection().send(eohvrmsg)

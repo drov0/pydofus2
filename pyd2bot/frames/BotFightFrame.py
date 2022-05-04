@@ -9,7 +9,12 @@ from com.ankamagames.dofus.datacenter.effects.EffectInstance import EffectInstan
 from com.ankamagames.dofus.internalDatacenter.spells.SpellWrapper import SpellWrapper
 from com.ankamagames.dofus.internalDatacenter.stats.EntityStats import EntityStats
 from com.ankamagames.dofus.logic.game.fight.managers.CurrentPlayedFighterManager import CurrentPlayedFighterManager
+from com.ankamagames.dofus.network.messages.game.actions.fight.GameActionFightSpellCastMessage import (
+    GameActionFightSpellCastMessage,
+)
 from com.ankamagames.dofus.network.messages.game.actions.sequence.SequenceEndMessage import SequenceEndMessage
+from com.ankamagames.dofus.network.messages.game.context.GameMapMovementMessage import GameMapMovementMessage
+from com.ankamagames.dofus.network.messages.game.context.GameMapNoMovementMessage import GameMapNoMovementMessage
 from com.ankamagames.dofus.network.types.game.context.GameContextActorInformations import GameContextActorInformations
 from com.ankamagames.jerakine.logger.Logger import Logger
 from com.ankamagames.atouin.managers.MapDisplayManager import MapDisplayManager
@@ -81,6 +86,7 @@ from com.ankamagames.jerakine.utils.display.spellZone.SpellShapeEnum import Spel
 
 from damageCalculation.tools import StatIds
 
+
 if TYPE_CHECKING:
     from com.ankamagames.dofus.logic.game.fight.frames.FightTurnFrame import (
         FightTurnFrame,
@@ -90,6 +96,7 @@ if TYPE_CHECKING:
     )
     from com.ankamagames.dofus.logic.game.fight.frames.FightBattleFrame import FightBattleFrame
     from com.ankamagames.dofus.logic.game.fight.frames.FightSpellCastFrame import FightSpellCastFrame
+    from pyd2bot.frames.BotFarmPathFrame import BotFarmPathFrame
 
 
 logger = Logger(__name__)
@@ -267,9 +274,18 @@ class BotFightFrame(Frame, metaclass=Singleton):
             logger.debug(f"Found path of length {len(path)}")
             dest = None
             if len(path) == 0:
+                self._wantcastSpell = {
+                    "spellId": self._spellId,
+                    "cellId": target["pos"].cellId,
+                    "targetId": target["targetId"],
+                }
                 self.castSpell(self._spellId, target["pos"].cellId)
             elif path[-1].cellId in self._reachableCells:
-                self._wantcastSpell = {"spellId": self._spellId, "cellId": target["pos"].cellId}
+                self._wantcastSpell = {
+                    "spellId": self._spellId,
+                    "cellId": target["pos"].cellId,
+                    "targetId": target["targetId"],
+                }
                 self._lastTarget = target
                 self.moveToCell(path[-1])
             else:
@@ -289,7 +305,7 @@ class BotFightFrame(Frame, metaclass=Singleton):
         if CurrentPlayedFighterManager().canCastThisSpell(self._spellId, spellw.spellLevel, targetId, reason):
             return True
         else:
-            logger.error(f"Unable to cast spell for reason {reason[0]}")
+            # logger.error(f"Unable to cast spell for reason {reason[0]}")
             return False
 
     def process(self, msg: Message) -> bool:
@@ -301,6 +317,9 @@ class BotFightFrame(Frame, metaclass=Singleton):
 
         if isinstance(msg, GameFightEndMessage):
             self._inFight = False
+            if Kernel().getWorker().contains("BotFarmPathFrame"):
+                bfpf: "BotFarmPathFrame" = Kernel().getWorker().getFrame("BotFarmPathFrame")
+            bfpf.doFarm()
             return True
 
         if isinstance(msg, MapComplementaryInformationsDataMessage):
@@ -319,15 +338,25 @@ class BotFightFrame(Frame, metaclass=Singleton):
             ConnectionsHandler.getConnection().send(startFightMsg)
             return True
 
-        if isinstance(msg, SequenceEndMessage):
-            if int(msg.authorId) == int(PlayedCharacterManager().id):
-                if self._myTurn and not self.battleFrame._sequenceFrameSwitcher:
+        if isinstance(msg, GameMapMovementMessage):
+            if int(msg.actorId) == int(PlayedCharacterManager().id):
+                if self._myTurn:
                     if self._wantcastSpell:
-                        self.castSpell(**self._wantcastSpell)
-                        self._wantcastSpell = None
+                        self.castSpell(self._wantcastSpell["spellId"], self._wantcastSpell["cellId"])
                     else:
-                        self.playTurn()
+                        self.turnEnd()
             return True
+
+        if isinstance(msg, GameActionFightSpellCastMessage):
+            if (
+                self._myTurn
+                and self._wantcastSpell
+                and msg.spellId == self._wantcastSpell["spellId"]
+                and msg.targetId == self._wantcastSpell["targetId"]
+                and msg.sourceId == PlayedCharacterManager().id
+                and msg.destinationCellId == self._wantcastSpell["cellId"]
+            ):
+                self.playTurn()
 
         if isinstance(msg, GameFightTurnStartMessage):
             turnStartMsg = msg
@@ -441,5 +470,6 @@ class BotFightFrame(Frame, metaclass=Singleton):
             return False
         logger.debug(f"Current cell {self.fighterInfos.disposition.cellId} moving to cell {cell.cellId}")
         fightTurnFrame.drawPath(cell)
+        self._requestedMovement = cell
         fightTurnFrame.askMoveTo(cell)
         return True

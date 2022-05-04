@@ -274,7 +274,7 @@ class FightTurnFrame(Frame):
                 return False
             self._isRequestingMovement = False
             self.removePath()
-            return True
+            return False
 
         elif isinstance(msg, EntityMovementCompleteMessage):
             emcmsg = msg
@@ -537,7 +537,7 @@ class FightTurnFrame(Frame):
             return False
         path: MovementPath = MovementPath()
         cells: list[int] = self._cells if (self._cells and len(self._cells) > 0) else self._cellsTackled
-        cells.insert(0, self.playerEntity.position.cellId)
+        cells.insert(0, self.currentPosition.cellId)
         path.fillFromCellIds(cells[0:-1])
         path.end = MapPoint.fromCellId(cells[-1])
         path.path[-1].orientation = path.path[-1].step.orientationTo(path.end)

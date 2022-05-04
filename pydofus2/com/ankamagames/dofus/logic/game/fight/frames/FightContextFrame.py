@@ -719,6 +719,7 @@ class FightContextFrame(Frame):
                     pass
 
             Kernel().getWorker().removeFrame(self)
+            logger.debug(resultsRecap)
             return False
 
         elif isinstance(msg, ChallengeTargetsListRequestAction):

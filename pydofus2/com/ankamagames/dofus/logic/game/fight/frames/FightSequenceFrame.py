@@ -786,7 +786,7 @@ class FightSequenceFrame(Frame, ISpellCastProvider):
                         ts.x = cellPos.x
                         ts.y = cellPos.y
             self._castingSpells.append(self._castingSpell)
-            return True
+            return False
 
         if isinstance(msg, GameMapMovementMessage):
             gmmmsg = msg

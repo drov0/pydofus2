@@ -1,3 +1,5 @@
+from com.ankamagames.dofus.internalDatacenter.stats.EntityStats import EntityStats
+from com.ankamagames.dofus.internalDatacenter.stats.Stat import Stat
 from com.ankamagames.dofus.logic.common.managers.StatsManager import StatsManager
 from com.ankamagames.dofus.logic.game.fight.fightEvents.FightEventsHelper import (
     FightEventsHelper,
@@ -15,6 +17,7 @@ from com.ankamagames.jerakine.logger.Logger import Logger
 from com.ankamagames.jerakine.utils.display.EnterFrameDispatcher import (
     EnterFrameDispatcher,
 )
+from damageCalculation.tools.StatIds import StatIds
 
 logger = Logger(__name__)
 
@@ -63,40 +66,12 @@ class FightMovementPointsVariationStep(AbstractStatContextualStep, IFightStep):
         return self._intValue
 
     def start(self) -> None:
-        EnterFrameDispatcher().worker.addSingleTreatment(self, self.apply, [])
-
-    def apply(self) -> None:
+        stats: EntityStats = StatsManager().getStats(self._targetId)
+        newTotalValue: int = stats.getStat(StatIds.MOVEMENT_POINTS).totalValue + self._intValue
+        stats.setStat(Stat(StatIds.MOVEMENT_POINTS, newTotalValue))
         if self._updateCharacteristicManager:
             FightEntitiesFrame.getCurrentInstance().setLastKnownEntityMovementPoint(
                 self._targetId, -self._intValue, True
             )
-        if self._showChatmessage:
-            if self._intValue > 0:
-                FightEventsHelper().sendFightEvent(
-                    FightEventEnum.FIGHTER_MP_GAINED,
-                    [self._targetId, abs(self._intValue)],
-                    self._targetId,
-                    self.castingSpellId,
-                    False,
-                    2,
-                )
-            elif self._intValue < 0:
-                if self._voluntarlyUsed:
-                    FightEventsHelper().sendFightEvent(
-                        FightEventEnum.FIGHTER_MP_USED,
-                        [self._targetId, abs(self._intValue)],
-                        self._targetId,
-                        self.castingSpellId,
-                        False,
-                        2,
-                    )
-                else:
-                    FightEventsHelper().sendFightEvent(
-                        FightEventEnum.FIGHTER_MP_LOST,
-                        [self._targetId, abs(self._intValue)],
-                        self._targetId,
-                        self.castingSpellId,
-                        False,
-                        2,
-                    )
+            logger.debug(f"new movement points: {newTotalValue}")
         super().start()

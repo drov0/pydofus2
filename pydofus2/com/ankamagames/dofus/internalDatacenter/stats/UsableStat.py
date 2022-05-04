@@ -1,4 +1,4 @@
-from .DetailedStats import DetailedStat
+from com.ankamagames.dofus.internalDatacenter.stats.DetailedStats import DetailedStat
 
 
 class UsableStat(DetailedStat):
@@ -15,12 +15,12 @@ class UsableStat(DetailedStat):
         usedValue: float,
     ):
         super().__init__(
-            id,
-            baseValue,
-            additionalValue,
-            objectsAndMountBonusValue,
-            alignGiftBonusValue,
-            contextModifValue,
+            id=id,
+            baseValue=baseValue,
+            additionalValue=additionalValue,
+            objectsAndMountBonusValue=objectsAndMountBonusValue,
+            alignGiftBonusValue=alignGiftBonusValue,
+            contextModifValue=contextModifValue,
         )
         self.usedValue = usedValue
 
@@ -47,6 +47,4 @@ class UsableStat(DetailedStat):
             self._additionalValue
         ) = (
             self._objectsAndMountBonusValue
-        ) = (
-            self._alignGiftBonusValue
-        ) = self._contextModifValue = self.usedValue = self._totalValue = 0
+        ) = self._alignGiftBonusValue = self._contextModifValue = self.usedValue = self._totalValue = 0

@@ -698,7 +698,7 @@ class FightBattleFrame(Frame):
                 return False
         if self._sequenceFrames:
             nextSequenceFrame: fseqf.FightSequenceFrame = self._sequenceFrames.pop(0)
-            # logger.debug(f"Executing next sequence #{nextSequenceFrame._instanceId}")
+            logger.debug(f"Executing next sequence #{nextSequenceFrame._instanceId}")
             self._executingSequence = True
             nextSequenceFrame.execute(self.finishSequence(nextSequenceFrame))
             return True
@@ -819,9 +819,6 @@ class FightBattleFrame(Frame):
 
     def endBattle(self, fightEnd: GameFightEndMessage) -> None:
         self._holder: FightEntitiesHolder = FightEntitiesHolder()
-        entities: dict = self._holder.getEntities()
-        for coward in entities:
-            coward
         self._holder.reset()
         self._synchroniseFighters = None
         krnl.Kernel().getWorker().removeFrame(self)

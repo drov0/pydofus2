@@ -200,7 +200,7 @@ class RoleplayMovementFrame(Frame):
                 if player.isMoving:
                     player.stop = True
                 player.position = newPos
-                if self._wantToChangeMap >= 0:
+                if not PlayedCharacterManager().isFighting and self._wantToChangeMap >= 0:
                     mp = MapPoint.fromCellId(self._destinationPoint)
                     if newPos == mp:
                         self.askMapChange()
@@ -369,7 +369,7 @@ class RoleplayMovementFrame(Frame):
         playerEntity: AnimatedCharacter = DofusEntities.getEntity(PlayedCharacterManager().id)
         if playerEntity.position.cellId == cell.cellId:
             logger.debug("[RolePlayMovement] Already on the cell")
-        logger.debug(f"[RolePlayMovement] Asking to move to cell {cell}")
+        logger.debug(f"[RolePlayMovement] Asking to move to cell {cell}, can Move {self._canMove}")
         if not self._canMove or PlayedCharacterManager().state == PlayerLifeStatusEnum.STATUS_TOMBSTONE:
             logger.debug("[RolePlayMovement] Can't move or dead, aborting")
             return False

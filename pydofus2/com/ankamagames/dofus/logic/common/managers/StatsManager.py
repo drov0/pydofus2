@@ -61,9 +61,7 @@ class StatsManager(metaclass=Singleton):
         return self._entityStats.get(key)
 
     def addRawStats(self, entityId: float, rawStats: list[CharacterCharacteristic]) -> None:
-        # logger.debug(
-        #     f"Adding rawStats count {len(rawStats)} for entity with ID {entityId}"
-        # )
+        logger.debug(f"Adding rawStats count {len(rawStats)} for entity with ID {entityId}")
         entityKey = str(float(entityId))
         entityStats: EntityStats = self._entityStats.get(entityKey)
         isCurLifeStatOnly: bool = (
@@ -74,7 +72,9 @@ class StatsManager(metaclass=Singleton):
             self.setStats(entityStats)
 
         for rawStat in rawStats:
+            # logger.debug(f"update rawStat {rawStat.__dict__}")
             if isinstance(rawStat, CharacterUsableCharacteristicDetailed):
+
                 rawUsableStat = rawStat
                 entityStat = UsableStat(
                     id=rawUsableStat.characteristicId,
@@ -82,7 +82,7 @@ class StatsManager(metaclass=Singleton):
                     additionalValue=rawUsableStat.additional,
                     objectsAndMountBonusValue=rawUsableStat.objectsAndMountBonus,
                     alignGiftBonusValue=rawUsableStat.alignGiftBonus,
-                    contextModifValue=rawUsableStat.contextModif,
+                    contextModifValue=0,
                     usedValue=rawUsableStat.used,
                 )
             elif isinstance(rawStat, CharacterCharacteristicDetailed):
@@ -93,7 +93,7 @@ class StatsManager(metaclass=Singleton):
                     rawDetailedStat.additional,
                     rawDetailedStat.objectsAndMountBonus,
                     rawDetailedStat.alignGiftBonus,
-                    rawDetailedStat.contextModif,
+                    contextModifValue=0,
                 )
             else:
                 if not isinstance(rawStat, CharacterCharacteristicValue):
@@ -140,7 +140,7 @@ class StatsManager(metaclass=Singleton):
             logger.info(f"Listener {listener.__name__}{listener.__annotations__} added to stat with ID " + key)
         else:
             logger.error(
-                f"Listener {listener.__name__}{listener.__annotations__} could NOT added to stat with ID " + key
+                f"Listener {listener.__name__}{listener.__annotations__} could NOT be added to stat with ID " + key
             )
         return isListenerAdded
 

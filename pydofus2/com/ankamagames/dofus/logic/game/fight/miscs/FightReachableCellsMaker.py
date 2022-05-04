@@ -113,8 +113,6 @@ class FightReachableCellsMaker:
         stats = StatsManager().getStats(infos.contextualId)
         movementPoints: Stat = stats.getStat(StatIds.MOVEMENT_POINTS)
         movementPointsValue: float = float(movementPoints.totalValue) if movementPoints is not None else float(0)
-        if movementPointsValue > 30:
-            raise Exception("Movement points value is too high")
         self._reachableCells = list[int]()
         self._unreachableCells = list[int]()
         if movementPoint > -1:

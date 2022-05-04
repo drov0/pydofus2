@@ -1,4 +1,6 @@
 from com.ankamagames.dofus.internalDatacenter.spells.SpellWrapper import SpellWrapper
+from com.ankamagames.dofus.internalDatacenter.stats.EntityStats import EntityStats
+from com.ankamagames.dofus.internalDatacenter.stats.Stat import Stat
 from com.ankamagames.dofus.logic.common.managers.StatsManager import StatsManager
 from com.ankamagames.dofus.logic.game.fight.fightEvents.FightEventsHelper import (
     FightEventsHelper,
@@ -13,6 +15,7 @@ from com.ankamagames.jerakine.logger.Logger import Logger
 from com.ankamagames.jerakine.utils.display.EnterFrameDispatcher import (
     EnterFrameDispatcher,
 )
+from damageCalculation.tools.StatIds import StatIds
 
 logger = Logger(__name__)
 
@@ -66,37 +69,10 @@ class FightActionPointsVariationStep(AbstractStatContextualStep, IFightStep):
         return self._voluntarlyUsed
 
     def start(self) -> None:
-        EnterFrameDispatcher().worker.addSingleTreatment(self, self.apply, [])
-
-    def apply(self) -> None:
+        stats: EntityStats = StatsManager().getStats(self._targetId)
+        ap: Stat = stats.getStat(StatIds.ACTION_POINTS)
+        newValue = ap.totalValue + self._intValue
+        stats.setStat(Stat(StatIds.ACTION_POINTS, newValue))
+        logger.debug(f"new ap value : {newValue}")
         SpellWrapper.refreshAllPlayerSpellHolder(self._targetId)
-        if self._showChatmessage:
-            if self._intValue > 0:
-                FightEventsHelper().sendFightEvent(
-                    FightEventEnum.FIGHTER_AP_GAINED,
-                    [self._targetId, abs(self._intValue)],
-                    self._targetId,
-                    self.castingSpellId,
-                    False,
-                    2,
-                )
-            elif self._intValue < 0:
-                if self._voluntarlyUsed:
-                    FightEventsHelper().sendFightEvent(
-                        FightEventEnum.FIGHTER_AP_USED,
-                        [self._targetId, abs(self._intValue)],
-                        self._targetId,
-                        self.castingSpellId,
-                        False,
-                        2,
-                    )
-                else:
-                    FightEventsHelper().sendFightEvent(
-                        FightEventEnum.FIGHTER_AP_LOST,
-                        [self._targetId, abs(self._intValue)],
-                        self._targetId,
-                        self.castingSpellId,
-                        False,
-                        2,
-                    )
         super().start()

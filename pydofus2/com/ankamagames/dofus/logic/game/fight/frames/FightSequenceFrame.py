@@ -792,7 +792,7 @@ class FightSequenceFrame(Frame, ISpellCastProvider):
             gmmmsg = msg
             self.keepInMindToUpdateMovementArea()
             self.fighterHasMoved(gmmmsg)
-            return True
+            return False
 
         if isinstance(msg, FighterStatsListMessage):
             fslmsg = msg
@@ -1712,9 +1712,9 @@ class FightSequenceFrame(Frame, ISpellCastProvider):
     def pushStep(self, step: AbstractSequencable) -> None:
         if self.castingSpell is not None:
             step.castingSpellId = self.castingSpell.castingSpellId
-        logger.debug(
-            f"[SEQ DEBUG] Push step of type {step.__class__.__name__} to buffer of sequence #{self._instanceId}"
-        )
+        # logger.debug(
+        #     f"[SEQ DEBUG] Push step of type {step.__class__.__name__} to buffer of sequence #{self._instanceId}"
+        # )
         self._stepsBuffer.append(step)
 
     def pushPointsLossDodgeStep(self, fighterId: float, actionId: int, amount: int) -> None:

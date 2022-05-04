@@ -371,11 +371,12 @@ class FightBattleFrame(Frame):
             self._currentPlayerId = gftsmsg.id
             if not self._lastPlayerId:
                 self._lastPlayerId = self._currentPlayerId
-            logger.info("Start turn for entityId: " + str(self._currentPlayerId))
+
+            logger.info("*" * 50 + f"   Start turn for entityId {self._currentPlayerId}    " + "*" * 50)
             if self._currentPlayerId == playerId:
                 self._slaveId = 0
             self._playingSlaveEntity = gftsmsg.id == self._slaveId
-            logger.debug("Playing slave entity: " + str(self._playingSlaveEntity))
+            # logger.debug("Playing slave entity: " + str(self._playingSlaveEntity))
             self._turnFrame.turnDuration = gftsmsg.waitTime * 0.1
             isResumeMessage = isinstance(msg, GameFightTurnResumeMessage)
             if not isResumeMessage:
@@ -449,10 +450,10 @@ class FightBattleFrame(Frame):
             return True
 
         elif isinstance(msg, SequenceStartMessage):
-            logger.debug(f"[SEQ DEBUG] =================>> Received Sequence start author {msg.authorId}")
+            # logger.debug(f"[SEQ DEBUG] =================>> Received Sequence start author {msg.authorId}")
             self._autoEndTurn = False
             if not self._sequenceFrameSwitcher:
-                logger.debug(f"[SEQ DEBUG] Switcher is not set, creating new one")
+                # logger.debug(f"[SEQ DEBUG] Switcher is not set, creating new one")
                 self._sequenceFrameSwitcher = FightSequenceSwitcherFrame()
                 krnl.Kernel().getWorker().addFrame(self._sequenceFrameSwitcher)
             self._currentSequenceFrame = fseqf.FightSequenceFrame(self, self._currentSequenceFrame)
@@ -460,7 +461,7 @@ class FightBattleFrame(Frame):
             return True
 
         elif isinstance(msg, SequenceEndMessage):
-            self.logState()
+            # self.logState()
             semsg = msg
             if not self._currentSequenceFrame:
                 logger.warn("Wow wow wow, I've got a Sequence End but no Sequence Start? What the hell?")
@@ -481,9 +482,9 @@ class FightBattleFrame(Frame):
                 self._currentSequenceFrame = None
                 self.executeNextSequence()
             else:
-                logger.debug(
-                    f"Sequence #{self._currentSequenceFrame._instanceId} is not the last one, so we will wait for the end of the parent sequence"
-                )
+                # logger.debug(
+                #     f"Sequence #{self._currentSequenceFrame._instanceId} is not the last one, so we will wait for the end of the parent sequence"
+                # )
                 self._currentSequenceFrame.execute()
                 self._sequenceFrameSwitcher.currentFrame = self._currentSequenceFrame.parent
                 self._currentSequenceFrame = self._currentSequenceFrame.parent
@@ -649,7 +650,7 @@ class FightBattleFrame(Frame):
             if nextCharacterId == self._masterId:
                 # FightApi.slaveContext = False
                 CurrentPlayedFighterManager().resetPlayerSpellList()
-                SpellInventoryManagementFrame.getCurrentInstance().applySpellGlobalCoolDownInfo(self._masterId)
+                SpellInventoryManagementFrame().applySpellGlobalCoolDownInfo(self._masterId)
             elif nextCharacterId == self._slaveId:
                 pass
 
@@ -725,7 +726,7 @@ class FightBattleFrame(Frame):
         if self._sequenceFrameCached == None:
             return
         ack: GameActionAcknowledgementMessage = GameActionAcknowledgementMessage()
-        logger.debug(f"Sending acknowledgement for act id {self._sequenceFrameCached.ackIdent}")
+        logger.debug(f"Sending acknowledgement for sequence #{self._sequenceFrameCached._instanceId}")
         ack.init(True, self._sequenceFrameCached.ackIdent)
         self._sequenceFrameCached = None
         try:
@@ -744,7 +745,6 @@ class FightBattleFrame(Frame):
                 if not self.isFightAboutToEnd:
                     self.sendAcknowledgement()
             fevth.FightEventsHelper().sendAllFightEvent(True)
-            logger.info("Sequence finished.")
             self._executingSequence = False
             if self._refreshTurnsList:
                 logger.warn("There was a turns list refresh delayed, what about updating it now?")

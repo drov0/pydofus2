@@ -13,9 +13,7 @@ class EntitiesManager(metaclass=Singleton):
         self._entitiesScheduledForDestruction = dict()
         self._currentRandomEntity: float = self.RANDOM_ENTITIES_ID_START
 
-    def addAnimatedEntity(
-        self, entityID: float, entity: "IEntity", strata: int = 0
-    ) -> None:
+    def addAnimatedEntity(self, entityID: float, entity: "IEntity", strata: int = 0) -> None:
         if not isinstance(entity, IEntity):
             raise Exception("entity must be an IEntity, not a " + str(type(entity)))
         if self._entities.get(entityID) is not None:

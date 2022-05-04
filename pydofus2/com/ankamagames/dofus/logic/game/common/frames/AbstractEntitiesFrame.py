@@ -113,7 +113,7 @@ class AbstractEntitiesFrame(Frame):
         if not self._entities or not self._entitiesTotal:
             return None
         if not self._entities.get(entityId):
-            logger.error(f"Entity {entityId} is unknown. Available actor Ids are {list(self._entities.keys())}")
+            # logger.error(f"Entity {entityId} is unknown. Available actor Ids are {list(self._entities.keys())}")
             if entityId <= EntitiesManager.RANDOM_ENTITIES_ID_START:
                 return None
             return None
@@ -164,6 +164,9 @@ class AbstractEntitiesFrame(Frame):
                 pcm.PlayedCharacterManager().restrictions = humanoid.humanoidInfo.restrictions
         if infos.disposition.cellId != -1:
             characterEntity.position = MapPoint.fromCellId(infos.disposition.cellId)
+        characterEntity: AnimatedCharacter = DofusEntities.getEntity(infos.contextualId)
+        logger.debug(f"addOrUpdateActor new actor added {infos.contextualId} position is {characterEntity.position}")
+
         return characterEntity
 
     def updateActorDisposition(self, actorId: float, newDisposition: EntityDispositionInformations) -> None:

@@ -1,5 +1,5 @@
 from com.ankamagames.atouin.AtouinConstants import AtouinConstants
-from com.ankamagames.jerakine.types.positions.MapPoint import Point
+from com.ankamagames.jerakine.types.positions.Point import Point
 
 
 class CellIdConverter:

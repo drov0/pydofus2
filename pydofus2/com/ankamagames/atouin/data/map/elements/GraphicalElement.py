@@ -5,7 +5,7 @@ from com.ankamagames.atouin.enums.ElementTypesEnum import ElementTypesEnum
 from com.ankamagames.jerakine.logger.Logger import Logger
 from com.ankamagames.jerakine.network.CustomDataWrapper import ByteArray
 from com.ankamagames.jerakine.types.ColorMultiplicator import ColorMultiplicator
-from com.ankamagames.jerakine.types.positions.MapPoint import Point
+from com.ankamagames.jerakine.types.positions.Point import Point
 
 logger = Logger(__name__)
 
@@ -51,9 +51,7 @@ class GraphicalElement(BasicElement):
         self.subFromRaw(raw, mapVersion)
         self.identifier = raw.readUnsignedInt()
         if AtouinConstants.DEBUG_FILES_PARSING_ELEMENTS:
-            logger.debug(
-                "      (GraphicalElement) Identifier : " + str(self.identifier)
-            )
+            logger.debug("      (GraphicalElement) Identifier : " + str(self.identifier))
 
     def subFromRaw(self, raw: ByteArray, mapVersion: int) -> None:
         self.elementId = raw.readUnsignedInt()

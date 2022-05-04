@@ -60,6 +60,9 @@ from com.ankamagames.jerakine.messages.Frame import Frame
 from com.ankamagames.jerakine.messages.Message import Message
 from com.ankamagames.jerakine.types.enums.Priority import Priority
 from com.ankamagames.jerakine.types.positions.MapPoint import MapPoint
+from com.ankamagames.jerakine.types.zones.Cross import Cross
+from com.ankamagames.jerakine.types.zones.Custom import Custom
+from com.ankamagames.jerakine.types.zones.Lozenge import Lozenge
 from com.ankamagames.jerakine.utils.display.spellZone.SpellShapeEnum import (
     SpellShapeEnum,
 )
@@ -134,7 +137,7 @@ class FightSpellCastFrame(Frame):
         if spellId or not PlayedCharacterManager().currentWeapon:
             for i in PlayedCharacterManager().spellsInventory:
                 if i.spellId == self._spellId:
-                    self._spellLevel = i
+                    self._spellLevel = i.spellLevel
         else:
             weapon = PlayedCharacterManager().currentWeapon
             self._spellLevel = {

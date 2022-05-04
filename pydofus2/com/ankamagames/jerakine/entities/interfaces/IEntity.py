@@ -1,4 +1,7 @@
-from com.ankamagames.jerakine.types.positions.MapPoint import MapPoint
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from com.ankamagames.jerakine.types.positions.MapPoint import MapPoint
 
 
 class IEntity:
@@ -11,9 +14,9 @@ class IEntity:
         pass
 
     @property
-    def position(self) -> MapPoint:
+    def position(self) -> "MapPoint":
         pass
 
     @position.setter
-    def position(self, param1: MapPoint) -> None:
+    def position(self, param1: "MapPoint") -> None:
         pass

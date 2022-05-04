@@ -12,12 +12,7 @@ from com.ankamagames.dofus.datacenter.spells.SpellVariant import SpellVariant
 from com.ankamagames.dofus.internalDatacenter.spells.SpellWrapper import SpellWrapper
 from com.ankamagames.dofus.kernel.Kernel import Kernel
 from com.ankamagames.dofus.kernel.net.ConnectionsHandler import ConnectionsHandler
-
-# from com.ankamagames.dofus.logic.common.managers.FeatureManager import FeatureManager
 from com.ankamagames.dofus.logic.common.managers.StatsManager import StatsManager
-from com.ankamagames.dofus.logic.game.common.managers.InventoryManager import (
-    InventoryManager,
-)
 from com.ankamagames.dofus.logic.game.common.managers.PlayedCharacterManager import (
     PlayedCharacterManager,
 )
@@ -82,6 +77,9 @@ class SpellInventoryManagementFrame(Frame, metaclass=Singleton):
         self._fullSpellList = dict[int, list[SpellWrapper]]()
         self._spellsGlobalCooldowns = dict()
         super().__init__()
+
+    def getCurrentInstance(self) -> "SpellInventoryManagementFrame":
+        return Kernel().getWorker().getFrame("SpellInventoryManagementFrame")
 
     def generateCurrentCustomModeBreedSpells(self) -> list:
         spellId: int = 0
@@ -264,8 +262,8 @@ class SpellInventoryManagementFrame(Frame, metaclass=Singleton):
                             spellManager.resetInitialCooldown(spellCastManager.currentTurn)
             if Kernel().getWorker().contains("FightSpellCastFrame"):
                 Kernel().getWorker().removeFrame(Kernel().getWorker().getFrame("FightSpellCastFrame"))
-            imf = Kernel().getWorker().getFrame("InventoryManagementFrame")
-            InventoryManager().shortcutBarSpells = imf.getWrappersFromShortcuts(sscmsg.shortcuts)
+            # imf = Kernel().getWorker().getFrame("InventoryManagementFrame")
+            # InventoryManager().shortcutBarSpells = imf.getWrappersFromShortcuts(sscmsg.shortcuts)
             return False
 
         elif isinstance(msg, SpellVariantActivationRequestAction):
@@ -341,7 +339,7 @@ class SpellInventoryManagementFrame(Frame, metaclass=Singleton):
         self._spellsGlobalCooldowns[pEntityId].append(pGameFightSpellCooldown)
 
     def applySpellGlobalCoolDownInfo(self, pEntityId: float) -> None:
-        sgcds: list[GameFightSpellCooldown] = self._spellsGlobalCooldowns[pEntityId]
+        sgcds: list[GameFightSpellCooldown] = self._spellsGlobalCooldowns.get(pEntityId)
         if sgcds:
             for gfsc in sgcds:
                 gcdvalue = gfsc.cooldown

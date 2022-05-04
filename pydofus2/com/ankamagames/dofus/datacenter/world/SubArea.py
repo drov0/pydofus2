@@ -6,7 +6,7 @@ from com.ankamagames.jerakine.data.GameData import GameData
 from com.ankamagames.jerakine.data.I18n import I18n
 from com.ankamagames.jerakine.data.IposInit import IPostInit
 from com.ankamagames.jerakine.interfaces.IDataCenter import IDataCenter
-from com.ankamagames.jerakine.types.positions.MapPoint import Point
+from com.ankamagames.jerakine.types.positions.Point import Point
 from flash.geom.Rectangle import Rectangle
 
 
@@ -160,9 +160,7 @@ class SubArea(IDataCenter, IPostInit):
     @property
     def zaapMapPosition(self) -> MapPosition:
         if not self._zaapMapCoord:
-            self._zaapMapCoord = MapPosition.getMapPositionById(
-                self.associatedZaapMapId
-            )
+            self._zaapMapCoord = MapPosition.getMapPositionById(self.associatedZaapMapId)
         return self._zaapMapCoord
 
     def postInit(self) -> None:

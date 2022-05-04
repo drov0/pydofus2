@@ -144,10 +144,7 @@ class PlayedCharacterApi(IApi, metaclass=Singleton):
         item = None
         equipment: list = list()
         for item in PlayedCharacterManager().inventory:
-            if (
-                item.position
-                <= CharacterInventoryPositionEnum.ACCESSORY_POSITION_SHIELD
-            ):
+            if item.position <= CharacterInventoryPositionEnum.ACCESSORY_POSITION_SHIELD:
                 equipment.append(item)
         return equipment
 
@@ -155,9 +152,7 @@ class PlayedCharacterApi(IApi, metaclass=Singleton):
         return PlayedCharacterManager().spellsInventory
 
     def getSpells(self, returnBreedSpells: bool) -> list:
-        spim: "SpellInventoryManagementFrame" = (
-            Kernel().getWorker().getFrame("SpellInventoryManagementFrame")
-        )
+        spim: "SpellInventoryManagementFrame" = Kernel().getWorker().getFrame("SpellInventoryManagementFrame")
         if returnBreedSpells:
             return spim.getBreedSpellsInVariantslist()
         return spim.getCommonSpellsInVariantslist()
@@ -175,9 +170,7 @@ class PlayedCharacterApi(IApi, metaclass=Singleton):
         return ForgettableSpell.getForgettableSpellById(id)
 
     def isForgettableSpellAvailable(self, id: int) -> bool:
-        forgettableSpellItems: dict = (
-            PlayedCharacterManager().playerForgettableSpelldict
-        )
+        forgettableSpellItems: dict = PlayedCharacterManager().playerForgettableSpelldict
         if forgettableSpellItems == None:
             return False
         forgettableSpellItem: ForgettableSpellItem = forgettableSpellItems[id]
@@ -205,10 +198,7 @@ class PlayedCharacterApi(IApi, metaclass=Singleton):
         breedSpellsId: list = breedData.allSpellsId
         for spellWrapper in spellsInventory:
             if spellWrapper is not None:
-                if (
-                    spellWrapper.variantActivated
-                    and breedSpellsId.find(spellWrapper.id) != -1
-                ):
+                if spellWrapper.variantActivated and breedSpellsId.find(spellWrapper.id) != -1:
                     activatedSpellIds.append(spellWrapper.id)
         return activatedSpellIds
 
@@ -304,12 +294,12 @@ class PlayedCharacterApi(IApi, metaclass=Singleton):
             FightContextFrame,
         )
 
-        return Kernel().getWorker().getFrame("FightContextFrame") != None
+        return Kernel().getWorker().contains("FightContextFrame")
 
     def isInPreFight(self) -> bool:
-        return Kernel().getWorker().contains(
-            "FightPreparationFrame"
-        ) or Kernel().getWorker().isBeingAdded(FightPreparationFrame)
+        return Kernel().getWorker().contains("FightPreparationFrame") or Kernel().getWorker().isBeingAdded(
+            FightPreparationFrame
+        )
 
     def isSpectator(self) -> bool:
         return PlayedCharacterManager().isSpectator
@@ -336,12 +326,8 @@ class PlayedCharacterApi(IApi, metaclass=Singleton):
         return PlayedCharacterManager().restrictions
 
     def isMutant(self) -> bool:
-        rcf: RoleplayContextFrame = (
-            Kernel().getWorker().getFrame("RoleplayContextFrame")
-        )
-        infos: GameRolePlayActorInformations = rcf.entitiesFrame.getEntityInfos(
-            PlayedCharacterManager().id
-        )
+        rcf: RoleplayContextFrame = Kernel().getWorker().getFrame("RoleplayContextFrame")
+        infos: GameRolePlayActorInformations = rcf.entitiesFrame.getEntityInfos(PlayedCharacterManager().id)
         return infos is GameRolePlayMutantInformations
 
     def publicMode(self) -> bool:
@@ -407,16 +393,12 @@ class PlayedCharacterApi(IApi, metaclass=Singleton):
     def canCastThisSpell(self, spellId: int, lvl: int) -> bool:
         return CurrentPlayedFighterManager().canCastThisSpell(spellId, lvl)
 
-    def canCastThisSpellWithResult(
-        self, spellId: int, lvl: int, target: float = 0
-    ) -> str:
+    def canCastThisSpellWithResult(self, spellId: int, lvl: int, target: float = 0) -> str:
         resultA: list = ["."]
         CurrentPlayedFighterManager().canCastThisSpell(spellId, lvl, target, resultA)
         return resultA[0]
 
-    def canCastThisSpellOnTarget(
-        self, spellId: int, lvl: int, pTargetId: float
-    ) -> bool:
+    def canCastThisSpellOnTarget(self, spellId: int, lvl: int, pTargetId: float) -> bool:
         return CurrentPlayedFighterManager().canCastThisSpell(spellId, lvl, pTargetId)
 
     def isInHisHouse(self) -> bool:
@@ -448,10 +430,7 @@ class PlayedCharacterApi(IApi, metaclass=Singleton):
         return PlayedCharacterManager().state
 
     def isAlive(self) -> bool:
-        return (
-            PlayedCharacterManager().state
-            == PlayerLifeStatusEnum.STATUS_ALIVE_AND_KICKING
-        )
+        return PlayedCharacterManager().state == PlayerLifeStatusEnum.STATUS_ALIVE_AND_KICKING
 
     def getFollowingPlayerIds(self) -> list[float]:
         return PlayedCharacterManager().followingPlayerIds
@@ -509,10 +488,7 @@ class PlayedCharacterApi(IApi, metaclass=Singleton):
         return PlayedCharacterManager().isInBreach
 
     def isInBreachSubArea(self) -> bool:
-        return (
-            PlayedCharacterManager().currentSubArea.id == 904
-            or PlayedCharacterManager().currentSubArea.id == 938
-        )
+        return PlayedCharacterManager().currentSubArea.id == 904 or PlayedCharacterManager().currentSubArea.id == 938
 
     def isInAnomaly(self) -> bool:
         return PlayedCharacterManager().isInAnomaly

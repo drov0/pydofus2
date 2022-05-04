@@ -1,3 +1,4 @@
+from com.ankamagames.dofus.datacenter.optionalFeatures.ForgettableSpell import ForgettableSpell
 from com.ankamagames.dofus.datacenter.spells.Spell import Spell
 from com.ankamagames.dofus.datacenter.spells.SpellLevel import SpellLevel
 import com.ankamagames.dofus.internalDatacenter.spells.SpellWrapper as spellw
@@ -79,7 +80,7 @@ class SpellManager:
         self._forcedCooldown = False
         self._spellHasBeenCast = True
         for target in pTarget:
-            if self._targetsThisTurn[target] == None:
+            if self._targetsThisTurn.get(target) is None:
                 self._targetsThisTurn[target] = 0
             self._targetsThisTurn[target] += 1
         if pCountForCooldown:
@@ -91,7 +92,7 @@ class SpellManager:
         self.updateSpellWrapper()
 
     def getCastOnEntity(self, pEntityId: float) -> int:
-        if self._targetsThisTurn[pEntityId] is None:
+        if self._targetsThisTurn.get(pEntityId) is None:
             return 0
         return self._targetsThisTurn[pEntityId]
 
@@ -106,15 +107,11 @@ class SpellManager:
         cooldown: int = 0
         spell: Spell = Spell.getSpellById(self._spellId)
         spellLevel: SpellLevel = spell.getSpellLevel(self._spellLevel)
-        spellModifiers = SpellModifiersManager().getSpellModifiers(
-            self._spellCastManager.entityId, self._spellId
-        )
+        spellModifiers = SpellModifiersManager().getSpellModifiers(self._spellCastManager.entityId, self._spellId)
         castIntervalModifier: float = 0
         castIntervalSetModifier: float = 0
         if spellModifiers is not None:
-            castIntervalModifier = spellModifiers.getModifierValue(
-                CharacterSpellModificationTypeEnum.CAST_INTERVAL
-            )
+            castIntervalModifier = spellModifiers.getModifierValue(CharacterSpellModificationTypeEnum.CAST_INTERVAL)
             castIntervalSetModifier = spellModifiers.getModifierValue(
                 CharacterSpellModificationTypeEnum.CAST_INTERVAL_SET
             )
@@ -129,27 +126,20 @@ class SpellManager:
         if castIntervalSetModifier:
             interval = -castIntervalModifier + castIntervalSetModifier
         else:
-            interval = spellLevel.minCastInterval - (
-                0 if castIntervalModifier < 0 else castIntervalModifier
-            )
+            interval = spellLevel.minCastInterval - (0 if castIntervalModifier < 0 else castIntervalModifier)
         if interval == 63:
             return 63
         initialCooldown: int = (
-            self._lastInitialCooldownReset
-            + spellLevel.initialCooldown
-            - self._spellCastManager.currentTurn
+            self._lastInitialCooldownReset + spellLevel.initialCooldown - self._spellCastManager.currentTurn
         )
         if (
-            self._lastCastTurn
-            >= self._lastInitialCooldownReset + spellLevel.initialCooldown
+            self._lastCastTurn >= self._lastInitialCooldownReset + spellLevel.initialCooldown
             or spellLevel.initialCooldown == 0
             or self._forcedCooldown
             or self._castThisTurn > 0
             or self._spellHasBeenCast
         ):
-            cooldown = (
-                interval + self._lastCastTurn - self._spellCastManager.currentTurn
-            )
+            cooldown = interval + self._lastCastTurn - self._spellCastManager.currentTurn
         else:
             cooldown = initialCooldown
         if cooldown <= 0:
@@ -159,9 +149,7 @@ class SpellManager:
     def forceCooldown(self, cooldown: int, isBonusRefresh: bool = False) -> None:
         spell: Spell = Spell.getSpellById(self._spellId)
         spellL: SpellLevel = spell.getSpellLevel(self._spellLevel)
-        self._lastCastTurn = (
-            cooldown + self._spellCastManager.currentTurn - spellL.minCastInterval
-        )
+        self._lastCastTurn = cooldown + self._spellCastManager.currentTurn - spellL.minCastInterval
         self._forcedCooldown = True
         spellW: spellw.SpellWrapper = spellw.SpellWrapper.getSpellWrapperById(
             self._spellId, self._spellCastManager.entityId
@@ -179,9 +167,7 @@ class SpellManager:
         spellW: spellw.SpellWrapper = spellw.SpellWrapper.getSpellWrapperById(
             self._spellId, self._spellCastManager.entityId
         )
-        if spellW == None:
-            spellW = spellw.SpellWrapper.create(
-                self._spellId, self._spellLevel, True, self._spellCastManager.entityId
-            )
+        if spellW is None:
+            spellW = spellw.SpellWrapper.create(self._spellId, self._spellLevel, True, self._spellCastManager.entityId)
         if spellW and spellW.actualCooldown != 63:
             spellW.actualCooldown = self.cooldown

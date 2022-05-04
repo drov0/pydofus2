@@ -80,11 +80,7 @@ class _ReachableCellData:
                 if neighbour and neighbour.state == self.STATE_UNREACHABLE:
                     self.evadePercent *= neighbour.evadePercent
 
-            self.state = (
-                int(self.STATE_REACHABLE)
-                if self.evadePercent == 1
-                else int(self.STATE_WATCHED)
-            )
+            self.state = int(self.STATE_REACHABLE) if self.evadePercent == 1 else int(self.STATE_WATCHED)
 
     def updateMp(self, bestMp: int, bestUntackledMp: int) -> None:
         self.mpUpdated = True
@@ -113,14 +109,12 @@ class FightReachableCellsMaker:
         fromCellId: int = -1,
         movementPoint: int = -1,
     ):
-        entitiesFrame: FightEntitiesFrame = (
-            Kernel().getWorker().getFrame("FightEntitiesFrame")
-        )
+        entitiesFrame: FightEntitiesFrame = Kernel().getWorker().getFrame("FightEntitiesFrame")
         stats = StatsManager().getStats(infos.contextualId)
         movementPoints: Stat = stats.getStat(StatIds.MOVEMENT_POINTS)
-        movementPointsValue: float = (
-            float(movementPoints.totalValue) if movementPoints is not None else float(0)
-        )
+        movementPointsValue: float = float(movementPoints.totalValue) if movementPoints is not None else float(0)
+        if movementPointsValue > 30:
+            raise Exception("Movement points value is too high")
         self._reachableCells = list[int]()
         self._unreachableCells = list[int]()
         if movementPoint > -1:
@@ -153,21 +147,16 @@ class FightReachableCellsMaker:
                 x = entity.position.x - self._mapPoint.x + self._mp
                 y = entity.position.y - self._mapPoint.y + self._mp
                 if x >= 0 and x < self._mp * 2 + 1 and y >= 0 and y < self._mp * 2 + 1:
-                    entityInfos: GameFightFighterInformations = (
-                        entitiesFrame.getEntityInfos(entity.id)
-                    )
+                    entityInfos: GameFightFighterInformations = entitiesFrame.getEntityInfos(entity.id)
                     if entityInfos:
                         if not (
                             isinstance(
                                 entityInfos.disposition,
                                 FightEntityDispositionInformations,
                             )
-                            and entityInfos.disposition.carryingCharacterId
-                            == infos.contextualId
+                            and entityInfos.disposition.carryingCharacterId == infos.contextualId
                         ):
-                            node = _ReachableCellData(
-                                entity.position, x, y, self._cellGrid
-                            )
+                            node = _ReachableCellData(entity.position, x, y, self._cellGrid)
                             node.state = _ReachableCellData.STATE_UNREACHABLE
                             evade = TackleUtil.getTackleForFighter(entityInfos, infos)
                             if not node.evadePercent or evade < node.evadePercent:
@@ -220,9 +209,7 @@ class FightReachableCellsMaker:
         yTab: int = y - self._mapPoint.y + self._mp
         node: _ReachableCellData = self._cellGrid[xTab][yTab]
         if not node:
-            node = _ReachableCellData(
-                MapPoint.fromCoords(x, y), xTab, yTab, self._cellGrid
-            )
+            node = _ReachableCellData(MapPoint.fromCoords(x, y), xTab, yTab, self._cellGrid)
             self._cellGrid[xTab][yTab] = node
             node.findState()
             if node.state != _ReachableCellData.STATE_UNREACHABLE:
@@ -230,16 +217,10 @@ class FightReachableCellsMaker:
                     self._reachableCells.append(node.mapPoint.cellId)
                 else:
                     self._unreachableCells.append(node.mapPoint.cellId)
-        if node.state == _ReachableCellData.STATE_UNREACHABLE and (
-            self._mapPoint.x != x or self._mapPoint.y != y
-        ):
+        if node.state == _ReachableCellData.STATE_UNREACHABLE and (self._mapPoint.x != x or self._mapPoint.y != y):
             return
 
-        if (
-            not node.mpUpdated
-            or mp > node.bestRemainingMp
-            or untackledMp > node.bestRemainingMpNoTackle
-        ):
+        if not node.mpUpdated or mp > node.bestRemainingMp or untackledMp > node.bestRemainingMpNoTackle:
             if mp >= 0 and node.mapPoint.cellId in self._unreachableCells:
                 self._reachableCells.append(node.mapPoint.cellId)
                 self._unreachableCells.remove(node.mapPoint.cellId)

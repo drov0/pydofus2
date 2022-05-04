@@ -1,6 +1,6 @@
 from com.ankamagames.jerakine.interfaces.IDataCenter import IDataCenter
 from com.ankamagames.jerakine.types.DataStoreType import JerakineError
-from com.ankamagames.jerakine.types.positions.MapPoint import Point
+from com.ankamagames.jerakine.types.positions.Point import Point
 
 
 class WorldPoint(IDataCenter):
@@ -82,11 +82,7 @@ class WorldPoint(IDataCenter):
             self._y = -(self._y & 255)
 
     def setFromCoords(self) -> None:
-        if (
-            self._x > self.MAP_COORDS_MAX
-            or self._y > self.MAP_COORDS_MAX
-            or self._worldId > self.WORLD_ID_MAX
-        ):
+        if self._x > self.MAP_COORDS_MAX or self._y > self.MAP_COORDS_MAX or self._worldId > self.WORLD_ID_MAX:
             raise JerakineError("Coordinates or world identifier out of range.")
         worldValue: int = self._worldId & 4095
         xValue: int = abs(self._x) & 255

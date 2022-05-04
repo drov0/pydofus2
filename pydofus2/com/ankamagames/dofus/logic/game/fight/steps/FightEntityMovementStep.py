@@ -52,20 +52,12 @@ class FightEntityMovementStep(AbstractSequencable, IFightStep):
         return "entityMovement"
 
     def start(self) -> None:
-        logger.debug("FightEntityMovementStep start step")
         self._entity = DofusEntities.getEntity(self._entityId)
         if self._entity:
             fighterInfos = FightEntitiesFrame.getCurrentInstance().getEntityInfos(self._entityId)
-            logger.warn(
-                f"Entity {self._entityId} is moving from {fighterInfos.disposition.cellId} to {self._path.end.cellId}"
-            )
             ftf: "FightTurnFrame" = Kernel().getWorker().getFrame("FightTurnFrame")
             ftf._playerEntity.position.cellId = self._path.end.cellId
             fighterInfos.disposition.cellId = self._path.end.cellId
-            logger.debug(f"New entity {self._entityId} cellId in fightTurnFrame {ftf._playerEntity.position.cellId}")
-            logger.debug(
-                f"New entity {self._entityId} cellId in fightEntitiesFrame {FightEntitiesFrame.getCurrentInstance().getEntityInfos(self._entityId).disposition.cellId}"
-            )
         else:
             logger.warn(f"Unable to move unknown entity {self._entityId}.")
         self.movementEnd()

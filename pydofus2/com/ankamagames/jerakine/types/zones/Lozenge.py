@@ -15,9 +15,7 @@ class Lozenge(IZone):
 
     _dataMapProvider: IDataMapProvider
 
-    def __init__(
-        self, nMinRadius: int, nRadius: int, dataMapProvider: IDataMapProvider
-    ):
+    def __init__(self, nMinRadius: int, nRadius: int, dataMapProvider: IDataMapProvider):
         super().__init__()
         self.radius = nRadius
         self.minRadius = nMinRadius
@@ -60,7 +58,8 @@ class Lozenge(IZone):
             if self._minRadius == 0:
                 aCells.append(cellId)
             return aCells
-        for radiusStep in range(self.radius, self._minRadius - 1, -1):
+
+        for radiusStep in range(int(self.radius), int(self._minRadius) - 1, -1):
             for i in range(-radiusStep, radiusStep + 1):
                 for j in range(-radiusStep, radiusStep + 1):
                     if abs(i) + abs(j) == radiusStep:

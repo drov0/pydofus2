@@ -1,5 +1,4 @@
 import math
-from com.ankamagames.jerakine.types.positions.MapPoint import Point
 
 
 class AtouinConstants:
@@ -64,11 +63,11 @@ class AtouinConstants:
 
     MAX_MAP_Y: int = 255
 
-    RESOLUTION_HIGH_QUALITY: Point = Point(1978, 1024)
+    RESOLUTION_HIGH_QUALITY = (1978, 1024)
 
-    RESOLUTION_MEDIUM_QUALITY: Point = Point(1483.5, 768)
+    RESOLUTION_MEDIUM_QUALITY = (1483.5, 768)
 
-    RESOLUTION_LOW_QUALITY: Point = Point(989, 512)
+    RESOLUTION_LOW_QUALITY = (989, 512)
 
     MOVEMENT_WALK: int = 1
 

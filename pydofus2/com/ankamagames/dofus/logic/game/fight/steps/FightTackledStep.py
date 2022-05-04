@@ -30,13 +30,8 @@ class FightTackledStep(AbstractSequencable, IFightStep, ISequencableListener):
     def start(self) -> None:
         tackledEntity: IEntity = DofusEntities.getEntity(self._fighterId)
         if not tackledEntity:
-            logger.warn(
-                "Unable to play tackle of an unexisting fighter "
-                + str(self._fighterId)
-                + "."
-            )
-            self.stepFinished(self)
-            return
+            logger.warn("Unable to play tackle of an unexisting fighter " + str(self._fighterId) + ".")
+        self.stepFinished(self)
 
     def stepFinished(self, step: ISequencable, withTimout: bool = False) -> None:
         FightEventsHelper().sendFightEvent(

@@ -1,10 +1,16 @@
+import collections
 import math
 import random
 from threading import Timer
 from time import sleep
-from types import FunctionType
-from com.ankamagames.dofus.logic.game.fight.frames.FightBattleFrame import FightBattleFrame
+from com.ankamagames.atouin.AtouinConstants import AtouinConstants
+from com.ankamagames.atouin.utils.DataMapProvider import DataMapProvider
+from com.ankamagames.dofus.datacenter.effects.EffectInstance import EffectInstance
+from com.ankamagames.dofus.internalDatacenter.spells.SpellWrapper import SpellWrapper
+from com.ankamagames.dofus.internalDatacenter.stats.EntityStats import EntityStats
 from com.ankamagames.dofus.logic.game.fight.managers.CurrentPlayedFighterManager import CurrentPlayedFighterManager
+from com.ankamagames.dofus.network.messages.game.actions.sequence.SequenceEndMessage import SequenceEndMessage
+from com.ankamagames.dofus.network.types.game.context.GameContextActorInformations import GameContextActorInformations
 from com.ankamagames.jerakine.logger.Logger import Logger
 from com.ankamagames.atouin.managers.MapDisplayManager import MapDisplayManager
 from com.ankamagames.atouin.messages.CellClickMessage import CellClickMessage
@@ -31,9 +37,6 @@ from com.ankamagames.dofus.network.messages.common.basic.BasicPingMessage import
 )
 from com.ankamagames.dofus.network.messages.game.actions.fight.GameActionFightCastRequestMessage import (
     GameActionFightCastRequestMessage,
-)
-from com.ankamagames.dofus.network.messages.game.actions.sequence.SequenceEndMessage import (
-    SequenceEndMessage,
 )
 from com.ankamagames.dofus.network.messages.game.context.fight.GameFightEndMessage import (
     GameFightEndMessage,
@@ -64,12 +67,19 @@ from com.ankamagames.dofus.network.types.game.context.roleplay.GameRolePlayGroup
 )
 from com.ankamagames.jerakine.entities.interfaces.IEntity import IEntity
 from com.ankamagames.jerakine.entities.interfaces.IInteractive import IInteractive
+from com.ankamagames.jerakine.map.LosDetector import LosDetector
 from com.ankamagames.jerakine.messages.Frame import Frame
 from com.ankamagames.jerakine.messages.Message import Message
 from com.ankamagames.jerakine.metaclasses.Singleton import Singleton
 from com.ankamagames.jerakine.types.enums.Priority import Priority
 from com.ankamagames.jerakine.types.positions.MapPoint import MapPoint
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Tuple
+from com.ankamagames.jerakine.types.zones.Cross import Cross
+from com.ankamagames.jerakine.types.zones.IZone import IZone
+from com.ankamagames.jerakine.types.zones.Lozenge import Lozenge
+from com.ankamagames.jerakine.utils.display.spellZone.SpellShapeEnum import SpellShapeEnum
+
+from damageCalculation.tools import StatIds
 
 if TYPE_CHECKING:
     from com.ankamagames.dofus.logic.game.fight.frames.FightTurnFrame import (
@@ -78,6 +88,9 @@ if TYPE_CHECKING:
     from com.ankamagames.dofus.logic.game.fight.frames.FightContextFrame import (
         FightContextFrame,
     )
+    from com.ankamagames.dofus.logic.game.fight.frames.FightBattleFrame import FightBattleFrame
+    from com.ankamagames.dofus.logic.game.fight.frames.FightSpellCastFrame import FightSpellCastFrame
+
 
 logger = Logger(__name__)
 
@@ -104,6 +117,10 @@ class BotFightFrame(Frame, metaclass=Singleton):
 
     _turnAction: list
 
+    _spellId = 13516  # Sadida ronce
+
+    _lastTarget: int = None
+
     def __init__(self):
         self._turnAction = []
         super().__init__()
@@ -113,11 +130,29 @@ class BotFightFrame(Frame, metaclass=Singleton):
         self.fakeActivity()
         self._myTurn = False
         self._mapPos = MapPosition.getMapPositions()
+        self._wantcastSpell = None
+        self._reachableCells = None
         return True
 
     @property
     def fightTurnFrame(self) -> "FightTurnFrame":
         return Kernel().getWorker().getFrame("FightTurnFrame")
+
+    @property
+    def fightContextFrame(self) -> "FightContextFrame":
+        return Kernel().getWorker().getFrame("FightContextFrame")
+
+    @property
+    def entitiesFrame(self) -> "FightEntitiesFrame":
+        return Kernel().getWorker().getFrame("FightEntitiesFrame")
+
+    @property
+    def spellFrame(self) -> "FightSpellCastFrame":
+        return Kernel().getWorker().getFrame("FightSpellCastFrame")
+
+    @property
+    def battleFrame(self) -> "FightBattleFrame":
+        return Kernel().getWorker().getFrame("FightBattleFrame")
 
     def pulled(self) -> bool:
         self._enabled = False
@@ -130,6 +165,132 @@ class BotFightFrame(Frame, metaclass=Singleton):
     @property
     def fightCount(self) -> int:
         return self._fightCount
+
+    def findPathToTarget(self, spellw: SpellWrapper) -> Tuple[MapPoint, list[MapPoint]]:
+        """
+        Find path to the closest ldv to hit a mob.
+        :param origin: position of the character
+        :param po: max range of the spell
+        :param targets: positions of the mobs
+        :return: cell of the mob, path to the ldv if any else None
+        """
+        logger.debug("Searching for path to hit some mob")
+        spellZone = self.getSpellZone(spellw)
+        origin = self.fighterPos
+        targets = self.mobPositions
+        queue = collections.deque([[origin]])
+        seen = {origin}
+        while queue:
+            path = queue.popleft()
+            curr: MapPoint = path[-1]
+            tested = {}
+            currSpellZone = spellZone.getCells(curr.cellId)
+            currReachableCells = self.getReachableCells(curr.cellId)
+            for target in targets:
+                if (
+                    target["pos"].cellId in currSpellZone
+                    and curr.los(LosDetector, DataMapProvider(), target["pos"], tested)
+                    and self.canCastSpell(spellw, target["targetId"])
+                ):
+                    return target, path[1:]
+            for cell in currReachableCells:
+                mp = MapPoint.fromCellId(cell)
+                pmove = curr.pointMov(DataMapProvider(), mp, False)
+                if mp not in seen and pmove:
+                    queue.append(path + [mp])
+                    seen.add(mp)
+        return None, None
+
+    def getSpellWrapper(self, id: int) -> SpellWrapper:
+        for spellw in PlayedCharacterManager().playerSpellList:
+            if spellw.id == id:
+                return spellw
+
+    def getActualSpellRange(self, spellw: SpellWrapper) -> int:
+        playerStats: EntityStats = CurrentPlayedFighterManager().getStats()
+        range: int = spellw.maximalRangeWithBoosts
+        minRange: int = spellw.minimalRange
+        if spellw["rangeCanBeBoosted"]:
+            range += playerStats.getStatTotalValue(StatIds.RANGE) - playerStats.getStatAdditionalValue(StatIds.RANGE)
+        if range < minRange:
+            range = minRange
+        range = min(range, AtouinConstants.MAP_WIDTH * AtouinConstants.MAP_HEIGHT)
+        if range < 0:
+            range = 0
+        return range
+
+    def getSpellShape(self, spellw: SpellWrapper) -> int:
+        spellShape: int = 0
+        spellEffect: EffectInstance = None
+        for spellEffect in spellw["effects"]:
+            if spellEffect.zoneShape != 0 and (
+                spellEffect.zoneSize > 0
+                or spellEffect.zoneSize == 0
+                and (spellEffect.zoneShape == SpellShapeEnum.P or spellEffect.zoneMinSize < 0)
+            ):
+                spellShape = spellEffect.zoneShape
+        return spellShape
+
+    def getSpellZone(self, spellw: SpellWrapper) -> IZone:
+        range: int = self.getActualSpellRange(spellw)
+        minRange: int = spellw.minimalRange
+        spellShape: int = self.getSpellShape(spellw)
+        castInLine: bool = spellw["castInLine"] or spellShape == SpellShapeEnum.l
+        if castInLine and spellw["castInDiagonal"]:
+            shapePlus = Cross(minRange, range, DataMapProvider())
+            shapePlus.allDirections = True
+            return shapePlus
+        elif castInLine:
+            return Cross(minRange, range, DataMapProvider())
+        elif spellw["castInDiagonal"]:
+            shapePlus = Cross(minRange, range, DataMapProvider())
+            shapePlus.diagonal = True
+            return shapePlus
+        else:
+            return Lozenge(minRange, range, DataMapProvider())
+
+    def getLosCells(self, origin: MapPoint, spellId: int) -> list:
+        rangeCells = self.getSpellRangeCells(self.getSpellWrapper(spellId), origin.cellId)
+        losCells = LosDetector.getCell(DataMapProvider(), rangeCells, origin)
+        return losCells
+
+    def playTurn(self):
+        self._reachableCells = self.getReachableCells()
+        self._wantcastSpell = None
+        spellw = self.getSpellWrapper(self._spellId)
+        stats: EntityStats = CurrentPlayedFighterManager().getStats()
+        movementPoints: int = stats.getStatTotalValue(StatIds.MOVEMENT_POINTS)
+        actionPoints: int = stats.getStatTotalValue(StatIds.ACTION_POINTS)
+        logger.debug(f"MP : {movementPoints}, AP : {actionPoints}")
+        target, path = self.findPathToTarget(spellw)
+        if path is not None:
+            logger.debug(f"Found path of length {len(path)}")
+            dest = None
+            if len(path) == 0:
+                self.castSpell(self._spellId, target["pos"].cellId)
+            elif path[-1].cellId in self._reachableCells:
+                self._wantcastSpell = {"spellId": self._spellId, "cellId": target["pos"].cellId}
+                self._lastTarget = target
+                self.moveToCell(path[-1])
+            else:
+                for i, mp in enumerate(path):
+                    if mp.cellId not in self._reachableCells:
+                        if i == 0:
+                            dest = None
+                        else:
+                            dest = path[i - 1]
+                        break
+                self.moveToCell(dest)
+        else:
+            self.turnEnd()
+
+    def canCastSpell(self, spellw: SpellWrapper, targetId: int) -> bool:
+        reason = [""]
+        if CurrentPlayedFighterManager().canCastThisSpell(self._spellId, spellw.spellLevel, targetId, reason):
+            return True
+        else:
+            logger.error(f"Unable to cast spell for reason {reason[0]}")
+            return False
 
     def process(self, msg: Message) -> bool:
 
@@ -158,36 +319,39 @@ class BotFightFrame(Frame, metaclass=Singleton):
             ConnectionsHandler.getConnection().send(startFightMsg)
             return True
 
+        if isinstance(msg, SequenceEndMessage):
+            if int(msg.authorId) == int(PlayedCharacterManager().id):
+                if self._myTurn and not self.battleFrame._sequenceFrameSwitcher:
+                    if self._wantcastSpell:
+                        self.castSpell(**self._wantcastSpell)
+                        self._wantcastSpell = None
+                    else:
+                        self.playTurn()
+            return True
+
         if isinstance(msg, GameFightTurnStartMessage):
-            fbf: FightBattleFrame = Kernel().getWorker().getFrame("FightBattleFrame")
             turnStartMsg = msg
-            self._turnAction = []
-            if turnStartMsg.id == PlayedCharacterManager().id:
+            if int(turnStartMsg.id) == int(PlayedCharacterManager().id):
                 self._myTurn = True
                 self._turnPlayed += 1
-                self.addTurnAction(self.fightRandomMove, [])
-                # self.addTurnAction(self.turnEnd, [])
-                self.nextTurnAction()
+                self.playTurn()
             else:
                 self._myTurn = False
             return True
-
-        # if isinstance(msg, SequenceEndMessage):
-        #     self.nextTurnAction()
-        #     return True
-
         return False
 
-    def nextTurnAction(self) -> None:
-        action: object = None
-        if len(self._turnAction) > 0:
-            action = self._turnAction.pop(0)
-            action["fct"](*action["args"])
+    @property
+    def actionPoints(self) -> int:
+        stats = CurrentPlayedFighterManager().getStats()
+        return stats.getStatTotalValue(StatIds.ACTION_POINTS)
 
-    def addTurnAction(self, fct: FunctionType, args: list) -> None:
-        self._turnAction.append({"fct": fct, "args": args})
+    @property
+    def movementPoints(self) -> int:
+        stats = CurrentPlayedFighterManager().getStats()
+        return stats.getStatTotalValue(StatIds.MOVEMENT_POINTS)
 
     def turnEnd(self) -> None:
+        self.battleFrame.confirmTurnEnd()
         finDeTourMsg: GameFightTurnFinishMessage = GameFightTurnFinishMessage()
         finDeTourMsg.init(False)
         ConnectionsHandler.getConnection().send(finDeTourMsg)
@@ -221,37 +385,49 @@ class BotFightFrame(Frame, metaclass=Singleton):
         ccmsg.id = MapDisplayManager().currentMapPoint.mapId
         Kernel().getWorker().process(ccmsg)
 
+    @property
+    def fighterInfos(self) -> "GameContextActorInformations":
+        info = self.entitiesFrame.getEntityInfos(CurrentPlayedFighterManager().currentFighterId)
+        return info
+
+    @property
+    def fighterPos(self) -> "MapPoint":
+        return MapPoint.fromCellId(self.fighterInfos.disposition.cellId)
+
+    def getReachableCells(self, cellId=None) -> list:
+        infos = self.fighterInfos
+        tmp = infos.disposition.cellId
+        if cellId is None:
+            cellId = tmp
+        infos.disposition.cellId = cellId
+        reachableCells: FightReachableCellsMaker = FightReachableCellsMaker(self.fighterInfos).reachableCells
+        infos.disposition.cellId = tmp
+        return reachableCells
+
     def fightRandomMove(self) -> None:
-        playerEntityInfos = DofusEntities.getEntity(CurrentPlayedFighterManager().currentFighterId)
-        reachableCellsMaker: FightReachableCellsMaker = FightReachableCellsMaker(playerEntityInfos)
-        logger.debug(
-            f"From curr cell {playerEntityInfos.disposition.cellId} found {len(reachableCellsMaker.reachableCells)} reachable cells"
-        )
-        if len(reachableCellsMaker.reachableCells) == 0:
-            self.nextTurnAction()
+        if len(self.reachableCells) == 0:
             return
-        randomCell: int = random.choice(reachableCellsMaker.reachableCells)
+        randomCell: int = random.choice(self.reachableCells)
         self.moveToCell(MapPoint.fromCellId(randomCell))
 
-    def castSpell(self, spellId: int, onMySelf: bool) -> None:
-        cellId: int = 0
-        avaibleCells: list = None
-        entity = None
-        monster: GameFightMonsterInformations = None
+    @property
+    def mobPositions(self) -> list[MapPoint]:
+        result = []
+        for entity in FightEntitiesFrame.getCurrentInstance().entities.values():
+            if entity.contextualId < 0 and isinstance(entity, GameFightMonsterInformations):
+                monster = entity
+                if (
+                    monster.spawnInfo.teamId != self.fighterInfos.spawnInfo.teamId
+                    and monster.spawnInfo.alive
+                    and not monster.stats.summoned
+                ):
+                    result.append(
+                        {"targetId": entity.contextualId, "pos": MapPoint.fromCellId(entity.disposition.cellId)}
+                    )
+        return result
+
+    def castSpell(self, spellId: int, cellId: bool) -> None:
         gafcrmsg: GameActionFightCastRequestMessage = GameActionFightCastRequestMessage()
-        if onMySelf:
-            cellId = (
-                FightEntitiesFrame.getCurrentInstance().getEntityInfos(PlayedCharacterManager().id).disposition.cellId
-            )
-        else:
-            avaibleCells = []
-            for entity in FightEntitiesFrame.getCurrentInstance().entities.values():
-                if entity.contextualId < 0 and isinstance(entity, GameFightMonsterInformations):
-                    monster = entity
-                    if monster.spawnInfo.alive:
-                        avaibleCells.append(entity.disposition.cellId)
-            logger.debug(avaibleCells)
-            cellId = avaibleCells[math.floor(len(avaibleCells) * random.random())]
         gafcrmsg.init(spellId, cellId)
         ConnectionsHandler.getConnection().send(gafcrmsg)
 
@@ -263,7 +439,7 @@ class BotFightFrame(Frame, metaclass=Singleton):
         if not fightTurnFrame:
             logger.debug("Wants to move inside fight but 'FightTurnFrame' not found in kernel")
             return False
-        logger.debug(f"Current cell {fightTurnFrame._playerEntity.position.cellId} moving to cell {cell.cellId}")
+        logger.debug(f"Current cell {self.fighterInfos.disposition.cellId} moving to cell {cell.cellId}")
         fightTurnFrame.drawPath(cell)
         fightTurnFrame.askMoveTo(cell)
         return True

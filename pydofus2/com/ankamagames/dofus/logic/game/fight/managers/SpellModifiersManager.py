@@ -38,12 +38,8 @@ class SpellModifiersManager(metaclass=Singleton):
                 DataStoreEnum.LOCATION_LOCAL,
                 DataStoreEnum.BIND_COMPUTER,
             )
-        rawIsVerbose = StoreDataManager().getData(
-            self._dataStoreType, self.DATA_STORE_KEY_IS_VERBOSE
-        )
-        self._isVerbose = (
-            rawIsVerbose if isinstance(rawIsVerbose, bool) else self.DEFAULT_IS_VERBOSE
-        )
+        rawIsVerbose = StoreDataManager().getData(self._dataStoreType, self.DATA_STORE_KEY_IS_VERBOSE)
+        self._isVerbose = rawIsVerbose if isinstance(rawIsVerbose, bool) else self.DEFAULT_IS_VERBOSE
 
     @property
     def isVerbose(self) -> bool:
@@ -54,9 +50,7 @@ class SpellModifiersManager(metaclass=Singleton):
         if self._isVerbose == isVerbose:
             return
         self._isVerbose = isVerbose
-        StoreDataManager().setData(
-            self._dataStoreType, self.DATA_STORE_KEY_IS_VERBOSE, self._isVerbose
-        )
+        StoreDataManager().setData(self._dataStoreType, self.DATA_STORE_KEY_IS_VERBOSE, self._isVerbose)
         verboseAction: str = "enabled" if self._isVerbose else "disabled"
         logger.info("Verbose mode has been " + verboseAction)
 
@@ -88,17 +82,13 @@ class SpellModifiersManager(metaclass=Singleton):
             return None
         return spellsModifierStats[spellKey]
 
-    def getSpellModifier(
-        self, entityId: float, spellId: float, modifierId: float
-    ) -> SpellModifier:
+    def getSpellModifier(self, entityId: float, spellId: float, modifierId: float) -> SpellModifier:
         spellModifiers: SpellModifiers = self.getSpellModifiers(entityId, spellId)
         if spellModifiers is not None:
             return spellModifiers.getModifier(modifierId)
         return None
 
-    def setRawSpellsModifiers(
-        self, entityId: float, rawSpellsModifiers: list[CharacterSpellModification]
-    ) -> None:
+    def setRawSpellsModifiers(self, entityId: float, rawSpellsModifiers: list[CharacterSpellModification]) -> None:
         spellModifiers: SpellModifiers = None
         spellModifier: SpellModifier = None
         rawSpellModifier: CharacterSpellModification = None
@@ -108,8 +98,8 @@ class SpellModifiersManager(metaclass=Singleton):
         if rawSpellsModifiers is not None and len(rawSpellsModifiers) > 0:
             spellModifier = None
             for rawSpellModifier in rawSpellsModifiers:
-                spellModifiers = spellsModifierStats[str(rawSpellModifier.spellId)]
-                if spellModifiers == None:
+                spellModifiers = spellsModifierStats.get(str(rawSpellModifier.spellId))
+                if spellModifiers is None:
                     spellModifiers = SpellModifiers(entityId, rawSpellModifier.spellId)
                     self.setSpellModifiers(spellModifiers)
                 spellModifier = SpellModifier(
@@ -122,9 +112,7 @@ class SpellModifiersManager(metaclass=Singleton):
                 )
                 spellModifiers.setModifier(spellModifier)
 
-    def setRawSpellModifier(
-        self, entityId: float, rawSpellModifier: CharacterSpellModification
-    ) -> None:
+    def setRawSpellModifier(self, entityId: float, rawSpellModifier: CharacterSpellModification) -> None:
         if rawSpellModifier == None:
             return
         entityKey: str = str(entityId)
@@ -132,11 +120,9 @@ class SpellModifiersManager(metaclass=Singleton):
         if spellsModifierStats == None:
             spellsModifierStats = self._entitiesMap[entityKey] = dict()
         spellKey: str = str(rawSpellModifier.spellId)
-        spellModifiers: SpellModifiers = spellsModifierStats[spellKey]
+        spellModifiers: SpellModifiers = spellsModifierStats.get(spellKey)
         if spellModifiers == None:
-            spellModifiers = spellsModifierStats[spellKey] = SpellModifiers(
-                entityId, rawSpellModifier.spellId
-            )
+            spellModifiers = spellsModifierStats[spellKey] = SpellModifiers(entityId, rawSpellModifier.spellId)
         spellModifier: SpellModifier = SpellModifier(
             rawSpellModifier.modificationType,
             rawSpellModifier.value.base,
@@ -151,9 +137,7 @@ class SpellModifiersManager(metaclass=Singleton):
         key: str = str(entityId)
         if key not in self._entitiesMap:
             logger.error(
-                "Tried to del spells modifier stats for entity with ID "
-                + key
-                + ", but none were found. Aborting"
+                "Tried to del spells modifier stats for entity with ID " + key + ", but none were found. Aborting"
             )
             return False
         del self._entitiesMap[key]
@@ -183,11 +167,5 @@ class SpellModifiersManager(metaclass=Singleton):
             )
             return False
         del spellModifiers[spellKey]
-        logger.info(
-            "Spell "
-            + spellKey
-            + " modifiers for entity with ID "
-            + entityKey
-            + " deleted"
-        )
+        logger.info("Spell " + spellKey + " modifiers for entity with ID " + entityKey + " deleted")
         return True

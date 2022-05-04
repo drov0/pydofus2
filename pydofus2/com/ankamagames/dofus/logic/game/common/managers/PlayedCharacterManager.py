@@ -41,7 +41,7 @@ from com.ankamagames.dofus.network.ProtocolConstantsEnum import ProtocolConstant
 from com.ankamagames.jerakine.interfaces.IDestroyable import IDestroyable
 from com.ankamagames.jerakine.metaclasses.Singleton import Singleton
 from com.ankamagames.jerakine.types.Callback import Callback
-from com.ankamagames.jerakine.types.positions.MapPoint import Point
+from com.ankamagames.jerakine.types.positions.Point import Point
 from damageCalculation.tools import StatIds
 
 logger = Logger(__name__)
@@ -76,7 +76,7 @@ class PlayedCharacterManager(IDestroyable, metaclass=Singleton):
         self.realEntityLook: "EntityLook" = None
         self.characteristics: "CharacterCharacteristicsInformations" = None
         self.spellsInventory = list["SpellWrapper"]()
-        self.playerSpellList = list()
+        self.playerSpellList = list["SpellWrapper"]()
         self.playerShortcutList = list()
         self.inventory = list["ItemWrapper"]()
         self.currentWeapon = None

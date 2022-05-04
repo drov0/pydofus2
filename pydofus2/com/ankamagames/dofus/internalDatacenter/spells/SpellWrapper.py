@@ -76,6 +76,7 @@ class SpellWrapper(ISlotData, ICellZoneProvider, IDataCenter):
     _uri: str = None
 
     _slotDataHolderManager: SlotDataHolderManager = None
+
     _canTargetCasterOutOfZone: object = None
 
     _variantActivated: bool = False
@@ -96,7 +97,7 @@ class SpellWrapper(ISlotData, ICellZoneProvider, IDataCenter):
 
     playerId: float
 
-    versionNum: int
+    versionNum: int = 0
 
     additionalEffectsZones: list[EffectZone]
 
@@ -391,7 +392,7 @@ class SpellWrapper(ISlotData, ICellZoneProvider, IDataCenter):
                 self._canTargetCasterOutOfZone = False
         return self._canTargetCasterOutOfZone
 
-    def getProperty(self, name) -> Any:
+    def __getitem__(self, name) -> Any:
         if hasattr(self, name):
             return getattr(self, name)
         if InventoryManager().currentBuildId != -1:
@@ -439,7 +440,7 @@ class SpellWrapper(ISlotData, ICellZoneProvider, IDataCenter):
         if str(name) == "criticalHitProbability":
             return self.getCriticalHitProbability()
         if str(name) == "maxCastPerTurn":
-            numberToReturn = self.spellLevelInfos["maxCastPerTurn"]
+            numberToReturn = self.spellLevelInfos.maxCastPerTurn
             spellModifier = spellmm.SpellModifiersManager().getSpellModifier(
                 SpellWrapper.getEntityId(),
                 self.id,
@@ -449,7 +450,7 @@ class SpellWrapper(ISlotData, ICellZoneProvider, IDataCenter):
                 numberToReturn += spellModifier.contextModifValue + spellModifier.objectsAndMountBonusValue
             return numberToReturn
         if str(name) == "range":
-            numberToReturn = self.spellLevelInfos["range"]
+            numberToReturn = self.spellLevelInfos.range
             spellModifier = spellmm.SpellModifiersManager().getSpellModifier(
                 SpellWrapper.getEntityId(),
                 self.id,
@@ -459,7 +460,7 @@ class SpellWrapper(ISlotData, ICellZoneProvider, IDataCenter):
                 numberToReturn += spellModifier.contextModifValue + spellModifier.objectsAndMountBonusValue
             return numberToReturn
         if str(name) == "minRange":
-            numberToReturn = self.spellLevelInfos["minRange"]
+            numberToReturn = self.spellLevelInfos.minRange
             spellModifier = spellmm.SpellModifiersManager().getSpellModifier(
                 SpellWrapper.getEntityId(),
                 self.id,
@@ -469,7 +470,7 @@ class SpellWrapper(ISlotData, ICellZoneProvider, IDataCenter):
                 numberToReturn += spellModifier.contextModifValue + spellModifier.objectsAndMountBonusValue
             return numberToReturn
         if str(name) == "maxCastPerTarget":
-            numberToReturn = self.spellLevelInfos["maxCastPerTarget"]
+            numberToReturn = self.spellLevelInfos.maxCastPerTarget
             spellModifier = spellmm.SpellModifiersManager().getSpellModifier(
                 SpellWrapper.getEntityId(),
                 self.id,
@@ -479,7 +480,7 @@ class SpellWrapper(ISlotData, ICellZoneProvider, IDataCenter):
                 numberToReturn += spellModifier.contextModifValue + spellModifier.objectsAndMountBonusValue
             return numberToReturn
         if str(name) == "castInLine":
-            booleanToReturn = self.spellLevelInfos["castInLine"]
+            booleanToReturn = self.spellLevelInfos.castInLine
             spellModifier = spellmm.SpellModifiersManager().getSpellModifier(
                 SpellWrapper.getEntityId(),
                 self.id,
@@ -489,9 +490,9 @@ class SpellWrapper(ISlotData, ICellZoneProvider, IDataCenter):
                 booleanToReturn = booleanToReturn and spellModifier.totalValue == 0
             return booleanToReturn
         if str(name) == "castInDiagonal":
-            return self.spellLevelInfos["castInDiagonal"]
+            return self.spellLevelInfos.castInDiagonal
         if str(name) == "castTestLos":
-            booleanToReturn = self.spellLevelInfos["castTestLos"]
+            booleanToReturn = self.spellLevelInfos.castTestLos
             spellModifier = spellmm.SpellModifiersManager().getSpellModifier(
                 SpellWrapper.getEntityId(),
                 self.id,
@@ -501,7 +502,7 @@ class SpellWrapper(ISlotData, ICellZoneProvider, IDataCenter):
                 booleanToReturn = booleanToReturn and spellModifier.totalValue == 0
             return booleanToReturn
         if str(name) == "rangeCanBeBoosted":
-            booleanToReturn = self.spellLevelInfos["rangeCanBeBoosted"]
+            booleanToReturn = self.spellLevelInfos.rangeCanBeBoosted
             spellModifier = spellmm.SpellModifiersManager().getSpellModifier(
                 SpellWrapper.getEntityId(),
                 self.id,
@@ -511,7 +512,7 @@ class SpellWrapper(ISlotData, ICellZoneProvider, IDataCenter):
                 booleanToReturn = booleanToReturn or spellModifier.totalValue > 0
             return booleanToReturn
         if str(name) == "apCost":
-            numberToReturn = self.spellLevelInfos["apCost"]
+            numberToReturn = self.spellLevelInfos.apCost
             spellModifier = spellmm.SpellModifiersManager().getSpellModifier(
                 SpellWrapper.getEntityId(),
                 self.id,
@@ -527,7 +528,7 @@ class SpellWrapper(ISlotData, ICellZoneProvider, IDataCenter):
                 )
             return numberToReturn
         if str(name) == "minCastInterval":
-            numberToReturn = self.spellLevelInfos["minCastInterval"]
+            numberToReturn = self.spellLevelInfos.minCastInterval
             spellModifier = spellmm.SpellModifiersManager().getSpellModifier(
                 SpellWrapper.getEntityId(),
                 self.id,
@@ -604,7 +605,7 @@ class SpellWrapper(ISlotData, ICellZoneProvider, IDataCenter):
             return
 
     def getCriticalHitProbability(self) -> float:
-        criticalHitProbability: float = self.spellLevelInfos["criticalHitProbability"]
+        criticalHitProbability: float = self.spellLevelInfos.criticalHitProbability
         return float(55 - criticalHitProbability) if criticalHitProbability > 0 else None
 
     def clone(self) -> Any:
@@ -620,7 +621,7 @@ class SpellWrapper(ISlotData, ICellZoneProvider, IDataCenter):
         self._slotDataHolderManager.removeHolder(h)
 
     def __str__(self) -> str:
-        return "[SpellWrapper #" + self.id + "]"
+        return f"[SpellWrapper #{self.id}]"
 
     def updateSpellLevelAccordingToPlayerLevel(self) -> None:
         i: int = 0

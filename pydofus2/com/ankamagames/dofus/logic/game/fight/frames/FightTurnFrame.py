@@ -31,6 +31,7 @@ from com.ankamagames.dofus.logic.game.fight.actions.GameFightTurnFinishAction im
 from typing import TYPE_CHECKING
 
 from com.ankamagames.dofus.types.entities.AnimatedCharacter import AnimatedCharacter
+from sniffio import current_async_library
 
 if TYPE_CHECKING:
     from com.ankamagames.dofus.logic.game.fight.frames.FightContextFrame import (
@@ -171,6 +172,11 @@ class FightTurnFrame(Frame):
     @property
     def priority(self) -> int:
         return Priority.HIGH
+
+    @property
+    def playerEntity(self) -> IEntity:
+        self._currentFighterId = CurrentPlayedFighterManager().currentFighterId
+        return DofusEntities.getEntity(self._currentFighterId)
 
     @property
     def myTurn(self) -> bool:
@@ -337,21 +343,21 @@ class FightTurnFrame(Frame):
         return True
 
     def drawMovementArea(self) -> list[int]:
-        logger.debug("drawing the movement area")
-        if not self._playerEntity or self._playerEntity.isMoving:
-            logger.debug(f"player {self._playerEntity} is moving {self._playerEntity.isMoving} or not found")
+        # logger.debug("drawing the movement area")
+        if not self.playerEntity or self.playerEntity.isMoving:
+            logger.debug(f"player {self.playerEntity} is moving {self.playerEntity.isMoving} or not found")
             self.removeMovementArea()
             return []
-        playerPosition: MapPoint = self._playerEntity.position
+        playerPosition: MapPoint = self.playerEntity.position
         stats: EntityStats = CurrentPlayedFighterManager().getStats()
         if not stats:
             logger.debug("no stats")
             return
         movementPoints: int = stats.getStatTotalValue(StatIds.MOVEMENT_POINTS)
-        logger.debug(f"movementPoints available {movementPoints}")
+        # logger.debug(f"movementPoints available {movementPoints}")
         self._lastMP = movementPoints
         entitiesFrame: FightEntitiesFrame = FightEntitiesFrame.getCurrentInstance()
-        playerInfos: GameFightFighterInformations = entitiesFrame.getEntityInfos(self._playerEntity.id)
+        playerInfos: GameFightFighterInformations = entitiesFrame.getEntityInfos(self.playerEntity.id)
         tackle: float = TackleUtil.getTackle(playerInfos, playerPosition)
         self._tackleByCellId = dict()
         self._tackleByCellId[playerPosition.cellId] = tackle
@@ -369,12 +375,20 @@ class FightTurnFrame(Frame):
             return []
         return reachableCells
 
+    @property
+    def currentPosition(self) -> MapPoint:
+        playerInfos: GameFightFighterInformations = FightEntitiesFrame.getCurrentInstance().getEntityInfos(
+            self.playerEntity.id
+        )
+        currentMp = MapPoint.fromCellId(playerInfos.disposition.cellId)
+        return currentMp
+
     def drawPath(self, destCell: MapPoint = None) -> None:
         firstObstacle: PathElement = None
         self._cells = []
         self._cellsTackled = []
         self._cellsUnreachable = []
-        logger.debug(f"Drawing the move path to {destCell}")
+        # logger.debug(f"Drawing the move path to {destCell}")
         if Kernel().getWorker().contains("FightSpellCastFrame"):
             return
         fcf: "FightContextFrame" = Kernel().getWorker().getFrame("FightContextFrame")
@@ -383,10 +397,10 @@ class FightTurnFrame(Frame):
             return
         if not destCell:
             if fcf.currentCell == -1:
-                logger.debug("No current cell hovered to draw path")
+                # logger.debug("No current cell hovered to draw path")
                 return
             destCell = MapPoint.fromCellId(fcf.currentCell)
-        if not self._playerEntity:
+        if not self.playerEntity:
             logger.debug("No player entity found")
             self.removePath()
             return
@@ -396,14 +410,15 @@ class FightTurnFrame(Frame):
         movementPoints: int = stats.getStatTotalValue(StatIds.MOVEMENT_POINTS)
         actionPoints: int = stats.getStatTotalValue(StatIds.ACTION_POINTS)
         logger.debug(f"MP : {movementPoints}, AP : {actionPoints}")
-        if self._playerEntity.isMoving or self._playerEntity.position.distanceToCell(destCell) > movementPoints:
+
+        if self.playerEntity.isMoving or self.currentPosition.distanceToCell(destCell) > movementPoints:
             logger.debug(
-                f"Player is moving {self._playerEntity.isMoving} or dest is too far {self._playerEntity.position.distanceToCell(destCell)} from {movementPoints} abort"
+                f"Player is moving {self.playerEntity.isMoving} or dest is too far {self.currentPosition.distanceToCell(destCell)} from {movementPoints} abort"
             )
             self.removePath()
             return
         path: MovementPath = Pathfinding.findPath(
-            DataMapProvider(), self._playerEntity.position, destCell, False, False, True
+            DataMapProvider(), self.currentPosition, destCell, False, False, True
         )
         logger.debug(f"Found a path {path}")
         if len(DataMapProvider().obstaclesCells) > 0 and (len(path.path) == 0 or len(path.path) > movementPoints):
@@ -510,7 +525,7 @@ class FightTurnFrame(Frame):
             logger.warn("The player tried to move before its character was added to the scene. Aborting.")
             self._isRequestingMovement = False
             return False
-        if self._playerEntity.isMoving:
+        if self.playerEntity.isMoving:
             logger.warn("The player is already moving")
             self._isRequestingMovement = False
             return False
@@ -522,9 +537,8 @@ class FightTurnFrame(Frame):
             return False
         path: MovementPath = MovementPath()
         cells: list[int] = self._cells if (self._cells and len(self._cells) > 0) else self._cellsTackled
-        cells.insert(0, self._playerEntity.position.cellId)
+        cells.insert(0, self.playerEntity.position.cellId)
         path.fillFromCellIds(cells[0:-1])
-        path.start = self._playerEntity.position
         path.end = MapPoint.fromCellId(cells[-1])
         path.path[-1].orientation = path.path[-1].step.orientationTo(path.end)
         logger.debug(f"Path of movement {path}")

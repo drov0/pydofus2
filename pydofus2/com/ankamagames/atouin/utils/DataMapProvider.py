@@ -75,14 +75,9 @@ class DataMapProvider(IDataMapProvider, metaclass=Singleton):
             useNewSystem = dataMap.isUsingNewMovementSystem
             cellId = MapTools.getCellIdByCoord(x, y)
             cellData = dataMap.cells[cellId]
-            # logger.debug(
-            #     f"IsInFight : {self.isInFight}, cellData.nonWalkableDuringRP : {cellData.nonWalkableDuringRP}, useNewSystem : {useNewSystem}"
-            # )
             mov = cellData.mov and not (self.isInFight and cellData.nonWalkableDuringFight)
-            # logger.debug(f"mov : {mov}")
             if self._updatedCell.get(cellId) != None:
                 mov = self._updatedCell[cellId]
-            # logger.debug(f"mov : {mov}")
             if mov and useNewSystem and previousCellId != -1 and previousCellId != cellId:
                 previousCellData = dataMap.cells[previousCellId]
                 dif = abs(abs(cellData.floor) - abs(previousCellData.floor))
@@ -94,13 +89,12 @@ class DataMapProvider(IDataMapProvider, metaclass=Singleton):
                     and dif > self.TOLERANCE_ELEVATION
                 ):
                     mov = False
-                    # logger.debug(f"mov : {mov}")
             if not bAllowTroughEntity:
+                # logger.debug(f"avoiding through entity {list(EntitiesManager().entities.keys())}")
                 for e in EntitiesManager().entities.values():
                     if isinstance(e, IObstacle) and e.position and e.position.cellId == cellId:
-                        o = e
-                        if not (endCellId == cellId and o.canWalkTo):
-                            if not o.canWalkThrough:
+                        if not (endCellId == cellId and e.canWalkTo):
+                            if not e.canWalkThrough:
                                 return False
                 if avoidObstacles and (cellId in self.obstaclesCells and cellId != endCellId):
                     return False
@@ -180,12 +174,10 @@ class DataMapProvider(IDataMapProvider, metaclass=Singleton):
         return AtouinConstants.MAP_HEIGHT + AtouinConstants.MAP_WIDTH - 1
 
     def hasEntity(self, x: int, y: int, bAllowTroughEntity: bool = False) -> bool:
-        o: IObstacle = None
-        cellEntities: list = EntitiesManager().getEntitiesOnCell(MapTools.getCellIdByCoord(x, y), IObstacle)
-        if len(cellEntities):
-            for o in cellEntities:
-                if not IObstacle(o).canWalkTo() and (not bAllowTroughEntity or not o.canSeeThrough()):
-                    return True
+        cellEntities: list[IObstacle] = EntitiesManager().getEntitiesOnCell(MapTools.getCellIdByCoord(x, y), IObstacle)
+        for o in cellEntities:
+            if not (o.canWalkTo or (bAllowTroughEntity and o.canSeeThrough)):
+                return True
         return False
 
     def updateCellMovLov(self, cellId: int, canMove: bool) -> None:

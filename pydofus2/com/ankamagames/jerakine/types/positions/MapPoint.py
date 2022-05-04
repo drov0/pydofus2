@@ -1,18 +1,11 @@
 import math
 from com.ankamagames.jerakine.logger.Logger import Logger
 from com.ankamagames.jerakine.map.IDataMapProvider import IDataMapProvider
+from com.ankamagames.jerakine.map.ILosDetector import ILosDetector
 from com.ankamagames.jerakine.types.enums.DirectionsEnum import DirectionsEnum
+from com.ankamagames.jerakine.types.positions.Point import Point
 
 logger = Logger(__name__)
-
-
-class Point:
-    def __init__(self, x=None, y=None):
-        self.x = x
-        self.y = y
-
-    def __str__(self):
-        return "(" + str(self.x) + ", " + str(self.y) + ")"
 
 
 class MapPoint:
@@ -187,11 +180,22 @@ class MapPoint:
             return MapPoint.fromCoords(i1, i2)
         return None
 
+    def los(self, losDetector: ILosDetector, provider: IDataMapProvider, target: "MapPoint", tested: dict[int, bool]):
+        return losDetector.losBetween(provider, self, target, tested)
+
     def getNearestFreeCell(self, mapProvider: IDataMapProvider, allowThoughEntity: bool = True) -> "MapPoint":
         for i in range(8):
             mp = self.getNearestFreeCellInDirection(i, mapProvider, False, allowThoughEntity)
             if mp:
                 return mp
+
+    def vicinity(self) -> list["MapPoint"]:
+        res = []
+        for i in range(8):
+            mp = self.getNearestCellInDirection(i)
+            if mp is not None:
+                res.append(mp)
+        return res
 
     def getNearestCellInDirection(self, orientation: int) -> "MapPoint":
         if orientation == 0:
@@ -210,9 +214,15 @@ class MapPoint:
             mp = MapPoint.fromCoords(self._nX - 1, self._nY + 1)
         elif orientation == 7:
             mp = MapPoint.fromCoords(self._nX, self._nY + 1)
-        elif MapPoint.isInMap(mp._nX, mp._nY):
+        if MapPoint.isInMap(mp._nX, mp._nY):
             return mp
         return None
+
+    def inDiag(self, mp: "MapPoint") -> bool:
+        return abs(self.x - mp.x) == abs(self.y - mp.y)
+
+    def pointMov(self, provider: IDataMapProvider, dest: "MapPoint", allowThoughEntity: bool) -> bool:
+        return provider.pointMov(dest.x, dest.y, allowThoughEntity, self.cellId)
 
     def getNearestFreeCellInDirection(
         self,

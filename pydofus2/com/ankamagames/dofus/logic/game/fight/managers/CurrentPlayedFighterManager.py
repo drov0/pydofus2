@@ -1,7 +1,9 @@
 from typing import TYPE_CHECKING
 from com.ankamagames.dofus.datacenter.items.Item import Item
 from com.ankamagames.dofus.logic.game.fight.managers.SpellModifiersManager import SpellModifiersManager
+from com.ankamagames.dofus.network.ProtocolConstantsEnum import ProtocolConstantsEnum
 from com.ankamagames.dofus.network.enums.CharacterSpellModificationTypeEnum import CharacterSpellModificationTypeEnum
+from com.ankamagames.jerakine.data.I18n import I18n
 
 if TYPE_CHECKING:
     from com.ankamagames.dofus.datacenter.spells.SpellLevel import SpellLevel
@@ -28,9 +30,12 @@ from com.ankamagames.dofus.logic.game.fight.managers.FightersStateManager import
     FightersStateManager,
 )
 import com.ankamagames.dofus.logic.game.common.managers.PlayedCharacterManager as pcm
-from com.ankamagames.dofus.types.entities.AnimatedCharacter import AnimatedCharacter
 from com.ankamagames.jerakine.metaclasses.Singleton import Singleton
 from damageCalculation.tools import StatIds
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from com.ankamagames.dofus.types.entities.AnimatedCharacter import AnimatedCharacter
 
 logger = Logger(__name__)
 
@@ -68,12 +73,12 @@ class CurrentPlayedFighterManager(metaclass=Singleton):
         self._currentFighterId = id
         playerManager = pcm.PlayedCharacterManager()
         self._currentFighterIsRealPlayer = self._currentFighterId == playerManager.id
-        lastFighterEntity: AnimatedCharacter = DofusEntities.getEntity(lastFighterId)
+        lastFighterEntity: "AnimatedCharacter" = DofusEntities.getEntity(lastFighterId)
         if lastFighterEntity:
             lastFighterEntity.canSeeThrough = False
             lastFighterEntity.canWalkThrough = False
             lastFighterEntity.canWalkTo = False
-        currentFighterEntity: AnimatedCharacter = DofusEntities.getEntity(self._currentFighterId)
+        currentFighterEntity: "AnimatedCharacter" = DofusEntities.getEntity(self._currentFighterId)
         if currentFighterEntity:
             currentFighterEntity.canSeeThrough = True
             currentFighterEntity.canWalkThrough = True
@@ -96,9 +101,8 @@ class CurrentPlayedFighterManager(metaclass=Singleton):
         if playerManager.spellsInventory != playerManager.playerSpellList:
             logger.info("Remise à jour de la liste des sorts du joueur")
             playerManager.spellsInventory = playerManager.playerSpellList
-            # FIXME: Uncomment this when spell cast frame is implemented
-            # if knl.Kernel().getWorker().contains(FightSpellCastFrame):
-            #    knl.Kernel().getWorker().removeFrame(knl.Kernel().getWorker().getFrame("FightSpellCastFrame)")
+            if knl.Kernel().getWorker().contains("FightSpellCastFrame"):
+                knl.Kernel().getWorker().removeFrame(knl.Kernel().getWorker().getFrame("FightSpellCastFrame"))
 
     def setCharacteristicsInformations(self, id: float, characteristics: CharacterCharacteristicsInformations) -> None:
         self._characteristicsInformationsList[id] = characteristics
@@ -161,9 +165,12 @@ class CurrentPlayedFighterManager(metaclass=Singleton):
     def canCastThisSpell(self, spellId: int, lvl: int, pTargetId: float = 0, result: list = None) -> bool:
         from com.ankamagames.dofus.datacenter.spells.Spell import Spell
 
+        spellName = None
         spell: Spell = Spell.getSpellById(spellId)
         spellLevel: SpellLevel = spell.getSpellLevel(lvl)
         if spellLevel == None:
+            if result:
+                result[0] = I18n.getUiText("ui.fightAutomsg.spellcast.noSpell", [spellName])
             return False
         player = pcm.PlayedCharacterManager()
         if self._currentFighterIsRealPlayer:
@@ -173,10 +180,23 @@ class CurrentPlayedFighterManager(metaclass=Singleton):
                 else:
                     spellName = spell.name
             else:
-                if spellLevel.minPlayerLevel > player.infos.level:
-                    return False
+                spellName = "{spell," + str(spellId) + "," + str(lvl) + "}"
+            if spellLevel.minPlayerLevel > player.infos.level:
+                if result:
+                    if player.infos.level > ProtocolConstantsEnum.MAX_LEVEL:
+                        result[0] = I18n.getUiText(
+                            "ui.fightAutomsg.spellcast.prestigeTooLow",
+                            [spellName, player.infos.level - ProtocolConstantsEnum.MAX_LEVEL],
+                        )
+                    else:
+                        result[0] = I18n.getUiText(
+                            "ui.fightAutomsg.spellcast.levelTooLow", [spellName, player.infos.level]
+                        )
+                return False
             characteristics = self.getCharacteristicsInformations()
             if not characteristics:
+                if result:
+                    result[0] = I18n.getUiText("ui.fightAutomsg.spellcast.notAvailableWithoutStats", [spellName])
                 return False
         selfSpell = None
         for spellKnown in player.spellsInventory:
@@ -184,19 +204,25 @@ class CurrentPlayedFighterManager(metaclass=Singleton):
                 selfSpell = spellKnown
                 break
         if not selfSpell:
+            if result:
+                result[0] = I18n.getUiText("ui.fightAutomsg.spellcast.notAvailable", [spellName])
             return False
         entityStats: EntityStats = StatsManager().getStats(self.currentFighterId)
         currentPA: int = int(entityStats.getStatTotalValue(StatIds.ACTION_POINTS)) if entityStats is not None else 0
-        if spellId == 0 and player.currentWeapon != None:
+        if spellId == 0 and player.currentWeapon is not None:
             weapon = Item.getItemById(player.currentWeapon.objectGID)
             if not weapon:
+                if result:
+                    result[0] = I18n.getUiText("ui.fightAutomsg.spellcast.notAWeapon", [spellName])
                 return False
             apCost = weapon.apCost
             maxCastPerTurn = weapon.maxCastPerTurn
         else:
-            apCost = selfSpell.apCost
-            maxCastPerTurn = selfSpell.maxCastPerTurn
+            apCost = selfSpell["apCost"]
+            maxCastPerTurn = selfSpell["maxCastPerTurn"]
         if apCost > currentPA:
+            if result:
+                result[0] = I18n.getUiText("ui.fightAutomsg.spellcast.needAP", [spellName, apCost])
             return False
         states: list = FightersStateManager().getStates(self._currentFighterId)
         if not states:
@@ -204,15 +230,31 @@ class CurrentPlayedFighterManager(metaclass=Singleton):
         for state in states:
             currentState = SpellState.getSpellStateById(state)
             if currentState.preventsFight and spellId == 0:
+                if result:
+                    result[0] = I18n.getUiText(
+                        "ui.fightAutomsg.spellcast.stateForbidden", [spellName, currentState.name]
+                    )
                 return False
             if currentState.id == DataEnum.SPELL_STATE_ARCHER and spellId == 0:
                 weapon2 = Item.getItemById(player.currentWeapon.objectGID)
                 if weapon2.typeId != DataEnum.ITEM_TYPE_BOW:
+                    if result:
+                        result[0] = I18n.getUiText(
+                            "ui.fightAutomsg.spellcast.stateForbidden", [spellName, currentState.name]
+                        )
                     return False
-            if spellLevel.statesForbidden and state not in spellLevel.statesForbidden:
+            if spellLevel.statesForbidden and state in spellLevel.statesForbidden:
+                if result:
+                    result[0] = I18n.getUiText(
+                        "ui.fightAutomsg.spellcast.stateForbidden", [spellName, currentState.name]
+                    )
                 return False
             if currentState.preventsSpellCast:
                 if not (spellLevel.statesRequired or spellLevel.statesAuthorized):
+                    if result:
+                        result[0] = I18n.getUiText(
+                            "ui.fightAutomsg.spellcast.stateForbidden", [spellName, currentState.name]
+                        )
                     return False
                 if (
                     not spellLevel.statesRequired
@@ -223,25 +265,46 @@ class CurrentPlayedFighterManager(metaclass=Singleton):
                     or len(spellLevel.statesAuthorized) == 0
                     or state not in spellLevel.statesAuthorized
                 ):
+                    if result:
+                        result[0] = I18n.getUiText(
+                            "ui.fightAutomsg.spellcast.stateForbidden", [spellName, currentState.name]
+                        )
                     return False
         for stateRequired in spellLevel.statesRequired:
             if stateRequired not in states:
                 stateReq = SpellState.getSpellStateById(stateRequired)
+                if result:
+                    result[0] = I18n.getUiText("ui.fightAutomsg.spellcast.stateRequired", [spellName, stateReq.name])
                 return False
         if not spell.bypassSummoningLimit and spellLevel.canSummon and not self.canSummon():
+            if result:
+                result[0] = I18n.getUiText("ui.fightAutomsg.spellcast.tooManySummon", [spellName])
             return False
         if spellLevel.canBomb and not self.canBomb():
+            if result:
+                result[0] = I18n.getUiText("ui.fightAutomsg.spellcast.tooManyBomb", [spellName])
             return False
         if not player.isFighting:
+            if result:
+                result[0] = I18n.getUiText("ui.fightAutomsg.spellcast.available", [spellName])
             return True
         spellCastManager: scifm.SpellCastInFightManager = self.getSpellCastManager()
         spellManager: SpellManager = spellCastManager.getSpellManagerBySpellId(spellId)
-        if spellManager == None:
+        if spellManager is None:
+            if result:
+                result[0] = I18n.getUiText("ui.fightAutomsg.spellcast.available", [spellName])
             return True
         if maxCastPerTurn <= spellManager.numberCastThisTurn and maxCastPerTurn > 0:
+            if result:
+                result[0] = I18n.getUiText("ui.fightAutomsg.spellcast.castPerTurn", [spellName, maxCastPerTurn])
             return False
         if spellManager.cooldown > 0 or selfSpell.actualCooldown > 0:
             cooldown = max(spellManager.cooldown, selfSpell.actualCooldown)
+            if result:
+                if cooldown == 63:
+                    result[0] = I18n.getUiText("ui.fightAutomsg.spellcast.noCast", [spellName])
+                else:
+                    result[0] = I18n.getUiText("ui.fightAutomsg.spellcast.cooldown", [spellName, cooldown])
             return False
         if pTargetId != 0:
             numberCastOnTarget = spellManager.getCastOnEntity(pTargetId)
@@ -252,7 +315,11 @@ class CurrentPlayedFighterManager(metaclass=Singleton):
                 else float(0)
             )
             if spellLevel.maxCastPerTarget + bonus <= numberCastOnTarget and spellLevel.maxCastPerTarget > 0:
+                if result:
+                    result[0] = I18n.getUiText("ui.fightAutomsg.spellcast.castPerTarget", [spellName])
                 return False
+        if result:
+            result[0] = I18n.getUiText("ui.fightAutomsg.spellcast.available", [spellName])
         return True
 
     def endFight(self) -> None:

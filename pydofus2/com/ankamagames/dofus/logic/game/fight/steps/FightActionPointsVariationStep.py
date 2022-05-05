@@ -73,6 +73,6 @@ class FightActionPointsVariationStep(AbstractStatContextualStep, IFightStep):
         ap: Stat = stats.getStat(StatIds.ACTION_POINTS)
         newValue = ap.totalValue + self._intValue
         stats.setStat(Stat(StatIds.ACTION_POINTS, newValue))
-        logger.debug(f"new ap value : {newValue}")
+        # logger.debug(f"new ap value : {newValue}")
         SpellWrapper.refreshAllPlayerSpellHolder(self._targetId)
         super().start()

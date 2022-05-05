@@ -3,10 +3,10 @@ from com.ankamagames.dofus.logic.game.fight.steps.IFightStep import IFightStep
 from com.ankamagames.dofus.network.types.game.character.characteristic.CharacterCharacteristic import (
     CharacterCharacteristic,
 )
+from com.ankamagames.jerakine.logger.Logger import Logger
 from com.ankamagames.jerakine.sequencer.AbstractSequencable import AbstractSequencable
-from com.ankamagames.jerakine.utils.display.EnterFrameDispatcher import (
-    EnterFrameDispatcher,
-)
+
+logger = Logger(__name__)
 
 
 class FightUpdateStatStep(AbstractSequencable, IFightStep):
@@ -34,8 +34,7 @@ class FightUpdateStatStep(AbstractSequencable, IFightStep):
         return self._targets
 
     def start(self) -> None:
-        EnterFrameDispatcher().worker.addSingleTreatment(
-            StatsManager(), StatsManager().addRawStats, [self._entityId, self._newStats]
-        )
+        logger.debug(f"new stats -> {self._newStats}")
+        StatsManager().addRawStats(self._entityId, self._newStats)
         super().start()
         self.executeCallbacks()

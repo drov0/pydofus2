@@ -23,6 +23,7 @@ class MapDisplayManager(metaclass=Singleton):
     _nMapLoadStart: int
     _nMapLoadEnd: int
     _identifiedElementPosition: dict[int, MapPoint]
+    _currentMapRendered = True
 
     def __init__(self) -> None:
         from com.ankamagames.jerakine.resources.loaders.MapLoader import MapLoader
@@ -55,6 +56,7 @@ class MapDisplayManager(metaclass=Singleton):
         self._currentMap = None
         logger.debug("mapInstanceId reset 0")
         self._mapInstanceId = 0
+        self._currentMapRendered = True
         self._lastMap = None
 
     def initIdentifiedElements(self):
@@ -66,9 +68,7 @@ class MapDisplayManager(metaclass=Singleton):
                 for element in cell.elements:
                     if element.elementType == ElementTypesEnum.GRAPHICAL:
                         if element.identifier > 0:
-                            self._identifiedElementPosition[
-                                element.identifier
-                            ] = MapPoint.fromCellId(cell.cellId)
+                            self._identifiedElementPosition[element.identifier] = MapPoint.fromCellId(cell.cellId)
 
     def isIdentifiedElement(self, identifier: int) -> bool:
         return self._identifiedElementPosition.get(identifier)
@@ -79,21 +79,16 @@ class MapDisplayManager(metaclass=Singleton):
     def mapDisplayed(self) -> None:
         pass
 
-    def loadMap(
-        self, mapId: int, forceReloadWithoutCache: bool = False, decryptionKey=None
-    ) -> None:
+    def loadMap(self, mapId: int, forceReloadWithoutCache: bool = False, decryptionKey=None) -> None:
         from com.ankamagames.dofus.kernel.Kernel import Kernel
 
         self.lastDataMap = self.currentDataMap
         self._forceReloadWithoutCache = forceReloadWithoutCache
         self._nMapLoadStart = perf_counter()
         map = self._loader.load(mapId, key=decryptionKey)
+        self._currentMapRendered = True
         self._nMapLoadEnd = perf_counter()
-        logger.debug(
-            f"Map {map.id} loaded in "
-            + str(self._nMapLoadEnd - self._nMapLoadStart)
-            + " seconds"
-        )
+        logger.debug(f"Map {map.id} loaded in " + str(self._nMapLoadEnd - self._nMapLoadStart) + " seconds")
         dmpm.DataMapProvider().resetUpdatedCell()
         dmpm.DataMapProvider().resetSpecialEffects()
         self.currentDataMap = map

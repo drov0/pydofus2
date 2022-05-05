@@ -3,6 +3,7 @@ import math
 import random
 from threading import Timer
 from time import sleep
+from types import FunctionType
 from com.ankamagames.atouin.AtouinConstants import AtouinConstants
 from com.ankamagames.atouin.utils.DataMapProvider import DataMapProvider
 from com.ankamagames.dofus.datacenter.effects.EffectInstance import EffectInstance
@@ -13,8 +14,12 @@ from com.ankamagames.dofus.network.messages.game.actions.fight.GameActionFightSp
     GameActionFightSpellCastMessage,
 )
 from com.ankamagames.dofus.network.messages.game.actions.sequence.SequenceEndMessage import SequenceEndMessage
+from com.ankamagames.dofus.network.messages.game.actions.sequence.SequenceStartMessage import SequenceStartMessage
 from com.ankamagames.dofus.network.messages.game.context.GameMapMovementMessage import GameMapMovementMessage
 from com.ankamagames.dofus.network.messages.game.context.GameMapNoMovementMessage import GameMapNoMovementMessage
+from com.ankamagames.dofus.network.messages.game.context.fight.GameFightTurnStartPlayingMessage import (
+    GameFightTurnStartPlayingMessage,
+)
 from com.ankamagames.dofus.network.types.game.context.GameContextActorInformations import GameContextActorInformations
 from com.ankamagames.jerakine.logger.Logger import Logger
 from com.ankamagames.atouin.managers.MapDisplayManager import MapDisplayManager
@@ -139,10 +144,12 @@ class BotFightFrame(Frame, metaclass=Singleton):
         self._mapPos = MapPosition.getMapPositions()
         self._wantcastSpell = None
         self._reachableCells = None
+        self._turnAction = []
+        self._seqQueue = []
         return True
 
     @property
-    def fightTurnFrame(self) -> "FightTurnFrame":
+    def turnFrame(self) -> "FightTurnFrame":
         return Kernel().getWorker().getFrame("FightTurnFrame")
 
     @property
@@ -181,9 +188,9 @@ class BotFightFrame(Frame, metaclass=Singleton):
         :param targets: positions of the mobs
         :return: cell of the mob, path to the ldv if any else None
         """
-        logger.debug("Searching for path to hit some mob")
         spellZone = self.getSpellZone(spellw)
         origin = self.fighterPos
+        logger.debug(f"Searching for path to hit some mob, origin = {origin.cellId}")
         targets = self.mobPositions
         queue = collections.deque([[origin]])
         seen = {origin}
@@ -261,6 +268,17 @@ class BotFightFrame(Frame, metaclass=Singleton):
         losCells = LosDetector.getCell(DataMapProvider(), rangeCells, origin)
         return losCells
 
+    def addTurnAction(self, fct: FunctionType, args: list) -> None:
+        self._turnAction.append({"fct": fct, "args": args})
+
+    def nextTurnAction(self) -> None:
+        logger.debug(f"Next turn action, {self._turnAction}")
+        if len(self._turnAction) > 0:
+            action = self._turnAction.pop(0)
+            action["fct"](*action["args"])
+        else:
+            self.playTurn()
+
     def playTurn(self):
         self._reachableCells = self.getReachableCells()
         self._wantcastSpell = None
@@ -271,34 +289,24 @@ class BotFightFrame(Frame, metaclass=Singleton):
         logger.debug(f"MP : {movementPoints}, AP : {actionPoints}")
         target, path = self.findPathToTarget(spellw)
         if path is not None:
-            logger.debug(f"Found path of length {len(path)}")
-            dest = None
+            logger.debug(f"Found path to hit a length {[mp.cellId for mp in path]}")
             if len(path) == 0:
-                self._wantcastSpell = {
-                    "spellId": self._spellId,
-                    "cellId": target["pos"].cellId,
-                    "targetId": target["targetId"],
-                }
-                self.castSpell(self._spellId, target["pos"].cellId)
+                self.addTurnAction(self.castSpell, [self._spellId, target["pos"].cellId])
             elif path[-1].cellId in self._reachableCells:
-                self._wantcastSpell = {
-                    "spellId": self._spellId,
-                    "cellId": target["pos"].cellId,
-                    "targetId": target["targetId"],
-                }
-                self._lastTarget = target
-                self.moveToCell(path[-1])
+                logger.debug(f"Path ends in reachable cell {path[-1].cellId}")
+                self.addTurnAction(self.moveToCell, [path[-1]])
+                self.addTurnAction(self.castSpell, [self._spellId, target["pos"].cellId])
             else:
                 for i, mp in enumerate(path):
                     if mp.cellId not in self._reachableCells:
-                        if i == 0:
-                            dest = None
-                        else:
-                            dest = path[i - 1]
+                        if i != 0:
+                            logger.debug(f"reachable cells {self._reachableCells}")
+                            logger.debug(f"path {[mp.cellId for mp in path]}")
+                            self.addTurnAction(self.moveToCell, [path[i - 1]])
                         break
-                self.moveToCell(dest)
         else:
-            self.turnEnd()
+            self.addTurnAction(self.turnEnd, [])
+        self.nextTurnAction()
 
     def canCastSpell(self, spellw: SpellWrapper, targetId: int) -> bool:
         reason = [""]
@@ -319,18 +327,18 @@ class BotFightFrame(Frame, metaclass=Singleton):
             self._inFight = False
             if Kernel().getWorker().contains("BotFarmPathFrame"):
                 bfpf: "BotFarmPathFrame" = Kernel().getWorker().getFrame("BotFarmPathFrame")
-            bfpf.doFarm()
+            Timer(3, bfpf.doFarm).start()
             return True
 
-        if isinstance(msg, MapComplementaryInformationsDataMessage):
+        elif isinstance(msg, MapComplementaryInformationsDataMessage):
             self._wait = False
             return False
 
-        if isinstance(msg, MapLoadedMessage):
+        elif isinstance(msg, MapLoadedMessage):
             self._wait = True
             return False
 
-        if isinstance(msg, GameFightShowFighterMessage):
+        elif isinstance(msg, GameFightShowFighterMessage):
             self._turnPlayed = 0
             self._myTurn = False
             startFightMsg = GameFightReadyMessage()
@@ -338,35 +346,32 @@ class BotFightFrame(Frame, metaclass=Singleton):
             ConnectionsHandler.getConnection().send(startFightMsg)
             return True
 
-        if isinstance(msg, GameMapMovementMessage):
-            if int(msg.actorId) == int(PlayedCharacterManager().id):
-                if self._myTurn:
-                    if self._wantcastSpell:
-                        self.castSpell(self._wantcastSpell["spellId"], self._wantcastSpell["cellId"])
-                    else:
-                        self.turnEnd()
+        elif isinstance(msg, SequenceEndMessage):
+            if self._myTurn:
+                logger.debug(f"<<<<<<<<<<SequenceEndtMessage {len(self._seqQueue)}, myTurn {self._myTurn}")
+                if self._seqQueue:
+                    self._seqQueue.pop()
+                    if not self._seqQueue:
+                        self.nextTurnAction()
             return True
 
-        if isinstance(msg, GameActionFightSpellCastMessage):
-            if (
-                self._myTurn
-                and self._wantcastSpell
-                and msg.spellId == self._wantcastSpell["spellId"]
-                and msg.targetId == self._wantcastSpell["targetId"]
-                and msg.sourceId == PlayedCharacterManager().id
-                and msg.destinationCellId == self._wantcastSpell["cellId"]
-            ):
-                self.playTurn()
+        elif isinstance(msg, SequenceStartMessage):
+            if self._myTurn:
+                logger.debug(f">>>>>>>>>>>>SequenceStartMessage {len(self._seqQueue)}, myTurn {self._myTurn}")
+                self._seqQueue.append(msg)
+            return True
 
-        if isinstance(msg, GameFightTurnStartMessage):
+        elif isinstance(msg, GameFightTurnStartMessage):
             turnStartMsg = msg
-            if int(turnStartMsg.id) == int(PlayedCharacterManager().id):
+            self._myTurn = int(turnStartMsg.id) == int(PlayedCharacterManager().id)
+            if self._myTurn:
+                logger.debug("my turn to play")
+                self._seqQueue.clear()
                 self._myTurn = True
+                self._turnAction.clear()
                 self._turnPlayed += 1
-                self.playTurn()
-            else:
-                self._myTurn = False
-            return True
+                self.nextTurnAction()
+
         return False
 
     @property
@@ -380,7 +385,9 @@ class BotFightFrame(Frame, metaclass=Singleton):
         return stats.getStatTotalValue(StatIds.MOVEMENT_POINTS)
 
     def turnEnd(self) -> None:
-        self.battleFrame.confirmTurnEnd()
+        self._myTurn = False
+        self._seqQueue.clear()
+        self._turnAction.clear()
         finDeTourMsg: GameFightTurnFinishMessage = GameFightTurnFinishMessage()
         finDeTourMsg.init(False)
         ConnectionsHandler.getConnection().send(finDeTourMsg)
@@ -423,7 +430,7 @@ class BotFightFrame(Frame, metaclass=Singleton):
     def fighterPos(self) -> "MapPoint":
         return MapPoint.fromCellId(self.fighterInfos.disposition.cellId)
 
-    def getReachableCells(self, cellId=None) -> list:
+    def getReachableCells(self, cellId=None) -> list[int]:
         infos = self.fighterInfos
         tmp = infos.disposition.cellId
         if cellId is None:

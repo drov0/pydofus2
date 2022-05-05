@@ -260,11 +260,12 @@ class RoleplayWorldFrame(Frame):
                                 forbiddenCellsIds,
                             )
                             if not nearestCell or nearestCell.cellId == playerEntity.position.cellId:
-                                iRange += 1
+                                break
+                            iRange += 1
                 if len(skills) == 1 and skills[0].skillId == DataEnum.SKILL_POINT_OUT_EXIT:
                     nearestCell.cellId = ieamsg.position.cellId
                     sendInteractiveUseRequest = False
-                if not nearestCell or nearestCell.cellId not in forbiddenCellsIds:
+                if not nearestCell or nearestCell.cellId in forbiddenCellsIds:
                     nearestCell = ieamsg.position
                 if sendInteractiveUseRequest:
                     self.roleplayMovementFrame.setFollowingInteraction(

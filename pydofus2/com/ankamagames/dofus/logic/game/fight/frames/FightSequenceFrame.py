@@ -1121,7 +1121,7 @@ class FightSequenceFrame(Frame, ISpellCastProvider):
             return False
 
     def execute(self, callback: FunctionType = None) -> None:
-        logger.debug(f"[SEQ DEBUG] Executing sequence #{self._instanceId}")
+        # logger.debug(f"[SEQ DEBUG] Executing sequence #{self._instanceId}")
         self._sequencer = SerialSequencer(self.FIGHT_SEQUENCERS_CATEGORY)
         self._sequencer.add_listener(SequencerEvent.SEQUENCE_STEP_FINISH, self.onStepEnd)
         if self._parent:

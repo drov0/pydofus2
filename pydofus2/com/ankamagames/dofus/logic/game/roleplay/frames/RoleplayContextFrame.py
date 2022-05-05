@@ -5,6 +5,7 @@ from com.ankamagames.dofus.internalDatacenter.world.WorldPointWrapper import (
     WorldPointWrapper,
 )
 from com.ankamagames.dofus.kernel.Kernel import Kernel
+from com.ankamagames.dofus.kernel.net.ConnectionsHandler import ConnectionsHandler
 from com.ankamagames.dofus.logic.game.common.managers.PlayedCharacterManager import (
     PlayedCharacterManager,
 )
@@ -38,6 +39,7 @@ class RoleplayContextFrame(Frame):
         self._newCurrentMapIsReceived = False
         self._previousMapId = None
         self._priority = Priority.NORMAL
+        self._listMapNpcsMsg = []
         super().__init__()
 
     @property
@@ -62,12 +64,12 @@ class RoleplayContextFrame(Frame):
 
     @property
     def entitiesFrame(self) -> ref.RoleplayEntitiesFrame:
-        return self._roleplayEntitiesFrame
+        return self._entitiesFrame
 
     def pushed(self) -> bool:
         self._movementFrame = RoleplayMovementFrame()
         self._worldFrame = rplWF.RoleplayWorldFrame()
-        self._roleplayEntitiesFrame = ref.RoleplayEntitiesFrame()
+        self._entitiesFrame = ref.RoleplayEntitiesFrame()
         self._interactivesFrame = rif.RoleplayInteractivesFrame()
         return True
 
@@ -83,6 +85,14 @@ class RoleplayContextFrame(Frame):
             else:
                 MapDisplayManager().mapInstanceId = 0
             wp = None
+            if self._entitiesFrame and Kernel().getWorker().contains("RoleplayEntitiesFrame"):
+                Kernel().getWorker().removeFrame(self._entitiesFrame)
+            if self._worldFrame and Kernel().getWorker().contains("RoleplayWorldFrame"):
+                Kernel().getWorker().removeFrame(self._worldFrame)
+            if self._interactivesFrame and Kernel().getWorker().contains("RoleplayInteractivesFrame"):
+                Kernel().getWorker().removeFrame(self._interactivesFrame)
+            if self._movementFrame and Kernel().getWorker().contains(RoleplayMovementFrame):
+                Kernel().getWorker().removeFrame(self._movementFrame)
             if PlayedCharacterManager().isInHouse:
                 wp = WorldPointWrapper(
                     mcmsg.mapId,
@@ -95,22 +105,29 @@ class RoleplayContextFrame(Frame):
             if PlayedCharacterManager().currentMap:
                 self._previousMapId = PlayedCharacterManager().currentMap.mapId
             PlayedCharacterManager().currentMap = wp
-            self._roleplayEntitiesFrame._waitForMap = True
+            self._entitiesFrame._waitForMap = True
             if self._movementFrame._changeMapTimer is not None:
                 self._movementFrame._changeMapTimer.cancel()
             MapDisplayManager().loadMap(int(mcmsg.mapId))
-            return True
+            return False
 
         elif isinstance(msg, MapLoadedMessage):
             if not Kernel().getWorker().contains("RoleplayEntitiesFrame"):
-                Kernel().getWorker().addFrame(self._roleplayEntitiesFrame)
+                Kernel().getWorker().addFrame(self._entitiesFrame)
             if not Kernel().getWorker().contains("RoleplayInteractivesFrame"):
                 Kernel().getWorker().addFrame(self._interactivesFrame)
             if not Kernel().getWorker().contains("RoleplayMovementFrame"):
                 Kernel().getWorker().addFrame(self._movementFrame)
             if not Kernel().getWorker().contains("RoleplayWorldFrame"):
                 Kernel().getWorker().addFrame(self._worldFrame)
-            return False
+            Kernel().getWorker().resume()
+            Kernel().getWorker().clearUnstoppableMsgClassList()
+            ConnectionsHandler.resume()
+            # SurveyManager.getInstance().checkSurveys()
+            if self._listMapNpcsMsg:
+                Kernel().getWorker().process(self._listMapNpcsMsg)
+                self._listMapNpcsMsg = None
+            return True
 
         elif isinstance(msg, GameContextDestroyMessage):
             Kernel().getWorker().removeFrame(self)

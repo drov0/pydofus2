@@ -31,7 +31,6 @@ class Worker(EventDispatcher, MessageHandler):
     MAX_TIME_FRAME: int = 40
 
     def __init__(self):
-        self._unstoppableMsgobjectList = list()
         self._framesBeingDeleted = dict()
         self._messagesQueue = list[Message]()
         self._treatmentsQueue = list[Treatment]()
@@ -43,7 +42,7 @@ class Worker(EventDispatcher, MessageHandler):
         self._pausedQueue = list[Message]()
         self._terminated: bool = False
         self._terminating: bool = False
-        self._unstoppableMsgobjectList = list()
+        self._unstoppableMsgClassList = list()
         self._currentFrameTypesCache = dict()
         super().__init__()
 
@@ -183,8 +182,8 @@ class Worker(EventDispatcher, MessageHandler):
         if not frame:
             return
 
-        if self.DEBUG_FRAMES:
-            logger.info(f"Removing frame: {frame.__class__.__name__}")
+        # if self.DEBUG_FRAMES:
+        logger.info(f"Removing frame: {frame.__class__.__name__}")
 
         if self._processingMessage or len(self._framesToRemove) > 0:
             self._framesToRemove.append(frame)
@@ -217,14 +216,11 @@ class Worker(EventDispatcher, MessageHandler):
         logger.info("Worker is paused, all queueable messages will be queued : ")
         self._paused = True
         if unstoppableMsgobjectList:
-            self._unstoppableMsgobjectList = self._unstoppableMsgobjectList.extend(unstoppableMsgobjectList)
-
-    def clearUnstoppableMsgobjectList(self) -> None:
-        self._unstoppableMsgobjectList = []
+            self._unstoppableMsgClassList = self._unstoppableMsgClassList.extend(unstoppableMsgobjectList)
 
     def msgIsUnstoppable(self, msg: Message) -> bool:
         msgobject: object = None
-        for msgobject in self._unstoppableMsgobjectList:
+        for msgobject in self._unstoppableMsgClassList:
             if msg is msgobject:
                 return True
         return False
@@ -362,16 +358,19 @@ class Worker(EventDispatcher, MessageHandler):
                 self.pushFrame(frameToAdd)
             del self._framesToAdd[0 : len(self._framesToAdd)]
 
-    def avoidFlood(self, messageName:str) -> bool:
+    def avoidFlood(self, messageName: str) -> bool:
         if len(self._messagesQueue) > self.LONG_MESSAGE_QUEUE:
-            count = 0;
+            count = 0
             toClean = []
             for i in range(len(self._messagesQueue)):
-                if self._messagesQueue[i].__class__.__name__  == messageName:
-                    count+=1
+                if self._messagesQueue[i].__class__.__name__ == messageName:
+                    count += 1
                     toClean.append(self._messagesQueue[i])
             if count > 10:
                 for i in range(len(toClean)):
                     self._messagesQueue.remove(toClean[i])
                 return True
         return False
+
+    def clearUnstoppableMsgClassList(self) -> None:
+        self._unstoppableMsgClassList.clear()

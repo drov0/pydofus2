@@ -455,22 +455,25 @@ class FightContextFrame(Frame):
 
         elif isinstance(msg, CurrentMapMessage):
             mcmsg = msg
+            ConnectionsHandler.pause()
+            Kernel().getWorker().pause()
             if isinstance(mcmsg, CurrentMapInstanceMessage):
                 mdm.MapDisplayManager().mapInstanceId = mcmsg.instantiatedMapId
             else:
                 mdm.MapDisplayManager().mapInstanceId = 0
             wp = WorldPointWrapper(mcmsg.mapId)
             EntitiesManager().clearEntities()
-            self._currentMapRenderId = mdm.MapDisplayManager().loadMap(mcmsg.mapId)
+            mdm.MapDisplayManager().loadMap(mcmsg.mapId)
             PlayedCharacterManager().currentMap = wp
             PlayedCharacterManager().currentSubArea = SubArea.getSubAreaByMapId(mcmsg.mapId)
             return False
 
         elif isinstance(msg, MapLoadedMessage):
-            logger.info("MapsLoadingCompleteMessage")
             gcrmsg = GameContextReadyMessage()
             gcrmsg.init(mdm.MapDisplayManager().currentMapPoint.mapId)
             ConnectionsHandler.getConnection().send(gcrmsg)
+            Kernel().getWorker().resume()
+            ConnectionsHandler.resume()
             return True
 
         elif isinstance(msg, GameFightResumeMessage):
@@ -668,7 +671,7 @@ class FightContextFrame(Frame):
                             winners.append(frew)
                         results[resultIndex] = frew
                         resultIndex += 1
-                        if frew.id == PlayedCharacterManager().id:
+                        if frew.id == CurrentPlayedFighterManager().currentFighterId:
                             isSpectator = False
 
                 if hardcoreLoots:
@@ -714,12 +717,10 @@ class FightContextFrame(Frame):
                 resultsKey = self.saveResults(resultsRecap)
                 if not PlayedCharacterManager().isSpectator:
                     fevth.FightEventsHelper().sendFightEvent(FightEventEnum.FIGHT_END, [resultsKey], 0, -1, True)
-
                 if PlayerManager().kisServerPort > 0:
                     pass
-
             Kernel().getWorker().removeFrame(self)
-            logger.debug(resultsRecap)
+            # logger.debug(resultsRecap)
             return False
 
         elif isinstance(msg, ChallengeTargetsListRequestAction):
@@ -753,6 +754,7 @@ class FightContextFrame(Frame):
             return True
 
         elif isinstance(msg, GameActionFightNoSpellCastMessage):
+            logger.debug(f"failed to cast spell {msg.to_json()}")
             return True
 
         # if isinstance(msg, BreachEnterMessage):

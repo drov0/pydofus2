@@ -179,6 +179,7 @@ class RoleplayMovementFrame(Frame):
 
         if isinstance(msg, GameMapNoMovementMessage):
             logger.debug("Movement impossible")
+            self._canMove = True
             self._isRequestingMovement = False
             if self._followingIe:
                 self.activateSkill(
@@ -235,11 +236,18 @@ class RoleplayMovementFrame(Frame):
                 )
                 gmmcmsg = GameMapMovementConfirmMessage()
                 ConnectionsHandler.getConnection().send(gmmcmsg)
-                if self._wantToChangeMap >= 0 and emcmsg.entity.position.cellId == self._destinationPoint:
+                if self._wantToChangeMap >= 0:
                     logger.debug(f"[RolePlayMovement] Wants to change map to {self._wantToChangeMap}")
-                    self.askMapChange()
-                    self._isRequestingMovement = False
-                if self._followingIe:
+                    if emcmsg.entity.position.cellId != self._destinationPoint:
+                        logger.debug(
+                            f"Wants to change map but didn't reach the map change cell will retry to reach it"
+                        )
+                        self._isRequestingMovement = False
+                        self.askMoveTo(self._destinationPoint)
+                    else:
+                        self.askMapChange()
+
+                elif self._followingIe:
                     logger.debug(f"[RolePlayMovement] Wants to activate element {self._followingIe['ie'].elementId}")
                     self._isRequestingMovement = False
                     self.activateSkill(
@@ -248,7 +256,7 @@ class RoleplayMovementFrame(Frame):
                         self._followingIe["additionalParam"],
                     )
                     self._followingIe = None
-                if self._followingMonsterGroup:
+                elif self._followingMonsterGroup:
                     self._isRequestingMovement = False
                     self.requestMonsterFight(self._followingMonsterGroup.id)
                     self._followingMonsterGroup = None

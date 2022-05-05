@@ -55,9 +55,7 @@ class FightPlaySpellScriptStep(AbstractSequencable, IFightStep):
             return
         if self._spellCastProvider.castingSpell.spell:
             logger.info(
-                "Executing SpellScript"
-                + str(self._fxScriptId)
-                + " for spell '"
+                "Executing Spell "
                 + self._spellCastProvider.castingSpell.spell.name
                 + "' ("
                 + str(self._spellCastProvider.castingSpell.spell.id)

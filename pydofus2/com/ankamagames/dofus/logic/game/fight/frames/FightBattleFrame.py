@@ -371,7 +371,6 @@ class FightBattleFrame(Frame):
             self._currentPlayerId = gftsmsg.id
             if not self._lastPlayerId:
                 self._lastPlayerId = self._currentPlayerId
-
             logger.info("*" * 50 + f"   Start turn for entityId {self._currentPlayerId}    " + "*" * 50)
             if self._currentPlayerId == playerId:
                 self._slaveId = 0
@@ -429,9 +428,6 @@ class FightBattleFrame(Frame):
             krnl.Kernel().getWorker().getFrame("FightContextFrame")
             return False
 
-        elif isinstance(msg, GameFightTurnStartPlayingMessage):
-            return True
-
         elif isinstance(msg, GameFightTurnEndMessage):
             gftemsg = msg
             if not self._confirmTurnEnd:
@@ -458,7 +454,7 @@ class FightBattleFrame(Frame):
                 krnl.Kernel().getWorker().addFrame(self._sequenceFrameSwitcher)
             self._currentSequenceFrame = fseqf.FightSequenceFrame(self, self._currentSequenceFrame)
             self._sequenceFrameSwitcher.currentFrame = self._currentSequenceFrame
-            return True
+            return False
 
         elif isinstance(msg, SequenceEndMessage):
             # self.logState()
@@ -469,9 +465,9 @@ class FightBattleFrame(Frame):
             self._currentSequenceFrame.mustAck = semsg.authorId == int(CurrentPlayedFighterManager().currentFighterId)
             self._currentSequenceFrame.ackIdent = semsg.actionId
             self._sequenceFrameSwitcher.currentFrame = None
-            logger.debug(
-                f"================>> Received sequence #{self._currentSequenceFrame._instanceId} end with id: {semsg.actionId} and author id: {semsg.authorId}"
-            )
+            # logger.debug(
+            #     f"================>> Received sequence #{self._currentSequenceFrame._instanceId} end with id: {semsg.actionId} and author id: {semsg.authorId}"
+            # )
             if not self._currentSequenceFrame.parent:
                 # logger.debug(
                 #     f"Sequence {self._currentSequenceFrame._instanceId} is root, removing it and executing next sequence"
@@ -583,7 +579,7 @@ class FightBattleFrame(Frame):
             krnl.Kernel().getWorker().removeFrame(self._turnFrame)
         bffm.BuffManager.clear()
         if self._executingSequence or krnl.Kernel().getWorker().contains("FightSequenceFrame"):
-            logger.warn("Wow, wait. We're pulling FightBattle but there's still sequences inside the worker !!")
+            # logger.warn("Wow, wait. We're pulling FightBattle but there's still sequences inside the worker !!")
             fsf = krnl.Kernel().getWorker().getFrame("FightSequenceFrame")
             krnl.Kernel().getWorker().removeFrame(fsf)
         self._currentSequenceFrame = None
@@ -698,10 +694,10 @@ class FightBattleFrame(Frame):
                 return False
         if self._sequenceFrames:
             nextSequenceFrame: fseqf.FightSequenceFrame = self._sequenceFrames.pop(0)
-            logger.debug(f"Executing next sequence #{nextSequenceFrame._instanceId}")
+            # logger.debug(f"Executing next sequence #{nextSequenceFrame._instanceId}")
             self._executingSequence = True
             nextSequenceFrame.execute(self.finishSequence(nextSequenceFrame))
-            return True
+            return False
         return False
 
     def applyDelayedStats(self) -> None:
@@ -826,7 +822,6 @@ class FightBattleFrame(Frame):
         fightContextFrame.process(fightEnd)
 
     def onSkipTurnTimeOut(self, event) -> None:
-        action: Action = None
         self._skipTurnTimer.cancel()
 
     def gameFightSynchronize(self, fighters: list[GameFightFighterInformations]) -> None:
@@ -836,7 +831,6 @@ class FightBattleFrame(Frame):
         newWaveMonsterIndex: int = 0
         bffm.BuffManager().synchronize()
         for fighterInfos in fighters:
-            stats = StatsManager().getStats(fighterInfos.contextualId)
             if fighterInfos.spawnInfo.alive:
                 newWaveMonster = (
                     fighterInfos.wave == self._newWaveId

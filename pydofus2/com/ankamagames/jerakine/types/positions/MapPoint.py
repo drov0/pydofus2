@@ -162,9 +162,10 @@ class MapPoint:
         xDiff = target.x - self.x
         yDiff = self.y - target.y
         dist = math.sqrt(math.pow(xDiff, 2) + math.pow(yDiff, 2))
-        if dist == 0:
-            return 0
-        angle = math.acos(xDiff / dist) * 180 / math.pi * (-1 if target.y > self.y else 1)
+        if xDiff == 0:
+            angle = math.pi / 2
+        else:
+            angle = math.acos(xDiff / dist) * 180 / math.pi * (-1 if target.y > self.y else 1)
         if fourDir:
             angle = round(angle / 90) * 2 + 1
         else:

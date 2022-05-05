@@ -1,3 +1,4 @@
+from asyncio.log import logger
 import random
 from threading import Timer
 from com.ankamagames.atouin.managers.EntitiesManager import EntitiesManager
@@ -160,7 +161,7 @@ class RoleplayEntitiesFrame(AbstractEntitiesFrame, Frame):
 
     def pushed(self) -> bool:
         # TODO: implement init new map here
-        # self.initNewMap()
+        self.initNewMap()
         self._playersId = list()
         self._merchantsList = list()
         self._monstersIds = list[float]()
@@ -180,6 +181,13 @@ class RoleplayEntitiesFrame(AbstractEntitiesFrame, Frame):
         self._interactiveElements = list[InteractiveElement]()
         return super().pushed()
 
+    def initNewMap(self):
+        self._npcList = dict()
+        self._fights = dict()
+        self._objects = dict()
+        self._objectsByCellId = dict()
+        self._paddockItem = dict()
+
     def onMapDataRequestTimeout(self):
         mirmsg = MapInformationsRequestMessage()
         mirmsg.init(mapId_=MapDisplayManager().currentMapPoint.mapId)
@@ -188,6 +196,7 @@ class RoleplayEntitiesFrame(AbstractEntitiesFrame, Frame):
     def process(self, msg: Message):
 
         if isinstance(msg, MapLoadedMessage):
+            logger.info(f"Map loaded received but waiting for map = {self._waitForMap}")
             if self._waitForMap:
                 ccFrame = Kernel().getWorker().getFrame("ContextChangeFrame")
                 connexion = ""
@@ -197,7 +206,7 @@ class RoleplayEntitiesFrame(AbstractEntitiesFrame, Frame):
                 mirmsg.init(mapId_=MapDisplayManager().currentMapPoint.mapId)
                 ConnectionsHandler.getConnection().send(mirmsg, connexion)
                 self._waitForMap = False
-            return True
+            return False
 
         if isinstance(msg, MapComplementaryInformationsDataMessage):
             self._responseTimer.cancel()

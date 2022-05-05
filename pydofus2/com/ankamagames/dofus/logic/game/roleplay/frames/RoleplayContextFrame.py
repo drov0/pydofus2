@@ -77,7 +77,6 @@ class RoleplayContextFrame(Frame):
 
         if isinstance(msg, CurrentMapMessage):
             mcmsg = msg
-            logger.debug("Roleplay context frame received CurrentMapMessage")
             self._newCurrentMapIsReceived = True
             newSubArea = SubArea.getSubAreaByMapId(mcmsg.mapId)
             PlayedCharacterManager().currentSubArea = newSubArea
@@ -89,7 +88,7 @@ class RoleplayContextFrame(Frame):
             else:
                 MapDisplayManager().mapInstanceId = 0
             wp = None
-            Kernel().getWorker().logFrameCache()
+            # Kernel().getWorker().logFrameCache()
             if self._entitiesFrame and Kernel().getWorker().contains("RoleplayEntitiesFrame"):
                 Kernel().getWorker().removeFrame(self._entitiesFrame)
             if self._worldFrame and Kernel().getWorker().contains("RoleplayWorldFrame"):

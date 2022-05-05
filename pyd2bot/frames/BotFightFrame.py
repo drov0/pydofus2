@@ -268,7 +268,7 @@ class BotFightFrame(Frame, metaclass=Singleton):
         self._turnAction.append({"fct": fct, "args": args})
 
     def nextTurnAction(self) -> None:
-        logger.debug(f"Next turn action, {self._turnAction}")
+        # logger.debug(f"Next turn action, {self._turnAction}")
         if len(self._turnAction) > 0:
             action = self._turnAction.pop(0)
             action["fct"](*action["args"])
@@ -277,7 +277,7 @@ class BotFightFrame(Frame, metaclass=Singleton):
 
     def playTurn(self):
         self._reachableCells = self.getReachableCells()
-        logger.debug(f"reachable cells {self._reachableCells}")
+        # logger.debug(f"reachable cells {self._reachableCells}")
         self._wantcastSpell = None
         spellw = self.getSpellWrapper(self._spellId)
         stats: EntityStats = CurrentPlayedFighterManager().getStats()

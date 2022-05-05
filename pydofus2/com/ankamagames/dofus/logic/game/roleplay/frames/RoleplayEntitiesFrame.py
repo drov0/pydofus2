@@ -197,15 +197,14 @@ class RoleplayEntitiesFrame(AbstractEntitiesFrame, Frame):
 
         if isinstance(msg, MapLoadedMessage):
             logger.info(f"Map loaded received but waiting for map = {self._waitForMap}")
-            if self._waitForMap:
-                ccFrame = Kernel().getWorker().getFrame("ContextChangeFrame")
-                connexion = ""
-                if ccFrame:
-                    connexion = ccFrame.mapChangeConnexion
-                mirmsg = MapInformationsRequestMessage()
-                mirmsg.init(mapId_=MapDisplayManager().currentMapPoint.mapId)
-                ConnectionsHandler.getConnection().send(mirmsg, connexion)
-                self._waitForMap = False
+            ccFrame = Kernel().getWorker().getFrame("ContextChangeFrame")
+            connexion = ""
+            if ccFrame:
+                connexion = ccFrame.mapChangeConnexion
+            mirmsg = MapInformationsRequestMessage()
+            mirmsg.init(mapId_=MapDisplayManager().currentMapPoint.mapId)
+            ConnectionsHandler.getConnection().send(mirmsg, connexion)
+            self._waitForMap = False
             return False
 
         if isinstance(msg, MapComplementaryInformationsDataMessage):

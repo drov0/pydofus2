@@ -297,7 +297,8 @@ class Worker(EventDispatcher, MessageHandler):
         if frame.pulled():
             if frame in self._framesList:
                 self._framesList.remove(frame)
-                logger.debug(f"Frame {frame.__class__.__name__} removed from worker")
+                if self.DEBUG_FRAMES:
+                    logger.debug(f"Frame {frame.__class__.__name__} removed from worker")
                 del self._currentFrameTypesCache[frame.__class__.__name__]
                 self._framesBeingDeleted.clear()
             if self.has_listeners(FramePulledEvent.EVENT_FRAME_PULLED):

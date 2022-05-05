@@ -7,7 +7,7 @@ from com.ankamagames.dofus.datacenter.items.criterion.IItemCriterion import (
 from com.ankamagames.dofus.datacenter.items.criterion.ItemCriterion import ItemCriterion
 from com.ankamagames.jerakine.logger.Logger import Logger
 
-logger = Logger(__name__)
+logger = Logger("pyd2bot")
 
 
 class GroupFeatureCriterion(GroupItemCriterion):
@@ -19,11 +19,7 @@ class GroupFeatureCriterion(GroupItemCriterion):
         criterion: IItemCriterion = None
         if not self._criteria or len(self._criteria) == 0:
             return True
-        if (
-            self._criteria is not None
-            and len(self._criteria) == 1
-            and self._criteria[0] is ItemCriterion
-        ):
+        if self._criteria is not None and len(self._criteria) == 1 and self._criteria[0] is ItemCriterion:
             return self._criteria[0].isRespected
         if len(self._operators) > 0 and self._operators[0] == "|":
             for criterion in self._criteria:

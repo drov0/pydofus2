@@ -22,7 +22,7 @@ from com.ankamagames.jerakine.sequencer.AbstractSequencable import AbstractSeque
 from com.ankamagames.jerakine.sequencer.ISequencer import ISequencer
 from com.ankamagames.jerakine.types.positions.MapPoint import MapPoint
 
-logger = Logger(__name__)
+logger = Logger("pyd2bot")
 
 
 class FightCarryCharacterStep(AbstractSequencable, IFightStep):
@@ -102,9 +102,7 @@ class FightCarryCharacterStep(AbstractSequencable, IFightStep):
     def targets(self) -> list[float]:
         return [self._carriedId]
 
-    def updateCarriedEntityPosition(
-        self, pCarryingEntity: IMovable, pCarriedEntity: IMovable
-    ) -> None:
+    def updateCarriedEntityPosition(self, pCarryingEntity: IMovable, pCarriedEntity: IMovable) -> None:
         carried: AnimatedCharacter = None
         if not pCarryingEntity and DofusEntities.getEntity(self._fighterId):
             pCarryingEntity = DofusEntities.getEntity(self._fighterId)
@@ -126,16 +124,12 @@ class FightCarryCharacterStep(AbstractSequencable, IFightStep):
             self.castingSpellId,
         )
         FightSpellCastFrame.updateRangeAndTarget()
-        fightEntitiesFrame: FightEntitiesFrame = (
-            Kernel().getWorker().getFrame("FightEntitiesFrame")
-        )
+        fightEntitiesFrame: FightEntitiesFrame = Kernel().getWorker().getFrame("FightEntitiesFrame")
         if fightEntitiesFrame is not None:
             carrierAnimatedEntity = carryingEntity
             carriedAnimatedEntity = carriedEntity
             if carrierAnimatedEntity is not None and carriedAnimatedEntity is not None:
-                fightEntitiesFrame.addCarrier(
-                    carrierAnimatedEntity, carriedAnimatedEntity, True
-                )
+                fightEntitiesFrame.addCarrier(carrierAnimatedEntity, carriedAnimatedEntity, True)
         self.executeCallbacks()
 
     def restart(self, pEvt=None) -> None:

@@ -3,7 +3,7 @@ from com.ankamagames.dofus.logic.game.misc.IEntityLocalizer import IEntityLocali
 from com.ankamagames.jerakine.logger.Logger import Logger
 from com.ankamagames.jerakine.entities.interfaces.IEntity import IEntity
 
-logger = Logger(__name__)
+logger = Logger("pyd2bot")
 
 
 class DofusEntities:
@@ -14,10 +14,10 @@ class DofusEntities:
     @classmethod
     def getEntity(cls, entityId: float) -> IEntity:
         for localizer in cls._localizers:
-            foundEntity = localizer.getEntity(entityId)
+            foundEntity = localizer.getEntity(float(entityId))
             if foundEntity:
                 return foundEntity
-        return EntitiesManager().getEntity(entityId)
+        return EntitiesManager().getEntity(float(entityId))
 
     @classmethod
     def registerLocalizer(cls, localizer: IEntityLocalizer) -> None:

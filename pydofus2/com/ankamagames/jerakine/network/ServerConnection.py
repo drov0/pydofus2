@@ -34,7 +34,7 @@ from com.ankamagames.jerakine.utils.display.EnterFrameDispatcher import (
 from mx.CustomSocket.Socket import Socket
 from com.ankamagames.jerakine.network.NetworkMessage import NetworkMessage
 
-logger = Logger(__name__)
+logger = Logger("pyd2bot")
 
 
 class ServerConnection(IServerConnection):

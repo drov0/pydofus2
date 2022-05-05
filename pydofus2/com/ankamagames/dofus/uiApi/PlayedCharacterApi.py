@@ -96,7 +96,7 @@ from com.ankamagames.dofus.network.types.game.guild.application.GuildApplication
 from com.ankamagames.jerakine.logger.Logger import Logger
 from com.ankamagames.jerakine.metaclasses.Singleton import Singleton
 
-logger = Logger(__name__)
+logger = Logger("pyd2bot")
 
 
 class PlayedCharacterApi(IApi, metaclass=Singleton):

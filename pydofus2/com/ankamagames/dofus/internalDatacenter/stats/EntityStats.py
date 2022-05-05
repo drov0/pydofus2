@@ -4,7 +4,7 @@ from com.ankamagames.dofus.internalDatacenter.stats.Stat import Stat
 from com.ankamagames.dofus.internalDatacenter.stats.UsableStat import UsableStat
 from damageCalculation.tools import StatIds
 
-logger = Logger(__name__)
+logger = Logger("pyd2bot")
 
 
 class EntityStats:
@@ -25,13 +25,7 @@ class EntityStats:
         return self._stats
 
     def getFormattedMessage(self, message: str) -> str:
-        return (
-            self.__class__.__name__
-            + " (Entity ID: "
-            + str(self._entityId)
-            + "): "
-            + message
-        )
+        return self.__class__.__name__ + " (Entity ID: " + str(self._entityId) + "): " + message
 
     def setStat(self, stat: Stat, isBulkUpdate: bool = True) -> None:
         # logger.debug(f"Set stat {stat} for entity {self._entityId}")
@@ -41,9 +35,7 @@ class EntityStats:
     def getStat(self, statId: float) -> Stat:
         statKey = str(statId)
         if statKey not in self._stats:
-            logger.error(
-                self.getFormattedMessage("Stat ID " + statKey + " not found in stats")
-            )
+            logger.error(self.getFormattedMessage("Stat ID " + statKey + " not found in stats"))
             return None
         return self._stats[statKey]
 

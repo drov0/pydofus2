@@ -102,7 +102,7 @@ if TYPE_CHECKING:
         FightBattleFrame,
     )
     from com.ankamagames.jerakine.entities.interfaces.IMovable import IMovable
-logger = Logger(__name__)
+logger = Logger("pyd2bot")
 
 
 class FightTurnFrame(Frame):
@@ -240,7 +240,6 @@ class FightTurnFrame(Frame):
         self._isRequestingMovement = False
 
     def pushed(self) -> bool:
-        StatsManager().addListenerToStat(StatIds.MOVEMENT_POINTS, self.onUpdateMovementPoints)
         return True
 
     def process(self, msg: Message) -> bool:
@@ -521,7 +520,7 @@ class FightTurnFrame(Frame):
     def removeMovementArea(self) -> None:
         self._movementAreaSelection = None
 
-    def askMoveTo(self, cell: MapPoint) -> bool:
+    def askMoveTo(self, cells: list[int] = [], cellsTackled: list[int] = []) -> bool:
         if self._isRequestingMovement:
             logger.warn("Already requesting movement")
             return False
@@ -534,6 +533,10 @@ class FightTurnFrame(Frame):
             logger.warn("The player is already moving")
             self._isRequestingMovement = False
             return False
+        if cells:
+            self._cells = cells
+        if cellsTackled:
+            self._cellsTackled = cellsTackled
         if (self._cells is None or len(self._cells) == 0) and (
             self._cellsTackled is None or len(self._cellsTackled) == 0
         ):

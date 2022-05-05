@@ -22,7 +22,7 @@ from com.ankamagames.dofus.network.types.game.actions.fight.FightTemporaryBoostS
 )
 from com.ankamagames.jerakine.logger.Logger import Logger
 
-logger = Logger(__name__)
+logger = Logger("pyd2bot")
 
 
 class StateBuff(BasicBuff):
@@ -108,23 +108,12 @@ class StateBuff(BasicBuff):
         FightersStateManager().addStateOnTarget(self.targetId, self.stateId, self.delta)
 
     def removeBuffState(self) -> None:
-        statePreviouslyActivated: bool = FightersStateManager().hasState(
-            self.targetId, self.stateId
-        )
-        FightersStateManager().removeStateOnTarget(
-            self.targetId, self.stateId, self.delta
-        )
-        stateActivated: bool = FightersStateManager().hasState(
-            self.targetId, self.stateId
-        )
+        statePreviouslyActivated: bool = FightersStateManager().hasState(self.targetId, self.stateId)
+        FightersStateManager().removeStateOnTarget(self.targetId, self.stateId, self.delta)
+        stateActivated: bool = FightersStateManager().hasState(self.targetId, self.stateId)
         chatLog: bool = False
         fbf: "FightBattleFrame" = Kernel().getWorker().getFrame("FightBattleFrame")
-        if (
-            fbf
-            and not fbf.executingSequence
-            and fbf.deadFightersList.find(self.targetId) == -1
-            and not self.isSilent
-        ):
+        if fbf and not fbf.executingSequence and fbf.deadFightersList.find(self.targetId) == -1 and not self.isSilent:
             chatLog = True
         if not stateActivated:
             self.removeStateIcon()

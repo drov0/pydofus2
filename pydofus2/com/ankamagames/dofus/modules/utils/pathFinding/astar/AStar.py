@@ -14,7 +14,7 @@ from com.ankamagames.jerakine.utils.display.EnterFrameDispatcher import (
     EnterFrameDispatcher,
 )
 
-logger = Logger(__name__)
+logger = Logger("pyd2bot")
 
 
 class AStar:
@@ -48,9 +48,7 @@ class AStar:
         super().__init__()
 
     @classmethod
-    def search(
-        cls, worldGraph: WorldGraph, src: Vertex, dst: Vertex, callback: FunctionType
-    ) -> None:
+    def search(cls, worldGraph: WorldGraph, src: Vertex, dst: Vertex, callback: FunctionType) -> None:
         logger.info(f"Searching path from {src} to {dst} ...")
         if cls.callback != None:
             raise Exception("Pathfinding already in progress")
@@ -67,15 +65,11 @@ class AStar:
         cls.openDic = dict()
         cls.iterations = 0
         cls.openList.append(Node(src, MapPosition.getMapPositionById(src.mapId)))
-        EnterFrameDispatcher().addEventListener(
-            cls.compute, EnterFrameConst.COMPUTE_ASTAR
-        )
+        EnterFrameDispatcher().addEventListener(cls.compute, EnterFrameConst.COMPUTE_ASTAR)
 
     @classmethod
     def initForbiddenSubareaList(cls) -> None:
-        cls._forbiddenSubareaIds = GameDataQuery.queryEquals(
-            SubArea, "mountAutoTripAllowed", False
-        )
+        cls._forbiddenSubareaIds = GameDataQuery.queryEquals(SubArea, "mountAutoTripAllowed", False)
 
     @classmethod
     def stopSearch(cls) -> None:
@@ -95,9 +89,7 @@ class AStar:
             current = cls.openList.pop(0)
             cls.openDic[current.vertex] = None
             if current.vertex == cls.dst:
-                logger.info(
-                    "Goal reached within " + str(cls.iterations) + " iterations"
-                )
+                logger.info("Goal reached within " + str(cls.iterations) + " iterations")
                 cls.callbackWithResult(cls.buildResultPath(cls.worldGraph, current))
                 return
             edges = cls.worldGraph.getOutgoingEdgesFromVertex(current.vertex)
@@ -112,26 +104,16 @@ class AStar:
                             if not (existing != None and cost >= existing.cost):
                                 map = MapPosition.getMapPositionById(edge.dst.mapId)
                                 if map == None:
-                                    logger.info(
-                                        "La map "
-                                        + edge.dst.mapId
-                                        + " ne semble pas exister"
-                                    )
+                                    logger.info("La map " + edge.dst.mapId + " ne semble pas exister")
                                 else:
-                                    manhattanDistance = abs(
-                                        map.posX - cls.dest.posX
-                                    ) + abs(map.posY - cls.dest.posY)
+                                    manhattanDistance = abs(map.posX - cls.dest.posX) + abs(map.posY - cls.dest.posY)
                                     node = Node(
                                         edge.dst,
                                         map,
                                         cost,
                                         cost
                                         + cls.HEURISTIC_SCALE * manhattanDistance
-                                        + (
-                                            cls.INDOOR_WEIGHT
-                                            if current.map.outdoor and not map.outdoor
-                                            else 0
-                                        ),
+                                        + (cls.INDOOR_WEIGHT if current.map.outdoor and not map.outdoor else 0),
                                         current,
                                     )
                                     cls.openList.append(node)
@@ -192,11 +174,7 @@ class AStar:
 
     @classmethod
     def orderNodes(cls, a: Node, b: Node) -> int:
-        return (
-            0
-            if a.heuristic == b.heuristic
-            else (1 if a.heuristic > b.heuristic else -1)
-        )
+        return 0 if a.heuristic == b.heuristic else (1 if a.heuristic > b.heuristic else -1)
 
     @classmethod
     def buildResultPath(cls, worldGraph: WorldGraph, node: Node) -> list[Edge]:

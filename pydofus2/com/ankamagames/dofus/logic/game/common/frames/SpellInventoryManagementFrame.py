@@ -66,7 +66,7 @@ from com.ankamagames.jerakine.messages.Message import Message
 from com.ankamagames.jerakine.types.enums.Priority import Priority
 from functools import cmp_to_key
 
-logger = Logger(__name__)
+logger = Logger("pyd2bot")
 
 
 class SpellInventoryManagementFrame(Frame, metaclass=Singleton):

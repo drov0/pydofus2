@@ -29,7 +29,7 @@ from com.ankamagames.jerakine.utils.display.EnterFrameDispatcher import (
     EnterFrameDispatcher,
 )
 
-logger = Logger(__name__)
+logger = Logger("pyd2bot")
 
 
 class FightEventsHelper(metaclass=Singleton):
@@ -88,10 +88,7 @@ class FightEventsHelper(metaclass=Singleton):
                 self._fightEvents.insert(0, fightEvent)
             if self._joinedEvents and len(self._joinedEvents) > 0:
                 if self._joinedEvents[0].name == FightEventEnum.FIGHTER_GOT_TACKLED:
-                    if (
-                        name == FightEventEnum.FIGHTER_MP_LOST
-                        or name == FightEventEnum.FIGHTER_AP_LOST
-                    ):
+                    if name == FightEventEnum.FIGHTER_MP_LOST or name == FightEventEnum.FIGHTER_AP_LOST:
                         self._joinedEvents[0] = fightEvent
                         return
                     if name != FightEventEnum.FIGHTER_VISIBILITY_CHANGED:
@@ -138,16 +135,13 @@ class FightEventsHelper(metaclass=Singleton):
                 eventList = self._events[i]
                 event = eventList[0]
                 if event.name == fightEvent.name and (
-                    event.castingSpellId == fightEvent.castingSpellId
-                    or fightEvent.castingSpellId == -1
+                    event.castingSpellId == fightEvent.castingSpellId or fightEvent.castingSpellId == -1
                 ):
                     if (
                         event.name == FightEventEnum.FIGHTER_LIFE_LOSS
                         or fightEvent.name == FightEventEnum.FIGHTER_LIFE_GAIN
                         or fightEvent.name == FightEventEnum.FIGHTER_SHIELD_LOSS
-                    ) and event.params[len(event.params) - 1] != fightEvent.params[
-                        len(fightEvent.params) - 1
-                    ]:
+                    ) and event.params[len(event.params) - 1] != fightEvent.params[len(fightEvent.params) - 1]:
                         break
                     targetEvent = eventList
                     break
@@ -160,17 +154,13 @@ class FightEventsHelper(metaclass=Singleton):
         if now:
             self.sendEvents(None)
         else:
-            EnterFrameDispatcher().addEventListener(
-                self.sendEvents, EnterFrameConst.SEND_FIGHT_EVENTS_HELPER
-            )
+            EnterFrameDispatcher().addEventListener(self.sendEvents, EnterFrameConst.SEND_FIGHT_EVENTS_HELPER)
 
     def sendEvents(self, pEvt: Event = None) -> None:
         EnterFrameDispatcher().removeEventListener(self.sendEvents)
         self.sendFightEvent(None, None, 0, -1)
         self.sendAllFightEvents()
-        entitiesFrame: "FightEntitiesFrame" = (
-            Kernel().getWorker().getFrame("FightEntitiesFrame")
-        )
+        entitiesFrame: "FightEntitiesFrame" = Kernel().getWorker().getFrame("FightEntitiesFrame")
         entitiesList: dict = entitiesFrame.entities if entitiesFrame else dict()
         self.groupAllEventsForDisplay(entitiesList)
 
@@ -228,10 +218,7 @@ class FightEventsHelper(metaclass=Singleton):
                     else:
                         ecopy = eventList.copy()
                         for eventBase in ecopy:
-                            if (
-                                eventBase.name == FightEventEnum.FIGHTER_DEATH
-                                and deadTargets[eventBase.targetId]
-                            ):
+                            if eventBase.name == FightEventEnum.FIGHTER_DEATH and deadTargets[eventBase.targetId]:
                                 eventList.remove(eventBase)
                         self.groupByTeam(
                             playerTeamId,
@@ -286,10 +273,7 @@ class FightEventsHelper(metaclass=Singleton):
         events: list[list[FightEvent]] = self._events.copy()
         for eventList in events:
             for fightEvent in eventList:
-                if (
-                    fightEvent.name == FightEventEnum.FIGHTER_LIFE_LOSS
-                    and not deadTargets.get(fightEvent.targetId)
-                ):
+                if fightEvent.name == FightEventEnum.FIGHTER_LIFE_LOSS and not deadTargets.get(fightEvent.targetId):
                     lastDamageMap[fightEvent.targetId] = fightEvent.id
                 elif fightEvent.name == FightEventEnum.FIGHTER_DEATH:
                     deadTargets[fightEvent.targetId] = True
@@ -310,9 +294,7 @@ class FightEventsHelper(metaclass=Singleton):
                     isSameElement = False
                 previousElement = fe.params[2]
                 ttpts += fe.params[1]
-        fightEventName = (
-            "fightLifeLossAndDeath" if pAddDeathInTheSameMsg else pvgroup[0].name
-        )
+        fightEventName = "fightLifeLossAndDeath" if pAddDeathInTheSameMsg else pvgroup[0].name
         newparams: list = list()
         newparams[0] = pvgroup[0].params[0]
         if activeDetails and len(pvgroup) > 1:
@@ -360,14 +342,10 @@ class FightEventsHelper(metaclass=Singleton):
                     buffStackCount = 1
                     tmpparam1 = int(evt.buff.rawParam1)
                     for event in listToConcat:
-                        if (
-                            event.targetId == evt.targetId
-                            and event.buff.id is not evt.buff.id
-                        ):
+                        if event.targetId == evt.targetId and event.buff.id is not evt.buff.id:
                             if (
                                 evt.buff.castingSpell.spellRank.maxStack
-                                and buffStackCount
-                                >= evt.buff.castingSpell.spellRank.maxStack
+                                and buffStackCount >= evt.buff.castingSpell.spellRank.maxStack
                             ):
                                 break
                             buffStackCount += 1
@@ -382,10 +360,7 @@ class FightEventsHelper(metaclass=Singleton):
             )
             if team in ["all", "allies", "enemies"]:
                 self.removeEventFromEventsList(pEventList, listToConcat)
-                if (
-                    evt.name == "fighterLifeLoss"
-                    and deadTargets[listToConcat[0].targetId]
-                ):
+                if evt.name == "fighterLifeLoss" and deadTargets[listToConcat[0].targetId]:
                     pass
             elif team == "other":
                 self.removeEventFromEventsList(pEventList, listToConcat)
@@ -405,10 +380,7 @@ class FightEventsHelper(metaclass=Singleton):
                     ):
                         list.remove(t.contextualId)
                 self.removeEventFromEventsList(pEventList, listToConcat)
-                if (
-                    evt.name == "fighterLifeLoss"
-                    and deadTargets[listToConcat[0].targetId]
-                ):
+                if evt.name == "fighterLifeLoss" and deadTargets[listToConcat[0].targetId]:
                     pass
                 else:
                     pass
@@ -426,9 +398,7 @@ class FightEventsHelper(metaclass=Singleton):
         self.removeEventFromEventsList(pInEventList, listToConcat)
         return listToConcat
 
-    def removeEventFromEventsList(
-        self, pEventList: list[FightEvent], pListToRemove: list[FightEvent]
-    ) -> None:
+    def removeEventFromEventsList(self, pEventList: list[FightEvent], pListToRemove: list[FightEvent]) -> None:
         event: FightEvent = None
         for event in pListToRemove:
             pEventList.remove(event)
@@ -480,9 +450,7 @@ class FightEventsHelper(metaclass=Singleton):
             numParam = baseEvent.checkParams
         return numParam
 
-    def needToGroupFightEventsData(
-        self, pNbParams: int, pFightEvent: FightEvent, pBaseEvent: FightEvent
-    ) -> bool:
+    def needToGroupFightEventsData(self, pNbParams: int, pFightEvent: FightEvent, pBaseEvent: FightEvent) -> bool:
         if (
             pFightEvent.castingSpellId != pBaseEvent.castingSpellId
             or GameDebugManager().detailedFightLog_unGroupEffects

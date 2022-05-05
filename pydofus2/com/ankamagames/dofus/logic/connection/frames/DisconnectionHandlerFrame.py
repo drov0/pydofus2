@@ -25,7 +25,7 @@ from com.ankamagames.jerakine.network.messages.UnexpectedSocketClosureMessage im
 from com.ankamagames.jerakine.types.enums.Priority import Priority
 import com.ankamagames.dofus.logic.game.approach.frames.GameServerApproachFrame as gsaF
 
-logger = Logger(__name__)
+logger = Logger("pyd2bot")
 
 
 class DisconnectionHandlerFrame(Frame):
@@ -52,9 +52,7 @@ class DisconnectionHandlerFrame(Frame):
 
     def resetConnectionAttempts(self) -> None:
         self._connectionUnexpectedFailureTimes = list()
-        StoreDataManager().setData(
-            Constants.DATASTORE_MODULE_DEBUG, "connection_fail_times", None
-        )
+        StoreDataManager().setData(Constants.DATASTORE_MODULE_DEBUG, "connection_fail_times", None)
         self._numberOfAttemptsAlreadyDone = 0
 
     def pushed(self) -> bool:
@@ -74,17 +72,13 @@ class DisconnectionHandlerFrame(Frame):
             ):
                 return False
 
-            if (
-                sccmsg.closedConnection
-                == connh.ConnectionsHandler.getConnection().getSubConnection(sccmsg)
-            ):
+            if sccmsg.closedConnection == connh.ConnectionsHandler.getConnection().getSubConnection(sccmsg):
                 logger.debug("The connection was closed. Checking reasons.")
                 gsaF.GameServerApproachFrame.authenticationTicketAccepted = False
                 if connh.ConnectionsHandler.hasReceivedMsg:
                     if (
                         not connh.ConnectionsHandler.hasReceivedNetworkMsg
-                        and self._numberOfAttemptsAlreadyDone
-                        < self.CONNECTION_ATTEMPTS_NUMBER
+                        and self._numberOfAttemptsAlreadyDone < self.CONNECTION_ATTEMPTS_NUMBER
                     ):
                         self._numberOfAttemptsAlreadyDone += 1
                         logger.warn(
@@ -99,41 +93,28 @@ class DisconnectionHandlerFrame(Frame):
                     else:
                         reason = connh.ConnectionsHandler.handleDisconnection()
                         if not reason.expected:
-                            logger.warn(
-                                "The connection was closed unexpectedly. Reseting."
-                            )
-                            if (
-                                self._numberOfAttemptsAlreadyDone
-                                == self.CONNECTION_ATTEMPTS_NUMBER
-                            ):
-                                self._connectionUnexpectedFailureTimes.append(
-                                    perf_counter()
-                                )
+                            logger.warn("The connection was closed unexpectedly. Reseting.")
+                            if self._numberOfAttemptsAlreadyDone == self.CONNECTION_ATTEMPTS_NUMBER:
+                                self._connectionUnexpectedFailureTimes.append(perf_counter())
                                 StoreDataManager().setData(
                                     Constants.DATASTORE_MODULE_DEBUG,
                                     "connection_fail_times",
                                     self._connectionUnexpectedFailureTimes,
                                 )
                             if len(self.messagesAfterReset) == 0:
-                                self.messagesAfterReset = [
-                                    UnexpectedSocketClosureMessage()
-                                ] + self.messagesAfterReset
+                                self.messagesAfterReset = [UnexpectedSocketClosureMessage()] + self.messagesAfterReset
                             krnl.Kernel().reset()
                         else:
                             logger.debug(
                                 f"The connection closure was expected (reason: {reason.reason}). Dispatching the message."
                             )
                             if (
-                                reason.reason
-                                == DisconnectionReasonEnum.DISCONNECTED_BY_POPUP
-                                or reason.reason
-                                == DisconnectionReasonEnum.SWITCHING_TO_HUMAN_VENDOR
+                                reason.reason == DisconnectionReasonEnum.DISCONNECTED_BY_POPUP
+                                or reason.reason == DisconnectionReasonEnum.SWITCHING_TO_HUMAN_VENDOR
                             ):
                                 krnl.Kernel().reset()
                             else:
-                                krnl.Kernel().getWorker().process(
-                                    ExpectedSocketClosureMessage(reason.reason)
-                                )
+                                krnl.Kernel().getWorker().process(ExpectedSocketClosureMessage(reason.reason))
                 else:
                     logger.warn("The connection hasn't even start.")
             return True

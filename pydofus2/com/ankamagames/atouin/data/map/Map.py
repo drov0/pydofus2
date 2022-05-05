@@ -10,7 +10,7 @@ from com.ankamagames.jerakine.logger.Logger import Logger
 from com.ankamagames.jerakine.types.enums.DirectionsEnum import DirectionsEnum
 from com.ankamagames.jerakine.types.positions.MapPoint import MapPoint
 
-logger = Logger(__name__)
+logger = Logger("pyd2bot")
 
 
 class Map:
@@ -50,10 +50,7 @@ class Map:
             grid_green = (read_color & 65280) >> 8
             grid_blue = read_color & 255
             self.gridColor = (
-                (grid_alpha & 255) << 32
-                | (grid_red & 255) << 16
-                | (grid_green & 255) << 8
-                | grid_blue & 255
+                (grid_alpha & 255) << 32 | (grid_red & 255) << 16 | (grid_green & 255) << 8 | grid_blue & 255
             )
 
         elif self.version >= 3:
@@ -114,9 +111,7 @@ class Map:
         self._parser = True
 
     def getOutgoingCells(self, direction: DirectionsEnum):
-        return set(
-            [i for i in self.OUTCELLS[direction] if self.cells[i].allowsMapChange()]
-        )
+        return set([i for i in self.OUTCELLS[direction] if self.cells[i].allowsMapChange()])
 
     def cellOutTowards(self, currCellId, direction: DirectionsEnum):
         currZone = self.zones.getZone(currCellId)
@@ -133,9 +128,7 @@ class Map:
                     outCellId = cellid
         return outCellId
 
-    def getNeighbourCellFromDirection(
-        cls, srcId: int, direction: DirectionsEnum
-    ) -> "Cell":
+    def getNeighbourCellFromDirection(cls, srcId: int, direction: DirectionsEnum) -> "Cell":
         if (srcId // AtouinConstants.MAP_WIDTH) % 2 == 0:
             offsetId = 0
 
@@ -150,10 +143,7 @@ class Map:
 
         elif direction == DirectionsEnum.DOWN_RIGHT:
             destId = srcId + AtouinConstants.MAP_WIDTH + offsetId
-            if (
-                destId < AtouinConstants.MAP_CELLS_COUNT
-                and (srcId + 1) % (AtouinConstants.MAP_WIDTH * 2) != 0
-            ):
+            if destId < AtouinConstants.MAP_CELLS_COUNT and (srcId + 1) % (AtouinConstants.MAP_WIDTH * 2) != 0:
                 return cls.cells[destId]
             return None
 
@@ -165,10 +155,7 @@ class Map:
 
         elif direction == DirectionsEnum.DOWN_LEFT:
             destId = srcId + AtouinConstants.MAP_WIDTH - 1 + offsetId
-            if (
-                destId < AtouinConstants.MAP_CELLS_COUNT
-                and srcId % (AtouinConstants.MAP_WIDTH * 2) != 0
-            ):
+            if destId < AtouinConstants.MAP_CELLS_COUNT and srcId % (AtouinConstants.MAP_WIDTH * 2) != 0:
                 return cls.cells[destId]
             return None
 
@@ -204,9 +191,7 @@ class Map:
         for i in DirectionsEnum:
             cell = self.getNeighbourCellFromDirection(cellId, i)
             if cell and cell.isAccessibleDuringRP():
-                canMovTo = DataMapProvider().pointMov(
-                    currMp._nX, currMp._nY, allowThrought, cell.id, dataMap=self
-                )
+                canMovTo = DataMapProvider().pointMov(currMp._nX, currMp._nY, allowThrought, cell.id, dataMap=self)
                 if canMovTo:
                     neighbours.add(cell)
         return neighbours
@@ -237,13 +222,7 @@ class Map:
         for j in range(2 * AtouinConstants.MAP_HEIGHT):
             row = []
             for i in range(AtouinConstants.MAP_WIDTH):
-                row.append(
-                    " "
-                    if self.cells[
-                        i + j * AtouinConstants.MAP_WIDTH
-                    ].isAccessibleDuringRP()
-                    else "X"
-                )
+                row.append(" " if self.cells[i + j * AtouinConstants.MAP_WIDTH].isAccessibleDuringRP() else "X")
             print(format_row.format(" ", *row, " "))
         print(format_row.format(*[" "] * (AtouinConstants.MAP_WIDTH + 2)))
 
@@ -272,9 +251,7 @@ class Map:
         if direction == DirectionsEnum.RIGHT or direction == DirectionsEnum.LEFT:
             maxI = AtouinConstants.MAP_HEIGHT * 2
             for i in range(maxI):
-                currentCellId = MapPoint.fromCoords(
-                    currentlyCheckedCellX, currentlyCheckedCellY
-                ).cellId
+                currentCellId = MapPoint.fromCoords(currentlyCheckedCellX, currentlyCheckedCellY).cellId
                 cellData = self.cells[currentCellId]
                 mapChangeData = cellData.mapChangeData
                 if mapChangeData and (
@@ -303,9 +280,7 @@ class Map:
 
         elif direction == DirectionsEnum.DOWN or direction == DirectionsEnum.UP:
             for i in range(AtouinConstants.MAP_WIDTH * 2):
-                currentCellId = MapPoint.fromCoords(
-                    currentlyCheckedCellX, currentlyCheckedCellY
-                ).cellId
+                currentCellId = MapPoint.fromCoords(currentlyCheckedCellX, currentlyCheckedCellY).cellId
                 cellData = self.cells[currentCellId]
                 mapChangeData = cellData.mapChangeData
                 if mapChangeData and (
@@ -319,12 +294,10 @@ class Map:
                     )
                     or direction == DirectionsEnum.DOWN
                     and (
-                        currentCellId
-                        >= AtouinConstants.MAP_CELLS_COUNT - AtouinConstants.MAP_WIDTH
+                        currentCellId >= AtouinConstants.MAP_CELLS_COUNT - AtouinConstants.MAP_WIDTH
                         and mapChangeData & 2
                         or mapChangeData & 4
-                        or currentCellId
-                        >= AtouinConstants.MAP_CELLS_COUNT - AtouinConstants.MAP_WIDTH
+                        or currentCellId >= AtouinConstants.MAP_CELLS_COUNT - AtouinConstants.MAP_WIDTH
                         and mapChangeData & 8
                     )
                 ):

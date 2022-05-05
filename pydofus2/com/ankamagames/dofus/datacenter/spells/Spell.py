@@ -11,7 +11,7 @@ from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
     from com.ankamagames.dofus.datacenter.spells.SpellLevel import SpellLevel
-logger = Logger(__name__)
+logger = Logger("pyd2bot")
 
 
 class Spell(IDataCenter):
@@ -133,11 +133,7 @@ class Spell(IDataCenter):
         tmp: list = None
         tmp2: list = None
         param: str = None
-        if (
-            critical
-            and self.scriptParamsCritical
-            and self.scriptParamsCritical != "None"
-        ):
+        if critical and self.scriptParamsCritical and self.scriptParamsCritical != "None":
             if not self._indexedCriticalParam or not self.useParamCache:
                 self._indexedCriticalParam = list()
                 if self.scriptParamsCritical:

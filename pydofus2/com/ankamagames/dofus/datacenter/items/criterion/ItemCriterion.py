@@ -13,7 +13,7 @@ from com.ankamagames.dofus.logic.common.managers.StatsManager import StatsManage
 from com.ankamagames.jerakine.data import I18n
 from damageCalculation.tools import StatIds
 
-logger = Logger(__name__)
+logger = Logger("pyd2bot")
 
 
 class ItemCriterion(IItemCriterion):
@@ -141,13 +141,7 @@ class ItemCriterion(IItemCriterion):
             ]
             index = knownCriteriaList.index(self._criterionRef)
 
-        return (
-            readableCriterionRef
-            + " "
-            + self._operator.text
-            + " "
-            + self._criterionValue
-        )
+        return readableCriterionRef + " " + self._operator.text + " " + self._criterionValue
 
     def getInfos(self) -> None:
         operator: str = None

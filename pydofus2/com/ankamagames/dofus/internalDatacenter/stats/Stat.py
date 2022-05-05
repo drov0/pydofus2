@@ -4,7 +4,7 @@ from com.ankamagames.dofus.datacenter.characteristics.Characteristic import (
 from com.ankamagames.jerakine.logger.Logger import Logger
 from damageCalculation.tools import StatIds
 
-logger = Logger(__name__)
+logger = Logger("pyd2bot")
 
 
 class Stat:

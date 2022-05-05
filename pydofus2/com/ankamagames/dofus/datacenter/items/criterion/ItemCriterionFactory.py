@@ -13,7 +13,7 @@ from com.ankamagames.dofus.datacenter.items.criterion.UnusableItemCriterion impo
     UnusableItemCriterion,
 )
 
-logger = Logger(__name__)
+logger = Logger("pyd2bot")
 
 
 class ItemCriterionFactory:
@@ -265,8 +265,6 @@ class ItemCriterionFactory:
             criterion = CommunityItemCriterion(pServerCriterionForm)
 
         else:
-            logger.warn(
-                "Criterion '" + s + "' unknow or unused (" + pServerCriterionForm + ")"
-            )
+            logger.warn("Criterion '" + s + "' unknow or unused (" + pServerCriterionForm + ")")
 
         return criterion

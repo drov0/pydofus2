@@ -26,7 +26,7 @@ from com.ankamagames.jerakine.logger.Logger import Logger
 
 class FightTeam(GameContextActorInformations):
 
-    logger = Logger(__name__)
+    logger = Logger("pyd2bot")
 
     fight: "Fight"
 
@@ -52,26 +52,16 @@ class FightTeam(GameContextActorInformations):
         self.teamEntity = teamEntity
         self.teamInfos = teamInfos
         self.teamOptions = [False] * 4
-        self.teamOptions[
-            FightOptionsEnum.FIGHT_OPTION_ASK_FOR_HELP.value
-        ] = teamOptions.isAskingForHelp
-        self.teamOptions[
-            FightOptionsEnum.FIGHT_OPTION_SET_CLOSED.value
-        ] = teamOptions.isClosed
-        self.teamOptions[
-            FightOptionsEnum.FIGHT_OPTION_SET_SECRET.value
-        ] = teamOptions.isSecret
-        self.teamOptions[
-            FightOptionsEnum.FIGHT_OPTION_SET_TO_PARTY_ONLY.value
-        ] = teamOptions.isRestrictedToPartyOnly
+        self.teamOptions[FightOptionsEnum.FIGHT_OPTION_ASK_FOR_HELP.value] = teamOptions.isAskingForHelp
+        self.teamOptions[FightOptionsEnum.FIGHT_OPTION_SET_CLOSED.value] = teamOptions.isClosed
+        self.teamOptions[FightOptionsEnum.FIGHT_OPTION_SET_SECRET.value] = teamOptions.isSecret
+        self.teamOptions[FightOptionsEnum.FIGHT_OPTION_SET_TO_PARTY_ONLY.value] = teamOptions.isRestrictedToPartyOnly
 
     def hasGroupMember(self) -> bool:
         partyMember: PartyMemberWrapper = None
         fightTeamMember: FightTeamMemberInformations = None
         teamHasGroupMember: bool = False
-        pmf: PartyManagementFrame = (
-            Kernel().getWorker().getFrame("PartyManagementFrame")
-        )
+        pmf: PartyManagementFrame = Kernel().getWorker().getFrame("PartyManagementFrame")
         partyMemberNames: list[str] = list[str]()
         for partyMember in pmf.partyMembers:
             partyMemberNames.append(partyMember.name)
@@ -79,8 +69,7 @@ class FightTeam(GameContextActorInformations):
             if (
                 fightTeamMember
                 and isinstance(fightTeamMember, FightTeamMemberCharacterInformations)
-                and FightTeamMemberCharacterInformations(fightTeamMember).name
-                in partyMemberNames
+                and FightTeamMemberCharacterInformations(fightTeamMember).name in partyMemberNames
             ):
                 teamHasGroupMember = True
         return teamHasGroupMember

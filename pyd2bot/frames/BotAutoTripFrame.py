@@ -19,7 +19,7 @@ from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from pyd2bot.frames.BotFarmPathFrame import BotFarmPathFrame
 
-logger = Logger(__name__)
+logger = Logger("pyd2bot")
 
 
 class BotAutoTripFrame(Frame):

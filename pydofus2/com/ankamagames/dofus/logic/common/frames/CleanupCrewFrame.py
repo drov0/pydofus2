@@ -48,7 +48,7 @@ from com.ankamagames.jerakine.network.messages.ServerConnectionFailedMessage imp
 )
 from com.ankamagames.jerakine.types.enums.Priority import Priority
 
-logger = Logger(__name__)
+logger = Logger("pyd2bot")
 
 
 class CleanupCrewFrame(Frame):

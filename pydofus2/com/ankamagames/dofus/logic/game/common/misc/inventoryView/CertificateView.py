@@ -2,7 +2,7 @@ from com.ankamagames.dofus.internalDatacenter.items.ItemWrapper import ItemWrapp
 from com.ankamagames.dofus.logic.game.common.misc.IInventoryView import IInventoryView
 from com.ankamagames.jerakine.logger.Logger import Logger
 
-logger = Logger(__name__)
+logger = Logger("pyd2bot")
 
 
 class CertificateView(IInventoryView):

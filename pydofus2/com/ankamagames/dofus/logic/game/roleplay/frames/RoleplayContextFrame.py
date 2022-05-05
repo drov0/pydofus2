@@ -31,7 +31,7 @@ from com.ankamagames.jerakine.messages.Frame import Frame
 from com.ankamagames.jerakine.messages.Message import Message
 from com.ankamagames.jerakine.types.enums.Priority import Priority
 
-logger = Logger(__name__)
+logger = Logger("pyd2bot")
 
 
 class RoleplayContextFrame(Frame):
@@ -127,7 +127,7 @@ class RoleplayContextFrame(Frame):
                 Kernel().getWorker().addFrame(self._movementFrame)
             if not Kernel().getWorker().contains("RoleplayWorldFrame"):
                 Kernel().getWorker().addFrame(self._worldFrame)
-            Kernel().getWorker().logFrameCache()
+            # Kernel().getWorker().logFrameCache()
             # SurveyManager.getInstance().checkSurveys()
             if self._listMapNpcsMsg:
                 Kernel().getWorker().process(self._listMapNpcsMsg)

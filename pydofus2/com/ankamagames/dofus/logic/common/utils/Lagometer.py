@@ -4,7 +4,7 @@ from com.ankamagames.jerakine.logger.Logger import Logger
 from com.ankamagames.jerakine.network.ILagometer import ILagometer
 from com.ankamagames.jerakine.network.INetworkMessage import INetworkMessage
 
-logger = Logger(__name__)
+logger = Logger("pyd2bot")
 
 
 class Lagometer(ILagometer):

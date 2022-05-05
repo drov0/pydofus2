@@ -8,7 +8,7 @@ import mapTools.MapTools as MapTools
 
 class Line(IZone):
 
-    logger = Logger(__name__)
+    logger = Logger("pyd2bot")
 
     _radius: int = 0
 
@@ -86,17 +86,11 @@ class Line(IZone):
         distance: int = 0
         aCells: list[int] = list[int]()
         origin: MapPoint = (
-            MapPoint.fromCellId(cellId)
-            if not self._fromCaster
-            else MapPoint.fromCellId(self.casterCellId)
+            MapPoint.fromCellId(cellId) if not self._fromCaster else MapPoint.fromCellId(self.casterCellId)
         )
         x: int = origin.x
         y: int = origin.y
-        length: int = (
-            int(self._radius)
-            if not self.fromCaster
-            else int(self._radius + self._minRadius - 1)
-        )
+        length: int = int(self._radius) if not self.fromCaster else int(self._radius + self._minRadius - 1)
         if self.fromCaster and self.stopAtTarget:
             distance = origin.distanceToCell(MapPoint.fromCellId(cellId))
             length = int(distance) if distance < length else int(length)

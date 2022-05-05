@@ -414,7 +414,7 @@ from com.ankamagames.jerakine.types.enums.Priority import Priority
 from com.ankamagames.jerakine.types.positions.MapPoint import MapPoint, Point
 from com.ankamagames.jerakine.types.positions.MovementPath import MovementPath
 
-logger = Logger(__name__)
+logger = Logger("pyd2bot")
 
 
 class FightSequenceFrame(Frame, ISpellCastProvider):
@@ -549,6 +549,7 @@ class FightSequenceFrame(Frame, ISpellCastProvider):
             forceDetailedLogs = GameDebugManager().detailedFightLog_showEverything
             if not self._castingSpells:
                 self._castingSpells = list[CastingSpell]()
+
             if isinstance(msg, GameActionFightSpellCastMessage):
                 gafscmsg = msg
                 if forceDetailedLogs:
@@ -838,19 +839,16 @@ class FightSequenceFrame(Frame, ISpellCastProvider):
 
         if isinstance(msg, GameActionFightTeleportOnSameMapMessage):
             gaftosmmsg = msg
-            self.keepInMindToUpdateMovementArea()
             self.fighterHasBeenTeleported(gaftosmmsg)
             return True
 
         if isinstance(msg, GameActionFightExchangePositionsMessage):
             gafepmsg = msg
-            self.keepInMindToUpdateMovementArea()
             self.fightersExchangedPositions(gafepmsg)
             return True
 
         if isinstance(msg, GameActionFightSlideMessage):
             gafsmsg = msg
-            self.keepInMindToUpdateMovementArea()
             fightContextFrame_gafsmsg: "FightContextFrame" = Kernel().getWorker().getFrame("FightContextFrame")
             slideTargetInfos = fightContextFrame_gafsmsg.entitiesFrame.getEntityInfos(gafsmsg.targetId)
             if slideTargetInfos:
@@ -860,13 +858,11 @@ class FightSequenceFrame(Frame, ISpellCastProvider):
 
         if isinstance(msg, GameActionFightSummonMessage):
             gafsnmsg = msg
-            self.keepInMindToUpdateMovementArea()
             self.fighterSummonEntity(gafsnmsg)
             return True
 
         if isinstance(msg, GameActionFightMultipleSummonMessage):
             gafmsmsg = msg
-            self.keepInMindToUpdateMovementArea()
             gffinfos = GameFightFighterInformations()
             self.pushStep(
                 FightUpdateStatStep(
@@ -929,19 +925,16 @@ class FightSequenceFrame(Frame, ISpellCastProvider):
 
         if isinstance(msg, GameActionFightLeaveMessage):
             gaflmsg = msg
-            self.keepInMindToUpdateMovementArea()
             self.fighterHasLeftBattle(gaflmsg)
             return True
 
         if isinstance(msg, GameActionFightDeathMessage):
             gafdmsg = msg
-            self.keepInMindToUpdateMovementArea()
             self.fighterHasBeenKilled(gafdmsg)
             return True
 
         if isinstance(msg, GameActionFightVanishMessage):
             gafvmsg = msg
-            self.keepInMindToUpdateMovementArea()
             self.pushStep(FightVanishStep(gafvmsg.targetId, gafvmsg.sourceId))
             entityInfosv = FightEntitiesFrame.getCurrentInstance().getEntityInfos(gafvmsg.targetId)
             if isinstance(entityInfosv, GameFightFighterInformations):
@@ -1052,7 +1045,6 @@ class FightSequenceFrame(Frame, ISpellCastProvider):
 
         if isinstance(msg, GameActionFightDispellableEffectMessage):
             gaftbmsg = msg
-            self.keepInMindToUpdateMovementArea()
             self.fighterHasBeenBuffed(gaftbmsg)
             return True
 
@@ -1063,7 +1055,6 @@ class FightSequenceFrame(Frame, ISpellCastProvider):
 
         if isinstance(msg, GameActionFightCarryCharacterMessage):
             gafcchmsg = msg
-            self.keepInMindToUpdateMovementArea()
             if gafcchmsg.cellId != -1:
                 fightContextFrame_gafcchmsg: "FightContextFrame" = Kernel().getWorker().getFrame("FightContextFrame")
                 fightContextFrame_gafcchmsg.saveFighterPosition(gafcchmsg.targetId, gafcchmsg.cellId)
@@ -1077,7 +1068,6 @@ class FightSequenceFrame(Frame, ISpellCastProvider):
 
         if isinstance(msg, GameActionFightThrowCharacterMessage):
             gaftcmsg = msg
-            self.keepInMindToUpdateMovementArea()
             throwCellId = (
                 int(self._castingSpell.targetedCell.cellId)
                 if self._castingSpell and self._castingSpell.targetedCell
@@ -1090,7 +1080,6 @@ class FightSequenceFrame(Frame, ISpellCastProvider):
 
         if isinstance(msg, GameActionFightDropCharacterMessage):
             gafdcmsg = msg
-            self.keepInMindToUpdateMovementArea()
             dropCellId = gafdcmsg.cellId
             if dropCellId == -1 and self._castingSpell:
                 dropCellId = self._castingSpell.targetedCell.cellId
@@ -1110,7 +1099,6 @@ class FightSequenceFrame(Frame, ISpellCastProvider):
             return True
 
         if isinstance(msg, GameFightSynchronizeMessage):
-            self.keepInMindToUpdateMovementArea()
             return False
 
         if isinstance(msg, AbstractGameActionMessage):
@@ -1646,7 +1634,7 @@ class FightSequenceFrame(Frame, ISpellCastProvider):
                 # logger.debug(f"\r[SEQ DEBUG] Sequence #{self._instanceId} calling callback {callback.__name__}")
                 callback()
             # else:
-            # logger.error(f"\r[SEQ DEBUG] Sequence #{self._instanceId} has no callback!!!!!!!!!!!!!!!!!!!!!!!")
+            # logger.error(f"\r[SEQ DEBUG] Sequence #{self._instanceId} has no callback")
             # logger.debug(f"\r[SEQ DEBUG] will call parent sequence init done")
             self._parent.subSequenceInitDone()
 

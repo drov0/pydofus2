@@ -2,7 +2,7 @@ from com.ankamagames.dofus.internalDatacenter.items.ItemWrapper import ItemWrapp
 from com.ankamagames.dofus.logic.game.common.misc.IInventoryView import IInventoryView
 from com.ankamagames.jerakine.logger.Logger import Logger
 
-logger = Logger(__name__)
+logger = Logger("pyd2bot")
 
 
 class ListView(IInventoryView):
@@ -26,9 +26,7 @@ class ListView(IInventoryView):
     def content(self) -> list[ItemWrapper]:
         return self._view
 
-    def addItem(
-        self, item: ItemWrapper, invisible: int, needUpdateView: bool = True
-    ) -> None:
+    def addItem(self, item: ItemWrapper, invisible: int, needUpdateView: bool = True) -> None:
         self._view.append(item)
 
     def removeItem(self, item: ItemWrapper, invisible: int) -> None:
@@ -41,9 +39,7 @@ class ListView(IInventoryView):
             )
         self._view.remove(item)
 
-    def modifyItem(
-        self, item: ItemWrapper, oldItem: ItemWrapper, invisible: int
-    ) -> None:
+    def modifyItem(self, item: ItemWrapper, oldItem: ItemWrapper, invisible: int) -> None:
         if item not in self._view:
             raise Exception(
                 "Demande de modification d'un item (id "

@@ -6,18 +6,17 @@ from com.ankamagames.jerakine.logger.Logger import Logger
 from com.ankamagames.jerakine.types.DataStoreType import DataStoreType
 from com.ankamagames.jerakine.types.enums.DataStoreEnum import DataStoreEnum
 from typing import TYPE_CHECKING
+
 if TYPE_CHECKING:
     from com.ankamagames.dofus.datacenter.world.SubArea import SubArea
-logger = Logger(__name__)
+logger = Logger("pyd2bot")
 
 
 class MapPosition(IDataCenter):
 
     MODULE: str = "MapPositions"
 
-    DST: DataStoreType = DataStoreType(
-        MODULE, True, DataStoreEnum.LOCATION_LOCAL, DataStoreEnum.BIND_COMPUTER
-    )
+    DST: DataStoreType = DataStoreType(MODULE, True, DataStoreEnum.LOCATION_LOCAL, DataStoreEnum.BIND_COMPUTER)
 
     CAPABILITY_ALLOW_CHALLENGE: int = 1
 
@@ -152,9 +151,7 @@ class MapPosition(IDataCenter):
 
     @property
     def allowExchanges(self) -> bool:
-        return (
-            self.capabilities & self.CAPABILITY_ALLOW_EXCHANGES_BETWEEN_PLAYERS
-        ) != 0
+        return (self.capabilities & self.CAPABILITY_ALLOW_EXCHANGES_BETWEEN_PLAYERS) != 0
 
     @property
     def allowHumanVendor(self) -> bool:

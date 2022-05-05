@@ -9,14 +9,14 @@ if TYPE_CHECKING:
     from com.ankamagames.dofus.logic.game.fight.frames.FightContextFrame import (
         FightContextFrame,
     )
-    from com.ankamagames.dofus.logic.game.fight.frames.FightEntitiesFrame import (
-        FightEntitiesFrame,
-    )
     from com.ankamagames.dofus.logic.game.fight.frames.FightSpellCastFrame import (
         FightSpellCastFrame,
     )
     from com.ankamagames.dofus.types.entities.AnimatedCharacter import AnimatedCharacter
 
+from com.ankamagames.dofus.logic.game.fight.frames.FightEntitiesFrame import (
+    FightEntitiesFrame,
+)
 from com.ankamagames.dofus.logic.game.fight.steps.IFightStep import IFightStep
 from com.ankamagames.dofus.logic.game.fight.types.FightEventEnum import FightEventEnum
 from com.ankamagames.dofus.network.types.game.context.fight.GameFightFighterInformations import (
@@ -26,7 +26,7 @@ from com.ankamagames.jerakine.logger.Logger import Logger
 from com.ankamagames.jerakine.sequencer.AbstractSequencable import AbstractSequencable
 from com.ankamagames.jerakine.types.positions.MapPoint import MapPoint
 
-logger = Logger(__name__)
+logger = Logger("pyd2bot")
 
 
 class FightEntitySlideStep(AbstractSequencable, IFightStep):
@@ -50,14 +50,10 @@ class FightEntitySlideStep(AbstractSequencable, IFightStep):
         self._fighterId = fighterId
         self._startCell = startCell
         self._endCell = endCell
-        infos: "GameFightFighterInformations" = (
-            FightEntitiesFrame.getCurrentInstance().getEntityInfos(fighterId)
-        )
+        infos: "GameFightFighterInformations" = FightEntitiesFrame.getCurrentInstance().getEntityInfos(fighterId)
         infos.disposition.cellId = endCell.cellId
         self._entity: "AnimatedCharacter" = DofusEntities.getEntity(self._fighterId)
-        self._fightContextFrame: "FightContextFrame" = (
-            Kernel().getWorker().getFrame("FightContextFrame")
-        )
+        self._fightContextFrame: "FightContextFrame" = Kernel().getWorker().getFrame("FightContextFrame")
 
     @property
     def stepType(self) -> str:
@@ -65,16 +61,12 @@ class FightEntitySlideStep(AbstractSequencable, IFightStep):
 
     def start(self) -> None:
         if self._entity:
-            self._entity.direction = self._startCell.advancedOrientationTo(
-                self._endCell
-            )
+            self._entity.direction = self._startCell.advancedOrientationTo(self._endCell)
             if not self._entity.position == self._startCell:
                 logger.warn(
                     f"We were ordered to slide {self._fighterId} from {self._startCell.cellId}, but self fighter is on {self._entity.position.cellId}."
                 )
-            fighterInfos = FightEntitiesFrame.getCurrentInstance().getEntityInfos(
-                self._fighterId
-            )
+            fighterInfos = FightEntitiesFrame.getCurrentInstance().getEntityInfos(self._fighterId)
             fighterInfos.disposition.cellId = self._endCell.cellId
             # TODO : Uncomment this and sleep for path dyration if the server rejects the simulated behavio
             # path = MovementPath()

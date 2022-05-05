@@ -6,7 +6,7 @@ from com.ankamagames.atouin.enums.ElementTypesEnum import ElementTypesEnum
 from com.ankamagames.jerakine.data.BinaryStream import BinaryStream
 from com.ankamagames.jerakine.logger.Logger import Logger
 
-logger = Logger(__name__)
+logger = Logger("pyd2bot")
 
 
 class Layer:

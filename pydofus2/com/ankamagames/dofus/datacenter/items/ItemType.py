@@ -7,7 +7,7 @@ from com.ankamagames.jerakine.interfaces.IDataCenter import IDataCenter
 from com.ankamagames.jerakine.logger.Logger import Logger
 
 
-logger = Logger(__name__)
+logger = Logger("pyd2bot")
 
 
 class ItemType(IDataCenter):
@@ -70,9 +70,7 @@ class ItemType(IDataCenter):
         if not self._evolutiveType:
             if self.evolutiveTypeId == 0:
                 return None
-            self._evolutiveType = EvolutiveItemType.getEvolutiveItemTypeById(
-                self.evolutiveTypeId
-            )
+            self._evolutiveType = EvolutiveItemType.getEvolutiveItemTypeById(self.evolutiveTypeId)
         return self._evolutiveType
 
     @property

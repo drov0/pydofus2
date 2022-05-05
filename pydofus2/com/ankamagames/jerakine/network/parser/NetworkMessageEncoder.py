@@ -9,10 +9,9 @@ import com.ankamagames.jerakine.network.NetworkMessage as bnm
 from com.ankamagames.jerakine.network.parser.TypeEnum import TypeEnum
 from com.ankamagames.jerakine.network.parser.ProtocolSpec import D2PROTOCOL
 
-logger = Logger(__name__)
+logger = Logger("pyd2bot")
 dataWrite = {
-    name: (getattr(ByteArray, "read" + name), getattr(ByteArray, "write" + name))
-    for name in D2PROTOCOL["primitives"]
+    name: (getattr(ByteArray, "read" + name), getattr(ByteArray, "write" + name)) for name in D2PROTOCOL["primitives"]
 }
 
 PY_PRIMITIVES = {int, float, str, bool}
@@ -20,9 +19,7 @@ PY_PRIMITIVES = {int, float, str, bool}
 
 class NetworkMessageEncoder:
     @classmethod
-    def encode(
-        cls, inst: "bnm.NetworkMessage", data=None, random_hash=True
-    ) -> ByteArray:
+    def encode(cls, inst: "bnm.NetworkMessage", data=None, random_hash=True) -> ByteArray:
         spec = inst.getSpec()
         try:
             return cls._encode(spec, inst, data, random_hash)
@@ -65,10 +62,7 @@ class NetworkMessageEncoder:
         for field in spec["fields"]:
 
             if field["optional"]:
-                if (
-                    hasattr(inst, field["name"])
-                    and getattr(inst, field["name"]) is not None
-                ):
+                if hasattr(inst, field["name"]) and getattr(inst, field["name"]) is not None:
                     data.writeByte(1)
 
                 else:

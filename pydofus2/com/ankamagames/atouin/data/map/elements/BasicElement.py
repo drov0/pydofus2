@@ -3,7 +3,7 @@ from com.ankamagames.atouin.enums.ElementTypesEnum import ElementTypesEnum
 from com.ankamagames.jerakine.logger.Logger import Logger
 from com.ankamagames.jerakine.network.CustomDataWrapper import ByteArray
 
-logger = Logger(__name__)
+logger = Logger("pyd2bot")
 
 
 class BasicElement:
@@ -26,11 +26,7 @@ class BasicElement:
             return SoundElement(cell)
         else:
             raise Exception(
-                "Un �l�ment de type inconnu "
-                + str(type)
-                + " a �t� trouv� sur la cellule "
-                + str(cell.cellId)
-                + "!"
+                "Un �l�ment de type inconnu " + str(type) + " a �t� trouv� sur la cellule " + str(cell.cellId) + "!"
             )
 
     @property

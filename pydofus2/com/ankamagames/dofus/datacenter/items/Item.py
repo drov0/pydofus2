@@ -18,7 +18,7 @@ from com.ankamagames.jerakine.data.GameDataFileAccessor import GameDataFileAcces
 from com.ankamagames.jerakine.interfaces.IDataCenter import IDataCenter
 from com.ankamagames.jerakine.logger.Logger import Logger
 
-logger = Logger(__name__)
+logger = Logger("pyd2bot")
 
 
 class Item(IPostInit, IDataCenter):
@@ -182,9 +182,7 @@ class Item(IPostInit, IDataCenter):
         item: Item = GameData.getObject(cls.MODULE, id)
         if item or not returnDefaultItemIfNull:
             return item
-        logger.error(
-            f"Impossible de trouver l'objet {id}, remplacement par l'objet 666"
-        )
+        logger.error(f"Impossible de trouver l'objet {id}, remplacement par l'objet 666")
         return GameData.getObject(cls.MODULE, 666)
 
     @staticmethod
@@ -227,9 +225,7 @@ class Item(IPostInit, IDataCenter):
     def description(self) -> str:
         if not self._description:
             if self.etheral:
-                self._description = I18n.getUiText(
-                    "ui.common.etherealWeaponDescription"
-                )
+                self._description = I18n.getUiText("ui.common.etherealWeaponDescription")
             else:
                 self._description = I18n.getText(self.descriptionId)
         return self._description
@@ -246,9 +242,7 @@ class Item(IPostInit, IDataCenter):
             return self._processedImportantNotice
         if not self.importantNotice:
             return None
-        self._processedImportantNotice = HyperlinkMapPosition.parseMapLinks(
-            self.importantNotice
-        )
+        self._processedImportantNotice = HyperlinkMapPosition.parseMapLinks(self.importantNotice)
         return self._processedImportantNotice
 
     @property
@@ -358,9 +352,7 @@ class Item(IPostInit, IDataCenter):
     def basicExperienceAsFood(self) -> float:
         experienceInt: int = 0
         if self._basicExperienceAsFood == 0:
-            self._basicExperienceAsFood = self.nuggetsQuantity / len(
-                self.nuggetsBySubarea
-            )
+            self._basicExperienceAsFood = self.nuggetsQuantity / len(self.nuggetsBySubarea)
             experienceInt = math.floor(self._basicExperienceAsFood * 100000)
             self._basicExperienceAsFood = experienceInt / 100000
         return self._basicExperienceAsFood

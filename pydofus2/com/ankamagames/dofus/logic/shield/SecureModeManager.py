@@ -17,7 +17,7 @@ from com.ankamagames.jerakine.network.CustomDataWrapper import ByteArray
 from com.ankamagames.jerakine.types.CustomSharedObject import CustomSharedObject
 from flash.Capabilities import Capabilities
 
-logger = Logger(__name__)
+logger = Logger("pyd2bot")
 
 
 class SecureModeManager(metaclass=Singleton):
@@ -134,9 +134,7 @@ class SecureModeManager(metaclass=Singleton):
                     f = self.getCertifFolder(1) / fileName
                 else:
                     found = True
-                    logger.debug(
-                        "CERTIF FOUND IN MAC APPLICATION DIRECTORY" + str(f.absolute())
-                    )
+                    logger.debug("CERTIF FOUND IN MAC APPLICATION DIRECTORY" + str(f.absolute()))
             if not found:
                 if not f.exists():
                     f = self.getCertifFolder(1, False, True) / fileName
@@ -154,14 +152,10 @@ class SecureModeManager(metaclass=Singleton):
                     f = self.getCertifFolder(1, True) / fileName
                 else:
                     found = True
-                    logger.debug(
-                        "CERTIF FOUND IN CUSTOM SHARED OBJECTS V2" + str(f.absolute())
-                    )
+                    logger.debug("CERTIF FOUND IN CUSTOM SHARED OBJECTS V2" + str(f.absolute()))
             if not found and f.exists():
                 found = True
-                logger.debug(
-                    "CERTIF FOUND IN CUSTOM SHARED OBJECTS V1" + str(f.absolute())
-                )
+                logger.debug("CERTIF FOUND IN CUSTOM SHARED OBJECTS V1" + str(f.absolute()))
             if not found:
                 logger.debug("CERTIF NOT FOUND")
             if f.exists:
@@ -177,15 +171,11 @@ class SecureModeManager(metaclass=Singleton):
             f = self.getCertificateFile()
             if f:
                 with open(f, "rb") as fs:
-                    certif: ShieldCertifcate = ShieldCertifcate.fromRaw(
-                        ByteArray(fs.read())
-                    )
+                    certif: ShieldCertifcate = ShieldCertifcate.fromRaw(ByteArray(fs.read()))
                 if certif.id == 0:
                     logger.error("Certificat invalide (id=0)")
                     return None
-                if certif.version < 4 and (
-                    Capabilities.os == "Windows 10" or "Darwin" in Capabilities.os
-                ):
+                if certif.version < 4 and (Capabilities.os == "Windows 10" or "Darwin" in Capabilities.os):
                     self._hasV1Certif = True
                 logger.debug("RETREIVE CERTIFICATE :: RETRIEVED")
                 return certif.toNetwork()

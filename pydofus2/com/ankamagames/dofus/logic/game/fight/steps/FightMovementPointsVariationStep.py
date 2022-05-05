@@ -19,7 +19,7 @@ from com.ankamagames.jerakine.utils.display.EnterFrameDispatcher import (
 )
 from damageCalculation.tools.StatIds import StatIds
 
-logger = Logger(__name__)
+logger = Logger("pyd2bot")
 
 
 class FightMovementPointsVariationStep(AbstractStatContextualStep, IFightStep):

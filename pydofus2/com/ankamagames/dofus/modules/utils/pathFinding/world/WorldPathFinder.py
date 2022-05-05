@@ -16,7 +16,7 @@ from com.ankamagames.jerakine.logger.Logger import Logger
 from com.ankamagames.jerakine.metaclasses.Singleton import Singleton
 from com.ankamagames.jerakine.network.CustomDataWrapper import ByteArray
 
-logger = Logger(__name__)
+logger = Logger("pyd2bot")
 
 
 class WorldPathFinder(metaclass=Singleton):
@@ -58,9 +58,7 @@ class WorldPathFinder(metaclass=Singleton):
             return None
         playedEntityCellId: int = playedEntity.position.cellId
         playerCell: Cell = MapDisplayManager().dataMap.cells[playedEntityCellId]
-        vertex = self.worldGraph.getVertex(
-            PlayedCharacterManager().currentMap.mapId, playerCell.linkedZoneRP
-        )
+        vertex = self.worldGraph.getVertex(PlayedCharacterManager().currentMap.mapId, playerCell.linkedZoneRP)
         return vertex
 
     def findPath(self, destinationMapId: float, callback: FunctionType) -> None:
@@ -88,13 +86,7 @@ class WorldPathFinder(metaclass=Singleton):
         if path is None:
             self.next()
         else:
-            logger.info(
-                "path to map "
-                + str(self.dst)
-                + " found in "
-                + str(TimeDebug.getElapsedTime())
-                + "s"
-            )
+            logger.info("path to map " + str(self.dst) + " found in " + str(TimeDebug.getElapsedTime()) + "s")
             self.callback(path)
 
     def next(self) -> None:

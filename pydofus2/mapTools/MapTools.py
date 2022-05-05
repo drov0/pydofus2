@@ -16,7 +16,7 @@ PSEUDO_INFINITE: int = 63
 COEFF_FOR_REBASE_ON_CLOSEST_8_DIRECTION: float = math.tan(math.pi / 8)
 COORDINATES_DIRECTION: list = ""
 
-logger = Logger(__name__)
+logger = Logger("pyd2bot")
 
 
 def getCellsIdBetween(param1: int, param2: int) -> list:

@@ -33,7 +33,7 @@ from com.ankamagames.dofus.network.types.game.context.fight.GameFightFighterInfo
 )
 from com.ankamagames.jerakine.logger.Logger import Logger
 
-logger = Logger(__name__)
+logger = Logger("pyd2bot")
 
 
 class BasicBuff:
@@ -93,9 +93,7 @@ class BasicBuff:
         self.dispelable = effect.dispelable
         self.source = castingSpell.casterId
         self.dataUid = effect.effectId
-        fightBattleFrame: "FightBattleFrame" = (
-            Kernel().getWorker().getFrame("FightBattleFrame")
-        )
+        fightBattleFrame: "FightBattleFrame" = Kernel().getWorker().getFrame("FightBattleFrame")
         currentPlayerId: float = fightBattleFrame.currentPlayerId
         isPlayerId = currentPlayerId != 0
         fighterInfo: GameFightFighterInformations = None
@@ -222,9 +220,7 @@ class BasicBuff:
         slId: int = 0
         foundEi: EffectInstanceDice = None
         forceBuffsShowInUI: bool = GameDebugManager().detailedFightLog_showBuffsInUi
-        forceBuffsShowInFightLog: bool = (
-            GameDebugManager().detailedFightLog_showEverything
-        )
+        forceBuffsShowInFightLog: bool = GameDebugManager().detailedFightLog_showEverything
         if param1 and param1 != 0 or param2 and param2 != 0:
             self._rawParam1 = param1
             self._rawParam2 = param2
@@ -251,24 +247,16 @@ class BasicBuff:
             if sl:
                 foundEi = self.findEffectOnSpellList(self.dataUid, sl.effects)
                 if foundEi == None:
-                    foundEi = self.findEffectOnSpellList(
-                        self.dataUid, sl.criticalEffect
-                    )
+                    foundEi = self.findEffectOnSpellList(self.dataUid, sl.criticalEffect)
                 if foundEi:
                     self._effect.visibleInTooltip = foundEi.visibleInTooltip
-                    self._effect.visibleInBuffUi = (
-                        True if forceBuffsShowInUI else bool(foundEi.visibleInBuffUi)
-                    )
+                    self._effect.visibleInBuffUi = True if forceBuffsShowInUI else bool(foundEi.visibleInBuffUi)
                     self._effect.visibleInFightLog = (
-                        True
-                        if forceBuffsShowInFightLog
-                        else bool(foundEi.visibleInFightLog)
+                        True if forceBuffsShowInFightLog else bool(foundEi.visibleInFightLog)
                     )
                     self._effect.order = foundEi.order
 
-    def findEffectOnSpellList(
-        self, id: int, list: list[EffectInstanceDice]
-    ) -> EffectInstanceDice:
+    def findEffectOnSpellList(self, id: int, list: list[EffectInstanceDice]) -> EffectInstanceDice:
         for i in range(len(list)):
             if list[i].effectUid == id:
                 return list[i]
@@ -385,10 +373,7 @@ class BasicBuff:
             if self.param1 != other.param1:
                 return False
         else:
-            if (
-                self.actionId
-                == ActionIds.ACTION_CHARACTER_BOOST_ONE_WEAPON_DAMAGE_PERCENT
-            ):
+            if self.actionId == ActionIds.ACTION_CHARACTER_BOOST_ONE_WEAPON_DAMAGE_PERCENT:
                 return False
             if self.actionId == ActionIds.ACTION_CHARACTER_ADD_APPEARANCE:
                 if self.dataUid != other.dataUid:
@@ -430,21 +415,15 @@ class BasicBuff:
             ActionIds.ACTION_DEBOOST_SPELL_RANGE_MAX,
             ActionIds.ACTION_DEBOOST_SPELL_RANGE_MIN,
         ]:
-            additionDetails += (
-                f"\rparam2 : {self.param2}  & {(str(self.param2) + str(buff.param2))}"
-            )
-            additionDetails += (
-                f"\rparam3 : {self.value}  & {(str(self.value) + str(buff.value))}"
-            )
+            additionDetails += f"\rparam2 : {self.param2}  & {(str(self.param2) + str(buff.param2))}"
+            additionDetails += f"\rparam3 : {self.value}  & {(str(self.value) + str(buff.value))}"
             self.param1 = buff.param1
             if self.param2:
                 self.param2 += buff.param2
             if self.value:
                 self.value += buff.value
         if self.actionId == ActionIds.ACTION_CHARACTER_PUNISHMENT:
-            additionDetails += (
-                f"\rparam1 : {self.param1}  &  {(str(self.param1) + str(buff.param2))}"
-            )
+            additionDetails += f"\rparam1 : {self.param1}  &  {(str(self.param1) + str(buff.param2))}"
             self.param1 += buff.param2
 
         if self.actionId in [
@@ -457,29 +436,19 @@ class BasicBuff:
                 self.delta += buff.delta
 
         else:
-            additionDetails += (
-                f"\rparam1 : {self.param1} à {str(self.param1) + str(buff.param1)}"
-            )
-            additionDetails += (
-                f"\rparam2 : {self.param2} à {str(self.param2) + str(buff.param2)}"
-            )
-            additionDetails += (
-                f"\rparam3 : {self.value} à {str(self.value) + str(buff.value)}"
-            )
+            additionDetails += f"\rparam1 : {self.param1} à {str(self.param1) + str(buff.param1)}"
+            additionDetails += f"\rparam2 : {self.param2} à {str(self.param2) + str(buff.param2)}"
+            additionDetails += f"\rparam3 : {self.value} à {str(self.value) + str(buff.value)}"
             self.param1 += buff.param1
             if self.param2:
                 self.param2 += buff.param2
             if self.value:
                 self.value += buff.value
         if GameDebugManager().buffsDebugActivated:
-            logger.debug(
-                "[BUFFS DEBUG] Buff {self.uid} : ajout du buff {buff.uid} {additionDetails}"
-            )
+            logger.debug("[BUFFS DEBUG] Buff {self.uid} : ajout du buff {buff.uid} {additionDetails}")
         self.refreshDescription()
 
-    def updateParam(
-        self, value1: int = 0, value2: int = 0, value3: int = 0, buffId: int = -1
-    ) -> None:
+    def updateParam(self, value1: int = 0, value2: int = 0, value3: int = 0, buffId: int = -1) -> None:
         if buffId == -1:
             p1 = value1
             p2 = value2
@@ -562,9 +531,7 @@ class BasicBuff:
         oldDuration: int = 0
         if GameDebugManager().buffsDebugActivated:
             if dispellEffect:
-                logger.debug(
-                    f"[BUFFS DEBUG] Buff {self.id} durée modifiée de {delta} (desenvoutement de l'effet)"
-                )
+                logger.debug(f"[BUFFS DEBUG] Buff {self.id} durée modifiée de {delta} (desenvoutement de l'effet)")
         if not dispellEffect or self.canBeDispell():
             if self.duration >= 63 or self.duration == -1000:
                 return False

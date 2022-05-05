@@ -17,7 +17,7 @@ from com.ankamagames.jerakine.utils.display.spellZone.ICellZoneProvider import (
 from com.ankamagames.jerakine.utils.display.spellZone.IZoneShape import IZoneShape
 from com.ankamagames.jerakine.utils.display.spellZone.ZoneEffect import ZoneEffect
 
-logger = Logger(__name__)
+logger = Logger("pyd2bot")
 
 
 class SpellLevel(ICellZoneProvider, IDataCenter):
@@ -143,9 +143,7 @@ class SpellLevel(ICellZoneProvider, IDataCenter):
             self._spellZoneEffects = list[IZoneShape]()
             numEffects = len(self.effects)
             for i in range(numEffects):
-                zone = ZoneEffect(
-                    int(self.effects[i].zoneSize), self.effects[i].zoneShape
-                )
+                zone = ZoneEffect(int(self.effects[i].zoneSize), self.effects[i].zoneShape)
                 self._spellZoneEffects.append(zone)
         return self._spellZoneEffects
 

@@ -8,7 +8,7 @@ class EvolutiveItemType(IDataCenter):
 
     MODULE: str = "EvolutiveItemTypes"
 
-    logger = Logger(__name__)
+    logger = Logger("pyd2bot")
 
     id: int
 

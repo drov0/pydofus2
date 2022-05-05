@@ -11,7 +11,7 @@ from com.ankamagames.jerakine.network.ServerConnection import ServerConnection
 from snifferApp.network.message import Message
 import threading
 
-logger = Logger(__name__)
+logger = Logger("pyd2bot")
 LOW_LEVEL_DEBUG = False
 
 
@@ -37,9 +37,7 @@ class SnifferBuffer:
 
     def write(self, tcp_packet):
         if LOW_LEVEL_DEBUG:
-            logger.debug(
-                f"nextSeq {self.nextSeq}, lenBuffer {len(self.buffer)}, lenMemory {len(self.memory)}"
-            )
+            logger.debug(f"nextSeq {self.nextSeq}, lenBuffer {len(self.buffer)}, lenMemory {len(self.memory)}")
         seq, data = self.getSeqRw(tcp_packet)
         if LOW_LEVEL_DEBUG:
             logger.debug(f"Write (seq {seq}, len data {len(data)})")
@@ -100,9 +98,7 @@ class Provider(threading.Thread):
             return True
         elif dst == self.LOCAL_IP:
             return False
-        raise Exception(
-            f"Packet origin unknown\nsrc: {src}\ndst: {dst}\nLOCAL_IP: {self.LOCAL_IP}"
-        )
+        raise Exception(f"Packet origin unknown\nsrc: {src}\ndst: {dst}\nLOCAL_IP: {self.LOCAL_IP}")
 
     def run(self):
         capture = pyshark.LiveCapture(bpf_filter="tcp port 5555")
@@ -119,14 +115,10 @@ class Provider(threading.Thread):
                         logger.debug(f"isfromClient: {isfromClient}")
                     if isfromClient:
                         self.clientBuffer.write(p.tcp)
-                        self.dispatcher.dispatch(
-                            "Client packet received", PacketEvent(p)
-                        )
+                        self.dispatcher.dispatch("Client packet received", PacketEvent(p))
                     else:
                         self.serverBuffer.write(p.tcp)
-                        self.dispatcher.dispatch(
-                            "Server packet received", PacketEvent(p)
-                        )
+                        self.dispatcher.dispatch("Server packet received", PacketEvent(p))
                 except AttributeError as e:
                     # logger.debug(f"AttributeError: {e}", exc_info=True)
                     pass
@@ -150,12 +142,8 @@ class DofusSniffer:
         self.servConn.handler = ServerMsgHandler(self.processServerMsg)
         self.provider = Provider()
         self.servConn._id = "ServerSniffer"
-        self.provider.dispatcher.add_listener(
-            "Client packet received", self.onClientPacketReceived, 0
-        )
-        self.provider.dispatcher.add_listener(
-            "Server packet received", self.onServerPacketReceived, 0
-        )
+        self.provider.dispatcher.add_listener("Client packet received", self.onClientPacketReceived, 0)
+        self.provider.dispatcher.add_listener("Server packet received", self.onServerPacketReceived, 0)
         self.handle = callback
         self.running = False
 
@@ -197,6 +185,4 @@ if __name__ == "__main__":
 
     mySniffer = DofusSniffer(handle)
     mySniffer.start()
-    subprocess.call(
-        "make test bot=shooter", stderr=subprocess.DEVNULL, stdout=subprocess.DEVNULL
-    )
+    subprocess.call("make test bot=shooter", stderr=subprocess.DEVNULL, stdout=subprocess.DEVNULL)

@@ -3,7 +3,7 @@ from com.ankamagames.dofus.types.IdAccessors import IdAccessors
 from com.ankamagames.jerakine.interfaces.IDataCenter import IDataCenter
 from com.ankamagames.jerakine.logger.Logger import Logger
 
-logger = Logger(__name__)
+logger = Logger("pyd2bot")
 
 
 class Weapon(Item, IDataCenter):

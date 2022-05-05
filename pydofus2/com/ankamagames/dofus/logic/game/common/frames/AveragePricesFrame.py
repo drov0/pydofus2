@@ -25,7 +25,7 @@ from com.ankamagames.jerakine.types.DataStoreType import DataStoreType
 from com.ankamagames.jerakine.types.enums.DataStoreEnum import DataStoreEnum
 from com.ankamagames.jerakine.types.enums.Priority import Priority
 
-logger = Logger(__name__)
+logger = Logger("pyd2bot")
 
 
 class AveragePricesFrame(Frame):
@@ -60,9 +60,7 @@ class AveragePricesFrame(Frame):
         return self._pricesData
 
     def pushed(self) -> bool:
-        self._pricesData = StoreDataManager().getData(
-            self._dataStoreType, self._serverName
-        )
+        self._pricesData = StoreDataManager().getData(self._dataStoreType, self._serverName)
         return True
 
     def pulled(self) -> bool:
@@ -83,22 +81,16 @@ class AveragePricesFrame(Frame):
         else:
             return False
 
-    def updatePricesData(
-        self, pItemsIds: list[int], pItemsAvgPrices: list[float]
-    ) -> None:
+    def updatePricesData(self, pItemsIds: list[int], pItemsAvgPrices: list[float]) -> None:
         nbItems: int = len(pItemsIds)
         self._pricesData = {"lastUpdate": datetime.now(), "items": dict()}
         for i in range(nbItems):
             self._pricesData.items[pItemsIds[i]] = pItemsAvgPrices[i]
-        StoreDataManager().setData(
-            self._dataStoreType, self._serverName, self._pricesData
-        )
+        StoreDataManager().setData(self._dataStoreType, self._serverName, self._pricesData)
 
     def updateAllowed(self) -> bool:
         featureManager: FeatureManager = FeatureManager()
-        if not featureManager or not featureManager.isFeatureWithKeywordEnabled(
-            "trade.averagePricesAutoUpdate"
-        ):
+        if not featureManager or not featureManager.isFeatureWithKeywordEnabled("trade.averagePricesAutoUpdate"):
             return False
         if self.dataAvailable:
             now = datetime.now()

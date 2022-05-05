@@ -8,7 +8,7 @@ import com.ankamagames.dofus.datacenter.effects.EffectInstance as effinst
 from com.ankamagames.jerakine.interfaces.IDataCenter import IDataCenter
 from com.ankamagames.jerakine.logger.Logger import Logger
 
-logger = Logger(__name__)
+logger = Logger("pyd2bot")
 
 
 class EffectInstanceInteger(effinst.EffectInstance, IDataCenter):

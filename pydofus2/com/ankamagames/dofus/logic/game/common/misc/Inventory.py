@@ -11,7 +11,7 @@ from com.ankamagames.dofus.network.enums.CharacterInventoryPositionEnum import (
 from com.ankamagames.dofus.network.types.game.data.items.ObjectItem import ObjectItem
 from com.ankamagames.jerakine.logger.Logger import Logger
 
-logger = Logger(__name__)
+logger = Logger("pyd2bot")
 
 
 class Inventory:
@@ -117,9 +117,7 @@ class Inventory:
             self.removeItemFromViews(itemSet)
         else:
             if itemSet.item.quantity < quantity:
-                logger.error(
-                    "On essaye de supprimer de l'inventaire plus d'objet qu'il n'en existe"
-                )
+                logger.error("On essaye de supprimer de l'inventaire plus d'objet qu'il n'en existe")
                 return
             oldItem = itemSet.item.clone()
             itemSet.item.quantity -= quantity
@@ -128,9 +126,7 @@ class Inventory:
     def modifyItemQuantity(self, itemUID: int, quantity: int) -> None:
         itemSet: ItemSet = self._itemsDict[itemUID]
         if not itemSet:
-            logger.error(
-                "On essaye de modifier la quantit� d'un objet qui n'existe pas"
-            )
+            logger.error("On essaye de modifier la quantit� d'un objet qui n'existe pas")
             return
         iw: ItemWrapper = itemSet.item.clone()
         iw.quantity = quantity
@@ -139,9 +135,7 @@ class Inventory:
     def modifyItemPosition(self, itemUID: int, position: int) -> None:
         itemSet: ItemSet = self._itemsDict[itemUID]
         if not itemSet:
-            logger.error(
-                "On essaye de modifier la position d'un objet qui n'existe pas"
-            )
+            logger.error("On essaye de modifier la position d'un objet qui n'existe pas")
             return
         iw: ItemWrapper = itemSet.item.clone()
         iw.position = position
@@ -184,9 +178,7 @@ class Inventory:
     def addItemMask(self, objectUID: int, name: str, size: int) -> None:
         itemSet: ItemSet = self._itemsDict[objectUID]
         if not itemSet:
-            logger.error(
-                "On essaye de masquer un item qui n'existe pas dans l'inventaire"
-            )
+            logger.error("On essaye de masquer un item qui n'existe pas dans l'inventaire")
             return
         itemSet.masks[name] = size
         self.modifyItemFromViews(itemSet, itemSet.item)

@@ -27,7 +27,7 @@ from com.ankamagames.dofus.types.enums.ItemCategoryEnum import ItemCategoryEnum
 from com.ankamagames.jerakine.logger.Logger import Logger
 from com.ankamagames.jerakine.metaclasses.Singleton import Singleton
 
-logger = Logger(__name__)
+logger = Logger("pyd2bot")
 
 
 class StorageOptionManager(metaclass=Singleton):
@@ -108,13 +108,9 @@ class StorageOptionManager(metaclass=Singleton):
         self._filterType = filterType
         if self._filterType != -1:
             if self.category == ItemCategoryEnum.ECAFLIP_CARD_CATEGORY:
-                inventorymgr.InventoryManager().inventory.refillView(
-                    "storageMinouki", "storageMinoukiFiltered"
-                )
+                inventorymgr.InventoryManager().inventory.refillView("storageMinouki", "storageMinoukiFiltered")
             else:
-                inventorymgr.InventoryManager().inventory.refillView(
-                    "storage", "storageFiltered"
-                )
+                inventorymgr.InventoryManager().inventory.refillView("storage", "storageFiltered")
         self.updateStorageView()
 
     def hasFilter(self) -> bool:
@@ -129,13 +125,9 @@ class StorageOptionManager(metaclass=Singleton):
         self._bankFilterType = bankFilterType
         if self._bankFilterType != -1:
             if self.bankCategory == ItemCategoryEnum.ECAFLIP_CARD_CATEGORY:
-                inventorymgr.InventoryManager().bankInventory.refillView(
-                    "bankMinouki", "bankMinoukiFiltered"
-                )
+                inventorymgr.InventoryManager().bankInventory.refillView("bankMinouki", "bankMinoukiFiltered")
             else:
-                inventorymgr.InventoryManager().bankInventory.refillView(
-                    "bank", "bankFiltered"
-                )
+                inventorymgr.InventoryManager().bankInventory.refillView("bank", "bankFiltered")
         self.updateBankStorageView()
 
     def hasBankFilter(self) -> bool:
@@ -209,9 +201,7 @@ class StorageOptionManager(metaclass=Singleton):
                     if iw.typeId == self.bankFilter:
                         itemsDisplayed.append(iw.clone())
         else:
-            inventorymgr.InventoryManager().bankInventory.getView(
-                "bankAssociatedRunes"
-            ).updateView()
+            inventorymgr.InventoryManager().bankInventory.getView("bankAssociatedRunes").updateView()
         self._newSort = False
 
     @property
@@ -259,13 +249,8 @@ class StorageOptionManager(metaclass=Singleton):
 
     @property
     def currentBankView(self) -> IStorageView:
-        if (
-            self.hasBankFilter()
-            and self.bankCategory == ItemCategoryEnum.ECAFLIP_CARD_CATEGORY
-        ):
-            return inventorymgr.InventoryManager().bankInventory.getView(
-                "bankMinoukiFiltered"
-            )
+        if self.hasBankFilter() and self.bankCategory == ItemCategoryEnum.ECAFLIP_CARD_CATEGORY:
+            return inventorymgr.InventoryManager().bankInventory.getView("bankMinoukiFiltered")
         return self.getBankView(self.bankCategory)
 
     def enableBidHouseFilter(self, allowedTypes: list[int], maxItemLevel: int) -> None:
@@ -279,9 +264,7 @@ class StorageOptionManager(metaclass=Singleton):
                 maxItemLevel,
             )
         )
-        inventorymgr.InventoryManager().inventory.refillView(
-            name, "storageBidHouseFilter"
-        )
+        inventorymgr.InventoryManager().inventory.refillView(name, "storageBidHouseFilter")
 
     def disableBidHouseFilter(self) -> None:
         if self.inventory.getView("storageBidHouseFilter"):
@@ -298,20 +281,12 @@ class StorageOptionManager(metaclass=Singleton):
         if not skill:
             craftFrame = Kernel().getWorker().getFrame("CraftFrame")
             if not craftFrame:
-                logger.error(
-                    "Activation des filtres de forgemagie alors que la craftFrame n'est pas active"
-                )
+                logger.error("Activation des filtres de forgemagie alors que la craftFrame n'est pas active")
                 return
             skill = Skill.getSkillById(craftFrame.skillId)
         name: str = self.currentStorageView.name
-        self.inventory.addView(
-            StorageSmithMagicFilterView(
-                self.inventory.hookLock, self.currentStorageView, skill
-            )
-        )
-        inventorymgr.InventoryManager().inventory.refillView(
-            name, "storageSmithMagicFilter"
-        )
+        self.inventory.addView(StorageSmithMagicFilterView(self.inventory.hookLock, self.currentStorageView, skill))
+        inventorymgr.InventoryManager().inventory.refillView(name, "storageSmithMagicFilter")
 
     def disableSmithMagicFilter(self) -> None:
         if self.inventory.getView("storageSmithMagicFilter"):
@@ -323,16 +298,12 @@ class StorageOptionManager(metaclass=Singleton):
         if not skill:
             craftFrame = Kernel().getWorker().getFrame("CraftFrame")
             if not craftFrame:
-                logger.error(
-                    "Activation des filtres de forgemagie alors que la craftFrame n'est pas active"
-                )
+                logger.error("Activation des filtres de forgemagie alors que la craftFrame n'est pas active")
                 return
             skill = Skill.getSkillById(craftFrame.skillId)
         name: str = self.currentStorageView.name
         self.inventory.addView(
-            StorageCraftFilterView(
-                self.inventory.hookLock, self.currentStorageView, skill.id, jobLevel
-            )
+            StorageCraftFilterView(self.inventory.hookLock, self.currentStorageView, skill.id, jobLevel)
         )
         inventorymgr.InventoryManager().inventory.refillView(name, "storageCraftFilter")
 
@@ -364,21 +335,13 @@ class StorageOptionManager(metaclass=Singleton):
 
     def getBankView(self, category: int) -> IStorageView:
         if category == ItemCategoryEnum.EQUIPMENT_CATEGORY:
-            return inventorymgr.InventoryManager().bankInventory.getView(
-                "bankEquipement"
-            )
+            return inventorymgr.InventoryManager().bankInventory.getView("bankEquipement")
         if category == ItemCategoryEnum.CONSUMABLES_CATEGORY:
-            return inventorymgr.InventoryManager().bankInventory.getView(
-                "bankConsumables"
-            )
+            return inventorymgr.InventoryManager().bankInventory.getView("bankConsumables")
         if category == ItemCategoryEnum.RESOURCES_CATEGORY:
-            return inventorymgr.InventoryManager().bankInventory.getView(
-                "bankRessources"
-            )
+            return inventorymgr.InventoryManager().bankInventory.getView("bankRessources")
         if category == ItemCategoryEnum.COSMETICS_CATEGORY:
-            return inventorymgr.InventoryManager().bankInventory.getView(
-                "bankCosmetics"
-            )
+            return inventorymgr.InventoryManager().bankInventory.getView("bankCosmetics")
         if category == ItemCategoryEnum.QUEST_CATEGORY:
             return inventorymgr.InventoryManager().bankInventory.getView("bankQuest")
         if category == ItemCategoryEnum.ECAFLIP_CARD_CATEGORY:
@@ -422,9 +385,7 @@ class StorageOptionManager(metaclass=Singleton):
             craftFilterView.parent = parentView
             self.refreshView("storageCraftFilter")
         if self.getIsForgettableSpellsFilterEnabled():
-            forgettableSpellsFilterView = self.inventory.getView(
-                "forgettableSpellsFilter"
-            )
+            forgettableSpellsFilterView = self.inventory.getView("forgettableSpellsFilter")
             forgettableSpellsFilterView.parent = parentView
             self.refreshView("forgettableSpellsFilter")
 
@@ -438,9 +399,7 @@ class StorageOptionManager(metaclass=Singleton):
     def getIsForgettableSpellsFilterEnabled(self) -> bool:
         return self.inventory.getView("forgettableSpellsFilter") is not None
 
-    def enableForgettableSpellsFilter(
-        self, allowedTypes: list[int], isHideLearnedSpells: bool
-    ) -> None:
+    def enableForgettableSpellsFilter(self, allowedTypes: list[int], isHideLearnedSpells: bool) -> None:
         self.disableBidHouseFilter()
         self.inventory.addView(
             ForgettableSpellsFilterView(
@@ -450,9 +409,7 @@ class StorageOptionManager(metaclass=Singleton):
                 isHideLearnedSpells,
             )
         )
-        inventorymgr.InventoryManager().inventory.refillView(
-            "storageResources", "forgettableSpellsFilter"
-        )
+        inventorymgr.InventoryManager().inventory.refillView("storageResources", "forgettableSpellsFilter")
 
     def disableForgettableSpellsFilter(self) -> None:
         if self.inventory.getView("forgettableSpellsFilter"):
@@ -460,18 +417,12 @@ class StorageOptionManager(metaclass=Singleton):
 
     def enableBankAssociatedRunesFilter(self, item: ItemWrapper) -> None:
         inventorymgr.InventoryManager().bankInventory.addView(
-            BankAssociatedRunesView(
-                inventorymgr.InventoryManager().bankInventory.hookLock, item
-            )
+            BankAssociatedRunesView(inventorymgr.InventoryManager().bankInventory.hookLock, item)
         )
-        inventorymgr.InventoryManager().bankInventory.refillView(
-            "bankRessources", "bankAssociatedRunes"
-        )
+        inventorymgr.InventoryManager().bankInventory.refillView("bankRessources", "bankAssociatedRunes")
         self._associatedRunesActive = True
 
     def disableBankAssociatedRunesFilter(self) -> None:
         if inventorymgr.InventoryManager().bankInventory.getView("bankAssociatedRunes"):
-            inventorymgr.InventoryManager().bankInventory.removeView(
-                "bankAssociatedRunes"
-            )
+            inventorymgr.InventoryManager().bankInventory.removeView("bankAssociatedRunes")
         self._associatedRunesActive = False

@@ -29,7 +29,7 @@ from pyd2bot.managers.BotsDataManager import BotsDataManager
 from pyd2bot.frames.BotGameApproachFrame import BotGameApproach
 from com.ankamagames.atouin.utils.DataMapProvider import DataMapProvider
 
-logger = Logger(__name__)
+logger = Logger("pyd2bot")
 
 
 class DofusClient:

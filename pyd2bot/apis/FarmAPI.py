@@ -11,7 +11,7 @@ if TYPE_CHECKING:
     )
 from com.ankamagames.jerakine.logger.Logger import Logger
 
-logger = Logger(__name__)
+logger = Logger("pyd2bot")
 
 
 class FarmAPI(metaclass=Singleton):
@@ -40,9 +40,7 @@ class FarmAPI(metaclass=Singleton):
                 ce = self.rplInteractivesFrame.collectables.get(elementId)
             if ce is not None and ce.enabled:
                 if self.VERBOSE:
-                    logger.info(
-                        f"[{self.id}] Collecting {ce} ... skillId : {ce.skill.id}"
-                    )
+                    logger.info(f"[{self.id}] Collecting {ce} ... skillId : {ce.skill.id}")
                 ie = self.rplInteractivesFrame.interactives.get(elementId)
                 if ie is None:
                     raise Exception(f"[{self.id}] InteractiveElement {elementId} not found")

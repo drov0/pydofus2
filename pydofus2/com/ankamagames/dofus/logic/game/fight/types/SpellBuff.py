@@ -5,7 +5,7 @@ from com.ankamagames.dofus.network.types.game.actions.fight.FightTemporarySpellB
 )
 from com.ankamagames.jerakine.logger.Logger import Logger
 
-logger = Logger(__name__)
+logger = Logger("pyd2bot")
 
 
 class SpellBuff(BasicBuff):

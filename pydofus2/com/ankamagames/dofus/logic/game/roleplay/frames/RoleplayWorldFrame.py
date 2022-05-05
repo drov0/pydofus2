@@ -60,7 +60,7 @@ from com.ankamagames.jerakine.types.enums.Priority import Priority
 from com.ankamagames.jerakine.types.positions.MapPoint import MapPoint
 from flash.geom.Rectangle import Rectangle
 
-logger = Logger(__name__)
+logger = Logger("pyd2bot")
 
 
 class RoleplayWorldFrame(Frame):

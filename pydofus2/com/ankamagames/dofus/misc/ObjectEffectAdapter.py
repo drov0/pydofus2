@@ -60,7 +60,7 @@ from com.ankamagames.dofus.network.types.game.data.items.effects.ObjectEffectStr
 )
 from com.ankamagames.jerakine.logger.Logger import Logger
 
-logger = Logger(__name__)
+logger = Logger("pyd2bot")
 
 
 class ObjectEffectAdapter:
@@ -69,24 +69,17 @@ class ObjectEffectAdapter:
 
     @classmethod
     def fromNetwork(cls, oe: ObjectEffect) -> EffectInstance:
-        if (
-            isinstance(oe, ObjectEffectDice)
-            and oe.actionId == ActionIds.ACTION_INCARNATION
-        ):
+        if isinstance(oe, ObjectEffectDice) and oe.actionId == ActionIds.ACTION_INCARNATION:
             effect = EffectInstanceDate()
             effect.year = oe.param1
             effect.month = oe.param2 * 32768 + oe.diceConst
             level = 1
             while True:
-                incLevel = IncarnationLevel.getIncarnationLevelByIdAndLevel(
-                    oe.param1, level
-                )
+                incLevel = IncarnationLevel.getIncarnationLevelByIdAndLevel(oe.param1, level)
                 if incLevel:
                     floor = incLevel.requiredXp
                 level += 1
-                incLevelPlusOne = IncarnationLevel.getIncarnationLevelByIdAndLevel(
-                    oe.param1, level
-                )
+                incLevelPlusOne = IncarnationLevel.getIncarnationLevelByIdAndLevel(oe.param1, level)
                 if incLevelPlusOne:
                     nextFloor = incLevelPlusOne.requiredXp
                 if nextFloor < effect.month and level < 51:

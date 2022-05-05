@@ -37,7 +37,7 @@ from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from com.ankamagames.dofus.types.entities.AnimatedCharacter import AnimatedCharacter
 
-logger = Logger(__name__)
+logger = Logger("pyd2bot")
 
 
 class CurrentPlayedFighterManager(metaclass=Singleton):

@@ -8,7 +8,7 @@ from com.ankamagames.jerakine.newCache.impl.Cache import Cache
 from com.ankamagames.jerakine.newCache.impl.InfiniteCache import InfiniteCache
 from com.ankamagames.jerakine.types.CustomSharedObject import CustomSharedObject
 
-logger = Logger(__name__)
+logger = Logger("pyd2bot")
 
 
 class AbstractDataManager:
@@ -41,18 +41,14 @@ class AbstractDataManager:
 
     @classmethod
     def getObjects(cls) -> list:
-        fileList: list = StoreDataManager.getData(
-            JerakineConstants.DATASTORE_FILES_INFO, cls._soPrefix + "_filelist"
-        )
+        fileList: list = StoreDataManager.getData(JerakineConstants.DATASTORE_FILES_INFO, cls._soPrefix + "_filelist")
         if not fileList:
             return None
         data: list = list()
         for fileNum in fileList:
             soName = cls._soPrefix + fileNum
             if cls._cacheSO.contains(soName):
-                data = data.extend(
-                    CustomSharedObject(cls._cacheSO.peek(soName)).data[cls.DATA_KEY]
-                )
+                data = data.extend(CustomSharedObject(cls._cacheSO.peek(soName)).data[cls.DATA_KEY])
             else:
                 so = CustomSharedObject.getLocal(soName)
                 if so and cls.DATA_KEY in so.data:
@@ -69,10 +65,6 @@ class AbstractDataManager:
         if keyCacheSize == float("inf"):
             cls._cacheKey = InfiniteCache()
         else:
-            cls._cacheKey = Cache.create(
-                keyCacheSize, LruGarbageCollector(), cls.__class__.__name__ + "_key"
-            )
-        cls._cacheSO = Cache.create(
-            soCacheSize, LruGarbageCollector(), cls.__class__.__name__ + "_so"
-        )
+            cls._cacheKey = Cache.create(keyCacheSize, LruGarbageCollector(), cls.__class__.__name__ + "_key")
+        cls._cacheSO = Cache.create(soCacheSize, LruGarbageCollector(), cls.__class__.__name__ + "_so")
         cls._soPrefix = soPrefix

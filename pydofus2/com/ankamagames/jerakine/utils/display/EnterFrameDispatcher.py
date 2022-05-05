@@ -6,7 +6,7 @@ from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
     from com.ankamagames.jerakine.network.messages.Worker import Worker
-logger = Logger(__name__)
+logger = Logger("pyd2bot")
 
 
 class EnterFrameDispatcher(metaclass=Singleton):
@@ -42,9 +42,7 @@ class EnterFrameDispatcher(metaclass=Singleton):
     def worker(self) -> "Worker":
         return self._worker
 
-    def addEventListener(
-        self, listener: FunctionType, name: str, frameRate: int = 0.004294967295e9
-    ) -> None:
+    def addEventListener(self, listener: FunctionType, name: str, frameRate: int = 0.004294967295e9) -> None:
         if not self._controledListeners.get(listener):
             exp1 = 0 if frameRate == float("inf") else int(1 / frameRate)
             self._controledListeners[listener] = ControledEnterFrameListener(
@@ -107,9 +105,7 @@ class ControledEnterFrameListener:
     overhead: int
     latestChange: int
 
-    def __init__(
-        self, name: str, listener: FunctionType, wantedGap: int, latestChange: int
-    ):
+    def __init__(self, name: str, listener: FunctionType, wantedGap: int, latestChange: int):
         self.name = name
         self.listener = listener
         self.wantedGap = wantedGap

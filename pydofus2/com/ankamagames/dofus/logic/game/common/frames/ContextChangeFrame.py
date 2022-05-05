@@ -4,6 +4,7 @@ from com.ankamagames.dofus.kernel.net.ConnectionsHandler import ConnectionsHandl
 from com.ankamagames.dofus.logic.game.common.actions.GameContextQuitAction import (
     GameContextQuitAction,
 )
+from com.ankamagames.dofus.logic.game.roleplay.frames.RoleplayMovementFrame import RoleplayMovementFrame
 from com.ankamagames.dofus.network.enums.GameContextEnum import GameContextEnum
 from com.ankamagames.dofus.network.messages.game.context.GameContextCreateMessage import (
     GameContextCreateMessage,
@@ -11,15 +12,13 @@ from com.ankamagames.dofus.network.messages.game.context.GameContextCreateMessag
 from com.ankamagames.dofus.network.messages.game.context.GameContextQuitMessage import (
     GameContextQuitMessage,
 )
-from com.ankamagames.dofus.network.messages.game.context.roleplay.CurrentMapMessage import (
-    CurrentMapMessage,
-)
+from com.ankamagames.dofus.network.messages.game.context.roleplay.CurrentMapMessage import CurrentMapMessage
 from com.ankamagames.jerakine.logger.Logger import Logger
 from com.ankamagames.jerakine.messages.Frame import Frame
 from com.ankamagames.jerakine.messages.Message import Message
 from com.ankamagames.jerakine.types.enums.Priority import Priority
 
-logger = Logger(__name__)
+logger = Logger("pyd2bot")
 
 
 class ContextChangeFrame(Frame):

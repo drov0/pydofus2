@@ -11,7 +11,7 @@ from com.ankamagames.jerakine.metaclasses.Singleton import Singleton
 from com.ankamagames.jerakine.types.positions.MapPoint import MapPoint
 from com.ankamagames.jerakine.types.positions.WorldPoint import WorldPoint
 
-logger = Logger(__name__)
+logger = Logger("pyd2bot")
 
 
 class MapDisplayManager(metaclass=Singleton):

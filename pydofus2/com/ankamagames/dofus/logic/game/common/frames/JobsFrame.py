@@ -62,7 +62,7 @@ from com.ankamagames.jerakine.messages.Frame import Frame
 from com.ankamagames.jerakine.messages.Message import Message
 from com.ankamagames.jerakine.types.enums.Priority import Priority
 
-logger = Logger(__name__)
+logger = Logger("pyd2bot")
 
 
 class JobsFrame(Frame):

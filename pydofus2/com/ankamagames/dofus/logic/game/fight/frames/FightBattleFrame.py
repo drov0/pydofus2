@@ -134,7 +134,7 @@ if TYPE_CHECKING:
         FightContextFrame,
     )
 
-logger = Logger(__name__)
+logger = Logger("pyd2bot")
 
 
 class FightBattleFrame(Frame):
@@ -487,11 +487,7 @@ class FightBattleFrame(Frame):
             return False
 
         elif isinstance(msg, GameFightTurnReadyRequestMessage):
-            if self._executingSequence:
-                logger.warn("Delaying turn end acknowledgement because we're still in a sequence.")
-                self._confirmTurnEnd = True
-            else:
-                self.confirmTurnEnd()
+            self.confirmTurnEnd()
             return False
 
         elif isinstance(msg, GameFightNewWaveMessage):
@@ -518,8 +514,6 @@ class FightBattleFrame(Frame):
                 leaveSequenceFrame.process(fakeDeathMessage.init(0, 0, gflmsg.charId))
                 self._sequenceFrames.append(leaveSequenceFrame)
                 self.executeNextSequence()
-            if gflmsg.charId == PlayedCharacterManager().id and PlayedCharacterManager().isSpectator:
-                pass
             return True
 
         elif isinstance(msg, GameFightEndMessage):

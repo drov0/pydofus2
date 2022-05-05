@@ -1,7 +1,7 @@
 from com.ankamagames.dofus.logic.game.roleplay.types.FightTeam import FightTeam
 from com.ankamagames.jerakine.logger.Logger import Logger
 
-logger = Logger(__name__)
+logger = Logger("pyd2bot")
 
 
 class Fight:

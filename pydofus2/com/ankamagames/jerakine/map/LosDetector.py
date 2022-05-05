@@ -5,7 +5,7 @@ from com.ankamagames.jerakine.map.ILosDetector import ILosDetector
 from com.ankamagames.jerakine.types.positions.MapPoint import MapPoint
 from mapTools import MapTools
 
-logger = Logger(__name__)
+logger = Logger("pyd2bot")
 
 
 class LosDetector(ILosDetector):
@@ -14,7 +14,10 @@ class LosDetector(ILosDetector):
         cls, mapProvider: IDataMapProvider, refPos: MapPoint, targetPos: MapPoint, tested: dict[str, bool] = {}
     ) -> bool:
         los = True
-        if f"{targetPos.x}_{targetPos.y}" not in tested or refPos.inDiag(targetPos):
+        ptKey = f"{targetPos.x}_{targetPos.y}"
+        if ptKey in tested:
+            return tested[ptKey]
+        if refPos.inDiag(targetPos):
             line = MapTools.getCellsCoordBetween(refPos.cellId, targetPos.cellId)
             if len(line) == 0:
                 return True

@@ -45,7 +45,7 @@ from com.ankamagames.dofus.logic.game.common.managers.InventoryManager import (
     InventoryManager,
 )
 
-logger = Logger(__name__)
+logger = Logger("pyd2bot")
 
 
 class SpellWrapper(ISlotData, ICellZoneProvider, IDataCenter):

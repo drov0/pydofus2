@@ -145,7 +145,7 @@ if TYPE_CHECKING:
         GameRolePlayHumanoidInformations,
     )
 
-logger = Logger(__name__)
+logger = Logger("pyd2bot")
 
 
 class PlayedCharacterUpdatesFrame(Frame):

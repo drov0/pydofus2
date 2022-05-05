@@ -25,7 +25,7 @@ if TYPE_CHECKING:
     )
 from com.ankamagames.jerakine.logger.Logger import Logger
 
-logger = Logger(__name__)
+logger = Logger("pyd2bot")
 
 
 class SpellCastInFightManager:
@@ -53,17 +53,11 @@ class SpellCastInFightManager:
     def resetInitialCooldown(self, hasBeenSummoned: bool = False) -> None:
         spellWrapper: SpellWrapper = None
         spellManager: SpellManager = None
-        spim: "SpellInventoryManagementFrame" = (
-            Kernel().getWorker().getFrame("SpellInventoryManagementFrame")
-        )
+        spim: "SpellInventoryManagementFrame" = Kernel().getWorker().getFrame("SpellInventoryManagementFrame")
         spellList: list = spim.getFullSpellListByOwnerId(self.entityId)
         for spellWrapper in spellList:
             if spellWrapper.spellLevelInfos.initialCooldown is not 0:
-                if (
-                    hasBeenSummoned
-                    and spellWrapper.actualCooldown
-                    > spellWrapper.spellLevelInfos.initialCooldown
-                ):
+                if hasBeenSummoned and spellWrapper.actualCooldown > spellWrapper.spellLevelInfos.initialCooldown:
                     return
                 if self._spells[spellWrapper.spellId] is None:
                     self._spells[spellWrapper.spellId] = SpellManager(
@@ -72,37 +66,27 @@ class SpellCastInFightManager:
                 spellManager = self._spells[spellWrapper.spellId]
                 spellManager.resetInitialCooldown(self.currentTurn)
 
-    def updateCooldowns(
-        self, spellCooldowns: list["GameFightSpellCooldown"] = None
-    ) -> None:
+    def updateCooldowns(self, spellCooldowns: list["GameFightSpellCooldown"] = None) -> None:
         if self.needCooldownUpdate and not spellCooldowns:
             spellCooldowns = self._storedSpellCooldowns
-        playedFighterManager: CurrentPlayedFighterManager = (
-            CurrentPlayedFighterManager()
-        )
+        playedFighterManager: CurrentPlayedFighterManager = CurrentPlayedFighterManager()
         numCoolDown: int = len(spellCooldowns)
         for k in range(numCoolDown):
             spellCooldown = spellCooldowns[k]
-            spellW = SpellWrapper.getSpellWrapperById(
-                spellCooldown.spellId, self.entityId
-            )
+            spellW = SpellWrapper.getSpellWrapperById(spellCooldown.spellId, self.entityId)
             if not spellW:
                 self.needCooldownUpdate = True
                 self._storedSpellCooldowns = spellCooldowns
                 return
             if spellW and spellW.spellLevel > 0:
                 spellLevel = spellW.spell.getSpellLevel(spellW.spellLevel)
-                spellCastManager = playedFighterManager.getSpellCastManagerById(
-                    self.entityId
-                )
+                spellCastManager = playedFighterManager.getSpellCastManagerById(self.entityId)
                 spellCastManager.castSpell(spellW.id, spellW.spellLevel, [], False)
                 interval = spellLevel.minCastInterval
                 if spellCooldown.cooldown != 63:
                     castInterval = 0
                     castIntervalSet = 0
-                    spellModifiers = SpellModifiersManager().getSpellModifiers(
-                        self.entityId, spellW.id
-                    )
+                    spellModifiers = SpellModifiersManager().getSpellModifiers(self.entityId, spellW.id)
                     if spellModifiers is not None:
                         castInterval = spellModifiers.getModifierValue(
                             CharacterSpellModificationTypeEnum.CAST_INTERVAL
@@ -135,7 +119,5 @@ class SpellCastInFightManager:
     ) -> SpellManager:
         spellManager: SpellManager = self._spells[pSpellId]
         if spellManager == None and isForceNewInstance and pSpellLevelId is not -1:
-            spellManager = self._spells[pSpellId] = SpellManager(
-                self, pSpellId, pSpellLevelId
-            )
+            spellManager = self._spells[pSpellId] = SpellManager(self, pSpellId, pSpellLevelId)
         return spellManager

@@ -5,7 +5,7 @@ from com.ankamagames.jerakine.interfaces.IDataCenter import IDataCenter
 from com.ankamagames.jerakine.logger.Logger import Logger
 
 
-logger = Logger(__name__)
+logger = Logger("pyd2bot")
 
 
 class MapCoordinates(IDataCenter):
@@ -28,18 +28,14 @@ class MapCoordinates(IDataCenter):
         super().__init__()
 
     @classmethod
-    def getMapCoordinatesByCompressedCoords(
-        cls, compressedCoords: int
-    ) -> "MapCoordinates":
+    def getMapCoordinatesByCompressedCoords(cls, compressedCoords: int) -> "MapCoordinates":
         return GameData.getObject(cls.MODULE, compressedCoords)
 
     @classmethod
     def getMapCoordinatesByCoords(cls, x: int, y: int) -> "MapCoordinates":
         xCompressed: int = cls.getCompressedValue(x)
         yCompressed: int = cls.getCompressedValue(y)
-        return cls.getMapCoordinatesByCompressedCoords(
-            (xCompressed << 16) + yCompressed
-        )
+        return cls.getMapCoordinatesByCompressedCoords((xCompressed << 16) + yCompressed)
 
     @classmethod
     def getSignedValue(cls, v: int) -> int:

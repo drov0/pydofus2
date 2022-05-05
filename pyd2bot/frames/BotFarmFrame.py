@@ -46,7 +46,7 @@ if TYPE_CHECKING:
     from com.ankamagames.dofus.logic.game.roleplay.frames.RoleplayEntitiesFrame import (
         RoleplayEntitiesFrame,
     )
-logger = Logger(__name__)
+logger = Logger("pyd2bot")
 
 
 class BotFarmFrame(Frame):
@@ -99,12 +99,8 @@ class BotFarmFrame(Frame):
 
         elif isinstance(msg, InteractiveUseEndedMessage):
             if self._entities[msg.elemId] == PlayedCharacterManager().id:
-                logger.debug(
-                    f"[BotFarmFrame] Interactive element {msg.elemId} use ended"
-                )
-                logger.debug(
-                    "------------------------------------------------------------"
-                )
+                logger.debug(f"[BotFarmFrame] Interactive element {msg.elemId} use ended")
+                logger.debug("------------------------------------------------------------")
                 self._usingInteractive = FirstHeaderLineIsContinuationDefect
                 self.doFarm()
 
@@ -118,9 +114,7 @@ class BotFarmFrame(Frame):
             return True
 
         elif isinstance(msg, MapChangeFailedMessage):
-            logger.debug(
-                f"[BotFarmFrame] Map change to {self._dstMapId} failed will discard that destination"
-            )
+            logger.debug(f"[BotFarmFrame] Map change to {self._dstMapId} failed will discard that destination")
             self._mapIdDiscard.append(msg.mapId)
             MoveAPI.randomMapChange(discard=self._mapIdDiscard)
             return True

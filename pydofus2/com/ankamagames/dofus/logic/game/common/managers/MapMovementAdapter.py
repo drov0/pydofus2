@@ -3,7 +3,7 @@ from com.ankamagames.jerakine.types.positions.MapPoint import MapPoint
 from com.ankamagames.jerakine.types.positions.MovementPath import MovementPath
 from com.ankamagames.jerakine.types.positions.PathElement import PathElement
 
-logger = Logger(__name__)
+logger = Logger("pyd2bot")
 
 
 class MapMovementAdapter:

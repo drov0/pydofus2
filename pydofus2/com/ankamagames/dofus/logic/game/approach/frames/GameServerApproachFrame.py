@@ -107,7 +107,7 @@ from com.ankamagames.jerakine.network.messages.ServerConnectionFailedMessage imp
 from com.ankamagames.jerakine.types.DataStoreType import DataStoreType
 from com.ankamagames.jerakine.types.enums.Priority import Priority
 
-logger = Logger(__name__)
+logger = Logger("pyd2bot")
 
 
 class GameServerApproachFrame(Frame):
@@ -188,10 +188,7 @@ class GameServerApproachFrame(Frame):
         elif isinstance(msg, ServerConnectionFailedMessage):
             scfMsg = ServerConnectionFailedMessage(msg)
             self.authenticationTicketAccepted = False
-            if (
-                scfMsg.failedConnection
-                == connh.ConnectionsHandler.getConnection().getSubConnection(scfMsg)
-            ):
+            if scfMsg.failedConnection == connh.ConnectionsHandler.getConnection().getSubConnection(scfMsg):
                 PlayerManager().destroy()
             return True
 
@@ -214,9 +211,7 @@ class GameServerApproachFrame(Frame):
             cssmsg = msg
             self._loadingStart = time.perf_counter()
             if krnl.Kernel().getWorker().getFrame("ServerSelectionFrame"):
-                krnl.Kernel().getWorker().removeFrame(
-                    krnl.Kernel().getWorker().getFrame("ServerSelectionFrame")
-                )
+                krnl.Kernel().getWorker().removeFrame(krnl.Kernel().getWorker().getFrame("ServerSelectionFrame"))
             PlayedCharacterManager().infos = cssmsg.infos
             DataStoreType.CHARACTER_ID = str(cssmsg.infos.id)
             krnl.Kernel().getWorker().addFrame(WorldFrame())
@@ -233,13 +228,9 @@ class GameServerApproachFrame(Frame):
             # krnl.Kernel().getWorker().addFrame(AveragePricesFrame())
             if krnl.Kernel().beingInReconection and not self._reconnectMsgSend:
                 self._reconnectMsgSend = True
-                connh.ConnectionsHandler.getConnection().send(
-                    CharacterSelectedForceReadyMessage()
-                )
+                connh.ConnectionsHandler.getConnection().send(CharacterSelectedForceReadyMessage())
             if InterClientManager.flashKey and (
-                not PlayerManager()
-                or PlayerManager().server.id != 129
-                and PlayerManager().server.id != 130
+                not PlayerManager() or PlayerManager().server.id != 129 and PlayerManager().server.id != 130
             ):
                 flashKeyMsg = ClientKeyMessage.from_json(
                     {
@@ -268,20 +259,14 @@ class GameServerApproachFrame(Frame):
                 krnl.Kernel().beingInReconection = True
                 self.characterId = msg.id
                 self._reconnectMsgSend = True
-                connh.ConnectionsHandler.getConnection().send(
-                    CharacterSelectedForceReadyMessage()
-                )
+                connh.ConnectionsHandler.getConnection().send(CharacterSelectedForceReadyMessage())
 
         elif isinstance(msg, BasicTimeMessage):
             btmsg = msg
             TimeManager().serverTimeLag = (
-                btmsg.timestamp
-                + btmsg.timezoneOffset * 60 * 1000
-                - datetime.now().timestamp()
+                btmsg.timestamp + btmsg.timezoneOffset * 60 * 1000 - datetime.now().timestamp()
             )
-            TimeManager().serverUtcTimeLag = (
-                btmsg.timestamp - datetime.now().timestamp()
-            )
+            TimeManager().serverUtcTimeLag = btmsg.timestamp - datetime.now().timestamp()
             TimeManager().timezoneOffset = btmsg.timezoneOffset * 60 * 1000
             TimeManager().dofusTimeYearLag = -1370
             return True
@@ -292,9 +277,7 @@ class GameServerApproachFrame(Frame):
             for gift in salm.actions:
                 _items = []
                 for item in gift.items:
-                    iw = ItemWrapper.create(
-                        0, 0, item.objectGID, item.quantity, item.effects, False
-                    )
+                    iw = ItemWrapper.create(0, 0, item.objectGID, item.quantity, item.effects, False)
                     _items.append(iw)
                     oj = {
                         "uid": gift.uid,

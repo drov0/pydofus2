@@ -11,7 +11,7 @@ from com.hurlan.crypto.symmetric.ECBMode import ECBMode
 from flash.Capabilities import Capabilities
 
 
-logger = Logger(__name__)
+logger = Logger("pyd2bot")
 
 
 class ShieldCertifcate:
@@ -64,9 +64,7 @@ class ShieldCertifcate:
         self.version = version
 
     @classmethod
-    def fromRaw(
-        cls, data: ByteArray, output: "ShieldCertifcate" = None
-    ) -> "ShieldCertifcate":
+    def fromRaw(cls, data: ByteArray, output: "ShieldCertifcate" = None) -> "ShieldCertifcate":
         result: ShieldCertifcate = output if output is not None else ShieldCertifcate()
         data.position = 0
         header: str = data.readUTFBytes(3)
@@ -165,9 +163,7 @@ class ShieldCertifcate:
 
     def toNetwork(self) -> TrustCertificate:
         certif: TrustCertificate = TrustCertificate()
-        hash: str = sha256(
-            bytes.fromhex(self.getHash()) + self.content.encode()
-        ).hexdigest()
+        hash: str = sha256(bytes.fromhex(self.getHash()) + self.content.encode()).hexdigest()
         certif.init(self.id, hash)
         return certif
 

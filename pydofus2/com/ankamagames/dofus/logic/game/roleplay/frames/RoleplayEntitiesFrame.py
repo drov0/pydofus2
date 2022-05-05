@@ -5,6 +5,7 @@ from com.ankamagames.atouin.managers.EntitiesManager import EntitiesManager
 from com.ankamagames.atouin.managers.MapDisplayManager import MapDisplayManager
 from com.ankamagames.atouin.messages.MapLoadedMessage import MapLoadedMessage
 from com.ankamagames.atouin.utils.DataMapProvider import DataMapProvider
+from com.ankamagames.dofus.datacenter.monsters.Monster import Monster
 from com.ankamagames.dofus.datacenter.world.SubArea import SubArea
 from com.ankamagames.dofus.internalDatacenter.DataEnum import DataEnum
 from com.ankamagames.dofus.internalDatacenter.world.WorldPointWrapper import (
@@ -52,6 +53,7 @@ from com.ankamagames.dofus.network.messages.game.interactive.InteractiveUsedMess
 from com.ankamagames.dofus.network.messages.game.interactive.StatedMapUpdateMessage import (
     StatedMapUpdateMessage,
 )
+from com.ankamagames.dofus.network.types.game.context.GameContextActorInformations import GameContextActorInformations
 from com.ankamagames.dofus.network.types.game.context.fight.FightCommonInformations import (
     FightCommonInformations,
 )
@@ -96,6 +98,7 @@ from com.ankamagames.dofus.network.types.game.context.roleplay.HumanOptionObject
 from com.ankamagames.dofus.network.types.game.context.roleplay.HumanOptionSkillUse import (
     HumanOptionSkillUse,
 )
+from com.ankamagames.dofus.network.types.game.context.roleplay.MonsterInGroupLightInformations import MonsterInGroupLightInformations
 from com.ankamagames.dofus.network.types.game.interactive.InteractiveElement import (
     InteractiveElement,
 )
@@ -482,3 +485,24 @@ class RoleplayEntitiesFrame(AbstractEntitiesFrame, Frame):
             teams.append(fightTeam)
             teamCounter += 1
         self._fights[infos.fightId] = fight
+
+    def updateMonstersGroup(self, pMonstersInfo:GameRolePlayGroupMonsterInformations) -> None:
+        monsterInfos:MonsterInGroupLightInformations = None
+        underling:MonsterInGroupLightInformations = None
+        monstersGroup:list[MonsterInGroupLightInformations] = self.getMonsterGroup(pMonstersInfo.staticInfos)
+        groupHasMiniBoss:bool = Monster.getMonsterById(pMonstersInfo.staticInfos.mainCreatureLightInfos.genericId).isMiniBoss
+        if monstersGroup:
+            for monsterInfos in monstersGroup:
+                if monsterInfos.genericId == pMonstersInfo.staticInfos.mainCreatureLightInfos.genericId:
+                    monstersGroup.remove(monsterInfos)
+        for underling in pMonstersInfo.staticInfos.underlings:
+            if not groupHasMiniBoss and Monster.getMonsterById(underling.genericId).isMiniBoss:
+                groupHasMiniBoss = True
+
+    def updateMonstersGroups(self) -> None:
+        entityInfo:GameContextActorInformations = None
+        entities:dict = entities
+        for entityInfo in entities:
+            if isinstance(entityInfo, GameRolePlayGroupMonsterInformations):
+                self.updateMonstersGroup(entityInfo)
+        

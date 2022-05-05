@@ -100,7 +100,7 @@ if TYPE_CHECKING:
     from com.ankamagames.dofus.logic.game.roleplay.frames.RoleplayMovementFrame import RoleplayMovementFrame
 
 
-logger = Logger(__name__)
+logger = Logger("pyd2bot")
 
 
 class BotFightFrame(Frame, metaclass=Singleton):
@@ -142,6 +142,7 @@ class BotFightFrame(Frame, metaclass=Singleton):
         self._reachableCells = None
         self._turnAction = []
         self._seqQueue = []
+        self._waitingSeqEnd = False
         return True
 
     @property
@@ -195,7 +196,7 @@ class BotFightFrame(Frame, metaclass=Singleton):
             curr: MapPoint = path[-1]
             tested = {}
             currSpellZone = spellZone.getCells(curr.cellId)
-            currReachableCells = self.getReachableCells(curr.cellId)
+            currReachableCells = FightReachableCellsMaker(self.fighterInfos, curr.cellId, 1).reachableCells
             for target in targets:
                 if (
                     target["pos"].cellId in currSpellZone
@@ -203,12 +204,11 @@ class BotFightFrame(Frame, metaclass=Singleton):
                     and self.canCastSpell(spellw, target["targetId"])
                 ):
                     return target, path[1:]
-            for mp in curr.vicinity():
-                if mp.cellId in currReachableCells:
-                    pmove = curr.pointMov(DataMapProvider(), mp, False)
-                    if mp not in seen and pmove:
-                        queue.append(path + [mp])
-                        seen.add(mp)
+            for cellId in currReachableCells:
+                mp = MapPoint.fromCellId(cellId)
+                if mp not in seen:
+                    queue.append(path + [mp])
+                    seen.add(mp)
         return None, None
 
     def getSpellWrapper(self, id: int) -> SpellWrapper:
@@ -272,11 +272,12 @@ class BotFightFrame(Frame, metaclass=Singleton):
         if len(self._turnAction) > 0:
             action = self._turnAction.pop(0)
             action["fct"](*action["args"])
+            self._waitingSeqEnd = True
         else:
             self.playTurn()
 
     def playTurn(self):
-        self._reachableCells = self.getReachableCells()
+        self._reachableCells = FightReachableCellsMaker(self.fighterInfos).reachableCells
         # logger.debug(f"reachable cells {self._reachableCells}")
         self._wantcastSpell = None
         spellw = self.getSpellWrapper(self._spellId)
@@ -286,20 +287,22 @@ class BotFightFrame(Frame, metaclass=Singleton):
         logger.debug(f"MP : {movementPoints}, AP : {actionPoints}")
         target, path = self.findPathToTarget(spellw)
         if path is not None:
-            logger.debug(f"Found path to hit a mob {[mp.cellId for mp in path]}")
+            logger.debug(
+                f"Found path {[mp.cellId for mp in path]} to hit a mob {target['targetId']} at pos {target['pos'].cellId}"
+            )
             if len(path) == 0:
                 self.addTurnAction(self.castSpell, [self._spellId, target["pos"].cellId])
             elif path[-1].cellId in self._reachableCells:
-                logger.debug(f"Path ends in reachable cell {path[-1].cellId}")
-                self.addTurnAction(self.moveToCell, [path[-1]])
+                logger.debug(f"Path ends in a reachable cell {path[-1].cellId}")
+                self.addTurnAction(self.askMove, [path])
                 self.addTurnAction(self.castSpell, [self._spellId, target["pos"].cellId])
             else:
                 for i, mp in enumerate(path):
                     if mp.cellId not in self._reachableCells:
                         if i != 0:
-                            self.addTurnAction(self.moveToCell, [path[i - 1]])
-                            self.addTurnAction(self.turnEnd, [])
+                            self.addTurnAction(self.askMove, [path[:i]])
                         break
+                self.addTurnAction(self.turnEnd, [])
         else:
             self.addTurnAction(self.turnEnd, [])
         self.nextTurnAction()
@@ -349,7 +352,9 @@ class BotFightFrame(Frame, metaclass=Singleton):
                 if self._seqQueue:
                     self._seqQueue.pop()
                     if not self._seqQueue:
-                        self.nextTurnAction()
+                        if self._waitingSeqEnd:
+                            self._waitingSeqEnd = False
+                            self.nextTurnAction()
             return True
 
         elif isinstance(msg, SequenceStartMessage):
@@ -426,21 +431,11 @@ class BotFightFrame(Frame, metaclass=Singleton):
     def fighterPos(self) -> "MapPoint":
         return MapPoint.fromCellId(self.fighterInfos.disposition.cellId)
 
-    def getReachableCells(self, cellId=None) -> list[int]:
-        infos = self.fighterInfos
-        tmp = infos.disposition.cellId
-        if cellId is None:
-            cellId = tmp
-        infos.disposition.cellId = cellId
-        reachableCells: FightReachableCellsMaker = FightReachableCellsMaker(self.fighterInfos).reachableCells
-        infos.disposition.cellId = tmp
-        return reachableCells
-
     def fightRandomMove(self) -> None:
         if len(self.reachableCells) == 0:
             return
         randomCell: int = random.choice(self.reachableCells)
-        self.moveToCell(MapPoint.fromCellId(randomCell))
+        self.askMove(MapPoint.fromCellId(randomCell))
 
     @property
     def mobPositions(self) -> list[MapPoint]:
@@ -463,7 +458,8 @@ class BotFightFrame(Frame, metaclass=Singleton):
         gafcrmsg.init(spellId, cellId)
         ConnectionsHandler.getConnection().send(gafcrmsg)
 
-    def moveToCell(self, cell: MapPoint) -> None:
+    def askMove(self, mpcells: list[MapPoint], mpcellsTackled: list[MapPoint] = []) -> None:
+        logger.debug(f"ask move follwing path {[mp.cellId for mp in mpcells]}")
         if not self._myTurn:
             logger.debug("Wants to move when it's not its turn yet")
             return False
@@ -471,8 +467,7 @@ class BotFightFrame(Frame, metaclass=Singleton):
         if not fightTurnFrame:
             logger.debug("Wants to move inside fight but 'FightTurnFrame' not found in kernel")
             return False
-        logger.debug(f"Current cell {self.fighterInfos.disposition.cellId} moving to cell {cell.cellId}")
-        fightTurnFrame.drawPath(cell)
-        self._requestedMovement = cell
-        fightTurnFrame.askMoveTo(cell)
+        cells = [mp.cellId for mp in mpcells]
+        cellsTackled = [mp.cellId for mp in mpcellsTackled]
+        fightTurnFrame.askMoveTo(cells, cellsTackled)
         return True

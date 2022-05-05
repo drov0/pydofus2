@@ -73,7 +73,7 @@ from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from com.ankamagames.dofus.internalDatacenter.items.ItemWrapper import ItemWrapper
 
-logger = Logger(__name__)
+logger = Logger("pyd2bot")
 
 
 class InventoryManager(metaclass=Singleton):
@@ -164,21 +164,13 @@ class InventoryManager(metaclass=Singleton):
         if not self._bankInventory:
             self._bankInventory = Inventory()
             self._bankInventory.addView(BankView(self._bankInventory.hookLock))
-            self._bankInventory.addView(
-                BankEquipementView(self._bankInventory.hookLock)
-            )
-            self._bankInventory.addView(
-                BankConsumablesView(self._bankInventory.hookLock)
-            )
-            self._bankInventory.addView(
-                BankRessourcesView(self._bankInventory.hookLock)
-            )
+            self._bankInventory.addView(BankEquipementView(self._bankInventory.hookLock))
+            self._bankInventory.addView(BankConsumablesView(self._bankInventory.hookLock))
+            self._bankInventory.addView(BankRessourcesView(self._bankInventory.hookLock))
             self._bankInventory.addView(BankCosmeticsView(self._bankInventory.hookLock))
             self._bankInventory.addView(BankQuestView(self._bankInventory.hookLock))
             self._bankInventory.addView(BankMinoukiView(self._bankInventory.hookLock))
-            self._bankInventory.addView(
-                BankMinoukiFilteredView(self._bankInventory.hookLock)
-            )
+            self._bankInventory.addView(BankMinoukiFilteredView(self._bankInventory.hookLock))
             self._bankInventory.addView(BankFilteredView(self._bankInventory.hookLock))
         return self._bankInventory
 

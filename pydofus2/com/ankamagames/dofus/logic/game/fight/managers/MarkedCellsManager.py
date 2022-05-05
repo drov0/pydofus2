@@ -27,7 +27,7 @@ from com.ankamagames.jerakine.types.zones.Cross import Cross
 from com.ankamagames.jerakine.types.zones.Custom import Custom
 from com.ankamagames.jerakine.types.zones.Lozenge import Lozenge
 
-logger = Logger(__name__)
+logger = Logger("pyd2bot")
 
 
 class MarkedCellsManager(IDestroyable, metaclass=Singleton):
@@ -95,9 +95,7 @@ class MarkedCellsManager(IDestroyable, metaclass=Singleton):
             self._marks[markId] = mi
             self.updateDataMapProvider()
 
-    def getMarks(
-        self, pMarkType: int, pTeamId: int, pActiveOnly: bool = True
-    ) -> list[MarkInstance]:
+    def getMarks(self, pMarkType: int, pTeamId: int, pActiveOnly: bool = True) -> list[MarkInstance]:
         marks: list[MarkInstance] = list[MarkInstance]()
         for mi in self._marks:
             if (
@@ -153,9 +151,7 @@ class MarkedCellsManager(IDestroyable, metaclass=Singleton):
                 self._glyphs[markId].clear()
             del self._glyphs[markId]
 
-    def getMarksMapPoint(
-        self, markType: int, teamId: int = 2, activeOnly: bool = True
-    ) -> list[MapPoint]:
+    def getMarksMapPoint(self, markType: int, teamId: int = 2, activeOnly: bool = True) -> list[MapPoint]:
         mapPoints: list[MapPoint] = list[MapPoint]()
         for mi in self._marks.values():
             if (
@@ -168,53 +164,32 @@ class MarkedCellsManager(IDestroyable, metaclass=Singleton):
 
     def getMarkAtCellId(self, cellId: int, markType: int = -1) -> MarkInstance:
         for mark in self._marks.values():
-            if mark.markImpactCellId == cellId and (
-                markType == -1 or markType == mark.markType
-            ):
+            if mark.markImpactCellId == cellId and (markType == -1 or markType == mark.markType):
                 return mark
         return None
 
     def cellHasTrap(self, cellId: int) -> bool:
         for mark in self._marks.values():
-            if (
-                mark.markImpactCellId == cellId
-                and mark.markType == GameActionMarkTypeEnum.TRAP
-            ):
+            if mark.markImpactCellId == cellId and mark.markType == GameActionMarkTypeEnum.TRAP:
                 return True
         return False
 
     def getCellIdsFromMarkIds(self, markIds: list[int]) -> list[int]:
         cellIds: list[int] = list[int]()
         for markId in markIds:
-            if (
-                self._marks[markId]
-                and self._marks[markId].cells
-                and len(self._marks[markId].cells) == 1
-            ):
+            if self._marks[markId] and self._marks[markId].cells and len(self._marks[markId].cells) == 1:
                 cellIds.append(self._marks[markId].cells[0])
             else:
-                logger.warn(
-                    "Can't find cellId for markId "
-                    + markId
-                    + " in getCellIdsFromMarkIds()"
-                )
+                logger.warn("Can't find cellId for markId " + markId + " in getCellIdsFromMarkIds()")
         return cellIds
 
     def getMapPointsFromMarkIds(self, markIds: list[int]) -> list[MapPoint]:
         mapPoints: list[MapPoint] = list[MapPoint]()
         for markId in markIds:
-            if (
-                self._marks[markId]
-                and self._marks[markId].cells
-                and len(self._marks[markId].cells) == 1
-            ):
+            if self._marks[markId] and self._marks[markId].cells and len(self._marks[markId].cells) == 1:
                 mapPoints.append(MapPoint.fromCellId(self._marks[markId].cells[0]))
             else:
-                logger.warn(
-                    "Can't find cellId for markId "
-                    + markId
-                    + " in getMapPointsFromMarkIds()"
-                )
+                logger.warn("Can't find cellId for markId " + markId + " in getMapPointsFromMarkIds()")
         return mapPoints
 
     def getActivePortalsCount(self, teamId: int = 2) -> int:
@@ -273,9 +248,7 @@ class MarkedCellsManager(IDestroyable, metaclass=Singleton):
             mp = MapPoint.fromCellId(i)
             dmp.setSpecialEffects(i, (dmp.pointSpecialEffects(mp.x, mp.y) | 3) ^ 3)
             if markedCells[i]:
-                dmp.setSpecialEffects(
-                    i, dmp.pointSpecialEffects(mp.x, mp.y) | markedCells[i]
-                )
+                dmp.setSpecialEffects(i, dmp.pointSpecialEffects(mp.x, mp.y) | markedCells[i])
         self.updateMarksNumber(GameActionMarkTypeEnum.PORTAL)
 
     def updateMarksNumber(self, marktype: int) -> None:

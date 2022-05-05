@@ -7,7 +7,7 @@ from com.ankamagames.jerakine.types.positions.MapPoint import MapPoint
 if TYPE_CHECKING:
     from com.ankamagames.atouin.data.map.Cell import Cell
     from com.ankamagames.atouin.data.map.Map import Map
-logger = Logger(__name__)
+logger = Logger("pyd2bot")
 
 
 class Zone(dict[int, "Cell"]):
@@ -21,9 +21,7 @@ class Zone(dict[int, "Cell"]):
         if direction not in self._ouGoingCells:
             mapOutCells = self.map.getOutgoingCells(direction)
             logger.debug(f"mapOutCells to direction {direction}: {mapOutCells}")
-            self._ouGoingCells[direction] = [
-                cellId for cellId in mapOutCells if cellId in self
-            ]
+            self._ouGoingCells[direction] = [cellId for cellId in mapOutCells if cellId in self]
             logger.debug(f"zone OutCells to direction {direction}: {mapOutCells}")
         return self._ouGoingCells[direction]
 
@@ -32,11 +30,7 @@ class Zone(dict[int, "Cell"]):
 
     def getPossibleMapChangeDirections(self):
         if not self._possibleDirections:
-            self._possibleDirections = [
-                direction
-                for direction in range(0, 8, 2)
-                if self.getOutGoingCells(direction)
-            ]
+            self._possibleDirections = [direction for direction in range(0, 8, 2) if self.getOutGoingCells(direction)]
         return self._possibleDirections
 
     def getRandMapChange(self) -> tuple[int, int]:

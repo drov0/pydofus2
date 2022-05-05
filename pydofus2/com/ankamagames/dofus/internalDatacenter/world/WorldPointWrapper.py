@@ -4,7 +4,7 @@ from com.ankamagames.dofus.datacenter.world.MapScrollAction import MapScrollActi
 from com.ankamagames.jerakine.logger.Logger import Logger
 from com.ankamagames.jerakine.types.positions.WorldPoint import WorldPoint
 
-logger = Logger(__name__)
+logger = Logger("pyd2bot")
 
 
 class WorldPointWrapper(WorldPoint):

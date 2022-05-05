@@ -24,7 +24,7 @@ from com.ankamagames.jerakine.messages.Frame import Frame
 from com.ankamagames.jerakine.messages.Message import Message
 from com.ankamagames.jerakine.types.enums.Priority import Priority
 
-logger = Logger(__name__)
+logger = Logger("pyd2bot")
 
 
 class WorldFrame(Frame):
@@ -80,15 +80,15 @@ class WorldFrame(Frame):
 
     def getMonsterXpBoostMultiplier(self, pMonsterId: int) -> float:
         boost: MonsterBoosts = self.getMonsterBoost(pMonsterId)
-        return (
-            boost.xpBoost / 100 if not boost else 1
-        ) * self.getRaceXpBoostMultiplier(Monster.getMonsterById(pMonsterId).race)
+        return (boost.xpBoost / 100 if not boost else 1) * self.getRaceXpBoostMultiplier(
+            Monster.getMonsterById(pMonsterId).race
+        )
 
     def getMonsterDropBoostMultiplier(self, pMonsterId: int) -> float:
         boost: MonsterBoosts = self.getMonsterBoost(pMonsterId)
-        return (
-            boost.dropBoost / 100 if not boost else 1
-        ) * self.getRaceDropBoostMultiplier(Monster.getMonsterById(pMonsterId).race)
+        return (boost.dropBoost / 100 if not boost else 1) * self.getRaceDropBoostMultiplier(
+            Monster.getMonsterById(pMonsterId).race
+        )
 
     def getRaceXpBoostMultiplier(self, pRaceId: int) -> float:
         boost: MonsterBoosts = self.getRaceBoost(pRaceId)

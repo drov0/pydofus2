@@ -1,13 +1,11 @@
 from com.ankamagames.jerakine.logger.Logger import Logger
 import re
 
-logger = Logger(__name__)
+logger = Logger("pyd2bot")
 
 
 class StringUtils:
-    accents: str = (
-        "ŠŒŽšœžÀÁÂÃÄÅÆÇÈÉÊËÌÍÎÏÐÑÒÓÔÕÖØÙÚÛÜŸÝÞßàáâãäåæçèéêëìíîïðñòóôõöøùúûüýÿþ"
-    )
+    accents: str = "ŠŒŽšœžÀÁÂÃÄÅÆÇÈÉÊËÌÍÎÏÐÑÒÓÔÕÖØÙÚÛÜŸÝÞßàáâãäåæçèéêëìíîïðñòóôõöøùúûüýÿþ"
     pattern = None
 
     def fill(str: str, len: int, char: str, before: bool = True) -> str:
@@ -113,9 +111,7 @@ class StringUtils:
         pSecondDelimiter: str,
         pIncludeDelimiter: bool = False,
     ) -> list[str]:
-        r = re.findall(
-            re.escape(pFirstDelimiter) + r"(.*?)" + re.escape(pSecondDelimiter), pText
-        )
+        r = re.findall(re.escape(pFirstDelimiter) + r"(.*?)" + re.escape(pSecondDelimiter), pText)
         r = [_.lstrip(pFirstDelimiter).rstrip(pSecondDelimiter) for _ in r]
         if pIncludeDelimiter:
             r = [pFirstDelimiter + _ + pSecondDelimiter for _ in r]
@@ -130,12 +126,8 @@ class StringUtils:
         return StringUtils.decomposeUnicode(src)
 
     def decomposeUnicode(src: str) -> str:
-        toCheck: str = (
-            src if len(StringUtils.accents) < len(src) else StringUtils.accents
-        )
-        toLoop: str = (
-            StringUtils.accents if len(StringUtils.accents) < len(src) else src
-        )
+        toCheck: str = src if len(StringUtils.accents) < len(src) else StringUtils.accents
+        toLoop: str = StringUtils.accents if len(StringUtils.accents) < len(src) else src
         for c in toLoop:
             if c in toCheck:
                 src = re.sub(c, StringUtils.pattern[c], src)

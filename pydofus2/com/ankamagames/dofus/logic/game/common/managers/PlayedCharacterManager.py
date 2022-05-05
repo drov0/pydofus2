@@ -1,4 +1,5 @@
 from typing import TYPE_CHECKING
+from com.ankamagames.dofus.logic.game.common.misc.DofusEntities import DofusEntities
 
 
 if TYPE_CHECKING:
@@ -44,7 +45,7 @@ from com.ankamagames.jerakine.types.Callback import Callback
 from com.ankamagames.jerakine.types.positions.Point import Point
 from damageCalculation.tools import StatIds
 
-logger = Logger(__name__)
+logger = Logger("pyd2bot")
 
 
 class PlayedCharacterManager(IDestroyable, metaclass=Singleton):
@@ -109,13 +110,13 @@ class PlayedCharacterManager(IDestroyable, metaclass=Singleton):
     @property
     def id(self) -> float:
         if self.infos:
-            return self.infos.id
+            return float(self.infos.id)
         return 0
 
     @id.setter
     def id(self, id: float) -> None:
         if self.infos:
-            self.infos.id = id
+            self.infos.id = float(id)
 
     @property
     def infos(self) -> "CharacterBaseInformations":
@@ -245,6 +246,14 @@ class PlayedCharacterManager(IDestroyable, metaclass=Singleton):
         if self.currentSubArea and self.currentSubArea.worldmap:
             return self.currentSubArea.worldmap.id
         return -1
+
+    @property
+    def currentCellId(self) -> int:
+        playedEntity = DofusEntities.getEntity(self.id)
+        if playedEntity is None:
+            logger.error("No player entity found")
+            return None
+        return playedEntity.position.cellId
 
     @property
     def isMutated(self) -> bool:

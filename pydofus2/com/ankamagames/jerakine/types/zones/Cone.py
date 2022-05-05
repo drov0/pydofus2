@@ -6,7 +6,7 @@ from com.ankamagames.jerakine.types.positions.MapPoint import MapPoint
 from com.ankamagames.jerakine.types.zones.IZone import IZone
 import mapTools.MapTools as MapTools
 
-logger = Logger(__name__)
+logger = Logger("pyd2bot")
 
 
 class Cone(IZone):
@@ -19,9 +19,7 @@ class Cone(IZone):
 
     _dataMapProvider: IDataMapProvider
 
-    def __init__(
-        self, nMinRadius: int, nRadius: int, dataMapProvider: IDataMapProvider
-    ):
+    def __init__(self, nMinRadius: int, nRadius: int, dataMapProvider: IDataMapProvider):
         super().__init__()
         self.radius = nRadius
         self.minRadius = nMinRadius

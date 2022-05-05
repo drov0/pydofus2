@@ -8,7 +8,7 @@ from com.ankamagames.jerakine.interfaces.IDataCenter import IDataCenter
 from com.ankamagames.jerakine.interfaces.ISlotDataHolder import ISlotDataHolder
 from com.ankamagames.jerakine.logger.Logger import Logger
 
-logger = Logger(__name__)
+logger = Logger("pyd2bot")
 
 
 class PresetWrapper(ItemWrapper, IDataCenter):
@@ -26,9 +26,7 @@ class PresetWrapper(ItemWrapper, IDataCenter):
     def __init__(self):
         super().__init__()
 
-    def create(
-        self, id: int, gfxId: int, objects: list[ItemForPreset], mount: bool = False
-    ) -> "PresetWrapper":
+    def create(self, id: int, gfxId: int, objects: list[ItemForPreset], mount: bool = False) -> "PresetWrapper":
 
         mountFakeItemWrapper: MountWrapper = None
         itemsCount: int = inventorymgr.InventoryManager().getMaxItemsCountForPreset()
@@ -43,20 +41,12 @@ class PresetWrapper(ItemWrapper, IDataCenter):
             for item in objects:
                 if item.position == pos:
                     if item.objUid:
-                        presetWrapper.objects[i] = inventorymgr.InventoryManager().inventory.getItem(
-                            item.objUid
-                        )
+                        presetWrapper.objects[i] = inventorymgr.InventoryManager().inventory.getItem(item.objUid)
                     else:
-                        presetWrapper.objects[i] = ItemWrapper.create(
-                            0, 0, item.objGid, 1, None, False
-                        )
+                        presetWrapper.objects[i] = ItemWrapper.create(0, 0, item.objGid, 1, None, False)
                         presetWrapper.objects[i].active = False
                     objExists = True
-            if (
-                pos == CharacterInventoryPositionEnum.ACCESSORY_POSITION_PETS
-                and not objExists
-                and mount
-            ):
+            if pos == CharacterInventoryPositionEnum.ACCESSORY_POSITION_PETS and not objExists and mount:
                 mountFakeItemWrapper = MountWrapper.create()
                 presetWrapper.objects[i] = mountFakeItemWrapper
                 presetWrapper.objects[i].backGroundIconUri = None

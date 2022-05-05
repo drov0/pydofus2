@@ -4,7 +4,7 @@ from com.ankamagames.jerakine.network.parser.ProtocolSpec import ProtocolSpec
 from com.ankamagames.jerakine.network.parser.TypeEnum import TypeEnum
 import com.ankamagames.jerakine.network.parser.NetworkMessageClassDefinition as nmcd
 
-logger = Logger(__name__)
+logger = Logger("pyd2bot")
 
 
 class NetMsgDataField:
@@ -69,9 +69,7 @@ class NetMsgDataField:
             raise Exception(f"Type id {typeId} not found in known types ids")
         ret = getattr(self._raw, dataReader)()
         if self.TRACE:
-            logger.debug(
-                f"{self._spec['name']} : {TypeEnum(self._spec['typeId']).name} =  value is {ret}"
-            )
+            logger.debug(f"{self._spec['name']} : {TypeEnum(self._spec['typeId']).name} =  value is {ret}")
         return ret
 
     def readObject(self):

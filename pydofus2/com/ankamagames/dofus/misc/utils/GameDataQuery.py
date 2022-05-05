@@ -11,17 +11,13 @@ from com.ankamagames.jerakine.enum.GameDataTypeEnum import GameDataTypeEnum
 from com.ankamagames.jerakine.logger.Logger import Logger
 from com.ankamagames.jerakine.utils.misc.StringUtils import StringUtils
 
-logger = Logger(__name__)
+logger = Logger("pyd2bot")
 
 
 class GameDataQuery:
     def getQueryableFields(cls, target: object) -> list[str]:
         target = cls.checkPackage(target)
-        return (
-            GameDataFileAccessor()
-            .getDataProcessor(target["MODULE"])
-            .getQueryableField()
-        )
+        return GameDataFileAccessor().getDataProcessor(target["MODULE"]).getQueryableField()
 
     def union(cls, *idsVectors) -> list[int]:
         result: list[int] = list[int]()
@@ -61,11 +57,7 @@ class GameDataQuery:
         fieldName = cls.checkField(target, fieldName)
         if not fieldName:
             return list[int]()
-        result = (
-            GameDataFileAccessor()
-            .getDataProcessor(getattr(target, "MODULE"))
-            .queryEquals(fieldName, value)
-        )
+        result = GameDataFileAccessor().getDataProcessor(getattr(target, "MODULE")).queryEquals(fieldName, value)
         if isinstance(value, Iterable):
             return cls.union(result)
         return result
@@ -93,11 +85,7 @@ class GameDataQuery:
         fieldName = cls.checkField(target, fieldName)
         if not fieldName:
             return list[int]()
-        return (
-            GameDataFileAccessor()
-            .getDataProcessor(target["MODULE"])
-            .query(fieldName, cls.getGreaterThanFct(value))
-        )
+        return GameDataFileAccessor().getDataProcessor(target["MODULE"]).query(fieldName, cls.getGreaterThanFct(value))
 
     @classmethod
     def querySmallerThan(cls, target: object, fieldName: str, value) -> list[int]:
@@ -105,11 +93,7 @@ class GameDataQuery:
         fieldName = cls.checkField(target, fieldName)
         if not fieldName:
             return list[int]()
-        return (
-            GameDataFileAccessor()
-            .getDataProcessor(target["MODULE"])
-            .query(fieldName, cls.getSmallerThanFct(value))
-        )
+        return GameDataFileAccessor().getDataProcessor(target["MODULE"]).query(fieldName, cls.getSmallerThanFct(value))
 
     @classmethod
     def returnInstance(cls, target: object, ids: list[int]) -> list[object]:
@@ -124,9 +108,7 @@ class GameDataQuery:
         return result
 
     @classmethod
-    def sort(
-        cls, target: object, ids: list[int], fieldNames, ascending=True
-    ) -> list[int]:
+    def sort(cls, target: object, ids: list[int], fieldNames, ascending=True) -> list[int]:
         cleanedFieldNames: list[str] = None
         i: int = 0
         field: str = None
@@ -142,11 +124,7 @@ class GameDataQuery:
             fieldNames = cls.checkField(target, fieldNames)
         if not fieldNames or len(fieldNames) == 0:
             return list[int]()
-        return (
-            GameDataFileAccessor()
-            .getDataProcessor(target["MODULE"])
-            .sort(fieldNames, ids, ascending)
-        )
+        return GameDataFileAccessor().getDataProcessor(target["MODULE"]).sort(fieldNames, ids, ascending)
 
     @classmethod
     def sortI18n(cls, datas, fields, ascending) -> Any:
@@ -171,9 +149,7 @@ class GameDataQuery:
             fieldName = fieldNames[i]
             fieldIndex = dict()
             for data in datas:
-                fieldIndex[data[fieldName]] = I18nFileAccessor().getOrderIndex(
-                    data[fieldName]
-                )
+                fieldIndex[data[fieldName]] = I18nFileAccessor().getOrderIndex(data[fieldName])
             if len(ascending) < len(fieldNames):
                 ascending.append(True)
             sortWay.append(1 if not ascending[i] else -1)
@@ -182,15 +158,9 @@ class GameDataQuery:
 
         def function(t1, t2) -> float:
             for fieldIndex in range(maxFieldIndex):
-                if (
-                    indexes[fieldIndex][t1[fieldNames[fieldIndex]]]
-                    < indexes[fieldIndex][t2[fieldNames[fieldIndex]]]
-                ):
+                if indexes[fieldIndex][t1[fieldNames[fieldIndex]]] < indexes[fieldIndex][t2[fieldNames[fieldIndex]]]:
                     return -sortWay[fieldIndex]
-                if (
-                    indexes[fieldIndex][t1[fieldNames[fieldIndex]]]
-                    > indexes[fieldIndex][t2[fieldNames[fieldIndex]]]
-                ):
+                if indexes[fieldIndex][t1[fieldNames[fieldIndex]]] > indexes[fieldIndex][t2[fieldNames[fieldIndex]]]:
                     return sortWay[fieldIndex]
             return 0
 
@@ -198,11 +168,7 @@ class GameDataQuery:
 
     @classmethod
     def getMatchStringFct(cls, pattern: str) -> FunctionType:
-        return (
-            lambda s: StringUtils.noAccent(str).toLowerCase().find(pattern) != -1
-            if s
-            else False
-        )
+        return lambda s: StringUtils.noAccent(str).toLowerCase().find(pattern) != -1 if s else False
 
     @classmethod
     def getGreaterThanFct(cls, cmpValue) -> FunctionType:
@@ -217,15 +183,8 @@ class GameDataQuery:
         module = getattr(target, "MODULE")
         fields = GameDataFileAccessor().getDataProcessor(module).getQueryableField()
         if name not in fields:
-            fieldType = (
-                GameDataFileAccessor()
-                .getDataProcessor(module)
-                .getFieldType(name + "Id")
-            )
-            if (
-                name + "Id" not in fields
-                or GameDataTypeEnum(fieldType) != GameDataTypeEnum.I18N
-            ):
+            fieldType = GameDataFileAccessor().getDataProcessor(module).getFieldType(name + "Id")
+            if name + "Id" not in fields or GameDataTypeEnum(fieldType) != GameDataTypeEnum.I18N:
                 logger.error("Field " + name + " not found in " + target.__name__)
                 return None
             name += "Id"
@@ -242,7 +201,5 @@ class GameDataQuery:
                 if gameDataobjectName == className:
                     return GameDataField.getobjectByName(gameDataobjectName)
         elif moduleName.find("com.ankamagames.dofus.datacenter") != 0:
-            raise Exception(
-                target.__name__ + " is queryable (note found in datacenter package)."
-            )
+            raise Exception(target.__name__ + " is queryable (note found in datacenter package).")
         return target

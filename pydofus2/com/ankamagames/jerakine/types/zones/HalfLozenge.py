@@ -8,7 +8,7 @@ import mapTools.MapTools as MapTools
 
 class HalfLozenge(IZone):
 
-    logger = Logger(__name__)
+    logger = Logger("pyd2bot")
 
     _radius: int = 0
 

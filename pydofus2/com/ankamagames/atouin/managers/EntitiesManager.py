@@ -2,7 +2,7 @@ from com.ankamagames.jerakine.logger.Logger import Logger
 from com.ankamagames.jerakine.entities.interfaces.IEntity import IEntity
 from com.ankamagames.jerakine.metaclasses.Singleton import Singleton
 
-logger = Logger(__name__)
+logger = Logger("pyd2bot")
 
 
 class EntitiesManager(metaclass=Singleton):
@@ -13,15 +13,15 @@ class EntitiesManager(metaclass=Singleton):
         self._entitiesScheduledForDestruction = dict()
         self._currentRandomEntity: float = self.RANDOM_ENTITIES_ID_START
 
-    def addAnimatedEntity(self, entityID: float, entity: "IEntity", strata: int = 0) -> None:
+    def addAnimatedEntity(self, entityId: float, entity: "IEntity", strata: int = 0) -> None:
         if not isinstance(entity, IEntity):
             raise Exception("entity must be an IEntity, not a " + str(type(entity)))
-        if self._entities.get(entityID) is not None:
-            logger.warn(f"Entity overwriting! Entity {entityID} has been replaced.")
-        self._entities[entityID] = entity
+        if self._entities.get(float(entityId)) is not None:
+            logger.warn(f"Entity overwriting! Entity {float(entityId)} has been replaced.")
+        self._entities[float(entityId)] = entity
 
-    def getEntity(self, entityID: float) -> "IEntity":
-        return self._entities.get(entityID)
+    def getEntity(self, entityId: float) -> "IEntity":
+        return self._entities.get(float(entityId))
 
     def getEntityID(self, entity: "IEntity") -> float:
         for i in self._entities:
@@ -29,11 +29,11 @@ class EntitiesManager(metaclass=Singleton):
                 return float(i)
         return 0
 
-    def removeEntity(self, entityID: float) -> None:
-        if self._entities.get(entityID):
-            del self._entities[entityID]
-            if self._entitiesScheduledForDestruction.get(entityID):
-                del self._entitiesScheduledForDestruction[entityID]
+    def removeEntity(self, entityId: float) -> None:
+        if self._entities.get(float(entityId)):
+            del self._entities[float(entityId)]
+            if self._entitiesScheduledForDestruction.get(float(entityId)):
+                del self._entitiesScheduledForDestruction[float(entityId)]
 
     def clearEntities(self) -> None:
         entityBuffer: list = []

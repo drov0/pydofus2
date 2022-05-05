@@ -34,7 +34,7 @@ from com.ankamagames.jerakine.messages.Message import Message
 from com.ankamagames.jerakine.types.enums.Priority import Priority
 from com.ankamagames.jerakine.types.positions.MapPoint import MapPoint
 
-logger = Logger(__name__)
+logger = Logger("pyd2bot")
 
 
 class AbstractEntitiesFrame(Frame):
@@ -165,7 +165,7 @@ class AbstractEntitiesFrame(Frame):
         if infos.disposition.cellId != -1:
             characterEntity.position = MapPoint.fromCellId(infos.disposition.cellId)
         characterEntity: AnimatedCharacter = DofusEntities.getEntity(infos.contextualId)
-        logger.debug(f"addOrUpdateActor new actor added {infos.contextualId} position is {characterEntity.position}")
+        # logger.debug(f"addOrUpdateActor new actor added {infos.contextualId} position is {characterEntity.position}")
 
         return characterEntity
 

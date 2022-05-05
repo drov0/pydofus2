@@ -6,7 +6,7 @@ from com.hurlan.crypto.symmetric.IPad import IPad
 from com.hurlan.crypto.symmetric.ISymetricKey import ISymmetricKey
 from com.hurlan.crypto.symmetric.PKCS5 import PKCS5
 
-logger = Logger(__name__)
+logger = Logger("pyd2bot")
 
 
 class ECBMode(IMode, ICipher):
@@ -44,9 +44,7 @@ class ECBMode(IMode, ICipher):
         src.position = 0
         blockSize: int = self.key.getBlockSize()
         if len(src) % blockSize != 0:
-            raise Exception(
-                "ECB mode cipher length must be a multiple of blocksize " + blockSize
-            )
+            raise Exception("ECB mode cipher length must be a multiple of blocksize " + blockSize)
         block: ByteArray = ByteArray()
         dst: ByteArray = ByteArray()
         for i in range(0, len(src), blockSize):

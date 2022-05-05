@@ -22,7 +22,7 @@ from damageCalculation.tools.StatIds import StatIds
 from com.ankamagames.atouin.data.map.Cell import Cell
 from com.ankamagames.jerakine.types.positions.MapPoint import MapPoint
 
-logger = Logger(__name__)
+logger = Logger("pyd2bot")
 
 
 class _ReachableCellData:

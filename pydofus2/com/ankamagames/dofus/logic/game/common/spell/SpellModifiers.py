@@ -6,7 +6,7 @@ from com.ankamagames.dofus.logic.game.fight.actions.UpdateSpellModifierAction im
 import com.ankamagames.dofus.logic.game.fight.managers.SpellModifiersManager as spellmm
 from com.ankamagames.jerakine.logger.Logger import Logger
 
-logger = Logger(__name__)
+logger = Logger("pyd2bot")
 
 
 class SpellModifiers:
@@ -56,9 +56,7 @@ class SpellModifiers:
                 + ": "
                 + str(modifier)
             )
-        updateSpellModifierAction = UpdateSpellModifierAction.create(
-            self.entityId, self.spellId, modifier.id
-        )
+        updateSpellModifierAction = UpdateSpellModifierAction.create(self.entityId, self.spellId, modifier.id)
         Kernel().getWorker().process(updateSpellModifierAction)
 
     def getModifier(self, modifierId: float) -> SpellModifier:

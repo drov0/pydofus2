@@ -198,7 +198,7 @@ from com.ankamagames.jerakine.types.enums.Priority import Priority
 from com.ankamagames.jerakine.types.positions.MapPoint import MapPoint
 from com.ankamagames.jerakine.utils.memory.WeakReference import WeakReference
 
-logger = Logger(__name__)
+logger = Logger("pyd2bot")
 
 
 class FightContextFrame(Frame):

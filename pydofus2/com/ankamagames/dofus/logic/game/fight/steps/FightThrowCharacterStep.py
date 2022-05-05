@@ -31,7 +31,7 @@ from com.ankamagames.jerakine.sequencer.AbstractSequencable import AbstractSeque
 from com.ankamagames.jerakine.sequencer.SerialSequencer import SerialSequencer
 from com.ankamagames.jerakine.types.positions.MapPoint import MapPoint
 
-logger = Logger(__name__)
+logger = Logger("pyd2bot")
 
 
 class FightThrowCharacterStep(AbstractSequencable, IFightStep):
@@ -62,51 +62,34 @@ class FightThrowCharacterStep(AbstractSequencable, IFightStep):
         return "throwCharacter"
 
     def start(self) -> None:
-        entitiesFrame: FightEntitiesFrame = (
-            Kernel().getWorker().getFrame(FightEntitiesFrame)
-        )
+        entitiesFrame: FightEntitiesFrame = Kernel().getWorker().getFrame(FightEntitiesFrame)
         carryingEntity = DofusEntities.getEntity(self._fighterId)
-        carryingEntityInfos: GameFightFighterInformations = (
-            entitiesFrame.getEntityInfos(self._fighterId)
-        )
+        carryingEntityInfos: GameFightFighterInformations = entitiesFrame.getEntityInfos(self._fighterId)
         carriedEntity: IEntity = DofusEntities.getEntity(self._carriedId)
-        carriedEntityInfos: GameFightFighterInformations = entitiesFrame.getEntityInfos(
-            self._carriedId
-        )
+        carriedEntityInfos: GameFightFighterInformations = entitiesFrame.getEntityInfos(self._carriedId)
         carryingFighterExist: bool = True
         if not carriedEntity or not carriedEntityInfos.spawnInfo.alive:
-            logger.error(
-                f"Attention, l'entit� [{self._fighterId}] ne porte pas [{self._carriedId}]"
-            )
+            logger.error(f"Attention, l'entit� [{self._fighterId}] ne porte pas [{self._carriedId}]")
             if carriedEntity:
                 del carriedEntity
             self.throwFinished()
             return
         if not carryingEntity or not carryingEntityInfos.spawnInfo.alive:
-            logger.error(
-                f"Attention, l'entit� [{self._fighterId}] ne porte pas [{self._carriedId}]"
-            )
+            logger.error(f"Attention, l'entit� [{self._fighterId}] ne porte pas [{self._carriedId}]")
             carryingFighterExist = False
-        fighterInfos: "GameFightFighterInformations" = (
-            FightEntitiesFrame.getCurrentInstance().getEntityInfos(self._carriedId)
+        fighterInfos: "GameFightFighterInformations" = FightEntitiesFrame.getCurrentInstance().getEntityInfos(
+            self._carriedId
         )
         if self._cellId != -1:
             fighterInfos.disposition.cellId = self._cellId
         if self._carriedId == CurrentPlayedFighterManager().currentFighterId:
-            fightTurnFrame: "FightTurnFrame" = (
-                Kernel().getWorker().getFrame("FightTurnFrame")
-            )
+            fightTurnFrame: "FightTurnFrame" = Kernel().getWorker().getFrame("FightTurnFrame")
             if fightTurnFrame:
                 fightTurnFrame.freePlayer()
         invisibility: bool = False
-        if (
-            fighterInfos.stats.invisibilityState
-            == GameActionFightInvisibilityStateEnum.INVISIBLE
-        ):
+        if fighterInfos.stats.invisibilityState == GameActionFightInvisibilityStateEnum.INVISIBLE:
             invisibility = True
-        logger.debug(
-            f"{self._fighterId} is throwing {self._carriedId} (invisibility : {invisibility})"
-        )
+        logger.debug(f"{self._fighterId} is throwing {self._carriedId} (invisibility : {invisibility})")
         if not invisibility:
             FightEntitiesHolder().unholdEntity(self._carriedId)
         if carryingFighterExist:

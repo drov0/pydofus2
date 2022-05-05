@@ -17,7 +17,7 @@ from com.ankamagames.jerakine.network.INetworkMessage import INetworkMessage
 from com.ankamagames.jerakine.types.enums.Priority import Priority
 from com.ankamagames.dofus.kernel.PanicMessages import PanicMessages
 
-logger = Logger(__name__)
+logger = Logger("pyd2bot")
 
 
 class HandshakeFrame(Frame):
@@ -31,13 +31,7 @@ class HandshakeFrame(Frame):
         super().__init__()
 
     def checkProtocolVersions(self, serverVersion: str) -> None:
-        logger.info(
-            "Server version is "
-            + serverVersion
-            + ". Client version is "
-            + Metadata.PROTOCOL_BUILD
-            + "."
-        )
+        logger.info("Server version is " + serverVersion + ". Client version is " + Metadata.PROTOCOL_BUILD + ".")
         if not serverVersion or not Metadata.PROTOCOL_BUILD:
             logger.fatal("A protocol version is empty or None. What happened?")
             krnl.Kernel().panic(
@@ -47,9 +41,7 @@ class HandshakeFrame(Frame):
             return
         clientHash: str = self.extractHashFromProtocolVersion(Metadata.PROTOCOL_BUILD)
         if not clientHash:
-            logger.fatal(
-                "The client protocol version is malformed: " + Metadata.PROTOCOL_BUILD
-            )
+            logger.fatal("The client protocol version is malformed: " + Metadata.PROTOCOL_BUILD)
             krnl.Kernel().panic(
                 PanicMessages.MALFORMED_PROTOCOL,
                 [Metadata.PROTOCOL_BUILD, serverVersion],

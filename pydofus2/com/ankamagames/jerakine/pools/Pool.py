@@ -4,7 +4,7 @@ from com.ankamagames.jerakine.pools.PoolableLinkedListNode import PoolableLinked
 from mx.utils.LinkedList import LinkedList
 from mx.utils.LinkedListNode import LinkedListNode
 
-logger = Logger(__name__)
+logger = Logger("pyd2bot")
 
 
 class Pool:
@@ -15,9 +15,7 @@ class Pool:
     _warnLimit: int
     _totalSize: int
 
-    def __init__(
-        self, pooledClass: object, initialSize: int, growSize: int, warnLimit: int = 0
-    ):
+    def __init__(self, pooledClass: object, initialSize: int, growSize: int, warnLimit: int = 0):
         super().__init__()
         self._pooledClass = pooledClass
         if self._pooledClass is PoolableLinkedListNode:

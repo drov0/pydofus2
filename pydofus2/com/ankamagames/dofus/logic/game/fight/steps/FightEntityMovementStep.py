@@ -23,7 +23,7 @@ if TYPE_CHECKING:
     from com.ankamagames.jerakine.types.positions.MovementPath import MovementPath
     from com.ankamagames.dofus.logic.game.fight.frames.FightTurnFrame import FightTurnFrame
 
-logger = Logger(__name__)
+logger = Logger("pyd2bot")
 
 
 class FightEntityMovementStep(AbstractSequencable, IFightStep):

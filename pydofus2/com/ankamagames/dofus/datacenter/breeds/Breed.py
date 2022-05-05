@@ -8,7 +8,7 @@ from com.ankamagames.jerakine.data import I18n
 from com.ankamagames.jerakine.data.GameData import GameData
 from com.ankamagames.jerakine.interfaces.IDataCenter import IDataCenter
 
-logger = Logger(__name__)
+logger = Logger("pyd2bot")
 
 
 class Breed(IDataCenter):
@@ -102,15 +102,11 @@ class Breed(IDataCenter):
                 look = breed.maleLook.split("|")[1]
                 look = look.split(",")[0]
                 self._skinsForBreed[look] = breed.id
-                self._skinsForBreed[
-                    SkinMapping.getSkinMappingById(int(look)).lowDefId
-                ] = breed.id
+                self._skinsForBreed[SkinMapping.getSkinMappingById(int(look)).lowDefId] = breed.id
                 look = breed.femaleLook.split("|")[1]
                 look = look.split(",")[0]
                 self._skinsForBreed[look] = breed.id
-                self._skinsForBreed[
-                    SkinMapping.getSkinMappingById(int(look)).lowDefId
-                ] = breed.id
+                self._skinsForBreed[SkinMapping.getSkinMappingById(int(look)).lowDefId] = breed.id
         for skinKnown in self._skinsForBreed:
             if skinKnown == str(skin):
                 id = self._skinsForBreed[skinKnown]
@@ -147,9 +143,7 @@ class Breed(IDataCenter):
     @property
     def gameplayClassDescription(self) -> str:
         if not self._gameplayClassDescription:
-            self._gameplayClassDescription = I18n.getText(
-                self.gameplayClassDescriptionId
-            )
+            self._gameplayClassDescription = I18n.getText(self.gameplayClassDescriptionId)
         return self._gameplayClassDescription
 
     @property

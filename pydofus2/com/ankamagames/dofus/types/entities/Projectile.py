@@ -17,7 +17,7 @@ from com.ankamagames.jerakine.types.positions.MovementPath import MovementPath
 
 class Projectile(IDisplayable, IMovable, IEntity):
 
-    logger = Logger(__name__)
+    logger = Logger("pyd2bot")
 
     _id: float
 

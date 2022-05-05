@@ -19,7 +19,7 @@ from com.ankamagames.jerakine.logger.Logger import Logger
 
 class SpellManager:
 
-    logger = Logger(__name__)
+    logger = Logger("pyd2bot")
 
     _spellId: int = 0
 

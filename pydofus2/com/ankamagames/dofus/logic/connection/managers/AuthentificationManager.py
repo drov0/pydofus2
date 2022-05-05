@@ -24,7 +24,7 @@ from com.hurlan.crypto.symmetric.PSAKey import RSACipher
 from com.hurlan.crypto.symmetric.SimpleIVMode import SimpleIVMode
 from Cryptodome.PublicKey import RSA
 
-logger = Logger(__name__)
+logger = Logger("pyd2bot")
 ROOTDIR = os.path.dirname(__file__)
 
 
@@ -57,11 +57,7 @@ class AuthentificationManager(metaclass=Singleton):
         ba_pubKey = ByteArray()
         if not rsacipher.verify(baSignedKey, ba_pubKey):
             raise Exception("Pubkey Sign validation failed!")
-        self._publicKey = (
-            "-----BEGIN PUBLIC KEY-----\n"
-            + str(ba_pubKey)
-            + "\n-----END PUBLIC KEY-----"
-        )
+        self._publicKey = "-----BEGIN PUBLIC KEY-----\n" + str(ba_pubKey) + "\n-----END PUBLIC KEY-----"
 
     def setValidationAction(self, lva: LoginValidationAction):
         self._lva = lva
@@ -124,9 +120,7 @@ class AuthentificationManager(metaclass=Singleton):
 
         else:
             if not isinstance(byteArrayOrVector, ByteArray):
-                raise ArgumentError(
-                    "Argument must be a bytearray or a vector of int/uint"
-                )
+                raise ArgumentError("Argument must be a bytearray or a vector of int/uint")
             result.writeByteArray(byteArrayOrVector)
 
         aescipher.decrypt(result)

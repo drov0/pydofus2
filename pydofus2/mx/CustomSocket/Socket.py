@@ -7,7 +7,7 @@ from com.ankamagames.jerakine.events.ProgressEvent import ProgressEvent
 from com.ankamagames.jerakine.logger.Logger import Logger
 from com.ankamagames.jerakine.network.CustomDataWrapper import ByteArray
 
-logger = Logger(__name__)
+logger = Logger("pyd2bot")
 
 
 class Socket(threading.Thread):
@@ -38,9 +38,7 @@ class Socket(threading.Thread):
                 rdata = self._sock.recv(1028)
                 if rdata:
                     self.buff += rdata
-                    self.dispatcher.dispatch(
-                        ProgressEvent.SOCKET_DATA, ProgressEvent(rdata)
-                    )
+                    self.dispatcher.dispatch(ProgressEvent.SOCKET_DATA, ProgressEvent(rdata))
                 else:
                     break
             except OSError as e:

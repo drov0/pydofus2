@@ -3,7 +3,7 @@ from com.ankamagames.jerakine.logger.Logger import Logger
 from com.ankamagames.jerakine.metaclasses.Singleton import Singleton
 from com.ankamagames.jerakine.data.BinaryStream import BinaryStream
 
-logger = Logger(__name__)
+logger = Logger("pyd2bot")
 
 
 class I18nFileAccessor(metaclass=Singleton):

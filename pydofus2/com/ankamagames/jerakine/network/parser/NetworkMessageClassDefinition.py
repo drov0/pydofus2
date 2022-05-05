@@ -8,7 +8,7 @@ from com.ankamagames.jerakine.network.parser.BooleanByteWrapper import boolByteW
 from com.ankamagames.jerakine.network.parser.ProtocolSpec import ProtocolSpec
 import com.ankamagames.jerakine.network.parser.NetworkMessageDataField as nmdf
 
-logger = Logger(__name__)
+logger = Logger("pyd2bot")
 
 
 class NetworkMessageClassDefinition:
@@ -37,18 +37,12 @@ class NetworkMessageClassDefinition:
             inst = childInstance
 
         if self.TRACE:
-            logger.debug(
-                "------------------ Deserializing {} STARTED-----------------".format(
-                    self._cls.__name__
-                )
-            )
+            logger.debug("------------------ Deserializing {} STARTED-----------------".format(self._cls.__name__))
 
         if self._parent is not None:
             if self.TRACE:
                 logger.debug("Class has parent {}".format(self._parent))
-            inst = NetworkMessageClassDefinition(self._parent, self.raw).deserialize(
-                inst
-            )
+            inst = NetworkMessageClassDefinition(self._parent, self.raw).deserialize(inst)
             if self.TRACE:
                 logger.debug("End of parent deserialization")
                 logger.debug("BytesArray positon: {}".format(self.raw.position))
@@ -83,11 +77,7 @@ class NetworkMessageClassDefinition:
                 logger.debug(f"found value : {value}")
             setattr(inst, attrib, value)
         if self.TRACE:
-            logger.debug(
-                "------------------ Deserializing {} ENDED---------------------".format(
-                    self._cls.__name__
-                )
-            )
+            logger.debug("------------------ Deserializing {} ENDED---------------------".format(self._cls.__name__))
 
         if inst.__class__.__base__ == bnm.NetworkMessage:
             bnm.NetworkMessage.__init__(inst)

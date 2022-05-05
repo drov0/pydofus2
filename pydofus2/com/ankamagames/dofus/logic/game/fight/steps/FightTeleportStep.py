@@ -24,7 +24,7 @@ from com.ankamagames.jerakine.logger.Logger import Logger
 from com.ankamagames.jerakine.sequencer.AbstractSequencable import AbstractSequencable
 from com.ankamagames.jerakine.types.positions.MapPoint import MapPoint
 
-logger = Logger(__name__)
+logger = Logger("pyd2bot")
 
 
 class FightTeleportStep(AbstractSequencable, IFightStep):
@@ -48,23 +48,15 @@ class FightTeleportStep(AbstractSequencable, IFightStep):
             entity.jump(self._destinationCell)
         else:
             logger.warn("Unable to teleport unknown entity " + self._fighterId + ".")
-        infos: "GameFightFighterInformations" = (
-            FightEntitiesFrame.getCurrentInstance().getEntityInfos(self._fighterId)
-        )
+        infos: "GameFightFighterInformations" = FightEntitiesFrame.getCurrentInstance().getEntityInfos(self._fighterId)
         infos.disposition.cellId = self._destinationCell.cellId
         carryingEntity: AnimatedCharacter = DofusEntities.getEntity(self._fighterId)
-        carriedEntity: AnimatedCharacter = (
-            carryingEntity.carriedEntity if carryingEntity.carriedEntity else None
-        )
+        carriedEntity: AnimatedCharacter = carryingEntity.carriedEntity if carryingEntity.carriedEntity else None
         if carriedEntity:
-            carriedEntityInfos = FightEntitiesFrame.getCurrentInstance().getEntityInfos(
-                carriedEntity.id
-            )
+            carriedEntityInfos = FightEntitiesFrame.getCurrentInstance().getEntityInfos(carriedEntity.id)
             carriedEntityInfos.disposition.cellId = infos.disposition.cellId
         if self._fighterId == PlayedCharacterManager().id:
-            fightTurnFrame: "FightTurnFrame" = (
-                Kernel().getWorker().getFrame("FightTurnFrame")
-            )
+            fightTurnFrame: "FightTurnFrame" = Kernel().getWorker().getFrame("FightTurnFrame")
             if fightTurnFrame and fightTurnFrame.myTurn:
                 fightTurnFrame.drawPath()
         FightSpellCastFrame.updateRangeAndTarget()

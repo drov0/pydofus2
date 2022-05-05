@@ -3,7 +3,7 @@ from Cryptodome.PublicKey import RSA as RSA
 from com.ankamagames.jerakine.network.CustomDataWrapper import ByteArray
 from com.hurlan.crypto.symmetric.IPad import IPad
 
-logger = Logger(__name__)
+logger = Logger("pyd2bot")
 
 
 class RSACipher:
@@ -30,13 +30,9 @@ class RSACipher:
     def encrypt(self, src: ByteArray) -> ByteArray:
         out = ByteArray()
         for i in range(0, len(src), self.blockSize):
-            block = int.from_bytes(
-                self.padding.pad(src[i : i + self.blockSize]), "big", signed=False
-            )
+            block = int.from_bytes(self.padding.pad(src[i : i + self.blockSize]), "big", signed=False)
             cypher_chunk_base10 = pow(block, self.key.e, self.key.n)
-            cypher_chunk_bytes = cypher_chunk_base10.to_bytes(
-                self.blockSize, "big", signed=False
-            )
+            cypher_chunk_bytes = cypher_chunk_base10.to_bytes(self.blockSize, "big", signed=False)
             out.writeByteArray(cypher_chunk_bytes)
         out.position = 0
         return out

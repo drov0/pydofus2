@@ -2,7 +2,7 @@ from com.ankamagames.jerakine.data.I18nFileAccessor import I18nFileAccessor
 from com.ankamagames.jerakine.data.AbstractDataManager import AbstractDataManager
 from com.ankamagames.jerakine.logger.Logger import Logger
 
-logger = Logger(__name__)
+logger = Logger("pyd2bot")
 
 
 class I18n(AbstractDataManager):

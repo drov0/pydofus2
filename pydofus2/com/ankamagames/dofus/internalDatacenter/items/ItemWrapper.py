@@ -42,7 +42,7 @@ from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from com.ankamagames.dofus.datacenter.effects.EffectInstance import EffectInstance
 
-logger = Logger(__name__)
+logger = Logger("pyd2bot")
 
 
 class ItemWrapper(Item, ISlotData, ICellZoneProvider, IDataCenter):

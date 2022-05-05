@@ -17,7 +17,7 @@ from com.ankamagames.jerakine.utils.display.spellZone.SpellShapeEnum import (
     SpellShapeEnum,
 )
 
-logger = Logger(__name__)
+logger = Logger("pyd2bot")
 
 
 class EffectInstance(IDataCenter):

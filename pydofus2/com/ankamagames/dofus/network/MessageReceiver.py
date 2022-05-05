@@ -11,13 +11,13 @@ from com.ankamagames.jerakine.network.RawDataParser import RawDataParser
 from com.ankamagames.jerakine.network.UnpackMode import UnpackMode
 import com.ankamagames.dofus.Constants as Constants
 
-logger = Logger(__name__)
+logger = Logger("pyd2bot")
 with open(Constants.PROTOCOL_MSG_SHUFFLE_PATH, "r") as fp:
     msgShuffle = json.load(fp)
 
 
 class MessageReceiver(RawDataParser):
-    logger = Logger(__name__)
+    logger = Logger("pyd2bot")
     _messagesTypes: dict = dict()
     _unpackModes: dict = dict()
     for cls_name, cls_infos in msgShuffle.items():
@@ -37,14 +37,10 @@ class MessageReceiver(RawDataParser):
         for cls in self._messagesTypes.values():
             StoreDataManager().registerClass(cls(), True, True)
 
-    def parse(
-        self, input: ByteArray, messageId: int, messageLength: int
-    ) -> INetworkMessage:
+    def parse(self, input: ByteArray, messageId: int, messageLength: int) -> INetworkMessage:
         messageType: NetworkMessage = self._messagesTypes[messageId]
         if not messageType:
-            logger.warn(
-                f"Unknown packet received (ID {messageId}  , length {messageLength}"
-            )
+            logger.warn(f"Unknown packet received (ID {messageId}  , length {messageLength}")
             return None
         message = messageType.unpack(input, messageLength)
         message.unpacked = True
@@ -59,13 +55,7 @@ class MessageReceiver(RawDataParser):
     ) -> INetworkMessage:
         messageType = self._messagesTypes[messageId]
         if not messageType:
-            logger.warn(
-                "Unknown packet received (ID "
-                + messageId
-                + ", length "
-                + messageLength
-                + ")"
-            )
+            logger.warn("Unknown packet received (ID " + messageId + ", length " + messageLength + ")")
             return None
         message: INetworkMessage = messageType()
         message.unpacked = False
@@ -73,8 +63,4 @@ class MessageReceiver(RawDataParser):
         return message
 
     def getUnpackMode(self, messageId: int) -> int:
-        return (
-            self._unpackModes[messageId]
-            if messageId in self._unpackModes
-            else UnpackMode.DEFAULT
-        )
+        return self._unpackModes[messageId] if messageId in self._unpackModes else UnpackMode.DEFAULT

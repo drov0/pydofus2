@@ -13,7 +13,7 @@ from com.ankamagames.dofus.network.enums.GameActionMarkTypeEnum import (
 from com.ankamagames.jerakine.logger.Logger import Logger
 from com.ankamagames.jerakine.sequencer.AbstractSequencable import AbstractSequencable
 
-logger = Logger(__name__)
+logger = Logger("pyd2bot")
 
 
 class FightMarkTriggeredStep(AbstractSequencable, IFightStep):
@@ -37,9 +37,7 @@ class FightMarkTriggeredStep(AbstractSequencable, IFightStep):
     def start(self) -> None:
         mi: MarkInstance = MarkedCellsManager().getMarkDatas(self._markId)
         if not mi:
-            logger.error(
-                "Trying to trigger an unknown mark (" + self._markId + "). Aborting."
-            )
+            logger.error("Trying to trigger an unknown mark (" + self._markId + "). Aborting.")
             self.executeCallbacks()
             return
         evt: str = FightEventEnum.UNKNOWN_FIGHT_EVENT

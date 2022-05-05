@@ -5,7 +5,7 @@ import os
 from com.ankamagames.dofus import Constants as Constants
 import pyamf
 
-logger = Logger(__name__)
+logger = Logger("pyd2bot")
 
 
 class CustomSharedObjectFileFormatError(Exception):
@@ -88,9 +88,7 @@ class CustomSharedObject:
 
     def getDataFromFile(self) -> None:
         if not self._file:
-            self._file = os.path.join(
-                self.COMMON_FOLDER, self._name + "." + self.DATAFILE_EXTENSION
-            )
+            self._file = os.path.join(self.COMMON_FOLDER, self._name + "." + self.DATAFILE_EXTENSION)
         logger.debug("Loading file : " + self._name + "." + self.DATAFILE_EXTENSION)
         if os.path.exists(self._file):
             try:
@@ -107,8 +105,6 @@ class CustomSharedObject:
                     self._fileStream.close()
                 logger.error("Impossible d'ouvrir le fichier " + self._file)
                 if self.throwException:
-                    raise CustomSharedObjectFileFormatError(
-                        "Malformated file : " + self._file
-                    )
+                    raise CustomSharedObjectFileFormatError("Malformated file : " + self._file)
         if not self.data:
             self.data = dict()

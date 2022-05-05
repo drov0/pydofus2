@@ -8,7 +8,7 @@ from com.ankamagames.jerakine.types.CustomSharedObject import CustomSharedObject
 from com.ankamagames.jerakine.types.DataStoreType import DataStoreType
 from com.ankamagames.jerakine.types.enums.DataStoreEnum import DataStoreEnum
 
-logger = Logger(__name__)
+logger = Logger("pyd2bot")
 
 
 class IExternalizable:
@@ -66,13 +66,9 @@ class StoreDataManager(metaclass=Singleton):
         else:
             return True
 
-    def registerClass(
-        self, oInstance, deepClassScan: bool = False, keepClassInSo: bool = True
-    ) -> None:
+    def registerClass(self, oInstance, deepClassScan: bool = False, keepClassInSo: bool = True) -> None:
         if isinstance(oInstance, IExternalizable):
-            raise Exception(
-                "Can't store a customized IExternalizable in a shared object."
-            )
+            raise Exception("Can't store a customized IExternalizable in a shared object.")
         if isinstance(oInstance, Secure):
             raise Exception("Can't store a Secure class")
         if self.isComplexType(oInstance):
@@ -86,16 +82,10 @@ class StoreDataManager(metaclass=Singleton):
                 logger.warn("Register " + className)
             except Exception as e:
                 self._aRegisteredClassAlias[className] = True
-                logger.fatal(
-                    "Impossible de trouver la classe "
-                    + className
-                    + " dans l'application domain courant"
-                )
+                logger.fatal("Impossible de trouver la classe " + className + " dans l'application domain courant")
                 return
             if keepClassInSo:
-                aClassAlias = self.getSetData(
-                    JerakineConstants.DATASTORE_CLASS_ALIAS, "classAliasList", []
-                )
+                aClassAlias = self.getSetData(JerakineConstants.DATASTORE_CLASS_ALIAS, "classAliasList", [])
                 aClassAlias[base64.encode(className)] = sAlias
                 self.setData(
                     JerakineConstants.DATASTORE_CLASS_ALIAS,
@@ -109,12 +99,7 @@ class StoreDataManager(metaclass=Singleton):
                 if isinstance(oInstance, list[Any]):
                     tmp = oInstance.__class__.__name__
                     leftBracePos = tmp.find("[")
-                    tmp = tmp[
-                        leftBracePos
-                        + 1 : str(reversed(tmp)).find("]")
-                        - leftBracePos
-                        - 1
-                    ]
+                    tmp = tmp[leftBracePos + 1 : str(reversed(tmp)).find("]") - leftBracePos - 1]
                     self.registerClass(oInstance.__class__(), True, keepClassInSo)
             else:
                 desc = self.scanType(oInstance)
@@ -124,9 +109,7 @@ class StoreDataManager(metaclass=Singleton):
                 if desc == oInstance:
                     break
 
-    def setData(
-        self, dataType: DataStoreType, sKey: str, oValue, deepClassScan: bool = False
-    ) -> bool:
+    def setData(self, dataType: DataStoreType, sKey: str, oValue, deepClassScan: bool = False) -> bool:
         so: CustomSharedObject = None
         if self._aData.get(dataType.category) == None:
             self._aData[dataType.category] = dict()

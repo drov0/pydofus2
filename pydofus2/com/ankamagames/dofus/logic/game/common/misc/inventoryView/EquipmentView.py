@@ -8,7 +8,7 @@ from com.ankamagames.dofus.network.enums.CharacterInventoryPositionEnum import (
 )
 from com.ankamagames.jerakine.logger.Logger import Logger
 
-logger = Logger(__name__)
+logger = Logger("pyd2bot")
 
 
 class EquipmentView(IInventoryView):
@@ -27,10 +27,7 @@ class EquipmentView(IInventoryView):
         for item in items:
             if self.isListening(item):
                 self.addItem(item, 0)
-            if (
-                item.position
-                == CharacterInventoryPositionEnum.ACCESSORY_POSITION_WEAPON
-            ):
+            if item.position == CharacterInventoryPositionEnum.ACCESSORY_POSITION_WEAPON:
                 PlayedCharacterManager().currentWeapon = item
         self._initializing = False
 
@@ -42,9 +39,7 @@ class EquipmentView(IInventoryView):
     def content(self) -> list[ItemWrapper]:
         return self._content
 
-    def addItem(
-        self, item: ItemWrapper, invisible: int, needUpdateView: bool = True
-    ) -> None:
+    def addItem(self, item: ItemWrapper, invisible: int, needUpdateView: bool = True) -> None:
         self.content[item.position] = item
         if item.position == CharacterInventoryPositionEnum.ACCESSORY_POSITION_WEAPON:
             PlayedCharacterManager().currentWeapon = item
@@ -56,9 +51,7 @@ class EquipmentView(IInventoryView):
         if item.position == CharacterInventoryPositionEnum.ACCESSORY_POSITION_WEAPON:
             PlayedCharacterManager().currentWeapon = None
 
-    def modifyItem(
-        self, item: ItemWrapper, oldItem: ItemWrapper, invisible: int
-    ) -> None:
+    def modifyItem(self, item: ItemWrapper, oldItem: ItemWrapper, invisible: int) -> None:
         if self.content[oldItem.position] == item:
             self.content[oldItem.position] = None
         self.content[item.position] = item

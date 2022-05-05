@@ -22,7 +22,7 @@ from com.ankamagames.jerakine.network.MultiConnection import MultiConnection
 from com.ankamagames.jerakine.network.ServerConnection import ServerConnection
 from com.ankamagames.dofus.network.MessageReceiver import MessageReceiver
 
-logger = Logger(__name__)
+logger = Logger("pyd2bot")
 
 
 class ConnectionsHandler:
@@ -91,9 +91,7 @@ class ConnectionsHandler:
     def connectToLoginServer(cls, host: str, port: int) -> None:
         if cls._currentConnection != None:
             cls.closeConnection()
-        cls.etablishConnection(
-            host, port, ConnectionType.TO_LOGIN_SERVER, cls._useSniffer
-        )
+        cls.etablishConnection(host, port, ConnectionType.TO_LOGIN_SERVER, cls._useSniffer)
         cls._currentConnectionType = ConnectionType.TO_LOGIN_SERVER
 
     @classmethod
@@ -113,9 +111,7 @@ class ConnectionsHandler:
     @classmethod
     def connectToKoliServer(cls, gameServerHost: str, gameServerPort: int) -> None:
         cls.startConnectionTimer()
-        if cls._currentConnection != None and cls._currentConnection.getSubConnection(
-            ConnectionType.TO_KOLI_SERVER
-        ):
+        if cls._currentConnection != None and cls._currentConnection.getSubConnection(ConnectionType.TO_KOLI_SERVER):
             cls._currentConnection.close(ConnectionType.TO_KOLI_SERVER)
         cls.etablishConnection(
             gameServerHost,
@@ -145,9 +141,7 @@ class ConnectionsHandler:
     @classmethod
     def closeConnection(cls) -> None:
         if krnl.Kernel().getWorker().contains("HandshakeFrame"):
-            krnl.Kernel().getWorker().removeFrame(
-                krnl.Kernel().getWorker().getFrame("HandshakeFrame")
-            )
+            krnl.Kernel().getWorker().removeFrame(krnl.Kernel().getWorker().getFrame("HandshakeFrame"))
         if cls._currentConnection and cls._currentConnection.connected:
             cls._currentConnection.close()
         cls._currentConnection = None
@@ -156,9 +150,7 @@ class ConnectionsHandler:
     @classmethod
     def handleDisconnection(cls) -> DisconnectionReason:
         cls.closeConnection()
-        reason: DisconnectionReason = DisconnectionReason(
-            cls._wantedSocketLost, cls._wantedSocketLostReason
-        )
+        reason: DisconnectionReason = DisconnectionReason(cls._wantedSocketLost, cls._wantedSocketLostReason)
         cls._wantedSocketLost = False
         cls._wantedSocketLostReason = DisconnectionReasonEnum.UNEXPECTED
         return reason
@@ -205,9 +197,7 @@ class ConnectionsHandler:
         conn: IServerConnection = None
         if useSniffer:
             if proxy is not None:
-                raise ArgumentError(
-                    "Can't etablish a connection using a proxy and the sniffer."
-                )
+                raise ArgumentError("Can't etablish a connection using a proxy and the sniffer.")
             conn = SnifferServerConnection(None, 0, id)
         elif proxy != None:
             conn = ProxyedServerConnection(proxy, None, 0, id)

@@ -8,7 +8,7 @@ from com.ankamagames.jerakine.newCache.impl.cache import Cache
 from com.ankamagames.jerakine.newCache.impl.infiniteCache import InfiniteCache
 from com.ankamagames.jerakine.types.CustomSharedObject import CustomSharedObject
 
-logger = Logger(__name__)
+logger = Logger("pyd2bot")
 
 
 class AbstractDataManager(object):
@@ -65,10 +65,6 @@ class AbstractDataManager(object):
         if keyCacheSize == float("inf"):
             self._cacheKey = InfiniteCache()
         else:
-            self._cacheKey = Cache.create(
-                keyCacheSize, LruGarbageCollector(), self.__class__.__name__ + "_key"
-            )
-        self._cacheSO = Cache.create(
-            soCacheSize, LruGarbageCollector(), self.__class__.__name__ + "_so"
-        )
+            self._cacheKey = Cache.create(keyCacheSize, LruGarbageCollector(), self.__class__.__name__ + "_key")
+        self._cacheSO = Cache.create(soCacheSize, LruGarbageCollector(), self.__class__.__name__ + "_so")
         self._soPrefix = soPrefix

@@ -3,7 +3,7 @@ from types import FunctionType
 from com.ankamagames.jerakine.logger.Logger import Logger
 
 
-logger = Logger(__name__)
+logger = Logger("pyd2bot")
 
 
 class FileLoader:
@@ -12,15 +12,9 @@ class FileLoader:
 
     def loadExternalFile(self, path: str, onLoaded: FunctionType) -> None:
         uri: Path = Path(path)
-        loader: IResourceLoader = ResourceLoaderFactory.getLoader(
-            ResourceLoaderType.SINGLE_LOADER
-        )
-        loader.addEventListener(
-            ResourceErrorEvent.ERROR, self.loaderError, False, 0, True
-        )
-        loader.addEventListener(
-            ResourceLoadedEvent.LOADED, self.loaderComplete, False, 0, True
-        )
+        loader: IResourceLoader = ResourceLoaderFactory.getLoader(ResourceLoaderType.SINGLE_LOADER)
+        loader.addEventListener(ResourceErrorEvent.ERROR, self.loaderError, False, 0, True)
+        loader.addEventListener(ResourceLoadedEvent.LOADED, self.loaderComplete, False, 0, True)
         if onLoaded != None:
             loader.addEventListener(ResourceLoadedEvent.LOADED, onLoaded, False, 0)
         try:

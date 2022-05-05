@@ -134,7 +134,7 @@ from com.ankamagames.jerakine.messages.Message import Message
 from com.ankamagames.jerakine.types.positions.MapPoint import MapPoint
 from damageCalculation.tools.StatIds import StatIds
 
-logger = Logger(__name__)
+logger = Logger("pyd2bot")
 
 
 class FightEntitiesFrame(AbstractEntitiesFrame, Frame):
@@ -201,7 +201,7 @@ class FightEntitiesFrame(AbstractEntitiesFrame, Frame):
             while index < len(listKilled) and isinstance(listKilled[index], GameFightFighterNamedInformations):
                 index += 1
             if not isinstance(entity, GameFightEntityInformation):
-                while index < len(listKilled) and isinstance(listKilled[index] is GameFightEntityInformation):
+                while index < len(listKilled) and isinstance(listKilled[index], GameFightEntityInformation):
                     index += 1
         if entity.spawnInfo.teamId == TeamEnum.TEAM_CHALLENGER:
             self.lastKilledChallengers.insert(index, entity)

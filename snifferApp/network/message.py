@@ -7,7 +7,7 @@ from com.ankamagames.jerakine.network.parser.NetworkMessageClassDefinition impor
 )
 from com.ankamagames.jerakine.network.parser.ProtocolSpec import ProtocolSpec
 
-logger = Logger(__name__)
+logger = Logger("pyd2bot")
 
 
 class Message:
@@ -54,9 +54,7 @@ class Message:
             return
 
         if buf.remaining() < 2:
-            logger.debug(
-                f"Not enough data to read the header, byte available : {buf.remaining()} (needed : 2)"
-            )
+            logger.debug(f"Not enough data to read the header, byte available : {buf.remaining()} (needed : 2)")
             return None
 
         staticHeader = buf.readUnsignedShort()
@@ -67,9 +65,7 @@ class Message:
             if buf.remaining() >= 4:
                 count = buf.readUnsignedInt()
             else:
-                logger.debug(
-                    f"Not enough data to read the count, byte available : {buf.remaining()} (needed : 4)"
-                )
+                logger.debug(f"Not enough data to read the count, byte available : {buf.remaining()} (needed : 4)")
                 return None
         if buf.remaining() >= byteLenDynamicHeader:
             lenData = Message.readMessageLength(staticHeader, buf)
@@ -95,9 +91,7 @@ class Message:
             if not msg or newbuffer.remaining():
                 raise Exception("Unable to parse Message")
 
-        res = cls(
-            m_id=id, data=data, count=count, from_client=from_client, src=src, dst=dst
-        )
+        res = cls(m_id=id, data=data, count=count, from_client=from_client, src=src, dst=dst)
         buf.trim()
         return res
 

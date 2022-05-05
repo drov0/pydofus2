@@ -59,7 +59,7 @@ patterns = {
     r"^(.*)function\s*get\s*(\S+)\((.*)\)\s*:\s*(\S+)$": r"\1@property\n\1def \2(self, \3) -> \4:",
     r"^(.*)function\s*set\s*(\S+)\((.*)\)\s*:\s*(\S+)$": r"\1@\2.setter\n\1def \2(self, \3) -> \4:",
     "function [A-Z]+(\S+)\((.*)\)": r"def __init__(self, \2):",
-    "_log:Logger = Log\.getLogger\((.*)\)": r"logger = Logger(__name__)",
+    "_log:Logger = Log\.getLogger\((.*)\)": r"logger = Logger('pyd2bot')",
     ", \)": r")",
     "!==": r"is not",
     "!(\w+)": r"not \1",
@@ -332,5 +332,5 @@ ROOTDIR = pathlib.Path(os.path.dirname(__file__))
 # )
 
 t = perf_counter()
-parseFile(ROOTDIR / "target.as", ROOTDIR / "MiscFrame.py")
+parseFile(ROOTDIR / "target.as", ROOTDIR / "updateMonstersGroup.py")
 print("parsing took:", perf_counter() - t)

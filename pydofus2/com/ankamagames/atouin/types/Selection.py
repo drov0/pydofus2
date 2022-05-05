@@ -2,7 +2,7 @@ from com.ankamagames.atouin.managers.MapDisplayManager import MapDisplayManager
 from com.ankamagames.jerakine.logger.Logger import Logger
 from com.ankamagames.jerakine.types.zones.IZone import IZone
 
-logger = Logger(__name__)
+logger = Logger("pyd2bot")
 
 
 class Selection:

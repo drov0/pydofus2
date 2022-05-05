@@ -74,7 +74,7 @@ from com.ankamagames.jerakine.types.enums.Priority import Priority
 
 class InventoryManagementFrame(Frame):
 
-    logger = Logger(__name__)
+    logger = Logger("pyd2bot")
 
     CHARACTER_BUILD_PRESET_TYPE: int = 1
 
@@ -137,21 +137,15 @@ class InventoryManagementFrame(Frame):
             equipmentView = InventoryManager().inventory.getView("equipment")
             if equipmentView and equipmentView.content:
                 if (
-                    equipmentView.content[
-                        CharacterInventoryPositionEnum.ACCESSORY_POSITION_PETS
-                    ]
-                    and equipmentView.content[
-                        CharacterInventoryPositionEnum.ACCESSORY_POSITION_PETS
-                    ].typeId
+                    equipmentView.content[CharacterInventoryPositionEnum.ACCESSORY_POSITION_PETS]
+                    and equipmentView.content[CharacterInventoryPositionEnum.ACCESSORY_POSITION_PETS].typeId
                     == DataEnum.ITEM_TYPE_PETSMOUNT
                 ):
                     PlayedCharacterManager().isPetsMounting = True
                     PlayedCharacterManager().petsMount = equipmentView.content[
                         CharacterInventoryPositionEnum.ACCESSORY_POSITION_PETS
                     ]
-                if equipmentView.content[
-                    CharacterInventoryPositionEnum.INVENTORY_POSITION_ENTITY
-                ]:
+                if equipmentView.content[CharacterInventoryPositionEnum.INVENTORY_POSITION_ENTITY]:
                     PlayedCharacterManager().hasCompanion = True
             playerCharacterManager = PlayedCharacterManager()
             playerCharacterManager.inventory = InventoryManager().realInventory
@@ -181,9 +175,7 @@ class InventoryManagementFrame(Frame):
         if isinstance(msg, ObjectsQuantityMessage):
             osqm = msg
             for objoqm in osqm.objectsUIDAndQty:
-                InventoryManager().inventory.modifyItemQuantity(
-                    objoqm.objectUID, objoqm.quantity
-                )
+                InventoryManager().inventory.modifyItemQuantity(objoqm.objectUID, objoqm.quantity)
                 for shortcutsQty in InventoryManager().shortcutBarItems:
                     if shortcutsQty and shortcutsQty.id == objoqm.objectUID:
                         shortcutsQty.quantity = objoqm.quantity
@@ -204,9 +196,7 @@ class InventoryManagementFrame(Frame):
 
         if isinstance(msg, ObjectMovementMessage):
             ommsg = msg
-            InventoryManager().inventory.modifyItemPosition(
-                ommsg.objectUID, ommsg.position
-            )
+            InventoryManager().inventory.modifyItemPosition(ommsg.objectUID, ommsg.position)
             return True
 
         if isinstance(msg, ObjectModifiedMessage):

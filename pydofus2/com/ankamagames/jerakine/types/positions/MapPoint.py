@@ -5,7 +5,7 @@ from com.ankamagames.jerakine.map.ILosDetector import ILosDetector
 from com.ankamagames.jerakine.types.enums.DirectionsEnum import DirectionsEnum
 from com.ankamagames.jerakine.types.positions.Point import Point
 
-logger = Logger(__name__)
+logger = Logger("pyd2bot")
 
 
 class MapPoint:
@@ -184,12 +184,13 @@ class MapPoint:
             if mp:
                 return mp
 
-    def vicinity(self) -> list["MapPoint"]:
+    def vicinity(self, fourDir) -> list["MapPoint"]:
         res = []
         for i in range(8):
-            mp = self.getNearestCellInDirection(i)
-            if mp is not None:
-                res.append(mp)
+            if i % 2 == 1:
+                mp = self.getNearestCellInDirection(i)
+                if mp is not None:
+                    res.append(mp)
         return res
 
     def getNearestCellInDirection(self, orientation: int) -> "MapPoint":

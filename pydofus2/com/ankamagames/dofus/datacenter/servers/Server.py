@@ -7,7 +7,7 @@ from com.ankamagames.dofus.types.IdAccessors import IdAccessors
 from com.ankamagames.jerakine.data.GameData import GameData
 from com.ankamagames.jerakine.interfaces.IDataCenter import IDataCenter
 
-logger = Logger(__name__)
+logger = Logger("pyd2bot")
 
 
 class Server(IDataCenter):
@@ -84,7 +84,5 @@ class Server(IDataCenter):
     @property
     def population(self) -> ServerPopulation:
         if not self._population:
-            self._population = ServerPopulation.getServerPopulationById(
-                self.populationId
-            )
+            self._population = ServerPopulation.getServerPopulationById(self.populationId)
         return self._population

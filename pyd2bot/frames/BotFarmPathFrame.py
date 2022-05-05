@@ -1,13 +1,18 @@
 from email.errors import FirstHeaderLineIsContinuationDefect
+from threading import Timer
 from com.ankamagames.atouin.managers.MapDisplayManager import MapDisplayManager
 from com.ankamagames.dofus.datacenter.world.MapPosition import MapPosition
 from com.ankamagames.dofus.logic.game.common.managers.InventoryManager import (
     InventoryManager,
 )
+from com.ankamagames.dofus.logic.game.common.misc.DofusEntities import DofusEntities
 from com.ankamagames.dofus.logic.game.roleplay.actions.DeleteObjectAction import (
     DeleteObjectAction,
 )
 from com.ankamagames.dofus.logic.game.roleplay.frames.RoleplayMovementFrame import RoleplayMovementFrame
+from com.ankamagames.dofus.network.types.game.context.roleplay.GameRolePlayGroupMonsterInformations import (
+    GameRolePlayGroupMonsterInformations,
+)
 from pyd2bot.apis.InventoryAPI import InventoryAPI
 from pyd2bot.apis.MoveAPI import MoveAPI
 from com.ankamagames.dofus.datacenter.notifications.Notification import Notification
@@ -60,13 +65,14 @@ def GetNextMap(path, index):
 class BotFarmPathFrame(Frame):
     def __init__(self, parcours: FarmParcours):
         super().__init__()
-        self._currentRequestedElementId = -1
+        self._followingIe = -1
         self._usingInteractive = False
-        self._dstMapId = -1
+        self._wantmapChange = -1
         self._entities = dict()
         self.parcours = parcours
         self._inAutoTrip = False
         self.pathIndex = None
+        self._worker = Kernel().getWorker()
 
     @property
     def currMapCoords(self):
@@ -97,15 +103,19 @@ class BotFarmPathFrame(Frame):
         return None
 
     def pushed(self) -> bool:
-        self._worker = Kernel().getWorker()
+        self.resetStates()
         return True
 
     def resetStates(self):
-        self._dstMapId = -1
-        self._currentRequestedElementId = -1
+        self._wantmapChange = -1
+        self._followingIe = -1
         self._usingInteractive = False
+        self._followinMonsterGroup = None
         if self.movementFrame:
             self.movementFrame._canMove = True
+            self.movementFrame._followingMonsterGroup = None
+            self.movementFrame._followingIe = None
+            self.movementFrame._isRequestingMovement = False
         if self.interactivesFrame:
             self.interactivesFrame.currentRequestedElementId = None
             self.interactivesFrame.usingInteractive = False
@@ -122,7 +132,7 @@ class BotFarmPathFrame(Frame):
                 f"[BotFarmFrame] Error unable to use interactive element {msg.elemId} with the skill {msg.skillInstanceUid}"
             )
             logger.debug("***********************************************************************")
-            if msg.elemId == self._currentRequestedElementId:
+            if msg.elemId == self._followingIe:
                 self.resetStates()
                 logger.debug("Will move on")
                 del self.interactivesFrame._ie[msg.elemId]
@@ -135,8 +145,8 @@ class BotFarmPathFrame(Frame):
             if PlayedCharacterManager().id == msg.entityId and msg.duration > 0:
                 logger.debug(f"[BotFarmFrame] Inventory weight {InventoryAPI.getWeightPourcent():.2f}%")
                 logger.debug(f"[BotFarmFrame] Started using interactive element {msg.elemId} ....")
-                if self._currentRequestedElementId == msg.elemId:
-                    self._currentRequestedElementId = -1
+                if self._followingIe == msg.elemId:
+                    self._followingIe = -1
                 if msg.duration > 0:
                     self._usingInteractive = True
             self._entities[msg.elemId] = msg.entityId
@@ -163,7 +173,7 @@ class BotFarmPathFrame(Frame):
                 return True
 
         elif isinstance(msg, MapChangeFailedMessage):
-            logger.debug(f"[BotFarmFrame] Map change to {self._dstMapId} failed will repeat")
+            logger.debug(f"[BotFarmFrame] Map change to {self._wantmapChange} failed will repeat")
             self.resetStates()
             MoveAPI.changeMapToDstCoords(*self.nextPathMapCoords)
             return True
@@ -176,11 +186,27 @@ class BotFarmPathFrame(Frame):
                 self.doFarm()
             return True
 
+    def moveToNextStep(self):
+        x, y = self.nextPathMapCoords
+        logger.debug(f"[BotFarmFrame] Current Map {self.currMapCoords} Moving to {x, y}")
+        self._wantmapChange = MoveAPI.changeMapToDstCoords(x, y)
+        if self._wantmapChange == -1:
+            raise Exception(f"Unable to move to Map {x, y}")
+        self._changeMapTimeout = Timer(5, self.moveToNextStep)
+
+    def doFight(self):
+        for entityId in self.entitiesFrame._monstersIds:
+            entity = self.entitiesFrame.getEntityInfos(entityId)
+            if isinstance(entity, GameRolePlayGroupMonsterInformations):
+                if entity.disposition.cellId != PlayedCharacterManager().currentCellId:
+                    self.movementFrame.askAtackMonsters(entity)
+                    return entity
+        return None
+
     def doFarm(self):
-        self._currentRequestedElementId = FarmAPI().collectResource(skills=self.parcours.skills)
-        if self._currentRequestedElementId == -1 and self._dstMapId == -1:
-            x, y = self.nextPathMapCoords
-            logger.debug(f"[BotFarmFrame] Current Map {self.currMapCoords} Moving to {x, y}")
-            self._dstMapId = MoveAPI.changeMapToDstCoords(x, y)
-            if self._dstMapId == -1:
-                raise Exception(f"Unable to move to Map {x, y}")
+        if self.parcours.fightOnly:
+            self._followinMonsterGroup = self.doFight()
+        else:
+            self._followingIe = FarmAPI().collectResource(skills=self.parcours.skills)
+        if self._followingIe == -1 and self._followinMonsterGroup is None:
+            self.moveToNextStep()

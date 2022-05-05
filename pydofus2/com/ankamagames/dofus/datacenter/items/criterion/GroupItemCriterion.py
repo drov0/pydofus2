@@ -8,7 +8,7 @@ from com.ankamagames.dofus.datacenter.items.criterion.IItemCriterion import (
 )
 from com.ankamagames.jerakine.utils.misc.StringUtils import StringUtils
 
-logger = Logger(__name__)
+logger = Logger("pyd2bot")
 
 
 class GroupItemCriterion(IItemCriterion):
@@ -26,23 +26,15 @@ class GroupItemCriterion(IItemCriterion):
         self._cleanCriterionTextForm = self._criterionTextForm
         if not pCriterion:
             return
-        self._cleanCriterionTextForm = str.replace(
-            self._cleanCriterionTextForm, " ", ""
-        )
-        delimitedlist: list[str] = StringUtils.getDelimitedText(
-            self._cleanCriterionTextForm, "(", ")", True
-        )
+        self._cleanCriterionTextForm = str.replace(self._cleanCriterionTextForm, " ", "")
+        delimitedlist: list[str] = StringUtils.getDelimitedText(self._cleanCriterionTextForm, "(", ")", True)
         if len(delimitedlist) > 0 and delimitedlist[0] == self._cleanCriterionTextForm:
             self._cleanCriterionTextForm = self._cleanCriterionTextForm[1:]
-            self._cleanCriterionTextForm = self._cleanCriterionTextForm[
-                0 : len(self._cleanCriterionTextForm) - 1
-            ]
+            self._cleanCriterionTextForm = self._cleanCriterionTextForm[0 : len(self._cleanCriterionTextForm) - 1]
         self.split()
         self.createNewGroups()
 
-    def create(
-        self, pCriteria: list[IItemCriterion], pOperators: list[str]
-    ) -> "GroupItemCriterion":
+    def create(self, pCriteria: list[IItemCriterion], pOperators: list[str]) -> "GroupItemCriterion":
         pair = None
         tabLength: int = len(pCriteria) + len(pOperators)
         textForm: str = ""
@@ -78,11 +70,7 @@ class GroupItemCriterion(IItemCriterion):
         player: PlayedCharacterManager = PlayedCharacterManager()
         if not player or not player.characteristics:
             return True
-        if (
-            self._criteria
-            and len(self._criteria) == 1
-            and self._criteria[0] is ItemCriterion
-        ):
+        if self._criteria and len(self._criteria) == 1 and self._criteria[0] is ItemCriterion:
             return self._criteria[0]
         if len(self._operators) > 0 and self._operators[0] == "|":
             for criterion in self._criteria:
@@ -130,12 +118,7 @@ class GroupItemCriterion(IItemCriterion):
         crits: list[IItemCriterion] = None
         ops: list[str] = None
         group: GroupItemCriterion = None
-        if (
-            self._malformated
-            or not self._criteria
-            or len(self._criteria) <= 2
-            or self._singleOperatorType
-        ):
+        if self._malformated or not self._criteria or len(self._criteria) <= 2 or self._singleOperatorType:
             return
         copyCriteria: list[IItemCriterion] = list[IItemCriterion]()
         copyOperators: list[str] = list[str]()
@@ -190,12 +173,7 @@ class GroupItemCriterion(IItemCriterion):
                 else:
                     self._criteria.append(criterion)
                     index = searchingstr.index(criterion.basicText)
-                    op = searchingstr[
-                        index
-                        + len(criterion.basicText) : index
-                        + 1
-                        + len(criterion.basicText)
-                    ]
+                    op = searchingstr[index + len(criterion.basicText) : index + 1 + len(criterion.basicText)]
                     if op:
                         self._operators.append(op)
                     searchingstr = searchingstr[index + 1 + len(criterion.basicText) :]
@@ -233,9 +211,7 @@ class GroupItemCriterion(IItemCriterion):
                         next = 0
                         searchingstr = searchingstr[1:]
             self._singleOperatorType = self.checkSingleOperatorType(self._operators)
-        if len(self._operators) >= len(self._criteria) and len(
-            (self._operators) > 0 and len(self._criteria) > 0
-        ):
+        if len(self._operators) >= len(self._criteria) and len((self._operators) > 0 and len(self._criteria) > 0):
             self._malformated = True
 
     def checkSingleOperatorType(self, pOperators: list[str]) -> bool:

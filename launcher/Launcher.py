@@ -5,7 +5,7 @@ import httpx
 from com.ankamagames.jerakine.logger.Logger import Logger
 from com.ankamagames.jerakine.metaclasses.Singleton import Singleton
 
-logger = Logger(__name__)
+logger = Logger("pyd2bot")
 from launcher.CredsManager import CredsManager
 
 

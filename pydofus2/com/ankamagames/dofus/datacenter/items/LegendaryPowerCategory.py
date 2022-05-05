@@ -8,7 +8,7 @@ class LegendaryPowerCategory(IDataCenter):
 
     MODULE: str = "LegendaryPowersCategories"
 
-    logger = Logger(__name__)
+    logger = Logger("pyd2bot")
 
     id: int
 
@@ -27,6 +27,4 @@ class LegendaryPowerCategory(IDataCenter):
     def getLegendaryPowersCategories(cls) -> list:
         return GameData.getObjects(cls.MODULE)
 
-    idAccessors: IdAccessors = IdAccessors(
-        getLegendaryPowerCategoryById, getLegendaryPowersCategories
-    )
+    idAccessors: IdAccessors = IdAccessors(getLegendaryPowerCategoryById, getLegendaryPowersCategories)

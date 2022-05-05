@@ -21,7 +21,7 @@ from com.ankamagames.jerakine.logger.Logger import Logger
 from com.ankamagames.jerakine.sequencer.AbstractSequencable import AbstractSequencable
 from com.ankamagames.jerakine.types.positions.PathElement import PathElement
 
-logger = Logger(__name__)
+logger = Logger("pyd2bot")
 
 
 class FightMarkCellsStep(AbstractSequencable, IFightStep):
@@ -102,9 +102,7 @@ class FightMarkCellsStep(AbstractSequencable, IFightStep):
                 evt = FightEventEnum.RUNE_APPEARED
             else:
                 logger.warn("Unknown mark type (" + mi.markType + ").")
-            FightEventsHelper().sendFightEvent(
-                evt, [mi.associatedSpell.id], 0, self.castingSpellId
-            )
+            FightEventsHelper().sendFightEvent(evt, [mi.associatedSpell.id], 0, self.castingSpellId)
             ftf = Kernel().getWorker().getFrame("FightTurnFrame")
             if ftf and ftf.myTurn and ftf.lastPath:
                 for pe in ftf.lastPath.path:

@@ -22,7 +22,7 @@ from com.ankamagames.dofus.kernel.Kernel import Kernel
 from com.ankamagames.jerakine.logger.Logger import Logger
 from com.ankamagames.jerakine.types.enums.DirectionsEnum import DirectionsEnum
 
-logger = Logger(__name__)
+logger = Logger("pyd2bot")
 
 
 class MapChange:
@@ -45,9 +45,7 @@ class MoveAPI:
             )
             ie = rplInteractivesFrame.interactives.get(randTransition.id)
             if ie is None:
-                raise Exception(
-                    f"[MouvementAPI] InteractiveElement {randTransition.id} not found"
-                )
+                raise Exception(f"[MouvementAPI] InteractiveElement {randTransition.id} not found")
             logger.debug(
                 f"[MouvementAPI] Activating skill {randTransition.skillId} to change map towards '{randTransition.transitionMapId}'"
             )
@@ -56,9 +54,7 @@ class MoveAPI:
             logger.debug(
                 f"[MouvementAPI] Sending a click to change map towards direction '{randTransition.transitionMapId}'"
             )
-            cls.sendClickAdjacentMsg(
-                randTransition.transitionMapId, randTransition.cell
-            )
+            cls.sendClickAdjacentMsg(randTransition.transitionMapId, randTransition.cell)
         return randTransition.transitionMapId, randTransition.skillId
 
     @classmethod
@@ -73,10 +69,7 @@ class MoveAPI:
                 if tr.transitionMapId not in discard:
                     if noskill and tr.skillId > 0:
                         continue
-                    if directions and (
-                        tr.direction < 0
-                        or DirectionsEnum(tr.direction) not in directions
-                    ):
+                    if directions and (tr.direction < 0 or DirectionsEnum(tr.direction) not in directions):
                         continue
                     if mapIds and tr.transitionMapId not in mapIds:
                         continue
@@ -84,12 +77,8 @@ class MoveAPI:
         return result
 
     @classmethod
-    def changeMapToDstDirection(
-        cls, direction: DirectionsEnum, discard: list[int] = []
-    ) -> None:
-        transitions = cls.getOutGoingTransitions(
-            discard=discard, directions=[direction]
-        )
+    def changeMapToDstDirection(cls, direction: DirectionsEnum, discard: list[int] = []) -> None:
+        transitions = cls.getOutGoingTransitions(discard=discard, directions=[direction])
         if len(transitions) == 0:
             raise Exception(f"No transition found towards direction '{direction.name}'")
         cls.sendClickAdjacentMsg(transitions[0].transitionMapId, transitions[0].cell)

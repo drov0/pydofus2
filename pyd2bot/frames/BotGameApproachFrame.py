@@ -24,7 +24,7 @@ from com.ankamagames.jerakine.messages.Message import Message
 from com.ankamagames.jerakine.types.enums.Priority import Priority
 import threading
 
-logger = Logger(__name__)
+logger = Logger("pyd2bot")
 
 
 class BotGameApproach(Frame):
@@ -46,17 +46,11 @@ class BotGameApproach(Frame):
 
     def process(self, msg: Message) -> bool:
         if isinstance(msg, ServersListMessage):
-            self._worker.process(
-                ServerSelectionAction.create(AuthentificationManager()._lva.serverId)
-            )
+            self._worker.process(ServerSelectionAction.create(AuthentificationManager()._lva.serverId))
             return True
 
         elif isinstance(msg, CharactersListMessage):
-            self._worker.process(
-                CharacterSelectionAction.create(
-                    characterId=self.characterId, btutoriel=False
-                )
-            )
+            self._worker.process(CharacterSelectionAction.create(characterId=self.characterId, btutoriel=False))
             return True
 
         elif isinstance(msg, MapComplementaryInformationsDataMessage):

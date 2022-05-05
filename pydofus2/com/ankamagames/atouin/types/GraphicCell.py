@@ -4,7 +4,7 @@ from com.ankamagames.jerakine.interfaces.ICustomUnicNameGetter import (
 )
 from com.ankamagames.jerakine.logger.Logger import Logger
 
-logger = Logger(__name__)
+logger = Logger("pyd2bot")
 
 
 class GraphicCell(ICustomUnicNameGetter):

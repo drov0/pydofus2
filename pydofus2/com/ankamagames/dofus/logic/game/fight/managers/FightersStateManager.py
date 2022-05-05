@@ -2,7 +2,7 @@ from com.ankamagames.jerakine.logger.Logger import Logger
 from com.ankamagames.dofus.logic.game.fight.types.FighterStatus import FighterStatus
 from com.ankamagames.jerakine.metaclasses.Singleton import Singleton
 
-logger = Logger(__name__)
+logger = Logger("pyd2bot")
 
 
 class FightersStateManager(metaclass=Singleton):
@@ -21,9 +21,7 @@ class FightersStateManager(metaclass=Singleton):
         else:
             self._entityStates[targetKey][statKey] += delta
 
-    def removeStateOnTarget(
-        self, targetId: float, stateId: int, delta: int = 1
-    ) -> None:
+    def removeStateOnTarget(self, targetId: float, stateId: int, delta: int = 1) -> None:
         targetKey = float(targetId)
         statKey = int(stateId)
         if not self._entityStates.get(targetKey):
@@ -38,9 +36,7 @@ class FightersStateManager(metaclass=Singleton):
     def hasState(self, targetId: float, stateId: int) -> bool:
         targetKey = float(targetId)
         statKey = int(stateId)
-        if not self._entityStates.get(targetKey) or not self._entityStates[
-            targetKey
-        ].get(statKey):
+        if not self._entityStates.get(targetKey) or not self._entityStates[targetKey].get(statKey):
             return False
         return self._entityStates[targetKey][statKey] > 0
 

@@ -3,7 +3,7 @@ from com.ankamagames.dofus.datacenter.feature.OptionalFeature import OptionalFea
 from com.ankamagames.jerakine.logger.Logger import Logger
 from com.ankamagames.jerakine.metaclasses.Singleton import Singleton
 
-logger = Logger(__name__)
+logger = Logger("pyd2bot")
 
 
 class FeatureManager(metaclass=Singleton):

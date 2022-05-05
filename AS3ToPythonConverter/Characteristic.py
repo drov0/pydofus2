@@ -3,48 +3,49 @@ from com.ankamagames.jerakine.data.GameData import GameData
 from com.ankamagames.jerakine.data.I18n import I18n
 from com.ankamagames.jerakine.interfaces.IDataCenter import IDataCenter
 from com.ankamagames.jerakine.logger.Logger import Logger
-logger = Logger(__name__)
+
+logger = Logger("pyd2bot")
+
+
 class Characteristic(IDataCenter):
 
-    MODULE:str = "Characteristics"
+    MODULE: str = "Characteristics"
 
-    id:int
+    id: int
 
-    keyword:str
+    keyword: str
 
-    nameId:int
+    nameId: int
 
-    asset:str
+    asset: str
 
-    categoryId:int
+    categoryId: int
 
-    visible:bool
+    visible: bool
 
-    order:int
+    order: int
 
-    scaleFormulaId:int
+    scaleFormulaId: int
 
-    upgradable:bool
+    upgradable: bool
 
-    _name:str = None
+    _name: str = None
 
     def __init__(self):
         super().__init__()
 
-    @classmethod        
-    def getCharacteristicById(cls, id:int) -> 'Characteristic':        	
+    @classmethod
+    def getCharacteristicById(cls, id: int) -> "Characteristic":
         return GameData.getObject(cls.MODULE, id)
 
-    @classmethod        
-    def getCharacteristics(cls) -> list['Characteristic']:        	
+    @classmethod
+    def getCharacteristics(cls) -> list["Characteristic"]:
         return GameData.getObjects(cls.MODULE)
 
-    idAccessors:IdAccessors = IdAccessors(getCharacteristicById, getCharacteristics)
-    
+    idAccessors: IdAccessors = IdAccessors(getCharacteristicById, getCharacteristics)
+
     @property
     def name(self) -> str:
         if not self._name:
             self._name = I18n.getText(self.nameId)
         return self._name
-
-

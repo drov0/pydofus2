@@ -12,7 +12,7 @@ from com.ankamagames.jerakine.metaclasses.Singleton import Singleton
 from com.ankamagames.jerakine.types.positions.MapPoint import MapPoint
 from mapTools import MapTools
 
-logger = Logger(__name__)
+logger = Logger("pyd2bot")
 
 
 class DataMapProvider(IDataMapProvider, metaclass=Singleton):

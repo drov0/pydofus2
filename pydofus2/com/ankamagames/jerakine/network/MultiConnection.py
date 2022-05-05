@@ -11,7 +11,7 @@ from com.ankamagames.jerakine.events.IOErrorEvent import IOErrorEvent
 from com.ankamagames.jerakine.events.SecurityErrorEvent import SecurityErrorEvent
 from com.ankamagames.jerakine.network.IMessagerouter import IMessageRouter
 
-logger = Logger(__name__)
+logger = Logger("pyd2bot")
 
 
 class MultiConnection(EventDispatcher):
@@ -36,9 +36,7 @@ class MultiConnection(EventDispatcher):
     @mainConnection.setter
     def mainConnection(self, conn: IServerConnection) -> None:
         if not self._idByConnection.get(conn):
-            raise Exception(
-                "Connection must be added before setted to be the main connection"
-            )
+            raise Exception("Connection must be added before setted to be the main connection")
         self._mainConnection = conn
 
     @property
@@ -86,9 +84,7 @@ class MultiConnection(EventDispatcher):
         conn.remove_listener(SocketEvent.CONNECT, self.onSubConnectionEvent)
         conn.remove_listener(SocketEvent.CLOSE, self.onSubConnectionEvent)
         conn.remove_listener(IOErrorEvent.IO_ERROR, self.onSubConnectionEvent)
-        conn.remove_listener(
-            SecurityErrorEvent.SECURITY_ERROR, self.onSubConnectionEvent
-        )
+        conn.remove_listener(SecurityErrorEvent.SECURITY_ERROR, self.onSubConnectionEvent)
         self._connectionCount -= 1
         if conn.connected:
             self._connectionConnectedCount -= 1

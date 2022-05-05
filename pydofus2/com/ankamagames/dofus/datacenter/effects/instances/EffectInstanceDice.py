@@ -7,7 +7,7 @@ from com.ankamagames.dofus.datacenter.effects.instances.EffectInstanceInteger im
     EffectInstanceInteger,
 )
 
-logger = Logger(__name__)
+logger = Logger("pyd2bot")
 
 
 class EffectInstanceDice(EffectInstanceInteger):
@@ -79,9 +79,7 @@ class EffectInstanceDice(EffectInstanceInteger):
             self.forceDescriptionRefresh()
         elif isinstance(term, EffectInstanceInteger):
             self.diceNum += term.value
-            self.diceSide = (
-                int(self.diceSide + term.value) if self.diceSide != 0 else int(0)
-            )
+            self.diceSide = int(self.diceSide + term.value) if self.diceSide != 0 else int(0)
             self.forceDescriptionRefresh()
         else:
             logger.error(term + " cannot be added to EffectInstanceDice.")

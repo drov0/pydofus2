@@ -5,7 +5,7 @@ from com.ankamagames.jerakine.data.BinaryStream import BinaryStream
 
 if TYPE_CHECKING:
     from ankamagames.jerakine.data.ModuleReader import ModuleReader
-logger = Logger(__name__)
+logger = Logger("pyd2bot")
 
 
 class GameDataField:
@@ -45,9 +45,7 @@ class GameDataField:
 
         elif typeId == GameDataTypeEnum.VECTOR:
             self._innerTypeNames.append(stream.readUTF())
-            self._innerReadMethods.insert(
-                0, self.getReadMethod(stream.readInt(), stream)
-            )
+            self._innerReadMethods.insert(0, self.getReadMethod(stream.readInt(), stream))
             return self.readVector
 
         else:

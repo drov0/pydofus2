@@ -1,7 +1,7 @@
-from re import VERBOSE
 from threading import Timer
 from time import perf_counter, sleep
 from com.ankamagames.atouin.managers.EntitiesManager import EntitiesManager
+from com.ankamagames.atouin.managers.MapDisplayManager import MapDisplayManager
 from com.ankamagames.atouin.messages.EntityMovementCompleteMessage import (
     EntityMovementCompleteMessage,
 )
@@ -119,13 +119,11 @@ logger = Logger(__name__)
 
 class RoleplayMovementFrame(Frame):
     CONSECUTIVE_MOVEMENT_DELAY: int = 0.25
-    VERBOSE = False
+    VERBOSE = True
 
     _wantToChangeMap: float = -1
 
     _changeMapByAutoTrip: bool = False
-
-    _changeMapTimer = None
 
     _followingMove: MapPoint
 
@@ -152,7 +150,6 @@ class RoleplayMovementFrame(Frame):
     _mapHasAggressiveMonsters: bool = False
 
     def __init__(self):
-        self._changeMapTimer = None
         super().__init__()
 
     @property
@@ -165,7 +162,6 @@ class RoleplayMovementFrame(Frame):
 
     def pushed(self) -> bool:
         self._wantToChangeMap = -1
-        self._changeMapTimer: Timer = None
         self._changeMapByAutoTrip = False
         self._followingIe = None
         self._followingMonsterGroup = None
@@ -238,12 +234,12 @@ class RoleplayMovementFrame(Frame):
                 ConnectionsHandler.getConnection().send(gmmcmsg)
                 if self._wantToChangeMap >= 0:
                     logger.debug(f"[RolePlayMovement] Wants to change map to {self._wantToChangeMap}")
+                    self._isRequestingMovement = False
                     if emcmsg.entity.position.cellId != self._destinationPoint:
                         logger.debug(
                             f"Wants to change map but didn't reach the map change cell will retry to reach it"
                         )
-                        self._isRequestingMovement = False
-                        self.askMoveTo(self._destinationPoint)
+                        self.askMoveTo(MapPoint.fromCellId(self._destinationPoint))
                     else:
                         self.askMapChange()
 
@@ -426,7 +422,7 @@ class RoleplayMovementFrame(Frame):
             return
         gmmrmsg = GameMapMovementRequestMessage()
         keymoves = MapMovementAdapter.getServerMovement(path)
-        gmmrmsg.init(keymoves, PlayedCharacterManager().currentMap.mapId)
+        gmmrmsg.init(keymoves, MapDisplayManager().currentMapPoint.mapId)
         ConnectionsHandler.getConnection().send(gmmrmsg)
         if self.VERBOSE:
             logger.debug(f"[RolePlayMovement] Movement request sent to server.")
@@ -448,16 +444,15 @@ class RoleplayMovementFrame(Frame):
         cmmsg: ChangeMapMessage = ChangeMapMessage()
         cmmsg.init(self._wantToChangeMap, self._changeMapByAutoTrip)
         ConnectionsHandler.getConnection().send(cmmsg)
-        self._changeMapTimer = Timer(5, self.onMapChangeFailed)
-        self._changeMapTimer.start()
         if self.VERBOSE:
             logger.debug("[RolePlayMovement] Change map timer started.")
 
     def onMapChangeFailed(self) -> None:
-        logger.debug(f"[RolePlayMovement] Change map to dest {self._wantToChangeMap} failed!")
-        cmfm: MapChangeFailedMessage = MapChangeFailedMessage()
-        cmfm.init(self._wantToChangeMap)
-        Kernel().getWorker().processImmediately(cmfm)
+        if self._wantToChangeMap != -1:
+            logger.debug(f"[RolePlayMovement] Change map to dest {self._wantToChangeMap} failed!")
+            cmfm: MapChangeFailedMessage = MapChangeFailedMessage()
+            cmfm.init(self._wantToChangeMap)
+            Kernel().getWorker().processImmediately(cmfm)
 
     def activateSkill(self, skillInstanceId: int, ie: InteractiveElement, additionalParam: int) -> None:
         rpInteractivesFrame: rif.RoleplayInteractivesFrame = Kernel().getWorker().getFrame("RoleplayInteractivesFrame")

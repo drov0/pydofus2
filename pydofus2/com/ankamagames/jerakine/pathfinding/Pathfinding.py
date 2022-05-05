@@ -114,12 +114,11 @@ class Pathfinding:
         itt = 0
         endCellId: int = end.cellId
         startCellId: int = start.cellId
-        logger.debug(f"Looking for path from {startCellId} to {endCellId}")
+        logger.debug(f"[CellPathFinding] Looking for path from {startCellId} to {endCellId}")
         endX: int = end.x
         endY: int = end.y
         endCellAuxId: int = startCellId
         distanceToEnd: int = MapTools.getDistance(startCellId, endCellId)
-        logger.debug("distanceToEnd : " + str(distanceToEnd))
         if not cls._isInit:
             cls.init()
         for i in range(MapTools.mapCountCell):
@@ -305,6 +304,7 @@ class Pathfinding:
             )
             cursor = cls._parentOfCell[cursor]
         movPath.path.reverse()
+        logger.debug(f"[CellPathFinding] Path found: {movPath}")
         return movPath
 
     @classmethod

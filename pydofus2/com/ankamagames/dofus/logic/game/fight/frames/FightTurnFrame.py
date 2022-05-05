@@ -29,6 +29,7 @@ from com.ankamagames.dofus.logic.game.fight.actions.GameFightTurnFinishAction im
     GameFightTurnFinishAction,
 )
 from typing import TYPE_CHECKING
+from com.ankamagames.dofus.network.messages.game.context.GameMapMovementMessage import GameMapMovementMessage
 
 from com.ankamagames.dofus.types.entities.AnimatedCharacter import AnimatedCharacter
 from sniffio import current_async_library
@@ -327,6 +328,10 @@ class FightTurnFrame(Frame):
 
         if isinstance(msg, GameFightTurnReadyRequestMessage):
             self._turnFinishingNoNeedToRedrawMovement = True
+            return False
+
+        if isinstance(msg, GameMapMovementMessage):
+            self._isRequestingMovement = False
             return False
         else:
             return False

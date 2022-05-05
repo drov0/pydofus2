@@ -159,19 +159,13 @@ class MapPoint:
     def advancedOrientationTo(self, target: "MapPoint", fourDir: bool = True) -> int:
         if target is None:
             return 0
-        xDiff = target.x - self.x
-        yDiff = self.y - target.y
-        dist = math.sqrt(math.pow(xDiff, 2) + math.pow(yDiff, 2))
-        if xDiff == 0:
-            angle = math.pi / 2
-        else:
-            angle = math.acos(xDiff / dist) * 180 / math.pi * (-1 if target.y > self.y else 1)
+        target_theta = math.atan2(target.x, target.y)
+        self_theta = math.atan2(self.x, self.y)
+        angle = self_theta - target_theta
         if fourDir:
-            angle = round(angle / 90) * 2 + 1
+            angle = round(2 * (angle / math.pi)) + 1 % 8
         else:
-            angle = round(angle / 45) + 1
-        if angle < 0:
-            angle += 8
+            angle = round(4 * (angle / math.pi)) + 1 % 8
         return angle
 
     def pointSymetry(self, mp: "MapPoint") -> "MapPoint":

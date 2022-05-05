@@ -1,3 +1,4 @@
+import json
 from com.ankamagames.dofus.logic.common.managers.StatsManager import StatsManager
 from com.ankamagames.dofus.logic.game.fight.steps.IFightStep import IFightStep
 from com.ankamagames.dofus.network.types.game.character.characteristic.CharacterCharacteristic import (
@@ -34,7 +35,9 @@ class FightUpdateStatStep(AbstractSequencable, IFightStep):
         return self._targets
 
     def start(self) -> None:
-        logger.debug(f"new stats -> {self._newStats}")
+        # logger.debug(f"new stats update*")
+        # for stat in self._newStats:
+        #     logger.debug(f"stat -> {json.dumps(stat.to_json(), indent=2)}")
         StatsManager().addRawStats(self._entityId, self._newStats)
         super().start()
         self.executeCallbacks()

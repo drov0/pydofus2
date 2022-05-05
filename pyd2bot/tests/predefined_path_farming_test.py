@@ -1,3 +1,5 @@
+import threading
+from time import perf_counter
 from pyd2bot.DofusClient import DofusClient
 from pyd2bot.frames.BotFarmPathFrame import BotFarmPathFrame
 from com.ankamagames.jerakine.logger.Logger import Logger
@@ -9,6 +11,7 @@ logger = Logger(__name__)
 
 # Goujon path incarnam
 FISHING_SKILL_ID = 124
+
 
 goujon_incarnam = {
     "startMapId": 154010882,

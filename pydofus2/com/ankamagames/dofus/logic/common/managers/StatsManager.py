@@ -61,7 +61,7 @@ class StatsManager(metaclass=Singleton):
         return self._entityStats.get(key)
 
     def addRawStats(self, entityId: float, rawStats: list[CharacterCharacteristic]) -> None:
-        logger.debug(f"Adding rawStats count {len(rawStats)} for entity with ID {entityId}")
+        # logger.debug(f"Adding rawStats count {len(rawStats)} for entity with ID {entityId}")
         entityKey = str(float(entityId))
         entityStats: EntityStats = self._entityStats.get(entityKey)
         isCurLifeStatOnly: bool = (

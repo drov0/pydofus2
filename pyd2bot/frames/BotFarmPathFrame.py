@@ -7,6 +7,7 @@ from com.ankamagames.dofus.logic.game.common.managers.InventoryManager import (
 from com.ankamagames.dofus.logic.game.roleplay.actions.DeleteObjectAction import (
     DeleteObjectAction,
 )
+from com.ankamagames.dofus.logic.game.roleplay.frames.RoleplayMovementFrame import RoleplayMovementFrame
 from pyd2bot.apis.InventoryAPI import InventoryAPI
 from pyd2bot.apis.MoveAPI import MoveAPI
 from com.ankamagames.dofus.datacenter.notifications.Notification import Notification
@@ -62,9 +63,9 @@ class BotFarmPathFrame(Frame):
         self._currentRequestedElementId = -1
         self._usingInteractive = False
         self._dstMapId = -1
-        self._mapIdDiscard = []
         self._entities = dict()
         self.parcours = parcours
+        self._inAutoTrip = False
         self.pathIndex = None
 
     @property
@@ -77,12 +78,16 @@ class BotFarmPathFrame(Frame):
         return Priority.LOW
 
     @property
-    def rolePlayEntitiesFrame(self) -> "RoleplayEntitiesFrame":
+    def entitiesFrame(self) -> "RoleplayEntitiesFrame":
         return Kernel().getWorker().getFrame("RoleplayEntitiesFrame")
 
     @property
-    def roleplayInteractivesFrame(self) -> "RoleplayInteractivesFrame":
+    def interactivesFrame(self) -> "RoleplayInteractivesFrame":
         return Kernel().getWorker().getFrame("RoleplayInteractivesFrame")
+
+    @property
+    def movementFrame(self) -> "RoleplayMovementFrame":
+        return Kernel().getWorker().getFrame("RoleplayMovementFrame")
 
     @property
     def nextPathMapCoords(self):
@@ -95,8 +100,21 @@ class BotFarmPathFrame(Frame):
         self._worker = Kernel().getWorker()
         return True
 
+    def resetStates(self):
+        self._dstMapId = -1
+        self._currentRequestedElementId = -1
+        self._usingInteractive = False
+        if self.movementFrame:
+            self.movementFrame._canMove = True
+        if self.interactivesFrame:
+            self.interactivesFrame.currentRequestedElementId = None
+            self.interactivesFrame.usingInteractive = False
+
     def process(self, msg: Message) -> bool:
-        if self._worker.contains("FightContextFrame") or self._worker.contains("BotAutoTripFrame"):
+
+        if PlayedCharacterManager().isFighting:
+            return False
+        if self._inAutoTrip:
             return False
 
         if isinstance(msg, InteractiveUseErrorMessage):
@@ -105,10 +123,11 @@ class BotFarmPathFrame(Frame):
             )
             logger.debug("***********************************************************************")
             if msg.elemId == self._currentRequestedElementId:
+                self.resetStates()
                 logger.debug("Will move on")
-                self._usingInteractive = False
-                del self.roleplayInteractivesFrame._ie[msg.elemId]
-                del self.roleplayInteractivesFrame._collectableIe[msg.elemId]
+                del self.interactivesFrame._ie[msg.elemId]
+                del self.interactivesFrame._collectableIe[msg.elemId]
+                self.resetStates()
                 self.doFarm()
             return True
 
@@ -127,7 +146,7 @@ class BotFarmPathFrame(Frame):
             if self._entities[msg.elemId] == PlayedCharacterManager().id:
                 logger.debug(f"[BotFarmFrame] Interactive element {msg.elemId} use ended")
                 logger.debug("*" * 100)
-                self._usingInteractive = False
+                self.resetStates()
                 self.doFarm()
             del self._entities[msg.elemId]
             return True
@@ -135,19 +154,18 @@ class BotFarmPathFrame(Frame):
         elif isinstance(msg, MapComplementaryInformationsDataMessage):
             logger.debug("-" * 100)
             if self.currMapCoords not in self.parcours.path:
+                self._inAutoTrip = True
                 self._worker.addFrame(BotAutoTripFrame(self.parcours.startMapId))
                 return False
             else:
-                self._dstMapId = -1
-                self._mapIdDiscard.clear()
+                self.resetStates()
                 self.doFarm()
                 return True
 
         elif isinstance(msg, MapChangeFailedMessage):
-            logger.debug(f"[BotFarmFrame] Map change to {self._dstMapId} failed will discard that destination")
-            if self._dstMapId != -1:
-                self._mapIdDiscard.append(self._dstMapId)
-                MoveAPI.changeMapToDstCoords(*self.nextPathMapCoords, discard=self._mapIdDiscard)
+            logger.debug(f"[BotFarmFrame] Map change to {self._dstMapId} failed will repeat")
+            self.resetStates()
+            MoveAPI.changeMapToDstCoords(*self.nextPathMapCoords)
             return True
 
         elif isinstance(msg, NotificationByServerMessage):
@@ -163,6 +181,6 @@ class BotFarmPathFrame(Frame):
         if self._currentRequestedElementId == -1 and self._dstMapId == -1:
             x, y = self.nextPathMapCoords
             logger.debug(f"[BotFarmFrame] Current Map {self.currMapCoords} Moving to {x, y}")
-            dstMapId = MoveAPI.changeMapToDstCoords(x, y)
-            if dstMapId == -1:
+            self._dstMapId = MoveAPI.changeMapToDstCoords(x, y)
+            if self._dstMapId == -1:
                 raise Exception(f"Unable to move to Map {x, y}")

@@ -62,9 +62,7 @@ logger = Logger(__name__)
 
 
 class CollectableElement:
-    def __init__(
-        self, id: int, interactiveSkill: InteractiveElementSkill, enabled: bool
-    ):
+    def __init__(self, id: int, interactiveSkill: InteractiveElementSkill, enabled: bool):
         self.id = id
         self.skill = Skill.getSkillById(interactiveSkill.skillId)
         self.skillName = self.skill.name
@@ -81,9 +79,7 @@ class CollectableElement:
 
 
 class InteractiveElementData:
-    def __init__(
-        self, element: InteractiveElement, position: MapPoint, firstSkill: int
-    ) -> None:
+    def __init__(self, element: InteractiveElement, position: MapPoint, firstSkill: int) -> None:
         self.element = element
         self.position = position
         self.firstSkill = firstSkill
@@ -176,6 +172,10 @@ class RoleplayInteractivesFrame(Frame):
     @property
     def usingInteractive(self) -> bool:
         return self._usingInteractive
+
+    @usingInteractive.setter
+    def usingInteractive(self, pUsing: bool) -> None:
+        self._usingInteractive = pUsing
 
     @property
     def nextInteractiveUsed(self) -> object:
@@ -275,9 +275,7 @@ class RoleplayInteractivesFrame(Frame):
 
         if isinstance(msg, InteractiveUseEndedMessage):
             iuemsg = msg
-            self.interactiveUsageFinished(
-                self._entities[iuemsg.elemId], iuemsg.elemId, iuemsg.skillId
-            )
+            self.interactiveUsageFinished(self._entities[iuemsg.elemId], iuemsg.elemId, iuemsg.skillId)
             del self._entities[iuemsg.elemId]
             del self._collectableIe[iuemsg.elemId]
             return False
@@ -307,11 +305,7 @@ class RoleplayInteractivesFrame(Frame):
         self._collectableIe.clear()
 
     def getInteractiveElementsCells(self) -> list[int]:
-        cells = [
-            cellObj.position.cellId
-            for cellObj in self._ie.values()
-            if cellObj is not None
-        ]
+        cells = [cellObj.position.cellId for cellObj in self._ie.values() if cellObj is not None]
         return cells
 
     def getInteractiveActionTimer(self, pUser) -> BenchmarkTimer:
@@ -323,9 +317,7 @@ class RoleplayInteractivesFrame(Frame):
     def registerInteractive(self, ie: InteractiveElement, firstSkill: int) -> None:
         if not MapDisplayManager().isIdentifiedElement(ie.elementId):
             return
-        entitiesFrame: rpeF.RoleplayEntitiesFrame = (
-            Kernel().getWorker().getFrame("RoleplayEntitiesFrame")
-        )
+        entitiesFrame: rpeF.RoleplayEntitiesFrame = Kernel().getWorker().getFrame("RoleplayEntitiesFrame")
         if entitiesFrame:
             found = False
             for s, cie in enumerate(entitiesFrame.interactiveElements):
@@ -334,9 +326,7 @@ class RoleplayInteractivesFrame(Frame):
                     entitiesFrame.interactiveElements[int(s)] = ie
             if not found:
                 entitiesFrame.interactiveElements.append(ie)
-        worldPos: MapPoint = MapDisplayManager().getIdentifiedElementPosition(
-            ie.elementId
-        )
+        worldPos: MapPoint = MapDisplayManager().getIdentifiedElementPosition(ie.elementId)
         self._ie[ie.elementId] = InteractiveElementData(ie, worldPos, firstSkill)
 
     def removeInteractive(self, ie: InteractiveElement) -> None:
@@ -373,9 +363,7 @@ class RoleplayInteractivesFrame(Frame):
         )
         Kernel().getWorker().process(msg)
 
-    def interactiveUsageFinished(
-        self, entityId: float, elementId: int, skillId: int
-    ) -> None:
+    def interactiveUsageFinished(self, entityId: float, elementId: int, skillId: int) -> None:
         if entityId == PlayedCharacterManager().id:
             if self.roleplayWorldFrame:
                 self.roleplayWorldFrame.cellClickEnabled = True

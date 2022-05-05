@@ -77,21 +77,26 @@ class RoleplayContextFrame(Frame):
 
         if isinstance(msg, CurrentMapMessage):
             mcmsg = msg
+            logger.debug("Roleplay context frame received CurrentMapMessage")
             self._newCurrentMapIsReceived = True
             newSubArea = SubArea.getSubAreaByMapId(mcmsg.mapId)
             PlayedCharacterManager().currentSubArea = newSubArea
+            logger.debug(f"Roleplay received current map, will pause the connextion until its loaded")
+            Kernel().getWorker().pause(None)
+            ConnectionsHandler.pause()
             if isinstance(mcmsg, CurrentMapInstanceMessage):
                 MapDisplayManager().mapInstanceId = mcmsg.instantiatedMapId
             else:
                 MapDisplayManager().mapInstanceId = 0
             wp = None
+            Kernel().getWorker().logFrameCache()
             if self._entitiesFrame and Kernel().getWorker().contains("RoleplayEntitiesFrame"):
                 Kernel().getWorker().removeFrame(self._entitiesFrame)
             if self._worldFrame and Kernel().getWorker().contains("RoleplayWorldFrame"):
                 Kernel().getWorker().removeFrame(self._worldFrame)
             if self._interactivesFrame and Kernel().getWorker().contains("RoleplayInteractivesFrame"):
                 Kernel().getWorker().removeFrame(self._interactivesFrame)
-            if self._movementFrame and Kernel().getWorker().contains(RoleplayMovementFrame):
+            if self._movementFrame and Kernel().getWorker().contains("RoleplayMovementFrame"):
                 Kernel().getWorker().removeFrame(self._movementFrame)
             if PlayedCharacterManager().isInHouse:
                 wp = WorldPointWrapper(
@@ -106,12 +111,15 @@ class RoleplayContextFrame(Frame):
                 self._previousMapId = PlayedCharacterManager().currentMap.mapId
             PlayedCharacterManager().currentMap = wp
             self._entitiesFrame._waitForMap = True
-            if self._movementFrame._changeMapTimer is not None:
-                self._movementFrame._changeMapTimer.cancel()
             MapDisplayManager().loadMap(int(mcmsg.mapId))
             return False
 
         elif isinstance(msg, MapLoadedMessage):
+            logger.debug("Roleplay received map loaded message, will resume the connection")
+            Kernel().getWorker().resume()
+            Kernel().getWorker().clearUnstoppableMsgClassList()
+            ConnectionsHandler.resume()
+            # Kernel().getWorker().logFrameCache()
             if not Kernel().getWorker().contains("RoleplayEntitiesFrame"):
                 Kernel().getWorker().addFrame(self._entitiesFrame)
             if not Kernel().getWorker().contains("RoleplayInteractivesFrame"):
@@ -120,9 +128,7 @@ class RoleplayContextFrame(Frame):
                 Kernel().getWorker().addFrame(self._movementFrame)
             if not Kernel().getWorker().contains("RoleplayWorldFrame"):
                 Kernel().getWorker().addFrame(self._worldFrame)
-            Kernel().getWorker().resume()
-            Kernel().getWorker().clearUnstoppableMsgClassList()
-            ConnectionsHandler.resume()
+            Kernel().getWorker().logFrameCache()
             # SurveyManager.getInstance().checkSurveys()
             if self._listMapNpcsMsg:
                 Kernel().getWorker().process(self._listMapNpcsMsg)

@@ -526,18 +526,7 @@ class FightBattleFrame(Frame):
             gfemsg = msg
             maxEndRescue = 5
             maxEndRescue -= 1
-            while self._currentSequenceFrame and maxEndRescue:
-                logger.error("/!\\ Fight end but no SequenceEnd was received")
-                seqEnd = SequenceEndMessage()
-                seqEnd.init(None, None, None)
-                self.process(seqEnd)
-                maxEndRescue -= 1
-            if self._executingSequence:
-                logger.warn("Delaying fight end because we're still in a sequence.")
-                self._endBattle = True
-                self._battleResults = gfemsg
-            else:
-                self.endBattle(gfemsg)
+            self.endBattle(gfemsg)
             FightersStateManager().endFight()
             CurrentPlayedFighterManager().endFight()
             return False
@@ -550,7 +539,7 @@ class FightBattleFrame(Frame):
                 logger.debug("Fin de combat brutale (pas de resultat connu)")
                 self._executingSequence = False
                 fakegfemsg = GameFightEndMessage()
-                fakegfemsg.init(0, 0, 0, None)
+                fakegfemsg.init(0, 0, 0, None, [])
                 self.process(fakegfemsg)
             return True
 

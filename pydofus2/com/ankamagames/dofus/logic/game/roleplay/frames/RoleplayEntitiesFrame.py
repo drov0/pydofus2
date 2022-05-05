@@ -166,7 +166,7 @@ class RoleplayEntitiesFrame(AbstractEntitiesFrame, Frame):
         self._merchantsList = list()
         self._monstersIds = list[float]()
         self._entitiesVisibleNumber = 0
-        if self._waitForMap:
+        if MapDisplayManager()._currentMapRendered:
             ccFrame = Kernel().getWorker().getFrame("ContextChangeFrame")
             connexion = ""
             if ccFrame:
@@ -174,7 +174,7 @@ class RoleplayEntitiesFrame(AbstractEntitiesFrame, Frame):
             mirmsg = MapInformationsRequestMessage()
             mirmsg.init(mapId_=MapDisplayManager().currentMapPoint.mapId)
             ConnectionsHandler.getConnection().send(mirmsg, connexion)
-            self._responseTimer = Timer(5, self.onMapDataRequestTimeout)
+            self._responseTimer = Timer(20, self.onMapDataRequestTimeout)
 
         else:
             self._waitForMap = True

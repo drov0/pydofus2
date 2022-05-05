@@ -24,6 +24,10 @@ class UsableStat(DetailedStat):
         )
         self.usedValue = usedValue
 
+    @property
+    def totalValue(self) -> float:
+        return super().totalValue - self.usedValue
+
     def __str__(self) -> str:
         return self.getFormattedMessage(
             "base: "

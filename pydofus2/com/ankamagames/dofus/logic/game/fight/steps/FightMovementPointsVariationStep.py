@@ -66,12 +66,8 @@ class FightMovementPointsVariationStep(AbstractStatContextualStep, IFightStep):
         return self._intValue
 
     def start(self) -> None:
-        stats: EntityStats = StatsManager().getStats(self._targetId)
-        newTotalValue: int = stats.getStat(StatIds.MOVEMENT_POINTS).totalValue + self._intValue
-        stats.setStat(Stat(StatIds.MOVEMENT_POINTS, newTotalValue))
         if self._updateCharacteristicManager:
             FightEntitiesFrame.getCurrentInstance().setLastKnownEntityMovementPoint(
                 self._targetId, -self._intValue, True
             )
-            logger.debug(f"new movement points: {newTotalValue}")
         super().start()

@@ -143,7 +143,7 @@ class RoleplayWorldFrame(Frame):
                     logger.warn("The player tried to move before its character was added to the scene. Aborting.")
                     return False
                 self.roleplayMovementFrame.setNextMoveMapChange(amcmsg.adjacentMapId)
-                if not playedEntity.position == MapPoint.fromCellId(amcmsg.cellId):
+                if playedEntity.position != MapPoint.fromCellId(amcmsg.cellId):
                     self.roleplayMovementFrame.setFollowingInteraction(None)
                     self.roleplayMovementFrame.askMoveTo(MapPoint.fromCellId(amcmsg.cellId))
                 else:
@@ -180,7 +180,6 @@ class RoleplayWorldFrame(Frame):
                     playerEntity3
                 else:
                     ConnectionsHandler.getConnection().send(gfjrmsg)
-            # else if its not the current player
             elif entityc.id != PlayedCharacterManager().id:
                 self.roleplayMovementFrame.setFollowingInteraction(None)
                 if isinstance(entityClickInfo, GameRolePlayActorInformations) and isinstance(
@@ -249,7 +248,7 @@ class RoleplayWorldFrame(Frame):
                         forbiddenCellsIds,
                     )
                     if minimalRange > 1:
-                        for iRange in range(1, minimalRange):
+                        for _ in range(minimalRange - 1):
                             forbiddenCellsIds.append(nearestCell.cellId)
                             nearestCell = nearestCell.getNearestFreeCellInDirection(
                                 nearestCell.advancedOrientationTo(playerEntity.position, False),
@@ -261,7 +260,6 @@ class RoleplayWorldFrame(Frame):
                             )
                             if not nearestCell or nearestCell.cellId == playerEntity.position.cellId:
                                 break
-                            iRange += 1
                 if len(skills) == 1 and skills[0].skillId == DataEnum.SKILL_POINT_OUT_EXIT:
                     nearestCell.cellId = ieamsg.position.cellId
                     sendInteractiveUseRequest = False

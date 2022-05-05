@@ -454,6 +454,7 @@ class FightContextFrame(Frame):
             return True
 
         elif isinstance(msg, CurrentMapMessage):
+            logger.debug(f"Fight context loading map ...")
             mcmsg = msg
             ConnectionsHandler.pause()
             Kernel().getWorker().pause()
@@ -469,11 +470,11 @@ class FightContextFrame(Frame):
             return False
 
         elif isinstance(msg, MapLoadedMessage):
+            Kernel().getWorker().resume()
+            ConnectionsHandler.resume()
             gcrmsg = GameContextReadyMessage()
             gcrmsg.init(mdm.MapDisplayManager().currentMapPoint.mapId)
             ConnectionsHandler.getConnection().send(gcrmsg)
-            Kernel().getWorker().resume()
-            ConnectionsHandler.resume()
             return True
 
         elif isinstance(msg, GameFightResumeMessage):
@@ -755,7 +756,7 @@ class FightContextFrame(Frame):
 
         elif isinstance(msg, GameActionFightNoSpellCastMessage):
             logger.debug(f"failed to cast spell {msg.to_json()}")
-            return True
+            return False
 
         # if isinstance(msg, BreachEnterMessage):
         #     bemsg = msg

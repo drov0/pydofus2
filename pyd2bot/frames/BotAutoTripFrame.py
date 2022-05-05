@@ -68,6 +68,7 @@ class BotAutoTripFrame(Frame):
                 self._worker.removeFrame(self)
                 if self._worker.contains("BotFarmPathFrame"):
                     bfpf: "BotFarmPathFrame" = Kernel().getWorker().getFrame("BotFarmPathFrame")
+                    bfpf._inAutoTrip = False
                     bfpf.doFarm()
                 return True
             e = self.path[self.nextStepIndex]

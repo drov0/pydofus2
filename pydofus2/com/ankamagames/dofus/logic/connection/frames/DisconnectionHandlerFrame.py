@@ -101,7 +101,7 @@ class DisconnectionHandlerFrame(Frame):
                     else:
                         reason = connh.ConnectionsHandler.handleDisconnection()
                         if not reason.expected:
-                            DofusClient.restart()
+                            DofusClient().restart()
                         else:
                             logger.debug(
                                 f"The connection closure was expected (reason: {reason.reason}). Dispatching the message."

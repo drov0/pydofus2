@@ -506,6 +506,15 @@ class RoleplayMovementFrame(Frame):
             logger.debug("[RolePlayMovement] Change map timer started.")
 
     def attackMonsters(self, contextualId: int) -> None:
+        if self._followingMonsterGroup:
+            logger.warn("[RolePlayMovement] Already following a monster group, aborting")
+            return
+        if PlayedCharacterManager().isFighting:
+            logger.warn("[RolePlayMovement] Trying to perform roleplay action while the player is fighting")
+            self._requestFighFails = 0
+            if self._requestFightTimeout:
+                self._requestFightTimeout.cancel()
+            return
         entityInfo = self.entitiesFrame.getEntityInfos(contextualId)
         logger.debug("[RolePlayMovement] Asking for a fight against monsters " + str(entityInfo.contextualId))
         self.setFollowingMonsterFight(entityInfo)

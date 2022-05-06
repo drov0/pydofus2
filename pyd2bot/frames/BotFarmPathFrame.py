@@ -1,18 +1,9 @@
-from email.errors import FirstHeaderLineIsContinuationDefect
 from threading import Timer
 from time import sleep
 from com.ankamagames.atouin.managers.MapDisplayManager import MapDisplayManager
 from com.ankamagames.dofus.datacenter.world.MapPosition import MapPosition
-from com.ankamagames.dofus.kernel.net.ConnectionsHandler import ConnectionsHandler
-from com.ankamagames.dofus.logic.game.common.managers.InventoryManager import (
-    InventoryManager,
-)
-from com.ankamagames.dofus.logic.game.common.misc.DofusEntities import DofusEntities
 from com.ankamagames.dofus.logic.game.fight.messages.FightRequestFailed import FightRequestFailed
 from com.ankamagames.dofus.logic.game.fight.messages.MapMoveFailed import MapMoveFailed
-from com.ankamagames.dofus.logic.game.roleplay.actions.DeleteObjectAction import (
-    DeleteObjectAction,
-)
 from com.ankamagames.dofus.logic.game.roleplay.frames.RoleplayMovementFrame import RoleplayMovementFrame
 from com.ankamagames.dofus.network.types.game.context.roleplay.GameRolePlayGroupMonsterInformations import (
     GameRolePlayGroupMonsterInformations,
@@ -47,7 +38,7 @@ from com.ankamagames.jerakine.logger.Logger import Logger
 from com.ankamagames.jerakine.messages.Frame import Frame
 from com.ankamagames.jerakine.messages.Message import Message
 from com.ankamagames.jerakine.types.enums.Priority import Priority
-from typing import TYPE_CHECKING, Tuple
+from typing import TYPE_CHECKING
 
 from pyd2bot.apis.FarmAPI import FarmAPI
 from pyd2bot.frames.BotAutoTripFrame import BotAutoTripFrame
@@ -60,7 +51,7 @@ if TYPE_CHECKING:
     from com.ankamagames.dofus.logic.game.roleplay.frames.RoleplayEntitiesFrame import (
         RoleplayEntitiesFrame,
     )
-logger = Logger(__name__)
+logger = Logger("Dofus2")
 
 
 def GetNextMap(path, index):
@@ -161,7 +152,6 @@ class BotFarmPathFrame(Frame):
 
         elif isinstance(msg, (FightRequestFailed, MapChangeFailedMessage, MapMoveFailed)):
             logger.error(f"Fatal error, restarting bot")
-            self.reset()
             DofusClient().restart()
 
         elif isinstance(msg, InteractiveUsedMessage):

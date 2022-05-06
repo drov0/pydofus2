@@ -546,7 +546,6 @@ class FightTurnFrame(Frame):
         path.fillFromCellIds(cells[0:-1])
         path.end = MapPoint.fromCellId(cells[-1])
         path.path[-1].orientation = path.path[-1].step.orientationTo(path.end)
-        logger.debug(f"Path of movement {path}")
         fightBattleFrame: "FightBattleFrame" = Kernel().getWorker().getFrame("FightBattleFrame")
         if not fightBattleFrame or not fightBattleFrame.fightIsPaused:
             gmmrmsg = GameMapMovementRequestMessage()
@@ -556,6 +555,7 @@ class FightTurnFrame(Frame):
             gmmrmsg.init(keyMovements, currMapId)
             ConnectionsHandler.getConnection().send(gmmrmsg)
         else:
+            logger.debug("Fight is not paused, and battle frame is running can't move")
             self._isRequestingMovement = False
         self.removePath()
         return True

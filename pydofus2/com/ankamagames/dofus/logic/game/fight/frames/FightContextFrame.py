@@ -454,10 +454,8 @@ class FightContextFrame(Frame):
             return True
 
         elif isinstance(msg, CurrentMapMessage):
-            logger.debug(f"Fight context loading map ...")
             mcmsg = msg
-            # ConnectionsHandler.pause()
-            # Kernel().getWorker().pause()
+            logger.debug(f"[FightContext] Loading the fight map {msg.mapId}...")
             if isinstance(mcmsg, CurrentMapInstanceMessage):
                 mdm.MapDisplayManager().mapInstanceId = mcmsg.instantiatedMapId
             else:
@@ -470,8 +468,6 @@ class FightContextFrame(Frame):
             return False
 
         elif isinstance(msg, MapLoadedMessage):
-            # Kernel().getWorker().resume()
-            # ConnectionsHandler.resume()
             gcrmsg = GameContextReadyMessage()
             gcrmsg.init(mdm.MapDisplayManager().currentMapPoint.mapId)
             ConnectionsHandler.getConnection().send(gcrmsg)
@@ -544,19 +540,12 @@ class FightContextFrame(Frame):
             else:
                 Kernel().getWorker().removeFrame(self._preparationFrame)
                 Kernel().getWorker().addFrame(self._battleFrame)
-
                 self.onlyTheOtherTeamCanPlace = False
             PlayedCharacterManager().isSpectator = False
             PlayedCharacterManager().isFighting = True
             timeBeforeStart = gfjmsg.timeMaxBeforeFightStart * 100
             if timeBeforeStart == 0 and preFightIsActive:
                 timeBeforeStart = -1
-
-            # if PlayerManager().kisServerPort > 0:
-            #     if ExternalNotificationManager().canAddExternalNotification(
-            #         ExternalNotificationTypeEnum.KOLO_JOIN
-            #     ):
-            #         pass
             return False
 
         elif isinstance(msg, GameFightStartMessage):
@@ -565,13 +554,7 @@ class FightContextFrame(Frame):
             Kernel().getWorker().removeFrame(self._preparationFrame)
             CurrentPlayedFighterManager().getSpellCastManager().resetInitialCooldown()
             Kernel().getWorker().addFrame(self._battleFrame)
-            # if PlayerManager().kisServerPort > 0:
-            #     if ExternalNotificationManager().canAddExternalNotification(
-            #         ExternalNotificationTypeEnum.KOLO_START
-            #     ):
-            #         pass
             self._fightIdols = gfsm.idols
-
             return True
 
         elif isinstance(msg, GameContextDestroyMessage):

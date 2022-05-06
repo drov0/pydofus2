@@ -77,18 +77,15 @@ class RoleplayContextFrame(Frame):
 
         if isinstance(msg, CurrentMapMessage):
             mcmsg = msg
+            logger.debug(f"[RoleplayContext] Loading ropeplay map {mcmsg.mapId}")
             self._newCurrentMapIsReceived = True
             newSubArea = SubArea.getSubAreaByMapId(mcmsg.mapId)
             PlayedCharacterManager().currentSubArea = newSubArea
-            logger.debug(f"Roleplay received current map, will load the map dlm file")
-            # Kernel().getWorker().pause(None)
-            # ConnectionsHandler.pause()
             if isinstance(mcmsg, CurrentMapInstanceMessage):
                 MapDisplayManager().mapInstanceId = mcmsg.instantiatedMapId
             else:
                 MapDisplayManager().mapInstanceId = 0
             wp = None
-            # Kernel().getWorker().logFrameCache()
             if self._entitiesFrame and Kernel().getWorker().contains("RoleplayEntitiesFrame"):
                 Kernel().getWorker().removeFrame(self._entitiesFrame)
             if self._worldFrame and Kernel().getWorker().contains("RoleplayWorldFrame"):
@@ -114,10 +111,6 @@ class RoleplayContextFrame(Frame):
             return False
 
         elif isinstance(msg, MapLoadedMessage):
-            # Kernel().getWorker().resume()
-            # Kernel().getWorker().clearUnstoppableMsgClassList()
-            # ConnectionsHandler.resume()
-            # Kernel().getWorker().logFrameCache()
             if not Kernel().getWorker().contains("RoleplayEntitiesFrame"):
                 Kernel().getWorker().addFrame(self._entitiesFrame)
             if not Kernel().getWorker().contains("RoleplayInteractivesFrame"):
@@ -126,14 +119,13 @@ class RoleplayContextFrame(Frame):
                 Kernel().getWorker().addFrame(self._movementFrame)
             if not Kernel().getWorker().contains("RoleplayWorldFrame"):
                 Kernel().getWorker().addFrame(self._worldFrame)
-            # Kernel().getWorker().logFrameCache()
-            # SurveyManager.getInstance().checkSurveys()
             if self._listMapNpcsMsg:
                 Kernel().getWorker().process(self._listMapNpcsMsg)
                 self._listMapNpcsMsg = None
             return True
 
         elif isinstance(msg, GameContextDestroyMessage):
+            logger.debug("RoleplayContextFrame: will be retrieved from kernel cause switching to fight")
             Kernel().getWorker().removeFrame(self)
             return True
 
@@ -143,4 +135,18 @@ class RoleplayContextFrame(Frame):
         return False
 
     def pulled(self) -> bool:
+        self._interactivesFrame.clear()
+        Kernel().getWorker().removeFrame(self._entitiesFrame)
+        # Kernel().getWorker().removeFrame(self._delayedActionFrame)
+        Kernel().getWorker().removeFrame(self._worldFrame)
+        Kernel().getWorker().removeFrame(self._movementFrame)
+        Kernel().getWorker().removeFrame(self._interactivesFrame)
+        # TODO : Don't forget to uncomment this when those frames are implemented dumpass
+        # Kernel().getWorker().removeFrame(self._spectatorManagementFrame)
+        # Kernel().getWorker().removeFrame(self._npcDialogFrame)
+        # Kernel().getWorker().removeFrame(self._documentFrame)
+        # Kernel().getWorker().removeFrame(self._zaapFrame)
+        # Kernel().getWorker().removeFrame(self._paddockFrame)
+        # if Kernel().getWorker().contains("HavenbagFrame"):
+        #     Kernel().getWorker().removeFrame(Kernel().getWorker().getFrame("HavenbagFrame"))
         return True

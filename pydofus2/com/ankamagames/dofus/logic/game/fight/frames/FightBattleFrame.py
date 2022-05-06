@@ -579,6 +579,14 @@ class FightBattleFrame(Frame):
         self._destroyed = True
         return True
 
+    def getSequencesStack(self) -> list[fseqf.FightSequenceFrame]:
+        res = []
+        seq = self._currentSequenceFrame
+        while seq:
+            res.insert(0, seq)
+            seq = seq._parent
+        return res
+    
     def logState(self):
         logger.debug(
             "****************************************************************** Current Sequences state ***********************************************************"
@@ -590,12 +598,8 @@ class FightBattleFrame(Frame):
         logger.debug(
             f"Sequence current : #{self._currentSequenceFrame._instanceId if self._currentSequenceFrame else 'None'}"
         )
-        res = []
-        seq = self._currentSequenceFrame
-        while seq:
-            res.insert(0, seq)
-            seq = seq._parent
         padd = ""
+        res = self.getSequencesStack()
         for seq in res:
             logger.debug(f"{padd}|---> Sequence #{seq._instanceId}")
             for step in seq._stepsBuffer:

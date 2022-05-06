@@ -2,6 +2,7 @@ import sys
 from threading import Timer
 from time import sleep
 import com.ankamagames.dofus.kernel.Kernel as krnl
+from com.ankamagames.dofus.kernel.net.DisconnectionReasonEnum import DisconnectionReasonEnum
 from com.ankamagames.dofus.logic.common.frames.MiscFrame import MiscFrame
 from com.ankamagames.dofus.logic.connection.actions.LoginValidationWithTokenAction import (
     LoginValidationWithTokenAction,
@@ -35,26 +36,26 @@ logger = Logger("Dofus2")
 
 
 class DofusClient(metaclass=Singleton):
-    def __init__(self, creds):
-        self.SERVER_ID = creds["serverId"]
-        self.CHARACTER_ID = creds["charachterId"]
-        self.ACCOUNT_ID = creds["account"]
+    def __init__(self):
         krnl.Kernel().init()
         self._worker = krnl.Kernel().getWorker()
-        self._gameApproachFrame = BotGameApproach(self.CHARACTER_ID)
         self._registredCustomFrames = []
         I18nFileAccessor().init()
         DataMapProvider().init(AnimatedCharacter)
         WorldPathFinder().init()
 
-    def stop(self):
+    def reset(self):
+        connh.ConnectionsHandler.connectionGonnaBeClosed(DisconnectionReasonEnum.RESTARTING)
         connh.ConnectionsHandler.getConnection().close()
         krnl.Kernel().reset()
 
-    def start(self):
-        self.LOGIN_TOKEN = Haapi().getLoginToken(self.ACCOUNT_ID)
-        auth.AuthentificationManager().setToken(self.LOGIN_TOKEN)
-        self._worker.addFrame(self._gameApproachFrame)
+    def login(self, accountId, serverId, charachterId):
+        self._serverId = serverId
+        self._charachterId = charachterId
+        self._accountId = accountId
+        self._loginToken = Haapi().getLoginToken(self._accountId)
+        auth.AuthentificationManager().setToken(self._loginToken)
+        self._worker.addFrame(BotGameApproach(self._charachterId))
         self._worker.addFrame(InventoryManagementFrame())
         self._worker.addFrame(SpellInventoryManagementFrame())
         self._worker.addFrame(JobsFrame())
@@ -62,7 +63,7 @@ class DofusClient(metaclass=Singleton):
         for frame in self._registredCustomFrames:
             self._worker.addFrame(frame)
         self._worker.processImmediately(
-            LoginValidationWithTokenAction.create(autoSelectServer=True, serverId=self.SERVER_ID)
+            LoginValidationWithTokenAction.create(autoSelectServer=True, serverId=self._serverId)
         )
 
     def join(self):
@@ -70,15 +71,15 @@ class DofusClient(metaclass=Singleton):
             try:
                 sleep(0.3)
             except KeyboardInterrupt:
-                self.stop()
+                self.reset()
                 sys.exit(0)
 
     def registerFrame(self, frame):
         self._registredCustomFrames.append(frame)
 
     def restart(self):
-        self.stop()
-        Timer(5, self.start).start()
+        self.reset()
+        Timer(5, self.login, [self._accountId, self._serverId, self._charachterId]).start()
 
     @property
     def mainConn(self) -> "ServerConnection":

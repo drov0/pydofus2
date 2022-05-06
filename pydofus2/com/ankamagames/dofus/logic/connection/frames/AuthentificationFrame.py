@@ -19,9 +19,6 @@ from com.ankamagames.dofus.logic.common.managers.InterClientManager import (
     InterClientManager,
 )
 from com.ankamagames.dofus.logic.common.managers.PlayerManager import PlayerManager
-from com.ankamagames.dofus.logic.connection.frames.DisconnectionHandlerFrame import (
-    DisconnectionHandlerFrame,
-)
 from com.ankamagames.dofus.network.enums.IdentificationFailureReasonsEnum import (
     IdentificationFailureReasonEnum,
 )

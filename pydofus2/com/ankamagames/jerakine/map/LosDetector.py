@@ -68,6 +68,6 @@ class LosDetector(ILosDetector):
         for i in spellrange:
             mp = MapPoint.fromCellId(i)
             if tested[mp]:
-                result.append(mp)
+                result.append(mp.cellId)
 
         return result

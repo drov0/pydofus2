@@ -262,13 +262,13 @@ class Worker(EventDispatcher, MessageHandler):
         if self.DEBUG_FRAMES:
             logger.debug("[debug worker] Clearing worker (no more frames or messages in queue)")
         nonPulledFrameList = [f for f in self._framesList if not f.pulled()]
-        self._framesList = list[Frame]()
-        self._framesToAdd = list[Frame]()
-        self._framesToRemove = list[Frame]()
-        self._messagesQueue = list[Message]()
-        self._treatmentsQueue = list[Treatment]()
-        self._pausedQueue = list[Message]()
-        self._currentFrameTypesCache = dict()
+        self._framesList.clear()
+        self._framesToAdd.clear()
+        self._framesToRemove.clear()
+        self._messagesQueue.clear()
+        self._treatmentsQueue.clear()
+        self._pausedQueue.clear()
+        self._currentFrameTypesCache.clear()
         for frame in nonPulledFrameList:
             self.pushFrame(frame)
         efd.EnterFrameDispatcher().removeWorker()

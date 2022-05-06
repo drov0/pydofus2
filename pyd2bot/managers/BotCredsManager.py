@@ -19,7 +19,7 @@ class BotCredsManager:
         cls._db.update(
             {
                 name: {
-                    "account": account,
+                    "accountId": account,
                     "charachterId": int(charId),
                     "serverId": int(serverId),
                 }

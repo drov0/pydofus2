@@ -1,11 +1,15 @@
 from email.errors import FirstHeaderLineIsContinuationDefect
 from threading import Timer
+from time import sleep
 from com.ankamagames.atouin.managers.MapDisplayManager import MapDisplayManager
 from com.ankamagames.dofus.datacenter.world.MapPosition import MapPosition
+from com.ankamagames.dofus.kernel.net.ConnectionsHandler import ConnectionsHandler
 from com.ankamagames.dofus.logic.game.common.managers.InventoryManager import (
     InventoryManager,
 )
 from com.ankamagames.dofus.logic.game.common.misc.DofusEntities import DofusEntities
+from com.ankamagames.dofus.logic.game.fight.messages.FightRequestFailed import FightRequestFailed
+from com.ankamagames.dofus.logic.game.fight.messages.MapMoveFailed import MapMoveFailed
 from com.ankamagames.dofus.logic.game.roleplay.actions.DeleteObjectAction import (
     DeleteObjectAction,
 )
@@ -13,6 +17,7 @@ from com.ankamagames.dofus.logic.game.roleplay.frames.RoleplayMovementFrame impo
 from com.ankamagames.dofus.network.types.game.context.roleplay.GameRolePlayGroupMonsterInformations import (
     GameRolePlayGroupMonsterInformations,
 )
+from pyd2bot.DofusClient import DofusClient
 from pyd2bot.apis.InventoryAPI import InventoryAPI
 from pyd2bot.apis.MoveAPI import MoveAPI
 from com.ankamagames.dofus.datacenter.notifications.Notification import Notification
@@ -72,6 +77,7 @@ class BotFarmPathFrame(Frame):
         self.parcours = parcours
         self._inAutoTrip = False
         self.pathIndex = None
+        self.lastGoodCellId = None
         self._worker = Kernel().getWorker()
 
     @property
@@ -103,19 +109,30 @@ class BotFarmPathFrame(Frame):
         return None
 
     def pushed(self) -> bool:
-        self.resetStates()
+        self.reset()
         return True
 
-    def resetStates(self):
+    def pulled(self) -> bool:
+        return self.reset()
+
+    def reset(self):
+        self._discardedMonsters = set()
         self._wantmapChange = -1
         self._followingIe = -1
         self._usingInteractive = False
         self._followinMonsterGroup = None
+        self._lastCellId = None
         if self.movementFrame:
             self.movementFrame._canMove = True
             self.movementFrame._followingMonsterGroup = None
             self.movementFrame._followingIe = None
             self.movementFrame._isRequestingMovement = False
+            self.movementFrame._wantToChangeMap = None
+            if self.movementFrame._requestFightTimeout:
+                self.movementFrame._requestFightTimeout.cancel()
+            self.movementFrame._requestFighFails = 0
+            if self.movementFrame._changeMapTimeout:
+                self.movementFrame._changeMapTimeout.cancel()
         if self.interactivesFrame:
             self.interactivesFrame.currentRequestedElementId = None
             self.interactivesFrame.usingInteractive = False
@@ -124,7 +141,8 @@ class BotFarmPathFrame(Frame):
 
         if PlayedCharacterManager().isFighting:
             return False
-        if self._inAutoTrip:
+        if Kernel().getWorker().contains("BotAutoTripFrame"):
+            logger.debug("BotAutoTripFrame is running, aborting")
             return False
 
         if isinstance(msg, InteractiveUseErrorMessage):
@@ -133,17 +151,22 @@ class BotFarmPathFrame(Frame):
             )
             logger.debug("***********************************************************************")
             if msg.elemId == self._followingIe:
-                self.resetStates()
+                self.reset()
                 logger.debug("Will move on")
                 del self.interactivesFrame._ie[msg.elemId]
                 del self.interactivesFrame._collectableIe[msg.elemId]
-                self.resetStates()
+                self.reset()
                 self.doFarm()
             return True
 
+        elif isinstance(msg, (FightRequestFailed, MapChangeFailedMessage, MapMoveFailed)):
+            logger.error(f"Fatal error, restarting bot")
+            self.reset()
+            DofusClient().restart()
+
         elif isinstance(msg, InteractiveUsedMessage):
             if PlayedCharacterManager().id == msg.entityId and msg.duration > 0:
-                logger.debug(f"[BotFarmFrame] Inventory weight {InventoryAPI.getWeightPourcent():.2f}%")
+                logger.debug(f"[BotFarmFrame] Inventory weight {InventoryAPI.getWeightPercent():.2f}%")
                 logger.debug(f"[BotFarmFrame] Started using interactive element {msg.elemId} ....")
                 if self._followingIe == msg.elemId:
                     self._followingIe = -1
@@ -156,27 +179,23 @@ class BotFarmPathFrame(Frame):
             if self._entities[msg.elemId] == PlayedCharacterManager().id:
                 logger.debug(f"[BotFarmFrame] Interactive element {msg.elemId} use ended")
                 logger.debug("*" * 100)
-                self.resetStates()
+                self.reset()
                 self.doFarm()
             del self._entities[msg.elemId]
             return True
 
         elif isinstance(msg, MapComplementaryInformationsDataMessage):
+            sleep(0.2)
+            self._discardedMonsters.clear()
             logger.debug("-" * 100)
             if self.currMapCoords not in self.parcours.path:
-                self._inAutoTrip = True
+                logger.debug(f"[BotFarmFrame] Map {self.currMapCoords} not in path will add autotripFrame")
                 self._worker.addFrame(BotAutoTripFrame(self.parcours.startMapId))
                 return False
             else:
-                self.resetStates()
+                self.reset()
                 self.doFarm()
                 return True
-
-        elif isinstance(msg, MapChangeFailedMessage):
-            logger.debug(f"[BotFarmFrame] Map change to {self._wantmapChange} failed will repeat")
-            self.resetStates()
-            MoveAPI.changeMapToDstCoords(*self.nextPathMapCoords)
-            return True
 
         elif isinstance(msg, NotificationByServerMessage):
             notification = Notification.getNotificationById(msg.id)
@@ -196,14 +215,17 @@ class BotFarmPathFrame(Frame):
 
     def doFight(self):
         for entityId in self.entitiesFrame._monstersIds:
-            entity = self.entitiesFrame.getEntityInfos(entityId)
-            if isinstance(entity, GameRolePlayGroupMonsterInformations):
-                if entity.disposition.cellId != PlayedCharacterManager().currentCellId:
-                    self.movementFrame.askAtackMonsters(entity)
-                    return entity
+            if entityId not in self._discardedMonsters:
+                infos: GameRolePlayGroupMonsterInformations = self.entitiesFrame.getEntityInfos(entityId)
+                if infos.staticInfos.mainCreatureLightInfos.level <= PlayedCharacterManager().limitedLevel:
+                    self.movementFrame.attackMonsters(entityId)
+                    return entityId
         return None
 
     def doFarm(self):
+        if InventoryAPI.getWeightPercent() > 90:
+            InventoryAPI.destroyAllItems()
+        self._lastCellId = PlayedCharacterManager().currentCellId
         if self.parcours.fightOnly:
             self._followinMonsterGroup = self.doFight()
         else:

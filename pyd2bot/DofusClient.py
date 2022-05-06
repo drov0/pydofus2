@@ -1,4 +1,5 @@
 import sys
+from threading import Timer
 from time import sleep
 import com.ankamagames.dofus.kernel.Kernel as krnl
 from com.ankamagames.dofus.logic.common.frames.MiscFrame import MiscFrame
@@ -22,6 +23,8 @@ from com.ankamagames.jerakine.data.I18nFileAccessor import I18nFileAccessor
 from com.ankamagames.jerakine.logger.Logger import Logger
 from typing import TYPE_CHECKING
 
+from com.ankamagames.jerakine.metaclasses.Singleton import Singleton
+
 if TYPE_CHECKING:
     from com.ankamagames.jerakine.network.ServerConnection import ServerConnection
 from launcher.Launcher import Haapi
@@ -32,31 +35,35 @@ from com.ankamagames.atouin.utils.DataMapProvider import DataMapProvider
 logger = Logger("pyd2bot")
 
 
-class DofusClient:
+class DofusClient(metaclass=Singleton):
     def __init__(self, name):
         self.name = name
         botCreds = BotsDataManager.getEntry(self.name)
         self.SERVER_ID = botCreds["serverId"]
         self.CHARACTER_ID = botCreds["charachterId"]
         self.ACCOUNT_ID = botCreds["account"]
-        self.LOGIN_TOKEN = Haapi().getLoginToken(self.ACCOUNT_ID)
-        auth.AuthentificationManager().setToken(self.LOGIN_TOKEN)
         krnl.Kernel().init()
         self._worker = krnl.Kernel().getWorker()
         self._gameApproachFrame = BotGameApproach(self.CHARACTER_ID)
-        self._worker.addFrame(self._gameApproachFrame)
-        self._worker.addFrame(InventoryManagementFrame())
-        self._worker.addFrame(SpellInventoryManagementFrame())
-        self._worker.addFrame(JobsFrame())
-        self._worker.addFrame(MiscFrame())
+        self._registredCustomFrames = []
         I18nFileAccessor().init()
         DataMapProvider().init(AnimatedCharacter)
         WorldPathFinder().init()
 
     def stop(self):
         connh.ConnectionsHandler.getConnection().close()
+        krnl.Kernel().reset()
 
-    def connect(self):
+    def start(self):
+        self.LOGIN_TOKEN = Haapi().getLoginToken(self.ACCOUNT_ID)
+        auth.AuthentificationManager().setToken(self.LOGIN_TOKEN)
+        self._worker.addFrame(self._gameApproachFrame)
+        self._worker.addFrame(InventoryManagementFrame())
+        self._worker.addFrame(SpellInventoryManagementFrame())
+        self._worker.addFrame(JobsFrame())
+        self._worker.addFrame(MiscFrame())
+        for frame in self._registredCustomFrames:
+            self._worker.addFrame(frame)
         self._worker.processImmediately(
             LoginValidationWithTokenAction.create(autoSelectServer=True, serverId=self.SERVER_ID)
         )
@@ -64,22 +71,20 @@ class DofusClient:
     def join(self):
         while True:
             try:
-                sleep(0.2)
-                if self.mainConn is None:
-                    sys.exit(0)
+                sleep(0.3)
             except KeyboardInterrupt:
-                if self.mainConn is not None:
-                    self.mainConn.close()
+                self.stop()
                 sys.exit(0)
 
-    def start(self):
-        self.connect()
-
     def registerFrame(self, frame):
-        self._worker.addFrame(frame)
+        self._registredCustomFrames.append(frame)
 
     def waitInsideGameMap(self):
         self._gameApproachFrame._insideGame.wait()
+
+    def restart(self):
+        self.stop()
+        Timer(5, self.start).start()
 
     @property
     def mainConn(self) -> "ServerConnection":

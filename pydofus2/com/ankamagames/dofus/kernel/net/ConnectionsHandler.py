@@ -174,10 +174,9 @@ class ConnectionsHandler:
 
     @classmethod
     def startConnectionTimer(cls) -> None:
-        if not cls._connectionTimeout:
-            cls._connectionTimeout = Timer(4, cls.onConnectionTimeout)
-        else:
+        if cls._connectionTimeout:
             cls._connectionTimeout.cancel()
+        cls._connectionTimeout = Timer(4, cls.onConnectionTimeout)
         cls._connectionTimeout.start()
 
     @classmethod

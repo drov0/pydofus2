@@ -45,7 +45,7 @@ class ServerConnection(IServerConnection):
 
     DEBUG_LOW_LEVEL_VERBOSE: bool = False
 
-    DEBUG_DATA: bool = True
+    DEBUG_DATA: bool = False
 
     LATENCY_AVG_BUFFER_SIZE: int = 50
 
@@ -168,8 +168,6 @@ class ServerConnection(IServerConnection):
         self._remoteSrvPort = port
         self.addListeners()
         logger.info(f"[{self._id}] Connecting to {host}:{port}...")
-        self._timeoutTimer = Timer(interval=7, function=self.onSocketTimeOut)
-        self._timeoutTimer.start()
         try:
             self._socket.connect(host, port)
         except Exception as e:
@@ -177,6 +175,8 @@ class ServerConnection(IServerConnection):
                 "[" + str(self._id) + "] Could not establish connection to the serveur!\n",
                 exc_info=True,
             )
+        self._timeoutTimer = Timer(interval=7, function=self.onSocketTimeOut)
+        self._timeoutTimer.start()
 
     def getType(self, v) -> str:
         className: str = v.__class__.__name__
@@ -488,7 +488,7 @@ class ServerConnection(IServerConnection):
     def onEnterFrame(self) -> None:
         start = perf_counter()
         if self._socket.connected:
-            self.receive(self._socket.buff, True)
+            self.receive(self._socket._buff, True)
         if len(self._asyncMessages) and len(self._asyncTrees):
             while True:
                 if not self._asyncTrees[0].next():
@@ -531,8 +531,8 @@ class ServerConnection(IServerConnection):
             self._willClose = True
             return
         if self.DEBUG_DATA:
-            logger.debug("[" + str(self._id) + "] Connection closed.")
-        Timer(1, self.removeListeners).start()
+            logger.debug(f"[{self._id}] Connection closed.")
+        Timer(10, self.removeListeners).start()
         if self._lagometer:
             self._lagometer.stop()
         from com.ankamagames.jerakine.network.ServerConnectionClosedMessage import (
@@ -543,8 +543,8 @@ class ServerConnection(IServerConnection):
         self._connecting = False
         self._outputBuffer = []
         EnterFrameDispatcher().removeEventListener(self.onEnterFrame)
-        self._asyncTrees = list[FuncTree]()
-        self._asyncMessages = list[INetworkMessage]()
+        self._asyncTrees.clear()
+        self._asyncMessages.clear()
         self._asyncNetworkDataContainerMessage = None
         self._input = ByteArray()
         self._splittedPacket = False
@@ -552,13 +552,13 @@ class ServerConnection(IServerConnection):
 
     def onSocketData(self, pe: ProgressEvent) -> None:
         if self.DEBUG_LOW_LEVEL_VERBOSE:
-            logger.info(f"[{self._id}] Receive Event, byte available : {self._socket.buff.remaining()}")
-        self.receive(self._socket.buff)
+            logger.info(f"[{self._id}] Receive Event, byte available : {self._socket.bytesAvailable}")
+        self.receive(self._socket._buff)
 
     def onSocketError(self, e: IOErrorEvent) -> None:
         if self._lagometer:
             self._lagometer.stop()
-        logger.error("[" + str(self._id) + "] Failure while opening socket.")
+        logger.error(f"[{self._id}] Failure while opening socket.")
         self._connecting = False
         self._handler.process(ServerConnectionFailedMessage(self, e.text))
 
@@ -567,11 +567,9 @@ class ServerConnection(IServerConnection):
             self._lagometer.stop()
         self._connecting = False
         if self._firstConnectionTry:
-            logger.error(
-                "[" + str(self._id) + "] Failure while opening socket, timeout, but WWJD ? Give a second chance !"
-            )
+            logger.error("[{self._id}] Failure while opening socket, timeout, but WWJD ? Give a second chance !")
             self.connect(self._remoteSrvHost, self._remoteSrvPort)
             self._firstConnectionTry = False
         else:
-            logger.error("[" + str(self._id) + "] Failure while opening socket, timeout.")
+            logger.error("[{self._id}] Failure while opening socket, timeout.")
             self._handler.process(ServerConnectionFailedMessage(self, "timeout"))

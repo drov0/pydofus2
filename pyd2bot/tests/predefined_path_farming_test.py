@@ -12,7 +12,12 @@ logger = Logger("pyd2bot")
 # Goujon path incarnam
 FISHING_SKILL_ID = 124
 
-
+bouftou_incarnam = {
+    "startMapId": 153879300,
+    "path": [(1, -4), (0, -4), (0, -5), (1, -5)],
+    "fightOnly": True,
+    "skills": [FISHING_SKILL_ID],
+}
 goujon_incarnam = {
     "startMapId": 154010882,
     "path": [

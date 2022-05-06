@@ -48,8 +48,6 @@ class ContextChangeFrame(Frame):
 
                 Kernel().getWorker().addFrame(fcf.FightContextFrame())
 
-                pass
-
             else:
                 Kernel().panic(PanicMessages.WRONG_CONTEXT_CREATED, [msg.context])
 

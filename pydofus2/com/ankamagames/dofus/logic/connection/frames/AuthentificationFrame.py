@@ -109,15 +109,17 @@ class AuthentificationFrame(Frame):
             # Plogger.info(f"Current version : {iMsg.version.major}.{iMsg.version.minor}.{iMsg.version.code}.{iMsg.version.build}")
             dhf = krnl.Kernel().getWorker().getFrame("DisconnectionHandlerFrame")
             time = perf_counter()
-            elapsedTimesSinceConnectionFail = list[int]()
             failureTimes = StoreDataManager().getData(Constants.DATASTORE_MODULE_DEBUG, "connection_fail_times")
+            if not failureTimes:
+                failureTimes = []
+            elapsedTimesSinceConnectionFail = list[int]([None] * len(failureTimes))
             if failureTimes:
                 for i in range(len(failureTimes)):
                     elapsedSeconds = time - failureTimes[i]
-                    if elapsedSeconds <= 3600:
-                        elapsedTimesSinceConnectionFail[i] = elapsedSeconds
+                    if elapsedSeconds <= 3.6:
+                        elapsedTimesSinceConnectionFail[i] = int(elapsedSeconds)
                 dhf.resetConnectionAttempts()
-            iMsg.failedAttempts = elapsedTimesSinceConnectionFail
+            # iMsg.failedAttempts = elapsedTimesSinceConnectionFail
             connh.ConnectionsHandler.getConnection().send(iMsg)
             if InterClientManager().flashKey:
                 flashKeyMsg = ClientKeyMessage()
@@ -209,7 +211,7 @@ class AuthentificationFrame(Frame):
                     if params["password"]:
                         lva.password = params["password"]
 
-            AuthentificationManager().setValidationAction(lva)
+            AuthentificationManager().loginValidationAction = lva
             connInfo = self._connexionSequence.pop(0)
             connh.ConnectionsHandler.connectToLoginServer(connInfo["host"], connInfo["port"])
             return True

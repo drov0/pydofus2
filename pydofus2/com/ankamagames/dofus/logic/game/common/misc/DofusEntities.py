@@ -36,8 +36,6 @@ class DofusEntities:
 
     @classmethod
     def reset(cls) -> None:
-        localizer: IEntityLocalizer = None
-        for i in range(0, len(cls._localizers), 1):
-            localizer = cls._localizers[i]
+        for localizer in cls._localizers:
             localizer.unregistered()
-        cls._localizers = list[IEntityLocalizer]()
+        cls._localizers.clear()

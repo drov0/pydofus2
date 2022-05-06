@@ -38,7 +38,7 @@ class DataMapProvider(IDataMapProvider, metaclass=Singleton):
             cellEntities = EntitiesManager().getEntitiesOnCell(cellId, IObstacle)
             if len(cellEntities):
                 for o in cellEntities:
-                    if not IObstacle(o).canSeeThrough():
+                    if not o.canSeeThrough:
                         return False
         return los
 

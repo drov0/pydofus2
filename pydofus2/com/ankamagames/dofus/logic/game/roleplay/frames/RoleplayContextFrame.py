@@ -81,8 +81,8 @@ class RoleplayContextFrame(Frame):
             newSubArea = SubArea.getSubAreaByMapId(mcmsg.mapId)
             PlayedCharacterManager().currentSubArea = newSubArea
             logger.debug(f"Roleplay received current map, will pause the connextion until its loaded")
-            Kernel().getWorker().pause(None)
-            ConnectionsHandler.pause()
+            # Kernel().getWorker().pause(None)
+            # ConnectionsHandler.pause()
             if isinstance(mcmsg, CurrentMapInstanceMessage):
                 MapDisplayManager().mapInstanceId = mcmsg.instantiatedMapId
             else:
@@ -114,10 +114,9 @@ class RoleplayContextFrame(Frame):
             return False
 
         elif isinstance(msg, MapLoadedMessage):
-            logger.debug("Roleplay received map loaded message, will resume the connection")
-            Kernel().getWorker().resume()
-            Kernel().getWorker().clearUnstoppableMsgClassList()
-            ConnectionsHandler.resume()
+            # Kernel().getWorker().resume()
+            # Kernel().getWorker().clearUnstoppableMsgClassList()
+            # ConnectionsHandler.resume()
             # Kernel().getWorker().logFrameCache()
             if not Kernel().getWorker().contains("RoleplayEntitiesFrame"):
                 Kernel().getWorker().addFrame(self._entitiesFrame)

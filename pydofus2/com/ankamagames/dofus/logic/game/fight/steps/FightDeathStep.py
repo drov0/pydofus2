@@ -45,7 +45,7 @@ class FightDeathStep(AbstractSequencable, IFightStep):
 
     _targetName: str = None
 
-    _needToWarn: bool = True
+    _needToWarn: bool = False
 
     _timeOut: bool = False
 

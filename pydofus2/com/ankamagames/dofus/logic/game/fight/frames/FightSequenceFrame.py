@@ -866,8 +866,8 @@ class FightSequenceFrame(Frame, ISpellCastProvider):
             gffinfos = GameFightFighterInformations()
             self.pushStep(
                 FightUpdateStatStep(
-                    gffinfos.contextualId,
-                    gffinfos.stats.characteristics.characteristics,
+                    0,
+                    [],
                 )
             )
             gffinfos = self.fighterSummonMultipleEntities(gafmsmsg, gffinfos)
@@ -930,6 +930,9 @@ class FightSequenceFrame(Frame, ISpellCastProvider):
 
         if isinstance(msg, GameActionFightDeathMessage):
             gafdmsg = msg
+            logger.info(f"{msg.targetId} died")
+            fbf : "FightBattleFrame" = Kernel().getWorker().getFrame("FightBattleFrame")
+            fbf._deadTurnsList.append(gafdmsg.targetId)
             self.fighterHasBeenKilled(gafdmsg)
             return True
 
@@ -1139,8 +1142,8 @@ class FightSequenceFrame(Frame, ISpellCastProvider):
         summonerIsMe = True
         if (
             targetInfos.stats.summoned
-            and not (targetInfos is GameFightFighterNamedInformations)
-            and not (targetInfos is GameFightEntityInformation)
+            and not isinstance(targetInfos, GameFightFighterNamedInformations)
+            and not isinstance(targetInfos, GameFightEntityInformation)
         ):
             summonerInfos = self.fightEntitiesFrame.getEntityInfos(targetInfos.stats.summoner)
             summonDestroyedWithSummoner = summonerInfos == None or not summonerInfos.spawnInfo.alive
@@ -1154,7 +1157,7 @@ class FightSequenceFrame(Frame, ISpellCastProvider):
 
         entityDeathStepAlreadyInBuffer: bool = False
         for step in self._stepsBuffer:
-            if step is FightDeathStep and step.entityId == gafdmsg.targetId:
+            if isinstance(step, FightDeathStep) and step.entityId == gafdmsg.targetId:
                 entityDeathStepAlreadyInBuffer = True
         if not entityDeathStepAlreadyInBuffer:
             self.pushStep(FightDeathStep(gafdmsg.targetId))
@@ -1284,43 +1287,44 @@ class FightSequenceFrame(Frame, ISpellCastProvider):
                 if isinstance(summons.spawnInformation, SpawnMonsterInformation):
                     gfminfos = GameFightMonsterInformations()
                     gfminfos.init(
-                        sum.informations.contextualId,
-                        sum.informations.disposition,
-                        summons.look,
-                        sum,
-                        summons.wave,
-                        summons.stats,
-                        None,
-                        summons.spawnInformation.creatureGenericId,
-                        summons.spawnInformation,
+                        contextualId_=sum.informations.contextualId,
+                        disposition_=sum.informations.disposition,
+                        look_=summons.look,
+                        spawnInfo_=sum,
+                        wave_=summons.wave,
+                        stats_=summons.stats,
+                        previousPositions_=None,
+                        creatureGenericId_=summons.spawnInformation.creatureGenericId,
+                        creatureGrade_=summons.spawnInformation.creatureGrade,
+                        creatureLevel_=1,
                     )
                     gffinfos = gfminfos
 
                 if isinstance(summons.spawnInformation, SpawnScaledMonsterInformation):
                     gfsminfos = GameFightMonsterInformations()
                     gfsminfos.init(
-                        sum.informations.contextualId,
-                        sum.informations.disposition,
-                        summons.look,
-                        sum,
-                        summons.wave,
-                        summons.stats,
-                        None,
-                        summons.spawnInformation.creatureGenericId,
-                        0,
-                        summons.spawnInformation,
+                        contextualId_=sum.informations.contextualId,
+                        disposition_=sum.informations.disposition,
+                        look_=summons.look,
+                        spawnInfo_=sum,
+                        wave_=summons.wave,
+                        stats_=summons.stats,
+                        previousPositions_=None,
+                        creatureGenericId_=summons.spawnInformation.creatureGenericId,
+                        creatureGrade_=summons.spawnInformation.creatureGrade,
                     )
                     gffinfos = gfsminfos
 
                 else:
                     gffinfos = GameFightFighterInformations()
                     gffinfos.init(
-                        sum.informations.contextualId,
-                        sum.informations.disposition,
-                        summons.look,
-                        sum,
-                        summons.wave,
-                        summons.stats,
+                        contextualId_=sum.informations.contextualId,
+                        disposition_=sum.informations.disposition,
+                        look_=summons.look,
+                        spawnInfo_=sum,
+                        wave_=summons.wave,
+                        stats_=summons.stats,
+                        previousPositions_=None
                     )
                 self.summonEntity(gffinfos, gafmsmsg.sourceId, gafmsmsg.actionId)
         return gffinfos
@@ -1779,7 +1783,7 @@ class FightSequenceFrame(Frame, ISpellCastProvider):
         monsterS: Monster = None
         gfsgmsg: GameFightShowFighterMessage = GameFightShowFighterMessage()
         gfsgmsg.init(entity)
-        Kernel().getWorker().getFrame().process(gfsgmsg)
+        Kernel().getWorker().process(gfsgmsg)
         if ActionIdHelper.isRevive(actionId):
             self.fightEntitiesFrame.removeLastKilledAlly(entity.spawnInfo.teamId)
         summonedCreature = DofusEntities.getEntity(entity.contextualId)
@@ -1795,7 +1799,7 @@ class FightSequenceFrame(Frame, ISpellCastProvider):
             entityInfosS = FightEntitiesFrame.getCurrentInstance().getEntityInfos(entity.contextualId)
             isBomb = False
             summonedEntityInfosS = entityInfosS
-            if summonedEntityInfosS:
+            if isinstance(summonedEntityInfosS, GameFightMonsterInformations):
                 monsterS = Monster.getMonsterById(summonedEntityInfosS.creatureGenericId)
                 if monsterS and monsterS.useBombSlot:
                     isBomb = True

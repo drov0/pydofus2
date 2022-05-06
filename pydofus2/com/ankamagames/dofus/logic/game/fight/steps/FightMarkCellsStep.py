@@ -101,7 +101,7 @@ class FightMarkCellsStep(AbstractSequencable, IFightStep):
             if mi.markType == GameActionMarkTypeEnum.RUNE:
                 evt = FightEventEnum.RUNE_APPEARED
             else:
-                logger.warn("Unknown mark type (" + mi.markType + ").")
+                logger.warn(f"Unknown mark type ({mi.markType}).")
             FightEventsHelper().sendFightEvent(evt, [mi.associatedSpell.id], 0, self.castingSpellId)
             ftf = Kernel().getWorker().getFrame("FightTurnFrame")
             if ftf and ftf.myTurn and ftf.lastPath:

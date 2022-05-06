@@ -366,7 +366,6 @@ class Item(IPostInit, IDataCenter):
         to.iconId = src.iconId
         to.level = src.level
         to.realWeight = src.realWeight
-
         to.weight = src.weight
         to.cursed = src.cursed
         to.useAnimationId = src.useAnimationId

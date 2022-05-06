@@ -336,7 +336,7 @@ class CurrentPlayedFighterManager(metaclass=Singleton):
     def getCurrentSummonedCreature(self, id: float = None) -> int:
         if id is None:
             id = self._currentFighterId
-        return self._currentSummonedCreature[id]
+        return self._currentSummonedCreature.get(id, 0)
 
     def setCurrentSummonedCreature(self, value: int, id: float = None) -> None:
         if id is None:

@@ -16,7 +16,7 @@ from com.ankamagames.jerakine.messages.Message import Message
 from com.ankamagames.jerakine.network.IServerConnection import IServerConnection
 from com.ankamagames.jerakine.types.enums.Priority import Priority
 
-logger = Logger("pyd2bot")
+logger = Logger("Dofus2")
 
 
 class LatencyFrame(Frame):

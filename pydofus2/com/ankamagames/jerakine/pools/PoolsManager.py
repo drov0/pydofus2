@@ -4,7 +4,7 @@ from com.ankamagames.jerakine.metaclasses.Singleton import Singleton
 import com.ankamagames.jerakine.pools.Pool as pool
 
 
-logger = Logger("pyd2bot")
+logger = Logger("Dofus2")
 
 
 class PoolsManager(metaclass=Singleton):

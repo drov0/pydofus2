@@ -8,7 +8,7 @@ from com.ankamagames.jerakine.network.parser.BooleanByteWrapper import boolByteW
 from com.ankamagames.jerakine.network.parser.ProtocolSpec import ProtocolSpec
 import com.ankamagames.jerakine.network.parser.NetworkMessageDataField as nmdf
 
-logger = Logger("pyd2bot")
+logger = Logger("Dofus2")
 
 
 class NetworkMessageClassDefinition:

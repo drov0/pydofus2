@@ -7,7 +7,7 @@ from com.ankamagames.dofus.datacenter.items.criterion.IItemCriterion import (
 from com.ankamagames.dofus.datacenter.items.criterion.ItemCriterion import ItemCriterion
 from com.ankamagames.jerakine.logger.Logger import Logger
 
-logger = Logger("pyd2bot")
+logger = Logger("Dofus2")
 
 
 class GroupFeatureCriterion(GroupItemCriterion):

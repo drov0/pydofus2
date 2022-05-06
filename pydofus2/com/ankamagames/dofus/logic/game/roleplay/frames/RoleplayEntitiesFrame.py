@@ -98,7 +98,9 @@ from com.ankamagames.dofus.network.types.game.context.roleplay.HumanOptionObject
 from com.ankamagames.dofus.network.types.game.context.roleplay.HumanOptionSkillUse import (
     HumanOptionSkillUse,
 )
-from com.ankamagames.dofus.network.types.game.context.roleplay.MonsterInGroupLightInformations import MonsterInGroupLightInformations
+from com.ankamagames.dofus.network.types.game.context.roleplay.MonsterInGroupLightInformations import (
+    MonsterInGroupLightInformations,
+)
 from com.ankamagames.dofus.network.types.game.interactive.InteractiveElement import (
     InteractiveElement,
 )
@@ -159,7 +161,6 @@ class RoleplayEntitiesFrame(AbstractEntitiesFrame, Frame):
 
         self._aggroTimeoutIdsMonsterAssoc = dict()
 
-        self._responseTimer: Timer = None
         super().__init__()
 
     def pushed(self) -> bool:
@@ -177,7 +178,6 @@ class RoleplayEntitiesFrame(AbstractEntitiesFrame, Frame):
             mirmsg = MapInformationsRequestMessage()
             mirmsg.init(mapId_=MapDisplayManager().currentMapPoint.mapId)
             ConnectionsHandler.getConnection().send(mirmsg, connexion)
-            self._responseTimer = Timer(20, self.onMapDataRequestTimeout)
 
         else:
             self._waitForMap = True
@@ -190,11 +190,6 @@ class RoleplayEntitiesFrame(AbstractEntitiesFrame, Frame):
         self._objects = dict()
         self._objectsByCellId = dict()
         self._paddockItem = dict()
-
-    def onMapDataRequestTimeout(self):
-        mirmsg = MapInformationsRequestMessage()
-        mirmsg.init(mapId_=MapDisplayManager().currentMapPoint.mapId)
-        ConnectionsHandler.getConnection().send(mirmsg)
 
     def process(self, msg: Message):
 
@@ -211,7 +206,6 @@ class RoleplayEntitiesFrame(AbstractEntitiesFrame, Frame):
             return False
 
         if isinstance(msg, MapComplementaryInformationsDataMessage):
-            self._responseTimer.cancel()
             mcidmsg = msg
             currentMapHasChanged = False
             currentSubAreaHasChanged = False
@@ -486,11 +480,13 @@ class RoleplayEntitiesFrame(AbstractEntitiesFrame, Frame):
             teamCounter += 1
         self._fights[infos.fightId] = fight
 
-    def updateMonstersGroup(self, pMonstersInfo:GameRolePlayGroupMonsterInformations) -> None:
-        monsterInfos:MonsterInGroupLightInformations = None
-        underling:MonsterInGroupLightInformations = None
-        monstersGroup:list[MonsterInGroupLightInformations] = self.getMonsterGroup(pMonstersInfo.staticInfos)
-        groupHasMiniBoss:bool = Monster.getMonsterById(pMonstersInfo.staticInfos.mainCreatureLightInfos.genericId).isMiniBoss
+    def updateMonstersGroup(self, pMonstersInfo: GameRolePlayGroupMonsterInformations) -> None:
+        monsterInfos: MonsterInGroupLightInformations = None
+        underling: MonsterInGroupLightInformations = None
+        monstersGroup: list[MonsterInGroupLightInformations] = self.getMonsterGroup(pMonstersInfo.staticInfos)
+        groupHasMiniBoss: bool = Monster.getMonsterById(
+            pMonstersInfo.staticInfos.mainCreatureLightInfos.genericId
+        ).isMiniBoss
         if monstersGroup:
             for monsterInfos in monstersGroup:
                 if monsterInfos.genericId == pMonstersInfo.staticInfos.mainCreatureLightInfos.genericId:
@@ -500,9 +496,8 @@ class RoleplayEntitiesFrame(AbstractEntitiesFrame, Frame):
                 groupHasMiniBoss = True
 
     def updateMonstersGroups(self) -> None:
-        entityInfo:GameContextActorInformations = None
-        entities:dict = entities
+        entityInfo: GameContextActorInformations = None
+        entities: dict = entities
         for entityInfo in entities:
             if isinstance(entityInfo, GameRolePlayGroupMonsterInformations):
                 self.updateMonstersGroup(entityInfo)
-        

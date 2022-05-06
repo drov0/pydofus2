@@ -8,7 +8,7 @@ from com.ankamagames.jerakine.data.GameDataClassDefinition import (
     GameDataClassDefinition,
 )
 
-logger = Logger("pyd2bot")
+logger = Logger("Dofus2")
 
 
 class InvalidD2OFile(Exception):

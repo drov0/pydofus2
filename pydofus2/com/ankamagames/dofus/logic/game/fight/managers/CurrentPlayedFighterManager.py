@@ -37,7 +37,7 @@ from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from com.ankamagames.dofus.types.entities.AnimatedCharacter import AnimatedCharacter
 
-logger = Logger("pyd2bot")
+logger = Logger("Dofus2")
 
 
 class CurrentPlayedFighterManager(metaclass=Singleton):
@@ -336,7 +336,7 @@ class CurrentPlayedFighterManager(metaclass=Singleton):
     def getCurrentSummonedCreature(self, id: float = None) -> int:
         if id is None:
             id = self._currentFighterId
-        return self._currentSummonedCreature[id]
+        return self._currentSummonedCreature.get(id, 0)
 
     def setCurrentSummonedCreature(self, value: int, id: float = None) -> None:
         if id is None:

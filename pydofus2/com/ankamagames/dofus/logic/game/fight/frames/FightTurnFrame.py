@@ -102,7 +102,7 @@ if TYPE_CHECKING:
         FightBattleFrame,
     )
     from com.ankamagames.jerakine.entities.interfaces.IMovable import IMovable
-logger = Logger("pyd2bot")
+logger = Logger("Dofus2")
 
 
 class FightTurnFrame(Frame):
@@ -193,7 +193,6 @@ class FightTurnFrame(Frame):
         self._turnFinishingNoNeedToRedrawMovement = False
         self._myTurn = b
         if b:
-            self.startRemindTurn()
             self.drawMovementArea()
         else:
             self._isRequestingMovement = False
@@ -287,7 +286,6 @@ class FightTurnFrame(Frame):
                 spellCastFrame: "FightSpellCastFrame" = Kernel().getWorker().getFrame("FightSpellCastFrame")
                 if not spellCastFrame:
                     self.drawPath()
-                self.startRemindTurn()
                 if self._finishingTurn:
                     self.finishTurn()
             return True
@@ -336,7 +334,6 @@ class FightTurnFrame(Frame):
             return False
 
     def pulled(self) -> bool:
-        StatsManager().removeListenerFromStat(StatIds.MOVEMENT_POINTS, self.onUpdateMovementPoints)
         if self._remindTurnTimeoutId:
             self._remindTurnTimeoutId.cancel()
         if self._intervalTurn:
@@ -569,23 +566,6 @@ class FightTurnFrame(Frame):
         ConnectionsHandler.getConnection().send(gftfmsg)
         self.removeMovementArea()
         self._finishingTurn = False
-
-    def startRemindTurn(self) -> None:
-        if not self._myTurn:
-            return
-        # if self._turnDuration > 0 and Dofus().options.getOption("remindTurn"):
-        #     if self._remindTurnTimeoutId is not None:
-        #         self._remindTurnTimeoutId.cancel()
-        #     self._remindTurnTimeoutId = Timer(self.REMIND_TURN_DELAY, self.remindTurn)
-        #     self._remindTurnTimeoutId.start()
-
-    def remindTurn(self) -> None:
-        fightBattleFrame: "FightBattleFrame" = Kernel().getWorker().getFrame("FightBattleFrame")
-        if fightBattleFrame and fightBattleFrame.fightIsPaused:
-            self._remindTurnTimeoutId.cancel()
-            self._remindTurnTimeoutId = None
-            return
-        self._remindTurnTimeoutId = None
 
     def onSecondTick(self) -> None:
         if self._remainingDurationSeconds > 0:

@@ -74,7 +74,7 @@ from com.ankamagames.jerakine.types.enums.Priority import Priority
 
 class InventoryManagementFrame(Frame):
 
-    logger = Logger("pyd2bot")
+    logger = Logger("Dofus2")
 
     CHARACTER_BUILD_PRESET_TYPE: int = 1
 

@@ -19,7 +19,7 @@ class FightMovementPointsLossDodgeStep(AbstractDodgePointLossStep, IFightStep):
     def start(self) -> None:
         FightEventsHelper().sendFightEvent(
             FightEventEnum.FIGHTER_MP_LOSS_DODGED,
-            [self.fighterId, self._amount],
+            [self._fighterId, self._amount],
             self._fighterId,
             self.castingSpellId,
         )

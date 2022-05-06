@@ -17,7 +17,7 @@ from com.ankamagames.jerakine.utils.display.spellZone.ICellZoneProvider import (
 from com.ankamagames.jerakine.utils.display.spellZone.IZoneShape import IZoneShape
 from com.ankamagames.jerakine.utils.display.spellZone.ZoneEffect import ZoneEffect
 
-logger = Logger("pyd2bot")
+logger = Logger("Dofus2")
 
 
 class SpellLevel(ICellZoneProvider, IDataCenter):

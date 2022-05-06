@@ -34,7 +34,7 @@ from com.ankamagames.jerakine.messages.Message import Message
 from com.ankamagames.jerakine.types.enums.Priority import Priority
 from com.ankamagames.jerakine.types.positions.MapPoint import MapPoint
 
-logger = Logger("pyd2bot")
+logger = Logger("Dofus2")
 
 
 class AbstractEntitiesFrame(Frame):
@@ -110,6 +110,7 @@ class AbstractEntitiesFrame(Frame):
     def getEntityInfos(self, entityId: float) -> GameContextActorInformations:
         if entityId == 0 or entityId is None:
             return None
+        entityId = float(entityId)
         if not self._entities or not self._entitiesTotal:
             return None
         if not self._entities.get(entityId):
@@ -118,6 +119,13 @@ class AbstractEntitiesFrame(Frame):
                 return None
             return None
         return self._entities.get(entityId)
+
+    def updateEntityCellId(self, entityId, cellId) -> None:
+        entityId = float(entityId)
+        info = self.getEntityInfos(entityId)
+        if info:
+            info.disposition.cellId = cellId
+            self._entities[entityId] = info
 
     def getEntitiesIdsList(self) -> list[float]:
         entitiesList = [gcai.contextualId for gcai in self._entities.values()]
@@ -130,6 +138,7 @@ class AbstractEntitiesFrame(Frame):
         self.registerActorWithId(infos, infos.contextualId)
 
     def registerActorWithId(self, infos: GameContextActorInformations, actorId: float) -> None:
+        actorId = float(actorId)
         if self._entities is None:
             self._entities = dict[int, GameContextActorInformations]()
         if not self._entities.get(actorId):
@@ -139,6 +148,7 @@ class AbstractEntitiesFrame(Frame):
             StatsManager().addRawStats(actorId, infos.stats.characteristics.characteristics)
 
     def unregisterActor(self, actorId: float) -> None:
+        actorId = float(actorId)
         entity: IEntity = None
         if self._entities[actorId]:
             entity = DofusEntities.getEntity(actorId)
@@ -170,10 +180,11 @@ class AbstractEntitiesFrame(Frame):
         return characterEntity
 
     def updateActorDisposition(self, actorId: float, newDisposition: EntityDispositionInformations) -> None:
+        actorId = float(actorId)
         if self._entities.get(actorId):
             self._entities[actorId].disposition = newDisposition
         else:
-            logger.warn(f"Cannot update unknown actor disposition ({actorId}) in informations.")
+            logger.error(f"Cannot update unknown actor disposition ({actorId}) in informations.")
 
     def removeActor(self, actorId: float) -> None:
         self.unregisterActor(actorId)

@@ -3,7 +3,7 @@ from com.ankamagames.jerakine.logger.Logger import Logger
 from com.ankamagames.jerakine.sequencer.IPausableSequencable import IPausableSequencable
 from com.ankamagames.jerakine.sequencer.ISequencableListener import ISequencableListener
 
-logger = Logger("pyd2bot")
+logger = Logger("Dofus2")
 
 
 class AbstractSequencable(IPausableSequencable):

@@ -5,7 +5,7 @@ import os
 from com.ankamagames.dofus import Constants as Constants
 import pyamf
 
-logger = Logger("pyd2bot")
+logger = Logger("Dofus2")
 
 
 class CustomSharedObjectFileFormatError(Exception):

@@ -3,7 +3,7 @@ from Cryptodome.PublicKey import RSA as RSA
 from com.ankamagames.jerakine.network.CustomDataWrapper import ByteArray
 from com.hurlan.crypto.symmetric.IPad import IPad
 
-logger = Logger("pyd2bot")
+logger = Logger("Dofus2")
 
 
 class RSACipher:

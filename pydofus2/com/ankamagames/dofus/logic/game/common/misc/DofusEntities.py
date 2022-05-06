@@ -3,7 +3,7 @@ from com.ankamagames.dofus.logic.game.misc.IEntityLocalizer import IEntityLocali
 from com.ankamagames.jerakine.logger.Logger import Logger
 from com.ankamagames.jerakine.entities.interfaces.IEntity import IEntity
 
-logger = Logger("pyd2bot")
+logger = Logger("Dofus2")
 
 
 class DofusEntities:
@@ -36,8 +36,6 @@ class DofusEntities:
 
     @classmethod
     def reset(cls) -> None:
-        localizer: IEntityLocalizer = None
-        for i in range(0, len(cls._localizers), 1):
-            localizer = cls._localizers[i]
+        for localizer in cls._localizers:
             localizer.unregistered()
-        cls._localizers = list[IEntityLocalizer]()
+        cls._localizers.clear()

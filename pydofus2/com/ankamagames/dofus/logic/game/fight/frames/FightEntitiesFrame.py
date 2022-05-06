@@ -134,7 +134,7 @@ from com.ankamagames.jerakine.messages.Message import Message
 from com.ankamagames.jerakine.types.positions.MapPoint import MapPoint
 from damageCalculation.tools.StatIds import StatIds
 
-logger = Logger("pyd2bot")
+logger = Logger("Dofus2")
 
 
 class FightEntitiesFrame(AbstractEntitiesFrame, Frame):

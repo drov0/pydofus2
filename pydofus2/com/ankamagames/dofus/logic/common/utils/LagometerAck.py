@@ -7,7 +7,7 @@ from com.ankamagames.jerakine.logger.Logger import Logger
 from com.ankamagames.jerakine.network.ILagometer import ILagometer
 from com.ankamagames.jerakine.network.INetworkMessage import INetworkMessage
 
-logger = Logger("pyd2bot")
+logger = Logger("Dofus2")
 
 
 class LagometerAck(Lagometer):

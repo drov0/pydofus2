@@ -25,7 +25,7 @@ from com.ankamagames.jerakine.types.DataStoreType import DataStoreType
 from com.ankamagames.jerakine.types.enums.DataStoreEnum import DataStoreEnum
 from com.ankamagames.jerakine.types.enums.Priority import Priority
 
-logger = Logger("pyd2bot")
+logger = Logger("Dofus2")
 
 
 class AveragePricesFrame(Frame):

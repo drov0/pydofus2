@@ -134,7 +134,7 @@ if TYPE_CHECKING:
         FightContextFrame,
     )
 
-logger = Logger("pyd2bot")
+logger = Logger("Dofus2")
 
 
 class FightBattleFrame(Frame):
@@ -163,11 +163,11 @@ class FightBattleFrame(Frame):
 
     _newTurnsList: list[float] = None
 
-    _newDeadTurnsList: list[float] = None
+    _newDeadTurnsList: list[float] = []
 
     _turnsList: list[float] = None
 
-    _deadTurnsList: list[float] = None
+    _deadTurnsList: list[float] = []
 
     _playerTargetedEntitiesList: list[float] = None
 
@@ -204,8 +204,6 @@ class FightBattleFrame(Frame):
     _slaveId: float = None
 
     _autoEndTurn: bool = False
-
-    _autoEndTurnTimer: Timer
 
     _newWave: bool = False
 
@@ -295,7 +293,6 @@ class FightBattleFrame(Frame):
         logger.debug(f"FightBattleFrame pushed, dataMapProvider.isInFight = {DataMapProvider().isInFight}")
         krnl.Kernel().getWorker().addFrame(self._turnFrame)
         self._destroyed = False
-        self._autoEndTurnTimer = Timer(6, self.sendAutoEndTurn)
         self._neverSynchronizedBefore = True
         return True
 
@@ -580,7 +577,6 @@ class FightBattleFrame(Frame):
         self._playerNewTurn = None
         self._skipTurnTimer = None
         self._destroyed = True
-        self._autoEndTurnTimer = None
         return True
 
     def logState(self):
@@ -770,7 +766,6 @@ class FightBattleFrame(Frame):
             action = GameFightTurnFinishAction()
             krnl.Kernel().getWorker().process(action)
             self._autoEndTurn = False
-        self._autoEndTurnTimer.stop()
 
     def updateTurnsList(self, turnsList: list[float], deadTurnsList: list[float]) -> None:
         self._turnsList = turnsList

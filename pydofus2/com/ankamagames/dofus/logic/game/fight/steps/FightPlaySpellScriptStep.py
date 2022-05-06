@@ -9,7 +9,7 @@ from com.ankamagames.jerakine.logger.Logger import Logger
 from com.ankamagames.jerakine.sequencer.AbstractSequencable import AbstractSequencable
 from com.ankamagames.jerakine.types.Callback import Callback
 
-logger = Logger("pyd2bot")
+logger = Logger("Dofus2")
 
 
 class FightPlaySpellScriptStep(AbstractSequencable, IFightStep):

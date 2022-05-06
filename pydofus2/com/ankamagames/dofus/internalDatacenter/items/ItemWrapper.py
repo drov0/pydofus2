@@ -42,7 +42,7 @@ from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from com.ankamagames.dofus.datacenter.effects.EffectInstance import EffectInstance
 
-logger = Logger("pyd2bot")
+logger = Logger("Dofus2")
 
 
 class ItemWrapper(Item, ISlotData, ICellZoneProvider, IDataCenter):
@@ -243,9 +243,10 @@ class ItemWrapper(Item, ISlotData, ICellZoneProvider, IDataCenter):
         item.updateEffects(item.effectsList)
         return item
 
-    def clearCache(self) -> None:
-        self._cache = dict()
-        self._cacheGId = dict()
+    @classmethod
+    def clearCache(cls) -> None:
+        cls._cache.clear()
+        cls._cacheGId.clear()
 
     @property
     def weight(self) -> int:

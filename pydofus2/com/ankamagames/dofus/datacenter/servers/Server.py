@@ -7,7 +7,7 @@ from com.ankamagames.dofus.types.IdAccessors import IdAccessors
 from com.ankamagames.jerakine.data.GameData import GameData
 from com.ankamagames.jerakine.interfaces.IDataCenter import IDataCenter
 
-logger = Logger("pyd2bot")
+logger = Logger("Dofus2")
 
 
 class Server(IDataCenter):

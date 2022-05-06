@@ -27,7 +27,7 @@ from com.ankamagames.jerakine.types.zones.Cross import Cross
 from com.ankamagames.jerakine.types.zones.Custom import Custom
 from com.ankamagames.jerakine.types.zones.Lozenge import Lozenge
 
-logger = Logger("pyd2bot")
+logger = Logger("Dofus2")
 
 
 class MarkedCellsManager(IDestroyable, metaclass=Singleton):
@@ -58,7 +58,7 @@ class MarkedCellsManager(IDestroyable, metaclass=Singleton):
         markActive: bool = True,
         markImpactCellId: int = -1,
     ) -> None:
-        if not self._marks[markId] or len(self._marks[markId].cells) == 0:
+        if not self._marks.get(markId) or len(self._marks[markId].cells) == 0:
             mi = MarkInstance()
             mi.markCasterId = markCasterId
             mi.markId = markId
@@ -87,7 +87,7 @@ class MarkedCellsManager(IDestroyable, metaclass=Singleton):
                     s.zone = Lozenge(0, markedCell.zoneSize, DataMapProvider())
                 else:
                     s.zone = Custom(cellsId)
-                for cell in s.cells:
+                for cell in s.zone.getCells():
                     mi.cells.append(cell)
                     if mi.markType == GameActionMarkTypeEnum.TRAP:
                         DataMapProvider().obstaclesCells.append(cell)
@@ -110,7 +110,7 @@ class MarkedCellsManager(IDestroyable, metaclass=Singleton):
         return self._marks
 
     def getMarkDatas(self, markId: int) -> MarkInstance:
-        return self._marks[markId]
+        return self._marks.get(markId)
 
     def removeMark(self, markId: int) -> None:
         cell: int = 0
@@ -239,10 +239,10 @@ class MarkedCellsManager(IDestroyable, metaclass=Singleton):
         return self.MARK_SELECTIONS_PREFIX + self._markUid
 
     def updateDataMapProvider(self) -> None:
-        markedCells: list = []
+        markedCells: list = [None] * AtouinConstants.MAP_CELLS_COUNT
         for mi in self._marks.values():
             for cell in mi.cells:
-                markedCells[cell] |= mi.markType
+                markedCells[cell] = mi.markType
         dmp = DataMapProvider()
         for i in range(AtouinConstants.MAP_CELLS_COUNT):
             mp = MapPoint.fromCellId(i)
@@ -268,3 +268,10 @@ class MarkedCellsManager(IDestroyable, metaclass=Singleton):
                     if isinstance(self._glyphs[mitn.markId], Glyph):
                         Glyph(self._glyphs[mitn.markId]).addNumber(num)
                 num += 1
+
+    def addSelection(self, s: Selection, name: str, cellId: int = 561.0) -> None:
+        if self._aSelection.get(name):
+            Selection(self._aSelection[name]).remove()
+        self._aSelection[name] = s
+        if cellId != AtouinConstants.MAP_CELLS_COUNT + 1:
+            self.update(name, cellId)

@@ -332,5 +332,5 @@ ROOTDIR = pathlib.Path(os.path.dirname(__file__))
 # )
 
 t = perf_counter()
-parseFile(ROOTDIR / "target.as", ROOTDIR / "updateMonstersGroup.py")
+parseFile(ROOTDIR / "target.as", ROOTDIR / "IDofus.py")
 print("parsing took:", perf_counter() - t)

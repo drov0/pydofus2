@@ -5,7 +5,7 @@ from com.ankamagames.jerakine.map.ILosDetector import ILosDetector
 from com.ankamagames.jerakine.types.positions.MapPoint import MapPoint
 from mapTools import MapTools
 
-logger = Logger("pyd2bot")
+logger = Logger("Dofus2")
 
 
 class LosDetector(ILosDetector):
@@ -13,26 +13,25 @@ class LosDetector(ILosDetector):
     def losBetween(
         cls, mapProvider: IDataMapProvider, refPos: MapPoint, targetPos: MapPoint, tested: dict[str, bool] = {}
     ) -> bool:
-        los = True
+        los = False
         ptKey = f"{targetPos.x}_{targetPos.y}"
         if ptKey in tested:
             return tested[ptKey]
-        if refPos.inDiag(targetPos):
-            line = MapTools.getCellsCoordBetween(refPos.cellId, targetPos.cellId)
-            if len(line) == 0:
-                return True
-            else:
-                for j in range(len(line)):
-                    ptKey = f"{math.floor(line[j].x)}_{math.floor(line[j].y)}"
-                    if MapPoint.isInMap(line[j].x, line[j].y):
-                        if j > 0 and mapProvider.hasEntity(math.floor(line[j - 1].x), math.floor(line[j - 1].y), True):
-                            los = False
-                        elif ptKey not in tested or refPos.inDiag(line[j]):
-                            los = los and mapProvider.pointLos(math.floor(line[j].x), math.floor(line[j].y), True)
-                        else:
-                            los = los and tested[ptKey]
-                        if not los:
-                            break
+        line = MapTools.getCellsCoordBetween(refPos.cellId, targetPos.cellId)
+        if len(line) == 0:
+            los = True
+        else:
+            for j in range(len(line)):
+                ptKey = f"{line[j].x}_{line[j].y}"
+                if MapPoint.isInMap(line[j].x, line[j].y):
+                    if j > 0 and mapProvider.hasEntity(line[j - 1].x, line[j - 1].y, True):
+                        los = False
+                    elif ptKey not in tested or refPos.inDiag(line[j]):
+                        los = los and mapProvider.pointLos(line[j].x, line[j].y, True)
+                    else:
+                        los = los and tested[ptKey]
+                    if not los:
+                        break
         tested[ptKey] = los
         return los
 
@@ -42,47 +41,33 @@ class LosDetector(ILosDetector):
         for cellId in spellrange:
             mp = MapPoint.fromCellId(cellId)
             orderedCell.append({"p": mp, "dist": refPosition.distanceToCell(mp)})
-        sorted(orderedCell, key=lambda x: x["dist"], reverse=True)
+        orderedCell.sort(key=lambda x: x["dist"], reverse=True)
         tested = dict[str, bool]()
         result: list[int] = list[int]()
         for i in range(len(orderedCell)):
             p: MapPoint = orderedCell[i]["p"]
-
-            if (
-                tested.get(f"{p.x}_{p.y}") is None
-                or refPosition.x + refPosition.y == p.x + p.y
-                or refPosition.x - refPosition.y == p.x - p.y
-            ):
+            if p not in tested or abs(p.x - refPosition.x) == abs(p.y - refPosition.y):
                 line = MapTools.getCellsCoordBetween(refPosition.cellId, p.cellId)
                 if len(line) == 0:
                     result.append(p.cellId)
-
                 else:
                     los = True
                     for j in range(len(line)):
-                        currentPoint = f"{math.floor(line[j].x)}_{math.floor(line[j].y)}"
                         if MapPoint.isInMap(line[j].x, line[j].y):
-                            if j > 0 and mapProvider.hasEntity(
-                                math.floor(line[j - 1].x), math.floor(line[j - 1].y), True
-                            ):
+                            if j > 0 and mapProvider.hasEntity(line[j - 1].x, line[j - 1].y, True):
                                 los = False
 
-                            elif (
-                                line[j].x + line[j].y == refPosition.x + refPosition.y
-                                or line[j].x - line[j].y == refPosition.x - refPosition.y
+                            elif line[j] not in tested or abs(line[j].x - refPosition.x) == abs(
+                                line[j].y - refPosition.y
                             ):
-                                los = los and mapProvider.pointLos(math.floor(line[j].x), math.floor(line[j].y))
-
-                            elif tested.get(currentPoint) is None:
-                                los = los and mapProvider.pointLos(math.floor(line[j].x), math.floor(line[j].y))
+                                los = los and mapProvider.pointLos(line[j].x, line[j].y, True)
 
                             else:
-                                los = los and tested[currentPoint]
-                    tested[currentPoint] = los
-
+                                los = los and tested[line[j]]
+                    tested[line[j]] = los
         for i in spellrange:
             mp = MapPoint.fromCellId(i)
-            if tested[f"{mp.x}_{mp.y}"]:
-                result.append(mp.cellId)
+            if tested[mp]:
+                result.append(mp)
 
         return result

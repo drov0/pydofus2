@@ -1,9 +1,12 @@
 from time import sleep
+from com.ankamagames.dofus.internalDatacenter.items.ItemWrapper import ItemWrapper
 from com.ankamagames.dofus.logic.common.frames.LatencyFrame import LatencyFrame
 from com.ankamagames.dofus.logic.common.managers.StatsManager import StatsManager
 from com.ankamagames.dofus.logic.connection.managers.AuthentificationManager import (
     AuthentificationManager,
 )
+from com.ankamagames.dofus.logic.game.common.managers.FeatureManager import FeatureManager
+from com.ankamagames.dofus.logic.game.common.misc.DofusEntities import DofusEntities
 from com.ankamagames.dofus.logic.game.fight.managers.FightersStateManager import (
     FightersStateManager,
 )
@@ -45,14 +48,18 @@ class Kernel(metaclass=Singleton):
         reloadData: bool = False,
     ) -> None:
         import com.ankamagames.dofus.logic.game.fight.managers.CurrentPlayedFighterManager as cpfm
+        from com.ankamagames.dofus.logic.game.fight.managers.SpellModifiersManager import SpellModifiersManager
 
+        # TODO : missing feature manager reset here
         StatsManager.clear()
+        SpellModifiersManager.clear()
         if not autoRetry:
             AuthentificationManager.clear()
         FightersStateManager().endFight()
         cpfm.CurrentPlayedFighterManager().endFight()
-        cpc = pcm.PlayedCharacterManager()
-        del cpc
+        pcm.PlayedCharacterManager.clear()
+        DofusEntities.reset()
+        ItemWrapper.clearCache()
         self._worker.clear()
         self.addInitialFrames(reloadData)
         self.beingInReconection = False

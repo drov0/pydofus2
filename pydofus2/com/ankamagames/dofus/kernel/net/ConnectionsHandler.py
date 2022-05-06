@@ -22,7 +22,7 @@ from com.ankamagames.jerakine.network.MultiConnection import MultiConnection
 from com.ankamagames.jerakine.network.ServerConnection import ServerConnection
 from com.ankamagames.dofus.network.MessageReceiver import MessageReceiver
 
-logger = Logger("pyd2bot")
+logger = Logger("Dofus2")
 
 
 class ConnectionsHandler:
@@ -174,10 +174,9 @@ class ConnectionsHandler:
 
     @classmethod
     def startConnectionTimer(cls) -> None:
-        if not cls._connectionTimeout:
-            cls._connectionTimeout = Timer(4, cls.onConnectionTimeout)
-        else:
+        if cls._connectionTimeout:
             cls._connectionTimeout.cancel()
+        cls._connectionTimeout = Timer(4, cls.onConnectionTimeout)
         cls._connectionTimeout.start()
 
     @classmethod

@@ -12,7 +12,7 @@ from com.ankamagames.jerakine.metaclasses.Singleton import Singleton
 from com.ankamagames.jerakine.types.positions.MapPoint import MapPoint
 from mapTools import MapTools
 
-logger = Logger("pyd2bot")
+logger = Logger("Dofus2")
 
 
 class DataMapProvider(IDataMapProvider, metaclass=Singleton):
@@ -38,7 +38,7 @@ class DataMapProvider(IDataMapProvider, metaclass=Singleton):
             cellEntities = EntitiesManager().getEntitiesOnCell(cellId, IObstacle)
             if len(cellEntities):
                 for o in cellEntities:
-                    if not IObstacle(o).canSeeThrough():
+                    if not o.canSeeThrough:
                         return False
         return los
 

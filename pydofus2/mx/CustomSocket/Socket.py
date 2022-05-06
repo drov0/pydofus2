@@ -1,16 +1,18 @@
 import socket
 import threading
-from time import perf_counter
+from time import perf_counter, sleep
 from whistle import EventDispatcher
 from com.ankamagames.jerakine.events.SocketEvent import SocketEvent
 from com.ankamagames.jerakine.events.ProgressEvent import ProgressEvent
 from com.ankamagames.jerakine.logger.Logger import Logger
 from com.ankamagames.jerakine.network.CustomDataWrapper import ByteArray
 
-logger = Logger("pyd2bot")
+logger = Logger("Dofus2")
 
 
 class Socket(threading.Thread):
+    MIN_TIME_BETWEEN_SEND = 0.05
+
     def __init__(self, host, port):
         self.dispatcher = EventDispatcher()
         self._sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -18,9 +20,13 @@ class Socket(threading.Thread):
         self.host = host
         self.port = port
         self._kill = threading.Event()
-        self.recording = ByteArray()
-        self.buff = ByteArray()
+        self._buff = ByteArray()
+        self._lastSent = 0
         super().__init__()
+
+    @property
+    def bytesAvailable(self):
+        return self._buff.remaining()
 
     def lenlenData(self, raw):
         if len(raw) > 65535:
@@ -37,7 +43,7 @@ class Socket(threading.Thread):
             try:
                 rdata = self._sock.recv(1028)
                 if rdata:
-                    self.buff += rdata
+                    self._buff += rdata
                     self.dispatcher.dispatch(ProgressEvent.SOCKET_DATA, ProgressEvent(rdata))
                 else:
                     break
@@ -69,4 +75,6 @@ class Socket(threading.Thread):
         self.dispatcher.dispatch(event)
 
     def send(self, data):
+        sleep(max(self.MIN_TIME_BETWEEN_SEND - (perf_counter() - self._lastSent), 0))
         self._sock.sendall(data)
+        self._lastSent = perf_counter()

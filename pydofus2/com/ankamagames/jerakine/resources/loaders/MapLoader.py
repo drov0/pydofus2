@@ -6,7 +6,7 @@ from com.ankamagames.jerakine.logger.Logger import Logger
 from com.ankamagames.jerakine.metaclasses.Singleton import Singleton
 from dataAdapter.dlm import DLM
 
-logger = Logger("pyd2bot")
+logger = Logger("Dofus2")
 
 
 class MapLoader(metaclass=Singleton):

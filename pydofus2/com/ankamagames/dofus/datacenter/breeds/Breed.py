@@ -8,7 +8,7 @@ from com.ankamagames.jerakine.data import I18n
 from com.ankamagames.jerakine.data.GameData import GameData
 from com.ankamagames.jerakine.interfaces.IDataCenter import IDataCenter
 
-logger = Logger("pyd2bot")
+logger = Logger("Dofus2")
 
 
 class Breed(IDataCenter):

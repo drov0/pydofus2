@@ -7,7 +7,7 @@ CURRDIR = Path(__file__).parent
 BOTSDB = CURRDIR / "botCharachtersDB.json"
 
 
-class BotsDataManager:
+class BotCredsManager:
     if not os.path.exists(BOTSDB):
         with open(BOTSDB, "w") as fp:
             json.dump({}, fp)
@@ -41,4 +41,4 @@ if __name__ == "__main__":
     account = sys.argv[2]
     serverId = int(sys.argv[3])
     charachterId = int(sys.argv[4])
-    BotsDataManager.addEntry(botName, account, charachterId, serverId)
+    BotCredsManager.addEntry(botName, account, charachterId, serverId)

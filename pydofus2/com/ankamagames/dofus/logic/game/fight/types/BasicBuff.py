@@ -33,7 +33,7 @@ from com.ankamagames.dofus.network.types.game.context.fight.GameFightFighterInfo
 )
 from com.ankamagames.jerakine.logger.Logger import Logger
 
-logger = Logger("pyd2bot")
+logger = Logger("Dofus2")
 
 
 class BasicBuff:

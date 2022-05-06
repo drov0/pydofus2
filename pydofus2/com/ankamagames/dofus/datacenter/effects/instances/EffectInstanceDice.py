@@ -7,7 +7,7 @@ from com.ankamagames.dofus.datacenter.effects.instances.EffectInstanceInteger im
     EffectInstanceInteger,
 )
 
-logger = Logger("pyd2bot")
+logger = Logger("Dofus2")
 
 
 class EffectInstanceDice(EffectInstanceInteger):

@@ -1,8 +1,10 @@
 from com.ankamagames.dofus.kernel.Kernel import Kernel
 from com.ankamagames.dofus.kernel.net.ConnectionsHandler import ConnectionsHandler
+from com.ankamagames.dofus.network.enums.GameContextEnum import GameContextEnum
 from com.ankamagames.dofus.network.messages.game.basic.SequenceNumberMessage import (
     SequenceNumberMessage,
 )
+from com.ankamagames.dofus.network.messages.game.context.GameContextCreateMessage import GameContextCreateMessage
 from com.ankamagames.dofus.network.messages.game.context.roleplay.CurrentMapMessage import CurrentMapMessage
 from com.ankamagames.jerakine.logger.Logger import Logger
 from com.ankamagames.jerakine.messages.Frame import Frame
@@ -16,7 +18,7 @@ from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from com.ankamagames.dofus.logic.game.roleplay.frames.RoleplayMovementFrame import RoleplayMovementFrame
 
-logger = Logger("pyd2bot")
+logger = Logger("Dofus2")
 
 
 class SynchronisationFrame(Frame):
@@ -54,8 +56,19 @@ class SynchronisationFrame(Frame):
         if isinstance(msg, CurrentMapMessage):
             rplmvf: "RoleplayMovementFrame" = Kernel().getWorker().getFrame("RoleplayMovementFrame")
             if rplmvf and rplmvf._changeMapTimeout:
+                logger.debug("Cancel change map timeout")
                 rplmvf._changeMapTimeout.cancel()
                 rplmvf._wantToChangeMap = None
+                rplmvf._changeMapFails = 0
+            return False
+
+        if isinstance(msg, GameContextCreateMessage):
+            if msg.context == GameContextEnum.FIGHT:
+                rplmvf: "RoleplayMovementFrame" = Kernel().getWorker().getFrame("RoleplayMovementFrame")
+                if rplmvf and rplmvf._requestFightTimeout:
+                    rplmvf._requestFightTimeout.cancel()
+                    rplmvf._requestFighFails = 0
+                    rplmvf._followingMonsterGroup = None
             return False
 
         else:

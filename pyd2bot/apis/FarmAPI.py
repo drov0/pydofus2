@@ -11,7 +11,7 @@ if TYPE_CHECKING:
     )
 from com.ankamagames.jerakine.logger.Logger import Logger
 
-logger = Logger("pyd2bot")
+logger = Logger("Dofus2")
 
 
 class FarmAPI(metaclass=Singleton):

@@ -7,7 +7,7 @@ from com.ankamagames.jerakine.network.CustomDataWrapper import ByteArray
 from com.ankamagames.jerakine.types.ColorMultiplicator import ColorMultiplicator
 from com.ankamagames.jerakine.types.positions.Point import Point
 
-logger = Logger("pyd2bot")
+logger = Logger("Dofus2")
 
 
 class GraphicalElement(BasicElement):

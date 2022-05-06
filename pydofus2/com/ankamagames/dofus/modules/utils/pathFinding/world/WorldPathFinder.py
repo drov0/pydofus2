@@ -16,7 +16,7 @@ from com.ankamagames.jerakine.logger.Logger import Logger
 from com.ankamagames.jerakine.metaclasses.Singleton import Singleton
 from com.ankamagames.jerakine.network.CustomDataWrapper import ByteArray
 
-logger = Logger("pyd2bot")
+logger = Logger("Dofus2")
 
 
 class WorldPathFinder(metaclass=Singleton):

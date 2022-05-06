@@ -13,7 +13,7 @@ from com.ankamagames.dofus.datacenter.items.criterion.UnusableItemCriterion impo
     UnusableItemCriterion,
 )
 
-logger = Logger("pyd2bot")
+logger = Logger("Dofus2")
 
 
 class ItemCriterionFactory:

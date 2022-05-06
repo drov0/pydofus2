@@ -9,7 +9,7 @@ import com.ankamagames.dofus.logic.game.common.managers.StorageOptionManager as 
 from com.ankamagames.dofus.logic.game.common.misc.IStorageView import IStorageView
 from com.ankamagames.jerakine.logger.Logger import Logger
 
-logger = Logger("pyd2bot")
+logger = Logger("Dofus2")
 
 
 class StorageGenericView(IStorageView):

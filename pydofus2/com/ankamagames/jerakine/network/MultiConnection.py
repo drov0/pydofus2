@@ -11,7 +11,7 @@ from com.ankamagames.jerakine.events.IOErrorEvent import IOErrorEvent
 from com.ankamagames.jerakine.events.SecurityErrorEvent import SecurityErrorEvent
 from com.ankamagames.jerakine.network.IMessagerouter import IMessageRouter
 
-logger = Logger("pyd2bot")
+logger = Logger("Dofus2")
 
 
 class MultiConnection(EventDispatcher):

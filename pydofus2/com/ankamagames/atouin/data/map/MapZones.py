@@ -7,7 +7,7 @@ from com.ankamagames.jerakine.types.positions.MapPoint import MapPoint
 if TYPE_CHECKING:
     from com.ankamagames.atouin.data.map.Cell import Cell
     from com.ankamagames.atouin.data.map.Map import Map
-logger = Logger("pyd2bot")
+logger = Logger("Dofus2")
 
 
 class Zone(dict[int, "Cell"]):

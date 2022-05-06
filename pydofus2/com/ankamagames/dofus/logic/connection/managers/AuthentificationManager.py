@@ -24,7 +24,7 @@ from com.hurlan.crypto.symmetric.PSAKey import RSACipher
 from com.hurlan.crypto.symmetric.SimpleIVMode import SimpleIVMode
 from Cryptodome.PublicKey import RSA
 
-logger = Logger("pyd2bot")
+logger = Logger("Dofus2")
 ROOTDIR = os.path.dirname(__file__)
 
 
@@ -37,9 +37,14 @@ class AuthentificationManager(metaclass=Singleton):
     _AESKey: ByteArray = None
     nextToken: str = None
     tokenMode: bool = None
-    username: str = None
+    username: str = "   "
     _password = None
     _certificate = None
+    _lva = None
+
+    @property
+    def loginValidationAction(self) -> LoginValidationAction:
+        return self._lva
 
     def initAESKey(self):
         self._AESKey = AESKey.generateRandomAESKey(self.AES_KEY_LENGTH)
@@ -59,7 +64,8 @@ class AuthentificationManager(metaclass=Singleton):
             raise Exception("Pubkey Sign validation failed!")
         self._publicKey = "-----BEGIN PUBLIC KEY-----\n" + str(ba_pubKey) + "\n-----END PUBLIC KEY-----"
 
-    def setValidationAction(self, lva: LoginValidationAction):
+    @loginValidationAction.setter
+    def loginValidationAction(self, lva: LoginValidationAction):
         self._lva = lva
 
     def getCanAutoConnectWithToken(self) -> bool:

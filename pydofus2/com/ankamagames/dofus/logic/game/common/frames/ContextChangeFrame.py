@@ -18,7 +18,7 @@ from com.ankamagames.jerakine.messages.Frame import Frame
 from com.ankamagames.jerakine.messages.Message import Message
 from com.ankamagames.jerakine.types.enums.Priority import Priority
 
-logger = Logger("pyd2bot")
+logger = Logger("Dofus2")
 
 
 class ContextChangeFrame(Frame):
@@ -47,8 +47,6 @@ class ContextChangeFrame(Frame):
                 import com.ankamagames.dofus.logic.game.fight.frames.FightContextFrame as fcf
 
                 Kernel().getWorker().addFrame(fcf.FightContextFrame())
-
-                pass
 
             else:
                 Kernel().panic(PanicMessages.WRONG_CONTEXT_CREATED, [msg.context])

@@ -19,7 +19,7 @@ from com.ankamagames.jerakine.pools.Poolable import Poolable
 import com.ankamagames.jerakine.utils.display.EnterFrameDispatcher as efd
 from com.ankamagames.jerakine.utils.display.FrameIdManager import FrameIdManager
 
-logger = Logger("pyd2bot")
+logger = Logger("Dofus2")
 
 
 class Worker(EventDispatcher, MessageHandler):
@@ -225,6 +225,9 @@ class Worker(EventDispatcher, MessageHandler):
 
     def pause(self, targetobject: object = None, unstoppableMsgobjectList: list = None) -> None:
         logger.debug("[debug worker] Worker is paused, all queueable messages will be queued : ")
+        # logger.debug(
+        #     f"[debug worker] - still processing a message {self._processingMessage}, message queue {self._messagesQueue}"
+        # )
         self._paused = True
         if unstoppableMsgobjectList:
             self._unstoppableMsgClassList = self._unstoppableMsgClassList.extend(unstoppableMsgobjectList)

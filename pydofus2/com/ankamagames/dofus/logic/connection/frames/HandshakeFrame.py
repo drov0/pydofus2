@@ -17,7 +17,7 @@ from com.ankamagames.jerakine.network.INetworkMessage import INetworkMessage
 from com.ankamagames.jerakine.types.enums.Priority import Priority
 from com.ankamagames.dofus.kernel.PanicMessages import PanicMessages
 
-logger = Logger("pyd2bot")
+logger = Logger("Dofus2")
 
 
 class HandshakeFrame(Frame):

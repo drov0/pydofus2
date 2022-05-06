@@ -11,7 +11,7 @@ from com.ankamagames.jerakine.enum.GameDataTypeEnum import GameDataTypeEnum
 from com.ankamagames.jerakine.logger.Logger import Logger
 from com.ankamagames.jerakine.utils.misc.StringUtils import StringUtils
 
-logger = Logger("pyd2bot")
+logger = Logger("Dofus2")
 
 
 class GameDataQuery:

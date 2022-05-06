@@ -10,7 +10,7 @@ from com.ankamagames.dofus.network.types.game.actions.fight.FightTemporaryBoostE
 )
 from com.ankamagames.jerakine.logger.Logger import Logger
 
-logger = Logger("pyd2bot")
+logger = Logger("Dofus2")
 
 
 class StatBuff(basicBuff.BasicBuff):

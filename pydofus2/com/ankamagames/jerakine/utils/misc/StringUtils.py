@@ -1,7 +1,7 @@
 from com.ankamagames.jerakine.logger.Logger import Logger
 import re
 
-logger = Logger("pyd2bot")
+logger = Logger("Dofus2")
 
 
 class StringUtils:

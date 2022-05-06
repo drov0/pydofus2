@@ -73,7 +73,7 @@ from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from com.ankamagames.dofus.internalDatacenter.items.ItemWrapper import ItemWrapper
 
-logger = Logger("pyd2bot")
+logger = Logger("Dofus2")
 
 
 class InventoryManager(metaclass=Singleton):

@@ -22,7 +22,7 @@ from com.ankamagames.dofus.network.types.game.actions.fight.FightTemporaryBoostS
 )
 from com.ankamagames.jerakine.logger.Logger import Logger
 
-logger = Logger("pyd2bot")
+logger = Logger("Dofus2")
 
 
 class StateBuff(BasicBuff):

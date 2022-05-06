@@ -10,7 +10,7 @@ from com.ankamagames.jerakine.sequencer.AbstractSequencable import AbstractSeque
 from com.ankamagames.jerakine.sequencer.ISequencable import ISequencable
 from com.ankamagames.jerakine.sequencer.ISequencableListener import ISequencableListener
 
-logger = Logger("pyd2bot")
+logger = Logger("Dofus2")
 
 
 class FightTackledStep(AbstractSequencable, IFightStep, ISequencableListener):

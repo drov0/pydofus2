@@ -14,7 +14,7 @@ from com.ankamagames.jerakine.utils.display.EnterFrameDispatcher import (
 )
 from com.ankamagames.jerakine.sequencer.AbstractSequencable import AbstractSequencable
 
-logger = Logger("pyd2bot")
+logger = Logger("Dofus2")
 
 
 class SerialSequencer(ISequencer, EventDispatcher):

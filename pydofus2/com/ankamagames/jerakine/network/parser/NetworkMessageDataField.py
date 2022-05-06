@@ -4,7 +4,7 @@ from com.ankamagames.jerakine.network.parser.ProtocolSpec import ProtocolSpec
 from com.ankamagames.jerakine.network.parser.TypeEnum import TypeEnum
 import com.ankamagames.jerakine.network.parser.NetworkMessageClassDefinition as nmcd
 
-logger = Logger("pyd2bot")
+logger = Logger("Dofus2")
 
 
 class NetMsgDataField:

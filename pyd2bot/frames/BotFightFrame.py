@@ -100,7 +100,7 @@ if TYPE_CHECKING:
     from com.ankamagames.dofus.logic.game.roleplay.frames.RoleplayMovementFrame import RoleplayMovementFrame
 
 
-logger = Logger("pyd2bot")
+logger = Logger("Dofus2")
 
 
 class BotFightFrame(Frame, metaclass=Singleton):
@@ -143,6 +143,7 @@ class BotFightFrame(Frame, metaclass=Singleton):
         self._turnAction = []
         self._seqQueue = []
         self._waitingSeqEnd = False
+        self._turnPlayed = 0
         return True
 
     @property
@@ -177,7 +178,7 @@ class BotFightFrame(Frame, metaclass=Singleton):
     def fightCount(self) -> int:
         return self._fightCount
 
-    def findPathToTarget(self, spellw: SpellWrapper) -> Tuple[MapPoint, list[MapPoint]]:
+    def findPathToTarget(self, spellw: SpellWrapper, targetSum=False) -> Tuple[MapPoint, list[MapPoint]]:
         """
         Find path to the closest ldv to hit a mob.
         :param origin: position of the character
@@ -187,23 +188,24 @@ class BotFightFrame(Frame, metaclass=Singleton):
         """
         spellZone = self.getSpellZone(spellw)
         origin = self.fighterPos
-        logger.debug(f"Searching for path to hit some mob, origin = {origin.cellId}")
-        targets = self.mobPositions
+        logger.debug(f"Searching for path to hit some target, origin = {origin.cellId}")
+        targets = self.getMobPositions(targetSum)
+        if not targets:
+            return None, None
         queue = collections.deque([[origin]])
         seen = {origin}
         while queue:
             path = queue.popleft()
             curr: MapPoint = path[-1]
-            tested = {}
             currSpellZone = spellZone.getCells(curr.cellId)
-            currReachableCells = FightReachableCellsMaker(self.fighterInfos, curr.cellId, 1).reachableCells
+            ldv = LosDetector.getCell(DataMapProvider(), currSpellZone, curr)
             for target in targets:
-                if (
-                    target["pos"].cellId in currSpellZone
-                    and curr.los(LosDetector, DataMapProvider(), target["pos"], tested)
-                    and self.canCastSpell(spellw, target["targetId"])
-                ):
+                if target["pos"] in ldv and self.canCastSpell(spellw, target["targetId"]):
+                    logger.debug(
+                        f"Found path {[mp.cellId for mp in path]} to hit a target {target['targetId']} at pos {target['pos'].cellId}"
+                    )
                     return target, path[1:]
+            currReachableCells = FightReachableCellsMaker(self.fighterInfos, curr.cellId, 1).reachableCells
             for cellId in currReachableCells:
                 mp = MapPoint.fromCellId(cellId)
                 if mp not in seen:
@@ -281,19 +283,14 @@ class BotFightFrame(Frame, metaclass=Singleton):
         # logger.debug(f"reachable cells {self._reachableCells}")
         self._wantcastSpell = None
         spellw = self.getSpellWrapper(self._spellId)
-        stats: EntityStats = CurrentPlayedFighterManager().getStats()
-        movementPoints: int = stats.getStatTotalValue(StatIds.MOVEMENT_POINTS)
-        actionPoints: int = stats.getStatTotalValue(StatIds.ACTION_POINTS)
-        logger.debug(f"MP : {movementPoints}, AP : {actionPoints}")
-        target, path = self.findPathToTarget(spellw)
+        logger.debug(f"MP : {self.movementPoints}, AP : {self.actionPoints}")
+        target, path = self.findPathToTarget(spellw, targetSum=False)
         if path is not None:
-            logger.debug(
-                f"Found path {[mp.cellId for mp in path]} to hit a mob {target['targetId']} at pos {target['pos'].cellId}"
-            )
+            target, path = self.findPathToTarget(spellw, targetSum=True)
+        if path is not None:
             if len(path) == 0:
                 self.addTurnAction(self.castSpell, [self._spellId, target["pos"].cellId])
             elif path[-1].cellId in self._reachableCells:
-                logger.debug(f"Path ends in a reachable cell {path[-1].cellId}")
                 self.addTurnAction(self.askMove, [path])
                 self.addTurnAction(self.castSpell, [self._spellId, target["pos"].cellId])
             else:
@@ -304,6 +301,7 @@ class BotFightFrame(Frame, metaclass=Singleton):
                         break
                 self.addTurnAction(self.turnEnd, [])
         else:
+            logger.debug("No path to any target found")
             self.addTurnAction(self.turnEnd, [])
         self.nextTurnAction()
 
@@ -327,7 +325,7 @@ class BotFightFrame(Frame, metaclass=Singleton):
             return True
 
         elif isinstance(msg, GameActionFightNoSpellCastMessage):
-            logger.debug(f"failed to cast spell {msg.to_json()}")
+            # logger.debug(f"failed to cast spell {msg.to_json()}")
             self.turnEnd()
             return True
 
@@ -437,20 +435,21 @@ class BotFightFrame(Frame, metaclass=Singleton):
         randomCell: int = random.choice(self.reachableCells)
         self.askMove(MapPoint.fromCellId(randomCell))
 
-    @property
-    def mobPositions(self) -> list[MapPoint]:
+    def getMobPositions(self, targetSum) -> list[MapPoint]:
         result = []
+        logger.debug(f"Deads list : {self.battleFrame._deadTurnsList}")
         for entity in FightEntitiesFrame.getCurrentInstance().entities.values():
             if entity.contextualId < 0 and isinstance(entity, GameFightMonsterInformations):
                 monster = entity
                 if (
                     monster.spawnInfo.teamId != self.fighterInfos.spawnInfo.teamId
-                    and monster.spawnInfo.alive
-                    and not monster.stats.summoned
+                    and float(entity.contextualId) not in self.battleFrame._deadTurnsList
+                    and (targetSum or not monster.stats.summoned)
                 ):
                     result.append(
                         {"targetId": entity.contextualId, "pos": MapPoint.fromCellId(entity.disposition.cellId)}
                     )
+        logger.debug(f"Found targets : {[(tgt['targetId'], tgt['pos'].cellId) for tgt in result]}")
         return result
 
     def castSpell(self, spellId: int, cellId: bool) -> None:

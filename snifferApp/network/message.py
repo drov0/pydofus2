@@ -7,7 +7,7 @@ from com.ankamagames.jerakine.network.parser.NetworkMessageClassDefinition impor
 )
 from com.ankamagames.jerakine.network.parser.ProtocolSpec import ProtocolSpec
 
-logger = Logger("pyd2bot")
+logger = Logger("Dofus2")
 
 
 class Message:

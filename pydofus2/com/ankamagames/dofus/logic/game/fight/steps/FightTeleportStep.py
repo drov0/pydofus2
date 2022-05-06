@@ -24,7 +24,7 @@ from com.ankamagames.jerakine.logger.Logger import Logger
 from com.ankamagames.jerakine.sequencer.AbstractSequencable import AbstractSequencable
 from com.ankamagames.jerakine.types.positions.MapPoint import MapPoint
 
-logger = Logger("pyd2bot")
+logger = Logger("Dofus2")
 
 
 class FightTeleportStep(AbstractSequencable, IFightStep):

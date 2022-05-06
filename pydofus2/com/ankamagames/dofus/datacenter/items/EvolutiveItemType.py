@@ -8,7 +8,7 @@ class EvolutiveItemType(IDataCenter):
 
     MODULE: str = "EvolutiveItemTypes"
 
-    logger = Logger("pyd2bot")
+    logger = Logger("Dofus2")
 
     id: int
 

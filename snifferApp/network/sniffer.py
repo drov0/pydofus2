@@ -11,7 +11,7 @@ from com.ankamagames.jerakine.network.ServerConnection import ServerConnection
 from snifferApp.network.message import Message
 import threading
 
-logger = Logger("pyd2bot")
+logger = Logger("Dofus2")
 LOW_LEVEL_DEBUG = False
 
 

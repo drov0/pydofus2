@@ -6,7 +6,7 @@ from com.ankamagames.jerakine.newCache.impl.Cache import Cache
 from com.ankamagames.jerakine.utils.memory.SoftReference import SoftReference
 from com.ankamagames.jerakine.utils.memory.WeakReference import WeakReference
 
-logger = Logger("pyd2bot")
+logger = Logger("Dofus2")
 
 
 class GameData(AbstractDataManager):

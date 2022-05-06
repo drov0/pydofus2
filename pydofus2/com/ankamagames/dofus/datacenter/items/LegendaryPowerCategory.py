@@ -8,7 +8,7 @@ class LegendaryPowerCategory(IDataCenter):
 
     MODULE: str = "LegendaryPowersCategories"
 
-    logger = Logger("pyd2bot")
+    logger = Logger("Dofus2")
 
     id: int
 

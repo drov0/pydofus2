@@ -7,7 +7,7 @@ from com.ankamagames.jerakine.types.positions.MapPoint import MapPoint
 from com.ankamagames.jerakine.types.positions.MovementPath import MovementPath
 from com.ankamagames.jerakine.types.positions.PathElement import PathElement
 
-logger = Logger("pyd2bot")
+logger = Logger("Dofus2")
 
 
 class Pathfinding:

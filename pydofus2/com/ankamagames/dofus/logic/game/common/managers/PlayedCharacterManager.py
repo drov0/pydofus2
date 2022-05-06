@@ -45,7 +45,7 @@ from com.ankamagames.jerakine.types.Callback import Callback
 from com.ankamagames.jerakine.types.positions.Point import Point
 from damageCalculation.tools import StatIds
 
-logger = Logger("pyd2bot")
+logger = Logger("Dofus2")
 
 
 class PlayedCharacterManager(IDestroyable, metaclass=Singleton):

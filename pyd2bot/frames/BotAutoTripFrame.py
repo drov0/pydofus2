@@ -1,5 +1,5 @@
-from mailbox import Message
-from tkinter import Frame
+from com.ankamagames.jerakine.messages.Frame import Frame
+from com.ankamagames.jerakine.messages.Message import Message
 from pyd2bot.apis.MoveAPI import MoveAPI
 from com.ankamagames.dofus.kernel.Kernel import Kernel
 from com.ankamagames.dofus.modules.utils.pathFinding.world.WorldPathFinder import (
@@ -19,7 +19,7 @@ from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from pyd2bot.frames.BotFarmPathFrame import BotFarmPathFrame
 
-logger = Logger("pyd2bot")
+logger = Logger("Dofus2")
 
 
 class BotAutoTripFrame(Frame):
@@ -32,25 +32,40 @@ class BotAutoTripFrame(Frame):
         self.nextStepIndex = None
         self.path = None
         self.changeMapFails = 0
+        self._computed = False
         super().__init__()
 
     @property
     def priority(self) -> int:
         return Priority.LOW
 
+    def reset(self):
+        self.dstMapId = None
+        self.nextStepIndex = None
+        self.path = None
+        self.changeMapFails = 0
+        self._computed = False
+        self._worker = Kernel().getWorker()
+
     def pushed(self) -> bool:
         self._worker = Kernel().getWorker()
+        self._computed = False
+        self.changeMapFails = 0
+        self.nextStepIndex = None
+        self.path = None
         self.walkToNextStep()
         return True
 
     def pulled(self) -> bool:
+        self.reset()
         return True
 
     def process(self, msg: Message) -> bool:
 
         if isinstance(msg, MapComplementaryInformationsDataMessage):
             logger.debug(f"New map entered")
-            self.walkToNextStep()
+            if self._computed:
+                self.walkToNextStep()
             return True
 
         if isinstance(msg, MapChangeFailedMessage):
@@ -68,7 +83,6 @@ class BotAutoTripFrame(Frame):
                 self._worker.removeFrame(self)
                 if self._worker.contains("BotFarmPathFrame"):
                     bfpf: "BotFarmPathFrame" = Kernel().getWorker().getFrame("BotFarmPathFrame")
-                    bfpf._inAutoTrip = False
                     bfpf.doFarm()
                 return True
             e = self.path[self.nextStepIndex]
@@ -91,6 +105,7 @@ class BotAutoTripFrame(Frame):
             return True
         self.path = path
         e = self.path[0]
-        self.nextStepIndex = 1
         direction = DirectionsEnum(e.transitions[0].direction)
         MoveAPI.changeMapToDstDirection(direction)
+        self._computed = True
+        self.nextStepIndex = 1

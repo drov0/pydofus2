@@ -2,7 +2,7 @@ from com.ankamagames.jerakine.interfaces.ISlotData import ISlotData
 from com.ankamagames.jerakine.interfaces.ISlotDataHolder import ISlotDataHolder
 from com.ankamagames.jerakine.logger.Logger import Logger
 
-logger = Logger("pyd2bot")
+logger = Logger("Dofus2")
 
 
 class SlotDataHolderManager:

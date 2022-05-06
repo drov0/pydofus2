@@ -27,7 +27,7 @@ from com.ankamagames.dofus.types.enums.ItemCategoryEnum import ItemCategoryEnum
 from com.ankamagames.jerakine.logger.Logger import Logger
 from com.ankamagames.jerakine.metaclasses.Singleton import Singleton
 
-logger = Logger("pyd2bot")
+logger = Logger("Dofus2")
 
 
 class StorageOptionManager(metaclass=Singleton):

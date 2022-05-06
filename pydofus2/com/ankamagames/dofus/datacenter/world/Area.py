@@ -9,7 +9,7 @@ from com.ankamagames.jerakine.logger.Logger import Logger
 from com.ankamagames.jerakine.utils.misc.StringUtils import StringUtils
 from flash.geom.Rectangle import Rectangle
 
-logger = Logger("pyd2bot")
+logger = Logger("Dofus2")
 
 
 class Area(IDataCenter):

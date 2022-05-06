@@ -19,7 +19,7 @@ from com.ankamagames.jerakine.pools.Poolable import Poolable
 import com.ankamagames.jerakine.utils.display.EnterFrameDispatcher as efd
 from com.ankamagames.jerakine.utils.display.FrameIdManager import FrameIdManager
 
-logger = Logger("pyd2bot")
+logger = Logger("Dofus2")
 
 
 class Worker(EventDispatcher, MessageHandler):

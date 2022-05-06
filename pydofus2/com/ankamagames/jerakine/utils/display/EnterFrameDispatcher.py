@@ -6,7 +6,7 @@ from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
     from com.ankamagames.jerakine.network.messages.Worker import Worker
-logger = Logger("pyd2bot")
+logger = Logger("Dofus2")
 
 
 class EnterFrameDispatcher(metaclass=Singleton):

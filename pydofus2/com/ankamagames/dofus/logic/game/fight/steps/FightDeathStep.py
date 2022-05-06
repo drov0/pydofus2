@@ -32,7 +32,7 @@ if TYPE_CHECKING:
     from com.ankamagames.dofus.logic.game.fight.frames.FightContextFrame import (
         FightContextFrame,
     )
-logger = Logger("pyd2bot")
+logger = Logger("Dofus2")
 
 
 class FightDeathStep(AbstractSequencable, IFightStep):

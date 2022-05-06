@@ -22,7 +22,7 @@ from com.ankamagames.jerakine.types.DataStoreType import DataStoreType
 from com.ankamagames.jerakine.types.enums.DataStoreEnum import DataStoreEnum
 from damageCalculation.tools.StatIds import StatIds
 
-logger = Logger("pyd2bot")
+logger = Logger("Dofus2")
 
 
 class StatsManager(metaclass=Singleton):

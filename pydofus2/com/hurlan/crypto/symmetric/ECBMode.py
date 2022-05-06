@@ -6,7 +6,7 @@ from com.hurlan.crypto.symmetric.IPad import IPad
 from com.hurlan.crypto.symmetric.ISymetricKey import ISymmetricKey
 from com.hurlan.crypto.symmetric.PKCS5 import PKCS5
 
-logger = Logger("pyd2bot")
+logger = Logger("Dofus2")
 
 
 class ECBMode(IMode, ICipher):

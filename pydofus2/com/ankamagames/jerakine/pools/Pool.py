@@ -4,7 +4,7 @@ from com.ankamagames.jerakine.pools.PoolableLinkedListNode import PoolableLinked
 from mx.utils.LinkedList import LinkedList
 from mx.utils.LinkedListNode import LinkedListNode
 
-logger = Logger("pyd2bot")
+logger = Logger("Dofus2")
 
 
 class Pool:

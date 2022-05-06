@@ -27,7 +27,7 @@ from com.ankamagames.jerakine.types.zones.Cross import Cross
 from com.ankamagames.jerakine.types.zones.Custom import Custom
 from com.ankamagames.jerakine.types.zones.Lozenge import Lozenge
 
-logger = Logger("pyd2bot")
+logger = Logger("Dofus2")
 
 
 class MarkedCellsManager(IDestroyable, metaclass=Singleton):

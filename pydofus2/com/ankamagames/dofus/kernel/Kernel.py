@@ -11,7 +11,6 @@ from com.ankamagames.dofus.logic.game.fight.managers.FightersStateManager import
     FightersStateManager,
 )
 import com.ankamagames.dofus.logic.game.common.managers.PlayedCharacterManager as pcm
-from com.ankamagames.dofus.logic.game.fight.managers.SpellModifiersManager import SpellModifiersManager
 from com.ankamagames.dofus.network.Metadata import Metadata
 from com.ankamagames.jerakine.network.messages.Worker import Worker
 from com.ankamagames.jerakine.metaclasses.Singleton import Singleton
@@ -49,6 +48,7 @@ class Kernel(metaclass=Singleton):
         reloadData: bool = False,
     ) -> None:
         import com.ankamagames.dofus.logic.game.fight.managers.CurrentPlayedFighterManager as cpfm
+        from com.ankamagames.dofus.logic.game.fight.managers.SpellModifiersManager import SpellModifiersManager
 
         # TODO : missing feature manager reset here
         StatsManager.clear()

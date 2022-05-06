@@ -18,7 +18,7 @@ from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from com.ankamagames.dofus.logic.game.roleplay.frames.RoleplayMovementFrame import RoleplayMovementFrame
 
-logger = Logger("pyd2bot")
+logger = Logger("Dofus2")
 
 
 class SynchronisationFrame(Frame):

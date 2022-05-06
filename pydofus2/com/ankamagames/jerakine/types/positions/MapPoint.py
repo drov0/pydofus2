@@ -5,7 +5,7 @@ from com.ankamagames.jerakine.map.ILosDetector import ILosDetector
 from com.ankamagames.jerakine.types.enums.DirectionsEnum import DirectionsEnum
 from com.ankamagames.jerakine.types.positions.Point import Point
 
-logger = Logger("pyd2bot")
+logger = Logger("Dofus2")
 
 
 class MapPoint:

@@ -8,7 +8,7 @@ from com.ankamagames.jerakine.newCache.impl.cache import Cache
 from com.ankamagames.jerakine.newCache.impl.infiniteCache import InfiniteCache
 from com.ankamagames.jerakine.types.CustomSharedObject import CustomSharedObject
 
-logger = Logger("pyd2bot")
+logger = Logger("Dofus2")
 
 
 class AbstractDataManager(object):

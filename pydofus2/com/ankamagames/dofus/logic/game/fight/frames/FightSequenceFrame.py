@@ -414,7 +414,7 @@ from com.ankamagames.jerakine.types.enums.Priority import Priority
 from com.ankamagames.jerakine.types.positions.MapPoint import MapPoint, Point
 from com.ankamagames.jerakine.types.positions.MovementPath import MovementPath
 
-logger = Logger("pyd2bot")
+logger = Logger("Dofus2")
 
 
 class FightSequenceFrame(Frame, ISpellCastProvider):
@@ -931,7 +931,7 @@ class FightSequenceFrame(Frame, ISpellCastProvider):
         if isinstance(msg, GameActionFightDeathMessage):
             gafdmsg = msg
             logger.info(f"{msg.targetId} died")
-            fbf : "FightBattleFrame" = Kernel().getWorker().getFrame("FightBattleFrame")
+            fbf: "FightBattleFrame" = Kernel().getWorker().getFrame("FightBattleFrame")
             fbf._deadTurnsList.append(gafdmsg.targetId)
             self.fighterHasBeenKilled(gafdmsg)
             return True
@@ -1324,7 +1324,7 @@ class FightSequenceFrame(Frame, ISpellCastProvider):
                         spawnInfo_=sum,
                         wave_=summons.wave,
                         stats_=summons.stats,
-                        previousPositions_=None
+                        previousPositions_=None,
                     )
                 self.summonEntity(gffinfos, gafmsmsg.sourceId, gafmsmsg.actionId)
         return gffinfos

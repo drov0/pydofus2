@@ -4,12 +4,15 @@ from com.ankamagames.dofus.logic.game.common.misc.IEntityLocalizer import (
 )
 from com.ankamagames.jerakine.entities.interfaces.IDisplayable import IDisplayable
 from com.ankamagames.jerakine.entities.interfaces.IEntity import IEntity
+from com.ankamagames.jerakine.logger.Logger import Logger
 from com.ankamagames.jerakine.metaclasses.Singleton import Singleton
+
+logger = Logger("Dofus2")
 
 
 class FightEntitiesHolder(IEntityLocalizer, metaclass=Singleton):
 
-    _holdedEntities: dict
+    _holdedEntities = dict()
 
     def __init__(self):
         self._holdedEntities = dict()
@@ -25,6 +28,7 @@ class FightEntitiesHolder(IEntityLocalizer, metaclass=Singleton):
     def unholdEntity(self, entityId: float) -> None:
         if entityId in self._holdedEntities:
             del self._holdedEntities[entityId]
+        logger.warn("Unholded entity with ID " + str(entityId))
 
     def reset(self) -> None:
         self._holdedEntities.clear()
@@ -38,5 +42,4 @@ class FightEntitiesHolder(IEntityLocalizer, metaclass=Singleton):
                 entity = None
             if isinstance(entity, TiphonSprite):
                 entity = None
-        self._holdedEntities = None
-        _self = None
+        self._holdedEntities.clear()

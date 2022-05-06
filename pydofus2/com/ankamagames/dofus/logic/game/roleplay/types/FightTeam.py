@@ -26,7 +26,7 @@ from com.ankamagames.jerakine.logger.Logger import Logger
 
 class FightTeam(GameContextActorInformations):
 
-    logger = Logger("pyd2bot")
+    logger = Logger("Dofus2")
 
     fight: "Fight"
 

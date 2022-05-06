@@ -100,7 +100,7 @@ if TYPE_CHECKING:
     from com.ankamagames.dofus.logic.game.roleplay.frames.RoleplayMovementFrame import RoleplayMovementFrame
 
 
-logger = Logger("pyd2bot")
+logger = Logger("Dofus2")
 
 
 class BotFightFrame(Frame, metaclass=Singleton):
@@ -188,7 +188,7 @@ class BotFightFrame(Frame, metaclass=Singleton):
         """
         spellZone = self.getSpellZone(spellw)
         origin = self.fighterPos
-        logger.debug(f"Searching for path to hit some mob, origin = {origin.cellId}")
+        logger.debug(f"Searching for path to hit some target, origin = {origin.cellId}")
         targets = self.getMobPositions(targetSum)
         if not targets:
             return None, None
@@ -201,6 +201,9 @@ class BotFightFrame(Frame, metaclass=Singleton):
             ldv = LosDetector.getCell(DataMapProvider(), currSpellZone, curr)
             for target in targets:
                 if target["pos"] in ldv and self.canCastSpell(spellw, target["targetId"]):
+                    logger.debug(
+                        f"Found path {[mp.cellId for mp in path]} to hit a target {target['targetId']} at pos {target['pos'].cellId}"
+                    )
                     return target, path[1:]
             currReachableCells = FightReachableCellsMaker(self.fighterInfos, curr.cellId, 1).reachableCells
             for cellId in currReachableCells:
@@ -285,9 +288,6 @@ class BotFightFrame(Frame, metaclass=Singleton):
         if path is not None:
             target, path = self.findPathToTarget(spellw, targetSum=True)
         if path is not None:
-            logger.debug(
-                f"Found path {[mp.cellId for mp in path]} to hit a mob {target['targetId']} at pos {target['pos'].cellId}"
-            )
             if len(path) == 0:
                 self.addTurnAction(self.castSpell, [self._spellId, target["pos"].cellId])
             elif path[-1].cellId in self._reachableCells:
@@ -301,6 +301,7 @@ class BotFightFrame(Frame, metaclass=Singleton):
                         break
                 self.addTurnAction(self.turnEnd, [])
         else:
+            logger.debug("No path to any target found")
             self.addTurnAction(self.turnEnd, [])
         self.nextTurnAction()
 
@@ -445,10 +446,10 @@ class BotFightFrame(Frame, metaclass=Singleton):
                     and float(entity.contextualId) not in self.battleFrame._deadTurnsList
                     and (targetSum or not monster.stats.summoned)
                 ):
-                    logger.debug(f"Entity {entity.contextualId} is a potential target")
                     result.append(
                         {"targetId": entity.contextualId, "pos": MapPoint.fromCellId(entity.disposition.cellId)}
                     )
+        logger.debug(f"Found targets : {[(tgt['targetId'], tgt['pos'].cellId) for tgt in result]}")
         return result
 
     def castSpell(self, spellId: int, cellId: bool) -> None:

@@ -1,6 +1,7 @@
 from logging import Logger
 from threading import Timer
-from time import perf_counter, perf_counter_ns
+from time import perf_counter
+from com.DofusClient import DofusClient
 from com.ankamagames.dofus import Constants
 import com.ankamagames.dofus.kernel.Kernel as krnl
 import com.ankamagames.dofus.kernel.net.ConnectionsHandler as connh
@@ -8,7 +9,6 @@ from com.ankamagames.dofus.kernel.net.DisconnectionReasonEnum import (
     DisconnectionReasonEnum,
 )
 from com.ankamagames.dofus.logic.connection.managers.AuthentificationManager import AuthentificationManager
-from com.ankamagames.jerakine.benchmark.BenchmarkTimer import BenchmarkTimer
 from com.ankamagames.jerakine.managers.StoreDataManager import StoreDataManager
 from com.ankamagames.jerakine.messages.Frame import Frame
 from com.ankamagames.jerakine.messages.Message import Message
@@ -27,7 +27,7 @@ from com.ankamagames.jerakine.network.messages.UnexpectedSocketClosureMessage im
 from com.ankamagames.jerakine.types.enums.Priority import Priority
 import com.ankamagames.dofus.logic.game.approach.frames.GameServerApproachFrame as gsaF
 
-logger = Logger("pyd2bot")
+logger = Logger("Dofus2")
 
 
 class DisconnectionHandlerFrame(Frame):
@@ -75,21 +75,6 @@ class DisconnectionHandlerFrame(Frame):
         self._timer = Timer(4, self.reconnect)
         self._timer.start()
 
-    def handleUnexpectedAlreadyConnected(self):
-        logger.warn("The connection was closed unexpectedly. Reseting.")
-        if self._numberOfAttemptsAlreadyDone == self.CONNECTION_ATTEMPTS_NUMBER:
-            self._connectionUnexpectedFailureTimes.append(perf_counter())
-            StoreDataManager().setData(
-                Constants.DATASTORE_MODULE_DEBUG,
-                "connection_fail_times",
-                self._connectionUnexpectedFailureTimes,
-            )
-        if len(self.messagesAfterReset) == 0:
-            self.messagesAfterReset = [UnexpectedSocketClosureMessage()] + self.messagesAfterReset
-        krnl.Kernel().reset([], True, True)
-        self._timer = Timer(4, self.reconnect)
-        self._timer.start()
-
     def process(self, msg: Message) -> bool:
 
         if isinstance(msg, ServerConnectionClosedMessage):
@@ -113,12 +98,10 @@ class DisconnectionHandlerFrame(Frame):
                         and self._numberOfAttemptsAlreadyDone < self.CONNECTION_ATTEMPTS_NUMBER
                     ):
                         self.handleUnexpectedNoMsgReceived()
-
                     else:
                         reason = connh.ConnectionsHandler.handleDisconnection()
                         if not reason.expected:
-                            self.handleUnexpectedAlreadyConnected()
-
+                            DofusClient.restart()
                         else:
                             logger.debug(
                                 f"The connection closure was expected (reason: {reason.reason}). Dispatching the message."

@@ -41,7 +41,7 @@ from com.ankamagames.jerakine.network.messages.ExpectedSocketClosureMessage impo
 from com.ankamagames.jerakine.network.messages.Worker import Worker
 from com.ankamagames.jerakine.types.enums.Priority import Priority
 
-logger = Logger("pyd2bot")
+logger = Logger("Dofus2")
 
 
 class ServerSelectionFrame(Frame):

@@ -22,7 +22,7 @@ from com.ankamagames.jerakine.sequencer.AbstractSequencable import AbstractSeque
 from com.ankamagames.jerakine.sequencer.ISequencer import ISequencer
 from com.ankamagames.jerakine.types.positions.MapPoint import MapPoint
 
-logger = Logger("pyd2bot")
+logger = Logger("Dofus2")
 
 
 class FightCarryCharacterStep(AbstractSequencable, IFightStep):

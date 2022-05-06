@@ -6,7 +6,7 @@ from com.ankamagames.jerakine.sequencer.ISubSequenceSequencable import (
 )
 from com.ankamagames.jerakine.types.events.SequencerEvent import SequencerEvent
 
-logger = Logger("pyd2bot")
+logger = Logger("Dofus2")
 
 
 class ParallelStartSequenceStep(AbstractSequencable, ISubSequenceSequencable):

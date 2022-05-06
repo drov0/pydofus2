@@ -11,7 +11,7 @@ from com.ankamagames.dofus.network.enums.CharacterInventoryPositionEnum import (
 from com.ankamagames.dofus.network.types.game.data.items.ObjectItem import ObjectItem
 from com.ankamagames.jerakine.logger.Logger import Logger
 
-logger = Logger("pyd2bot")
+logger = Logger("Dofus2")
 
 
 class Inventory:

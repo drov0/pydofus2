@@ -126,7 +126,7 @@ from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from com.ankamagames.dofus.logic.game.roleplay.frames.RoleplayEntitiesFrame import RoleplayEntitiesFrame
 
-logger = Logger("pyd2bot")
+logger = Logger("Dofus2")
 
 
 class RoleplayMovementFrame(Frame):
@@ -521,6 +521,8 @@ class RoleplayMovementFrame(Frame):
             cmfm: MapChangeFailedMessage = MapChangeFailedMessage()
             cmfm.init(self._wantToChangeMap)
             Kernel().getWorker().processImmediately(cmfm)
+        elif self._wantToChangeMap is None:
+            logger.error(f"We want to change map to None, aborting")
         else:
             self.askMapChange()
             self._changeMapTimeout = Timer(3, self.onMapChangeFailed)
@@ -550,6 +552,7 @@ class RoleplayMovementFrame(Frame):
 
     def requestMonsterFight(self, monsterGroupId: int) -> None:
         if self._requestFighFails > 1:
+            logger.error(f"Server rejected moster fight request for the {self._requestFighFails} time!")
             self._requestFighFails = 0
             nopmsg = FightRequestFailed()
             Kernel().getWorker().processImmediately(nopmsg)

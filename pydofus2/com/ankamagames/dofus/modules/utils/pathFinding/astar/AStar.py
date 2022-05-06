@@ -14,7 +14,7 @@ from com.ankamagames.jerakine.utils.display.EnterFrameDispatcher import (
     EnterFrameDispatcher,
 )
 
-logger = Logger("pyd2bot")
+logger = Logger("Dofus2")
 
 
 class AStar:

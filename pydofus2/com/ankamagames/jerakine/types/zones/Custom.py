@@ -4,7 +4,7 @@ from com.ankamagames.jerakine.types.zones.IZone import IZone
 
 class Custom(IZone):
 
-    logger = Logger("pyd2bot")
+    logger = Logger("Dofus2")
 
     _aCells: list[int]
 

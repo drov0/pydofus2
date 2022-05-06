@@ -8,7 +8,7 @@ import mapTools.MapTools as MapTools
 
 class Line(IZone):
 
-    logger = Logger("pyd2bot")
+    logger = Logger("Dofus2")
 
     _radius: int = 0
 

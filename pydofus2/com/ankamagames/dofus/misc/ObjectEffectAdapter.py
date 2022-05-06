@@ -60,7 +60,7 @@ from com.ankamagames.dofus.network.types.game.data.items.effects.ObjectEffectStr
 )
 from com.ankamagames.jerakine.logger.Logger import Logger
 
-logger = Logger("pyd2bot")
+logger = Logger("Dofus2")
 
 
 class ObjectEffectAdapter:

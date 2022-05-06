@@ -16,7 +16,7 @@ if TYPE_CHECKING:
         SpellInventoryManagementFrame,
     )
 
-logger = Logger("pyd2bot")
+logger = Logger("Dofus2")
 
 
 class SpellCastInFightManager:

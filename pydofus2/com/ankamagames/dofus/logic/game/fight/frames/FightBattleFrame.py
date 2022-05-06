@@ -134,7 +134,7 @@ if TYPE_CHECKING:
         FightContextFrame,
     )
 
-logger = Logger("pyd2bot")
+logger = Logger("Dofus2")
 
 
 class FightBattleFrame(Frame):

@@ -34,7 +34,7 @@ from com.ankamagames.jerakine.utils.display.EnterFrameDispatcher import (
 from mx.CustomSocket.Socket import Socket
 from com.ankamagames.jerakine.network.NetworkMessage import NetworkMessage
 
-logger = Logger("pyd2bot")
+logger = Logger("Dofus2")
 
 
 class ServerConnection(IServerConnection):
@@ -82,6 +82,7 @@ class ServerConnection(IServerConnection):
         self._willClose: bool = None
         self._maxUnpackTime: int = float("inf")
         self._firstConnectionTry: bool = True
+        self._timeoutTimer = None
         super().__init__()
 
     def close(self) -> None:
@@ -167,6 +168,8 @@ class ServerConnection(IServerConnection):
         self._remoteSrvHost = host
         self._remoteSrvPort = port
         self.addListeners()
+        self._timeoutTimer = Timer(interval=7, function=self.onSocketTimeOut)
+        self._timeoutTimer.start()
         logger.info(f"[{self._id}] Connecting to {host}:{port}...")
         try:
             self._socket.connect(host, port)
@@ -175,8 +178,6 @@ class ServerConnection(IServerConnection):
                 "[" + str(self._id) + "] Could not establish connection to the serveur!\n",
                 exc_info=True,
             )
-        self._timeoutTimer = Timer(interval=7, function=self.onSocketTimeOut)
-        self._timeoutTimer.start()
 
     def getType(self, v) -> str:
         className: str = v.__class__.__name__
@@ -567,9 +568,9 @@ class ServerConnection(IServerConnection):
             self._lagometer.stop()
         self._connecting = False
         if self._firstConnectionTry:
-            logger.error("[{self._id}] Failure while opening socket, timeout, but WWJD ? Give a second chance !")
+            logger.error(f"[{self._id}] Failure while opening socket, timeout, but WWJD ? Give a second chance !")
             self.connect(self._remoteSrvHost, self._remoteSrvPort)
             self._firstConnectionTry = False
         else:
-            logger.error("[{self._id}] Failure while opening socket, timeout.")
+            logger.error(f"[{self._id}] Failure while opening socket, timeout.")
             self._handler.process(ServerConnectionFailedMessage(self, "timeout"))

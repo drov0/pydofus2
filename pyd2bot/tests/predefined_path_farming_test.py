@@ -1,13 +1,14 @@
 import threading
 from time import perf_counter
-from pyd2bot.DofusClient import DofusClient
+from com.DofusClient import DofusClient
 from pyd2bot.frames.BotFarmPathFrame import BotFarmPathFrame
 from com.ankamagames.jerakine.logger.Logger import Logger
 from pyd2bot.frames.BotFightFrame import BotFightFrame
+from pyd2bot.managers.BotCredsManager import BotCredsManager
 
 from pyd2bot.models.FarmParcours import FarmParcours
 
-logger = Logger("pyd2bot")
+logger = Logger("Dofus2")
 
 # Goujon path incarnam
 FISHING_SKILL_ID = 124
@@ -40,6 +41,7 @@ goujon_incarnam = {
 
 if __name__ == "__main__":
     botName = "foobar"
+    creds = BotCredsManager.getEntry(botName)
     dofus2 = DofusClient(botName)
     dofus2.registerFrame(BotFarmPathFrame(FarmParcours(**goujon_incarnam)))
     dofus2.registerFrame(BotFightFrame())

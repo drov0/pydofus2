@@ -81,7 +81,7 @@ if TYPE_CHECKING:
         FightEntitiesFrame,
     )
 
-logger = Logger("pyd2bot")
+logger = Logger("Dofus2")
 
 
 class FightSpellCastFrame(Frame):

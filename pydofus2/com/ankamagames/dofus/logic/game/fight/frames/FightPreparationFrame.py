@@ -110,7 +110,7 @@ from com.ankamagames.jerakine.messages.Message import Message
 from com.ankamagames.jerakine.types.enums.Priority import Priority
 from com.ankamagames.jerakine.types.positions.MapPoint import MapPoint
 
-logger = Logger("pyd2bot")
+logger = Logger("Dofus2")
 
 
 class FightPreparationFrame(Frame):

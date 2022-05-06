@@ -22,7 +22,7 @@ from com.ankamagames.jerakine.network.MultiConnection import MultiConnection
 from com.ankamagames.jerakine.network.ServerConnection import ServerConnection
 from com.ankamagames.dofus.network.MessageReceiver import MessageReceiver
 
-logger = Logger("pyd2bot")
+logger = Logger("Dofus2")
 
 
 class ConnectionsHandler:

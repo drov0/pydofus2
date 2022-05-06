@@ -4,7 +4,7 @@ from com.ankamagames.jerakine.types.enums.DirectionsEnum import DirectionsEnum
 from com.ankamagames.jerakine.types.positions.MapPoint import MapPoint
 from com.ankamagames.jerakine.types.positions.PathElement import PathElement
 
-logger = Logger("pyd2bot")
+logger = Logger("Dofus2")
 
 
 class MovementPath:

@@ -28,20 +28,17 @@ from com.ankamagames.jerakine.metaclasses.Singleton import Singleton
 if TYPE_CHECKING:
     from com.ankamagames.jerakine.network.ServerConnection import ServerConnection
 from launcher.Launcher import Haapi
-from pyd2bot.managers.BotsDataManager import BotsDataManager
 from pyd2bot.frames.BotGameApproachFrame import BotGameApproach
 from com.ankamagames.atouin.utils.DataMapProvider import DataMapProvider
 
-logger = Logger("pyd2bot")
+logger = Logger("Dofus2")
 
 
 class DofusClient(metaclass=Singleton):
-    def __init__(self, name):
-        self.name = name
-        botCreds = BotsDataManager.getEntry(self.name)
-        self.SERVER_ID = botCreds["serverId"]
-        self.CHARACTER_ID = botCreds["charachterId"]
-        self.ACCOUNT_ID = botCreds["account"]
+    def __init__(self, creds):
+        self.SERVER_ID = creds["serverId"]
+        self.CHARACTER_ID = creds["charachterId"]
+        self.ACCOUNT_ID = creds["account"]
         krnl.Kernel().init()
         self._worker = krnl.Kernel().getWorker()
         self._gameApproachFrame = BotGameApproach(self.CHARACTER_ID)
@@ -78,9 +75,6 @@ class DofusClient(metaclass=Singleton):
 
     def registerFrame(self, frame):
         self._registredCustomFrames.append(frame)
-
-    def waitInsideGameMap(self):
-        self._gameApproachFrame._insideGame.wait()
 
     def restart(self):
         self.stop()

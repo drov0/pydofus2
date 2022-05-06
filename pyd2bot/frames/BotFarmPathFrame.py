@@ -17,7 +17,7 @@ from com.ankamagames.dofus.logic.game.roleplay.frames.RoleplayMovementFrame impo
 from com.ankamagames.dofus.network.types.game.context.roleplay.GameRolePlayGroupMonsterInformations import (
     GameRolePlayGroupMonsterInformations,
 )
-from pyd2bot.DofusClient import DofusClient
+from com.DofusClient import DofusClient
 from pyd2bot.apis.InventoryAPI import InventoryAPI
 from pyd2bot.apis.MoveAPI import MoveAPI
 from com.ankamagames.dofus.datacenter.notifications.Notification import Notification

@@ -17,7 +17,7 @@ from com.ankamagames.jerakine.utils.display.EnterFrameDispatcher import (
 )
 from damageCalculation.tools.StatIds import StatIds
 
-logger = Logger("pyd2bot")
+logger = Logger("Dofus2")
 
 
 class FightActionPointsVariationStep(AbstractStatContextualStep, IFightStep):

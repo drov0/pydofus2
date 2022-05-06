@@ -52,7 +52,7 @@ if TYPE_CHECKING:
     from com.ankamagames.dofus.logic.game.fight.frames.FightBattleFrame import (
         FightBattleFrame,
     )
-logger = Logger("pyd2bot")
+logger = Logger("Dofus2")
 
 
 class BuffManager(metaclass=Singleton):

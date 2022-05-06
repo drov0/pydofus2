@@ -102,7 +102,7 @@ if TYPE_CHECKING:
         FightBattleFrame,
     )
     from com.ankamagames.jerakine.entities.interfaces.IMovable import IMovable
-logger = Logger("pyd2bot")
+logger = Logger("Dofus2")
 
 
 class FightTurnFrame(Frame):

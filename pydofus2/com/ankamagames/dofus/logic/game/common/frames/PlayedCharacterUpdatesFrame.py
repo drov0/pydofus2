@@ -145,7 +145,7 @@ if TYPE_CHECKING:
         GameRolePlayHumanoidInformations,
     )
 
-logger = Logger("pyd2bot")
+logger = Logger("Dofus2")
 
 
 class PlayedCharacterUpdatesFrame(Frame):

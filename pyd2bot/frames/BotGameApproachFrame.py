@@ -24,13 +24,12 @@ from com.ankamagames.jerakine.messages.Message import Message
 from com.ankamagames.jerakine.types.enums.Priority import Priority
 import threading
 
-logger = Logger("pyd2bot")
+logger = Logger("Dofus2")
 
 
 class BotGameApproach(Frame):
     def __init__(self, characterId):
         self.characterId = characterId
-        self._insideGame = threading.Event()
         super().__init__()
 
     @property
@@ -52,8 +51,3 @@ class BotGameApproach(Frame):
         elif isinstance(msg, CharactersListMessage):
             self._worker.process(CharacterSelectionAction.create(characterId=self.characterId, btutoriel=False))
             return True
-
-        elif isinstance(msg, MapComplementaryInformationsDataMessage):
-            self._insideGame.set()
-            self._worker.removeFrame(self)
-            return False

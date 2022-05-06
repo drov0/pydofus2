@@ -9,7 +9,7 @@ import com.ankamagames.jerakine.network.NetworkMessage as bnm
 from com.ankamagames.jerakine.network.parser.TypeEnum import TypeEnum
 from com.ankamagames.jerakine.network.parser.ProtocolSpec import D2PROTOCOL
 
-logger = Logger("pyd2bot")
+logger = Logger("Dofus2")
 dataWrite = {
     name: (getattr(ByteArray, "read" + name), getattr(ByteArray, "write" + name)) for name in D2PROTOCOL["primitives"]
 }

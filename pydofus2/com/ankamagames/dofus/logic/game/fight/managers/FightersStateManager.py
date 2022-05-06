@@ -2,7 +2,7 @@ from com.ankamagames.jerakine.logger.Logger import Logger
 from com.ankamagames.dofus.logic.game.fight.types.FighterStatus import FighterStatus
 from com.ankamagames.jerakine.metaclasses.Singleton import Singleton
 
-logger = Logger("pyd2bot")
+logger = Logger("Dofus2")
 
 
 class FightersStateManager(metaclass=Singleton):

@@ -17,7 +17,7 @@ from com.ankamagames.jerakine.network.CustomDataWrapper import ByteArray
 from com.ankamagames.jerakine.types.CustomSharedObject import CustomSharedObject
 from flash.Capabilities import Capabilities
 
-logger = Logger("pyd2bot")
+logger = Logger("Dofus2")
 
 
 class SecureModeManager(metaclass=Singleton):

@@ -24,7 +24,7 @@ from com.hurlan.crypto.symmetric.PSAKey import RSACipher
 from com.hurlan.crypto.symmetric.SimpleIVMode import SimpleIVMode
 from Cryptodome.PublicKey import RSA
 
-logger = Logger("pyd2bot")
+logger = Logger("Dofus2")
 ROOTDIR = os.path.dirname(__file__)
 
 

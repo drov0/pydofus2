@@ -3,7 +3,7 @@ from com.ankamagames.dofus.logic.game.misc.IEntityLocalizer import IEntityLocali
 from com.ankamagames.jerakine.logger.Logger import Logger
 from com.ankamagames.jerakine.entities.interfaces.IEntity import IEntity
 
-logger = Logger("pyd2bot")
+logger = Logger("Dofus2")
 
 
 class DofusEntities:

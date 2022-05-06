@@ -46,7 +46,7 @@ if TYPE_CHECKING:
     from com.ankamagames.dofus.logic.game.roleplay.frames.RoleplayEntitiesFrame import (
         RoleplayEntitiesFrame,
     )
-logger = Logger("pyd2bot")
+logger = Logger("Dofus2")
 
 
 class BotFarmFrame(Frame):

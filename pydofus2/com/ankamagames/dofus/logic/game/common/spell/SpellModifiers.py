@@ -6,7 +6,7 @@ from com.ankamagames.dofus.logic.game.fight.actions.UpdateSpellModifierAction im
 import com.ankamagames.dofus.logic.game.fight.managers.SpellModifiersManager as spellmm
 from com.ankamagames.jerakine.logger.Logger import Logger
 
-logger = Logger("pyd2bot")
+logger = Logger("Dofus2")
 
 
 class SpellModifiers:

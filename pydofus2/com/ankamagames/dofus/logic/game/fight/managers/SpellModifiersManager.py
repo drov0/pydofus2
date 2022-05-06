@@ -9,7 +9,7 @@ from com.ankamagames.jerakine.metaclasses.Singleton import Singleton
 from com.ankamagames.jerakine.types.DataStoreType import DataStoreType
 from com.ankamagames.jerakine.types.enums.DataStoreEnum import DataStoreEnum
 
-logger = Logger("pyd2bot")
+logger = Logger("Dofus2")
 
 
 class SpellModifiersManager(metaclass=Singleton):

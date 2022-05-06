@@ -4,7 +4,7 @@ from com.ankamagames.dofus.internalDatacenter.stats.Stat import Stat
 from com.ankamagames.dofus.internalDatacenter.stats.UsableStat import UsableStat
 from damageCalculation.tools import StatIds
 
-logger = Logger("pyd2bot")
+logger = Logger("Dofus2")
 
 
 class EntityStats:

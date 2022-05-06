@@ -31,7 +31,7 @@ from com.ankamagames.jerakine.messages.Frame import Frame
 from com.ankamagames.jerakine.messages.Message import Message
 from com.ankamagames.jerakine.types.enums.Priority import Priority
 
-logger = Logger("pyd2bot")
+logger = Logger("Dofus2")
 
 
 class RoleplayContextFrame(Frame):
@@ -80,7 +80,7 @@ class RoleplayContextFrame(Frame):
             self._newCurrentMapIsReceived = True
             newSubArea = SubArea.getSubAreaByMapId(mcmsg.mapId)
             PlayedCharacterManager().currentSubArea = newSubArea
-            logger.debug(f"Roleplay received current map, will pause the connextion until its loaded")
+            logger.debug(f"Roleplay received current map, will load the map dlm file")
             # Kernel().getWorker().pause(None)
             # ConnectionsHandler.pause()
             if isinstance(mcmsg, CurrentMapInstanceMessage):

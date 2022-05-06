@@ -6,7 +6,7 @@ from com.ankamagames.jerakine.types.positions.MapPoint import MapPoint
 from com.ankamagames.jerakine.types.zones.IZone import IZone
 import mapTools.MapTools as MapTools
 
-logger = Logger("pyd2bot")
+logger = Logger("Dofus2")
 
 
 class Cone(IZone):

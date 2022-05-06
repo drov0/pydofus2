@@ -11,7 +11,7 @@ from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
     from com.ankamagames.dofus.datacenter.spells.SpellLevel import SpellLevel
-logger = Logger("pyd2bot")
+logger = Logger("Dofus2")
 
 
 class Spell(IDataCenter):

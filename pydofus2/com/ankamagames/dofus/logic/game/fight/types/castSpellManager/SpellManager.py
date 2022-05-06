@@ -19,7 +19,7 @@ from com.ankamagames.jerakine.logger.Logger import Logger
 
 class SpellManager:
 
-    logger = Logger("pyd2bot")
+    logger = Logger("Dofus2")
 
     _spellId: int = 0
 

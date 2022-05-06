@@ -11,13 +11,13 @@ from com.ankamagames.jerakine.network.RawDataParser import RawDataParser
 from com.ankamagames.jerakine.network.UnpackMode import UnpackMode
 import com.ankamagames.dofus.Constants as Constants
 
-logger = Logger("pyd2bot")
+logger = Logger("Dofus2")
 with open(Constants.PROTOCOL_MSG_SHUFFLE_PATH, "r") as fp:
     msgShuffle = json.load(fp)
 
 
 class MessageReceiver(RawDataParser):
-    logger = Logger("pyd2bot")
+    logger = Logger("Dofus2")
     _messagesTypes: dict = dict()
     _unpackModes: dict = dict()
     for cls_name, cls_infos in msgShuffle.items():

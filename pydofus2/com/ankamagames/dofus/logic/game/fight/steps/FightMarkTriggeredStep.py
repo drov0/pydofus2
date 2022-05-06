@@ -13,7 +13,7 @@ from com.ankamagames.dofus.network.enums.GameActionMarkTypeEnum import (
 from com.ankamagames.jerakine.logger.Logger import Logger
 from com.ankamagames.jerakine.sequencer.AbstractSequencable import AbstractSequencable
 
-logger = Logger("pyd2bot")
+logger = Logger("Dofus2")
 
 
 class FightMarkTriggeredStep(AbstractSequencable, IFightStep):

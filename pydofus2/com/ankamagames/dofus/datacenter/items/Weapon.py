@@ -78,5 +78,3 @@ class Weapon(Item, IDataCenter):
             to.criticalHitProbability = src.criticalHitProbability
             to.criticalHitBonus = src.criticalHitBonus
             to.criticalFailureProbability = src.criticalFailureProbability
-        else:
-            logger.error(f"Failed to properly copy weapon data {src.id} to {to.id}")

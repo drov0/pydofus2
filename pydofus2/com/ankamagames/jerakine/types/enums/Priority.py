@@ -2,7 +2,6 @@ from enum import Enum
 
 
 class Priority(Enum):
-
     LOG: int = 10
 
     ULTIMATE_HIGHEST_DEPTH_OF_DOOM: int = 3
@@ -15,4 +14,6 @@ class Priority(Enum):
 
     LOW: int = -1
 
-    LOWEST: int = -2
+    VERY_LOW = -2
+
+    LOWEST: int = -3

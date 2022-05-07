@@ -1,5 +1,5 @@
 import sys
-from threading import Timer
+from com.ankamagames.jerakine.benchmark.BenchmarkTimer import BenchmarkTimer
 from time import sleep
 import com.ankamagames.dofus.kernel.Kernel as krnl
 from com.ankamagames.dofus.kernel.net.DisconnectionReasonEnum import DisconnectionReasonEnum
@@ -44,10 +44,8 @@ class DofusClient(metaclass=Singleton):
         DataMapProvider().init(AnimatedCharacter)
         WorldPathFinder().init()
 
-    def reset(self):
-        connh.ConnectionsHandler.connectionGonnaBeClosed(DisconnectionReasonEnum.RESTARTING)
-        connh.ConnectionsHandler.getConnection().close()
-        krnl.Kernel().reset()
+    def relogin(self):
+        self.login(self._accountId, self._serverId, self._charachterId)
 
     def login(self, accountId, serverId, charachterId):
         self._serverId = serverId
@@ -71,15 +69,16 @@ class DofusClient(metaclass=Singleton):
             try:
                 sleep(0.3)
             except KeyboardInterrupt:
-                self.reset()
+                connh.ConnectionsHandler.connectionGonnaBeClosed(DisconnectionReasonEnum.UNEXPECTED)
+                connh.ConnectionsHandler.getConnection().close()
                 sys.exit(0)
 
     def registerFrame(self, frame):
         self._registredCustomFrames.append(frame)
 
     def restart(self):
-        self.reset()
-        Timer(5, self.login, [self._accountId, self._serverId, self._charachterId]).start()
+        connh.ConnectionsHandler.connectionGonnaBeClosed(DisconnectionReasonEnum.RESTARTING)
+        connh.ConnectionsHandler.getConnection().close()
 
     @property
     def mainConn(self) -> "ServerConnection":

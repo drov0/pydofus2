@@ -1,4 +1,5 @@
 from typing import TYPE_CHECKING
+import com.ankamagames.dofus.kernel.Kernel as krnl
 from com.ankamagames.dofus.logic.game.common.misc.DofusEntities import DofusEntities
 
 
@@ -91,8 +92,6 @@ class PlayedCharacterManager(IDestroyable, metaclass=Singleton):
         self.petsMount = None
         self.hasCompanion = False
         self.mount = None
-        self.isFighting = False
-        self.fightId = -1
         self.teamId = 0
         self.isSpectator = False
         self.experiencePercent = 0
@@ -105,6 +104,7 @@ class PlayedCharacterManager(IDestroyable, metaclass=Singleton):
         self.playerMaxForgettableSpellsfloat: int = -1
         self._knownZaapMapIds: list[float] = list()
         self._isPartyLeader: bool = False
+        self.isFighting = False
         super().__init__()
 
     @property

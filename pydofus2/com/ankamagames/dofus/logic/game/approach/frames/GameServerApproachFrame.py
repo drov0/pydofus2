@@ -1,5 +1,5 @@
 from datetime import datetime
-from threading import Timer
+from com.ankamagames.jerakine.benchmark.BenchmarkTimer import BenchmarkTimer
 import time
 from com.ankamagames.dofus.internalDatacenter.connection.BasicCharacterWrapper import (
     BasicCharacterWrapper,
@@ -169,7 +169,7 @@ class GameServerApproachFrame(Frame):
             return True
 
         elif isinstance(msg, AuthenticationTicketAcceptedMessage):
-            Timer(0.5, self.requestCharactersList).start()
+            BenchmarkTimer(0.5, self.requestCharactersList).start()
             self.authenticationTicketAccepted = True
             return True
 

@@ -1,4 +1,4 @@
-from threading import Timer
+from com.ankamagames.jerakine.benchmark.BenchmarkTimer import BenchmarkTimer
 from typing import Any
 
 
@@ -18,7 +18,7 @@ class SoftReference:
         if self.timeout:
             self.timeout.cancel()
         if self.value:
-            self.timeout = Timer(self.keptTime, self.clearReference)
+            self.timeout = BenchmarkTimer(self.keptTime, self.clearReference)
             self.timeout.start()
 
     def clearReference(self) -> None:

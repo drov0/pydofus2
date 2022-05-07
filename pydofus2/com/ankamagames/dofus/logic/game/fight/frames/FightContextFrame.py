@@ -1,5 +1,5 @@
 import math
-from threading import Timer
+from com.ankamagames.jerakine.benchmark.BenchmarkTimer import BenchmarkTimer
 from com.ankamagames.atouin.managers.EntitiesManager import EntitiesManager
 import com.ankamagames.atouin.managers.MapDisplayManager as mdm
 from com.ankamagames.atouin.messages.MapLoadedMessage import MapLoadedMessage
@@ -233,9 +233,9 @@ class FightContextFrame(Frame):
 
     _lastEffectEntity: WeakReference
 
-    _timerFighterInfo: Timer = None
+    _timerFighterInfo: BenchmarkTimer = None
 
-    _timerMovementRange: Timer = None
+    _timerMovementRange: BenchmarkTimer = None
 
     _currentFighterInfo: GameFightFighterInformations
 
@@ -559,7 +559,7 @@ class FightContextFrame(Frame):
 
         elif isinstance(msg, GameContextDestroyMessage):
             Kernel().getWorker().removeFrame(self)
-            return True
+            return False
 
         elif isinstance(msg, GameFightLeaveMessage):
             gflmsg = msg

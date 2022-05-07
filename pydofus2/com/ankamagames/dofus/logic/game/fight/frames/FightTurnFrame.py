@@ -90,7 +90,7 @@ from com.ankamagames.jerakine.types.positions.MapPoint import MapPoint
 from com.ankamagames.jerakine.types.positions.MovementPath import MovementPath
 from com.ankamagames.jerakine.types.positions.PathElement import PathElement
 from damageCalculation.tools.StatIds import StatIds
-from threading import Timer
+from com.ankamagames.jerakine.benchmark.BenchmarkTimer import BenchmarkTimer
 from typing import TYPE_CHECKING
 
 from com.ankamagames.dofus.logic.game.fight.frames.FightEntitiesFrame import (
@@ -137,7 +137,7 @@ class FightTurnFrame(Frame):
 
     _finishingTurn: bool = None
 
-    _remindTurnTimeoutId: Timer = None
+    _remindTurnTimeoutId: BenchmarkTimer = None
 
     _myTurn: bool = None
 
@@ -155,7 +155,7 @@ class FightTurnFrame(Frame):
 
     _lastPath: MovementPath = None
 
-    _intervalTurn: Timer = None
+    _intervalTurn: BenchmarkTimer = None
 
     _playerEntity: IEntity = None
 
@@ -225,7 +225,7 @@ class FightTurnFrame(Frame):
         self._remainingDurationSeconds = math.floor(v)
         if self._intervalTurn:
             self._intervalTurn.cancel()
-        self._intervalTurn = Timer(10, self.onSecondTick)
+        self._intervalTurn = BenchmarkTimer(10, self.onSecondTick)
 
     @property
     def lastPath(self) -> MovementPath:

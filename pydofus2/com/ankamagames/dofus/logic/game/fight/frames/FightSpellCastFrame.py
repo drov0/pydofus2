@@ -1,4 +1,4 @@
-from threading import Timer
+from com.ankamagames.jerakine.benchmark.BenchmarkTimer import BenchmarkTimer
 from com.ankamagames.atouin.AtouinConstants import AtouinConstants
 from com.ankamagames.atouin.data.map.Cell import Cell
 from com.ankamagames.atouin.managers.MapDisplayManager import MapDisplayManager
@@ -114,7 +114,7 @@ class FightSpellCastFrame(Frame):
 
     _currentCell: int = -1
 
-    _cancelTimer: Timer
+    _cancelTimer: BenchmarkTimer
 
     _lastTargetStatus: bool = True
 
@@ -122,7 +122,7 @@ class FightSpellCastFrame(Frame):
 
     _targetingThroughPortal: bool
 
-    _clearTargetTimer: Timer
+    _clearTargetTimer: BenchmarkTimer
 
     _spellmaximumRange: int
 
@@ -133,7 +133,7 @@ class FightSpellCastFrame(Frame):
     def __init__(self, spellId: int):
         super().__init__()
         self._spellId = spellId
-        self._cancelTimer = Timer(0.05, self.cancelCast)
+        self._cancelTimer = BenchmarkTimer(0.05, self.cancelCast)
         if spellId or not PlayedCharacterManager().currentWeapon:
             for i in PlayedCharacterManager().spellsInventory:
                 if i.spellId == self._spellId:
@@ -154,7 +154,7 @@ class FightSpellCastFrame(Frame):
                 "name": weapon.name,
                 "playerId": PlayedCharacterManager().id,
             }
-        self._clearTargetTimer = Timer(0.05, self.onClearTarget)
+        self._clearTargetTimer = BenchmarkTimer(0.05, self.onClearTarget)
 
     def isCurrentTargetTargetable(self) -> bool:
         return self._currentTargetIsTargetable

@@ -26,6 +26,7 @@ from com.ankamagames.dofus.network.messages.game.context.roleplay.CurrentMapMess
     CurrentMapMessage,
 )
 from com.ankamagames.dofus.network.messages.game.inventory.items.ObtainedItemMessage import ObtainedItemMessage
+from com.ankamagames.jerakine.benchmark.BenchmarkTimer import BenchmarkTimer
 from com.ankamagames.jerakine.logger.Logger import Logger
 from com.ankamagames.jerakine.messages.Frame import Frame
 from com.ankamagames.jerakine.messages.Message import Message
@@ -71,13 +72,14 @@ class RoleplayContextFrame(Frame):
         self._worldFrame = rplWF.RoleplayWorldFrame()
         self._entitiesFrame = ref.RoleplayEntitiesFrame()
         self._interactivesFrame = rif.RoleplayInteractivesFrame()
+        logger.debug("RoleplayContextFrame pushed")
         return True
 
     def process(self, msg: Message) -> bool:
 
         if isinstance(msg, CurrentMapMessage):
             mcmsg = msg
-            logger.debug(f"[RoleplayContext] Loading ropeplay map {mcmsg.mapId}")
+            logger.debug(f"[RoleplayContext] Loading roleplay map {mcmsg.mapId}")
             self._newCurrentMapIsReceived = True
             newSubArea = SubArea.getSubAreaByMapId(mcmsg.mapId)
             PlayedCharacterManager().currentSubArea = newSubArea
@@ -106,28 +108,26 @@ class RoleplayContextFrame(Frame):
             if PlayedCharacterManager().currentMap:
                 self._previousMapId = PlayedCharacterManager().currentMap.mapId
             PlayedCharacterManager().currentMap = wp
-            self._entitiesFrame._waitForMap = True
             MapDisplayManager().loadMap(int(mcmsg.mapId))
             return False
 
         elif isinstance(msg, MapLoadedMessage):
-            if not Kernel().getWorker().contains("RoleplayEntitiesFrame"):
-                Kernel().getWorker().addFrame(self._entitiesFrame)
-            if not Kernel().getWorker().contains("RoleplayInteractivesFrame"):
-                Kernel().getWorker().addFrame(self._interactivesFrame)
-            if not Kernel().getWorker().contains("RoleplayMovementFrame"):
-                Kernel().getWorker().addFrame(self._movementFrame)
-            if not Kernel().getWorker().contains("RoleplayWorldFrame"):
-                Kernel().getWorker().addFrame(self._worldFrame)
-            if self._listMapNpcsMsg:
-                Kernel().getWorker().process(self._listMapNpcsMsg)
-                self._listMapNpcsMsg = None
+            logger.debug("[RoleplayContext] Map loaded will push other roleplay frames")
+            Kernel().getWorker().addFrame(self._entitiesFrame)
+            Kernel().getWorker().addFrame(self._worldFrame)
+            Kernel().getWorker().addFrame(self._movementFrame)
+            # Kernel().getWorker().logFrameList()
+            #
+            # Kernel().getWorker().addFrame(self._interactivesFrame)
+            #
+            # Kernel().getWorker().process(self._listMapNpcsMsg)
+            self._listMapNpcsMsg = None
             return True
 
         elif isinstance(msg, GameContextDestroyMessage):
             logger.debug("RoleplayContextFrame: will be retrieved from kernel cause switching to fight")
             Kernel().getWorker().removeFrame(self)
-            return True
+            return False
 
         elif isinstance(msg, ObtainedItemMessage):
             return True
@@ -141,6 +141,7 @@ class RoleplayContextFrame(Frame):
         Kernel().getWorker().removeFrame(self._worldFrame)
         Kernel().getWorker().removeFrame(self._movementFrame)
         Kernel().getWorker().removeFrame(self._interactivesFrame)
+        logger.debug("RoleplayContextFrame pulled")
         # TODO : Don't forget to uncomment this when those frames are implemented dumpass
         # Kernel().getWorker().removeFrame(self._spectatorManagementFrame)
         # Kernel().getWorker().removeFrame(self._npcDialogFrame)

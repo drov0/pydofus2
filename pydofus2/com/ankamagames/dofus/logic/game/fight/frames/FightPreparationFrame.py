@@ -356,7 +356,7 @@ class FightPreparationFrame(Frame):
                 fightContextFrame.process(gfemsg2)
             else:
                 Kernel().getWorker().process(gfemsg2)
-            return True
+            return False
 
         if isinstance(msg, IdolFightPreparationUpdateMessage):
             return True

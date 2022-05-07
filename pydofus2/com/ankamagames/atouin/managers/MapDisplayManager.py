@@ -54,7 +54,6 @@ class MapDisplayManager(metaclass=Singleton):
 
     def reset(self) -> None:
         self._currentMap = None
-        logger.debug("mapInstanceId reset 0")
         self._mapInstanceId = 0
         self._currentMapRendered = True
         self._lastMap = None
@@ -84,6 +83,7 @@ class MapDisplayManager(metaclass=Singleton):
 
         self.lastDataMap = self.currentDataMap
         self._forceReloadWithoutCache = forceReloadWithoutCache
+        self._currentMapRendered = False
         self._nMapLoadStart = perf_counter()
         map = self._loader.load(mapId, key=decryptionKey)
         self._currentMapRendered = True
@@ -96,4 +96,9 @@ class MapDisplayManager(metaclass=Singleton):
         msg = MapLoadedMessage()
         msg.id = self._currentMap.mapId
         self.initIdentifiedElements()
-        Kernel().getWorker().process(msg)
+        if Kernel().getWorker().contains("RoleplayContextFrame"):
+            Kernel().getWorker().getFrame("RoleplayContextFrame").process(msg)
+        elif Kernel().getWorker().contains("FightContextFrame"):
+            Kernel().getWorker().getFrame("FightContextFrame").process(msg)
+        else:
+            logger.error("No context frame found!")

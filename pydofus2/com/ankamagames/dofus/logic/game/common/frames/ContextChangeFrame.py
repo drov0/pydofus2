@@ -24,6 +24,7 @@ logger = Logger("Dofus2")
 class ContextChangeFrame(Frame):
     def __init__(self):
         self.mapChangeConnexion = ""
+        self.currentContext = None
         super().__init__()
 
     @property
@@ -36,22 +37,23 @@ class ContextChangeFrame(Frame):
     def process(self, msg: Message) -> bool:
 
         if isinstance(msg, GameContextCreateMessage):
-            context = msg.context
-            if context == GameContextEnum.ROLE_PLAY:
+            self.currentContext = msg.context
+            if self.currentContext == GameContextEnum.ROLE_PLAY:
+                logger.debug("Roleplay context started")
                 import com.ankamagames.dofus.logic.game.roleplay.frames.RoleplayContextFrame as rplCF
 
                 Kernel().getWorker().addFrame(rplCF.RoleplayContextFrame())
 
-            elif context == GameContextEnum.FIGHT:
+            elif self.currentContext == GameContextEnum.FIGHT:
                 logger.debug("Fight context started")
                 import com.ankamagames.dofus.logic.game.fight.frames.FightContextFrame as fcf
 
                 Kernel().getWorker().addFrame(fcf.FightContextFrame())
 
             else:
-                Kernel().panic(PanicMessages.WRONG_CONTEXT_CREATED, [msg.context])
+                Kernel().panic(PanicMessages.WRONG_CONTEXT_CREATED, [self.currentContext])
 
-            return True
+            return False
 
         if isinstance(msg, GameContextQuitAction):
             gcqmsg = GameContextQuitMessage()

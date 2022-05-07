@@ -1,4 +1,4 @@
-from threading import Timer
+from com.ankamagames.jerakine.benchmark.BenchmarkTimer import BenchmarkTimer
 from time import sleep
 from com.ankamagames.atouin.managers.MapDisplayManager import MapDisplayManager
 from com.ankamagames.dofus.datacenter.world.MapPosition import MapPosition
@@ -9,6 +9,7 @@ from com.ankamagames.dofus.network.types.game.context.roleplay.GameRolePlayGroup
     GameRolePlayGroupMonsterInformations,
 )
 from com.DofusClient import DofusClient
+from com.ankamagames.jerakine.types.positions.MapPoint import MapPoint
 from pyd2bot.apis.InventoryAPI import InventoryAPI
 from pyd2bot.apis.MoveAPI import MoveAPI
 from com.ankamagames.dofus.datacenter.notifications.Notification import Notification
@@ -59,16 +60,18 @@ def GetNextMap(path, index):
 
 
 class BotFarmPathFrame(Frame):
-    def __init__(self, parcours: FarmParcours):
+    parcours: FarmParcours = None
+
+    def __init__(self, autoStart: bool = False):
+        if not BotFarmPathFrame.parcours:
+            raise Exception("No parcours loaded")
         super().__init__()
+        self._autoStart = autoStart
         self._followingIe = -1
         self._usingInteractive = False
         self._wantmapChange = -1
         self._entities = dict()
-        self.parcours = parcours
         self._inAutoTrip = False
-        self.pathIndex = None
-        self.lastGoodCellId = None
         self._worker = Kernel().getWorker()
 
     @property
@@ -78,7 +81,7 @@ class BotFarmPathFrame(Frame):
 
     @property
     def priority(self) -> int:
-        return Priority.LOW
+        return Priority.VERY_LOW
 
     @property
     def entitiesFrame(self) -> "RoleplayEntitiesFrame":
@@ -100,19 +103,21 @@ class BotFarmPathFrame(Frame):
         return None
 
     def pushed(self) -> bool:
-        self.reset()
+        if self._autoStart:
+            self.doFarm()
         return True
 
     def pulled(self) -> bool:
-        return self.reset()
+        self.reset()
+        return True
 
     def reset(self):
-        self._discardedMonsters = set()
         self._wantmapChange = -1
         self._followingIe = -1
         self._usingInteractive = False
         self._followinMonsterGroup = None
         self._lastCellId = None
+        self._inAutoTrip = False
         if self.movementFrame:
             self.movementFrame._canMove = True
             self.movementFrame._followingMonsterGroup = None
@@ -131,10 +136,10 @@ class BotFarmPathFrame(Frame):
     def process(self, msg: Message) -> bool:
 
         if PlayedCharacterManager().isFighting:
-            return False
+            raise Exception("Can't farm while fighting")
+
         if Kernel().getWorker().contains("BotAutoTripFrame"):
-            logger.debug("BotAutoTripFrame is running, aborting")
-            return False
+            raise Exception("Can't farm while in auto trip")
 
         if isinstance(msg, InteractiveUseErrorMessage):
             logger.error(
@@ -146,7 +151,6 @@ class BotFarmPathFrame(Frame):
                 logger.debug("Will move on")
                 del self.interactivesFrame._ie[msg.elemId]
                 del self.interactivesFrame._collectableIe[msg.elemId]
-                self.reset()
                 self.doFarm()
             return True
 
@@ -169,21 +173,21 @@ class BotFarmPathFrame(Frame):
             if self._entities[msg.elemId] == PlayedCharacterManager().id:
                 logger.debug(f"[BotFarmFrame] Interactive element {msg.elemId} use ended")
                 logger.debug("*" * 100)
-                self.reset()
                 self.doFarm()
             del self._entities[msg.elemId]
             return True
 
         elif isinstance(msg, MapComplementaryInformationsDataMessage):
             sleep(0.2)
-            self._discardedMonsters.clear()
             logger.debug("-" * 100)
+            self.reset()
             if self.currMapCoords not in self.parcours.path:
-                logger.debug(f"[BotFarmFrame] Map {self.currMapCoords} not in path will add autotripFrame")
+                logger.debug(f"[BotFarmFrame] Map {self.currMapCoords} not in path will switch to autotrip")
+                self._inAutoTrip = True
+                self._worker.removeFrame(self)
                 self._worker.addFrame(BotAutoTripFrame(self.parcours.startMapId))
-                return False
+                return True
             else:
-                self.reset()
                 self.doFarm()
                 return True
 
@@ -200,16 +204,24 @@ class BotFarmPathFrame(Frame):
         logger.debug(f"[BotFarmFrame] Current Map {self.currMapCoords} Moving to {x, y}")
         self._wantmapChange = MoveAPI.changeMapToDstCoords(x, y)
         if self._wantmapChange == -1:
-            raise Exception(f"Unable to move to Map {x, y}")
-        self._changeMapTimeout = Timer(5, self.moveToNextStep)
+            raise Exception(f"No transition found to move to Map {x, y}")
 
     def doFight(self):
+        availableMonsterFights = []
+        currPlayerPos = MapPoint.fromCellId(PlayedCharacterManager().currentCellId)
         for entityId in self.entitiesFrame._monstersIds:
-            if entityId not in self._discardedMonsters:
-                infos: GameRolePlayGroupMonsterInformations = self.entitiesFrame.getEntityInfos(entityId)
-                if infos.staticInfos.mainCreatureLightInfos.level <= PlayedCharacterManager().limitedLevel:
-                    self.movementFrame.attackMonsters(entityId)
-                    return entityId
+            infos: GameRolePlayGroupMonsterInformations = self.entitiesFrame.getEntityInfos(entityId)
+            # if infos.staticInfos.mainCreatureLightInfos.level <= int((1 / 2) * PlayedCharacterManager().limitedLevel):
+            if len(infos.staticInfos.underlings) <= 3:
+                monsterGroupPos = MapPoint.fromCellId(infos.disposition.cellId)
+                availableMonsterFights.append(
+                    {"info": infos, "distance": currPlayerPos.distanceToCell(monsterGroupPos)}
+                )
+        if availableMonsterFights:
+            availableMonsterFights.sort(key=lambda x: x["distance"])
+            entityId = availableMonsterFights[0]["info"].contextualId
+            self.movementFrame.attackMonsters(entityId)
+            return entityId
         return None
 
     def doFarm(self):

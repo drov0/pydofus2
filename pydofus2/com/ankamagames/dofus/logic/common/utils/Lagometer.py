@@ -1,4 +1,4 @@
-from threading import Timer
+from com.ankamagames.jerakine.benchmark.BenchmarkTimer import BenchmarkTimer
 from com.ankamagames.jerakine.benchmark.BenchmarkTimer import BenchmarkTimer
 from com.ankamagames.jerakine.logger.Logger import Logger
 from com.ankamagames.jerakine.network.ILagometer import ILagometer
@@ -11,16 +11,16 @@ class Lagometer(ILagometer):
 
     SHOW_LAG_DELAY: int = 2
 
-    _timer: Timer
+    _timer: BenchmarkTimer
 
     _lagging: bool = False
 
     def __init__(self):
         super().__init__()
-        self._timer = Timer(self.SHOW_LAG_DELAY, self.onTimerComplete)
+        self._timer = BenchmarkTimer(self.SHOW_LAG_DELAY, self.onTimerComplete)
 
     def ping(self, msg: INetworkMessage = None) -> None:
-        self._timer = Timer(self.SHOW_LAG_DELAY, self.onTimerComplete)
+        self._timer = BenchmarkTimer(self.SHOW_LAG_DELAY, self.onTimerComplete)
         self._timer.start()
 
     def pong(self, msg: INetworkMessage = None) -> None:

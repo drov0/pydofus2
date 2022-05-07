@@ -1,4 +1,4 @@
-from threading import Timer
+from com.ankamagames.jerakine.benchmark.BenchmarkTimer import BenchmarkTimer
 from time import sleep
 from types import FunctionType
 from com.ankamagames.atouin.managers.EntitiesManager import EntitiesManager
@@ -197,7 +197,7 @@ class FightBattleFrame(Frame):
 
     _currentPlayerId: float = None
 
-    _skipTurnTimer: Timer = None
+    _skipTurnTimer: BenchmarkTimer = None
 
     _masterId: float = None
 
@@ -532,7 +532,7 @@ class FightBattleFrame(Frame):
                 fakegfemsg = GameFightEndMessage()
                 fakegfemsg.init(0, 0, 0, None, [])
                 self.process(fakegfemsg)
-            return True
+            return False
 
         elif isinstance(msg, GameFightPauseMessage):
             gfpmsg = msg
@@ -586,7 +586,7 @@ class FightBattleFrame(Frame):
             res.insert(0, seq)
             seq = seq._parent
         return res
-    
+
     def logState(self):
         logger.debug(
             "****************************************************************** Current Sequences state ***********************************************************"

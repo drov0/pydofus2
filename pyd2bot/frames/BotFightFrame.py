@@ -1,7 +1,7 @@
 import collections
 import math
 import random
-from threading import Timer
+from com.ankamagames.jerakine.benchmark.BenchmarkTimer import BenchmarkTimer
 from time import sleep
 from types import FunctionType
 from com.ankamagames.atouin.AtouinConstants import AtouinConstants
@@ -135,21 +135,24 @@ class BotFightFrame(Frame, metaclass=Singleton):
 
     _lastTarget: int = None
 
+    _spellw: SpellWrapper = None
+
     def __init__(self):
         self._turnAction = []
+        self._spellw = None
         super().__init__()
 
     def pushed(self) -> bool:
         self._enabled = True
         self.fakeActivity()
         self._myTurn = False
-        self._mapPos = MapPosition.getMapPositions()
         self._wantcastSpell = None
         self._reachableCells = None
         self._turnAction = []
         self._seqQueue = []
         self._waitingSeqEnd = False
         self._turnPlayed = 0
+        self._spellw = None
         return True
 
     @property
@@ -178,13 +181,13 @@ class BotFightFrame(Frame, metaclass=Singleton):
 
     @property
     def priority(self) -> int:
-        return Priority.LOW
+        return Priority.VERY_LOW
 
     @property
     def fightCount(self) -> int:
         return self._fightCount
 
-    def findPathToTarget(self, spellw: SpellWrapper, targetSum=False) -> Tuple[_Target, list[int]]:
+    def findPathToTarget(self, spellw: SpellWrapper, targets: list[_Target]) -> Tuple[_Target, list[int]]:
         """
         Find path to the closest ldv to hit a mob.
         :param origin: position of the character
@@ -192,13 +195,12 @@ class BotFightFrame(Frame, metaclass=Singleton):
         :param targets: positions of the mobs
         :return: cell of the mob, path to the ldv if any else None
         """
-        targets = self.getTargetableEntities(spellw, targetSum)
         if not targets:
-            logger.debug("Not hittable target found")
+            logger.debug("[FightAlgo] Not hittable target found")
             return None, None
         spellZone = self.getSpellZone(spellw)
         origin = self.fighterPos
-        logger.debug(f"Searching for path to hit some target, origin = {origin.cellId}")
+        logger.debug(f"[FightAlgo] Searching for path to hit some target, origin = {origin.cellId}")
         queue = collections.deque([[origin.cellId]])
         seen = {origin.cellId}
         while queue:
@@ -208,20 +210,61 @@ class BotFightFrame(Frame, metaclass=Singleton):
             ldv = set(LosDetector.getCell(DataMapProvider(), currSpellZone, MapPoint.fromCellId(currCellId)))
             for target in targets:
                 if target.pos.cellId in ldv:
-                    logger.debug(f"Found path {path} to hit a target {target}")
+                    logger.debug(f"[FightAlgo] Found path {path} to hit a target {target}")
                     return target, path[1:]
             currReachableCells = set(FightReachableCellsMaker(self.fighterInfos, currCellId, 1).reachableCells)
             for cellId in currReachableCells:
                 if cellId not in seen:
                     queue.append(path + [cellId])
                     seen.add(cellId)
-        logger.debug(f"No valid path to reach a target found")
+        logger.debug(f"[FightAlgo] No valid path to reach a target found")
         return None, None
 
-    def getSpellWrapper(self, id: int) -> SpellWrapper:
-        for spellw in PlayedCharacterManager().playerSpellList:
-            if spellw.id == id:
-                return spellw
+    def playTurn(self):
+        targets = self.getTargetableEntities(self.spellw, targetSum=False)
+        if not targets:
+            targets = self.getTargetableEntities(self.spellw, targetSum=True)
+            if not targets:
+                self.addTurnAction(self.turnEnd, [])
+                self.nextTurnAction()
+                return
+        logger.info(f"[FightAlgo] MP : {self.movementPoints}, AP : {self.actionPoints}")
+        logger.info(f"[FightAlgo] Current atack spell : {self.spellw.spell.name}")
+        self.updateReachableCells()
+        logger.info(f"[FightAlgo] Current reachable cells {self._reachableCells}")
+        target, path = self.findPathToTarget(self.spellw, targets)
+        if target is not None:
+            if len(path) == 0:
+                logger.debug(f"[FightAlgo] Can hit target {target} from current position")
+                self.addTurnAction(self.castSpell, [self._spellId, target.pos.cellId])
+            elif path[-1] in self._reachableCells:
+                logger.debug(
+                    f"[FightAlgo] Last Path cell to target {target} is reachable will move to it before casting the spell"
+                )
+                self.addTurnAction(self.askMove, [path])
+                self.addTurnAction(self.castSpell, [self._spellId, target.pos.cellId])
+            else:
+                found = False
+                for i, cellId in enumerate(path):
+                    if cellId not in self._reachableCells:
+                        if i != 0:
+                            found = True
+                            self.addTurnAction(self.askMove, [path[:i]])
+                        break
+                logger.debug(f"[FightAlgo] Have enough PM to get closer to the target ? {found}")
+                self.addTurnAction(self.turnEnd, [])
+        else:
+            logger.warn("[FightAlgo] No path to any target found")
+            self.addTurnAction(self.turnEnd, [])
+        self.nextTurnAction()
+
+    @property
+    def spellw(self) -> SpellWrapper:
+        if self._spellw is None:
+            for spellw in PlayedCharacterManager().playerSpellList:
+                if spellw.id == self._spellId:
+                    self._spellw = spellw
+        return self._spellw
 
     def getActualSpellRange(self, spellw: SpellWrapper) -> int:
         playerStats: EntityStats = CurrentPlayedFighterManager().getStats()
@@ -272,55 +315,16 @@ class BotFightFrame(Frame, metaclass=Singleton):
     def nextTurnAction(self) -> None:
         battleSeqStack = self.battleFrame.getSequencesStack()
         if len(battleSeqStack) > 0:
-            logger.warn(f"Battle is busy processing sequences stack of size {len(battleSeqStack)}")
-            Timer(0.1, self.nextTurnAction).start()
+            logger.warn(f"[FightBot] Battle is busy processing sequences stack of size {len(battleSeqStack)}")
+            BenchmarkTimer(0.1, self.nextTurnAction).start()
         else:
-            logger.debug(f"Next turn actions, {[a['fct'].__name__ for a in self._turnAction]}")
+            logger.debug(f"[FightBot] Next turn actions, {[a['fct'].__name__ for a in self._turnAction]}")
             if len(self._turnAction) > 0:
                 action = self._turnAction.pop(0)
                 action["fct"](*action["args"])
                 self._waitingSeqEnd = True
             else:
                 self.playTurn()
-
-    def playTurn(self):
-        logger.info(f"MP : {self.movementPoints}, AP : {self.actionPoints}")
-        spellw = self.getSpellWrapper(self._spellId)
-        logger.info(f"Current atack spell : {spellw.spell.name}")
-        if self.actionPoints < spellw["apCost"]:
-            logger.info("No enough AP to cast the spell")
-            self.addTurnAction(self.turnEnd, [])
-            self.nextTurnAction()
-        self.updateReachableCells()
-        logger.info(f"Current reachable cells {self._reachableCells}")
-        self._wantcastSpell = None
-        target, path = self.findPathToTarget(spellw, targetSum=False)
-        if path is None:
-            target, path = self.findPathToTarget(spellw, targetSum=True)
-        if path is not None:
-            if len(path) == 0:
-                logger.debug(f"Can hit target {target} from current position")
-                self.addTurnAction(self.castSpell, [self._spellId, target.pos.cellId])
-            elif path[-1] in self._reachableCells:
-                logger.debug(
-                    f"Last Path cell to target {target} is reachable will move to it before casting the spell"
-                )
-                self.addTurnAction(self.askMove, [path])
-                self.addTurnAction(self.castSpell, [self._spellId, target.pos.cellId])
-            else:
-                found = False
-                for i, cellId in enumerate(path):
-                    if cellId not in self._reachableCells:
-                        if i != 0:
-                            found = True
-                            self.addTurnAction(self.askMove, [path[:i]])
-                        break
-                logger.debug(f"Have enough PM to get closer to the target ? {found}")
-                self.addTurnAction(self.turnEnd, [])
-        else:
-            logger.warn("No path to any target found")
-            self.addTurnAction(self.turnEnd, [])
-        self.nextTurnAction()
 
     def updateReachableCells(self) -> None:
         self._reachableCells = FightReachableCellsMaker(self.fighterInfos).reachableCells
@@ -330,7 +334,7 @@ class BotFightFrame(Frame, metaclass=Singleton):
         if CurrentPlayedFighterManager().canCastThisSpell(self._spellId, spellw.spellLevel, targetId, reason):
             return True
         else:
-            logger.error(f"Unable to cast spell for reason {reason[0]}")
+            logger.error(f"[FightBot] Unable to cast spell for reason {reason[0]}")
             return False
 
     def process(self, msg: Message) -> bool:
@@ -338,14 +342,14 @@ class BotFightFrame(Frame, metaclass=Singleton):
         if isinstance(msg, GameFightJoinMessage):
             self._fightCount += 1
             self._inFight = True
-            return True
+            return False
 
         elif isinstance(msg, GameFightEndMessage):
             self._inFight = False
             return True
 
         elif isinstance(msg, GameActionFightNoSpellCastMessage):
-            logger.debug(f"Failed to cast spell")
+            logger.debug(f"[FightBot] Failed to cast spell")
             self.turnEnd()
             return True
 
@@ -412,7 +416,7 @@ class BotFightFrame(Frame, metaclass=Singleton):
     def fakeActivity(self) -> None:
         if not self._enabled:
             return
-        Timer(60 * 5, self.fakeActivity).start()
+        BenchmarkTimer(60 * 5, self.fakeActivity).start()
         bpmgs: BasicPingMessage = BasicPingMessage()
         bpmgs.init(False)
         ConnectionsHandler.getConnection().send(bpmgs, ConnectionType.TO_ALL_SERVERS)
@@ -439,7 +443,7 @@ class BotFightFrame(Frame, metaclass=Singleton):
                     and self.canCastSpell(spellw, entity.contextualId)
                 ):
                     result.append(_Target(entity.contextualId, MapPoint.fromCellId(entity.disposition.cellId)))
-        logger.debug(f"Found targets : {[str(tgt) for tgt in result]}")
+        logger.debug(f"[FightBot] Found targets : {[str(tgt) for tgt in result]}")
         return result
 
     def castSpell(self, spellId: int, cellId: bool) -> None:
@@ -449,13 +453,13 @@ class BotFightFrame(Frame, metaclass=Singleton):
         ConnectionsHandler.getConnection().send(gafcrmsg)
 
     def askMove(self, cells: list[int], cellsTackled: list[int] = []) -> None:
-        logger.debug(f"Ask move follwing path {cells}")
+        logger.debug(f"[FightBot] Ask move follwing path {cells}")
         if not self._myTurn:
-            logger.warn("Wants to move when it's not its turn yet")
+            logger.warn("[FightBot] Wants to move when it's not its turn yet")
             return False
         fightTurnFrame: "FightTurnFrame" = Kernel().getWorker().getFrame("FightTurnFrame")
         if not fightTurnFrame:
-            logger.warn("Wants to move inside fight but 'FightTurnFrame' not found in kernel")
+            logger.warn("[FightBot] Wants to move inside fight but 'FightTurnFrame' not found in kernel")
             return False
         fightTurnFrame.askMoveTo(cells, cellsTackled)
         return True

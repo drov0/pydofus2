@@ -8,3 +8,6 @@ class Frame(MessageHandler, Prioritizable):
 
     def pulled(self) -> bool:
         pass
+
+    def __str__(self):
+        return self.__class__.__name__

@@ -1,4 +1,4 @@
-from threading import Timer
+from com.ankamagames.jerakine.benchmark.BenchmarkTimer import BenchmarkTimer
 from time import perf_counter, sleep
 from com.ankamagames.atouin.managers.EntitiesManager import EntitiesManager
 from com.ankamagames.atouin.managers.MapDisplayManager import MapDisplayManager
@@ -103,9 +103,8 @@ from com.ankamagames.dofus.network.messages.game.prism.PrismFightDefenderLeaveMe
 from com.ankamagames.dofus.network.types.game.context.roleplay.GameRolePlayGroupMonsterInformations import (
     GameRolePlayGroupMonsterInformations,
 )
-from com.ankamagames.dofus.network.types.game.context.roleplay.GameRolePlayGroupMonsterWaveInformations import (
-    GameRolePlayGroupMonsterWaveInformations,
-)
+import com.ankamagames.dofus.kernel.net.ConnectionsHandler as connh
+
 from com.ankamagames.dofus.network.types.game.interactive.InteractiveElement import (
     InteractiveElement,
 )
@@ -132,7 +131,8 @@ logger = Logger("Dofus2")
 class RoleplayMovementFrame(Frame):
     CONSECUTIVE_MOVEMENT_DELAY: int = 0.25
     VERBOSE = True
-
+    CHANGEMAP_TIMEOUT = 5
+    ATTACKMOSTERS_TIMEOUT = 20
     _wantToChangeMap: float = -1
 
     _changeMapByAutoTrip: bool = False
@@ -151,8 +151,6 @@ class RoleplayMovementFrame(Frame):
 
     _destinationPoint: int
 
-    _nextMovementBehavior: int
-
     _lastPlayerValidatedPosition: MapPoint
 
     _lastMoveEndCellId: int
@@ -162,6 +160,19 @@ class RoleplayMovementFrame(Frame):
     _mapHasAggressiveMonsters: bool = False
 
     def __init__(self):
+        self._wantToChangeMap = -1
+        self._changeMapByAutoTrip = False
+        self._followingIe = None
+        self._followingMonsterGroup = None
+        self._followingMove = None
+        self._isRequestingMovement = False
+        self._latestMovementRequest = 0
+        self._lastMoveEndCellId = None
+        self._changeMapTimeout = None
+        self._changeMapFails = 0
+        self._requestFightTimeout = None
+        self._requestFighFails = 0
+        self._moveRequetFails = 0
         super().__init__()
 
     @property
@@ -193,6 +204,9 @@ class RoleplayMovementFrame(Frame):
         return True
 
     def process(self, msg: Message) -> bool:
+        if Kernel().getWorker().contains("FightContextFrame"):
+            logger.error("[RolePlayMovement] Trying to perform roleplay action while the player is fighting")
+            connh.ConnectionsHandler.getConnection().close()
 
         if isinstance(msg, GameMapNoMovementMessage):
             logger.debug("Movement impossible")
@@ -392,6 +406,19 @@ class RoleplayMovementFrame(Frame):
             return False
 
     def pulled(self) -> bool:
+        logger.debug("[RolePlayMovement] Pulled")
+        self._canMove = True
+        self._followingMonsterGroup = None
+        self._followingIe = None
+        self._isRequestingMovement = False
+        self._wantToChangeMap = None
+        if self._requestFightTimeout:
+            self._requestFightTimeout.cancel()
+        self._requestFighFails = 0
+        if self._changeMapTimeout:
+            self._changeMapTimeout.cancel()
+        self._destinationPoint = None
+        self._followingMove = None
         return True
 
     def setNextMoveMapChange(self, mapId: float, autoTrip: bool = False) -> None:
@@ -412,9 +439,6 @@ class RoleplayMovementFrame(Frame):
         if not isinstance(message, (INetworkMessage, Action)):
             raise Exception("The message is neither INetworkMessage or Action")
         self._followingMessage = message
-
-    def forceNextMovementBehavior(self, pValue: int) -> None:
-        self._nextMovementBehavior = pValue
 
     def askMoveTo(self, cell: MapPoint) -> bool:
         playerEntity: AnimatedCharacter = DofusEntities.getEntity(PlayedCharacterManager().id)
@@ -498,18 +522,24 @@ class RoleplayMovementFrame(Frame):
     def askMapChange(self) -> None:
         logger.debug("[RolePlayMovement] Asking for a map change to map " + str(self._wantToChangeMap))
         cmmsg: ChangeMapMessage = ChangeMapMessage()
-        cmmsg.init(self._wantToChangeMap, self._changeMapByAutoTrip)
+        cmmsg.init(int(self._wantToChangeMap), False)
         ConnectionsHandler.getConnection().send(cmmsg)
-        self._changeMapTimeout = Timer(5, self.onMapChangeFailed)
+        self._changeMapTimeout = BenchmarkTimer(self.CHANGEMAP_TIMEOUT, self.onMapChangeFailed)
         self._changeMapTimeout.start()
         if self.VERBOSE:
             logger.debug("[RolePlayMovement] Change map timer started.")
 
     def attackMonsters(self, contextualId: int) -> None:
+        if self._followingMonsterGroup:
+            logger.warn("[RolePlayMovement] Already following a monster group, aborting")
+            return
         entityInfo = self.entitiesFrame.getEntityInfos(contextualId)
         logger.debug("[RolePlayMovement] Asking for a fight against monsters " + str(entityInfo.contextualId))
-        self.setFollowingMonsterFight(entityInfo)
-        self.askMoveTo(MapPoint.fromCellId(entityInfo.disposition.cellId))
+        if PlayedCharacterManager().currentCellId == entityInfo.disposition.cellId:
+            self.requestMonsterFight(contextualId)
+        else:
+            self.setFollowingMonsterFight(entityInfo)
+            self.askMoveTo(MapPoint.fromCellId(entityInfo.disposition.cellId))
 
     def onMapChangeFailed(self) -> None:
         logger.debug(f"[RolePlayMovement] Map change failed, resetting to {self._wantToChangeMap}")
@@ -525,7 +555,7 @@ class RoleplayMovementFrame(Frame):
             logger.error(f"We want to change map to None, aborting")
         else:
             self.askMapChange()
-            self._changeMapTimeout = Timer(3, self.onMapChangeFailed)
+            self._changeMapTimeout = BenchmarkTimer(self.CHANGEMAP_TIMEOUT, self.onMapChangeFailed)
             self._changeMapTimeout.start()
 
     def activateSkill(self, skillInstanceId: int, ie: InteractiveElement, additionalParam: int) -> None:
@@ -557,9 +587,10 @@ class RoleplayMovementFrame(Frame):
             nopmsg = FightRequestFailed()
             Kernel().getWorker().processImmediately(nopmsg)
             return False
+        self._followingMonsterGroup = None
         grpamrmsg: GameRolePlayAttackMonsterRequestMessage = GameRolePlayAttackMonsterRequestMessage()
         grpamrmsg.init(monsterGroupId)
         ConnectionsHandler.getConnection().send(grpamrmsg)
-        self._requestFightTimeout = Timer(3, lambda: self.attackMonsters(monsterGroupId))
+        self._requestFightTimeout = BenchmarkTimer(3, lambda: self.attackMonsters(monsterGroupId))
         self._requestFightTimeout.start()
         self._requestFighFails += 1

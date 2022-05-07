@@ -3,6 +3,8 @@ from enum import Enum
 
 class DisconnectionReasonEnum(Enum):
 
+    RESTARTING: int = 6
+
     UNEXPECTED: int = 0
 
     SWITCHING_TO_GAME_SERVER: int = 1

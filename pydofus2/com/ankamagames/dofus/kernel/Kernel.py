@@ -17,7 +17,7 @@ from com.ankamagames.jerakine.metaclasses.Singleton import Singleton
 from com.ankamagames.jerakine.logger.Logger import Logger
 from com.ankamagames.jerakine.utils.display.FrameIdManager import FrameIdManager
 
-logger = Logger("kernel")
+logger = Logger("Dofus2")
 
 
 class Kernel(metaclass=Singleton):
@@ -38,7 +38,7 @@ class Kernel(metaclass=Singleton):
     def init(self) -> None:
         FrameIdManager()
         self._worker.clear()
-        self.addInitialFrames(True)
+        self.addInitialFrames()
         logger.info(f"Using protocole #{Metadata.PROTOCOL_BUILD}, built on {Metadata.PROTOCOL_DATE}")
 
     def reset(
@@ -50,6 +50,7 @@ class Kernel(metaclass=Singleton):
         import com.ankamagames.dofus.logic.game.fight.managers.CurrentPlayedFighterManager as cpfm
         from com.ankamagames.dofus.logic.game.fight.managers.SpellModifiersManager import SpellModifiersManager
 
+        logger.debug("Resetting kernel")
         # TODO : missing feature manager reset here
         StatsManager.clear()
         SpellModifiersManager.clear()
@@ -61,13 +62,13 @@ class Kernel(metaclass=Singleton):
         DofusEntities.reset()
         ItemWrapper.clearCache()
         self._worker.clear()
-        self.addInitialFrames(reloadData)
+        self.addInitialFrames()
         self.beingInReconection = False
         if messagesToDispatchAfter is not None and len(messagesToDispatchAfter) > 0:
             for msg in messagesToDispatchAfter:
                 self._worker.process(msg)
 
-    def addInitialFrames(self, firstLaunch: bool = False) -> None:
+    def addInitialFrames(self) -> None:
         import com.ankamagames.dofus.logic.connection.frames.DisconnectionHandlerFrame as dhF
         from com.ankamagames.dofus.logic.connection.frames.AuthentificationFrame import (
             AuthentificationFrame,
@@ -81,6 +82,6 @@ class Kernel(metaclass=Singleton):
             self._worker.addFrame(LatencyFrame())
         self._worker.addFrame(AuthentificationFrame())
         self._worker.addFrame(QueueFrame())
-        self.getWorker().addFrame(dhF.DisconnectionHandlerFrame())
+        self._worker.addFrame(dhF.DisconnectionHandlerFrame())
         if not self._worker.contains("CleanupCrewFrame"):
             self._worker.addFrame(CleanupCrewFrame())

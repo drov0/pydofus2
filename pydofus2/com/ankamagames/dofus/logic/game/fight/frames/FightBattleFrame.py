@@ -1,4 +1,4 @@
-from threading import Timer
+from com.ankamagames.jerakine.benchmark.BenchmarkTimer import BenchmarkTimer
 from time import sleep
 from types import FunctionType
 from com.ankamagames.atouin.managers.EntitiesManager import EntitiesManager
@@ -197,7 +197,7 @@ class FightBattleFrame(Frame):
 
     _currentPlayerId: float = None
 
-    _skipTurnTimer: Timer = None
+    _skipTurnTimer: BenchmarkTimer = None
 
     _masterId: float = None
 
@@ -532,7 +532,7 @@ class FightBattleFrame(Frame):
                 fakegfemsg = GameFightEndMessage()
                 fakegfemsg.init(0, 0, 0, None, [])
                 self.process(fakegfemsg)
-            return True
+            return False
 
         elif isinstance(msg, GameFightPauseMessage):
             gfpmsg = msg
@@ -579,6 +579,14 @@ class FightBattleFrame(Frame):
         self._destroyed = True
         return True
 
+    def getSequencesStack(self) -> list[fseqf.FightSequenceFrame]:
+        res = []
+        seq = self._currentSequenceFrame
+        while seq:
+            res.insert(0, seq)
+            seq = seq._parent
+        return res
+
     def logState(self):
         logger.debug(
             "****************************************************************** Current Sequences state ***********************************************************"
@@ -590,12 +598,8 @@ class FightBattleFrame(Frame):
         logger.debug(
             f"Sequence current : #{self._currentSequenceFrame._instanceId if self._currentSequenceFrame else 'None'}"
         )
-        res = []
-        seq = self._currentSequenceFrame
-        while seq:
-            res.insert(0, seq)
-            seq = seq._parent
         padd = ""
+        res = self.getSequencesStack()
         for seq in res:
             logger.debug(f"{padd}|---> Sequence #{seq._instanceId}")
             for step in seq._stepsBuffer:

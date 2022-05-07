@@ -1,4 +1,4 @@
-from threading import Timer
+from com.ankamagames.jerakine.benchmark.BenchmarkTimer import BenchmarkTimer
 import com.ankamagames.dofus.kernel.Kernel as krnl
 import com.ankamagames.dofus.kernel.net.ConnectionsHandler as connh
 from com.ankamagames.dofus.network.Metadata import Metadata
@@ -93,7 +93,7 @@ class HandshakeFrame(Frame):
             return True
 
         elif isinstance(msg, ConnectedMessage):
-            self._timeoutTimer = Timer(self.TIMEOUT_DELAY, self.onTimeout)
+            self._timeoutTimer = BenchmarkTimer(self.TIMEOUT_DELAY, self.onTimeout)
             self._timeoutTimer.start()
             return True
 

@@ -1,4 +1,4 @@
-from threading import Timer
+from com.ankamagames.jerakine.benchmark.BenchmarkTimer import BenchmarkTimer
 from com.ankamagames.jerakine.logger.Logger import Logger
 from com.ankamagames.jerakine.sequencer.IPausableSequencable import IPausableSequencable
 from com.ankamagames.jerakine.sequencer.ISequencableListener import ISequencableListener
@@ -12,7 +12,7 @@ class AbstractSequencable(IPausableSequencable):
 
     _stepListeners: set = None
 
-    _timeOut: Timer = None
+    _timeOut: BenchmarkTimer = None
 
     _castingSpellId: int = -1
 
@@ -72,7 +72,7 @@ class AbstractSequencable(IPausableSequencable):
 
     def addListener(self, listener: ISequencableListener) -> None:
         if not self._timeOut and self._timeoutMax != -1:
-            self._timeOut = Timer(self._timeoutMax, self.onTimeOut)
+            self._timeOut = BenchmarkTimer(self._timeoutMax, self.onTimeOut)
             self._timeOut.start()
         if not self._stepListeners:
             self._stepListeners = set()

@@ -1,11 +1,9 @@
-import threading
-from time import perf_counter
+from unittest import skip
 from com.DofusClient import DofusClient
+from pyd2bot.frames.BotContextFrame import BotContextFrame
 from pyd2bot.frames.BotFarmPathFrame import BotFarmPathFrame
 from com.ankamagames.jerakine.logger.Logger import Logger
-from pyd2bot.frames.BotFightFrame import BotFightFrame
 from pyd2bot.managers.BotCredsManager import BotCredsManager
-
 from pyd2bot.models.FarmParcours import FarmParcours
 
 logger = Logger("Dofus2")
@@ -19,6 +17,13 @@ bouftou_incarnam = {
     "fightOnly": True,
     "skills": [FISHING_SKILL_ID],
 }
+pioute_astrub = {
+    "startMapId": 191104002,
+    "path": [(4, -18), (4, -19), (3, -19), (3, -18), (3, -17), (4, -17), (5, -17), (5, -18)],
+    "skills": [],
+    "fightOnly": True,
+}
+
 goujon_incarnam = {
     "startMapId": 154010882,
     "path": [
@@ -42,8 +47,8 @@ goujon_incarnam = {
 if __name__ == "__main__":
     botName = "foobar"
     creds = BotCredsManager.getEntry(botName)
-    dofus2 = DofusClient(botName)
-    dofus2.registerFrame(BotFarmPathFrame(FarmParcours(**goujon_incarnam)))
-    dofus2.registerFrame(BotFightFrame())
-    dofus2.start()
+    dofus2 = DofusClient()
+    BotFarmPathFrame.parcours = FarmParcours(**pioute_astrub)
+    dofus2.registerFrame(BotContextFrame())
+    dofus2.login(**creds)
     dofus2.join()

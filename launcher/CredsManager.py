@@ -30,10 +30,12 @@ class CredsManager:
         with open(CREDS_DB, "w") as fp:
             json.dump(CredsManager._creds, fp, indent=4)
 
-    @staticmethod
-    def getEntry(name):
-        result = CredsManager._creds.get(name).copy()
-        result["password"] = CredsManager.decryptPasssword(result["password"])
+    @classmethod
+    def getEntry(cls, name):
+        if name not in CredsManager._creds:
+            raise Exception(f"No registred account creds for account {name}")
+        result = cls._creds.get(name).copy()
+        result["password"] = cls.decryptPasssword(result["password"])
         return result
 
     @staticmethod

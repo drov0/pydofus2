@@ -112,7 +112,7 @@ class ServerSelectionFrame(Frame):
                 self._serversList.append(ssumsg.server)
                 self._serversList.sort(key=lambda x: x.date)
             logger.info(f"Server {ssumsg.server.id} status changed to {ServerStatusEnum(ssumsg.server.status).name}.")
-            if self._serverSelectionAction and float(ssumsg.server.id) == float(self._serverSelectionAction.serverId):
+            if float(ssumsg.server.id) == float(self._serverSelectionAction.serverId):
                 if ServerStatusEnum(ssumsg.server.status) != ServerStatusEnum.ONLINE:
                     logger.debug(
                         f"Waiting for my server {ssumsg.server.id} to be online current status {ServerStatusEnum(ssumsg.server.status)}."

@@ -1,5 +1,5 @@
 import base64
-from threading import Timer
+from com.ankamagames.jerakine.benchmark.BenchmarkTimer import BenchmarkTimer
 from time import perf_counter, sleep
 import traceback
 from types import FunctionType
@@ -34,7 +34,7 @@ from com.ankamagames.jerakine.utils.display.EnterFrameDispatcher import (
 from mx.CustomSocket.Socket import Socket
 from com.ankamagames.jerakine.network.NetworkMessage import NetworkMessage
 
-logger = Logger("Dofus2")
+logger = Logger("ServerConnection")
 
 
 class ServerConnection(IServerConnection):
@@ -45,7 +45,7 @@ class ServerConnection(IServerConnection):
 
     DEBUG_LOW_LEVEL_VERBOSE: bool = False
 
-    DEBUG_DATA: bool = False
+    DEBUG_DATA: bool = True
 
     LATENCY_AVG_BUFFER_SIZE: int = 50
 
@@ -168,7 +168,7 @@ class ServerConnection(IServerConnection):
         self._remoteSrvHost = host
         self._remoteSrvPort = port
         self.addListeners()
-        self._timeoutTimer = Timer(interval=7, function=self.onSocketTimeOut)
+        self._timeoutTimer = BenchmarkTimer(interval=7, function=self.onSocketTimeOut)
         self._timeoutTimer.start()
         logger.info(f"[{self._id}] Connecting to {host}:{port}...")
         try:
@@ -533,7 +533,7 @@ class ServerConnection(IServerConnection):
             return
         if self.DEBUG_DATA:
             logger.debug(f"[{self._id}] Connection closed.")
-        Timer(10, self.removeListeners).start()
+        BenchmarkTimer(10, self.removeListeners).start()
         if self._lagometer:
             self._lagometer.stop()
         from com.ankamagames.jerakine.network.ServerConnectionClosedMessage import (

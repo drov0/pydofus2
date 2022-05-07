@@ -16,9 +16,6 @@ from com.ankamagames.jerakine.types.enums.DirectionsEnum import DirectionsEnum
 from com.ankamagames.jerakine.types.enums.Priority import Priority
 from typing import TYPE_CHECKING
 
-if TYPE_CHECKING:
-    from pyd2bot.frames.BotFarmPathFrame import BotFarmPathFrame
-
 logger = Logger("Dofus2")
 
 
@@ -79,11 +76,11 @@ class BotAutoTripFrame(Frame):
         if self.nextStepIndex is not None:
             logger.debug(f"Next step index: {self.nextStepIndex}/{len(self.path)}")
             if self.nextStepIndex == len(self.path):
-                logger.info("Arrived at destination")
+                from pyd2bot.frames.BotFarmPathFrame import BotFarmPathFrame
+
+                logger.info("Arrived at destination will resume FarmingBot")
                 self._worker.removeFrame(self)
-                if self._worker.contains("BotFarmPathFrame"):
-                    bfpf: "BotFarmPathFrame" = Kernel().getWorker().getFrame("BotFarmPathFrame")
-                    bfpf.doFarm()
+                self._worker.addFrame(BotFarmPathFrame(autoStart=True))
                 return True
             e = self.path[self.nextStepIndex]
             self.nextStepIndex += 1

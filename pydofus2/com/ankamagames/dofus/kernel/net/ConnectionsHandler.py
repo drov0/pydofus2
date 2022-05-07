@@ -1,5 +1,5 @@
 from ctypes import ArgumentError
-from threading import Timer
+from com.ankamagames.jerakine.benchmark.BenchmarkTimer import BenchmarkTimer
 import com.ankamagames.dofus.kernel.Kernel as krnl
 from com.ankamagames.dofus.logic.common.utils.LagometerAck import LagometerAck
 from com.ankamagames.dofus.logic.connection.frames.HandshakeFrame import HandshakeFrame
@@ -176,7 +176,7 @@ class ConnectionsHandler:
     def startConnectionTimer(cls) -> None:
         if cls._connectionTimeout:
             cls._connectionTimeout.cancel()
-        cls._connectionTimeout = Timer(4, cls.onConnectionTimeout)
+        cls._connectionTimeout = BenchmarkTimer(4, cls.onConnectionTimeout)
         cls._connectionTimeout.start()
 
     @classmethod

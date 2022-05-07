@@ -1,6 +1,6 @@
 from asyncio.log import logger
 import random
-from threading import Timer
+from com.ankamagames.jerakine.benchmark.BenchmarkTimer import BenchmarkTimer
 from com.ankamagames.atouin.managers.EntitiesManager import EntitiesManager
 from com.ankamagames.atouin.managers.MapDisplayManager import MapDisplayManager
 from com.ankamagames.atouin.messages.MapLoadedMessage import MapLoadedMessage
@@ -113,7 +113,7 @@ from com.ankamagames.dofus.logic.game.roleplay.types.FightTeam import FightTeam
 
 class RoleplayEntitiesFrame(AbstractEntitiesFrame, Frame):
     def __init__(self):
-        self._fights = dict()
+        self._fights = dict[int, Fight]()
 
         self._objects = dict()
 
@@ -141,7 +141,7 @@ class RoleplayEntitiesFrame(AbstractEntitiesFrame, Frame):
 
         self._emoteTimesBySprite = dict()
 
-        self._waitForMap: bool = True
+        self._waitForMap: bool = False
 
         self._monstersIds = list[float]()
 
@@ -149,7 +149,7 @@ class RoleplayEntitiesFrame(AbstractEntitiesFrame, Frame):
 
         self._waitingEmotesAnims = dict()
 
-        self._auraCycleTimer: Timer = None
+        self._auraCycleTimer: BenchmarkTimer = None
 
         self._auraCycleIndex: int = None
 
@@ -163,8 +163,18 @@ class RoleplayEntitiesFrame(AbstractEntitiesFrame, Frame):
 
         super().__init__()
 
+    def pulled(self) -> bool:
+        self._fights.clear()
+        self._objects.clear()
+        self._npcList.clear()
+        self._objectsByCellId.clear()
+        self._paddockItem.clear()
+        self._housesList.clear()
+        logger.debug("RoleplayEntitiesFrame pulled")
+        return super().pulled()
+
     def pushed(self) -> bool:
-        # TODO: implement init new map here
+        logger.debug("RoleplayEntitiesFrame pushed")
         self.initNewMap()
         self._playersId = list()
         self._merchantsList = list()
@@ -178,7 +188,7 @@ class RoleplayEntitiesFrame(AbstractEntitiesFrame, Frame):
             mirmsg = MapInformationsRequestMessage()
             mirmsg.init(mapId_=MapDisplayManager().currentMapPoint.mapId)
             ConnectionsHandler.getConnection().send(mirmsg, connexion)
-
+            self._waitForMap = False
         else:
             self._waitForMap = True
         self._interactiveElements = list[InteractiveElement]()
@@ -194,15 +204,16 @@ class RoleplayEntitiesFrame(AbstractEntitiesFrame, Frame):
     def process(self, msg: Message):
 
         if isinstance(msg, MapLoadedMessage):
-            logger.info(f"Map loaded received but waiting for map = {self._waitForMap}")
-            ccFrame = Kernel().getWorker().getFrame("ContextChangeFrame")
-            connexion = ""
-            if ccFrame:
-                connexion = ccFrame.mapChangeConnexion
-            mirmsg = MapInformationsRequestMessage()
-            mirmsg.init(mapId_=MapDisplayManager().currentMapPoint.mapId)
-            ConnectionsHandler.getConnection().send(mirmsg, connexion)
-            self._waitForMap = False
+            if self._waitForMap:
+                logger.info(f"Map loaded received but waiting for map = {self._waitForMap}")
+                ccFrame = Kernel().getWorker().getFrame("ContextChangeFrame")
+                connexion = ""
+                if ccFrame:
+                    connexion = ccFrame.mapChangeConnexion
+                mirmsg = MapInformationsRequestMessage()
+                mirmsg.init(mapId_=MapDisplayManager().currentMapPoint.mapId)
+                ConnectionsHandler.getConnection().send(mirmsg, connexion)
+                self._waitForMap = False
             return False
 
         if isinstance(msg, MapComplementaryInformationsDataMessage):
@@ -386,12 +397,13 @@ class RoleplayEntitiesFrame(AbstractEntitiesFrame, Frame):
                     )
 
             rpIntFrame: rif.RoleplayInteractivesFrame = Kernel().getWorker().getFrame("RoleplayInteractivesFrame")
-            imumsg = InteractiveMapUpdateMessage()
-            imumsg.init(mcidmsg.interactiveElements)
-            rpIntFrame.process(imumsg)
-            smumsg = StatedMapUpdateMessage()
-            smumsg.init(mcidmsg.statedElements)
-            rpIntFrame.process(smumsg)
+            if rpIntFrame:
+                imumsg = InteractiveMapUpdateMessage()
+                imumsg.init(mcidmsg.interactiveElements)
+                rpIntFrame.process(imumsg)
+                smumsg = StatedMapUpdateMessage()
+                smumsg.init(mcidmsg.statedElements)
+                rpIntFrame.process(smumsg)
 
             if currentMapHasChanged or currentSubAreaHasChanged:
                 # TODO: Here you notify the bot throught BotEventsManager that the map(or subarea) has changed

@@ -1,5 +1,5 @@
 from logging import Logger
-from threading import Timer
+from com.ankamagames.jerakine.benchmark.BenchmarkTimer import BenchmarkTimer
 from time import perf_counter
 from com.DofusClient import DofusClient
 from com.ankamagames.dofus import Constants
@@ -40,7 +40,7 @@ class DisconnectionHandlerFrame(Frame):
 
     _numberOfAttemptsAlreadyDone: int = 0
 
-    _timer: Timer
+    _timer: BenchmarkTimer
 
     _mustShowLoginInterface: bool = False
 
@@ -72,12 +72,13 @@ class DisconnectionHandlerFrame(Frame):
             "connection_fail_times",
             self._connectionUnexpectedFailureTimes,
         )
-        self._timer = Timer(4, self.reconnect)
+        self._timer = BenchmarkTimer(4, self.reconnect)
         self._timer.start()
 
     def process(self, msg: Message) -> bool:
 
         if isinstance(msg, ServerConnectionClosedMessage):
+            logger.debug("Server Connection Closed.")
             sccmsg = msg
             if (
                 connh.ConnectionsHandler.getConnection()
@@ -87,6 +88,7 @@ class DisconnectionHandlerFrame(Frame):
                     or connh.ConnectionsHandler.getConnection().mainConnection.connecting
                 )
             ):
+                logger.debug("The connection was closed before we even receive any message. Will halt.")
                 return False
 
             if sccmsg.closedConnection == connh.ConnectionsHandler.getConnection().getSubConnection(sccmsg):
@@ -101,7 +103,9 @@ class DisconnectionHandlerFrame(Frame):
                     else:
                         reason = connh.ConnectionsHandler.handleDisconnection()
                         if not reason.expected:
-                            DofusClient.restart()
+                            logger.debug(f"Unexpected disconnection reason, will still restart")
+                            krnl.Kernel().reset(reloadData=True, autoRetry=True)
+                            DofusClient().relogin()
                         else:
                             logger.debug(
                                 f"The connection closure was expected (reason: {reason.reason}). Dispatching the message."
@@ -111,6 +115,9 @@ class DisconnectionHandlerFrame(Frame):
                                 or reason.reason == DisconnectionReasonEnum.SWITCHING_TO_HUMAN_VENDOR
                             ):
                                 krnl.Kernel().reset()
+                            elif reason.reason == DisconnectionReasonEnum.RESTARTING:
+                                krnl.Kernel().reset(reloadData=True, autoRetry=True)
+                                DofusClient().relogin()
                             else:
                                 krnl.Kernel().getWorker().process(ExpectedSocketClosureMessage(reason.reason))
                 else:

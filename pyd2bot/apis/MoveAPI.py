@@ -63,17 +63,19 @@ class MoveAPI:
     ) -> list[Transition]:
         result = []
         v = WorldPathFinder().getCurrentPlayerVertex()
+        logger.debug(f"current map {v.mapId}")
         outgoingEdges = WorldPathFinder().worldGraph.getOutgoingEdgesFromVertex(v)
         for e in outgoingEdges:
+            if e.dst.mapId in discard:
+                continue
             for tr in e.transitions:
-                if tr.transitionMapId not in discard:
-                    if noskill and tr.skillId > 0:
-                        continue
-                    if directions and (tr.direction < 0 or DirectionsEnum(tr.direction) not in directions):
-                        continue
-                    if mapIds and tr.transitionMapId not in mapIds:
-                        continue
-                    result.append(tr)
+                if noskill and tr.skillId > 0:
+                    continue
+                if directions and (tr.direction < 0 or DirectionsEnum(tr.direction) not in directions):
+                    continue
+                if mapIds and tr.transitionMapId not in mapIds:
+                    continue
+                result.append(tr)
         return result
 
     @classmethod
@@ -85,14 +87,15 @@ class MoveAPI:
 
     @classmethod
     def changeMapToDstCoords(cls, x: int, y: int, discard: list[int] = []):
-        transitions = cls.getOutGoingTransitions(discard)
-        if len(transitions) == 0:
+        v = WorldPathFinder().getCurrentPlayerVertex()
+        outgoingEdges = WorldPathFinder().worldGraph.getOutgoingEdgesFromVertex(v)
+        if len(outgoingEdges) == 0:
             raise Exception(f"No transition found towards coords '{x, y}'")
-        for tr in transitions:
-            mp = MapPosition.getMapPositionById(tr.transitionMapId)
+        for e in outgoingEdges:
+            mp = MapPosition.getMapPositionById(e.dst.mapId)
             if mp.posX == x and mp.posY == y:
-                cls.sendClickAdjacentMsg(tr.transitionMapId, tr.cell)
-                return tr.transitionMapId
+                cls.sendClickAdjacentMsg(e.transitions[0].transitionMapId, e.transitions[0].cell)
+                return e.transitions[0].transitionMapId
         return -1
 
     @classmethod

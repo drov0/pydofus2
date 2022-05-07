@@ -26,6 +26,7 @@ class FarmAPI(metaclass=Singleton):
         return Kernel().getWorker().getFrame("RoleplayInteractivesFrame")
 
     def collectResource(self, elementId: int = None, skills=[]) -> None:
+        logger.debug(self.rplInteractivesFrame)
         if self.rplInteractivesFrame:
             ce = None
             if elementId is None:

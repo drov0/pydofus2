@@ -51,6 +51,7 @@ class DofusClient(metaclass=Singleton):
         self._serverId = serverId
         self._charachterId = charachterId
         self._accountId = accountId
+        krnl.Kernel().init()
         self._loginToken = Haapi().getLoginToken(self._accountId)
         auth.AuthentificationManager().setToken(self._loginToken)
         self._worker.addFrame(BotGameApproach(self._charachterId))
@@ -68,8 +69,9 @@ class DofusClient(metaclass=Singleton):
         while True:
             try:
                 sleep(0.3)
+                if not self.mainConn:
+                    self.relogin()
             except KeyboardInterrupt:
-                connh.ConnectionsHandler.connectionGonnaBeClosed(DisconnectionReasonEnum.UNEXPECTED)
                 connh.ConnectionsHandler.getConnection().close()
                 sys.exit(0)
 

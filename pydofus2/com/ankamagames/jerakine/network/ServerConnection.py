@@ -45,7 +45,7 @@ class ServerConnection(IServerConnection):
 
     DEBUG_LOW_LEVEL_VERBOSE: bool = False
 
-    DEBUG_DATA: bool = True
+    DEBUG_DATA: bool = False
 
     LATENCY_AVG_BUFFER_SIZE: int = 50
 
@@ -164,6 +164,7 @@ class ServerConnection(IServerConnection):
         if self._connecting or self.disabled or self.disabledIn and self.disabledOut:
             return
         self._connecting = True
+        self._connected = False
         self._firstConnectionTry = True
         self._remoteSrvHost = host
         self._remoteSrvPort = port
@@ -516,6 +517,7 @@ class ServerConnection(IServerConnection):
 
     def onConnect(self, e: Event) -> None:
         self._connecting = False
+        self._connected = False
         self.stopConnectionTimeout()
         if self.DEBUG_DATA:
             logger.debug(f"[{self._id}] Connection opened.")
@@ -531,15 +533,15 @@ class ServerConnection(IServerConnection):
             e.stopImmediatePropagation()
             self._willClose = True
             return
-        if self.DEBUG_DATA:
-            logger.debug(f"[{self._id}] Connection closed.")
-        BenchmarkTimer(10, self.removeListeners).start()
+        logger.debug(f"[{self._id}] Connection closed received from the socket.")
+        BenchmarkTimer(3, self.removeListeners).start()
         if self._lagometer:
             self._lagometer.stop()
         from com.ankamagames.jerakine.network.ServerConnectionClosedMessage import (
             ServerConnectionClosedMessage,
         )
 
+        self._connected = False
         self._handler.process(ServerConnectionClosedMessage(self))
         self._connecting = False
         self._outputBuffer = []

@@ -149,13 +149,9 @@ class AbstractEntitiesFrame(Frame):
 
     def unregisterActor(self, actorId: float) -> None:
         actorId = float(actorId)
-        entity: IEntity = None
-        if self._entities[actorId]:
-            entity = DofusEntities.getEntity(actorId)
-            if entity != None and isinstance(entity, AnimatedCharacter):
-                entity
+        if self._entities.get(actorId):
             self._entitiesTotal -= 1
-        del self._entities[actorId]
+            del self._entities[actorId]
         StatsManager().deleteStats(actorId)
 
     def addOrUpdateActor(self, infos: GameContextActorInformations) -> AnimatedCharacter:

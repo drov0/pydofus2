@@ -143,11 +143,7 @@ class DisconnectionHandlerFrame(Frame):
             return True
 
     def reconnect(self) -> None:
-        self._timer.cancel()
-        if AuthentificationManager().loginValidationAction:
-            krnl.Kernel().getWorker().process(AuthentificationManager().loginValidationAction)
-        else:
-            logger.warn("No login validation action found. Reseting.")
+        DofusClient().relogin()
 
     def pulled(self) -> bool:
         return True

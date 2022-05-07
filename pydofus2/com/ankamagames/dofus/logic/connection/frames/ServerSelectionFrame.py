@@ -164,6 +164,7 @@ class ServerSelectionFrame(Frame):
             )
 
             escmsg = msg
+            logger.debug(f"Expected socket closure reason: {escmsg.reason}.")
             if escmsg.reason != DisconnectionReasonEnum.SWITCHING_TO_GAME_SERVER:
                 self._worker.process(
                     WrongSocketClosureReasonMessage(DisconnectionReasonEnum.SWITCHING_TO_GAME_SERVER, escmsg.reason)

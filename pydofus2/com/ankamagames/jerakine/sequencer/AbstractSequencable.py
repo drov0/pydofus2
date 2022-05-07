@@ -84,9 +84,10 @@ class AbstractSequencable(IPausableSequencable):
             self._timeOut.cancel()
             self._timeOut = None
         self._finished = True
-        for listener in self._stepListeners.copy():
-            if listener:
-                listener.stepFinished(self, self._withTimeOut)
+        if self._stepListeners:
+            for listener in self._stepListeners.copy():
+                if listener:
+                    listener.stepFinished(self, self._withTimeOut)
 
     def removeListener(self, listener: ISequencableListener) -> None:
         if not self._stepListeners:

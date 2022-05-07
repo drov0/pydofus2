@@ -1,3 +1,7 @@
+from com.ankamagames.dofus.kernel.net.ConnectionsHandler import ConnectionsHandler
+from com.ankamagames.dofus.network.messages.game.context.roleplay.MapInformationsRequestMessage import (
+    MapInformationsRequestMessage,
+)
 from com.ankamagames.jerakine.benchmark.BenchmarkTimer import BenchmarkTimer
 from time import sleep
 from com.ankamagames.atouin.managers.MapDisplayManager import MapDisplayManager
@@ -72,6 +76,7 @@ class BotFarmPathFrame(Frame):
         self._wantmapChange = -1
         self._entities = dict()
         self._inAutoTrip = False
+        self._discardedMonstersIds = []
         self._worker = Kernel().getWorker()
 
     @property
@@ -118,6 +123,7 @@ class BotFarmPathFrame(Frame):
         self._followinMonsterGroup = None
         self._lastCellId = None
         self._inAutoTrip = False
+        self._discardedMonstersIds.clear()
         if self.movementFrame:
             self.movementFrame._canMove = True
             self.movementFrame._followingMonsterGroup = None
@@ -154,7 +160,14 @@ class BotFarmPathFrame(Frame):
                 self.doFarm()
             return True
 
-        elif isinstance(msg, (FightRequestFailed, MapChangeFailedMessage, MapMoveFailed)):
+        elif isinstance(msg, FightRequestFailed):
+            logger.debug(f"[BotFarmFrame] Fight request failed, will dicard the {msg.actorId}")
+            self._discardedMonstersIds.append(msg.actorId)
+            mirmsg = MapInformationsRequestMessage()
+            mirmsg.init(mapId_=MapDisplayManager().currentMapPoint.mapId)
+            ConnectionsHandler.getConnection().send(mirmsg)
+
+        elif isinstance(msg, (MapChangeFailedMessage, MapMoveFailed)):
             logger.error(f"Fatal error, restarting bot")
             DofusClient().restart()
 
@@ -180,6 +193,7 @@ class BotFarmPathFrame(Frame):
         elif isinstance(msg, MapComplementaryInformationsDataMessage):
             sleep(0.2)
             logger.debug("-" * 100)
+            self._discardedMonstersIds.clear()
             self.reset()
             if self.currMapCoords not in self.parcours.path:
                 logger.debug(f"[BotFarmFrame] Map {self.currMapCoords} not in path will switch to autotrip")
@@ -210,6 +224,8 @@ class BotFarmPathFrame(Frame):
         availableMonsterFights = []
         currPlayerPos = MapPoint.fromCellId(PlayedCharacterManager().currentCellId)
         for entityId in self.entitiesFrame._monstersIds:
+            if entityId in self._discardedMonstersIds:
+                continue 
             infos: GameRolePlayGroupMonsterInformations = self.entitiesFrame.getEntityInfos(entityId)
             # if infos.staticInfos.mainCreatureLightInfos.level <= int((1 / 2) * PlayedCharacterManager().limitedLevel):
             if len(infos.staticInfos.underlings) <= 3:

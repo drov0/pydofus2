@@ -48,7 +48,7 @@ if __name__ == "__main__":
     botName = "foobar"
     creds = BotCredsManager.getEntry(botName)
     dofus2 = DofusClient()
-    BotFarmPathFrame.parcours = FarmParcours(**pioute_astrub)
+    BotFarmPathFrame.parcours = FarmParcours(**goujon_incarnam)
     dofus2.registerFrame(BotContextFrame())
     dofus2.login(**creds)
     dofus2.join()

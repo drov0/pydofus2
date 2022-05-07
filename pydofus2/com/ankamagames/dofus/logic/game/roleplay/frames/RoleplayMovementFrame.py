@@ -584,7 +584,7 @@ class RoleplayMovementFrame(Frame):
         if self._requestFighFails > 1:
             logger.error(f"Server rejected moster fight request for the {self._requestFighFails} time!")
             self._requestFighFails = 0
-            nopmsg = FightRequestFailed()
+            nopmsg = FightRequestFailed(monsterGroupId)
             Kernel().getWorker().processImmediately(nopmsg)
             return False
         self._followingMonsterGroup = None

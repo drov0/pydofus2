@@ -116,10 +116,7 @@ class RoleplayContextFrame(Frame):
             Kernel().getWorker().addFrame(self._entitiesFrame)
             Kernel().getWorker().addFrame(self._worldFrame)
             Kernel().getWorker().addFrame(self._movementFrame)
-            # Kernel().getWorker().logFrameList()
-            #
-            # Kernel().getWorker().addFrame(self._interactivesFrame)
-            #
+            Kernel().getWorker().addFrame(self._interactivesFrame)
             # Kernel().getWorker().process(self._listMapNpcsMsg)
             self._listMapNpcsMsg = None
             return True

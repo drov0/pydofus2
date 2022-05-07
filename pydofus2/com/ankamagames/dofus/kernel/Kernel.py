@@ -50,7 +50,7 @@ class Kernel(metaclass=Singleton):
         import com.ankamagames.dofus.logic.game.fight.managers.CurrentPlayedFighterManager as cpfm
         from com.ankamagames.dofus.logic.game.fight.managers.SpellModifiersManager import SpellModifiersManager
 
-        logger.debug("Resetting kernel")
+        logger.debug("[KERNEL] Resetting ...")
         # TODO : missing feature manager reset here
         StatsManager.clear()
         SpellModifiersManager.clear()
@@ -78,6 +78,7 @@ class Kernel(metaclass=Singleton):
         )
         from com.ankamagames.dofus.logic.common.frames.QueueFrame import QueueFrame
 
+        logger.debug("[KERNEL] Adding initial frames ...")
         if not self._worker.contains("LatencyFrame"):
             self._worker.addFrame(LatencyFrame())
         self._worker.addFrame(AuthentificationFrame())

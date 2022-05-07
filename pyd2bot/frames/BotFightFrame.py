@@ -153,6 +153,7 @@ class BotFightFrame(Frame, metaclass=Singleton):
         self._waitingSeqEnd = False
         self._turnPlayed = 0
         self._spellw = None
+        self._actionTimeout = None
         return True
 
     @property
@@ -322,6 +323,8 @@ class BotFightFrame(Frame, metaclass=Singleton):
             if len(self._turnAction) > 0:
                 action = self._turnAction.pop(0)
                 action["fct"](*action["args"])
+                self._actionTimeout = BenchmarkTimer(3, action["fct"], action["args"])
+                self._actionTimeout.start()
                 self._waitingSeqEnd = True
             else:
                 self.playTurn()
@@ -376,6 +379,7 @@ class BotFightFrame(Frame, metaclass=Singleton):
                     if not self._seqQueue:
                         if self._waitingSeqEnd:
                             self._waitingSeqEnd = False
+                            self._actionTimeout.cancel()
                             self.nextTurnAction()
             return True
 
@@ -411,7 +415,8 @@ class BotFightFrame(Frame, metaclass=Singleton):
         self._myTurn = False
         self._seqQueue.clear()
         self._turnAction.clear()
-        self.turnFrame.finishTurn()
+        if self.turnFrame:
+            self.turnFrame.finishTurn()
 
     def fakeActivity(self) -> None:
         if not self._enabled:

@@ -510,7 +510,7 @@ class BuffManager(metaclass=Singleton):
             dontDecrementBuffThisTurn = False
             if frame.currentPlayerId == sourceId:
                 dontDecrementBuffThisTurn = True
-            for buffList in self._buffs:
+            for buffList in self._buffs.values():
                 for buff in buffList:
                     if buff.aliveSource == sourceId:
                         if GameDebugManager().buffsDebugActivated:

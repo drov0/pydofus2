@@ -4,13 +4,13 @@ from com.ankamagames.dofus.logic.game.fight.fightEvents.FightEventsHelper import
     FightEventsHelper,
 )
 from typing import TYPE_CHECKING
+from com.ankamagames.dofus.logic.game.fight.frames.FightSpellCastFrame import (
+    FightSpellCastFrame,
+)
 
 if TYPE_CHECKING:
     from com.ankamagames.dofus.logic.game.fight.frames.FightContextFrame import (
         FightContextFrame,
-    )
-    from com.ankamagames.dofus.logic.game.fight.frames.FightSpellCastFrame import (
-        FightSpellCastFrame,
     )
     from com.ankamagames.dofus.types.entities.AnimatedCharacter import AnimatedCharacter
 

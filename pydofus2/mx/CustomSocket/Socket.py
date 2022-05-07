@@ -11,7 +11,7 @@ logger = Logger("Dofus2")
 
 
 class Socket(threading.Thread):
-    MIN_TIME_BETWEEN_SEND = 0.00
+    MIN_TIME_BETWEEN_SEND = 0.0
 
     def __init__(self, host, port):
         self.dispatcher = EventDispatcher()

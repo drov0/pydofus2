@@ -1,8 +1,3 @@
-<<<<<<< Updated upstream
-from asyncio.log import logger
-import random
-=======
-
 from com.ankamagames.dofus.network.messages.game.context.roleplay.npc.ListMapNpcsQuestStatusUpdateMessage import (
     ListMapNpcsQuestStatusUpdateMessage,
 )
@@ -15,7 +10,6 @@ from com.ankamagames.dofus.network.types.game.context.roleplay.GroupMonsterStati
 from com.ankamagames.dofus.network.types.game.context.roleplay.GroupMonsterStaticInformationsWithAlternatives import (
     GroupMonsterStaticInformationsWithAlternatives,
 )
->>>>>>> Stashed changes
 from com.ankamagames.jerakine.benchmark.BenchmarkTimer import BenchmarkTimer
 from com.ankamagames.atouin.managers.EntitiesManager import EntitiesManager
 from com.ankamagames.atouin.managers.MapDisplayManager import MapDisplayManager
@@ -123,6 +117,8 @@ from com.ankamagames.jerakine.messages.Message import Message
 from com.ankamagames.dofus.logic.game.roleplay.types.FightTeam import FightTeam
 
 logger = Logger("Dofus2")
+
+
 class RoleplayEntitiesFrame(AbstractEntitiesFrame, Frame):
     def __init__(self):
         self._fights = dict[int, Fight]()
@@ -228,12 +224,8 @@ class RoleplayEntitiesFrame(AbstractEntitiesFrame, Frame):
                 self._waitForMap = False
             return False
 
-<<<<<<< Updated upstream
-        if isinstance(msg, MapComplementaryInformationsDataMessage):
-=======
         elif isinstance(msg, MapComplementaryInformationsDataMessage):
             logger.debug("Processing MapComplementaryInformationsDataMessage ...")
->>>>>>> Stashed changes
             mcidmsg = msg
             currentMapHasChanged = False
             currentSubAreaHasChanged = False

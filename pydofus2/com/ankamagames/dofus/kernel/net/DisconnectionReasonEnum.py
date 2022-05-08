@@ -16,3 +16,5 @@ class DisconnectionReasonEnum(Enum):
     DISCONNECTED_BY_POPUP: int = 3
 
     NEVER_CONNECTED: int = 4
+
+    WANTED_SHUTDOWN = 7

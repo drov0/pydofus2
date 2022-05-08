@@ -320,7 +320,7 @@ class FightBattleFrame(Frame):
                         and fighter.wave == self._newWaveId
                         and not fenf.FightEntitiesFrame.getCurrentInstance().getEntityInfos(fighter.contextualId)
                     ):
-                        fenf.FightEntitiesFrame.getCurrentInstance().registerActor(fighter)
+                        fenf.FightEntitiesFrame.getCurrentInstance().addOrUpdateActor(fighter)
             if self._executingSequence:
                 self._synchroniseFighters = gftcimsg.fighters
                 self._synchroniseFightersInstanceId = fseqf.FightSequenceFrame.currentInstanceId
@@ -497,8 +497,7 @@ class FightBattleFrame(Frame):
             gfnrmsg = msg
             self._turnsCount = gfnrmsg.roundNumber
             CurrentPlayedFighterManager().getSpellCastManager().currentTurn = self._turnsCount
-            if GameDebugManager().buffsDebugActivated:
-                logger.debug(f"[BUFFS DEBUG] Fight turn {self._turnsCount} started!")
+            logger.debug(f"[BUFFS DEBUG] Fight turn {self._turnsCount} started!")
             bffm.BuffManager().spellBuffsToIgnore = []
             return True
 

@@ -1,7 +1,7 @@
 from typing import TYPE_CHECKING
 from com.ankamagames.atouin.AtouinConstants import AtouinConstants
 from com.ankamagames.jerakine.data.BinaryStream import BinaryStream
-from com.ankamagames.jerakine.types.positions.Point import Point
+from flash.geom.Point import Point
 
 if TYPE_CHECKING:
     from com.ankamagames.atouin.data.map.Map import Map
@@ -76,9 +76,7 @@ class Cell:
         if self.map.version > 5:
             self.moveZone = raw.readUnsignedByte()
 
-        if self.map.version > 10 and (
-            self.hasLinkedZoneRP() or self.hasLinkedZoneFight()
-        ):
+        if self.map.version > 10 and (self.hasLinkedZoneRP() or self.hasLinkedZoneFight()):
             self.linkedZone = raw.readUnsignedByte()
 
         if 7 < self.map.version < 9:
@@ -117,12 +115,7 @@ class Cell:
         return self.mov and not self.farmCell
 
     def hasLinkedZoneFight(self) -> bool:
-        return (
-            self.mov
-            and not self.nonWalkableDuringFight
-            and not self.farmCell
-            and not self.havenbagCell
-        )
+        return self.mov and not self.nonWalkableDuringFight and not self.farmCell and not self.havenbagCell
 
     def linkedZoneFight(self) -> int:
         return self.linkedZone & 15
@@ -147,9 +140,7 @@ class Cell:
     @classmethod
     def cellPixelCoords(cls, cellId: int) -> Point:
         p: Point = cls.getCoords(cellId)
-        p.x = p.x * AtouinConstants.CELL_WIDTH + (
-            AtouinConstants.CELL_HALF_WIDTH if p.y % 2 == 1 else 0
-        )
+        p.x = p.x * AtouinConstants.CELL_WIDTH + (AtouinConstants.CELL_HALF_WIDTH if p.y % 2 == 1 else 0)
         p.y *= AtouinConstants.CELL_HALF_HEIGHT
         return p
 

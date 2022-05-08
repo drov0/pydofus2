@@ -25,9 +25,11 @@ class IServerConnection(EventDispatcher):
     def pauseBuffer(self) -> list:
         raise NotImplementedError()
 
+    @property
     def connected(self) -> bool:
         raise NotImplementedError()
 
+    @property
     def connecting(self) -> bool:
         raise NotImplementedError()
 

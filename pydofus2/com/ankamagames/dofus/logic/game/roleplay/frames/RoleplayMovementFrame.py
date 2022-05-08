@@ -130,7 +130,7 @@ logger = Logger("Dofus2")
 
 class RoleplayMovementFrame(Frame):
     CONSECUTIVE_MOVEMENT_DELAY: int = 0.25
-    VERBOSE = True
+    VERBOSE = False
     CHANGEMAP_TIMEOUT = 5
     ATTACKMOSTERS_TIMEOUT = 20
     _wantToChangeMap: float = -1
@@ -209,7 +209,7 @@ class RoleplayMovementFrame(Frame):
             connh.ConnectionsHandler.getConnection().close()
 
         if isinstance(msg, GameMapNoMovementMessage):
-            logger.debug("Movement impossible")
+            logger.debug("[RolePlayMovement] Server rejected Movement!")
             if self._moveRequetFails > 0:
                 Kernel().getWorker().process(MapMoveFailed())
             self._moveRequetFails += 1
@@ -253,9 +253,10 @@ class RoleplayMovementFrame(Frame):
             # logger.debug(f"[MapMovement] Movement of actor {gmmmsg.actorId}")
             clientMovePath = MapMovementAdapter.getClientMovement(gmmmsg.keyMovements)
             if movedEntity:
-                logger.info(
-                    f"[MapMovement] Entity {movedEntity.id} moved from {movedEntity.position.cellId} to {clientMovePath.end.cellId}"
-                )
+                if self.VERBOSE:
+                    logger.info(
+                        f"[MapMovement] Entity {movedEntity.id} moved from {movedEntity.position.cellId} to {clientMovePath.end.cellId}"
+                    )
                 movedEntity.position.cellId = clientMovePath.end.cellId
                 self.entitiesFrame.updateEntityCellId(gmmmsg.actorId, clientMovePath.end.cellId)
             else:
@@ -277,11 +278,12 @@ class RoleplayMovementFrame(Frame):
         elif isinstance(msg, EntityMovementCompleteMessage):
             emcmsg = msg
             if emcmsg.entity.id == PlayedCharacterManager().id:
-                logger.debug(
-                    f"[RolePlayMovement] Mouvement complete, arrived at {emcmsg.entity.position.cellId}, destination point {self._destinationPoint}"
-                )
-                logger.debug(f"[RolePlayMovement] Wants to atack monsters? {self._followingMonsterGroup}")
-                logger.debug(f"[RolePlayMovement] Wants to changemap monsters? {self._wantToChangeMap}")
+                if self.VERBOSE:
+                    logger.debug(
+                        f"[RolePlayMovement] Mouvement complete, arrived at {emcmsg.entity.position.cellId}, destination point {self._destinationPoint}"
+                    )
+                    logger.debug(f"[RolePlayMovement] Wants to atack monsters? {self._followingMonsterGroup}")
+                    logger.debug(f"[RolePlayMovement] Wants to changemap monsters? {self._wantToChangeMap}")
                 gmmcmsg = GameMapMovementConfirmMessage()
                 ConnectionsHandler.getConnection().send(gmmcmsg)
                 if self._wantToChangeMap and self._wantToChangeMap != -1:
@@ -289,7 +291,7 @@ class RoleplayMovementFrame(Frame):
                     self._isRequestingMovement = False
                     if emcmsg.entity.position.cellId != self._destinationPoint:
                         logger.debug(
-                            f"Wants to change map but didn't reach the map change cell will retry to reach it"
+                            f"[RolePlayMovement] Wants to change map but didn't reach the map change cell will retry to reach it"
                         )
                         self.askMoveTo(MapPoint.fromCellId(self._destinationPoint))
                     else:

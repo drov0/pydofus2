@@ -5,7 +5,7 @@ from com.ankamagames.atouin.enums.ElementTypesEnum import ElementTypesEnum
 from com.ankamagames.jerakine.logger.Logger import Logger
 from com.ankamagames.jerakine.network.CustomDataWrapper import ByteArray
 from com.ankamagames.jerakine.types.ColorMultiplicator import ColorMultiplicator
-from com.ankamagames.jerakine.types.positions.Point import Point
+from flash.geom.Point import Point
 
 logger = Logger("Dofus2")
 

@@ -13,61 +13,56 @@ class LosDetector(ILosDetector):
     def losBetween(
         cls, mapProvider: IDataMapProvider, refPos: MapPoint, targetPos: MapPoint, tested: dict[str, bool] = {}
     ) -> bool:
-        los = False
-        ptKey = f"{targetPos.x}_{targetPos.y}"
-        if ptKey in tested:
-            return tested[ptKey]
+        if targetPos in tested:
+            return tested[targetPos]
         line = MapTools.getCellsCoordBetween(refPos.cellId, targetPos.cellId)
         if len(line) == 0:
             los = True
         else:
-            for j in range(len(line)):
-                ptKey = f"{line[j].x}_{line[j].y}"
+            los = True
+            for j in range(len(line) - 1):
                 if MapPoint.isInMap(line[j].x, line[j].y):
-                    if j > 0 and mapProvider.hasEntity(line[j - 1].x, line[j - 1].y, True):
+                    if j > 0 and mapProvider.hasEntity(line[j - 1].x, line[j - 1].y, False):
                         los = False
-                    elif ptKey not in tested or refPos.inDiag(line[j]):
-                        los = los and mapProvider.pointLos(line[j].x, line[j].y, True)
+                    elif targetPos not in tested:
+                        los = los and mapProvider.pointLos(line[j].x, line[j].y, False)
                     else:
-                        los = los and tested[ptKey]
+                        los = los and tested[targetPos]
                     if not los:
                         break
-        tested[ptKey] = los
+        tested[targetPos] = los
         return los
 
     @classmethod
-    def getCell(cls, mapProvider: IDataMapProvider, spellrange: list[int], refPosition: MapPoint) -> list[int]:
+    def getCell(cls, mapProvider: IDataMapProvider, spellrange: list[int], refPosition: int) -> set[int]:
+        refPosition = MapPoint.fromCellId(refPosition)
         orderedCell: list = list()
         for cellId in spellrange:
             mp = MapPoint.fromCellId(cellId)
             orderedCell.append({"p": mp, "dist": refPosition.distanceToCell(mp)})
         orderedCell.sort(key=lambda x: x["dist"], reverse=True)
-        tested = dict[str, bool]()
-        result: list[int] = list[int]()
+        tested = dict[MapPoint, bool]()
+        result = set[int]()
         for i in range(len(orderedCell)):
             p: MapPoint = orderedCell[i]["p"]
-            if p not in tested or abs(p.x - refPosition.x) == abs(p.y - refPosition.y):
+            if p not in tested:
                 line = MapTools.getCellsCoordBetween(refPosition.cellId, p.cellId)
                 if len(line) == 0:
-                    result.append(p.cellId)
+                    result.add(p.cellId)
                 else:
                     los = True
-                    for j in range(len(line)):
+                    for j in range(len(line) - 1):
                         if MapPoint.isInMap(line[j].x, line[j].y):
-                            if j > 0 and mapProvider.hasEntity(line[j - 1].x, line[j - 1].y, True):
+                            if j > 0 and mapProvider.hasEntity(line[j - 1].x, line[j - 1].y, False):
                                 los = False
-
-                            elif line[j] not in tested or abs(line[j].x - refPosition.x) == abs(
-                                line[j].y - refPosition.y
-                            ):
-                                los = los and mapProvider.pointLos(line[j].x, line[j].y, True)
-
+                            elif line[j] not in tested:
+                                los = los and mapProvider.pointLos(line[j].x, line[j].y, False)
                             else:
                                 los = los and tested[line[j]]
-                    tested[line[j]] = los
+                        if not los:
+                            break
+                    tested[p] = los
         for i in spellrange:
             mp = MapPoint.fromCellId(i)
-            if tested[mp]:
-                result.append(mp.cellId)
-
+            result = {mp.cellId for mp in tested if tested[mp]}
         return result

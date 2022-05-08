@@ -254,6 +254,7 @@ class Worker(EventDispatcher, MessageHandler):
         self._treatmentsQueue.clear()
         self._pausedQueue.clear()
         self._currentFrameTypesCache.clear()
+        self._processingMessage = False
         for frame in nonPulledFrameList:
             self.pushFrame(frame)
         efd.EnterFrameDispatcher().removeWorker()
@@ -293,7 +294,9 @@ class Worker(EventDispatcher, MessageHandler):
                 if self.DEBUG_FRAMES:
                     logger.debug(f"[DEBUG WORKER] << Frame {frame} pulled.")
             else:
-                logger.warn(f"[DEBUG WORKER] Frame {frame} not in worker frames lsit")
+                if self.DEBUG_FRAMES:
+                    logger.warn(f"[DEBUG WORKER] Frame {frame} not in worker frames lsit")
+                pass
             if self.has_listeners(FramePulledEvent.EVENT_FRAME_PULLED):
                 self.dispatch(FramePulledEvent.EVENT_FRAME_PULLED, FramePulledEvent(frame))
         else:

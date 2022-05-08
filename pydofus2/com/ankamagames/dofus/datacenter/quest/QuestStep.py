@@ -1,5 +1,4 @@
 from com.ankamagames.dofus.datacenter.quest.NpcMessage import NpcMessage
-from com.ankamagames.dofus.datacenter.quest.QuestObjective import QuestObjective
 from com.ankamagames.dofus.datacenter.quest.QuestStepRewards import QuestStepRewards
 from com.ankamagames.dofus.logic.game.common.managers.PlayedCharacterManager import PlayedCharacterManager
 from com.ankamagames.dofus.types.IdAccessors import IdAccessors
@@ -7,6 +6,9 @@ from com.ankamagames.jerakine.data.GameData import GameData
 from com.ankamagames.jerakine.data.I18n import I18n
 from com.ankamagames.jerakine.interfaces.IDataCenter import IDataCenter
 from com.ankamagames.jerakine.logger.Logger import Logger
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from com.ankamagames.dofus.datacenter.quest.QuestObjective import QuestObjective
 
 logger = Logger("Dofus2")
 
@@ -41,7 +43,7 @@ class QuestStep(IDataCenter):
 
     _dialog: str = None
 
-    _objectives: list[QuestObjective] = None
+    _objectives: list["QuestObjective"] = None
 
     def __init__(self):
         super().__init__()
@@ -112,10 +114,12 @@ class QuestStep(IDataCenter):
         return self._dialog
 
     @property
-    def objectives(self) -> list[QuestObjective]:
+    def objectives(self) -> list["QuestObjective"]:
+        from com.ankamagames.dofus.datacenter.quest.QuestObjective import QuestObjective
+
         i: int = 0
         if not self._objectives:
-            self._objectives = list[QuestObjective](len(self.objectiveIds), True)
+            self._objectives = list["QuestObjective"](len(self.objectiveIds), True)
             for i in range(len(self.objectiveIds)):
                 self._objectives[i] = QuestObjective.getQuestObjectiveById(self.objectiveIds[i])
         return self._objectives

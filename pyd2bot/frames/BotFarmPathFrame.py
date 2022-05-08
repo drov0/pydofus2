@@ -77,6 +77,8 @@ class BotFarmPathFrame(Frame):
         self._entities = dict()
         self._inAutoTrip = False
         self._discardedMonstersIds = []
+        self._requestMapDataRemediationTried = False
+        self._dicardMobsGroupRemediationTried = False
         self._worker = Kernel().getWorker()
 
     @property
@@ -108,6 +110,8 @@ class BotFarmPathFrame(Frame):
         return None
 
     def pushed(self) -> bool:
+        self._requestMapDataRemediationTried = False
+        self._dicardMobsGroupRemediationTried = False
         if self._autoStart:
             self.doFarm()
         return True
@@ -161,15 +165,28 @@ class BotFarmPathFrame(Frame):
             return True
 
         elif isinstance(msg, FightRequestFailed):
-            logger.debug(f"[BotFarmFrame] Fight request failed, will dicard the {msg.actorId}")
-            self._discardedMonstersIds.append(msg.actorId)
-            mirmsg = MapInformationsRequestMessage()
-            mirmsg.init(mapId_=MapDisplayManager().currentMapPoint.mapId)
-            ConnectionsHandler.getConnection().send(mirmsg)
+            if not self._dicardMobsGroupRemediationTried:
+                self._dicardMobsGroupRemediationTried = True
+                logger.debug(f"[BotFarmFrame] Fight request failed, will dicard the {msg.actorId}")
+                self._discardedMonstersIds.append(msg.actorId)
+                self.doFarm()
+            elif not self._requestMapDataRemediationTried:
+                self._requestMapDataRemediationTried = True
+                mirmsg = MapInformationsRequestMessage()
+                mirmsg.init(mapId_=MapDisplayManager().currentMapPoint.mapId)
+                ConnectionsHandler.getConnection().send(mirmsg)
+            else:
+                DofusClient().restart()
 
         elif isinstance(msg, (MapChangeFailedMessage, MapMoveFailed)):
-            logger.error(f"Fatal error, restarting bot")
-            DofusClient().restart()
+            logger.error(f"Fatal error {msg.__class__.__name__}")
+            if not self._requestMapDataRemediationTried:
+                self._requestMapDataRemediationTried = True
+                mirmsg = MapInformationsRequestMessage()
+                mirmsg.init(mapId_=MapDisplayManager().currentMapPoint.mapId)
+                ConnectionsHandler.getConnection().send(mirmsg)
+            else:
+                DofusClient().restart()
 
         elif isinstance(msg, InteractiveUsedMessage):
             if PlayedCharacterManager().id == msg.entityId and msg.duration > 0:
@@ -193,7 +210,6 @@ class BotFarmPathFrame(Frame):
         elif isinstance(msg, MapComplementaryInformationsDataMessage):
             sleep(0.2)
             logger.debug("-" * 100)
-            self._discardedMonstersIds.clear()
             self.reset()
             if self.currMapCoords not in self.parcours.path:
                 logger.debug(f"[BotFarmFrame] Map {self.currMapCoords} not in path will switch to autotrip")
@@ -225,10 +241,9 @@ class BotFarmPathFrame(Frame):
         currPlayerPos = MapPoint.fromCellId(PlayedCharacterManager().currentCellId)
         for entityId in self.entitiesFrame._monstersIds:
             if entityId in self._discardedMonstersIds:
-                continue 
+                continue
             infos: GameRolePlayGroupMonsterInformations = self.entitiesFrame.getEntityInfos(entityId)
-            # if infos.staticInfos.mainCreatureLightInfos.level <= int((1 / 2) * PlayedCharacterManager().limitedLevel):
-            if len(infos.staticInfos.underlings) <= 3:
+            if len(infos.staticInfos.underlings) <= 2:
                 monsterGroupPos = MapPoint.fromCellId(infos.disposition.cellId)
                 availableMonsterFights.append(
                     {"info": infos, "distance": currPlayerPos.distanceToCell(monsterGroupPos)}

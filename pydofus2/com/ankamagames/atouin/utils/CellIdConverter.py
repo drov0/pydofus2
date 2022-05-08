@@ -1,5 +1,5 @@
 from com.ankamagames.atouin.AtouinConstants import AtouinConstants
-from com.ankamagames.jerakine.types.positions.Point import Point
+from flash.geom.Point import Point
 
 
 class CellIdConverter:

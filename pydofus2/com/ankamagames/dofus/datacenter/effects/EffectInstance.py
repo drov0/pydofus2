@@ -324,7 +324,7 @@ class EffectInstance(IDataCenter):
             logger.error("Zone incorrect (" + self.rawZone + ")")
 
     @property
-    def parameter0():
+    def parameter0(self):
         return None
 
     @property

@@ -62,46 +62,29 @@ class FightSummonStep(AbstractSequencable, IFightStep):
             gfsgmsg = GameFightShowFighterMessage()
             gfsgmsg.init(self._summonInfos)
             Kernel().getWorker().getFrame("FightEntitiesFrame").process(gfsgmsg)
-        if EntitiesManager().entitiesScheduledForDestruction.get(
-            self._summonInfos.contextualId
-        ):
-            del EntitiesManager().entitiesScheduledForDestruction[
-                self._summonInfos.contextualId
-            ]
+        if EntitiesManager().entitiesScheduledForDestruction.get(self._summonInfos.contextualId):
+            del EntitiesManager().entitiesScheduledForDestruction[self._summonInfos.contextualId]
         SpellWrapper.refreshAllPlayerSpellHolder(self._summonerId)
-        fightBattleFrame: "FightBattleFrame" = (
-            Kernel().getWorker().getFrame("FightBattleFrame")
-        )
-        if (
-            fightBattleFrame
-            and self._summonInfos.contextualId not in fightBattleFrame.deadFightersList
-        ):
+        fightBattleFrame: "FightBattleFrame" = Kernel().getWorker().getFrame("FightBattleFrame")
+        if fightBattleFrame and self._summonInfos.contextualId in fightBattleFrame.deadFightersList:
             fightBattleFrame.deadFightersList.remove(self._summonInfos.contextualId)
             buffs = BuffManager().getAllBuff(self._summonInfos.contextualId)
             for buff in buffs:
                 if isinstance(buff, StateBuff):
                     BuffManager().updateBuff(buff)
-        summonStats: EntityStats = StatsManager().getStats(
-            self._summonInfos.contextualId
-        )
+        summonStats: EntityStats = StatsManager().getStats(self._summonInfos.contextualId)
         summonLifePoints: float = summonStats.getHealthPoints()
         if self._summonInfos.contextualId == PlayedCharacterManager().id:
-            fighterInfos: "GameFightFighterInformations" = (
-                FightEntitiesFrame.getCurrentInstance().getEntityInfos(
-                    self._summonInfos.contextualId
-                )
+            fighterInfos: "GameFightFighterInformations" = FightEntitiesFrame.getCurrentInstance().getEntityInfos(
+                self._summonInfos.contextualId
             )
             stats = StatsManager().getStats(fighterInfos.contextualId)
             if not fighterInfos or not stats or not summonStats:
                 super().executeCallbacks()
                 return
-            CurrentPlayedFighterManager().getSpellCastManager().resetInitialCooldown(
-                True
-            )
+            CurrentPlayedFighterManager().getSpellCastManager().resetInitialCooldown(True)
             fighterLifePoints = (
-                float(summonStats.getMaxHealthPoints() / 2)
-                if summonLifePoints == 0
-                else float(summonLifePoints)
+                float(summonStats.getMaxHealthPoints() / 2) if summonLifePoints == 0 else float(summonLifePoints)
             )
             stats.setStat(
                 Stat(
@@ -124,10 +107,7 @@ class FightSummonStep(AbstractSequencable, IFightStep):
             summonStats.setStat(
                 Stat(
                     StatIds.CUR_LIFE,
-                    -(
-                        summonStats.getMaxHealthPoints()
-                        + summonStats.getStatTotalValue(StatIds.CUR_PERMANENT_DAMAGE)
-                    )
+                    -(summonStats.getMaxHealthPoints() + summonStats.getStatTotalValue(StatIds.CUR_PERMANENT_DAMAGE))
                     / 2,
                 )
             )

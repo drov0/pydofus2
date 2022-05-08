@@ -3,7 +3,7 @@ from com.ankamagames.jerakine.logger.Logger import Logger
 from com.ankamagames.jerakine.map.IDataMapProvider import IDataMapProvider
 from com.ankamagames.jerakine.map.ILosDetector import ILosDetector
 from com.ankamagames.jerakine.types.enums.DirectionsEnum import DirectionsEnum
-from com.ankamagames.jerakine.types.positions.Point import Point
+from flash.geom.Point import Point
 
 logger = Logger("Dofus2")
 
@@ -272,6 +272,8 @@ class MapPoint:
         return mp
 
     def __eq__(self, mp: "MapPoint") -> bool:
+        if not isinstance(mp, MapPoint):
+            raise TypeError("mp must be a MapPoint")
         return self._nCellId == mp._nCellId
 
     def __str__(self):

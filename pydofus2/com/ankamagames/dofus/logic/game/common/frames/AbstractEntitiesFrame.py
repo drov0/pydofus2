@@ -163,14 +163,14 @@ class AbstractEntitiesFrame(Frame):
             characterEntity = AnimatedCharacter(infos.contextualId)
             if isinstance(infos, GameFightMonsterInformations):
                 characterEntity.speedAdjust = Monster.getMonsterById(infos.creatureGenericId).speedAdjust
-            EntitiesManager().addAnimatedEntity(int(infos.contextualId), characterEntity)
+            EntitiesManager().addAnimatedEntity(float(infos.contextualId), characterEntity)
         if isinstance(infos, GameRolePlayHumanoidInformations):
             humanoid = infos
-            if infos.contextualId == pcm.PlayedCharacterManager().id:
+            if int(infos.contextualId) == int(pcm.PlayedCharacterManager().id):
                 pcm.PlayedCharacterManager().restrictions = humanoid.humanoidInfo.restrictions
         if infos.disposition.cellId != -1:
             characterEntity.position = MapPoint.fromCellId(infos.disposition.cellId)
-        characterEntity: AnimatedCharacter = DofusEntities.getEntity(infos.contextualId)
+        logger.debug(f"[EntitiesManager] Added or updated entity {infos.contextualId}")
         # logger.debug(f"addOrUpdateActor new actor added {infos.contextualId} position is {characterEntity.position}")
 
         return characterEntity

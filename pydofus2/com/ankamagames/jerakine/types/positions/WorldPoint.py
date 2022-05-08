@@ -1,6 +1,6 @@
 from com.ankamagames.jerakine.interfaces.IDataCenter import IDataCenter
 from com.ankamagames.jerakine.types.DataStoreType import JerakineError
-from com.ankamagames.jerakine.types.positions.Point import Point
+from flash.geom.Point import Point
 
 
 class WorldPoint(IDataCenter):

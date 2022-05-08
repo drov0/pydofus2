@@ -103,9 +103,14 @@ class DisconnectionHandlerFrame(Frame):
                     else:
                         reason = connh.ConnectionsHandler.handleDisconnection()
                         if not reason.expected:
-                            logger.debug(f"Unexpected disconnection reason, will still restart")
-                            krnl.Kernel().reset(reloadData=True, autoRetry=True)
-                            DofusClient().relogin()
+                            logger.debug(f"The connection was closed unexpectedly. Reseting.")
+                            self._connectionUnexpectedFailureTimes.append(perf_counter())
+                            StoreDataManager().setData(
+                                Constants.DATASTORE_MODULE_DEBUG,
+                                "connection_fail_times",
+                                self._connectionUnexpectedFailureTimes,
+                            )
+                            krnl.Kernel().reset()
                         else:
                             logger.debug(
                                 f"The connection closure was expected (reason: {reason.reason}). Dispatching the message."
@@ -116,8 +121,7 @@ class DisconnectionHandlerFrame(Frame):
                             ):
                                 krnl.Kernel().reset()
                             elif reason.reason == DisconnectionReasonEnum.RESTARTING:
-                                krnl.Kernel().reset(reloadData=True, autoRetry=True)
-                                DofusClient().relogin()
+                                self.reconnect()
                             else:
                                 krnl.Kernel().getWorker().process(ExpectedSocketClosureMessage(reason.reason))
                 else:
@@ -129,9 +133,9 @@ class DisconnectionHandlerFrame(Frame):
             gsaF.GameServerApproachFrame.authenticationTicketAccepted = False
             logger.error(
                 "Expecting socket closure for reason "
-                + wscrmsg.expectedReason
+                + str(wscrmsg.expectedReason)
                 + ", got reason "
-                + wscrmsg.gotReason
+                + str(wscrmsg.gotReason)
                 + "! Reseting."
             )
             krnl.Kernel().reset([UnexpectedSocketClosureMessage()])
@@ -143,6 +147,7 @@ class DisconnectionHandlerFrame(Frame):
             return True
 
     def reconnect(self) -> None:
+        krnl.Kernel().reset(reloadData=True, autoRetry=True)
         DofusClient().relogin()
 
     def pulled(self) -> bool:

@@ -108,6 +108,11 @@ patterns = {
     "else$$": r"else:",
     "for each \((.*)\)$$": r"for \1:",
     "Kernel.getWorker\(\).getFrame\((\S+)\)": r"Kernel().getWorker().getFrame('\1')",
+    "(\S+)\.find\((.*)\) != -1": r"\2 in \1",
+    "(\S+)\.find\((.*)\) == -1": r"\2 not in \1",
+    "for \((\S+) = (\S+) (\S+) < (.*) (\S+) += 1\)": r"for \1 in range(\2, \4):",
+    " -> String": " -> str",
+    '" + (\S+) + "': r'" + str(\1) + "',
     # " as [A-Z]+\S+": "",
     # "(\S+) is ([A-Z]+\S+)": r"isinstance(\1, \2)",
     # "(\S+) ? (\S+) : (^[:\s]+)": r"\2 if \1 else \3",
@@ -332,5 +337,5 @@ ROOTDIR = pathlib.Path(os.path.dirname(__file__))
 # )
 
 t = perf_counter()
-parseFile(ROOTDIR / "target.as", ROOTDIR / "NpcMessage.py")
+parseFile(ROOTDIR / "target.as", ROOTDIR / "QuestObjectiveBringItemToNpc.py")
 print("parsing took:", perf_counter() - t)

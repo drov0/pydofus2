@@ -96,6 +96,7 @@ class ServerSelectionFrame(Frame):
             self._serversList = slmsg.servers
             self._serversList.sort(key=lambda x: x.date)
             self.broadcastServersListUpdate()
+            self._worker.process(ServerSelectionAction.create(AuthentificationManager()._lva.serverId))
             return False
 
         elif isinstance(msg, ServerStatusUpdateMessage):

@@ -1,6 +1,12 @@
 import collections
 import math
 import random
+from com.ankamagames.dofus.network.messages.game.context.fight.GameFightTurnResumeMessage import (
+    GameFightTurnResumeMessage,
+)
+from com.ankamagames.dofus.network.messages.game.context.fight.GameFightTurnStartPlayingMessage import (
+    GameFightTurnStartPlayingMessage,
+)
 from com.ankamagames.jerakine.benchmark.BenchmarkTimer import BenchmarkTimer
 from time import sleep
 from types import FunctionType
@@ -84,6 +90,9 @@ from com.ankamagames.jerakine.types.zones.IZone import IZone
 from com.ankamagames.jerakine.types.zones.Lozenge import Lozenge
 from com.ankamagames.jerakine.utils.display.spellZone.SpellShapeEnum import SpellShapeEnum
 from damageCalculation.tools import StatIds
+from mapTools import MapTools
+
+from pyd2bot.frames.BotFightTurnFrame import BotFightTurnFrame
 
 
 if TYPE_CHECKING:
@@ -110,7 +119,7 @@ class _Target:
 
 
 class BotFightFrame(Frame, metaclass=Singleton):
-
+    ACTION_TIMEOUT = 7
     _frameFightListRequest: bool
 
     _fightCount: int = 0
@@ -140,11 +149,11 @@ class BotFightFrame(Frame, metaclass=Singleton):
     def __init__(self):
         self._turnAction = []
         self._spellw = None
+        self._botTurnFrame = BotFightTurnFrame()
         super().__init__()
 
     def pushed(self) -> bool:
         self._enabled = True
-        self.fakeActivity()
         self._myTurn = False
         self._wantcastSpell = None
         self._reachableCells = None
@@ -153,7 +162,8 @@ class BotFightFrame(Frame, metaclass=Singleton):
         self._waitingSeqEnd = False
         self._turnPlayed = 0
         self._spellw = None
-        self._actionTimeout = None
+        self._repeatActionTimeout = None
+        Kernel().getWorker().addFrame(self._botTurnFrame)
         return True
 
     @property
@@ -178,6 +188,7 @@ class BotFightFrame(Frame, metaclass=Singleton):
 
     def pulled(self) -> bool:
         self._enabled = False
+        Kernel().getWorker().removeFrame(self._botTurnFrame)
         return True
 
     @property
@@ -199,6 +210,13 @@ class BotFightFrame(Frame, metaclass=Singleton):
         if not targets:
             logger.debug("[FightAlgo] Not hittable target found")
             return None, None
+        for target in targets:
+            logger.debug(f"[FightAlgo] distance to {target} is {target.pos.distanceToCell(self.fighterPos)}")
+            line = MapTools.getCellsCoordBetween(self.fighterPos.cellId, target.pos.cellId)
+            # logger.debug(f"Line to target {[l.cellId for l in line]}")
+            # logger.debug(f"Los to target {LosDetector.losBetween(DataMapProvider(), self.fighterPos, target.pos)}")
+            if target.pos.distanceTo(self.fighterPos) == 1.0:
+                return target, []
         spellZone = self.getSpellZone(spellw)
         origin = self.fighterPos
         logger.debug(f"[FightAlgo] Searching for path to hit some target, origin = {origin.cellId}")
@@ -208,12 +226,13 @@ class BotFightFrame(Frame, metaclass=Singleton):
             path = queue.popleft()
             currCellId: int = path[-1]
             currSpellZone = spellZone.getCells(currCellId)
-            ldv = set(LosDetector.getCell(DataMapProvider(), currSpellZone, MapPoint.fromCellId(currCellId)))
+            ldv = set(LosDetector.getCell(DataMapProvider(), currSpellZone, currCellId))
             for target in targets:
                 if target.pos.cellId in ldv:
                     logger.debug(f"[FightAlgo] Found path {path} to hit a target {target}")
                     return target, path[1:]
             currReachableCells = set(FightReachableCellsMaker(self.fighterInfos, currCellId, 1).reachableCells)
+            # logger.debug(f"[FightAlgo] Reachable cells for {currCellId} are {currReachableCells}")
             for cellId in currReachableCells:
                 if cellId not in seen:
                     queue.append(path + [cellId])
@@ -322,10 +341,10 @@ class BotFightFrame(Frame, metaclass=Singleton):
             logger.debug(f"[FightBot] Next turn actions, {[a['fct'].__name__ for a in self._turnAction]}")
             if len(self._turnAction) > 0:
                 action = self._turnAction.pop(0)
-                action["fct"](*action["args"])
-                self._actionTimeout = BenchmarkTimer(3, action["fct"], action["args"])
-                self._actionTimeout.start()
                 self._waitingSeqEnd = True
+                action["fct"](*action["args"])
+                self._repeatActionTimeout = BenchmarkTimer(self.ACTION_TIMEOUT, action["fct"], action["args"])
+                self._repeatActionTimeout.start()
             else:
                 self.playTurn()
 
@@ -379,8 +398,9 @@ class BotFightFrame(Frame, metaclass=Singleton):
                     if not self._seqQueue:
                         if self._waitingSeqEnd:
                             self._waitingSeqEnd = False
-                            self._actionTimeout.cancel()
-                            self.nextTurnAction()
+                            self._repeatActionTimeout.cancel()
+                            if self._inFight:
+                                self.nextTurnAction()
             return True
 
         elif isinstance(msg, SequenceStartMessage):
@@ -388,17 +408,15 @@ class BotFightFrame(Frame, metaclass=Singleton):
                 self._seqQueue.append(msg)
             return True
 
-        elif isinstance(msg, GameFightTurnStartMessage):
-            turnStartMsg = msg
-            self._myTurn = int(turnStartMsg.id) == int(PlayedCharacterManager().id)
-            if self._myTurn:
+        elif isinstance(msg, (GameFightTurnStartPlayingMessage, GameFightTurnResumeMessage)):
+            if self._botTurnFrame._myTurn:
                 logger.debug("my turn to play")
                 self._seqQueue.clear()
                 self._myTurn = True
                 self._turnAction.clear()
                 self._turnPlayed += 1
                 self.nextTurnAction()
-
+            return True
         return False
 
     @property
@@ -415,6 +433,8 @@ class BotFightFrame(Frame, metaclass=Singleton):
         self._myTurn = False
         self._seqQueue.clear()
         self._turnAction.clear()
+        if self._repeatActionTimeout:
+            self._repeatActionTimeout.cancel()
         if self.turnFrame:
             self.turnFrame.finishTurn()
 
@@ -452,7 +472,7 @@ class BotFightFrame(Frame, metaclass=Singleton):
         return result
 
     def castSpell(self, spellId: int, cellId: bool) -> None:
-        logger.debug(f"Casting spell {spellId} on cell {cellId}")
+        logger.debug(f"[FightBot] Casting spell {spellId} on cell {cellId}")
         gafcrmsg: GameActionFightCastRequestMessage = GameActionFightCastRequestMessage()
         gafcrmsg.init(spellId, cellId)
         ConnectionsHandler.getConnection().send(gafcrmsg)

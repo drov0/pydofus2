@@ -2,17 +2,17 @@ import importlib
 import sys
 from typing import Any, TYPE_CHECKING
 
+
 if TYPE_CHECKING:
-    from ankamagames.jerakine.data.ModuleReader import ModuleReader
+    from com.ankamagames.jerakine.data.ModuleReader import ModuleReader
+
 from com.ankamagames.jerakine.data.IposInit import IPostInit
 from com.ankamagames.jerakine.data.BinaryStream import BinaryStream
 from com.ankamagames.jerakine.data.GameDataField import GameDataField
 
 
 class GameDataClassDefinition:
-    def __init__(
-        self, packageName: str, className: str, moduleReader: "ModuleReader"
-    ) -> None:
+    def __init__(self, packageName: str, className: str, moduleReader: "ModuleReader") -> None:
         self._fields = list()
         moduleName = packageName + "." + className
         try:

@@ -7,7 +7,7 @@ class IDataMapProvider:
     def height(self) -> int:
         pass
 
-    def pointLos(self, param1: int, param2: int, param3: bool = True) -> bool:
+    def pointLos(self, x: int, y: int, bAllowTroughEntity: bool = True) -> bool:
         pass
 
     def pointMov(

@@ -70,7 +70,7 @@ class GroupItemCriterion(IItemCriterion):
         player: PlayedCharacterManager = PlayedCharacterManager()
         if not player or not player.characteristics:
             return True
-        if self._criteria and len(self._criteria) == 1 and self._criteria[0] is ItemCriterion:
+        if self._criteria and len(self._criteria) == 1 and isinstance(self._criteria[0], ItemCriterion):
             return self._criteria[0]
         if len(self._operators) > 0 and self._operators[0] == "|":
             for criterion in self._criteria:

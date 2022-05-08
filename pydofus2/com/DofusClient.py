@@ -1,5 +1,6 @@
 import sys
-from com.ankamagames.jerakine.benchmark.BenchmarkTimer import BenchmarkTimer
+from com.ankamagames.dofus.logic.common.frames.QuestFrame import QuestFrame
+from com.ankamagames.dofus.logic.common.managers.PlayerManager import PlayerManager
 from time import sleep
 import com.ankamagames.dofus.kernel.Kernel as krnl
 from com.ankamagames.dofus.kernel.net.DisconnectionReasonEnum import DisconnectionReasonEnum
@@ -29,7 +30,6 @@ from com.ankamagames.jerakine.metaclasses.Singleton import Singleton
 if TYPE_CHECKING:
     from com.ankamagames.jerakine.network.ServerConnection import ServerConnection
 from launcher.Launcher import Haapi
-from pyd2bot.frames.BotGameApproachFrame import BotGameApproach
 from com.ankamagames.atouin.utils.DataMapProvider import DataMapProvider
 
 logger = Logger("Dofus2")
@@ -51,14 +51,15 @@ class DofusClient(metaclass=Singleton):
         self._serverId = serverId
         self._charachterId = charachterId
         self._accountId = accountId
-        krnl.Kernel().init()
         self._loginToken = Haapi().getLoginToken(self._accountId)
         auth.AuthentificationManager().setToken(self._loginToken)
-        self._worker.addFrame(BotGameApproach(self._charachterId))
+        PlayerManager().allowAutoConnectCharacter = True
+        PlayerManager().autoConnectOfASpecificCharacterId = charachterId
         self._worker.addFrame(InventoryManagementFrame())
         self._worker.addFrame(SpellInventoryManagementFrame())
         self._worker.addFrame(JobsFrame())
         self._worker.addFrame(MiscFrame())
+        self._worker.addFrame(QuestFrame())
         for frame in self._registredCustomFrames:
             self._worker.addFrame(frame)
         self._worker.processImmediately(
@@ -69,9 +70,8 @@ class DofusClient(metaclass=Singleton):
         while True:
             try:
                 sleep(0.3)
-                if not self.mainConn:
-                    self.relogin()
             except KeyboardInterrupt:
+                connh.ConnectionsHandler.connectionGonnaBeClosed(DisconnectionReasonEnum.WANTED_SHUTDOWN)
                 connh.ConnectionsHandler.getConnection().close()
                 sys.exit(0)
 

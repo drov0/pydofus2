@@ -58,7 +58,6 @@ class Lozenge(IZone):
             if self._minRadius == 0:
                 aCells.append(cellId)
             return aCells
-
         for radiusStep in range(int(self.radius), int(self._minRadius) - 1, -1):
             for i in range(-radiusStep, radiusStep + 1):
                 for j in range(-radiusStep, radiusStep + 1):
@@ -70,5 +69,5 @@ class Lozenge(IZone):
         return aCells
 
     def addCell(self, x: int, y: int, cellMap: list[int]) -> None:
-        if self._dataMapProvider == None or self._dataMapProvider.pointMov(x, y):
+        if self._dataMapProvider is None or self._dataMapProvider.pointMov(x, y):
             cellMap.append(MapTools.getCellIdByCoord(x, y))

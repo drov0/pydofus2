@@ -4,6 +4,7 @@ import json
 import httpx
 from com.ankamagames.jerakine.logger.Logger import Logger
 from com.ankamagames.jerakine.metaclasses.Singleton import Singleton
+import xml.etree.ElementTree as ET
 
 logger = Logger("Dofus2")
 from launcher.CredsManager import CredsManager
@@ -79,12 +80,19 @@ class Haapi(metaclass=Singleton):
                 "certificate_hash": cert["hash"],
             },
             headers={
-                "User-Agent": "Zaap",
+                "User-Agent": "Zaap1",
                 "Content-Type": "multipart/form-data",
                 "APIKEY": self.APIKEY,
             },
         )
-        token = response.json()["token"]
+        try:
+            token = response.json()["token"]
+        except json.decoder.JSONDecodeError as e:
+            root = ET.fromstring(response.content)
+            for child in root.iter("*"):
+                print(child.tag)
+            raise Exception("Unable de retrieve token")
+
         logger.debug("Login Token created")
         return token
 

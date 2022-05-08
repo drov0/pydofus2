@@ -5,8 +5,13 @@ from com.ankamagames.dofus.datacenter.items.criterion.ItemCriterion import ItemC
 from com.ankamagames.dofus.datacenter.items.criterion.ItemCriterionOperator import (
     ItemCriterionOperator,
 )
+from com.ankamagames.dofus.datacenter.quest.QuestObjective import QuestObjective
 from com.ankamagames.dofus.kernel.Kernel import Kernel
 from com.ankamagames.jerakine.interfaces.IDataCenter import IDataCenter
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from com.ankamagames.dofus.logic.common.frames.QuestFrame import QuestFrame
 
 
 class QuestObjectiveItemCriterion(ItemCriterion, IDataCenter):
@@ -32,13 +37,13 @@ class QuestObjectiveItemCriterion(ItemCriterion, IDataCenter):
         s: str = self._serverCriterionForm[0:2]
         if s == "Qo":
             if self._operator.text == ItemCriterionOperator.EQUAL:
-                return activeObjs.find(self._objId) != -1
+                return self._objId in activeObjs
             if self._operator.text == ItemCriterionOperator.DIFFERENT:
-                return activeObjs.find(self._objId) == -1
+                return self._objId in activeObjs
             if self._operator.text == ItemCriterionOperator.INFERIOR:
-                return completedObjs.find(self._objId) == -1
+                return self._objId in completedObjs
             if self._operator.text == ItemCriterionOperator.SUPERIOR:
-                return completedObjs.find(self._objId) != -1
+                return self._objId in completedObjs
         return False
 
     def clone(self) -> IItemCriterion:

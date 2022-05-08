@@ -43,7 +43,7 @@ from com.ankamagames.dofus.network.ProtocolConstantsEnum import ProtocolConstant
 from com.ankamagames.jerakine.interfaces.IDestroyable import IDestroyable
 from com.ankamagames.jerakine.metaclasses.Singleton import Singleton
 from com.ankamagames.jerakine.types.Callback import Callback
-from com.ankamagames.jerakine.types.positions.Point import Point
+from flash.geom.Point import Point
 from damageCalculation.tools import StatIds
 
 logger = Logger("Dofus2")

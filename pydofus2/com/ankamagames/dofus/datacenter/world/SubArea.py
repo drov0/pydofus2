@@ -6,7 +6,7 @@ from com.ankamagames.jerakine.data.GameData import GameData
 from com.ankamagames.jerakine.data.I18n import I18n
 from com.ankamagames.jerakine.data.IposInit import IPostInit
 from com.ankamagames.jerakine.interfaces.IDataCenter import IDataCenter
-from com.ankamagames.jerakine.types.positions.Point import Point
+from flash.geom.Point import Point
 from flash.geom.Rectangle import Rectangle
 
 

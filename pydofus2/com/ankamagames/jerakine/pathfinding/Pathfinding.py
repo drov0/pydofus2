@@ -11,7 +11,7 @@ logger = Logger("Dofus2")
 
 
 class Pathfinding:
-
+    VERBOSE = False
     HV_COST: int = 10
 
     DIAG_COST: int = 15
@@ -304,7 +304,8 @@ class Pathfinding:
             )
             cursor = cls._parentOfCell[cursor]
         movPath.path.reverse()
-        logger.debug(f"[CellPathFinding] Path found: {movPath}")
+        if cls.VERBOSE:
+            logger.debug(f"[CellPathFinding] Path found: {movPath}")
         return movPath
 
     @classmethod

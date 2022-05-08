@@ -44,11 +44,18 @@ goujon_incarnam = {
     "fightOnly": True,
 }
 
+pioute_amakna = {
+    "startMapId": 88212244,
+    "path": [(0, 3), (1, 3), (2, 3), (3, 3), (3, 2), (2, 2), (1, 2), (0, 2)],
+    "skills": [FISHING_SKILL_ID],
+    "fightOnly": True,
+}
+
 if __name__ == "__main__":
     botName = "foobar"
     creds = BotCredsManager.getEntry(botName)
     dofus2 = DofusClient()
-    BotFarmPathFrame.parcours = FarmParcours(**goujon_incarnam)
+    BotFarmPathFrame.parcours = FarmParcours(**pioute_amakna)
     dofus2.registerFrame(BotContextFrame())
     dofus2.login(**creds)
     dofus2.join()

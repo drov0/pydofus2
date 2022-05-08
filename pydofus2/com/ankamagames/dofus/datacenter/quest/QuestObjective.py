@@ -1,12 +1,15 @@
 from com.ankamagames.dofus.datacenter.quest.NpcMessage import NpcMessage
 from com.ankamagames.dofus.datacenter.quest.QuestObjectiveType import QuestObjectiveType
-from com.ankamagames.dofus.datacenter.quest.QuestStep import QuestStep
 from com.ankamagames.dofus.datacenter.quest.objectives.QuestObjectiveParameters import QuestObjectiveParameters
 from com.ankamagames.dofus.types.IdAccessors import IdAccessors
 from com.ankamagames.jerakine.data.GameData import GameData
 from com.ankamagames.jerakine.interfaces.IDataCenter import IDataCenter
 from com.ankamagames.jerakine.logger.Logger import Logger
-from com.ankamagames.jerakine.types.positions.Point import Point
+from flash.geom.Point import Point
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from com.ankamagames.dofus.datacenter.quest.QuestStep import QuestStep
 
 logger = Logger("Dofus2")
 
@@ -29,7 +32,7 @@ class QuestObjective(IDataCenter):
 
     mapId: float
 
-    _step: QuestStep = None
+    _step: "QuestStep" = None
 
     _type: QuestObjectiveType = None
 
@@ -49,7 +52,9 @@ class QuestObjective(IDataCenter):
         return GameData.getObjects(cls.MODULE)
 
     @property
-    def step(self) -> QuestStep:
+    def step(self) -> "QuestStep":
+        from com.ankamagames.dofus.datacenter.quest.QuestStep import QuestStep
+
         if not self._step:
             self._step = QuestStep.getQuestStepById(self.stepId)
         return self._step

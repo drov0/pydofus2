@@ -1,4 +1,5 @@
 from types import FunctionType
+from com.ankamagames.atouin.managers.EntitiesManager import EntitiesManager
 from com.ankamagames.dofus import Constants
 from com.ankamagames.dofus.modules.utils.pathFinding.astar.AStar import AStar
 from com.ankamagames.dofus.modules.utils.pathFinding.world.Edge import Edge

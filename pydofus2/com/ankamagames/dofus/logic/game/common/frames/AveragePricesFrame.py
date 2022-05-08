@@ -30,11 +30,11 @@ logger = Logger("Dofus2")
 
 class AveragePricesFrame(Frame):
 
-    _dataStoreType: DataStoreType
+    _dataStoreType: DataStoreType = None
 
-    _serverName: str
+    _serverName: str = ""
 
-    _pricesData: object
+    _pricesData: object = None
 
     def __init__(self):
         super().__init__()

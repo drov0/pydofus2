@@ -39,7 +39,7 @@ class ContextChangeFrame(Frame):
         if isinstance(msg, GameContextCreateMessage):
             self.currentContext = msg.context
             if self.currentContext == GameContextEnum.ROLE_PLAY:
-                logger.debug("Roleplay context started")
+                # logger.debug("Roleplay context started")
                 import com.ankamagames.dofus.logic.game.roleplay.frames.RoleplayContextFrame as rplCF
 
                 Kernel().getWorker().addFrame(rplCF.RoleplayContextFrame())

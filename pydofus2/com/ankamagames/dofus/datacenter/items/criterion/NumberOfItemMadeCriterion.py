@@ -1,15 +1,18 @@
-      
-class floatOfItemMadeCriterion(ItemCriterion, IDataCenter):
-      
-   
-   function floatOfItemMadeCriterion(pCriterion:str)
-      super().__init__(pCriterion)
-   
-   @property
-   def text(self) -> str:
-      readableCriterionValue:str = _criterionValueText
-      itemsMadeCount:int = parseInt(readableCriterionValue.split(",")[1]) + 1
-      return I18n.getUiText("ui.smithmagic.itemsMadeCount",[itemsMadeCount])
-   
-   def clone(self) -> IItemCriterion:
-      return floatOfItemMadeCriterion(self.basicText)
+from com.ankamagames.dofus.datacenter.items.criterion.IItemCriterion import IItemCriterion
+from com.ankamagames.dofus.datacenter.items.criterion.ItemCriterion import ItemCriterion
+from com.ankamagames.jerakine.data.I18n import I18n
+from com.ankamagames.jerakine.interfaces.IDataCenter import IDataCenter
+
+
+class NumberOfItemMadeCriterion(ItemCriterion, IDataCenter):
+    def __init__(pCriterion: str):
+        super().__init__(pCriterion)
+
+    @property
+    def text(self) -> str:
+        readableCriterionValue: str = self._criterionValueText
+        itemsMadeCount: int = int(readableCriterionValue.split(",")[1]) + 1
+        return I18n.getUiText("ui.smithmagic.itemsMadeCount", [itemsMadeCount])
+
+    def clone(self) -> IItemCriterion:
+        return NumberOfItemMadeCriterion(self.basicText)

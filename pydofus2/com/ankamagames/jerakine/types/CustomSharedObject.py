@@ -19,7 +19,7 @@ class CustomSharedObject:
     directory = "Dofus"
     useDefaultDirectory = False
     clearedCacheAndRebooting = False
-    throwException = True
+    throwException = False
     _cache = dict[str, "CustomSharedObject"]()
     data = None
 
@@ -103,7 +103,7 @@ class CustomSharedObject:
             except Exception as e:
                 if self._fileStream:
                     self._fileStream.close()
-                logger.error("Impossible d'ouvrir le fichier " + self._file)
+                logger.error(str(e))
                 if self.throwException:
                     raise CustomSharedObjectFileFormatError("Malformated file : " + self._file)
         if not self.data:

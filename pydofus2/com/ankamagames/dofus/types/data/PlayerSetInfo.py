@@ -27,6 +27,6 @@ class PlayerSetInfo:
         self.setId = id
         self.setObjects = items
         nEffect: int = len(effects)
-        self.setEffects = list[EffectInstance](nEffect)
+        self.setEffects = list[EffectInstance]([None] * nEffect)
         for i in range(nEffect):
             self.setEffects[i] = ObjectEffectAdapter.fromNetwork(effects[i])

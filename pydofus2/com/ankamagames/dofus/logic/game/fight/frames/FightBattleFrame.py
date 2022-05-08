@@ -368,7 +368,7 @@ class FightBattleFrame(Frame):
             self._currentPlayerId = gftsmsg.id
             if not self._lastPlayerId:
                 self._lastPlayerId = self._currentPlayerId
-            logger.info("*" * 50 + f"   Start turn for entityId {self._currentPlayerId}    " + "*" * 50)
+            # logger.info("*" * 50 + f"   Start turn for entityId {self._currentPlayerId}    " + "*" * 50)
             if self._currentPlayerId == playerId:
                 self._slaveId = 0
             self._playingSlaveEntity = gftsmsg.id == self._slaveId
@@ -704,7 +704,7 @@ class FightBattleFrame(Frame):
         if self._sequenceFrameCached == None:
             return
         ack: GameActionAcknowledgementMessage = GameActionAcknowledgementMessage()
-        logger.debug(f"Sending acknowledgement for sequence #{self._sequenceFrameCached._instanceId}")
+        # logger.debug(f"Sending acknowledgement for sequence #{self._sequenceFrameCached._instanceId}")
         ack.init(True, self._sequenceFrameCached.ackIdent)
         self._sequenceFrameCached = None
         try:
@@ -792,7 +792,7 @@ class FightBattleFrame(Frame):
         turnEnd: GameFightTurnReadyMessage = GameFightTurnReadyMessage()
         turnEnd.init(True)
         ConnectionsHandler.getConnection().send(turnEnd)
-        logger.debug("Turn end confirmed.")
+        # logger.debug("Turn end confirmed.")
 
     def endBattle(self, fightEnd: GameFightEndMessage) -> None:
         self._holder: FightEntitiesHolder = FightEntitiesHolder()

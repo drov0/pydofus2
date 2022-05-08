@@ -1,7 +1,27 @@
+from com.ankamagames.dofus.datacenter.items.criterion.AchievementItemCriterion import AchievementItemCriterion
+from com.ankamagames.dofus.datacenter.items.criterion.AchievementPointsItemCriterion import (
+    AchievementPointsItemCriterion,
+)
+from com.ankamagames.dofus.datacenter.items.criterion.ArenaDuelRankCriterion import ArenaDuelRankCriterion
+from com.ankamagames.dofus.datacenter.items.criterion.ArenaMaxTeamRankCriterion import ArenaMaxTeamRankCriterion
+from com.ankamagames.dofus.datacenter.items.criterion.ArenaTeamRankCriterion import ArenaTeamRankCriterion
+from com.ankamagames.dofus.datacenter.items.criterion.BonesItemCriterion import BonesItemCriterion
+from com.ankamagames.dofus.datacenter.items.criterion.BonusSetItemCriterion import BonusSetItemCriterion
 from com.ankamagames.dofus.datacenter.items.criterion.ItemCriterion import ItemCriterion
+from com.ankamagames.dofus.datacenter.items.criterion.MapCharactersItemCriterion import MapCharactersItemCriterion
+from com.ankamagames.dofus.datacenter.items.criterion.MonsterGroupChallengeCriterion import (
+    MonsterGroupChallengeCriterion,
+)
+from com.ankamagames.dofus.datacenter.items.criterion.NumberOfItemMadeCriterion import NumberOfItemMadeCriterion
+from com.ankamagames.dofus.datacenter.items.criterion.NumberOfMountBirthedCriterion import (
+    NumberOfMountBirthedCriterion,
+)
+from com.ankamagames.dofus.datacenter.items.criterion.QuestItemCriterion import QuestItemCriterion
 from com.ankamagames.dofus.datacenter.items.criterion.QuestObjectiveItemCriterion import (
     QuestObjectiveItemCriterion,
 )
+from com.ankamagames.dofus.datacenter.items.criterion.RuneByBreakingItemCriterion import RuneByBreakingItemCriterion
+from com.ankamagames.dofus.datacenter.items.criterion.SpellItemCriterion import SpellItemCriterion
 from com.ankamagames.dofus.datacenter.items.criterion.SubscribeItemCriterion import (
     SubscribeItemCriterion,
 )
@@ -59,10 +79,10 @@ class ItemCriterionFactory:
             criterion = MonsterGroupChallengeCriterion(pServerCriterionForm)
 
         elif s == "EB":
-            criterion = floatOfMountBirthedCriterion(pServerCriterionForm)
+            criterion = NumberOfMountBirthedCriterion(pServerCriterionForm)
 
         elif s == "Ec":
-            criterion = floatOfItemMadeCriterion(pServerCriterionForm)
+            criterion = NumberOfItemMadeCriterion(pServerCriterionForm)
 
         elif s == "Eu":
             criterion = RuneByBreakingItemCriterion(pServerCriterionForm)

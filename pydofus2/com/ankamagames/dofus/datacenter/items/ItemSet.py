@@ -19,7 +19,7 @@ class ItemSet(IDataCenter):
 
     bonusIsSecret: bool
 
-    _name: str
+    _name: str = None
 
     def __init__(self):
         super().__init__()

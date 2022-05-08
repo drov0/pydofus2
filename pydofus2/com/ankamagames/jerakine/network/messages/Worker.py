@@ -387,3 +387,6 @@ class Worker(EventDispatcher, MessageHandler):
 
     def clearUnstoppableMsgClassList(self) -> None:
         self._unstoppableMsgClassList.clear()
+
+    def removeFrameByName(self, frameName: str) -> None:
+        self.removeFrame(self.getFrame(frameName))

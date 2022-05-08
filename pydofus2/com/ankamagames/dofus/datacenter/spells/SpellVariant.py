@@ -1,7 +1,10 @@
 from com.ankamagames.jerakine.data.GameData import GameData
 from com.ankamagames.jerakine.interfaces.IDataCenter import IDataCenter
 from com.ankamagames.jerakine.logger.Logger import Logger
+from typing import TYPE_CHECKING
 
+if TYPE_CHECKING:
+    from com.ankamagames.dofus.datacenter.spells.Spell import Spell
 logger = Logger("Dofus2")
 
 
@@ -28,7 +31,7 @@ class SpellVariant(IDataCenter):
         return GameData.getObjects(cls.MODULE)
 
     @property
-    def spells(self) -> list:
+    def spells(self) -> list["Spell"]:
         from com.ankamagames.dofus.datacenter.spells.Spell import Spell
 
         if not self._spells:

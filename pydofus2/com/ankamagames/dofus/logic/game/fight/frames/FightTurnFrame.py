@@ -213,7 +213,8 @@ class FightTurnFrame(Frame):
         if self._myTurn and not scf:
             self.drawPath()
         else:
-            logger.debug(f"FightTurnFrame: my turn {self._myTurn}, inside spell cast frame {scf}")
+            # logger.debug(f"FightTurnFrame: my turn {self._myTurn}, inside spell cast frame {scf}")
+            pass
 
     @property
     def turnDuration(self) -> int:
@@ -426,7 +427,7 @@ class FightTurnFrame(Frame):
             logger.debug("Path is empty because of obstacles or too long for the available move points")
             path = Pathfinding.findPath(
                 DataMapProvider(),
-                self._playerEntity.position,
+                self.playerEntity.position,
                 destCell,
                 False,
                 False,
@@ -454,7 +455,7 @@ class FightTurnFrame(Frame):
         apLost = 0
         lastPe: PathElement = None
         entitiesFrame: "FightEntitiesFrame" = Kernel().getWorker().getFrame("FightEntitiesFrame")
-        playerInfos: GameFightFighterInformations = entitiesFrame.getEntityInfos(self._playerEntity.id)
+        playerInfos: GameFightFighterInformations = entitiesFrame.getEntityInfos(self.playerEntity.id)
         for pe in path.path:
             if isFirst:
                 isFirst = False
@@ -522,7 +523,7 @@ class FightTurnFrame(Frame):
             logger.warn("Already requesting movement")
             return False
         self._isRequestingMovement = True
-        if not self._playerEntity:
+        if not self.playerEntity:
             logger.warn("The player tried to move before its character was added to the scene. Aborting.")
             self._isRequestingMovement = False
             return False
@@ -551,7 +552,7 @@ class FightTurnFrame(Frame):
             gmmrmsg = GameMapMovementRequestMessage()
             keyMovements = MapMovementAdapter.getServerMovement(path)
             currMapId = PlayedCharacterManager().currentMap.mapId
-            logger.debug(f"Sendings {keyMovements} to server, current map {currMapId}")
+            # logger.debug(f"Sendings {keyMovements} to server, current map {currMapId}")
             gmmrmsg.init(keyMovements, currMapId)
             ConnectionsHandler.getConnection().send(gmmrmsg)
         else:

@@ -55,11 +55,6 @@ class DofusClient(metaclass=Singleton):
         auth.AuthentificationManager().setToken(self._loginToken)
         PlayerManager().allowAutoConnectCharacter = True
         PlayerManager().autoConnectOfASpecificCharacterId = charachterId
-        self._worker.addFrame(InventoryManagementFrame())
-        self._worker.addFrame(SpellInventoryManagementFrame())
-        self._worker.addFrame(JobsFrame())
-        self._worker.addFrame(MiscFrame())
-        self._worker.addFrame(QuestFrame())
         for frame in self._registredCustomFrames:
             self._worker.addFrame(frame)
         self._worker.processImmediately(
@@ -70,6 +65,8 @@ class DofusClient(metaclass=Singleton):
         while True:
             try:
                 sleep(0.3)
+                if not self.mainConn:
+                    sys.exit(0)
             except KeyboardInterrupt:
                 connh.ConnectionsHandler.connectionGonnaBeClosed(DisconnectionReasonEnum.WANTED_SHUTDOWN)
                 connh.ConnectionsHandler.getConnection().close()

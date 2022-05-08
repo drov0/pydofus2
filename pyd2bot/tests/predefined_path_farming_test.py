@@ -1,6 +1,7 @@
 from unittest import skip
 from com.DofusClient import DofusClient
-from pyd2bot.frames.BotContextFrame import BotContextFrame
+from pyd2bot.frames.BotPhenixAutoRevive import BotPhenixAutoRevive
+from pyd2bot.frames.BotWorkflowFrame import BotWorkflowFrame
 from pyd2bot.frames.BotFarmPathFrame import BotFarmPathFrame
 from com.ankamagames.jerakine.logger.Logger import Logger
 from pyd2bot.managers.BotCredsManager import BotCredsManager
@@ -10,6 +11,7 @@ logger = Logger("Dofus2")
 
 # Goujon path incarnam
 FISHING_SKILL_ID = 124
+ANKARNAM_PHENIX_MAPID = 153879809.0
 
 bouftou_incarnam = {
     "startMapId": 153879300,
@@ -17,6 +19,7 @@ bouftou_incarnam = {
     "fightOnly": True,
     "skills": [FISHING_SKILL_ID],
 }
+
 pioute_astrub = {
     "startMapId": 191104002,
     "path": [(4, -18), (4, -19), (3, -19), (3, -18), (3, -17), (4, -17), (5, -17), (5, -18)],
@@ -55,7 +58,8 @@ if __name__ == "__main__":
     botName = "foobar"
     creds = BotCredsManager.getEntry(botName)
     dofus2 = DofusClient()
-    BotFarmPathFrame.parcours = FarmParcours(**pioute_amakna)
-    dofus2.registerFrame(BotContextFrame())
+    BotFarmPathFrame.parcours = FarmParcours(**goujon_incarnam)
+    BotPhenixAutoRevive.PHENIX_MAPID = ANKARNAM_PHENIX_MAPID
+    dofus2.registerFrame(BotWorkflowFrame())
     dofus2.login(**creds)
     dofus2.join()

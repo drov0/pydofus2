@@ -22,6 +22,7 @@ from com.ankamagames.dofus.logic.game.fight.managers.SpellModifiersManager impor
     SpellModifiersManager,
 )
 import com.ankamagames.dofus.logic.game.roleplay.frames.RoleplayContextFrame as rplCF
+from com.ankamagames.dofus.network.enums.AggressableStatusEnum import AggressableStatusEnum
 from com.ankamagames.dofus.network.enums.CompassTypeEnum import CompassTypeEnum
 from com.ankamagames.dofus.network.enums.PlayerLifeStatusEnum import (
     PlayerLifeStatusEnum,
@@ -207,8 +208,8 @@ class PlayedCharacterUpdatesFrame(Frame):
                 playerInfos = self.roleplayContextFrame.entitiesFrame.getEntityInfos(pcm.PlayedCharacterManager().id)
                 if playerInfos:
                     playerInfos.alignmentInfos = cslmsg.stats.alignmentInfos
-            # if krnl.Kernel().getWorker().getFrame("QuestFrame").achievmentsListProcessed == False:
-            #     krnl.Kernel().getWorker().getFrame("QuestFrame")
+            if krnl.Kernel().getWorker().getFrame("QuestFrame").achievmentsListProcessed == False:
+                krnl.Kernel().getWorker().getFrame("QuestFrame")
             return True
 
         if isinstance(msg, MapComplementaryInformationsDataMessage):
@@ -220,12 +221,17 @@ class PlayedCharacterUpdatesFrame(Frame):
                     for opt in grpci.humanoidInfo.options:
                         if isinstance(opt, HumanOptionAlliance):
                             pcm.PlayedCharacterManager().characteristics.alignmentInfos.aggressable = opt.aggressable
-            # TODO : When party mnagement is implemented, uncomment this
-            # if not (pcm.PlayedCharacterManager().characteristics.alignmentInfos.aggressable == AggressableStatusEnum.AvA_DISQUALIFIED or\
-            #     pcm.PlayedCharacterManager().characteristics.alignmentInfos.aggressable == AggressableStatusEnum.AvA_ENABLED_AGGRESSABLE or\
-            #         pcm.PlayedCharacterManager().characteristics.alignmentInfos.aggressable == AggressableStatusEnum.AvA_ENABLED_NON_AGGRESSABLE or\
-            #             pcm.PlayedCharacterManager().characteristics.alignmentInfos.aggressable == AggressableStatusEnum.AvA_PREQUALIFIED_AGGRESSABLE):
-            #    return False
+            if not (
+                pcm.PlayedCharacterManager().characteristics.alignmentInfos.aggressable
+                == AggressableStatusEnum.AvA_DISQUALIFIED
+                or pcm.PlayedCharacterManager().characteristics.alignmentInfos.aggressable
+                == AggressableStatusEnum.AvA_ENABLED_AGGRESSABLE
+                or pcm.PlayedCharacterManager().characteristics.alignmentInfos.aggressable
+                == AggressableStatusEnum.AvA_ENABLED_NON_AGGRESSABLE
+                or pcm.PlayedCharacterManager().characteristics.alignmentInfos.aggressable
+                == AggressableStatusEnum.AvA_PREQUALIFIED_AGGRESSABLE
+            ):
+                return False
 
             newSubArea = SubArea.getSubAreaByMapId(mcidmsg.mapId)
 

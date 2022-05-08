@@ -185,36 +185,17 @@ class FightTurnFrame(Frame):
 
     @myTurn.setter
     def myTurn(self, b: bool) -> None:
-        refreshTarget = b != self._myTurn
-        monsterEndTurn = not self._myTurn
         self._finishingTurn = False
         self._currentFighterId = CurrentPlayedFighterManager().currentFighterId
         self._playerEntity = DofusEntities.getEntity(self._currentFighterId)
         self._turnFinishingNoNeedToRedrawMovement = False
         self._myTurn = b
         if b:
-            self.drawMovementArea()
+            pass
         else:
             self._isRequestingMovement = False
             if self._remindTurnTimeoutId is not None:
                 self._remindTurnTimeoutId.cancel()
-            self.removePath()
-            self.removeMovementArea()
-        fcf: "FightContextFrame" = Kernel().getWorker().getFrame("FightContextFrame")
-        if fcf:
-            fcf.refreshTimelineOverEntityInfos()
-        scf: "FightSpellCastFrame" = Kernel().getWorker().getFrame("FightSpellCastFrame")
-        if scf:
-            if monsterEndTurn:
-                scf.drawRange()
-            if refreshTarget:
-                if scf:
-                    scf.refreshTarget(True)
-        if self._myTurn and not scf:
-            self.drawPath()
-        else:
-            # logger.debug(f"FightTurnFrame: my turn {self._myTurn}, inside spell cast frame {scf}")
-            pass
 
     @property
     def turnDuration(self) -> int:
@@ -278,15 +259,10 @@ class FightTurnFrame(Frame):
 
         elif isinstance(msg, EntityMovementCompleteMessage):
             emcmsg = msg
-            fcf: "FightContextFrame" = Kernel().getWorker().getFrame("FightContextFrame")
-            fcf.refreshTimelineOverEntityInfos()
             if not self.myTurn:
                 return True
-            if emcmsg.entity.id == self._currentFighterId:
+            if float(emcmsg.entity.id) == float(self._currentFighterId):
                 self._isRequestingMovement = False
-                spellCastFrame: "FightSpellCastFrame" = Kernel().getWorker().getFrame("FightSpellCastFrame")
-                if not spellCastFrame:
-                    self.drawPath()
                 if self._finishingTurn:
                     self.finishTurn()
             return True
@@ -552,7 +528,6 @@ class FightTurnFrame(Frame):
             gmmrmsg = GameMapMovementRequestMessage()
             keyMovements = MapMovementAdapter.getServerMovement(path)
             currMapId = PlayedCharacterManager().currentMap.mapId
-            # logger.debug(f"Sendings {keyMovements} to server, current map {currMapId}")
             gmmrmsg.init(keyMovements, currMapId)
             ConnectionsHandler.getConnection().send(gmmrmsg)
         else:
@@ -573,10 +548,6 @@ class FightTurnFrame(Frame):
             self._remainingDurationSeconds -= 1
         else:
             self._intervalTurn.cancel()
-
-    def onUpdateMovementPoints(self, stat: Stat) -> None:
-        if stat and stat.entityId == self._currentFighterId and stat.totalValue is not self._lastMP:
-            self.drawMovementArea()
 
     def showCell(self, cellId: MapPoint) -> None:
         if not Kernel().getWorker().contains("FightSpellCastFrame"):

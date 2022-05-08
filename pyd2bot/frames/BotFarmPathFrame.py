@@ -161,27 +161,8 @@ class BotFarmPathFrame(Frame):
                 self.doFarm()
             return True
 
-        elif isinstance(msg, FightRequestFailed):
-            if not self._dicardMobsGroupRemediationTried:
-                self._dicardMobsGroupRemediationTried = True
-                self._discardedMonstersIds.append(msg.actorId)
-                self.doFarm()
-            elif not self._requestMapDataRemediationTried:
-                self._requestMapDataRemediationTried = True
-                self.requestMapData()
-            else:
-                DofusClient().restart()
-
-        elif isinstance(msg, (MapChangeFailedMessage, MapMoveFailed)):
-            logger.error(f"Fatal error {msg.__class__.__name__}")
-            if not self._requestMapDataRemediationTried:
-                self._requestMapDataRemediationTried = True
-                self.requestMapData()
-            elif self._followinMonsterGroup:
-                self._discardedMonstersIds.append(self._followingIe)
-                self.doFarm()
-            else:
-                DofusClient().restart()
+        elif isinstance(msg, (FightRequestFailed, MapMoveFailed, MapChangeFailedMessage)):
+            self.requestMapData()
 
         elif isinstance(msg, InteractiveUsedMessage):
             if PlayedCharacterManager().id == msg.entityId and msg.duration > 0:

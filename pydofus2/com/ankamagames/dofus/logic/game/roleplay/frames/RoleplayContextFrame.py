@@ -122,7 +122,7 @@ class RoleplayContextFrame(Frame):
             return True
 
         elif isinstance(msg, GameContextDestroyMessage):
-            logger.debug("RoleplayContextFrame: will be retrieved from kernel cause switching to fight")
+            logger.debug("RoleplayContextFrame: will be retrieved from kernel because we are switching to fight")
             Kernel().getWorker().removeFrame(self)
             return False
 

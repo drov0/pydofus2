@@ -9,3 +9,4 @@ pylint
 jinja2
 pyshark
 xmltodict
+BeautifulSoup4

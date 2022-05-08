@@ -88,10 +88,11 @@ class Haapi(metaclass=Singleton):
         try:
             token = response.json()["token"]
         except json.decoder.JSONDecodeError as e:
-            root = ET.fromstring(response.content)
-            for child in root.iter("*"):
-                print(child.tag)
-            raise Exception("Unable de retrieve token")
+            from bs4 import BeautifulSoup
+
+            parsed_html = BeautifulSoup(response.content)
+            reason = parsed_html.body.find("div", attrs={"id": "what-happened-section"}).find("p").text
+            raise Exception(f"Error while getting login token: {reason}")
 
         logger.debug("Login Token created")
         return token

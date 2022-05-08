@@ -97,6 +97,10 @@ class QuestFrame(Frame):
     def achievmentsListProcessed(self) -> bool:
         return self._achievementsListProcessed
 
+    @achievmentsListProcessed.setter
+    def achievmentsListProcessed(self, value: bool):
+        self._achievementsListProcessed = value
+
     @property
     def followedQuestsCallback(self) -> FunctionType:
         return self._followedQuestsCallback

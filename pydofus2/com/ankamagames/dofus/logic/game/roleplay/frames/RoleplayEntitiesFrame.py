@@ -1,5 +1,21 @@
+<<<<<<< Updated upstream
 from asyncio.log import logger
 import random
+=======
+
+from com.ankamagames.dofus.network.messages.game.context.roleplay.npc.ListMapNpcsQuestStatusUpdateMessage import (
+    ListMapNpcsQuestStatusUpdateMessage,
+)
+from com.ankamagames.dofus.network.types.game.context.roleplay.GameRolePlayNpcWithQuestInformations import (
+    GameRolePlayNpcWithQuestInformations,
+)
+from com.ankamagames.dofus.network.types.game.context.roleplay.GroupMonsterStaticInformations import (
+    GroupMonsterStaticInformations,
+)
+from com.ankamagames.dofus.network.types.game.context.roleplay.GroupMonsterStaticInformationsWithAlternatives import (
+    GroupMonsterStaticInformationsWithAlternatives,
+)
+>>>>>>> Stashed changes
 from com.ankamagames.jerakine.benchmark.BenchmarkTimer import BenchmarkTimer
 from com.ankamagames.atouin.managers.EntitiesManager import EntitiesManager
 from com.ankamagames.atouin.managers.MapDisplayManager import MapDisplayManager
@@ -15,7 +31,6 @@ from com.ankamagames.dofus.kernel.Kernel import Kernel
 from com.ankamagames.dofus.kernel.net.ConnectionsHandler import ConnectionsHandler
 from com.ankamagames.dofus.logic.common.managers.PlayerManager import PlayerManager
 from com.ankamagames.dofus.logic.game.common.managers.TimerManager import TimeManager
-from com.ankamagames.dofus.logic.game.common.misc.DofusEntities import DofusEntities
 import com.ankamagames.dofus.logic.game.roleplay.frames.RoleplayContextFrame as rcf
 import com.ankamagames.dofus.logic.game.roleplay.frames.RoleplayInteractivesFrame as rif
 from com.ankamagames.dofus.logic.game.roleplay.messages.CharacterMovementStoppedMessage import (
@@ -25,7 +40,6 @@ from com.ankamagames.dofus.logic.game.roleplay.messages.DelayedActionMessage imp
     DelayedActionMessage,
 )
 from com.ankamagames.dofus.logic.game.roleplay.types.Fight import Fight
-from com.ankamagames.dofus.network.enums.AggressableStatusEnum import AggressableStatusEnum
 from com.ankamagames.dofus.network.enums.MapObstacleStateEnum import (
     MapObstacleStateEnum,
 )
@@ -56,9 +70,6 @@ from com.ankamagames.dofus.network.messages.game.interactive.StatedMapUpdateMess
 from com.ankamagames.dofus.network.types.game.context.GameContextActorInformations import GameContextActorInformations
 from com.ankamagames.dofus.network.types.game.context.fight.FightCommonInformations import (
     FightCommonInformations,
-)
-from com.ankamagames.dofus.network.types.game.context.fight.FightTeamInformations import (
-    FightTeamInformations,
 )
 from com.ankamagames.dofus.network.types.game.context.roleplay.GameRolePlayCharacterInformations import (
     GameRolePlayCharacterInformations,
@@ -106,11 +117,12 @@ from com.ankamagames.dofus.network.types.game.interactive.InteractiveElement imp
 )
 from com.ankamagames.dofus.types.entities.AnimatedCharacter import AnimatedCharacter
 from com.ankamagames.jerakine.entities.interfaces.IEntity import IEntity
+from com.ankamagames.jerakine.logger.Logger import Logger
 from com.ankamagames.jerakine.messages.Frame import Frame
 from com.ankamagames.jerakine.messages.Message import Message
 from com.ankamagames.dofus.logic.game.roleplay.types.FightTeam import FightTeam
 
-
+logger = Logger("Dofus2")
 class RoleplayEntitiesFrame(AbstractEntitiesFrame, Frame):
     def __init__(self):
         self._fights = dict[int, Fight]()
@@ -216,7 +228,12 @@ class RoleplayEntitiesFrame(AbstractEntitiesFrame, Frame):
                 self._waitForMap = False
             return False
 
+<<<<<<< Updated upstream
         if isinstance(msg, MapComplementaryInformationsDataMessage):
+=======
+        elif isinstance(msg, MapComplementaryInformationsDataMessage):
+            logger.debug("Processing MapComplementaryInformationsDataMessage ...")
+>>>>>>> Stashed changes
             mcidmsg = msg
             currentMapHasChanged = False
             currentSubAreaHasChanged = False
@@ -422,7 +439,7 @@ class RoleplayEntitiesFrame(AbstractEntitiesFrame, Frame):
             #     if partyManagementFrame.playerShouldReceiveRewards:
             #         partyManagementFrame.playerShouldReceiveRewards = False
             #         partyManagementFrame.playerRewards = None
-
+            logger.debug("MapComplementaryInformationsDataMessage processed")
             return False
 
         if isinstance(msg, CharacterMovementStoppedMessage):

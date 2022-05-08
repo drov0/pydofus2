@@ -1146,8 +1146,8 @@ class FightSequenceFrame(Frame, ISpellCastProvider):
             and not isinstance(targetInfos, GameFightEntityInformation)
         ):
             summonerInfos = self.fightEntitiesFrame.getEntityInfos(targetInfos.stats.summoner)
-            summonDestroyedWithSummoner = summonerInfos == None or not summonerInfos.spawnInfo.alive
-            summonerIsMe = summonerInfos != None and summonerInfos == playerInfos
+            summonDestroyedWithSummoner = summonerInfos is None or not summonerInfos.spawnInfo.alive
+            summonerIsMe = summonerInfos is not None and summonerInfos == playerInfos
         if not summonDestroyedWithSummoner and summonerIsMe:
             self.fightEntitiesFrame.addLastKilledAlly(targetInfos)
         if gafdmsg.targetId != self._fightBattleFrame.currentPlayerId and (
@@ -1189,10 +1189,7 @@ class FightSequenceFrame(Frame, ISpellCastProvider):
                 if currentPlayedFighterManager.checkPlayableEntity(fighterInfos.stats.summoner):
                     currentPlayedFighterManager.removeSummonedCreature(fighterInfos.stats.summoner)
                     SpellWrapper.refreshAllPlayerSpellHolder(fighterInfos.stats.summoner)
-        fightContextFrame: FightContextFrame = Kernel().getWorker().getFrame("FightContextFrame")
         FightEntitiesFrame.getCurrentInstance().updateRemovedEntity(gafdmsg.targetId)
-        if updatePath:
-            ftf.updatePath()
 
     def fighterHasLeftBattle(self, gaflmsg: GameActionFightLeaveMessage) -> None:
         fightEntityFrame_gaflmsg: FightEntitiesFrame = FightEntitiesFrame.getCurrentInstance()
@@ -1214,7 +1211,7 @@ class FightSequenceFrame(Frame, ISpellCastProvider):
                 if monster.useBombSlot:
                     currentPlayedFighterManager.removeSummonedBomb(summonedEntityInfosL.stats.summoner)
         if entityInfosL and entityInfosL is GameFightFighterInformations:
-            fightEntityFrame_gaflmsg.removeSpecificKilledAllyentityInfosL
+            fightEntityFrame_gaflmsg.removeSpecificKilledAlly(entityInfosL)
 
     def cellsHasBeenMarked(self, gafmcmsg: GameActionFightMarkCellsMessage) -> None:
         spellId: int = gafmcmsg.mark.markSpellId
@@ -1545,8 +1542,6 @@ class FightSequenceFrame(Frame, ISpellCastProvider):
         shieldLoseSum = dict()
         shieldLoseLastStep = dict()
         deathNumber = 0
-        allowHitAnim = False
-        allowSpellEffects = False
         for i in range(len(self._stepsBuffer) - 1, -1, -1):
             if removed and step:
                 step.clear()
@@ -1590,15 +1585,10 @@ class FightSequenceFrame(Frame, ISpellCastProvider):
                     lifeLoseLastStep[flvsTarget] = flvs
             removed = False
             cleanedBuffer.insert(0, step)
-            # logger.debug(f"\r[STEPS DEBUG] step {step.__class__.__name__} added to cleaned buffer first pos")
 
         self._fightBattleFrame.deathPlayingNumber = deathNumber
         for b in cleanedBuffer:
-            if (
-                isinstance(b, FightLifeVariationStep)
-                and lifeLoseSum[b.target] == 0
-                and shieldLoseSum.get(b.target) is not None
-            ):
+            if isinstance(b, FightLifeVariationStep) and lifeLoseSum[b.target] == 0 and b.target in shieldLoseSum:
                 b.skipTextEvent = True
 
         for index in lifeLoseSum:
@@ -1613,33 +1603,20 @@ class FightSequenceFrame(Frame, ISpellCastProvider):
             endStep.append(waitStep)
 
         cleanedBuffer = startStep + cleanedBuffer + endStep
-        for idx, step in enumerate(cleanedBuffer):
-            # logger.debug(
-            #     f"\r[SEQ DEBUG] Step {step.__class__.__name__} added to the sequencer of sequene #{self._instanceId} at pos {idx}"
-            # )
+        for step in cleanedBuffer:
             self._sequencer.addStep(step)
         self.clearBuffer()
         if callback is not None and not self._parent:
             self._sequenceEndCallback = callback
-            # logger.debug(f"\r[SEQ DEBUG] Sequence #{self._instanceId} adding a sequencer listener for callback")
             self._sequencer.add_listener(SequencerEvent.SEQUENCE_END, self.onSequenceEnd)
         self._lastCastingSpell = self._castingSpell
         self._scriptInit = True
         if not self._parent:
             if not self._subSequenceWaitingCount:
-                # logger.debug(f"\r[SEQ DEBUG] starting sequencer cause no child subsequence waiting")
                 self._sequencer.start()
-            else:
-                # logger.warn(f"Waiting sub sequence init end ({self._subSequenceWaitingCount} seq)")
-                pass
         else:
-            # logger.debug(f"\r[SEQ DEBUG] Sequence has parent sequence #{self._parent.instanceId}")
             if callback is not None:
-                # logger.debug(f"\r[SEQ DEBUG] Sequence #{self._instanceId} calling callback {callback.__name__}")
                 callback()
-            # else:
-            # logger.error(f"\r[SEQ DEBUG] Sequence #{self._instanceId} has no callback")
-            # logger.debug(f"\r[SEQ DEBUG] will call parent sequence init done")
             self._parent.subSequenceInitDone()
 
     def onSequenceEnd(self, e: SequencerEvent) -> None:

@@ -130,7 +130,7 @@ logger = Logger("Dofus2")
 
 class RoleplayMovementFrame(Frame):
     CONSECUTIVE_MOVEMENT_DELAY: int = 0.25
-    VERBOSE = False
+    VERBOSE = True
     CHANGEMAP_TIMEOUT = 5
     ATTACKMOSTERS_TIMEOUT = 20
     _wantToChangeMap: float = -1
@@ -235,11 +235,12 @@ class RoleplayMovementFrame(Frame):
                 newPos = MapPoint.fromCoords(gmnmm.cellX, gmnmm.cellY)
                 player: AnimatedCharacter = DofusEntities.getEntity(PlayedCharacterManager().id)
                 if not player:
+                    logger.warn("[RolePlayMovement] Player not found!!")
                     return True
                 if player.isMoving:
                     player.stop = True
                 player.position = newPos
-                if not PlayedCharacterManager().isFighting and self._wantToChangeMap:
+                if self._wantToChangeMap:
                     mp = MapPoint.fromCellId(self._destinationPoint)
                     if newPos == mp:
                         self.askMapChange()
@@ -250,7 +251,6 @@ class RoleplayMovementFrame(Frame):
         if isinstance(msg, GameMapMovementMessage):
             gmmmsg = msg
             movedEntity = DofusEntities.getEntity(gmmmsg.actorId)
-            # logger.debug(f"[MapMovement] Movement of actor {gmmmsg.actorId}")
             clientMovePath = MapMovementAdapter.getClientMovement(gmmmsg.keyMovements)
             if movedEntity:
                 if self.VERBOSE:
@@ -270,7 +270,7 @@ class RoleplayMovementFrame(Frame):
 
             else:
                 self._isRequestingMovement = False
-                pathDuration = max(1, clientMovePath.getCrossingDuration())
+                pathDuration = max(1.8, clientMovePath.getCrossingDuration())
                 sleep(pathDuration)
                 Kernel().getWorker().processImmediately(EntityMovementCompleteMessage(movedEntity)),
             return True
@@ -278,27 +278,33 @@ class RoleplayMovementFrame(Frame):
         elif isinstance(msg, EntityMovementCompleteMessage):
             emcmsg = msg
             if emcmsg.entity.id == PlayedCharacterManager().id:
+
                 if self.VERBOSE:
                     logger.debug(
                         f"[RolePlayMovement] Mouvement complete, arrived at {emcmsg.entity.position.cellId}, destination point {self._destinationPoint}"
                     )
-                    logger.debug(f"[RolePlayMovement] Wants to atack monsters? {self._followingMonsterGroup}")
-                    logger.debug(f"[RolePlayMovement] Wants to changemap monsters? {self._wantToChangeMap}")
+                    logger.debug(f"[RolePlayMovement] Wants to atack monsters ? {self._followingMonsterGroup}")
+                    logger.debug(f"[RolePlayMovement] Wants to changemap ? {self._wantToChangeMap}")
                 gmmcmsg = GameMapMovementConfirmMessage()
                 ConnectionsHandler.getConnection().send(gmmcmsg)
+
                 if self._wantToChangeMap and self._wantToChangeMap != -1:
                     logger.debug(f"[RolePlayMovement] Wants to change map to {self._wantToChangeMap}")
                     self._isRequestingMovement = False
                     if emcmsg.entity.position.cellId != self._destinationPoint:
-                        logger.debug(
-                            f"[RolePlayMovement] Wants to change map but didn't reach the map change cell will retry to reach it"
-                        )
+                        if self.VERBOSE:
+                            logger.debug(
+                                f"[RolePlayMovement] Wants to change map but didn't reach the map change cell will retry to reach it"
+                            )
                         self.askMoveTo(MapPoint.fromCellId(self._destinationPoint))
                     else:
                         self.askMapChange()
 
                 elif self._followingIe:
-                    logger.debug(f"[RolePlayMovement] Wants to activate element {self._followingIe['ie'].elementId}")
+                    if self.VERBOSE:
+                        logger.debug(
+                            f"[RolePlayMovement] Wants to activate element {self._followingIe['ie'].elementId}"
+                        )
                     self._isRequestingMovement = False
                     self.activateSkill(
                         self._followingIe["skillInstanceId"],
@@ -308,17 +314,26 @@ class RoleplayMovementFrame(Frame):
                     self._followingIe = None
 
                 elif self._followingMonsterGroup:
+                    if self.VERBOSE:
+                        logger.debug(
+                            f"[RolePlayMovement] Wants to attack monster group {self._followingMonsterGroup.contextualId}"
+                        )
                     self._isRequestingMovement = False
                     self._followingMonsterGroup = self.entitiesFrame.getEntityInfos(
-                        int(self._followingMonsterGroup.contextualId)
+                        self._followingMonsterGroup.contextualId
                     )
                     freshMonstersPosition = self._followingMonsterGroup.disposition
                     if freshMonstersPosition.cellId == emcmsg.entity.position.cellId:
-                        self.requestMonsterFight(self._followingMonsterGroup.contextualId)
-                        self._followingMonsterGroup = None
+                        BenchmarkTimer(
+                            0.1, lambda: self.requestMonsterFight(self._followingMonsterGroup.contextualId)
+                        ).start()
+
                     else:
-                        self.askMoveTo(MapPoint.fromCellId(self._followingMonsterGroup.disposition.cellId))
-                        self.requestMonsterFight(self._followingMonsterGroup.contextualId)
+                        if self.VERBOSE:
+                            logger.debug(
+                                f"[RolePlayMovement] Monster group {self._followingMonsterGroup.contextualId} changed the position from {emcmsg.entity.position.cellId} to {freshMonstersPosition.cellId}"
+                            )
+                        self.askMoveTo(MapPoint.fromCellId(freshMonstersPosition.cellId))
                 Kernel().getWorker().processImmediately(CharacterMovementStoppedMessage())
             return True
 
@@ -584,8 +599,10 @@ class RoleplayMovementFrame(Frame):
             self._canMove = False
 
     def requestMonsterFight(self, monsterGroupId: int) -> None:
-        if self._requestFighFails > 1:
-            logger.error(f"Server rejected moster fight request for the {self._requestFighFails} time!")
+        if self._requestFighFails > 0:
+            logger.error(
+                f"[RolePlayMovement]  Server rejected moster fight request for the {self._requestFighFails} time!"
+            )
             self._requestFighFails = 0
             nopmsg = FightRequestFailed(monsterGroupId)
             Kernel().getWorker().processImmediately(nopmsg)
@@ -594,6 +611,6 @@ class RoleplayMovementFrame(Frame):
         grpamrmsg: GameRolePlayAttackMonsterRequestMessage = GameRolePlayAttackMonsterRequestMessage()
         grpamrmsg.init(monsterGroupId)
         ConnectionsHandler.getConnection().send(grpamrmsg)
-        self._requestFightTimeout = BenchmarkTimer(3, lambda: self.attackMonsters(monsterGroupId))
+        self._requestFightTimeout = BenchmarkTimer(1, lambda: self.attackMonsters(monsterGroupId))
         self._requestFightTimeout.start()
         self._requestFighFails += 1

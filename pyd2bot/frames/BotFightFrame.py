@@ -190,6 +190,13 @@ class BotFightFrame(Frame, metaclass=Singleton):
 
     def pulled(self) -> bool:
         self._enabled = False
+<<<<<<< Updated upstream
+=======
+        self._spellw = None
+        if self._reachableCells:
+            self._reachableCells.clear()
+        self._turnAction.clear()
+>>>>>>> Stashed changes
         Kernel().getWorker().removeFrame(self._botTurnFrame)
         return True
 

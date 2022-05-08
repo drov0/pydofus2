@@ -1,4 +1,9 @@
 from datetime import datetime
+from com.ankamagames.dofus.logic.common.frames.QuestFrame import QuestFrame
+from com.ankamagames.dofus.logic.game.common.frames.AveragePricesFrame import AveragePricesFrame
+from com.ankamagames.dofus.logic.game.common.frames.InventoryManagementFrame import InventoryManagementFrame
+from com.ankamagames.dofus.logic.game.common.frames.JobsFrame import JobsFrame
+from com.ankamagames.dofus.logic.game.common.frames.SpellInventoryManagementFrame import SpellInventoryManagementFrame
 from com.ankamagames.jerakine.benchmark.BenchmarkTimer import BenchmarkTimer
 import time
 from com.ankamagames.dofus.internalDatacenter.connection.BasicCharacterWrapper import (
@@ -94,6 +99,7 @@ from com.ankamagames.dofus.network.messages.game.startup.StartupActionsListMessa
 from com.ankamagames.dofus.network.messages.security.ClientKeyMessage import (
     ClientKeyMessage,
 )
+from com.ankamagames.jerakine.data.XmlConfig import XmlConfig
 from com.ankamagames.jerakine.logger.Logger import Logger
 from com.ankamagames.jerakine.messages.ConnectionResumedMessage import (
     ConnectionResumedMessage,
@@ -158,13 +164,8 @@ class GameServerApproachFrame(Frame):
         if isinstance(msg, HelloGameMessage):
             connh.ConnectionsHandler.confirmGameServerConnection()
             self.authenticationTicketAccepted = False
-            atmsg = AuthenticationTicketMessage.from_json(
-                {
-                    "__type__": "AuthenticationTicketMessage",
-                    "lang": "fr",
-                    "ticket": AuthentificationManager().gameServerTicket,
-                }
-            )
+            atmsg = AuthenticationTicketMessage()
+            atmsg.init(XmlConfig().getEntry("config.lang.current"), AuthentificationManager().gameServerTicket)
             connh.ConnectionsHandler.getConnection().send(atmsg)
             return True
 
@@ -214,33 +215,28 @@ class GameServerApproachFrame(Frame):
             cssmsg = msg
             self._loadingStart = time.perf_counter()
             if krnl.Kernel().getWorker().getFrame("ServerSelectionFrame"):
-                krnl.Kernel().getWorker().removeFrame(krnl.Kernel().getWorker().getFrame("ServerSelectionFrame"))
+                krnl.Kernel().getWorker().removeFrameByName("ServerSelectionFrame")
             PlayedCharacterManager().infos = cssmsg.infos
             DataStoreType.CHARACTER_ID = str(cssmsg.infos.id)
             krnl.Kernel().getWorker().addFrame(WorldFrame())
             krnl.Kernel().getWorker().addFrame(SynchronisationFrame())
             krnl.Kernel().getWorker().addFrame(pcuF.PlayedCharacterUpdatesFrame())
-            # krnl.Kernel().getWorker().addFrame(SpellInventoryManagementFrame())
-            # krnl.Kernel().getWorker().addFrame(InventoryManagementFrame())
+            krnl.Kernel().getWorker().addFrame(SpellInventoryManagementFrame())
+            krnl.Kernel().getWorker().addFrame(InventoryManagementFrame())
             krnl.Kernel().getWorker().addFrame(ContextChangeFrame())
-            # krnl.Kernel().getWorker().addFrame(ProgressionFrame())
-            # krnl.Kernel().getWorker().addFrame(ChatFrame())
-            # krnl.Kernel().getWorker().addFrame(JobsFrame())
-            # krnl.Kernel().getWorker().addFrame(QuestFrame())
-            # krnl.Kernel().getWorker().addFrame(PartyManagementFrame())
-            # krnl.Kernel().getWorker().addFrame(AveragePricesFrame())
+            # TODO : krnl.Kernel().getWorker().addFrame(ChatFrame())
+            krnl.Kernel().getWorker().addFrame(JobsFrame())
+            krnl.Kernel().getWorker().addFrame(QuestFrame())
+            # TODO : krnl.Kernel().getWorker().addFrame(PartyManagementFrame())
+            krnl.Kernel().getWorker().addFrame(AveragePricesFrame())
             if krnl.Kernel().beingInReconection and not self._reconnectMsgSend:
                 self._reconnectMsgSend = True
                 connh.ConnectionsHandler.getConnection().send(CharacterSelectedForceReadyMessage())
             if InterClientManager.flashKey and (
                 not PlayerManager() or PlayerManager().server.id != 129 and PlayerManager().server.id != 130
             ):
-                flashKeyMsg = ClientKeyMessage.from_json(
-                    {
-                        "__type__": "ClientKeyMessage",
-                        "key": InterClientManager().flashKey,
-                    }
-                )
+                flashKeyMsg = ClientKeyMessage()
+                flashKeyMsg.init(InterClientManager().flashKey)
                 connh.ConnectionsHandler.getConnection().send(flashKeyMsg)
             if self._cssmsg is not None:
                 PlayedCharacterManager().infos = self._cssmsg.infos

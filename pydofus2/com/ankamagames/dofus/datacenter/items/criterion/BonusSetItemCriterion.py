@@ -1,3 +1,11 @@
+from com.ankamagames.dofus.datacenter.items.criterion.IItemCriterion import IItemCriterion
+from com.ankamagames.dofus.datacenter.items.criterion.ItemCriterion import ItemCriterion
+from com.ankamagames.dofus.internalDatacenter.items.ItemWrapper import ItemWrapper
+from com.ankamagames.dofus.logic.game.common.managers.InventoryManager import InventoryManager
+from com.ankamagames.jerakine.data.I18n import I18n
+from com.ankamagames.jerakine.interfaces.IDataCenter import IDataCenter
+
+
 class BonusSetItemCriterion(ItemCriterion, IDataCenter):
     def __init__(self, pCriterion: str):
         super().__init__(pCriterion)
@@ -5,11 +13,11 @@ class BonusSetItemCriterion(ItemCriterion, IDataCenter):
     @property
     def text(self) -> str:
         readableCriterionRef: str = I18n.getUiText("ui.criterion.setBonus")
-        return readableCriterionRef + " " + _operator.text + " " + _criterionValue
+        return readableCriterionRef + " " + self._operator.text + " " + self._criterionValue
 
     @property
     def isRespected(self) -> bool:
-        return _operator.compare(int(self.getCriterion()), _criterionValue)
+        return self._operator.compare(int(self.getCriterion()), self._criterionValue)
 
     def clone(self) -> IItemCriterion:
         return BonusSetItemCriterion(self.basicText)

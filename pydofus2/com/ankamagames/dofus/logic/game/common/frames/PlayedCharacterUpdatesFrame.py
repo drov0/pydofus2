@@ -26,9 +26,6 @@ from com.ankamagames.dofus.network.enums.CompassTypeEnum import CompassTypeEnum
 from com.ankamagames.dofus.network.enums.PlayerLifeStatusEnum import (
     PlayerLifeStatusEnum,
 )
-from com.ankamagames.dofus.network.enums.ProtocolConstantsEnum import (
-    ProtocolConstantsEnum,
-)
 from com.ankamagames.dofus.network.enums.StatsUpgradeResultEnum import (
     StatsUpgradeResultEnum,
 )
@@ -126,9 +123,8 @@ from com.ankamagames.dofus.network.types.game.character.characteristic.Character
 from com.ankamagames.dofus.network.types.game.context.roleplay.HumanOptionAlliance import (
     HumanOptionAlliance,
 )
-from com.ankamagames.dofus.network.types.game.context.roleplay.HumanOptionOrnament import (
-    HumanOptionOrnament,
-)
+from com.ankamagames.dofus.network.types.game.context.roleplay.HumanOptionOrnament import HumanOptionOrnament
+from com.ankamagames.dofus.types.data.PlayerSetInfo import PlayerSetInfo
 from com.ankamagames.jerakine.data.I18n import I18n
 from com.ankamagames.jerakine.messages.Frame import Frame
 from com.ankamagames.jerakine.messages.Message import Message
@@ -154,7 +150,7 @@ class PlayedCharacterUpdatesFrame(Frame):
 
     FORGETTABLE_SPELL_FIRST_NOTIF_NAME: str = "firstForgettableSpell"
 
-    setList: list
+    setList: dict = {}
 
     guildEmblemSymbolCategories: int
 
@@ -178,7 +174,7 @@ class PlayedCharacterUpdatesFrame(Frame):
         return self._kamasLimit
 
     def pushed(self) -> bool:
-        self.setList = []
+        self.setList = dict()
         self._giftListInitialized = False
         return True
 
@@ -224,7 +220,7 @@ class PlayedCharacterUpdatesFrame(Frame):
                     for opt in grpci.humanoidInfo.options:
                         if isinstance(opt, HumanOptionAlliance):
                             pcm.PlayedCharacterManager().characteristics.alignmentInfos.aggressable = opt.aggressable
-
+            # TODO : When party mnagement is implemented, uncomment this
             # if not (pcm.PlayedCharacterManager().characteristics.alignmentInfos.aggressable == AggressableStatusEnum.AvA_DISQUALIFIED or\
             #     pcm.PlayedCharacterManager().characteristics.alignmentInfos.aggressable == AggressableStatusEnum.AvA_ENABLED_AGGRESSABLE or\
             #         pcm.PlayedCharacterManager().characteristics.alignmentInfos.aggressable == AggressableStatusEnum.AvA_ENABLED_NON_AGGRESSABLE or\
@@ -268,79 +264,48 @@ class PlayedCharacterUpdatesFrame(Frame):
             return True
 
         if isinstance(msg, CharacterLevelUpMessage):
-            # clumsg = msg
-            # messageId = clumsg.getMessageId()
-            # if messageId == CharacterLevelUpMessage.getMessageId():
-            #     previousLevel = pcm.PlayedCharacterManager().infos.level
-            #     pcm.PlayedCharacterManager().infos.level = clumsg.newLevel
-            # if (
-            #     clumsg.newLevel == 10
-            #     and PlayerManager().server.gameTypeId
-            #     != GameServerTypeEnum.SERVER_TYPE_TEMPORIS
-            # ):
-            #     InventoryManagementFrame.displayNewsPopupClassic()
-            #     caracPointEarned = 0
-            #     healPointEarned = 0
-            #     caracPointEarned = (clumsg.newLevel - previousLevel) * 5
-            #     healPointEarned = (clumsg.newLevel - previousLevel) * 5
-            #     newSpellWrappers = []
-            #     playerBreed = Breed.getBreedById(
-            #         pcm.PlayedCharacterManager().infos.breed
-            #     )
-            #     for spellVariant in playerBreed.breedSpellVariants:
-            #         for spellBreed in spellVariant.spells:
-            #             for spellLevelBreedId in spellBreed.spellLevels:
-            #                 spellLevelBreed = SpellLevel.getLevelById(spellLevelBreedId)
-            #                 if spellLevelBreed:
-            #                     obtentionLevel = spellLevelBreed.minPlayerLevel
-            #                     if (
-            #                         obtentionLevel <= clumsg.newLevel
-            #                         and obtentionLevel > previousLevel
-            #                     ):
-            #                         newSpellWrappers.append(
-            #                             spellWrapper.SpellWrapper.create(
-            #                                 spellBreed.id, spellLevelBreed.grade, False
-            #                             )
-            #                         )
-            #     for spellWrapper in pcm.PlayedCharacterManager().spellsInventory:
-            #         spellWrapper.updateSpellLevelAndEffectsAccordingToPlayerLevel()
+            clumsg = msg
+            messageId = clumsg.getMessageId()
+            if messageId == CharacterLevelUpMessage.getMessageId():
+                previousLevel = pcm.PlayedCharacterManager().infos.level
+                pcm.PlayedCharacterManager().infos.level = clumsg.newLevel
+            if clumsg.newLevel == 10 and PlayerManager().server.gameTypeId != GameServerTypeEnum.SERVER_TYPE_TEMPORIS:
+                caracPointEarned = 0
+                healPointEarned = 0
+                caracPointEarned = (clumsg.newLevel - previousLevel) * 5
+                healPointEarned = (clumsg.newLevel - previousLevel) * 5
+                newSpellWrappers = []
+                playerBreed = Breed.getBreedById(pcm.PlayedCharacterManager().infos.breed)
+                for spellVariant in playerBreed.breedSpellVariants:
+                    for spellBreed in spellVariant.spells:
+                        for spellLevelBreedId in spellBreed.spellLevels:
+                            spellLevelBreed = SpellLevel.getLevelById(spellLevelBreedId)
+                            if spellLevelBreed:
+                                obtentionLevel = spellLevelBreed.minPlayerLevel
+                                if obtentionLevel <= clumsg.newLevel and obtentionLevel > previousLevel:
+                                    newSpellWrappers.append(
+                                        spellWrapper.SpellWrapper.create(spellBreed.id, spellLevelBreed.grade, False)
+                                    )
+                for spellWrapper in pcm.PlayedCharacterManager().spellsInventory:
+                    spellWrapper.updateSpellLevelAndEffectsAccordingToPlayerLevel()
 
-            #     if len(newSpellWrappers):
-            #         # new level handle
-            #         pass
-            #     try:
-            #         pass
-            #     except Exception as e:
-            #         pass
-            #     if self.roleplayContextFrame:
-            #         entityInfos = (
-            #             self.roleplayContextFrame.entitiesFrame.getEntityInfos(
-            #                 pcm.PlayedCharacterManager().id
-            #             )
-            #         )
-            #     if entityInfos:
-            #         for option in entityInfos.humanoidInfo.options:
-            #             if isinstance(option, HumanOptionOrnament):
-            #                 option.level = clumsg.newLevel
+                #     if len(newSpellWrappers):
+                #         # new level handle
+                #         pass
+                #     try:
+                #         pass
+                #     except Exception as e:
+                #         pass
 
-            # if messageId == CharacterLevelUpInformationMessage.getMessageId():
-            #     cluimsg = msg
-            #     onSameMap = False
-            #     try:
-            #         for (
-            #             entityId
-            #         ) in self.roleplayContextFrame.entitiesFrame.getEntitiesIdsList():
-            #             if entityId == cluimsg.id:
-            #                 onSameMap = True
-            #         if onSameMap:
-            #             pass
-            #     except Exception as e:
-            #         logger.warn(
-            #             "Un probl�me est survenu lors du traitement du message CharacterLevelUpInformationMessage. "
-            #             + "Un personnage vient de changer de niveau mais on n'est surement pas encore sur la map"
-            #         )
-            #     if cluimsg.newLevel <= ProtocolConstantsEnum.MAX_LEVEL:
-            #         pass
+                if self.roleplayContextFrame:
+                    entityInfos = self.roleplayContextFrame.entitiesFrame.getEntityInfos(
+                        pcm.PlayedCharacterManager().id
+                    )
+                if entityInfos:
+                    for option in entityInfos.humanoidInfo.options:
+                        if isinstance(option, HumanOptionOrnament):
+                            option.level = clumsg.newLevel
+
             return False
 
         if isinstance(msg, CharacterExperienceGainMessage):
@@ -349,8 +314,10 @@ class PlayedCharacterUpdatesFrame(Frame):
 
         if isinstance(msg, GameRolePlayPlayerLifeStatusMessage):
             grplsmsg = msg
-            pcm.PlayedCharacterManager().state = grplsmsg.state
-            return True
+            state = PlayerLifeStatusEnum(grplsmsg.state)
+            pcm.PlayedCharacterManager().state = state
+            logger.debug(f"Player state is {state.name}")
+            return False
 
         if isinstance(msg, GameRolePlayGameOverMessage):
             grpgomsg = msg
@@ -363,8 +330,8 @@ class PlayedCharacterUpdatesFrame(Frame):
             return True
 
         if isinstance(msg, SetUpdateMessage):
-            # sumsg = msg
-            # self.setList[sumsg.setId] = PlayerSetInfo(sumsg.setId, sumsg.setObjects, sumsg.setEffects)
+            sumsg = msg
+            self.setList[sumsg.setId] = PlayerSetInfo(sumsg.setId, sumsg.setObjects, sumsg.setEffects)
             return True
 
         if isinstance(msg, CompassResetMessage):

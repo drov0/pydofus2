@@ -11,7 +11,7 @@ logger = Logger("Dofus2")
 
 
 class Socket(threading.Thread):
-    MIN_TIME_BETWEEN_SEND = 0
+    MIN_TIME_BETWEEN_SEND = 0.0
 
     def __init__(self, host, port):
         self.dispatcher = EventDispatcher()
@@ -75,6 +75,7 @@ class Socket(threading.Thread):
         self.dispatcher.dispatch(event)
 
     def send(self, data):
-        sleep(max(self.MIN_TIME_BETWEEN_SEND - (perf_counter() - self._lastSent), 0))
+        if self.MIN_TIME_BETWEEN_SEND > 0:
+            sleep(max(self.MIN_TIME_BETWEEN_SEND - (perf_counter() - self._lastSent), 0))
         self._sock.sendall(data)
         self._lastSent = perf_counter()

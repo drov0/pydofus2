@@ -408,7 +408,7 @@ class RoleplayMovementFrame(Frame):
             return False
 
     def pulled(self) -> bool:
-        logger.debug("[RolePlayMovement] Pulled")
+        # logger.debug("[RolePlayMovement] Pulled")
         self._canMove = True
         self._followingMonsterGroup = None
         self._followingIe = None
@@ -504,7 +504,8 @@ class RoleplayMovementFrame(Frame):
         gmmrmsg = GameMapMovementRequestMessage()
         keymoves = MapMovementAdapter.getServerMovement(path)
         gmmrmsg.init(keymoves, MapDisplayManager().currentMapPoint.mapId)
-        logger.debug(f"[RolePlayMovement] Sending movement request with keymoves {keymoves}")
+        if self.VERBOSE:
+            logger.debug(f"[RolePlayMovement] Sending movement request with keymoves {keymoves}")
         ConnectionsHandler.getConnection().send(gmmrmsg)
         if self.VERBOSE:
             logger.debug(f"[RolePlayMovement] Movement request sent to server.")

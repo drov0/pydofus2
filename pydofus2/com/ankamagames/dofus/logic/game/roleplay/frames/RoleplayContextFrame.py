@@ -112,7 +112,7 @@ class RoleplayContextFrame(Frame):
             return False
 
         elif isinstance(msg, MapLoadedMessage):
-            logger.debug("[RoleplayContext] Map loaded will push other roleplay frames")
+            # logger.debug("[RoleplayContext] Map loaded will push other roleplay frames")
             Kernel().getWorker().addFrame(self._entitiesFrame)
             Kernel().getWorker().addFrame(self._worldFrame)
             Kernel().getWorker().addFrame(self._movementFrame)
@@ -138,7 +138,7 @@ class RoleplayContextFrame(Frame):
         Kernel().getWorker().removeFrame(self._worldFrame)
         Kernel().getWorker().removeFrame(self._movementFrame)
         Kernel().getWorker().removeFrame(self._interactivesFrame)
-        logger.debug("RoleplayContextFrame pulled")
+        # logger.debug("RoleplayContextFrame pulled")
         # TODO : Don't forget to uncomment this when those frames are implemented dumpass
         # Kernel().getWorker().removeFrame(self._spectatorManagementFrame)
         # Kernel().getWorker().removeFrame(self._npcDialogFrame)

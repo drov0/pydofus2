@@ -28,7 +28,7 @@ class FightEntitiesHolder(IEntityLocalizer, metaclass=Singleton):
     def unholdEntity(self, entityId: float) -> None:
         if entityId in self._holdedEntities:
             del self._holdedEntities[entityId]
-        logger.warn("Unholded entity with ID " + str(entityId))
+        # logger.warn("Unholded entity with ID " + str(entityId))
 
     def reset(self) -> None:
         self._holdedEntities.clear()

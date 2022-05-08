@@ -143,6 +143,8 @@ class RoleplayInteractivesFrame(Frame):
 
     dirmov: int = 666
 
+    REVIVE_SKILL_ID = 211
+
     def __init__(self):
         self._ie = dict[int, InteractiveElementData]()
         self._collectableIe = dict[int, CollectableElement]()
@@ -198,6 +200,7 @@ class RoleplayInteractivesFrame(Frame):
         return self._collectableIe
 
     def pushed(self) -> bool:
+        logger.debug("InteractiveElement pushed")
         return True
 
     def process(self, msg: Message) -> bool:
@@ -250,7 +253,6 @@ class RoleplayInteractivesFrame(Frame):
             iuem = msg
             if iuem.elemId == self._currentRequestedElementId:
                 self._currentRequestedElementId = -1
-                # TODO: Send error message to player
             return False
 
         if isinstance(msg, StatedMapUpdateMessage):
@@ -345,6 +347,11 @@ class RoleplayInteractivesFrame(Frame):
                 if skill.elementActionId == self.ACTION_COLLECTABLE_RESOURCES:
                     return CollectableElement(ie.elementId, interactiveSkill, False)
         return None
+
+    def getReviveIe(self) -> InteractiveElementData:
+        for ieid, ie in self._ie.items():
+            if ie.element.enabledSkills and ie.element.enabledSkills[0].skillId == self.REVIVE_SKILL_ID:
+                return ie
 
     def updateStatedElement(self, se: StatedElement, globalv: bool = False) -> None:
         if se.elementId == self._currentUsedElementId:

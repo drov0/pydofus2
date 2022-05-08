@@ -930,7 +930,7 @@ class FightSequenceFrame(Frame, ISpellCastProvider):
 
         if isinstance(msg, GameActionFightDeathMessage):
             gafdmsg = msg
-            logger.info(f"{msg.targetId} died")
+            # logger.info(f"{msg.targetId} died")
             fbf: "FightBattleFrame" = Kernel().getWorker().getFrame("FightBattleFrame")
             fbf._deadTurnsList.append(gafdmsg.targetId)
             self.fighterHasBeenKilled(gafdmsg)
@@ -1386,7 +1386,7 @@ class FightSequenceFrame(Frame, ISpellCastProvider):
     def fighterHasMoved(self, gmmmsg: GameMapMovementMessage) -> None:
         movementPath: MovementPath = MapMovementAdapter.getClientMovement(gmmmsg.keyMovements)
         movementPathCells: list[int] = movementPath.getCells()
-        logger.debug(f"Fighter {gmmmsg.actorId} has moved following the path {movementPathCells}")
+        # logger.debug(f"Fighter {gmmmsg.actorId} has moved following the path {movementPathCells}")
         fightContextFrame: "FightContextFrame" = Kernel().getWorker().getFrame("FightContextFrame")
         movingEntity: IMovable = DofusEntities.getEntity(gmmmsg.actorId)
         nbCells = len(movementPathCells)

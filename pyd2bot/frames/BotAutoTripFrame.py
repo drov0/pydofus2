@@ -1,3 +1,6 @@
+from threading import Timer
+from com.ankamagames.dofus.logic.game.common.managers.PlayedCharacterManager import PlayedCharacterManager
+from com.ankamagames.dofus.logic.game.common.misc.DofusEntities import DofusEntities
 from com.ankamagames.jerakine.messages.Frame import Frame
 from com.ankamagames.jerakine.messages.Message import Message
 from pyd2bot.apis.MoveAPI import MoveAPI
@@ -15,6 +18,11 @@ from com.ankamagames.jerakine.logger.Logger import Logger
 from com.ankamagames.jerakine.types.enums.DirectionsEnum import DirectionsEnum
 from com.ankamagames.jerakine.types.enums.Priority import Priority
 from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from com.ankamagames.dofus.logic.game.roleplay.frames.RoleplayMovementFrame import RoleplayMovementFrame
+
+from pyd2bot.messages.AutoTripEndedMessage import AutoTripEndedMessage
 
 logger = Logger("Dofus2")
 
@@ -70,17 +78,19 @@ class BotAutoTripFrame(Frame):
                 logger.error("Too many map change fails")
                 return True
             self.changeMapFails += 1
-            Kernel().getWorker().getFrame("RoleplayMovementFrame").askMapChange()
+            rolePlayFrame: "RoleplayMovementFrame" = Kernel().getWorker().getFrame("RoleplayMovementFrame")
+            rolePlayFrame.askMapChange()
+        return True
 
     def walkToNextStep(self):
+        if not DofusEntities.getEntity(PlayedCharacterManager().id):
+            Timer(0.1, self.walkToNextStep).start()
+            return
         if self.nextStepIndex is not None:
             logger.debug(f"Next step index: {self.nextStepIndex}/{len(self.path)}")
             if self.nextStepIndex == len(self.path):
-                from pyd2bot.frames.BotFarmPathFrame import BotFarmPathFrame
-
-                logger.info("Arrived at destination will resume FarmingBot")
-                self._worker.removeFrame(self)
-                self._worker.addFrame(BotFarmPathFrame(autoStart=True))
+                Kernel().getWorker().removeFrame(self)
+                Kernel().getWorker().process(AutoTripEndedMessage(self.dstMapId))
                 return True
             e = self.path[self.nextStepIndex]
             self.nextStepIndex += 1
@@ -98,7 +108,7 @@ class BotAutoTripFrame(Frame):
         if path is None:
             raise Exception("No path found")
         if len(path) == 0:
-            logger.info("Already at destination")
+            Kernel().getWorker().process(AutoTripEndedMessage(self.dstMapId))
             return True
         self.path = path
         e = self.path[0]

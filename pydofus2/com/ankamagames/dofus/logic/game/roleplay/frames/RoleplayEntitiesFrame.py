@@ -433,7 +433,7 @@ class RoleplayEntitiesFrame(AbstractEntitiesFrame, Frame):
             if Kernel().getWorker().avoidFlood(msg.__class__.__name__):
                 return True
             grpsamsg = msg
-            if grpsamsg.informations.contextualId == PlayedCharacterManager().id:
+            if int(grpsamsg.informations.contextualId) == int(PlayedCharacterManager().id):
                 humi: HumanInformations = grpsamsg.informations.humanoidInfo
                 PlayedCharacterManager().restrictions = humi.restrictions
                 PlayedCharacterManager().infos.entityLook = grpsamsg.informations.look
@@ -493,8 +493,6 @@ class RoleplayEntitiesFrame(AbstractEntitiesFrame, Frame):
         self._fights[infos.fightId] = fight
 
     def updateMonstersGroup(self, pMonstersInfo: GameRolePlayGroupMonsterInformations) -> None:
-        monsterInfos: MonsterInGroupLightInformations = None
-        underling: MonsterInGroupLightInformations = None
         monstersGroup: list[MonsterInGroupLightInformations] = self.getMonsterGroup(pMonstersInfo.staticInfos)
         groupHasMiniBoss: bool = Monster.getMonsterById(
             pMonstersInfo.staticInfos.mainCreatureLightInfos.genericId

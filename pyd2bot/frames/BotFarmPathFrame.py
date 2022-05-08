@@ -2,8 +2,6 @@ from com.ankamagames.dofus.kernel.net.ConnectionsHandler import ConnectionsHandl
 from com.ankamagames.dofus.network.messages.game.context.roleplay.MapInformationsRequestMessage import (
     MapInformationsRequestMessage,
 )
-from com.ankamagames.jerakine.benchmark.BenchmarkTimer import BenchmarkTimer
-from time import sleep
 from com.ankamagames.atouin.managers.MapDisplayManager import MapDisplayManager
 from com.ankamagames.dofus.datacenter.world.MapPosition import MapPosition
 from com.ankamagames.dofus.logic.game.fight.messages.FightRequestFailed import FightRequestFailed
@@ -47,6 +45,7 @@ from typing import TYPE_CHECKING
 
 from pyd2bot.apis.FarmAPI import FarmAPI
 from pyd2bot.frames.BotAutoTripFrame import BotAutoTripFrame
+from pyd2bot.messages.AutoTripEndedMessage import AutoTripEndedMessage
 from pyd2bot.models.FarmParcours import FarmParcours
 
 if TYPE_CHECKING:
@@ -145,17 +144,15 @@ class BotFarmPathFrame(Frame):
 
     def process(self, msg: Message) -> bool:
 
-        if PlayedCharacterManager().isFighting:
-            raise Exception("Can't farm while fighting")
+        if isinstance(msg, AutoTripEndedMessage):
+            self._inAutoTrip = False
+            self.doFarm()
 
-        if Kernel().getWorker().contains("BotAutoTripFrame"):
-            raise Exception("Can't farm while in auto trip")
-
-        if isinstance(msg, InteractiveUseErrorMessage):
+        elif isinstance(msg, InteractiveUseErrorMessage):
             logger.error(
                 f"[BotFarmFrame] Error unable to use interactive element {msg.elemId} with the skill {msg.skillInstanceUid}"
             )
-            logger.debug("***********************************************************************")
+            logger.debug("*" * 80)
             if msg.elemId == self._followingIe:
                 self.reset()
                 logger.debug("Will move on")
@@ -167,14 +164,11 @@ class BotFarmPathFrame(Frame):
         elif isinstance(msg, FightRequestFailed):
             if not self._dicardMobsGroupRemediationTried:
                 self._dicardMobsGroupRemediationTried = True
-                logger.debug(f"[BotFarmFrame] Fight request failed, will dicard the {msg.actorId}")
                 self._discardedMonstersIds.append(msg.actorId)
                 self.doFarm()
             elif not self._requestMapDataRemediationTried:
                 self._requestMapDataRemediationTried = True
-                mirmsg = MapInformationsRequestMessage()
-                mirmsg.init(mapId_=MapDisplayManager().currentMapPoint.mapId)
-                ConnectionsHandler.getConnection().send(mirmsg)
+                self.requestMapData()
             else:
                 DofusClient().restart()
 
@@ -182,9 +176,10 @@ class BotFarmPathFrame(Frame):
             logger.error(f"Fatal error {msg.__class__.__name__}")
             if not self._requestMapDataRemediationTried:
                 self._requestMapDataRemediationTried = True
-                mirmsg = MapInformationsRequestMessage()
-                mirmsg.init(mapId_=MapDisplayManager().currentMapPoint.mapId)
-                ConnectionsHandler.getConnection().send(mirmsg)
+                self.requestMapData()
+            elif self._followinMonsterGroup:
+                self._discardedMonstersIds.append(self._followingIe)
+                self.doFarm()
             else:
                 DofusClient().restart()
 
@@ -208,18 +203,12 @@ class BotFarmPathFrame(Frame):
             return True
 
         elif isinstance(msg, MapComplementaryInformationsDataMessage):
-            sleep(0.2)
             logger.debug("-" * 100)
-            self.reset()
-            if self.currMapCoords not in self.parcours.path:
-                logger.debug(f"[BotFarmFrame] Map {self.currMapCoords} not in path will switch to autotrip")
-                self._inAutoTrip = True
-                self._worker.removeFrame(self)
-                self._worker.addFrame(BotAutoTripFrame(self.parcours.startMapId))
-                return True
-            else:
+            if not self._inAutoTrip:
+                self.reset()
                 self.doFarm()
                 return True
+            return False
 
         elif isinstance(msg, NotificationByServerMessage):
             notification = Notification.getNotificationById(msg.id)
@@ -243,11 +232,9 @@ class BotFarmPathFrame(Frame):
             if entityId in self._discardedMonstersIds:
                 continue
             infos: GameRolePlayGroupMonsterInformations = self.entitiesFrame.getEntityInfos(entityId)
-            if len(infos.staticInfos.underlings) <= 2:
-                monsterGroupPos = MapPoint.fromCellId(infos.disposition.cellId)
-                availableMonsterFights.append(
-                    {"info": infos, "distance": currPlayerPos.distanceToCell(monsterGroupPos)}
-                )
+            # if len(infos.staticInfos.underlings) <= 2:
+            monsterGroupPos = MapPoint.fromCellId(infos.disposition.cellId)
+            availableMonsterFights.append({"info": infos, "distance": currPlayerPos.distanceToCell(monsterGroupPos)})
         if availableMonsterFights:
             availableMonsterFights.sort(key=lambda x: x["distance"])
             entityId = availableMonsterFights[0]["info"].contextualId
@@ -256,6 +243,13 @@ class BotFarmPathFrame(Frame):
         return None
 
     def doFarm(self):
+        if self.currMapCoords not in self.parcours.path:
+            logger.debug(f"[BotFarmFrame] Map {self.currMapCoords} not in path will switch to autotrip")
+            self._inAutoTrip = True
+            self._worker.addFrame(BotAutoTripFrame(self.parcours.startMapId))
+            return
+        self._followinMonsterGroup = None
+        self._followingIe = -1
         if InventoryAPI.getWeightPercent() > 90:
             InventoryAPI.destroyAllItems()
         self._lastCellId = PlayedCharacterManager().currentCellId
@@ -265,3 +259,8 @@ class BotFarmPathFrame(Frame):
             self._followingIe = FarmAPI().collectResource(skills=self.parcours.skills)
         if self._followingIe == -1 and self._followinMonsterGroup is None:
             self.moveToNextStep()
+
+    def requestMapData(self):
+        mirmsg = MapInformationsRequestMessage()
+        mirmsg.init(mapId_=MapDisplayManager().currentMapPoint.mapId)
+        ConnectionsHandler.getConnection().send(mirmsg)

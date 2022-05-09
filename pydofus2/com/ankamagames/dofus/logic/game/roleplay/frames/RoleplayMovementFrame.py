@@ -270,7 +270,10 @@ class RoleplayMovementFrame(Frame):
 
             else:
                 self._isRequestingMovement = False
-                pathDuration = max(1.8, clientMovePath.getCrossingDuration())
+                if (PlayedCharacterManager().inventoryWeight / PlayedCharacterManager().inventoryWeightMax) == 1:
+                    pathDuration = max(1, clientMovePath.getCrossingDuration(False))
+                else:
+                    pathDuration = max(1, clientMovePath.getCrossingDuration(True))
                 sleep(pathDuration)
                 Kernel().getWorker().processImmediately(EntityMovementCompleteMessage(movedEntity)),
             return True
@@ -324,10 +327,7 @@ class RoleplayMovementFrame(Frame):
                     )
                     freshMonstersPosition = self._followingMonsterGroup.disposition
                     if freshMonstersPosition.cellId == emcmsg.entity.position.cellId:
-                        BenchmarkTimer(
-                            0.1, lambda: self.requestMonsterFight(self._followingMonsterGroup.contextualId)
-                        ).start()
-
+                        self.requestMonsterFight(self._followingMonsterGroup.contextualId)
                     else:
                         if self.VERBOSE:
                             logger.debug(

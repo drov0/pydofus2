@@ -1,6 +1,8 @@
 import random
 from typing import TYPE_CHECKING, Tuple
 from com.ankamagames.dofus.datacenter.world.MapPosition import MapPosition
+from com.ankamagames.dofus.logic.game.roleplay.frames.RoleplayInteractivesFrame import InteractiveElementData
+from com.ankamagames.dofus.modules.utils.pathFinding.world.Edge import Edge
 
 from com.ankamagames.dofus.modules.utils.pathFinding.world.Transition import Transition
 
@@ -62,7 +64,7 @@ class MoveAPI:
         cls, discard=[], noskill=True, directions: list[DirectionsEnum] = [], mapIds=[]
     ) -> list[Transition]:
         result = []
-        v = WorldPathFinder().getCurrentPlayerVertex()
+        v = WorldPathFinder().currPlayerVertex
         logger.debug(f"current map {v.mapId}")
         outgoingEdges = WorldPathFinder().worldGraph.getOutgoingEdgesFromVertex(v)
         for e in outgoingEdges:
@@ -77,26 +79,6 @@ class MoveAPI:
                     continue
                 result.append(tr)
         return result
-
-    @classmethod
-    def changeMapToDstDirection(cls, direction: DirectionsEnum, discard: list[int] = []) -> None:
-        transitions = cls.getOutGoingTransitions(discard=discard, directions=[direction])
-        if len(transitions) == 0:
-            raise Exception(f"No transition found towards direction '{direction.name}'")
-        cls.sendClickAdjacentMsg(transitions[0].transitionMapId, transitions[0].cell)
-
-    @classmethod
-    def changeMapToDstCoords(cls, x: int, y: int, discard: list[int] = []):
-        v = WorldPathFinder().getCurrentPlayerVertex()
-        outgoingEdges = WorldPathFinder().worldGraph.getOutgoingEdgesFromVertex(v)
-        if len(outgoingEdges) == 0:
-            raise Exception(f"No transition found towards coords '{x, y}'")
-        for e in outgoingEdges:
-            mp = MapPosition.getMapPositionById(e.dst.mapId)
-            if mp.posX == x and mp.posY == y:
-                cls.sendClickAdjacentMsg(e.transitions[0].transitionMapId, e.transitions[0].cell)
-                return e.transitions[0].transitionMapId
-        return -1
 
     @classmethod
     def sendClickAdjacentMsg(cls, mapId: float, cellId: int) -> None:
@@ -118,3 +100,29 @@ class MoveAPI:
         if len(transitions) == 0:
             raise Exception(f"No transition found towards mapId '{destMapId}'")
         cls.sendClickAdjacentMsg(transitions[0].transitionMapId, transitions[0].cell)
+
+    @classmethod
+    def followEdge(cls, edge: Edge):
+        for tr in edge.transitions:
+            try:
+                cls.followTransition(tr)
+                return
+            except:
+                pass
+        raise Exception("No valid transition found!!")
+
+    @classmethod
+    def getTransitionIe(cls, transition: Transition) -> "InteractiveElementData":
+        rpframe: "RoleplayInteractivesFrame" = Kernel().getWorker().getFrame("RoleplayInteractivesFrame")
+        return rpframe.getIeBySkillId(transition.skillId)
+
+    @classmethod
+    def followTransition(cls, transition: Transition):
+        if transition.skillId != -1:
+            ie = cls.getTransitionIe(transition)
+            rpframe: "RoleplayInteractivesFrame" = Kernel().getWorker().getFrame("RoleplayInteractivesFrame")
+            rpframe.skillClicked(ie)
+        if transition.cell:
+            cls.sendClickAdjacentMsg(transition.transitionMapId, transition.cell)
+        else:
+            raise Exception("No direction or skill to transit found!!!")

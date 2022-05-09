@@ -1,6 +1,7 @@
 from threading import Timer
 from com.ankamagames.dofus.logic.game.common.managers.PlayedCharacterManager import PlayedCharacterManager
 from com.ankamagames.dofus.logic.game.common.misc.DofusEntities import DofusEntities
+from com.ankamagames.dofus.modules.utils.pathFinding.world.Edge import Edge
 from com.ankamagames.jerakine.messages.Frame import Frame
 from com.ankamagames.jerakine.messages.Message import Message
 from pyd2bot.apis.MoveAPI import MoveAPI
@@ -21,6 +22,7 @@ from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
     from com.ankamagames.dofus.logic.game.roleplay.frames.RoleplayMovementFrame import RoleplayMovementFrame
+    from com.ankamagames.dofus.logic.game.roleplay.frames.RoleplayInteractivesFrame import RoleplayInteractivesFrame
 
 from pyd2bot.messages.AutoTripEndedMessage import AutoTripEndedMessage
 
@@ -42,7 +44,7 @@ class BotAutoTripFrame(Frame):
 
     @property
     def priority(self) -> int:
-        return Priority.LOW
+        return Priority.VERY_LOW
 
     def reset(self):
         self.dstMapId = None
@@ -53,16 +55,18 @@ class BotAutoTripFrame(Frame):
         self._worker = Kernel().getWorker()
 
     def pushed(self) -> bool:
+        logger.debug("Auto trip frame pushed")
         self._worker = Kernel().getWorker()
         self._computed = False
         self.changeMapFails = 0
         self.nextStepIndex = None
         self.path = None
-        self.walkToNextStep()
+        Timer(0.2, self.walkToNextStep).start()
         return True
 
     def pulled(self) -> bool:
         self.reset()
+        logger.debug("Auto trip frame pulled")
         return True
 
     def process(self, msg: Message) -> bool:
@@ -84,35 +88,39 @@ class BotAutoTripFrame(Frame):
 
     def walkToNextStep(self):
         if not DofusEntities.getEntity(PlayedCharacterManager().id):
-            Timer(0.1, self.walkToNextStep).start()
+            logger.error("Player not found")
+            Timer(5, self.walkToNextStep).start()
             return
         if self.nextStepIndex is not None:
             logger.debug(f"Next step index: {self.nextStepIndex}/{len(self.path)}")
             if self.nextStepIndex == len(self.path):
+                logger.debug("Trip reached destination map")
                 Kernel().getWorker().removeFrame(self)
-                Kernel().getWorker().process(AutoTripEndedMessage(self.dstMapId))
+                Kernel().getWorker().processImmediately(AutoTripEndedMessage(self.dstMapId))
                 return True
             e = self.path[self.nextStepIndex]
             self.nextStepIndex += 1
-            direction = DirectionsEnum(e.transitions[0].direction)
-            MoveAPI.changeMapToDstDirection(direction)
+            MoveAPI.followEdge(e)
         else:
             WorldPathFinder().findPath(self.dstMapId, self.onComputeOver)
 
     def onComputeOver(self, *args):
-        path = None
+        path: list[Edge] = None
         for arg in args:
             if isinstance(arg, list):
                 path = arg
                 break
-        if path is None:
-            raise Exception("No path found")
-        if len(path) == 0:
-            Kernel().getWorker().process(AutoTripEndedMessage(self.dstMapId))
+        if path is None or len(path) == 0:
+            logger.error("No path found")
+            Kernel().getWorker().removeFrame(self)
+            Kernel().getWorker().process(AutoTripEndedMessage(None))
             return True
-        self.path = path
-        e = self.path[0]
-        direction = DirectionsEnum(e.transitions[0].direction)
-        MoveAPI.changeMapToDstDirection(direction)
+        logger.debug(f"Path found: ")
+        for e in path:
+            print(f"/t * src {e.src.mapId} -> dst {e.dst.mapId}")
+            for tr in e.transitions:
+                print(f"/t/t - direction : {tr.direction}, skill : {tr.skillId}, cell : {tr.cell}")
+        self.path: list[Edge] = path
+        MoveAPI.followEdge(self.path[0])
         self._computed = True
         self.nextStepIndex = 1

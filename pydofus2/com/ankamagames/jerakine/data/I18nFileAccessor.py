@@ -10,6 +10,9 @@ class I18nFileAccessor(metaclass=Singleton):
 
     directBuffer = None
 
+    def __init__(self) -> None:
+        self.init()
+
     def init(self):
         nativeFile = Constants.LANG_FILE_PATH
         if not nativeFile or not nativeFile.exists():

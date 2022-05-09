@@ -183,4 +183,4 @@ class MovementPath:
                     duration += self.VERTICAL_RUN_DURATION
                 else:
                     duration += self.DIAGONAL_RUN_DURATION
-        return min(duration / 1000, 5)
+        return duration / 1000

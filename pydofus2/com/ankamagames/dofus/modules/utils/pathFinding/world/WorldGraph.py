@@ -5,7 +5,7 @@ from com.ankamagames.jerakine.network.CustomDataWrapper import ByteArray
 
 class WorldGraph:
 
-    _vertices: dict[int, Vertex]
+    _vertices: dict[int, dict[int, Vertex]]
 
     _edges: dict[float, Edge]
 
@@ -52,8 +52,11 @@ class WorldGraph:
             return None
         return self._vertices[mapId].get(mapRpZone)
 
+    def getVertices(self, mapId) -> dict[int, Vertex]:
+        return self._vertices.get(mapId)
+
     def getOutgoingEdgesFromVertex(self, src: Vertex) -> list[Edge]:
-        return self._outgoingEdges[src.UID]
+        return self._outgoingEdges.get(src.UID, [])
 
     def getEdge(self, src: Vertex, dest: Vertex) -> Edge:
         if self._edges.get(src.UID) == None:

@@ -1,6 +1,5 @@
 from com.ankamagames.dofus.kernel.net.ConnectionsHandler import ConnectionsHandler
 from com.ankamagames.dofus.logic.game.common.managers.PlayedCharacterManager import PlayedCharacterManager
-from com.ankamagames.dofus.logic.game.roleplay.frames.RoleplayInteractivesFrame import RoleplayInteractivesFrame
 from com.ankamagames.dofus.network.enums.PlayerLifeStatusEnum import PlayerLifeStatusEnum
 from com.ankamagames.dofus.network.messages.game.context.roleplay.MapComplementaryInformationsDataMessage import (
     MapComplementaryInformationsDataMessage,
@@ -18,20 +17,25 @@ from com.ankamagames.jerakine.messages.Message import Message
 from com.ankamagames.jerakine.types.enums.Priority import Priority
 from pyd2bot.frames.BotAutoTripFrame import BotAutoTripFrame
 from pyd2bot.messages.AutoTripEndedMessage import AutoTripEndedMessage
+from typing import TYPE_CHECKING
+
+from pyd2bot.misc.Localizer import Localizer
+
+if TYPE_CHECKING:
+    from com.ankamagames.dofus.logic.game.roleplay.frames.RoleplayInteractivesFrame import RoleplayInteractivesFrame
 
 logger = Logger("Dofus2")
 
 
 class BotPhenixAutoRevive(Frame):
-    PHENIX_MAPID = None
-
-    def __init__(self, phenixMapId):
+    def __init__(self):
+        self.phenixMapId = Localizer.getPhenixMapId()
         super().__init__()
 
     def pushed(self) -> bool:
         self._waitingForMapData = False
         if PlayerLifeStatusEnum(PlayedCharacterManager().state) == PlayerLifeStatusEnum.STATUS_PHANTOM:
-            Kernel().getWorker().addFrame(BotAutoTripFrame(self.PHENIX_MAPID))
+            Kernel().getWorker().addFrame(BotAutoTripFrame(self.phenixMapId))
         elif PlayedCharacterManager().state == PlayerLifeStatusEnum.STATUS_TOMBSTONE:
             self.releaseSoul()
         return True
@@ -59,7 +63,7 @@ class BotPhenixAutoRevive(Frame):
 
         elif isinstance(msg, MapComplementaryInformationsDataMessage):
             if self._waitingForMapData:
-                Kernel().getWorker().addFrame(BotAutoTripFrame(self.PHENIX_MAPID))
+                Kernel().getWorker().addFrame(BotAutoTripFrame(self.phenixMapId))
                 self._waitingForMapData = False
             return False
 

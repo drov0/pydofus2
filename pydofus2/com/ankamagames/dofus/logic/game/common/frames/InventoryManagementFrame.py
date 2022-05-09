@@ -192,7 +192,7 @@ class InventoryManagementFrame(Frame):
             PlayedCharacterManager().inventoryWeight = iwmsg.inventoryWeight
             PlayedCharacterManager().shopWeight = iwmsg.shopWeight
             PlayedCharacterManager().inventoryWeightMax = iwmsg.weightMax
-            return True
+            return False
 
         if isinstance(msg, ObjectMovementMessage):
             ommsg = msg

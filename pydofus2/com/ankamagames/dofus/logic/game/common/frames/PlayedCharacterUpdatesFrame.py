@@ -271,10 +271,8 @@ class PlayedCharacterUpdatesFrame(Frame):
 
         if isinstance(msg, CharacterLevelUpMessage):
             clumsg = msg
-            messageId = clumsg.getMessageId()
-            if messageId == CharacterLevelUpMessage.getMessageId():
-                previousLevel = pcm.PlayedCharacterManager().infos.level
-                pcm.PlayedCharacterManager().infos.level = clumsg.newLevel
+            previousLevel = pcm.PlayedCharacterManager().infos.level
+            pcm.PlayedCharacterManager().infos.level = clumsg.newLevel
             if clumsg.newLevel == 10 and PlayerManager().server.gameTypeId != GameServerTypeEnum.SERVER_TYPE_TEMPORIS:
                 caracPointEarned = 0
                 healPointEarned = 0

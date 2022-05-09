@@ -1,6 +1,8 @@
 from typing import TYPE_CHECKING
+from com.ankamagames.atouin.managers.MapDisplayManager import MapDisplayManager
 import com.ankamagames.dofus.kernel.Kernel as krnl
 from com.ankamagames.dofus.logic.game.common.misc.DofusEntities import DofusEntities
+from com.ankamagames.jerakine.entities.interfaces.IEntity import IEntity
 
 
 if TYPE_CHECKING:
@@ -27,6 +29,8 @@ if TYPE_CHECKING:
     from com.ankamagames.dofus.network.types.game.character.restriction.ActorRestrictionsInformations import (
         ActorRestrictionsInformations,
     )
+    from com.ankamagames.atouin.data.map.Cell import Cell
+
 from com.ankamagames.dofus.network.enums.CharacterInventoryPositionEnum import (
     CharacterInventoryPositionEnum,
 )
@@ -248,12 +252,15 @@ class PlayedCharacterManager(IDestroyable, metaclass=Singleton):
         return -1
 
     @property
+    def entity(self) -> "IEntity":
+        return DofusEntities.getEntity(self.id)
+
+    @property
     def currentCellId(self) -> int:
-        playedEntity = DofusEntities.getEntity(self.id)
-        if playedEntity is None:
+        if self.entity is None:
             logger.error("No player entity found")
             return None
-        return playedEntity.position.cellId
+        return self.entity.position.cellId
 
     @property
     def isMutated(self) -> bool:
@@ -373,6 +380,14 @@ class PlayedCharacterManager(IDestroyable, metaclass=Singleton):
         else:
             diff = 1 * type
         return diff
+
+    @property
+    def currentCell(self) -> "Cell":
+        return MapDisplayManager().dataMap.cells[self.currentCellId]
+
+    @property
+    def currentZoneRp(self) -> int:
+        return self.currentCell.linkedZoneRP
 
     def addInfosAvailableCallback(self, pCallback: Callback) -> None:
         self._infosAvailableCallbacks.append(pCallback)

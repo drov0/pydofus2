@@ -52,23 +52,20 @@ class WorldPathFinder(metaclass=Singleton):
     def isInitialized(self) -> bool:
         return self.worldGraph is not None
 
-    def getCurrentPlayerVertex(self) -> Vertex:
-        playedEntity: IEntity = DofusEntities.getEntity(PlayedCharacterManager().id)
-        if playedEntity is None:
-            logger.error("No player entity found")
-            return None
-        playedEntityCellId: int = playedEntity.position.cellId
-        playerCell: Cell = MapDisplayManager().dataMap.cells[playedEntityCellId]
-        vertex = self.worldGraph.getVertex(PlayedCharacterManager().currentMap.mapId, playerCell.linkedZoneRP)
+    @property
+    def currPlayerVertex(self) -> Vertex:
+        vertex = self.worldGraph.getVertex(
+            PlayedCharacterManager().currentMap.mapId, PlayedCharacterManager().currentZoneRp
+        )
         return vertex
 
     def findPath(self, destinationMapId: float, callback: FunctionType) -> None:
         if not self.isInitialized():
             callback(None)
             return
-        logger.info("Start searching path to " + str(destinationMapId))
         TimeDebug.reset()
-        self.src = self.getCurrentPlayerVertex()
+        self.src = self.currPlayerVertex
+        logger.info(f"Start searching path from {self.currPlayerVertex} to destMapId {destinationMapId}")
         if self.src is None:
             callback(None)
             return

@@ -10,8 +10,6 @@ class Rectangle:
     def bottomRight(self, get, set) -> Point:
         pass
 
-    height: float
-
     @property
     def left(self, get, set) -> float:
         pass
@@ -32,6 +30,7 @@ class Rectangle:
     def topLeft(self, get, set) -> Point:
         pass
 
+    height: float
     width: float
     x: float
     y: float

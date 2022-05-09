@@ -5,7 +5,6 @@ from com.ankamagames.dofus.kernel.Kernel import Kernel
 from com.ankamagames.dofus.logic.game.common.managers.PlayedCharacterManager import (
     PlayedCharacterManager,
 )
-import com.ankamagames.dofus.logic.game.roleplay.frames.RoleplayEntitiesFrame as rpeF
 from com.ankamagames.dofus.logic.game.roleplay.frames.RoleplayWorldFrame import (
     RoleplayWorldFrame,
 )
@@ -57,6 +56,10 @@ from com.ankamagames.jerakine.messages.Frame import Frame
 from com.ankamagames.jerakine.messages.Message import Message
 from com.ankamagames.jerakine.types.enums.Priority import Priority
 from com.ankamagames.jerakine.types.positions.MapPoint import MapPoint
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from com.ankamagames.dofus.logic.game.roleplay.frames.RoleplayEntitiesFrame import RoleplayEntitiesFrame
 
 logger = Logger("Dofus2")
 
@@ -79,10 +82,10 @@ class CollectableElement:
 
 
 class InteractiveElementData:
-    def __init__(self, element: InteractiveElement, position: MapPoint, firstSkill: int) -> None:
+    def __init__(self, element: InteractiveElement, position: MapPoint, skillUID: int) -> None:
         self.element = element
         self.position = position
-        self.firstSkill = firstSkill
+        self.skillUID = skillUID
 
 
 class RoleplayInteractivesFrame(Frame):
@@ -319,7 +322,7 @@ class RoleplayInteractivesFrame(Frame):
     def registerInteractive(self, ie: InteractiveElement, firstSkill: int) -> None:
         if not MapDisplayManager().isIdentifiedElement(ie.elementId):
             return
-        entitiesFrame: rpeF.RoleplayEntitiesFrame = Kernel().getWorker().getFrame("RoleplayEntitiesFrame")
+        entitiesFrame: "RoleplayEntitiesFrame" = Kernel().getWorker().getFrame("RoleplayEntitiesFrame")
         if entitiesFrame:
             found = False
             for s, cie in enumerate(entitiesFrame.interactiveElements):
@@ -349,9 +352,15 @@ class RoleplayInteractivesFrame(Frame):
         return None
 
     def getReviveIe(self) -> InteractiveElementData:
+        return self.getIeBySkillId(self.REVIVE_SKILL_ID)
+
+    def getIeBySkillId(self, skillId: int) -> InteractiveElementData:
         for ieid, ie in self._ie.items():
-            if ie.element.enabledSkills and ie.element.enabledSkills[0].skillId == self.REVIVE_SKILL_ID:
-                return ie
+            if ie.element.enabledSkills:
+                for skill in ie.element.enabledSkills:
+                    if skill.skillId == skillId:
+                        ie.skillUID = skill.skillInstanceUid
+                        return ie
 
     def updateStatedElement(self, se: StatedElement, globalv: bool = False) -> None:
         if se.elementId == self._currentUsedElementId:
@@ -366,7 +375,7 @@ class RoleplayInteractivesFrame(Frame):
 
     def skillClicked(self, ie: InteractiveElementData) -> None:
         msg: InteractiveElementActivationMessage = InteractiveElementActivationMessage(
-            ie.element, ie.position, ie.firstSkill
+            ie.element, ie.position, ie.skillUID
         )
         Kernel().getWorker().process(msg)
 

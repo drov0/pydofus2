@@ -108,7 +108,7 @@ class Inventory:
 
     def removeItem(self, itemUID: int, quantity: int = -1) -> None:
         oldItem: ItemWrapper = None
-        itemSet: ItemSet = self._itemsDict[itemUID]
+        itemSet: ItemSet = self._itemsDict.get(itemUID)
         if not itemSet:
             logger.error("Suppression d'un item qui n'existe pas")
             return
@@ -124,7 +124,7 @@ class Inventory:
             self.modifyItemFromViews(itemSet, oldItem)
 
     def modifyItemQuantity(self, itemUID: int, quantity: int) -> None:
-        itemSet: ItemSet = self._itemsDict[itemUID]
+        itemSet: ItemSet = self._itemsDict.get(itemUID)
         if not itemSet:
             logger.error("On essaye de modifier la quantit� d'un objet qui n'existe pas")
             return
@@ -133,7 +133,7 @@ class Inventory:
         self.modifyItem(iw)
 
     def modifyItemPosition(self, itemUID: int, position: int) -> None:
-        itemSet: ItemSet = self._itemsDict[itemUID]
+        itemSet: ItemSet = self._itemsDict.get(itemUID)
         if not itemSet:
             logger.error("On essaye de modifier la position d'un objet qui n'existe pas")
             return
@@ -167,7 +167,7 @@ class Inventory:
 
     def modifyItem(self, item: ItemWrapper) -> None:
         oldItem: ItemWrapper = None
-        itemSet: ItemSet = self._itemsDict[item.objectUID]
+        itemSet: ItemSet = self._itemsDict.get(item.objectUID)
         if itemSet:
             oldItem = itemSet.item.clone()
             self.copyItem(itemSet.item, item)
@@ -176,7 +176,7 @@ class Inventory:
             self.addItem(item)
 
     def addItemMask(self, objectUID: int, name: str, size: int) -> None:
-        itemSet: ItemSet = self._itemsDict[objectUID]
+        itemSet: ItemSet = self._itemsDict.get(objectUID)
         if not itemSet:
             logger.error("On essaye de masquer un item qui n'existe pas dans l'inventaire")
             return
@@ -184,7 +184,7 @@ class Inventory:
         self.modifyItemFromViews(itemSet, itemSet.item)
 
     def removeItemMask(self, objectUID: int, name: str) -> None:
-        itemSet: ItemSet = self._itemsDict[objectUID]
+        itemSet: ItemSet = self._itemsDict.get(objectUID)
         if not itemSet:
             return
         del itemSet.masks[name]
@@ -193,7 +193,7 @@ class Inventory:
     def removeAllItemMasks(self, name: str) -> None:
         itemSet: ItemSet = None
         for itemSet in self._itemsDict:
-            if itemSet.masks[name]:
+            if itemSet.masks.get(name):
                 del itemSet.masks[name]
                 self.modifyItemFromViews(itemSet, itemSet.item)
 

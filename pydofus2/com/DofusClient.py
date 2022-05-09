@@ -1,22 +1,13 @@
 import sys
-from com.ankamagames.dofus.logic.common.frames.QuestFrame import QuestFrame
 from com.ankamagames.dofus.logic.common.managers.PlayerManager import PlayerManager
 from time import sleep
 import com.ankamagames.dofus.kernel.Kernel as krnl
 from com.ankamagames.dofus.kernel.net.DisconnectionReasonEnum import DisconnectionReasonEnum
-from com.ankamagames.dofus.logic.common.frames.MiscFrame import MiscFrame
 from com.ankamagames.dofus.logic.connection.actions.LoginValidationWithTokenAction import (
     LoginValidationWithTokenAction,
 )
 import com.ankamagames.dofus.logic.connection.managers.AuthentificationManager as auth
 import com.ankamagames.dofus.kernel.net.ConnectionsHandler as connh
-from com.ankamagames.dofus.logic.game.common.frames.InventoryManagementFrame import (
-    InventoryManagementFrame,
-)
-from com.ankamagames.dofus.logic.game.common.frames.JobsFrame import JobsFrame
-from com.ankamagames.dofus.logic.game.common.frames.SpellInventoryManagementFrame import (
-    SpellInventoryManagementFrame,
-)
 from com.ankamagames.dofus.modules.utils.pathFinding.world.WorldPathFinder import (
     WorldPathFinder,
 )
@@ -68,12 +59,15 @@ class DofusClient(metaclass=Singleton):
                 if not self.mainConn:
                     sys.exit(0)
             except KeyboardInterrupt:
-                connh.ConnectionsHandler.connectionGonnaBeClosed(DisconnectionReasonEnum.WANTED_SHUTDOWN)
-                connh.ConnectionsHandler.getConnection().close()
+                self.shutdown()
                 sys.exit(0)
 
     def registerFrame(self, frame):
         self._registredCustomFrames.append(frame)
+
+    def shutdown(self):
+        connh.ConnectionsHandler.connectionGonnaBeClosed(DisconnectionReasonEnum.WANTED_SHUTDOWN)
+        connh.ConnectionsHandler.getConnection().close()
 
     def restart(self):
         connh.ConnectionsHandler.connectionGonnaBeClosed(DisconnectionReasonEnum.RESTARTING)

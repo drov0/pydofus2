@@ -1,65 +1,35 @@
+from time import sleep
 from unittest import skip
 from com.DofusClient import DofusClient
-from pyd2bot.frames.BotPhenixAutoRevive import BotPhenixAutoRevive
+from com.ankamagames.dofus.logic.game.common.managers.PlayedCharacterManager import PlayedCharacterManager
+from com.ankamagames.dofus.modules.utils.pathFinding.world.WorldGraph import WorldGraph
+from com.ankamagames.dofus.modules.utils.pathFinding.world.WorldPathFinder import WorldPathFinder
 from pyd2bot.frames.BotWorkflowFrame import BotWorkflowFrame
 from pyd2bot.frames.BotFarmPathFrame import BotFarmPathFrame
 from com.ankamagames.jerakine.logger.Logger import Logger
 from pyd2bot.managers.BotCredsManager import BotCredsManager
-from pyd2bot.models.FarmParcours import FarmParcours
+from pyd2bot.models.farmPaths.RandomSubAreaFarmPath import RandomSubAreaFarmPath
 
 logger = Logger("Dofus2")
 
 # Goujon path incarnam
 FISHING_SKILL_ID = 124
-ANKARNAM_PHENIX_MAPID = 153879809.0
 
-bouftou_incarnam = {
-    "startMapId": 153879300,
-    "path": [(1, -4), (0, -4), (0, -5), (1, -5)],
-    "fightOnly": True,
-    "skills": [FISHING_SKILL_ID],
-}
-
-pioute_astrub = {
-    "startMapId": 191104002,
-    "path": [(4, -18), (4, -19), (3, -19), (3, -18), (3, -17), (4, -17), (5, -17), (5, -18)],
-    "skills": [],
-    "fightOnly": True,
-}
-
-goujon_incarnam = {
-    "startMapId": 154010882,
-    "path": [
-        (-2, -2),
-        (-1, -2),
-        (0, -2),
-        (0, -1),
-        (1, -1),
-        (1, 0),
-        (0, 0),
-        (-1, 0),
-        (-2, 0),
-        (-2, -1),
-        (-1, -1),
-        (-1, -2),
-    ],
-    "skills": [FISHING_SKILL_ID],
-    "fightOnly": True,
-}
-
-pioute_amakna = {
-    "startMapId": 88212244,
-    "path": [(0, 3), (1, 3), (2, 3), (3, 3), (3, 2), (2, 2), (1, 2), (0, 2)],
-    "skills": [FISHING_SKILL_ID],
-    "fightOnly": True,
-}
 
 if __name__ == "__main__":
-    botName = "foobar"
-    creds = BotCredsManager.getEntry(botName)
+
     dofus2 = DofusClient()
-    BotFarmPathFrame.parcours = FarmParcours(**goujon_incarnam)
-    BotPhenixAutoRevive.PHENIX_MAPID = ANKARNAM_PHENIX_MAPID
+
+    # setup the farm path
+    astrub_vilage_subareaid = 95
+    astrub_bank_map = WorldPathFinder().worldGraph.getVertex(191104002.0, 1)
+    pioute_astrub = RandomSubAreaFarmPath(astrub_vilage_subareaid, astrub_bank_map, True)
+
+    BotFarmPathFrame.farmPath = pioute_astrub
     dofus2.registerFrame(BotWorkflowFrame())
+    creds = BotCredsManager.getEntry("foobar")
     dofus2.login(**creds)
+    # if not PlayedCharacterManager().currentMap:
+    #     sleep(0.3)
+    # print([str(v) for v in pioute_astrub.verticies])
     dofus2.join()

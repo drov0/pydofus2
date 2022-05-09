@@ -9,14 +9,18 @@ from com.ankamagames.dofus.network.messages.game.context.roleplay.death.GameRole
 from com.ankamagames.dofus.network.messages.game.context.roleplay.death.GameRolePlayPlayerLifeStatusMessage import (
     GameRolePlayPlayerLifeStatusMessage,
 )
+from com.ankamagames.dofus.network.messages.game.inventory.items.InventoryWeightMessage import InventoryWeightMessage
 from com.ankamagames.jerakine.messages.Frame import Frame
 from com.ankamagames.dofus.kernel.Kernel import Kernel
 from com.ankamagames.jerakine.logger.Logger import Logger
 from com.ankamagames.jerakine.messages.Message import Message
 from com.ankamagames.jerakine.types.enums.Priority import Priority
+from pyd2bot.apis.InventoryAPI import InventoryAPI
 from pyd2bot.frames.BotFightFrame import BotFightFrame
 from pyd2bot.frames.BotFarmPathFrame import BotFarmPathFrame
 from pyd2bot.frames.BotPhenixAutoRevive import BotPhenixAutoRevive
+from pyd2bot.frames.BotUnloadInBankFrame import BotUnloadInBankFrame
+from pyd2bot.messages.BankUnloadEndedMessage import BankUnloadEndedMessage
 
 logger = Logger("Dofus2")
 
@@ -27,6 +31,8 @@ class BotWorkflowFrame(Frame):
         super().__init__()
 
     def pushed(self) -> bool:
+        self._inBankAutoUnload = False
+        self._inPhenixAutoRevive = False
         return True
 
     def pulled(self) -> bool:
@@ -40,11 +46,12 @@ class BotWorkflowFrame(Frame):
 
         if isinstance(msg, GameContextCreateMessage):
             self.currentContext = msg.context
-            if self.currentContext == GameContextEnum.ROLE_PLAY:
-                Kernel().getWorker().addFrame(BotFarmPathFrame())
+            if not self._inBankAutoUnload and not self._inPhenixAutoRevive:
+                if self.currentContext == GameContextEnum.ROLE_PLAY:
+                    Kernel().getWorker().addFrame(BotFarmPathFrame())
 
-            elif self.currentContext == GameContextEnum.FIGHT:
-                Kernel().getWorker().addFrame(BotFightFrame())
+                elif self.currentContext == GameContextEnum.FIGHT:
+                    Kernel().getWorker().addFrame(BotFightFrame())
             return True
 
         elif isinstance(msg, GameContextDestroyMessage):
@@ -57,6 +64,27 @@ class BotWorkflowFrame(Frame):
                     Kernel().getWorker().removeFrameByName("BotFarmPathFrame")
             return True
 
+        elif isinstance(msg, InventoryWeightMessage):
+            if not self._inBankAutoUnload:
+                if InventoryAPI.getWeightPercent() > 95:
+                    if Kernel().getWorker().getFrame("BotFarmPathFrame"):
+                        Kernel().getWorker().removeFrameByName("BotFarmPathFrame")
+                    self._inBankAutoUnload = True
+                    logger.warn(
+                        f"Inventory is almost full {InventoryAPI.getWeightPercent()}, will trigger auto bank unload..."
+                    )
+                    Kernel().getWorker().addFrame(BotUnloadInBankFrame())
+                return True
+            else:
+                return False
+
+        elif isinstance(msg, BankUnloadEndedMessage):
+            self._inBankAutoUnload = False
+            if not Kernel().getWorker().contains("BotFarmPathFrame"):
+                Kernel().getWorker().addFrame(BotFarmPathFrame(True))
+            if Kernel().getWorker().contains("BotUnloadInBankFrame"):
+                Kernel().getWorker().removeFrameByName("BotUnloadInBankFrame")
+
         elif (
             isinstance(msg, GameRolePlayPlayerLifeStatusMessage)
             and (
@@ -65,10 +93,11 @@ class BotWorkflowFrame(Frame):
             )
         ) or isinstance(msg, GameRolePlayGameOverMessage):
             logger.debug(f"Player is dead, auto reviving...")
+            self._inPhenixAutoRevive = True
             if Kernel().getWorker().contains("BotFarmPathFrame"):
                 Kernel().getWorker().removeFrameByName("BotFarmPathFrame")
             PlayedCharacterManager().state = PlayerLifeStatusEnum(msg.state)
-            Kernel().getWorker().addFrame(BotPhenixAutoRevive(msg.phenixMapId))
+            Kernel().getWorker().addFrame(BotPhenixAutoRevive())
             return False
 
         elif (
@@ -76,6 +105,7 @@ class BotWorkflowFrame(Frame):
             and PlayerLifeStatusEnum(msg.state) == PlayerLifeStatusEnum.STATUS_ALIVE_AND_KICKING
         ):
             logger.debug(f"Player is alive and kicking, returning to work...")
+            self._inPhenixAutoRevive = False
             if Kernel().getWorker().contains("BotPhenixAutoRevive"):
                 Kernel().getWorker().removeFrameByName("BotPhenixAutoRevive")
             if not Kernel().getWorker().contains("BotFarmPathFrame"):

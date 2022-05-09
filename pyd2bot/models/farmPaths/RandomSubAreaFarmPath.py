@@ -2,6 +2,7 @@ import collections
 import random
 from typing import Iterator
 from com.ankamagames.dofus.datacenter.world.SubArea import SubArea
+from com.ankamagames.dofus.modules.utils.pathFinding.astar.AStar import AStar
 from com.ankamagames.dofus.modules.utils.pathFinding.world.Transition import Transition
 from com.ankamagames.dofus.modules.utils.pathFinding.world.Vertex import Vertex
 from com.ankamagames.dofus.modules.utils.pathFinding.world.WorldPathFinder import WorldPathFinder
@@ -21,9 +22,10 @@ class RandomSubAreaFarmPath(AbstractFarmPath):
         transitions = []
         for edge in outgoingEdges:
             if edge.dst.mapId in self.subArea.mapIds:
-                for tr in edge.transitions:
-                    if tr.direction != -1:
-                        transitions.append(tr)
+                if AStar.hasValidTransition(edge):
+                    for tr in edge.transitions:
+                        if tr.direction != -1:
+                            transitions.append(tr)
         return random.choice(transitions)
 
     def currNeighbors(self) -> Iterator[Vertex]:

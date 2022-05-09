@@ -9,13 +9,13 @@ logger = Logger("Dofus2")
 
 class MovementPath:
 
-    MAX_PATH_LENGTH: int = 100
-    HORIZONTAL_WALK_DURATION = 510
-    VERTICAL_WALK_DURATION = 425
-    DIAGONAL_WALK_DURATION = 480
-    HORIZONTAL_RUN_DURATION = 255
-    VERTICAL_RUN_DURATION = 150
-    DIAGONAL_RUN_DURATION = 170
+    MAX_PATH_LENGTH: int = 100.0
+    HORIZONTAL_WALK_DURATION = 510.0
+    VERTICAL_WALK_DURATION = 425.0
+    DIAGONAL_WALK_DURATION = 480.0
+    HORIZONTAL_RUN_DURATION = 255.0
+    VERTICAL_RUN_DURATION = 150.0
+    DIAGONAL_RUN_DURATION = 170.0
 
     def __init__(self):
         super().__init__()
@@ -183,4 +183,4 @@ class MovementPath:
                     duration += self.VERTICAL_RUN_DURATION
                 else:
                     duration += self.DIAGONAL_RUN_DURATION
-        return duration / 1000
+        return duration / 1000.0

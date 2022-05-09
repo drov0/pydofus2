@@ -1,7 +1,13 @@
+from cmath import log
 from threading import Timer
+from com.ankamagames.atouin.managers.MapDisplayManager import MapDisplayManager
+from com.ankamagames.dofus.kernel.net.ConnectionsHandler import ConnectionsHandler
 from com.ankamagames.dofus.logic.game.common.managers.PlayedCharacterManager import PlayedCharacterManager
 from com.ankamagames.dofus.logic.game.common.misc.DofusEntities import DofusEntities
 from com.ankamagames.dofus.modules.utils.pathFinding.world.Edge import Edge
+from com.ankamagames.dofus.network.messages.game.context.roleplay.MapInformationsRequestMessage import (
+    MapInformationsRequestMessage,
+)
 from com.ankamagames.jerakine.messages.Frame import Frame
 from com.ankamagames.jerakine.messages.Message import Message
 from pyd2bot.apis.MoveAPI import MoveAPI
@@ -31,15 +37,14 @@ logger = Logger("Dofus2")
 
 class BotAutoTripFrame(Frame):
     dstMapId = None
-    nextStepIndex = None
     path = None
 
-    def __init__(self, dstmapid):
-        self.dstMapId = dstmapid
-        self.nextStepIndex = None
+    def __init__(self, dstMapId):
+        self.dstMapId = dstMapId
         self.path = None
         self.changeMapFails = 0
         self._computed = False
+        self._worker = Kernel().getWorker()
         super().__init__()
 
     @property
@@ -48,18 +53,15 @@ class BotAutoTripFrame(Frame):
 
     def reset(self):
         self.dstMapId = None
-        self.nextStepIndex = None
         self.path = None
         self.changeMapFails = 0
         self._computed = False
-        self._worker = Kernel().getWorker()
 
     def pushed(self) -> bool:
         logger.debug("Auto trip frame pushed")
         self._worker = Kernel().getWorker()
         self._computed = False
         self.changeMapFails = 0
-        self.nextStepIndex = None
         self.path = None
         Timer(0.2, self.walkToNextStep).start()
         return True
@@ -72,55 +74,60 @@ class BotAutoTripFrame(Frame):
     def process(self, msg: Message) -> bool:
 
         if isinstance(msg, MapComplementaryInformationsDataMessage):
-            logger.debug(f"New map entered")
             if self._computed:
                 self.walkToNextStep()
             return True
 
         if isinstance(msg, MapChangeFailedMessage):
-            if self.changeMapFails > 5:
-                logger.error("Too many map change fails")
-                return True
-            self.changeMapFails += 1
-            rolePlayFrame: "RoleplayMovementFrame" = Kernel().getWorker().getFrame("RoleplayMovementFrame")
-            rolePlayFrame.askMapChange()
-        return True
+            mirmsg = MapInformationsRequestMessage()
+            mirmsg.init(mapId_=MapDisplayManager().currentMapPoint.mapId)
+            ConnectionsHandler.getConnection().send(mirmsg)
+            return True
+
+    @property
+    def currentEdgeIndex(self):
+        v = WorldPathFinder().currPlayerVertex
+        i = 0
+        while i < len(self.path):
+            if self.path[i].src == v:
+                break
+            i += 1
+        return i
 
     def walkToNextStep(self):
-        if not DofusEntities.getEntity(PlayedCharacterManager().id):
-            logger.error("Player not found")
-            Timer(5, self.walkToNextStep).start()
+        if not PlayedCharacterManager().currentMap:
+            Timer(0.1, self.walkToNextStep).start()
             return
-        if self.nextStepIndex is not None:
-            logger.debug(f"Next step index: {self.nextStepIndex}/{len(self.path)}")
-            if self.nextStepIndex == len(self.path):
-                logger.debug("Trip reached destination map")
-                Kernel().getWorker().removeFrame(self)
-                Kernel().getWorker().processImmediately(AutoTripEndedMessage(self.dstMapId))
-                return True
-            e = self.path[self.nextStepIndex]
-            self.nextStepIndex += 1
-            MoveAPI.followEdge(e)
+        if PlayedCharacterManager().currentMap.mapId == self.dstMapId:
+            logger.debug("Trip reached destination Map")
+            Kernel().getWorker().removeFrame(self)
+            Kernel().getWorker().processImmediately(AutoTripEndedMessage(self.dstMapId))
+            return True
+        elif self._computed:
+            logger.debug(f"Current step index: {self.currentEdgeIndex}/{len(self.path)}")
+            if self.currentEdgeIndex == len(self.path):
+                raise Exception("Unexpected behavior: asking to move beyond path should have returned before")
+            MoveAPI.followEdge(self.path[self.currentEdgeIndex])
         else:
             WorldPathFinder().findPath(self.dstMapId, self.onComputeOver)
 
     def onComputeOver(self, *args):
+        self._computed = True
         path: list[Edge] = None
         for arg in args:
             if isinstance(arg, list):
                 path = arg
                 break
-        if path is None or len(path) == 0:
-            logger.error("No path found")
+        if len(path) == 0:
+            raise Exception("Unexpected behavior: path is empty")
+        if path is None:
             Kernel().getWorker().removeFrame(self)
             Kernel().getWorker().process(AutoTripEndedMessage(None))
             return True
-        logger.debug(f"Path found: ")
+        logger.debug(f"\nPath found: ")
         for e in path:
-            print(f"/t * src {e.src.mapId} -> dst {e.dst.mapId}")
+            print(f"\t|- src {e.src.mapId} -> dst {e.dst.mapId}")
             for tr in e.transitions:
-                print(f"/t/t - direction : {tr.direction}, skill : {tr.skillId}, cell : {tr.cell}")
+                print(f"\t\t|- direction : {tr.direction}, skill : {tr.skillId}, cell : {tr.cell}")
         self.path: list[Edge] = path
-        MoveAPI.followEdge(self.path[0])
-        self._computed = True
-        self.nextStepIndex = 1
+        self.walkToNextStep()

@@ -1,6 +1,5 @@
 import random
-from typing import TYPE_CHECKING, Tuple
-from com.ankamagames.dofus.datacenter.world.MapPosition import MapPosition
+from typing import TYPE_CHECKING
 from com.ankamagames.dofus.logic.game.roleplay.frames.RoleplayInteractivesFrame import InteractiveElementData
 from com.ankamagames.dofus.modules.utils.pathFinding.world.Edge import Edge
 
@@ -9,12 +8,15 @@ from com.ankamagames.dofus.modules.utils.pathFinding.world.Transition import Tra
 from com.ankamagames.dofus.modules.utils.pathFinding.world.WorldPathFinder import (
     WorldPathFinder,
 )
+from com.ankamagames.jerakine.types.positions.MapPoint import MapPoint
 
 if TYPE_CHECKING:
     from com.ankamagames.atouin.data.map.Map import Map
     from com.ankamagames.dofus.logic.game.roleplay.frames.RoleplayInteractivesFrame import (
         RoleplayInteractivesFrame,
     )
+    from com.ankamagames.dofus.logic.game.roleplay.frames.RoleplayMovementFrame import RoleplayMovementFrame
+
 import com.ankamagames.atouin.managers.MapDisplayManager as mdm
 from com.ankamagames.atouin.messages.AdjacentMapClickMessage import (
     AdjacentMapClickMessage,
@@ -104,25 +106,35 @@ class MoveAPI:
     @classmethod
     def followEdge(cls, edge: Edge):
         for tr in edge.transitions:
-            try:
+            if tr.isValid:
                 cls.followTransition(tr)
-                return
-            except:
-                pass
-        raise Exception("No valid transition found!!")
+                return True
+        raise Exception("No valid transition found!!!")
 
     @classmethod
     def getTransitionIe(cls, transition: Transition) -> "InteractiveElementData":
         rpframe: "RoleplayInteractivesFrame" = Kernel().getWorker().getFrame("RoleplayInteractivesFrame")
-        return rpframe.getIeBySkillId(transition.skillId)
+        ie = rpframe.getIeBySkillId(transition.skillId)
+        ie.position = MapPoint.fromCellId(transition.cell)
+        return ie
 
     @classmethod
-    def followTransition(cls, transition: Transition):
-        if transition.skillId != -1:
-            ie = cls.getTransitionIe(transition)
-            rpframe: "RoleplayInteractivesFrame" = Kernel().getWorker().getFrame("RoleplayInteractivesFrame")
-            rpframe.skillClicked(ie)
-        if transition.cell:
-            cls.sendClickAdjacentMsg(transition.transitionMapId, transition.cell)
+    def followTransition(cls, tr: Transition):
+        if not tr.isValid:
+            raise Exception("Trying to follow a NON valid transition")
+        if tr.skillId != -1:
+            ie = cls.getTransitionIe(tr)
+            rpmframe: "RoleplayMovementFrame" = Kernel().getWorker().getFrame("RoleplayMovementFrame")
+            rpmframe.setFollowingInteraction(
+                {
+                    "ie": ie.element,
+                    "skillInstanceId": ie.skillUID,
+                    "additionalParam": 0,
+                }
+            )
+            rpmframe.resetNextMoveMapChange()
+            rpmframe.askMoveTo(ie.position)
+        elif tr.cell:
+            cls.sendClickAdjacentMsg(tr.transitionMapId, tr.cell)
         else:
             raise Exception("No direction or skill to transit found!!!")

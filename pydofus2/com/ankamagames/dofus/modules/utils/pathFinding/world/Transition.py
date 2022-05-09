@@ -1,3 +1,6 @@
+from com.ankamagames.dofus.datacenter.items.criterion.GroupItemCriterion import GroupItemCriterion
+
+
 class Transition:
 
     _type: int
@@ -60,6 +63,27 @@ class Transition:
     @property
     def id(self) -> int:
         return self._id
+
+    @property
+    def isValid(self) -> bool:
+        criterionWhiteList: list = [
+            "Ad",
+            "DM",
+            "MI",
+            "Mk",
+            "Oc",
+            "Pc",
+            "QF",
+            "Qo",
+            "Qs",
+            "Sv",
+        ]
+        if len(self.criterion) != 0:
+            if "&" not in self.criterion and "|" not in self.criterion and self.criterion[0:2] in criterionWhiteList:
+                return False
+            criterion = GroupItemCriterion(self.criterion)
+            return criterion.isRespected
+        return True
 
     def __str__(self) -> str:
         return f"Transition(type={self._type}, direction={self._direction}, skillId={self._skillId}, criterion={self._criterion}, transitionMapId={self._transitionMapId}, cell={self._cell}, id={self._id})"

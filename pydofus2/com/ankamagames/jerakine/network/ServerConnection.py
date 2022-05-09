@@ -293,6 +293,7 @@ class ServerConnection(IServerConnection):
                         logger.info(f"[{self._id}] Handling data, byte available : {input.remaining()}")
                 msg: NetworkMessage = self.lowReceive(input)
                 while msg is not None:
+                    input.trim()
                     if self._lagometer:
                         self._lagometer.pong(msg)
                     msg.receptionTime = perf_counter()

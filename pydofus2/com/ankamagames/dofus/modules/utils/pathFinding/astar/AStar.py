@@ -104,7 +104,7 @@ class AStar:
                             if not (existing != None and cost >= existing.cost):
                                 map = MapPosition.getMapPositionById(edge.dst.mapId)
                                 if map == None:
-                                    logger.info("La map " + edge.dst.mapId + " ne semble pas exister")
+                                    logger.info(f"The map {edge.dst.mapId} doesn't seem to exist")
                                 else:
                                     manhattanDistance = abs(map.posX - cls.dest.posX) + abs(map.posY - cls.dest.posY)
                                     node = Node(

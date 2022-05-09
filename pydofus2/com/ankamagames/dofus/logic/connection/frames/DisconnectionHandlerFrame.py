@@ -110,7 +110,10 @@ class DisconnectionHandlerFrame(Frame):
                                 "connection_fail_times",
                                 self._connectionUnexpectedFailureTimes,
                             )
-                            krnl.Kernel().reset()
+                            if self._timer:
+                                self._timer.cancel()
+                            self._timer = BenchmarkTimer(7, self.reconnect)
+                            self._timer.start()
                         else:
                             logger.debug(
                                 f"The connection closure was expected (reason: {reason.reason}). Dispatching the message."

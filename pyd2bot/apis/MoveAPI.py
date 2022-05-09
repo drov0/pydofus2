@@ -123,6 +123,7 @@ class MoveAPI:
         if not tr.isValid:
             raise Exception("Trying to follow a NON valid transition")
         if tr.skillId != -1:
+            logger.debug(f"Activating skill {tr.skillId} to change map towards '{tr.transitionMapId}'")
             ie = cls.getTransitionIe(tr)
             rpmframe: "RoleplayMovementFrame" = Kernel().getWorker().getFrame("RoleplayMovementFrame")
             rpmframe.setFollowingInteraction(
@@ -135,6 +136,7 @@ class MoveAPI:
             rpmframe.resetNextMoveMapChange()
             rpmframe.askMoveTo(ie.position)
         elif tr.cell:
+            logger.debug(f"Classic map change map towards '{tr.transitionMapId}'")
             cls.sendClickAdjacentMsg(tr.transitionMapId, tr.cell)
         else:
             raise Exception("No direction or skill to transit found!!!")

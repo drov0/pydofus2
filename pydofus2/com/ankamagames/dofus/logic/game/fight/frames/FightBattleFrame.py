@@ -290,7 +290,7 @@ class FightBattleFrame(Frame):
         self._playingSlaveEntity = False
         self._sequenceFrames = []
         DataMapProvider().isInFight = True
-        # logger.debug(f"FightBattleFrame pushed, dataMapProvider.isInFight = {DataMapProvider().isInFight}")
+        logger.debug(f"FightBattleFrame pushed, dataMapProvider.isInFight = {DataMapProvider().isInFight}")
         krnl.Kernel().getWorker().addFrame(self._turnFrame)
         self._destroyed = False
         self._neverSynchronizedBefore = True

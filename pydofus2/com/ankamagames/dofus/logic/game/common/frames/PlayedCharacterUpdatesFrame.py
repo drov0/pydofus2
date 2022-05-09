@@ -208,8 +208,9 @@ class PlayedCharacterUpdatesFrame(Frame):
                 playerInfos = self.roleplayContextFrame.entitiesFrame.getEntityInfos(pcm.PlayedCharacterManager().id)
                 if playerInfos:
                     playerInfos.alignmentInfos = cslmsg.stats.alignmentInfos
-            if krnl.Kernel().getWorker().getFrame("QuestFrame").achievmentsListProcessed == False:
-                krnl.Kernel().getWorker().getFrame("QuestFrame")
+            if krnl.Kernel().getWorker().getFrame("QuestFrame"):
+                if krnl.Kernel().getWorker().getFrame("QuestFrame").achievmentsListProcessed == False:
+                    krnl.Kernel().getWorker().getFrame("QuestFrame")
             return True
 
         if isinstance(msg, MapComplementaryInformationsDataMessage):

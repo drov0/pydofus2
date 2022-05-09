@@ -1,9 +1,8 @@
-from cmath import log
 from threading import Timer
+from com.DofusClient import DofusClient
 from com.ankamagames.atouin.managers.MapDisplayManager import MapDisplayManager
 from com.ankamagames.dofus.kernel.net.ConnectionsHandler import ConnectionsHandler
 from com.ankamagames.dofus.logic.game.common.managers.PlayedCharacterManager import PlayedCharacterManager
-from com.ankamagames.dofus.logic.game.common.misc.DofusEntities import DofusEntities
 from com.ankamagames.dofus.modules.utils.pathFinding.world.Edge import Edge
 from com.ankamagames.dofus.network.messages.game.context.roleplay.MapInformationsRequestMessage import (
     MapInformationsRequestMessage,
@@ -22,14 +21,12 @@ from com.ankamagames.dofus.network.messages.game.context.roleplay.MapComplementa
     MapComplementaryInformationsDataMessage,
 )
 from com.ankamagames.jerakine.logger.Logger import Logger
-from com.ankamagames.jerakine.types.enums.DirectionsEnum import DirectionsEnum
 from com.ankamagames.jerakine.types.enums.Priority import Priority
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
     from com.ankamagames.dofus.logic.game.roleplay.frames.RoleplayMovementFrame import RoleplayMovementFrame
     from com.ankamagames.dofus.logic.game.roleplay.frames.RoleplayInteractivesFrame import RoleplayInteractivesFrame
-
 from pyd2bot.messages.AutoTripEndedMessage import AutoTripEndedMessage
 
 logger = Logger("Dofus2")
@@ -42,7 +39,7 @@ class BotAutoTripFrame(Frame):
     def __init__(self, dstMapId):
         self.dstMapId = dstMapId
         self.path = None
-        self.changeMapFails = 0
+        self.changeMapFails = dict()
         self._computed = False
         self._worker = Kernel().getWorker()
         super().__init__()
@@ -54,14 +51,14 @@ class BotAutoTripFrame(Frame):
     def reset(self):
         self.dstMapId = None
         self.path = None
-        self.changeMapFails = 0
+        self.changeMapFails.clear()
         self._computed = False
 
     def pushed(self) -> bool:
         logger.debug("Auto trip frame pushed")
         self._worker = Kernel().getWorker()
         self._computed = False
-        self.changeMapFails = 0
+        self.changeMapFails.clear()
         self.path = None
         Timer(0.2, self.walkToNextStep).start()
         return True
@@ -79,6 +76,13 @@ class BotAutoTripFrame(Frame):
             return True
 
         if isinstance(msg, MapChangeFailedMessage):
+            v = WorldPathFinder().currPlayerVertex
+            if self.changeMapFails.get(v.UID, 0) > 3:
+                DofusClient().restart()
+                return True
+            if v.UID not in self.changeMapFails:
+                self.changeMapFails[v.UID] = 0
+            self.changeMapFails[v.UID] += 1
             mirmsg = MapInformationsRequestMessage()
             mirmsg.init(mapId_=MapDisplayManager().currentMapPoint.mapId)
             ConnectionsHandler.getConnection().send(mirmsg)
@@ -98,16 +102,21 @@ class BotAutoTripFrame(Frame):
         if not PlayedCharacterManager().currentMap:
             Timer(0.1, self.walkToNextStep).start()
             return
-        if PlayedCharacterManager().currentMap.mapId == self.dstMapId:
-            logger.debug("Trip reached destination Map")
-            Kernel().getWorker().removeFrame(self)
-            Kernel().getWorker().processImmediately(AutoTripEndedMessage(self.dstMapId))
-            return True
         elif self._computed:
+            if WorldPathFinder().currPlayerVertex == self.path[-1].src:
+                logger.debug("Trip reached destination Map")
+                Kernel().getWorker().removeFrame(self)
+                Kernel().getWorker().processImmediately(AutoTripEndedMessage(self.dstMapId))
+                return True
             logger.debug(f"Current step index: {self.currentEdgeIndex}/{len(self.path)}")
             if self.currentEdgeIndex == len(self.path):
                 raise Exception("Unexpected behavior: asking to move beyond path should have returned before")
-            MoveAPI.followEdge(self.path[self.currentEdgeIndex])
+            e = self.path[self.currentEdgeIndex]
+            logger.debug(f"Moving using next edge")
+            print(f"\t|- src {e.src.mapId} -> dst {e.dst.mapId}")
+            for tr in e.transitions:
+                print(f"\t\t|- direction : {tr.direction}, skill : {tr.skillId}, cell : {tr.cell}")
+            MoveAPI.followEdge(e)
         else:
             WorldPathFinder().findPath(self.dstMapId, self.onComputeOver)
 

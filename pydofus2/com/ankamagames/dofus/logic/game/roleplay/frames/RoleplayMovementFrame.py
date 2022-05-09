@@ -443,7 +443,9 @@ class RoleplayMovementFrame(Frame):
         self._changeMapByAutoTrip = autoTrip
 
     def resetNextMoveMapChange(self) -> None:
-        self._wantToChangeMap = -1
+        self._wantToChangeMap = None
+        if self._changeMapTimeout:
+            self._changeMapTimeout.cancel()
         self._changeMapByAutoTrip = False
 
     def setFollowingInteraction(self, interaction: object) -> None:

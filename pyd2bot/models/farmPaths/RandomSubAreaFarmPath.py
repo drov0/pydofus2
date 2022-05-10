@@ -10,13 +10,21 @@ from pyd2bot.models.farmPaths.AbstractFarmPath import AbstractFarmPath
 
 
 class RandomSubAreaFarmPath(AbstractFarmPath):
-    def __init__(self, subAreaId: int, startVertex: Vertex, fightOnly: bool = False, monsterLvlCoefDiff : float = float("inf")) -> None:
+    def __init__(
+        self,
+        subAreaId: int,
+        startVertex: Vertex,
+        fightOnly: bool = False,
+        monsterLvlCoefDiff: float = float("inf"),
+        jobIds: list[int] = [],
+    ) -> None:
         self.fightOnly = fightOnly
         self.startVertex = startVertex
         self.subArea = SubArea.getSubAreaById(subAreaId)
         self._currentVertex = None
         self._verticies = list[Vertex]()
         self.monsterLvlCoefDiff = monsterLvlCoefDiff
+        self.jobIds = jobIds
 
     def __next__(self) -> Transition:
         outgoingEdges = WorldPathFinder().worldGraph.getOutgoingEdgesFromVertex(self.currentVertex)

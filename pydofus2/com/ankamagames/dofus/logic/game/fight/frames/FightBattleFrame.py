@@ -1,99 +1,61 @@
-from com.ankamagames.jerakine.benchmark.BenchmarkTimer import BenchmarkTimer
 from time import sleep
 from types import FunctionType
+from typing import TYPE_CHECKING
+
+import com.ankamagames.dofus.internalDatacenter.spells.SpellWrapper as spellwrapper
+import com.ankamagames.dofus.kernel.Kernel as krnl
+import com.ankamagames.dofus.logic.game.common.frames.PlayedCharacterUpdatesFrame as pcuF
+import com.ankamagames.dofus.logic.game.fight.fightEvents.FightEventsHelper as fevth
+import com.ankamagames.dofus.logic.game.fight.frames.FightEntitiesFrame as fenf
+import com.ankamagames.dofus.logic.game.fight.frames.FightSequenceFrame as fseqf
+import com.ankamagames.dofus.logic.game.fight.managers.BuffManager as bffm
 from com.ankamagames.atouin.managers.EntitiesManager import EntitiesManager
 from com.ankamagames.atouin.utils.DataMapProvider import DataMapProvider
-import com.ankamagames.dofus.internalDatacenter.spells.SpellWrapper as spellwrapper
 from com.ankamagames.dofus.internalDatacenter.stats.EntityStats import EntityStats
-import com.ankamagames.dofus.kernel.Kernel as krnl
 from com.ankamagames.dofus.kernel.net.ConnectionsHandler import ConnectionsHandler
 from com.ankamagames.dofus.logic.common.managers.PlayerManager import PlayerManager
 from com.ankamagames.dofus.logic.common.managers.StatsManager import StatsManager
-import com.ankamagames.dofus.logic.game.common.frames.PlayedCharacterUpdatesFrame as pcuF
-from com.ankamagames.dofus.logic.game.common.frames.SpellInventoryManagementFrame import (
-    SpellInventoryManagementFrame,
-)
-from com.ankamagames.dofus.logic.game.common.managers.PlayedCharacterManager import (
-    PlayedCharacterManager,
-)
+from com.ankamagames.dofus.logic.game.common.frames.SpellInventoryManagementFrame import SpellInventoryManagementFrame
+from com.ankamagames.dofus.logic.game.common.managers.PlayedCharacterManager import PlayedCharacterManager
 from com.ankamagames.dofus.logic.game.common.misc.DofusEntities import DofusEntities
-from com.ankamagames.dofus.logic.game.fight.actions.GameFightTurnFinishAction import (
-    GameFightTurnFinishAction,
-)
-import com.ankamagames.dofus.logic.game.fight.fightEvents.FightEventsHelper as fevth
-from com.ankamagames.dofus.logic.game.fight.frames.FightSequenceSwitcherFrame import (
-    FightSequenceSwitcherFrame,
-)
-import com.ankamagames.dofus.logic.game.fight.frames.FightEntitiesFrame as fenf
-import com.ankamagames.dofus.logic.game.fight.frames.FightSequenceFrame as fseqf
+from com.ankamagames.dofus.logic.game.fight.actions.GameFightTurnFinishAction import GameFightTurnFinishAction
+from com.ankamagames.dofus.logic.game.fight.frames.FightSequenceSwitcherFrame import FightSequenceSwitcherFrame
 from com.ankamagames.dofus.logic.game.fight.frames.FightTurnFrame import FightTurnFrame
-import com.ankamagames.dofus.logic.game.fight.managers.BuffManager as bffm
-from com.ankamagames.dofus.logic.game.fight.managers.CurrentPlayedFighterManager import (
-    CurrentPlayedFighterManager,
-)
-from com.ankamagames.dofus.logic.game.fight.managers.FightersStateManager import (
-    FightersStateManager,
-)
-from com.ankamagames.dofus.logic.game.fight.managers.SpellCastInFightManager import (
-    SpellCastInFightManager,
-)
-from com.ankamagames.dofus.logic.game.fight.managers.SpellModifiersManager import (
-    SpellModifiersManager,
-)
-from com.ankamagames.dofus.logic.game.fight.miscs.FightEntitiesHolder import (
-    FightEntitiesHolder,
-)
+from com.ankamagames.dofus.logic.game.fight.managers.CurrentPlayedFighterManager import CurrentPlayedFighterManager
+from com.ankamagames.dofus.logic.game.fight.managers.FightersStateManager import FightersStateManager
+from com.ankamagames.dofus.logic.game.fight.managers.SpellCastInFightManager import SpellCastInFightManager
+from com.ankamagames.dofus.logic.game.fight.managers.SpellModifiersManager import SpellModifiersManager
+from com.ankamagames.dofus.logic.game.fight.miscs.FightEntitiesHolder import FightEntitiesHolder
 from com.ankamagames.dofus.logic.game.fight.types.StatBuff import StatBuff
 from com.ankamagames.dofus.logic.game.fight.types.TriggeredBuff import TriggeredBuff
 from com.ankamagames.dofus.misc.utils.GameDebugManager import GameDebugManager
-from com.ankamagames.dofus.network.messages.game.actions.GameActionAcknowledgementMessage import (
-    GameActionAcknowledgementMessage,
-)
 from com.ankamagames.dofus.network.messages.game.actions.fight.GameActionFightDeathMessage import (
     GameActionFightDeathMessage,
 )
 from com.ankamagames.dofus.network.messages.game.actions.fight.GameActionUpdateEffectTriggerCountMessage import (
     GameActionUpdateEffectTriggerCountMessage,
 )
-from com.ankamagames.dofus.network.messages.game.actions.sequence.SequenceEndMessage import (
-    SequenceEndMessage,
+from com.ankamagames.dofus.network.messages.game.actions.GameActionAcknowledgementMessage import (
+    GameActionAcknowledgementMessage,
 )
-from com.ankamagames.dofus.network.messages.game.actions.sequence.SequenceStartMessage import (
-    SequenceStartMessage,
-)
+from com.ankamagames.dofus.network.messages.game.actions.sequence.SequenceEndMessage import SequenceEndMessage
+from com.ankamagames.dofus.network.messages.game.actions.sequence.SequenceStartMessage import SequenceStartMessage
 from com.ankamagames.dofus.network.messages.game.character.stats.CharacterStatsListMessage import (
     CharacterStatsListMessage,
 )
 from com.ankamagames.dofus.network.messages.game.character.stats.UpdateSpellModifierMessage import (
     UpdateSpellModifierMessage,
 )
-from com.ankamagames.dofus.network.messages.game.context.GameContextDestroyMessage import (
-    GameContextDestroyMessage,
-)
-from com.ankamagames.dofus.network.messages.game.context.fight.GameFightEndMessage import (
-    GameFightEndMessage,
-)
-from com.ankamagames.dofus.network.messages.game.context.fight.GameFightLeaveMessage import (
-    GameFightLeaveMessage,
-)
-from com.ankamagames.dofus.network.messages.game.context.fight.GameFightNewRoundMessage import (
-    GameFightNewRoundMessage,
-)
-from com.ankamagames.dofus.network.messages.game.context.fight.GameFightNewWaveMessage import (
-    GameFightNewWaveMessage,
-)
-from com.ankamagames.dofus.network.messages.game.context.fight.GameFightPauseMessage import (
-    GameFightPauseMessage,
-)
+from com.ankamagames.dofus.network.messages.game.context.fight.GameFightEndMessage import GameFightEndMessage
+from com.ankamagames.dofus.network.messages.game.context.fight.GameFightLeaveMessage import GameFightLeaveMessage
+from com.ankamagames.dofus.network.messages.game.context.fight.GameFightNewRoundMessage import GameFightNewRoundMessage
+from com.ankamagames.dofus.network.messages.game.context.fight.GameFightNewWaveMessage import GameFightNewWaveMessage
+from com.ankamagames.dofus.network.messages.game.context.fight.GameFightPauseMessage import GameFightPauseMessage
 from com.ankamagames.dofus.network.messages.game.context.fight.GameFightSynchronizeMessage import (
     GameFightSynchronizeMessage,
 )
-from com.ankamagames.dofus.network.messages.game.context.fight.GameFightTurnEndMessage import (
-    GameFightTurnEndMessage,
-)
-from com.ankamagames.dofus.network.messages.game.context.fight.GameFightTurnListMessage import (
-    GameFightTurnListMessage,
-)
+from com.ankamagames.dofus.network.messages.game.context.fight.GameFightTurnEndMessage import GameFightTurnEndMessage
+from com.ankamagames.dofus.network.messages.game.context.fight.GameFightTurnListMessage import GameFightTurnListMessage
 from com.ankamagames.dofus.network.messages.game.context.fight.GameFightTurnReadyMessage import (
     GameFightTurnReadyMessage,
 )
@@ -115,6 +77,7 @@ from com.ankamagames.dofus.network.messages.game.context.fight.SlaveNoLongerCont
 from com.ankamagames.dofus.network.messages.game.context.fight.SlaveSwitchContextMessage import (
     SlaveSwitchContextMessage,
 )
+from com.ankamagames.dofus.network.messages.game.context.GameContextDestroyMessage import GameContextDestroyMessage
 from com.ankamagames.dofus.network.types.game.context.fight.GameFightCharacterInformations import (
     GameFightCharacterInformations,
 )
@@ -122,17 +85,15 @@ from com.ankamagames.dofus.network.types.game.context.fight.GameFightFighterInfo
     GameFightFighterInformations,
 )
 from com.ankamagames.dofus.types.entities.AnimatedCharacter import AnimatedCharacter
+from com.ankamagames.jerakine.benchmark.BenchmarkTimer import BenchmarkTimer
 from com.ankamagames.jerakine.handlers.messages.Action import Action
 from com.ankamagames.jerakine.logger.Logger import Logger
 from com.ankamagames.jerakine.messages.Frame import Frame
 from com.ankamagames.jerakine.messages.Message import Message
 from com.ankamagames.jerakine.types.enums.Priority import Priority
-from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
-    from com.ankamagames.dofus.logic.game.fight.frames.FightContextFrame import (
-        FightContextFrame,
-    )
+    from com.ankamagames.dofus.logic.game.fight.frames.FightContextFrame import FightContextFrame
 
 logger = Logger("Dofus2")
 

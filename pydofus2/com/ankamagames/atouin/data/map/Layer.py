@@ -1,8 +1,5 @@
 from com.ankamagames.atouin.AtouinConstants import AtouinConstants
 from com.ankamagames.atouin.data.map.elements.BasicElement import BasicElement
-from com.ankamagames.atouin.data.map.elements.GraphicalElement import GraphicalElement
-from com.ankamagames.atouin.data.map.elements.SoundElement import SoundElement
-from com.ankamagames.atouin.enums.ElementTypesEnum import ElementTypesEnum
 from com.ankamagames.jerakine.data.BinaryStream import BinaryStream
 from com.ankamagames.jerakine.logger.Logger import Logger
 

@@ -1,66 +1,37 @@
-from com.ankamagames.jerakine.benchmark.BenchmarkTimer import BenchmarkTimer
 from time import perf_counter, sleep
+from typing import TYPE_CHECKING
+
+import com.ankamagames.dofus.kernel.net.ConnectionsHandler as connh
+import com.ankamagames.dofus.logic.game.roleplay.frames.RoleplayInteractivesFrame as rif
 from com.ankamagames.atouin.managers.EntitiesManager import EntitiesManager
 from com.ankamagames.atouin.managers.MapDisplayManager import MapDisplayManager
-from com.ankamagames.atouin.messages.EntityMovementCompleteMessage import (
-    EntityMovementCompleteMessage,
-)
-from com.ankamagames.atouin.messages.EntityMovementStoppedMessage import (
-    EntityMovementStoppedMessage,
-)
+from com.ankamagames.atouin.messages.EntityMovementCompleteMessage import EntityMovementCompleteMessage
+from com.ankamagames.atouin.messages.EntityMovementStoppedMessage import EntityMovementStoppedMessage
 from com.ankamagames.atouin.utils.DataMapProvider import DataMapProvider
 from com.ankamagames.dofus.kernel.Kernel import Kernel
 from com.ankamagames.dofus.kernel.net.ConnectionsHandler import ConnectionsHandler
-from com.ankamagames.dofus.logic.game.common.managers.MapMovementAdapter import (
-    MapMovementAdapter,
-)
-from com.ankamagames.dofus.logic.game.common.managers.PlayedCharacterManager import (
-    PlayedCharacterManager,
-)
+from com.ankamagames.dofus.logic.game.common.managers.MapMovementAdapter import MapMovementAdapter
+from com.ankamagames.dofus.logic.game.common.managers.PlayedCharacterManager import PlayedCharacterManager
 from com.ankamagames.dofus.logic.game.common.misc.DofusEntities import DofusEntities
-from com.ankamagames.dofus.logic.game.fight.messages.MapMoveFailed import MapMoveFailed
 from com.ankamagames.dofus.logic.game.fight.messages.FightRequestFailed import FightRequestFailed
-from com.ankamagames.dofus.logic.game.roleplay.actions.PlayerFightRequestAction import (
-    PlayerFightRequestAction,
-)
-import com.ankamagames.dofus.logic.game.roleplay.frames.RoleplayInteractivesFrame as rif
-
+from com.ankamagames.dofus.logic.game.fight.messages.MapMoveFailed import MapMoveFailed
+from com.ankamagames.dofus.logic.game.roleplay.actions.PlayerFightRequestAction import PlayerFightRequestAction
 from com.ankamagames.dofus.logic.game.roleplay.messages.CharacterMovementStoppedMessage import (
     CharacterMovementStoppedMessage,
 )
-from com.ankamagames.dofus.network.enums.PlayerLifeStatusEnum import (
-    PlayerLifeStatusEnum,
-)
+from com.ankamagames.dofus.network.enums.PlayerLifeStatusEnum import PlayerLifeStatusEnum
 from com.ankamagames.dofus.network.messages.game.context.GameMapMovementCancelMessage import (
     GameMapMovementCancelMessage,
 )
 from com.ankamagames.dofus.network.messages.game.context.GameMapMovementConfirmMessage import (
     GameMapMovementConfirmMessage,
 )
-from com.ankamagames.dofus.network.messages.game.context.GameMapMovementMessage import (
-    GameMapMovementMessage,
-)
+from com.ankamagames.dofus.network.messages.game.context.GameMapMovementMessage import GameMapMovementMessage
 from com.ankamagames.dofus.network.messages.game.context.GameMapMovementRequestMessage import (
     GameMapMovementRequestMessage,
 )
-from com.ankamagames.dofus.network.messages.game.context.GameMapNoMovementMessage import (
-    GameMapNoMovementMessage,
-)
-from com.ankamagames.dofus.network.messages.game.context.roleplay.ChangeMapMessage import (
-    ChangeMapMessage,
-)
-from com.ankamagames.dofus.network.messages.game.context.roleplay.CurrentMapMessage import (
-    CurrentMapMessage,
-)
-from com.ankamagames.dofus.network.messages.game.context.roleplay.MapChangeFailedMessage import (
-    MapChangeFailedMessage,
-)
-from com.ankamagames.dofus.network.messages.game.context.roleplay.MapComplementaryInformationsDataMessage import (
-    MapComplementaryInformationsDataMessage,
-)
-from com.ankamagames.dofus.network.messages.game.context.roleplay.TeleportOnSameMapMessage import (
-    TeleportOnSameMapMessage,
-)
+from com.ankamagames.dofus.network.messages.game.context.GameMapNoMovementMessage import GameMapNoMovementMessage
+from com.ankamagames.dofus.network.messages.game.context.roleplay.ChangeMapMessage import ChangeMapMessage
 from com.ankamagames.dofus.network.messages.game.context.roleplay.delay.GameRolePlayDelayedActionFinishedMessage import (
     GameRolePlayDelayedActionFinishedMessage,
 )
@@ -73,12 +44,18 @@ from com.ankamagames.dofus.network.messages.game.context.roleplay.fight.GameRole
 from com.ankamagames.dofus.network.messages.game.context.roleplay.havenbag.EditHavenBagFinishedMessage import (
     EditHavenBagFinishedMessage,
 )
-from com.ankamagames.dofus.network.messages.game.dialog.LeaveDialogMessage import (
-    LeaveDialogMessage,
+from com.ankamagames.dofus.network.messages.game.context.roleplay.MapChangeFailedMessage import MapChangeFailedMessage
+from com.ankamagames.dofus.network.messages.game.context.roleplay.MapComplementaryInformationsDataMessage import (
+    MapComplementaryInformationsDataMessage,
 )
+from com.ankamagames.dofus.network.messages.game.context.roleplay.TeleportOnSameMapMessage import (
+    TeleportOnSameMapMessage,
+)
+from com.ankamagames.dofus.network.messages.game.dialog.LeaveDialogMessage import LeaveDialogMessage
 from com.ankamagames.dofus.network.messages.game.guild.tax.GuildFightPlayersHelpersLeaveMessage import (
     GuildFightPlayersHelpersLeaveMessage,
 )
+from com.ankamagames.dofus.network.messages.game.interactive.InteractiveUsedMessage import InteractiveUsedMessage
 from com.ankamagames.dofus.network.messages.game.interactive.InteractiveUseEndedMessage import (
     InteractiveUseEndedMessage,
 )
@@ -88,27 +65,19 @@ from com.ankamagames.dofus.network.messages.game.interactive.InteractiveUseError
 from com.ankamagames.dofus.network.messages.game.interactive.InteractiveUseRequestMessage import (
     InteractiveUseRequestMessage,
 )
-from com.ankamagames.dofus.network.messages.game.interactive.InteractiveUsedMessage import (
-    InteractiveUsedMessage,
-)
 from com.ankamagames.dofus.network.messages.game.interactive.skill.InteractiveUseWithParamRequestMessage import (
     InteractiveUseWithParamRequestMessage,
 )
-from com.ankamagames.dofus.network.messages.game.inventory.exchanges.ExchangeLeaveMessage import (
-    ExchangeLeaveMessage,
-)
+from com.ankamagames.dofus.network.messages.game.inventory.exchanges.ExchangeLeaveMessage import ExchangeLeaveMessage
 from com.ankamagames.dofus.network.messages.game.prism.PrismFightDefenderLeaveMessage import (
     PrismFightDefenderLeaveMessage,
 )
 from com.ankamagames.dofus.network.types.game.context.roleplay.GameRolePlayGroupMonsterInformations import (
     GameRolePlayGroupMonsterInformations,
 )
-import com.ankamagames.dofus.kernel.net.ConnectionsHandler as connh
-
-from com.ankamagames.dofus.network.types.game.interactive.InteractiveElement import (
-    InteractiveElement,
-)
+from com.ankamagames.dofus.network.types.game.interactive.InteractiveElement import InteractiveElement
 from com.ankamagames.dofus.types.entities.AnimatedCharacter import AnimatedCharacter
+from com.ankamagames.jerakine.benchmark.BenchmarkTimer import BenchmarkTimer
 from com.ankamagames.jerakine.entities.interfaces.IEntity import IEntity
 from com.ankamagames.jerakine.entities.interfaces.IMovable import IMovable
 from com.ankamagames.jerakine.handlers.messages.Action import Action
@@ -120,7 +89,6 @@ from com.ankamagames.jerakine.pathfinding.Pathfinding import Pathfinding
 from com.ankamagames.jerakine.types.enums.Priority import Priority
 from com.ankamagames.jerakine.types.positions.MapPoint import MapPoint
 from com.ankamagames.jerakine.types.positions.MovementPath import MovementPath
-from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
     from com.ankamagames.dofus.logic.game.roleplay.frames.RoleplayEntitiesFrame import RoleplayEntitiesFrame
@@ -274,9 +242,9 @@ class RoleplayMovementFrame(Frame):
             else:
                 self._isRequestingMovement = False
                 if (PlayedCharacterManager().inventoryWeight / PlayedCharacterManager().inventoryWeightMax) == 1:
-                    pathDuration = max(1, clientMovePath.getCrossingDuration(False))
+                    pathDuration = max(1, 1.4 * clientMovePath.getCrossingDuration(False))
                 else:
-                    pathDuration = max(1, clientMovePath.getCrossingDuration(True))
+                    pathDuration = max(1, 1.5 * clientMovePath.getCrossingDuration(True))
                 sleep(pathDuration)
                 Kernel().getWorker().processImmediately(EntityMovementCompleteMessage(movedEntity)),
             return True

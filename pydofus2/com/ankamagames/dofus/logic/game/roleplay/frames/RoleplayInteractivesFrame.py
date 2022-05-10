@@ -1,22 +1,16 @@
+from typing import TYPE_CHECKING
+
 from com.ankamagames.atouin.managers.MapDisplayManager import MapDisplayManager
 from com.ankamagames.dofus.datacenter.interactives.Interactive import Interactive
 from com.ankamagames.dofus.datacenter.jobs.Skill import Skill
 from com.ankamagames.dofus.kernel.Kernel import Kernel
-from com.ankamagames.dofus.logic.game.common.managers.PlayedCharacterManager import (
-    PlayedCharacterManager,
-)
-from com.ankamagames.dofus.logic.game.roleplay.frames.RoleplayWorldFrame import (
-    RoleplayWorldFrame,
-)
+from com.ankamagames.dofus.logic.game.common.managers.PlayedCharacterManager import PlayedCharacterManager
+from com.ankamagames.dofus.logic.game.roleplay.frames.RoleplayWorldFrame import RoleplayWorldFrame
 from com.ankamagames.dofus.logic.game.roleplay.messages.InteractiveElementActivationMessage import (
     InteractiveElementActivationMessage,
 )
-from com.ankamagames.dofus.network.enums.MapObstacleStateEnum import (
-    MapObstacleStateEnum,
-)
-from com.ankamagames.dofus.network.messages.game.context.GameContextDestroyMessage import (
-    GameContextDestroyMessage,
-)
+from com.ankamagames.dofus.network.enums.MapObstacleStateEnum import MapObstacleStateEnum
+from com.ankamagames.dofus.network.messages.game.context.GameContextDestroyMessage import GameContextDestroyMessage
 from com.ankamagames.dofus.network.messages.game.context.roleplay.MapObstacleUpdateMessage import (
     MapObstacleUpdateMessage,
 )
@@ -26,37 +20,26 @@ from com.ankamagames.dofus.network.messages.game.interactive.InteractiveElementU
 from com.ankamagames.dofus.network.messages.game.interactive.InteractiveMapUpdateMessage import (
     InteractiveMapUpdateMessage,
 )
+from com.ankamagames.dofus.network.messages.game.interactive.InteractiveUsedMessage import InteractiveUsedMessage
 from com.ankamagames.dofus.network.messages.game.interactive.InteractiveUseEndedMessage import (
     InteractiveUseEndedMessage,
 )
 from com.ankamagames.dofus.network.messages.game.interactive.InteractiveUseErrorMessage import (
     InteractiveUseErrorMessage,
 )
-from com.ankamagames.dofus.network.messages.game.interactive.InteractiveUsedMessage import (
-    InteractiveUsedMessage,
-)
 from com.ankamagames.dofus.network.messages.game.interactive.StatedElementUpdatedMessage import (
     StatedElementUpdatedMessage,
 )
-from com.ankamagames.dofus.network.messages.game.interactive.StatedMapUpdateMessage import (
-    StatedMapUpdateMessage,
-)
-from com.ankamagames.dofus.network.types.game.interactive.InteractiveElement import (
-    InteractiveElement,
-)
-from com.ankamagames.dofus.network.types.game.interactive.InteractiveElementSkill import (
-    InteractiveElementSkill,
-)
-from com.ankamagames.dofus.network.types.game.interactive.StatedElement import (
-    StatedElement,
-)
+from com.ankamagames.dofus.network.messages.game.interactive.StatedMapUpdateMessage import StatedMapUpdateMessage
+from com.ankamagames.dofus.network.types.game.interactive.InteractiveElement import InteractiveElement
+from com.ankamagames.dofus.network.types.game.interactive.InteractiveElementSkill import InteractiveElementSkill
+from com.ankamagames.dofus.network.types.game.interactive.StatedElement import StatedElement
 from com.ankamagames.jerakine.benchmark.BenchmarkTimer import BenchmarkTimer
 from com.ankamagames.jerakine.logger.Logger import Logger
 from com.ankamagames.jerakine.messages.Frame import Frame
 from com.ankamagames.jerakine.messages.Message import Message
 from com.ankamagames.jerakine.types.enums.Priority import Priority
 from com.ankamagames.jerakine.types.positions.MapPoint import MapPoint
-from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
     from com.ankamagames.dofus.logic.game.roleplay.frames.RoleplayEntitiesFrame import RoleplayEntitiesFrame
@@ -355,7 +338,7 @@ class RoleplayInteractivesFrame(Frame):
         return self.getIeBySkillId(self.REVIVE_SKILL_ID)
 
     def getIeBySkillId(self, skillId: int) -> InteractiveElementData:
-        for ieid, ie in self._ie.items():
+        for ie in self._ie.values():
             if ie.element.enabledSkills:
                 for skill in ie.element.enabledSkills:
                     if skill.skillId == skillId:

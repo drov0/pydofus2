@@ -1,20 +1,16 @@
+from typing import TYPE_CHECKING
+
+import com.ankamagames.dofus.logic.game.roleplay.frames.RoleplayInteractivesFrame as riF
 from com.ankamagames.atouin.managers.MapDisplayManager import MapDisplayManager
-from com.ankamagames.atouin.messages.AdjacentMapClickMessage import (
-    AdjacentMapClickMessage,
-)
+from com.ankamagames.atouin.messages.AdjacentMapClickMessage import AdjacentMapClickMessage
 from com.ankamagames.atouin.messages.CellClickMessage import CellClickMessage
 from com.ankamagames.atouin.utils.DataMapProvider import DataMapProvider
 from com.ankamagames.dofus.datacenter.jobs.Skill import Skill
 from com.ankamagames.dofus.internalDatacenter.DataEnum import DataEnum
 from com.ankamagames.dofus.kernel.Kernel import Kernel
 from com.ankamagames.dofus.kernel.net.ConnectionsHandler import ConnectionsHandler
-from com.ankamagames.dofus.logic.game.common.managers.PlayedCharacterManager import (
-    PlayedCharacterManager,
-)
+from com.ankamagames.dofus.logic.game.common.managers.PlayedCharacterManager import PlayedCharacterManager
 from com.ankamagames.dofus.logic.game.common.misc.DofusEntities import DofusEntities
-from typing import TYPE_CHECKING
-import com.ankamagames.dofus.logic.game.roleplay.frames.RoleplayInteractivesFrame as riF
-
 from com.ankamagames.dofus.logic.game.roleplay.messages.InteractiveElementActivationMessage import (
     InteractiveElementActivationMessage,
 )
@@ -24,9 +20,7 @@ if TYPE_CHECKING:
         RoleplayContextFrame,
     )
 
-from com.ankamagames.dofus.logic.game.roleplay.frames.RoleplayMovementFrame import (
-    RoleplayMovementFrame,
-)
+from com.ankamagames.dofus.logic.game.roleplay.frames.RoleplayMovementFrame import RoleplayMovementFrame
 from com.ankamagames.dofus.network.messages.game.context.fight.GameFightJoinRequestMessage import (
     GameFightJoinRequestMessage,
 )
@@ -39,9 +33,7 @@ from com.ankamagames.dofus.network.messages.game.context.roleplay.MapFightStartP
 from com.ankamagames.dofus.network.messages.game.inventory.exchanges.ExchangeOnHumanVendorRequestMessage import (
     ExchangeOnHumanVendorRequestMessage,
 )
-from com.ankamagames.dofus.network.types.game.context.fight.FightStartingPositions import (
-    FightStartingPositions,
-)
+from com.ankamagames.dofus.network.types.game.context.fight.FightStartingPositions import FightStartingPositions
 from com.ankamagames.dofus.network.types.game.context.roleplay.GameRolePlayActorInformations import (
     GameRolePlayActorInformations,
 )
@@ -49,16 +41,13 @@ from com.ankamagames.dofus.network.types.game.context.roleplay.GameRolePlayGroup
     GameRolePlayGroupMonsterInformations,
 )
 from com.ankamagames.dofus.types.entities.AnimatedCharacter import AnimatedCharacter
-from com.ankamagames.jerakine.entities.messages.EntityClickMessage import (
-    EntityClickMessage,
-)
+from com.ankamagames.jerakine.entities.messages.EntityClickMessage import EntityClickMessage
 from com.ankamagames.jerakine.logger.Logger import Logger
+from com.ankamagames.jerakine.messages.events.FramePushedEvent import FramePushedEvent
 from com.ankamagames.jerakine.messages.Frame import Frame
 from com.ankamagames.jerakine.messages.Message import Message
-from com.ankamagames.jerakine.messages.events.FramePushedEvent import FramePushedEvent
 from com.ankamagames.jerakine.types.enums.Priority import Priority
 from com.ankamagames.jerakine.types.positions.MapPoint import MapPoint
-from flash.geom.Rectangle import Rectangle
 
 logger = Logger("Dofus2")
 
@@ -106,9 +95,7 @@ class RoleplayWorldFrame(Frame):
 
     @property
     def roleplayContextFrame(self) -> "RoleplayContextFrame":
-        from com.ankamagames.dofus.logic.game.roleplay.frames.RoleplayContextFrame import (
-            RoleplayContextFrame,
-        )
+        from com.ankamagames.dofus.logic.game.roleplay.frames.RoleplayContextFrame import RoleplayContextFrame
 
         return Kernel().getWorker().getFrame("RoleplayContextFrame")
 
@@ -283,9 +270,7 @@ class RoleplayWorldFrame(Frame):
         return True
 
     def onFramePushed(self, pEvent: FramePushedEvent) -> None:
-        from com.ankamagames.dofus.logic.game.roleplay.frames.RoleplayEntitiesFrame import (
-            RoleplayEntitiesFrame,
-        )
+        from com.ankamagames.dofus.logic.game.roleplay.frames.RoleplayEntitiesFrame import RoleplayEntitiesFrame
 
         if isinstance(pEvent.frame, RoleplayEntitiesFrame):
             pEvent.currentTarget.removeEventListener(FramePushedEvent.EVENT_FRAME_PUSHED, self.onFramePushed)

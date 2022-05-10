@@ -139,7 +139,7 @@ class BotFarmPathFrame(Frame):
                 f"[BotFarmFrame] Error unable to use interactive element {msg.elemId} with the skill {msg.skillInstanceUid}"
             )
             logger.debug("*" * 80)
-            if msg.elemId == self._followingIe:
+            if msg.elemId == self._followingIe.element.elementId:
                 self.reset()
                 logger.debug("Will move on")
                 del self.interactivesFrame._ie[msg.elemId]
@@ -154,8 +154,8 @@ class BotFarmPathFrame(Frame):
             if PlayedCharacterManager().id == msg.entityId and msg.duration > 0:
                 logger.debug(f"[BotFarmFrame] Inventory weight {InventoryAPI.getWeightPercent():.2f}%")
                 logger.debug(f"[BotFarmFrame] Started using interactive element {msg.elemId} ....")
-                if self._followingIe == msg.elemId:
-                    self._followingIe = -1
+                if self._followingIe.element.elementId == msg.elemId:
+                    self._followingIe = None
                 if msg.duration > 0:
                     self._usingInteractive = True
             self._entities[msg.elemId] = msg.entityId
@@ -199,10 +199,14 @@ class BotFarmPathFrame(Frame):
             if entityId in self._discardedMonstersIds:
                 continue
             infos: GameRolePlayGroupMonsterInformations = self.entitiesFrame.getEntityInfos(entityId)
-            totalGrpLvl = infos.staticInfos.mainCreatureLightInfos.level + sum([ul.level for ul in infos.staticInfos.underlings])
+            totalGrpLvl = infos.staticInfos.mainCreatureLightInfos.level + sum(
+                [ul.level for ul in infos.staticInfos.underlings]
+            )
             if totalGrpLvl < self.farmPath.monsterLvlCoefDiff * PlayedCharacterManager().limitedLevel:
                 monsterGroupPos = MapPoint.fromCellId(infos.disposition.cellId)
-                availableMonsterFights.append({"info": infos, "distance": currPlayerPos.distanceToCell(monsterGroupPos)})
+                availableMonsterFights.append(
+                    {"info": infos, "distance": currPlayerPos.distanceToCell(monsterGroupPos)}
+                )
         if availableMonsterFights:
             availableMonsterFights.sort(key=lambda x: x["distance"])
             entityId = availableMonsterFights[0]["info"].contextualId
@@ -236,8 +240,15 @@ class BotFarmPathFrame(Frame):
         ce = None
         for it in self.interactivesFrame.collectables.values():
             if it.enabled:
-                if skills and it.skill.id not in skills:
-                    continue
+                if self.farmPath.jobIds:
+                    if it.skill.parentJobId not in self.farmPath.jobIds:
+                        continue
+                    logger.debug(f"[BotFarmFrame] Found a resource i can collect with job {it.skill.parentJobId}")
+                    if PlayedCharacterManager().jobs[it.skill.parentJobId].jobLevel < it.skill.levelMin:
+                        continue
+                    logger.debug(
+                        f"[BotFarmFrame] Resource i can collect with job {it.skill.parentJobId} is level {it.skill.levelMin}"
+                    )
                 ce = it
                 elementId = it.id
                 break

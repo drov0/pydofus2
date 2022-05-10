@@ -1,31 +1,23 @@
+from typing import TYPE_CHECKING
+
+import com.ankamagames.dofus.kernel.Kernel as krnl
+import com.ankamagames.dofus.logic.game.common.managers.PlayedCharacterManager as pcm
 from com.ankamagames.atouin.managers.MapDisplayManager import MapDisplayManager
 from com.ankamagames.dofus.datacenter.world.SubArea import SubArea
-from com.ankamagames.dofus.internalDatacenter.world.WorldPointWrapper import (
-    WorldPointWrapper,
-)
-import com.ankamagames.dofus.kernel.Kernel as krnl
+from com.ankamagames.dofus.internalDatacenter.world.WorldPointWrapper import WorldPointWrapper
 from com.ankamagames.dofus.logic.common.managers.PlayerManager import PlayerManager
 from com.ankamagames.dofus.logic.common.managers.StatsManager import StatsManager
-from com.ankamagames.dofus.logic.game.common.frames.AbstractEntitiesFrame import (
-    AbstractEntitiesFrame,
-)
-import com.ankamagames.dofus.logic.game.common.managers.PlayedCharacterManager as pcm
+from com.ankamagames.dofus.logic.game.common.frames.AbstractEntitiesFrame import AbstractEntitiesFrame
 from com.ankamagames.dofus.logic.game.common.misc.DofusEntities import DofusEntities
-from com.ankamagames.dofus.logic.game.fight.actions.RemoveEntityAction import (
-    RemoveEntityAction,
-)
-from typing import TYPE_CHECKING
+from com.ankamagames.dofus.logic.game.fight.actions.RemoveEntityAction import RemoveEntityAction
 
 if TYPE_CHECKING:
     from com.ankamagames.dofus.logic.game.fight.frames.FightContextFrame import (
         FightContextFrame,
     )
-from com.ankamagames.dofus.logic.game.fight.managers.CurrentPlayedFighterManager import (
-    CurrentPlayedFighterManager,
-)
-from com.ankamagames.dofus.logic.game.fight.miscs.FightEntitiesHolder import (
-    FightEntitiesHolder,
-)
+
+from com.ankamagames.dofus.logic.game.fight.managers.CurrentPlayedFighterManager import CurrentPlayedFighterManager
+from com.ankamagames.dofus.logic.game.fight.miscs.FightEntitiesHolder import FightEntitiesHolder
 from com.ankamagames.dofus.network.enums.GameActionFightInvisibilityStateEnum import (
     GameActionFightInvisibilityStateEnum,
 )
@@ -42,6 +34,21 @@ from com.ankamagames.dofus.network.messages.game.actions.fight.GameActionFightTh
 from com.ankamagames.dofus.network.messages.game.character.status.PlayerStatusUpdateMessage import (
     PlayerStatusUpdateMessage,
 )
+from com.ankamagames.dofus.network.messages.game.context.fight.character.GameFightRefreshFighterMessage import (
+    GameFightRefreshFighterMessage,
+)
+from com.ankamagames.dofus.network.messages.game.context.fight.character.GameFightShowFighterMessage import (
+    GameFightShowFighterMessage,
+)
+from com.ankamagames.dofus.network.messages.game.context.fight.character.GameFightShowFighterRandomStaticPoseMessage import (
+    GameFightShowFighterRandomStaticPoseMessage,
+)
+from com.ankamagames.dofus.network.messages.game.context.fight.GameFightHumanReadyStateMessage import (
+    GameFightHumanReadyStateMessage,
+)
+from com.ankamagames.dofus.network.messages.game.context.fight.GameFightPlacementSwapPositionsMessage import (
+    GameFightPlacementSwapPositionsMessage,
+)
 from com.ankamagames.dofus.network.messages.game.context.GameContextRefreshEntityLookMessage import (
     GameContextRefreshEntityLookMessage,
 )
@@ -51,26 +58,11 @@ from com.ankamagames.dofus.network.messages.game.context.GameEntitiesDisposition
 from com.ankamagames.dofus.network.messages.game.context.GameEntityDispositionMessage import (
     GameEntityDispositionMessage,
 )
-from com.ankamagames.dofus.network.messages.game.context.ShowCellMessage import (
-    ShowCellMessage,
+from com.ankamagames.dofus.network.messages.game.context.roleplay.anomaly.AnomalyStateMessage import (
+    AnomalyStateMessage,
 )
-from com.ankamagames.dofus.network.messages.game.context.ShowCellSpectatorMessage import (
-    ShowCellSpectatorMessage,
-)
-from com.ankamagames.dofus.network.messages.game.context.fight.GameFightHumanReadyStateMessage import (
-    GameFightHumanReadyStateMessage,
-)
-from com.ankamagames.dofus.network.messages.game.context.fight.GameFightPlacementSwapPositionsMessage import (
-    GameFightPlacementSwapPositionsMessage,
-)
-from com.ankamagames.dofus.network.messages.game.context.fight.character.GameFightRefreshFighterMessage import (
-    GameFightRefreshFighterMessage,
-)
-from com.ankamagames.dofus.network.messages.game.context.fight.character.GameFightShowFighterMessage import (
-    GameFightShowFighterMessage,
-)
-from com.ankamagames.dofus.network.messages.game.context.fight.character.GameFightShowFighterRandomStaticPoseMessage import (
-    GameFightShowFighterRandomStaticPoseMessage,
+from com.ankamagames.dofus.network.messages.game.context.roleplay.breach.MapComplementaryInformationsBreachMessage import (
+    MapComplementaryInformationsBreachMessage,
 )
 from com.ankamagames.dofus.network.messages.game.context.roleplay.MapComplementaryInformationsDataInHouseMessage import (
     MapComplementaryInformationsDataInHouseMessage,
@@ -81,29 +73,11 @@ from com.ankamagames.dofus.network.messages.game.context.roleplay.MapComplementa
 from com.ankamagames.dofus.network.messages.game.context.roleplay.MapComplementaryInformationsWithCoordsMessage import (
     MapComplementaryInformationsWithCoordsMessage,
 )
-from com.ankamagames.dofus.network.messages.game.context.roleplay.MapRewardRateMessage import (
-    MapRewardRateMessage,
-)
-from com.ankamagames.dofus.network.messages.game.context.roleplay.anomaly.AnomalyStateMessage import (
-    AnomalyStateMessage,
-)
-from com.ankamagames.dofus.network.messages.game.context.roleplay.breach.MapComplementaryInformationsBreachMessage import (
-    MapComplementaryInformationsBreachMessage,
-)
+from com.ankamagames.dofus.network.messages.game.context.roleplay.MapRewardRateMessage import MapRewardRateMessage
+from com.ankamagames.dofus.network.messages.game.context.ShowCellMessage import ShowCellMessage
+from com.ankamagames.dofus.network.messages.game.context.ShowCellSpectatorMessage import ShowCellSpectatorMessage
 from com.ankamagames.dofus.network.types.game.context.EntityDispositionInformations import (
     EntityDispositionInformations,
-)
-from com.ankamagames.dofus.network.types.game.context.FightEntityDispositionInformations import (
-    FightEntityDispositionInformations,
-)
-from com.ankamagames.dofus.network.types.game.context.GameContextActorInformations import (
-    GameContextActorInformations,
-)
-from com.ankamagames.dofus.network.types.game.context.GameContextActorPositionInformations import (
-    GameContextActorPositionInformations,
-)
-from com.ankamagames.dofus.network.types.game.context.IdentifiedEntityDispositionInformations import (
-    IdentifiedEntityDispositionInformations,
 )
 from com.ankamagames.dofus.network.types.game.context.fight.GameFightCharacterInformations import (
     GameFightCharacterInformations,
@@ -120,12 +94,15 @@ from com.ankamagames.dofus.network.types.game.context.fight.GameFightFighterName
 from com.ankamagames.dofus.network.types.game.context.fight.GameFightMonsterInformations import (
     GameFightMonsterInformations,
 )
-from com.ankamagames.dofus.network.types.game.interactive.InteractiveElement import (
-    InteractiveElement,
+from com.ankamagames.dofus.network.types.game.context.FightEntityDispositionInformations import (
+    FightEntityDispositionInformations,
 )
-from com.ankamagames.dofus.network.types.game.interactive.StatedElement import (
-    StatedElement,
+from com.ankamagames.dofus.network.types.game.context.GameContextActorInformations import GameContextActorInformations
+from com.ankamagames.dofus.network.types.game.context.GameContextActorPositionInformations import (
+    GameContextActorPositionInformations,
 )
+from com.ankamagames.dofus.network.types.game.interactive.InteractiveElement import InteractiveElement
+from com.ankamagames.dofus.network.types.game.interactive.StatedElement import StatedElement
 from com.ankamagames.dofus.network.types.game.look.EntityLook import EntityLook
 from com.ankamagames.dofus.types.entities.AnimatedCharacter import AnimatedCharacter
 from com.ankamagames.jerakine.logger.Logger import Logger

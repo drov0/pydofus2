@@ -1,175 +1,79 @@
 from types import FunctionType
 from typing import TYPE_CHECKING
+
 from com.ankamagames.dofus.enums.ElementEnum import ElementEnum
 from com.ankamagames.dofus.internalDatacenter.spells.SpellWrapper import SpellWrapper
-from com.ankamagames.dofus.logic.game.common.misc.ISpellCastProvider import (
-    ISpellCastProvider,
-)
-from com.ankamagames.dofus.logic.game.fight.frames.FightSpellCastFrame import (
-    FightSpellCastFrame,
-)
-
+from com.ankamagames.dofus.logic.game.common.misc.ISpellCastProvider import ISpellCastProvider
+from com.ankamagames.dofus.logic.game.fight.frames.FightSpellCastFrame import FightSpellCastFrame
 from com.ankamagames.dofus.logic.game.fight.frames.FightTurnFrame import FightTurnFrame
-from com.ankamagames.dofus.logic.game.fight.managers.MarkedCellsManager import (
-    MarkedCellsManager,
-)
-from com.ankamagames.dofus.logic.game.fight.messages.GameActionFightLeaveMessage import (
-    GameActionFightLeaveMessage,
-)
+from com.ankamagames.dofus.logic.game.fight.managers.MarkedCellsManager import MarkedCellsManager
+from com.ankamagames.dofus.logic.game.fight.messages.GameActionFightLeaveMessage import GameActionFightLeaveMessage
 from com.ankamagames.dofus.logic.game.fight.miscs.ActionIdHelper import ActionIdHelper
-from com.ankamagames.dofus.logic.game.fight.miscs.ActionIdProtocol import (
-    ActionIdProtocol,
-)
-from com.ankamagames.dofus.logic.game.fight.miscs.SpellScriptBuffer import (
-    SpellScriptBuffer,
-)
-from com.ankamagames.dofus.logic.game.fight.steps.FightActionPointsLossDodgeStep import (
-    FightActionPointsLossDodgeStep,
-)
-from com.ankamagames.dofus.logic.game.fight.steps.FightActionPointsVariationStep import (
-    FightActionPointsVariationStep,
-)
-from com.ankamagames.dofus.logic.game.fight.steps.FightCarryCharacterStep import (
-    FightCarryCharacterStep,
-)
-from com.ankamagames.dofus.logic.game.fight.steps.FightChangeVisibilityStep import (
-    FightChangeVisibilityStep,
-)
-from com.ankamagames.dofus.logic.game.fight.steps.FightCloseCombatStep import (
-    FightCloseCombatStep,
-)
+from com.ankamagames.dofus.logic.game.fight.miscs.ActionIdProtocol import ActionIdProtocol
+from com.ankamagames.dofus.logic.game.fight.miscs.SpellScriptBuffer import SpellScriptBuffer
+from com.ankamagames.dofus.logic.game.fight.steps.FightActionPointsLossDodgeStep import FightActionPointsLossDodgeStep
+from com.ankamagames.dofus.logic.game.fight.steps.FightActionPointsVariationStep import FightActionPointsVariationStep
+from com.ankamagames.dofus.logic.game.fight.steps.FightCarryCharacterStep import FightCarryCharacterStep
+from com.ankamagames.dofus.logic.game.fight.steps.FightChangeVisibilityStep import FightChangeVisibilityStep
+from com.ankamagames.dofus.logic.game.fight.steps.FightCloseCombatStep import FightCloseCombatStep
 from com.ankamagames.dofus.logic.game.fight.steps.FightDeathStep import FightDeathStep
-from com.ankamagames.dofus.logic.game.fight.steps.FightDispellEffectStep import (
-    FightDispellEffectStep,
-)
-from com.ankamagames.dofus.logic.game.fight.steps.FightDispellSpellStep import (
-    FightDispellSpellStep,
-)
-from com.ankamagames.dofus.logic.game.fight.steps.FightDispellStep import (
-    FightDispellStep,
-)
-from com.ankamagames.dofus.logic.game.fight.steps.FightDisplayBuffStep import (
-    FightDisplayBuffStep,
-)
-from com.ankamagames.dofus.logic.game.fight.steps.FightEnteringStateStep import (
-    FightEnteringStateStep,
-)
-from com.ankamagames.dofus.logic.game.fight.steps.FightEntityMovementStep import (
-    FightEntityMovementStep,
-)
-from com.ankamagames.dofus.logic.game.fight.steps.FightEntitySlideStep import (
-    FightEntitySlideStep,
-)
-from com.ankamagames.dofus.logic.game.fight.steps.FightExchangePositionsStep import (
-    FightExchangePositionsStep,
-)
-from com.ankamagames.dofus.logic.game.fight.steps.FightFighterStatsListStep import (
-    FightFighterStatsListStep,
-)
+from com.ankamagames.dofus.logic.game.fight.steps.FightDispellEffectStep import FightDispellEffectStep
+from com.ankamagames.dofus.logic.game.fight.steps.FightDispellSpellStep import FightDispellSpellStep
+from com.ankamagames.dofus.logic.game.fight.steps.FightDispellStep import FightDispellStep
+from com.ankamagames.dofus.logic.game.fight.steps.FightDisplayBuffStep import FightDisplayBuffStep
+from com.ankamagames.dofus.logic.game.fight.steps.FightEnteringStateStep import FightEnteringStateStep
+from com.ankamagames.dofus.logic.game.fight.steps.FightEntityMovementStep import FightEntityMovementStep
+from com.ankamagames.dofus.logic.game.fight.steps.FightEntitySlideStep import FightEntitySlideStep
+from com.ankamagames.dofus.logic.game.fight.steps.FightExchangePositionsStep import FightExchangePositionsStep
+from com.ankamagames.dofus.logic.game.fight.steps.FightFighterStatsListStep import FightFighterStatsListStep
 from com.ankamagames.dofus.logic.game.fight.steps.FightInvisibleTemporarilyDetectedStep import (
     FightInvisibleTemporarilyDetectedStep,
 )
 from com.ankamagames.dofus.logic.game.fight.steps.FightKillStep import FightKillStep
-from com.ankamagames.dofus.logic.game.fight.steps.FightLeavingStateStep import (
-    FightLeavingStateStep,
-)
-from com.ankamagames.dofus.logic.game.fight.steps.FightLifeVariationStep import (
-    FightLifeVariationStep,
-)
-from com.ankamagames.dofus.logic.game.fight.steps.FightMarkActivateStep import (
-    FightMarkActivateStep,
-)
-from com.ankamagames.dofus.logic.game.fight.steps.FightMarkCellsStep import (
-    FightMarkCellsStep,
-)
-from com.ankamagames.dofus.logic.game.fight.steps.FightModifyEffectsDurationStep import (
-    FightModifyEffectsDurationStep,
-)
+from com.ankamagames.dofus.logic.game.fight.steps.FightLeavingStateStep import FightLeavingStateStep
+from com.ankamagames.dofus.logic.game.fight.steps.FightLifeVariationStep import FightLifeVariationStep
+from com.ankamagames.dofus.logic.game.fight.steps.FightMarkActivateStep import FightMarkActivateStep
+from com.ankamagames.dofus.logic.game.fight.steps.FightMarkCellsStep import FightMarkCellsStep
+from com.ankamagames.dofus.logic.game.fight.steps.FightMarkTriggeredStep import FightMarkTriggeredStep
+from com.ankamagames.dofus.logic.game.fight.steps.FightModifyEffectsDurationStep import FightModifyEffectsDurationStep
 from com.ankamagames.dofus.logic.game.fight.steps.FightMovementPointsLossDodgeStep import (
     FightMovementPointsLossDodgeStep,
 )
 from com.ankamagames.dofus.logic.game.fight.steps.FightMovementPointsVariationStep import (
     FightMovementPointsVariationStep,
 )
-from com.ankamagames.dofus.logic.game.fight.steps.FightPlaySpellScriptStep import (
-    FightPlaySpellScriptStep,
-)
-from com.ankamagames.dofus.logic.game.fight.steps.FightReducedDamagesStep import (
-    FightReducedDamagesStep,
-)
-from com.ankamagames.dofus.logic.game.fight.steps.FightReflectedDamagesStep import (
-    FightReflectedDamagesStep,
-)
-from com.ankamagames.dofus.logic.game.fight.steps.FightReflectedSpellStep import (
-    FightReflectedSpellStep,
-)
-from com.ankamagames.dofus.logic.game.fight.steps.FightRefreshFighterStep import (
-    FightRefreshFighterStep,
-)
-from com.ankamagames.dofus.logic.game.fight.steps.FightShieldPointsVariationStep import (
-    FightShieldPointsVariationStep,
-)
-from com.ankamagames.dofus.logic.game.fight.steps.FightSpellCastStep import (
-    FightSpellCastStep,
-)
+from com.ankamagames.dofus.logic.game.fight.steps.FightPlaySpellScriptStep import FightPlaySpellScriptStep
+from com.ankamagames.dofus.logic.game.fight.steps.FightReducedDamagesStep import FightReducedDamagesStep
+from com.ankamagames.dofus.logic.game.fight.steps.FightReflectedDamagesStep import FightReflectedDamagesStep
+from com.ankamagames.dofus.logic.game.fight.steps.FightReflectedSpellStep import FightReflectedSpellStep
+from com.ankamagames.dofus.logic.game.fight.steps.FightRefreshFighterStep import FightRefreshFighterStep
+from com.ankamagames.dofus.logic.game.fight.steps.FightShieldPointsVariationStep import FightShieldPointsVariationStep
+from com.ankamagames.dofus.logic.game.fight.steps.FightSpellCastStep import FightSpellCastStep
 from com.ankamagames.dofus.logic.game.fight.steps.FightSpellCooldownVariationStep import (
     FightSpellCooldownVariationStep,
 )
-from com.ankamagames.dofus.logic.game.fight.steps.FightSpellImmunityStep import (
-    FightSpellImmunityStep,
-)
-from com.ankamagames.dofus.logic.game.fight.steps.FightStealingKamasStep import (
-    FightStealingKamasStep,
-)
+from com.ankamagames.dofus.logic.game.fight.steps.FightSpellImmunityStep import FightSpellImmunityStep
+from com.ankamagames.dofus.logic.game.fight.steps.FightStealingKamasStep import FightStealingKamasStep
 from com.ankamagames.dofus.logic.game.fight.steps.FightSummonStep import FightSummonStep
-from com.ankamagames.dofus.logic.game.fight.steps.FightTackledStep import (
-    FightTackledStep,
-)
-from com.ankamagames.dofus.logic.game.fight.steps.FightTemporaryBoostStep import (
-    FightTemporaryBoostStep,
-)
-from com.ankamagames.dofus.logic.game.fight.steps.FightThrowCharacterStep import (
-    FightThrowCharacterStep,
-)
-from com.ankamagames.dofus.logic.game.fight.steps.FightTurnListStep import (
-    FightTurnListStep,
-)
-from com.ankamagames.dofus.logic.game.fight.steps.FightUnmarkCellsStep import (
-    FightUnmarkCellsStep,
-)
-from com.ankamagames.dofus.logic.game.fight.steps.FightUpdateStatStep import (
-    FightUpdateStatStep,
-)
+from com.ankamagames.dofus.logic.game.fight.steps.FightTackledStep import FightTackledStep
+from com.ankamagames.dofus.logic.game.fight.steps.FightTeleportStep import FightTeleportStep
+from com.ankamagames.dofus.logic.game.fight.steps.FightTemporaryBoostStep import FightTemporaryBoostStep
+from com.ankamagames.dofus.logic.game.fight.steps.FightThrowCharacterStep import FightThrowCharacterStep
+from com.ankamagames.dofus.logic.game.fight.steps.FightTurnListStep import FightTurnListStep
+from com.ankamagames.dofus.logic.game.fight.steps.FightUnmarkCellsStep import FightUnmarkCellsStep
+from com.ankamagames.dofus.logic.game.fight.steps.FightUpdateStatStep import FightUpdateStatStep
 from com.ankamagames.dofus.logic.game.fight.steps.FightVanishStep import FightVanishStep
-from com.ankamagames.dofus.logic.game.fight.steps.FightVisibilityStep import (
-    FightVisibilityStep,
-)
+from com.ankamagames.dofus.logic.game.fight.steps.FightVisibilityStep import FightVisibilityStep
 from com.ankamagames.dofus.logic.game.fight.steps.IFightStep import IFightStep
 from com.ankamagames.dofus.logic.game.fight.types.MarkInstance import MarkInstance
 from com.ankamagames.dofus.logic.game.fight.types.StatBuff import StatBuff
 from com.ankamagames.dofus.logic.game.fight.types.StateBuff import StateBuff
-from com.ankamagames.dofus.network.enums.GameActionMarkTypeEnum import (
-    GameActionMarkTypeEnum,
-)
-from com.ankamagames.dofus.types.enums.AnimationEnum import AnimationEnum
+from com.ankamagames.dofus.network.enums.GameActionMarkTypeEnum import GameActionMarkTypeEnum
 from com.ankamagames.jerakine.entities.interfaces.IMovable import IMovable
 from com.ankamagames.jerakine.logger.Logger import Logger
-from com.ankamagames.jerakine.sequencer.CallbackStep import CallbackStep
-from com.ankamagames.jerakine.sequencer.ParallelStartSequenceStep import (
-    ParallelStartSequenceStep,
-)
+from com.ankamagames.jerakine.sequencer.ParallelStartSequenceStep import ParallelStartSequenceStep
 from com.ankamagames.jerakine.types.events.SequencerEvent import SequencerEvent
-from com.ankamagames.jerakine.utils.display.spellZone.SpellShapeEnum import (
-    SpellShapeEnum,
-)
-
-from com.ankamagames.dofus.logic.game.fight.steps.FightTeleportStep import (
-    FightTeleportStep,
-)
-
-from com.ankamagames.dofus.logic.game.fight.steps.FightMarkTriggeredStep import (
-    FightMarkTriggeredStep,
-)
+from com.ankamagames.jerakine.utils.display.spellZone.SpellShapeEnum import SpellShapeEnum
 
 if TYPE_CHECKING:
     from com.ankamagames.dofus.logic.game.fight.frames.FightBattleFrame import (
@@ -182,42 +86,24 @@ if TYPE_CHECKING:
         FightContextFrame,
     )
 
-from com.ankamagames.atouin.managers.EntitiesManager import EntitiesManager
 from com.ankamagames.dofus.datacenter.effects.Effect import Effect
-from com.ankamagames.dofus.datacenter.effects.EffectInstance import EffectInstance
-from com.ankamagames.dofus.datacenter.effects.instances.EffectInstanceDice import (
-    EffectInstanceDice,
-)
+from com.ankamagames.dofus.datacenter.effects.instances.EffectInstanceDice import EffectInstanceDice
 from com.ankamagames.dofus.datacenter.monsters.Monster import Monster
 from com.ankamagames.dofus.datacenter.spells.Spell import Spell
-from com.ankamagames.dofus.datacenter.spells.SpellLevel import SpellLevel
 from com.ankamagames.dofus.enums.ActionIds import ActionIds
 from com.ankamagames.dofus.kernel.Kernel import Kernel
-from com.ankamagames.dofus.logic.game.common.managers.MapMovementAdapter import (
-    MapMovementAdapter,
-)
-from com.ankamagames.dofus.logic.game.common.managers.PlayedCharacterManager import (
-    PlayedCharacterManager,
-)
+from com.ankamagames.dofus.logic.game.common.managers.MapMovementAdapter import MapMovementAdapter
+from com.ankamagames.dofus.logic.game.common.managers.PlayedCharacterManager import PlayedCharacterManager
 from com.ankamagames.dofus.logic.game.common.misc.DofusEntities import DofusEntities
-from com.ankamagames.dofus.logic.game.fight.frames.FightEntitiesFrame import (
-    FightEntitiesFrame,
-)
-
+from com.ankamagames.dofus.logic.game.fight.frames.FightEntitiesFrame import FightEntitiesFrame
 from com.ankamagames.dofus.logic.game.fight.managers.BuffManager import BuffManager
-from com.ankamagames.dofus.logic.game.fight.managers.CurrentPlayedFighterManager import (
-    CurrentPlayedFighterManager,
-)
+from com.ankamagames.dofus.logic.game.fight.managers.CurrentPlayedFighterManager import CurrentPlayedFighterManager
 from com.ankamagames.dofus.logic.game.fight.miscs.TackleUtil import TackleUtil
 from com.ankamagames.dofus.logic.game.fight.types.BasicBuff import BasicBuff
 from com.ankamagames.dofus.logic.game.fight.types.CastingSpell import CastingSpell
 from com.ankamagames.dofus.misc.utils.GameDebugManager import GameDebugManager
-from com.ankamagames.dofus.network.enums.FightSpellCastCriticalEnum import (
-    FightSpellCastCriticalEnum,
-)
-from com.ankamagames.dofus.network.messages.game.actions.AbstractGameActionMessage import (
-    AbstractGameActionMessage,
-)
+from com.ankamagames.dofus.network.enums.FightSpellCastCriticalEnum import FightSpellCastCriticalEnum
+from com.ankamagames.dofus.network.messages.game.actions.AbstractGameActionMessage import AbstractGameActionMessage
 from com.ankamagames.dofus.network.messages.game.actions.fight.GameActionFightActivateGlyphTrapMessage import (
     GameActionFightActivateGlyphTrapMessage,
 )
@@ -233,6 +119,9 @@ from com.ankamagames.dofus.network.messages.game.actions.fight.GameActionFightCl
 from com.ankamagames.dofus.network.messages.game.actions.fight.GameActionFightDeathMessage import (
     GameActionFightDeathMessage,
 )
+from com.ankamagames.dofus.network.messages.game.actions.fight.GameActionFightDispellableEffectMessage import (
+    GameActionFightDispellableEffectMessage,
+)
 from com.ankamagames.dofus.network.messages.game.actions.fight.GameActionFightDispellEffectMessage import (
     GameActionFightDispellEffectMessage,
 )
@@ -241,9 +130,6 @@ from com.ankamagames.dofus.network.messages.game.actions.fight.GameActionFightDi
 )
 from com.ankamagames.dofus.network.messages.game.actions.fight.GameActionFightDispellSpellMessage import (
     GameActionFightDispellSpellMessage,
-)
-from com.ankamagames.dofus.network.messages.game.actions.fight.GameActionFightDispellableEffectMessage import (
-    GameActionFightDispellableEffectMessage,
 )
 from com.ankamagames.dofus.network.messages.game.actions.fight.GameActionFightDodgePointLossMessage import (
     GameActionFightDodgePointLossMessage,
@@ -332,27 +218,9 @@ from com.ankamagames.dofus.network.messages.game.actions.fight.GameActionFightUn
 from com.ankamagames.dofus.network.messages.game.actions.fight.GameActionFightVanishMessage import (
     GameActionFightVanishMessage,
 )
-from com.ankamagames.dofus.network.messages.game.actions.sequence.SequenceEndMessage import (
-    SequenceEndMessage,
-)
-from com.ankamagames.dofus.network.messages.game.actions.sequence.SequenceStartMessage import (
-    SequenceStartMessage,
-)
-from com.ankamagames.dofus.network.messages.game.character.stats.FighterStatsListMessage import (
-    FighterStatsListMessage,
-)
-from com.ankamagames.dofus.network.messages.game.context.GameMapMovementMessage import (
-    GameMapMovementMessage,
-)
-from com.ankamagames.dofus.network.messages.game.context.fight.GameFightSynchronizeMessage import (
-    GameFightSynchronizeMessage,
-)
-from com.ankamagames.dofus.network.messages.game.context.fight.GameFightTurnListMessage import (
-    GameFightTurnListMessage,
-)
-from com.ankamagames.dofus.network.messages.game.context.fight.RefreshCharacterStatsMessage import (
-    RefreshCharacterStatsMessage,
-)
+from com.ankamagames.dofus.network.messages.game.actions.sequence.SequenceEndMessage import SequenceEndMessage
+from com.ankamagames.dofus.network.messages.game.actions.sequence.SequenceStartMessage import SequenceStartMessage
+from com.ankamagames.dofus.network.messages.game.character.stats.FighterStatsListMessage import FighterStatsListMessage
 from com.ankamagames.dofus.network.messages.game.context.fight.character.GameFightRefreshFighterMessage import (
     GameFightRefreshFighterMessage,
 )
@@ -362,15 +230,18 @@ from com.ankamagames.dofus.network.messages.game.context.fight.character.GameFig
 from com.ankamagames.dofus.network.messages.game.context.fight.character.GameFightShowFighterRandomStaticPoseMessage import (
     GameFightShowFighterRandomStaticPoseMessage,
 )
+from com.ankamagames.dofus.network.messages.game.context.fight.GameFightSynchronizeMessage import (
+    GameFightSynchronizeMessage,
+)
+from com.ankamagames.dofus.network.messages.game.context.fight.GameFightTurnListMessage import GameFightTurnListMessage
+from com.ankamagames.dofus.network.messages.game.context.fight.RefreshCharacterStatsMessage import (
+    RefreshCharacterStatsMessage,
+)
+from com.ankamagames.dofus.network.messages.game.context.GameMapMovementMessage import GameMapMovementMessage
 from com.ankamagames.dofus.network.types.game.actions.fight.AbstractFightDispellableEffect import (
     AbstractFightDispellableEffect,
 )
-from com.ankamagames.dofus.network.types.game.actions.fight.FightTemporaryBoostEffect import (
-    FightTemporaryBoostEffect,
-)
-from com.ankamagames.dofus.network.types.game.context.GameContextActorInformations import (
-    GameContextActorInformations,
-)
+from com.ankamagames.dofus.network.types.game.actions.fight.FightTemporaryBoostEffect import FightTemporaryBoostEffect
 from com.ankamagames.dofus.network.types.game.context.fight.GameFightCharacterInformations import (
     GameFightCharacterInformations,
 )
@@ -386,32 +257,22 @@ from com.ankamagames.dofus.network.types.game.context.fight.GameFightFighterName
 from com.ankamagames.dofus.network.types.game.context.fight.GameFightMonsterInformations import (
     GameFightMonsterInformations,
 )
-from com.ankamagames.dofus.network.types.game.context.fight.GameFightSpellCooldown import (
-    GameFightSpellCooldown,
-)
-from com.ankamagames.dofus.network.types.game.context.fight.SpawnCharacterInformation import (
-    SpawnCharacterInformation,
-)
-from com.ankamagames.dofus.network.types.game.context.fight.SpawnCompanionInformation import (
-    SpawnCompanionInformation,
-)
-from com.ankamagames.dofus.network.types.game.context.fight.SpawnMonsterInformation import (
-    SpawnMonsterInformation,
-)
+from com.ankamagames.dofus.network.types.game.context.fight.GameFightSpellCooldown import GameFightSpellCooldown
+from com.ankamagames.dofus.network.types.game.context.fight.SpawnCharacterInformation import SpawnCharacterInformation
+from com.ankamagames.dofus.network.types.game.context.fight.SpawnCompanionInformation import SpawnCompanionInformation
+from com.ankamagames.dofus.network.types.game.context.fight.SpawnMonsterInformation import SpawnMonsterInformation
 from com.ankamagames.dofus.network.types.game.context.fight.SpawnScaledMonsterInformation import (
     SpawnScaledMonsterInformation,
 )
-from com.ankamagames.dofus.types.entities.AnimatedCharacter import AnimatedCharacter
-from com.ankamagames.jerakine.entities.interfaces.IEntity import IEntity
+from com.ankamagames.dofus.network.types.game.context.GameContextActorInformations import GameContextActorInformations
 from com.ankamagames.jerakine.messages.Frame import Frame
 from com.ankamagames.jerakine.messages.Message import Message
 from com.ankamagames.jerakine.sequencer.AbstractSequencable import AbstractSequencable
 from com.ankamagames.jerakine.sequencer.ISequencable import ISequencable
 from com.ankamagames.jerakine.sequencer.ISequencer import ISequencer
 from com.ankamagames.jerakine.sequencer.SerialSequencer import SerialSequencer
-from com.ankamagames.jerakine.types.Callback import Callback
 from com.ankamagames.jerakine.types.enums.Priority import Priority
-from com.ankamagames.jerakine.types.positions.MapPoint import MapPoint, Point
+from com.ankamagames.jerakine.types.positions.MapPoint import MapPoint
 from com.ankamagames.jerakine.types.positions.MovementPath import MovementPath
 
 logger = Logger("Dofus2")
@@ -1091,7 +952,9 @@ class FightSequenceFrame(Frame, ISpellCastProvider):
 
         if isinstance(msg, GameActionFightInvisibleDetectedMessage):
             gafidMsg = msg
-            self.pushStep(FightInvisibleTemporarilyDetectedStep(DofusEntities.getEntity(gafidMsg.sourceId), gafidMsg.cellId))
+            self.pushStep(
+                FightInvisibleTemporarilyDetectedStep(DofusEntities.getEntity(gafidMsg.sourceId), gafidMsg.cellId)
+            )
             FightEntitiesFrame.getCurrentInstance().setLastKnownEntityPosition(gafidMsg.targetId, gafidMsg.cellId)
             FightEntitiesFrame.getCurrentInstance().setLastKnownEntityMovementPoint(gafidMsg.targetId, 0)
             return True

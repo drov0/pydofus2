@@ -122,13 +122,15 @@ class BotFightFrame(Frame, metaclass=Singleton):
 
     _turnAction: list[FunctionType]
 
-    _spellId = 13516  # Sadida ronce
+    spellId = None
 
     _lastTarget: int = None
 
     _spellw: SpellWrapper = None
 
     def __init__(self):
+        if not self.spellId:
+            raise Exception("No spellId set")
         self._turnAction = []
         self._spellw = None
         self._botTurnFrame = BotFightTurnFrame()
@@ -247,14 +249,14 @@ class BotFightFrame(Frame, metaclass=Singleton):
             if len(path) == 0:
                 if self.VERBOSE:
                     logger.debug(f"[FightAlgo] Can hit target {target} from current position")
-                self.addTurnAction(self.castSpell, [self._spellId, target.pos.cellId])
+                self.addTurnAction(self.castSpell, [self.spellId, target.pos.cellId])
             elif path[-1] in self._reachableCells:
                 if self.VERBOSE:
                     logger.debug(
                         f"[FightAlgo] Last Path cell to target {target} is reachable will move to it before casting the spell"
                     )
                 self.addTurnAction(self.askMove, [path])
-                self.addTurnAction(self.castSpell, [self._spellId, target.pos.cellId])
+                self.addTurnAction(self.castSpell, [self.spellId, target.pos.cellId])
             else:
                 found = False
                 for i, cellId in enumerate(path):
@@ -276,7 +278,7 @@ class BotFightFrame(Frame, metaclass=Singleton):
     def spellw(self) -> SpellWrapper:
         if self._spellw is None:
             for spellw in PlayedCharacterManager().playerSpellList:
-                if spellw.id == self._spellId:
+                if spellw.id == self.spellId:
                     self._spellw = spellw
         return self._spellw
 
@@ -349,7 +351,7 @@ class BotFightFrame(Frame, metaclass=Singleton):
 
     def canCastSpell(self, spellw: SpellWrapper, targetId: int) -> bool:
         reason = [""]
-        if CurrentPlayedFighterManager().canCastThisSpell(self._spellId, spellw.spellLevel, targetId, reason):
+        if CurrentPlayedFighterManager().canCastThisSpell(self.spellId, spellw.spellLevel, targetId, reason):
             return True
         else:
             if self.VERBOSE:

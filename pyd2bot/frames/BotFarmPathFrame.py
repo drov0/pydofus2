@@ -200,7 +200,7 @@ class BotFarmPathFrame(Frame):
                 continue
             infos: GameRolePlayGroupMonsterInformations = self.entitiesFrame.getEntityInfos(entityId)
             totalGrpLvl = infos.staticInfos.mainCreatureLightInfos.level + sum([ul.level for ul in infos.staticInfos.underlings])
-            if totalGrpLvl < 1.5 * PlayedCharacterManager().limitedLevel:
+            if totalGrpLvl < self.farmPath.monsterLvlCoefDiff * PlayedCharacterManager().limitedLevel:
                 monsterGroupPos = MapPoint.fromCellId(infos.disposition.cellId)
                 availableMonsterFights.append({"info": infos, "distance": currPlayerPos.distanceToCell(monsterGroupPos)})
         if availableMonsterFights:

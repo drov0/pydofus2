@@ -23,13 +23,10 @@ if __name__ == "__main__":
     # setup the farm path
     astrub_vilage_subareaid = 95
     astrub_bank_map = WorldPathFinder().worldGraph.getVertex(191104002.0, 1)
-    pioute_astrub = RandomSubAreaFarmPath(astrub_vilage_subareaid, astrub_bank_map, True)
+    pioute_astrub = RandomSubAreaFarmPath(astrub_vilage_subareaid, astrub_bank_map, True, 1.5)
 
     BotFarmPathFrame.farmPath = pioute_astrub
     dofus2.registerFrame(BotWorkflowFrame())
     creds = BotCredsManager.getEntry("foobar")
     dofus2.login(**creds)
-    # if not PlayedCharacterManager().currentMap:
-    #     sleep(0.3)
-    # print([str(v) for v in pioute_astrub.verticies])
     dofus2.join()

@@ -103,7 +103,7 @@ class BotAutoTripFrame(Frame):
             Timer(0.1, self.walkToNextStep).start()
             return
         elif self._computed:
-            if WorldPathFinder().currPlayerVertex == self.path[-1].src:
+            if WorldPathFinder().currPlayerVertex == self.path[-1].dst:
                 logger.debug("Trip reached destination Map")
                 Kernel().getWorker().removeFrame(self)
                 Kernel().getWorker().processImmediately(AutoTripEndedMessage(self.dstMapId))
@@ -128,7 +128,9 @@ class BotAutoTripFrame(Frame):
                 path = arg
                 break
         if len(path) == 0:
-            raise Exception("Unexpected behavior: path is empty")
+            Kernel().getWorker().removeFrame(self)
+            Kernel().getWorker().process(AutoTripEndedMessage(self.dstMapId))
+            return True
         if path is None:
             Kernel().getWorker().removeFrame(self)
             Kernel().getWorker().process(AutoTripEndedMessage(None))

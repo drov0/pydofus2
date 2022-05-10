@@ -241,11 +241,14 @@ class RoleplayMovementFrame(Frame):
                     player.stop = True
                 player.position = newPos
                 if self._wantToChangeMap:
-                    mp = MapPoint.fromCellId(self._destinationPoint)
-                    if newPos == mp:
-                        self.askMapChange()
+                    if self._destinationPoint is not None:
+                        mp = MapPoint.fromCellId(self._destinationPoint)
+                        if newPos == mp:
+                            self.askMapChange()
+                        else:
+                            self.askMoveTo(mp)
                     else:
-                        self.askMoveTo(mp)
+                        self.askMapChange()
             return True
 
         if isinstance(msg, GameMapMovementMessage):

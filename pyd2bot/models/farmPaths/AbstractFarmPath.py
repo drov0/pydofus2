@@ -9,6 +9,7 @@ class AbstractFarmPath:
     _currentVertex: Vertex
     startVertex: Vertex
     skills = []
+    monsterLvlCoefDiff = float("inf")
 
     def __init__(self) -> None:
         pass

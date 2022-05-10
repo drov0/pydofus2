@@ -182,7 +182,7 @@ class SpellWrapper(ISlotData, ICellZoneProvider, IDataCenter):
 
     @classmethod
     def refreshAllPlayerSpellHolder(cls, playerId: float) -> None:
-        EnterFrameDispatcher().worker.addUniqueSingleTreatment(SpellWrapper, cls.refreshSpellHolders, [playerId])
+        cls.refreshSpellHolders(playerId)
 
     @classmethod
     def refreshSpellHolders(cls, playerID: float) -> None:

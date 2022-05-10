@@ -1091,7 +1091,7 @@ class FightSequenceFrame(Frame, ISpellCastProvider):
 
         if isinstance(msg, GameActionFightInvisibleDetectedMessage):
             gafidMsg = msg
-            self.pushStep(FightInvisibleTemporarilyDetectedStep(DofusEntities.getEntity(gafidMsg.sourceId)))
+            self.pushStep(FightInvisibleTemporarilyDetectedStep(DofusEntities.getEntity(gafidMsg.sourceId), gafidMsg.cellId))
             FightEntitiesFrame.getCurrentInstance().setLastKnownEntityPosition(gafidMsg.targetId, gafidMsg.cellId)
             FightEntitiesFrame.getCurrentInstance().setLastKnownEntityMovementPoint(gafidMsg.targetId, 0)
             return True

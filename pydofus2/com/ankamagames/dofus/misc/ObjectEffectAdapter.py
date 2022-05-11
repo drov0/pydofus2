@@ -71,15 +71,15 @@ class ObjectEffectAdapter:
     def fromNetwork(cls, oe: ObjectEffect) -> EffectInstance:
         if isinstance(oe, ObjectEffectDice) and oe.actionId == ActionIds.ACTION_INCARNATION:
             effect = EffectInstanceDate()
-            effect.year = oe.param1
-            effect.month = oe.param2 * 32768 + oe.diceConst
+            effect.year = oe.diceNum
+            effect.month = oe.diceSide * 32768 + oe.diceConst
             level = 1
             while True:
-                incLevel = IncarnationLevel.getIncarnationLevelByIdAndLevel(oe.param1, level)
+                incLevel = IncarnationLevel.getIncarnationLevelByIdAndLevel(oe.diceNum, level)
                 if incLevel:
                     floor = incLevel.requiredXp
                 level += 1
-                incLevelPlusOne = IncarnationLevel.getIncarnationLevelByIdAndLevel(oe.param1, level)
+                incLevelPlusOne = IncarnationLevel.getIncarnationLevelByIdAndLevel(oe.diceNum, level)
                 if incLevelPlusOne:
                     nextFloor = incLevelPlusOne.requiredXp
                 if nextFloor < effect.month and level < 51:
@@ -101,8 +101,8 @@ class ObjectEffectAdapter:
                 effect.max = oe.max
             if isinstance(oe, ObjectEffectDice):
                 effect = EffectInstanceDice()
-                effect.diceNum = oe.param1
-                effect.diceSide = oe.param2
+                effect.diceNum = oe.diceNum
+                effect.diceSide = oe.diceSide
                 effect.param3 = oe.diceConst
             if isinstance(oe, ObjectEffectDate):
                 effect = EffectInstanceDate()
@@ -138,9 +138,9 @@ class ObjectEffectAdapter:
                 effect.reproductionCount = oe.reproductionCount
                 effect.reproductionCountMax = oe.reproductionCountMax
                 clientEffects = list[EffectInstanceInteger]()
-                for serverEffect in oe:
+                for serverEffect in oe.effects:
                     intEffect = EffectInstanceInteger()
-                    inteffect.param3 = servereffect.param3
+                    intEffect.value = serverEffect.value
                     intEffect.effectId = serverEffect.actionId
                     intEffect.duration = 0
                     clientEffects.append(intEffect)

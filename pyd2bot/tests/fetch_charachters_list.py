@@ -7,7 +7,6 @@ from pyd2bot.managers.BotCredsManager import BotCredsManager
 
 logger = Logger("Dofus2")
 
-
 if __name__ == "__main__":
     accountId = "aloone95"
     serverId = 210

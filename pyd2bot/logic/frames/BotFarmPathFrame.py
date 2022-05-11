@@ -41,9 +41,9 @@ from com.ankamagames.jerakine.messages.Frame import Frame
 from com.ankamagames.jerakine.messages.Message import Message
 from com.ankamagames.jerakine.types.enums.Priority import Priority
 from typing import TYPE_CHECKING
-from pyd2bot.enums.ServerNotificationTitlesEnum import ServerNotificationTitlesEnum
-from pyd2bot.frames.BotAutoTripFrame import BotAutoTripFrame
-from pyd2bot.messages.AutoTripEndedMessage import AutoTripEndedMessage
+from pyd2bot.models.enums.ServerNotificationTitlesEnum import ServerNotificationTitlesEnum
+from pyd2bot.logic.frames.BotAutoTripFrame import BotAutoTripFrame
+from pyd2bot.logic.messages.AutoTripEndedMessage import AutoTripEndedMessage
 from pyd2bot.models.farmPaths.AbstractFarmPath import AbstractFarmPath
 
 if TYPE_CHECKING:

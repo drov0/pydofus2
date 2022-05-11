@@ -3,7 +3,7 @@ from com.DofusClient import DofusClient
 from com.ankamagames.dofus.logic.common.managers.PlayerManager import PlayerManager
 from com.ankamagames.jerakine.logger.Logger import Logger
 from launcher.AccountCredsManager import AccountCredsManager
-from pyd2bot.managers.BotCredsManager import BotCredsManager
+from pyd2bot.logic.managers.BotCredsManager import BotCredsManager
 
 logger = Logger("Dofus2")
 

@@ -72,7 +72,7 @@ from com.ankamagames.jerakine.types.zones.IZone import IZone
 from com.ankamagames.jerakine.types.zones.Lozenge import Lozenge
 from com.ankamagames.jerakine.utils.display.spellZone.SpellShapeEnum import SpellShapeEnum
 from damageCalculation.tools import StatIds
-from pyd2bot.frames.BotFightTurnFrame import BotFightTurnFrame
+from pyd2bot.logic.frames.BotFightTurnFrame import BotFightTurnFrame
 
 
 if TYPE_CHECKING:

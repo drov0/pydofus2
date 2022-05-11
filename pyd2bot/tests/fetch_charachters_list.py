@@ -9,10 +9,10 @@ logger = Logger("Dofus2")
 
 
 if __name__ == "__main__":
-    accountId = "grinder"
+    accountId = "aloone95"
     serverId = 210
-    username = "xxxxxx"
-    password = "xxxxxx"
+    username = "aloone95"
+    password = "rmrtxha4"
     AccountCredsManager.addEntry(accountId, username, password)
     dofus2 = DofusClient()
     dofus2.login(accountId, serverId)

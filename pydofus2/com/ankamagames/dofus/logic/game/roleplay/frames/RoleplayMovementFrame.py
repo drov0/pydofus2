@@ -469,9 +469,6 @@ class RoleplayMovementFrame(Frame):
                 logger.warn(
                     f"[RolePlayMovement] Discarding a movement path that begins and ends on the same cell ({path.start.cellId})."
                 )
-            logger.debug(
-                f"[RolePlayMovement] following mosters {self._followingMonsterGroup}, followingIe {self._followingIe}"
-            )
             self._isRequestingMovement = False
             if self._followingIe:
                 self.activateSkill(

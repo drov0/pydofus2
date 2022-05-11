@@ -1,10 +1,8 @@
 import json
 import os
-from pathlib import Path
-from com.ankamagames.jerakine.network.CustomDataWrapper import ByteArray
+from pyd2bot.Constants import BotConstants
 
-CURRDIR = Path(__file__).parent
-BOTSDB = CURRDIR / "botCharachtersDB.json"
+BOTSDB = BotConstants.PERSISTENCE_DIR / "charachters.json"
 
 
 class BotCredsManager:
@@ -31,6 +29,8 @@ class BotCredsManager:
     @classmethod
     def getEntry(cls, name):
         result = cls._db.get(name)
+        if not result:
+            raise Exception(f"Bot {name} not found")
         return result
 
 

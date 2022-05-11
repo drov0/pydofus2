@@ -1,59 +1,50 @@
-from com.ankamagames.dofus.kernel.net.ConnectionsHandler import ConnectionsHandler
-from com.ankamagames.dofus.modules.utils.pathFinding.world.WorldPathFinder import WorldPathFinder
-from com.ankamagames.dofus.network.messages.game.context.roleplay.MapInformationsRequestMessage import (
-    MapInformationsRequestMessage,
-)
+from typing import TYPE_CHECKING
+
 from com.ankamagames.atouin.managers.MapDisplayManager import MapDisplayManager
-from com.ankamagames.dofus.datacenter.world.MapPosition import MapPosition
-from com.ankamagames.dofus.logic.game.fight.messages.FightRequestFailed import FightRequestFailed
-from com.ankamagames.dofus.logic.game.fight.messages.MapMoveFailed import MapMoveFailed
-from com.ankamagames.dofus.network.types.game.context.roleplay.GameRolePlayGroupMonsterInformations import (
-    GameRolePlayGroupMonsterInformations,
-)
-from com.ankamagames.jerakine.types.positions.MapPoint import MapPoint
-from pyd2bot.apis.InventoryAPI import InventoryAPI
-from pyd2bot.apis.MoveAPI import MoveAPI
 from com.ankamagames.dofus.datacenter.notifications.Notification import Notification
 from com.ankamagames.dofus.kernel.Kernel import Kernel
-from com.ankamagames.dofus.logic.game.common.managers.PlayedCharacterManager import (
-    PlayedCharacterManager,
-)
+from com.ankamagames.dofus.kernel.net.ConnectionsHandler import ConnectionsHandler
+from com.ankamagames.dofus.logic.game.common.managers.PlayedCharacterManager import PlayedCharacterManager
+from com.ankamagames.dofus.logic.game.fight.messages.FightRequestFailed import FightRequestFailed
+from com.ankamagames.dofus.logic.game.fight.messages.MapMoveFailed import MapMoveFailed
+from com.ankamagames.dofus.modules.utils.pathFinding.world.WorldPathFinder import WorldPathFinder
 from com.ankamagames.dofus.network.messages.game.context.notification.NotificationByServerMessage import (
     NotificationByServerMessage,
 )
-from com.ankamagames.dofus.network.messages.game.context.roleplay.MapChangeFailedMessage import (
-    MapChangeFailedMessage,
-)
+from com.ankamagames.dofus.network.messages.game.context.roleplay.MapChangeFailedMessage import MapChangeFailedMessage
 from com.ankamagames.dofus.network.messages.game.context.roleplay.MapComplementaryInformationsDataMessage import (
     MapComplementaryInformationsDataMessage,
 )
+from com.ankamagames.dofus.network.messages.game.context.roleplay.MapInformationsRequestMessage import (
+    MapInformationsRequestMessage,
+)
+from com.ankamagames.dofus.network.messages.game.interactive.InteractiveUsedMessage import InteractiveUsedMessage
 from com.ankamagames.dofus.network.messages.game.interactive.InteractiveUseEndedMessage import (
     InteractiveUseEndedMessage,
 )
 from com.ankamagames.dofus.network.messages.game.interactive.InteractiveUseErrorMessage import (
     InteractiveUseErrorMessage,
 )
-from com.ankamagames.dofus.network.messages.game.interactive.InteractiveUsedMessage import (
-    InteractiveUsedMessage,
+from com.ankamagames.dofus.network.types.game.context.roleplay.GameRolePlayGroupMonsterInformations import (
+    GameRolePlayGroupMonsterInformations,
 )
 from com.ankamagames.jerakine.logger.Logger import Logger
 from com.ankamagames.jerakine.messages.Frame import Frame
 from com.ankamagames.jerakine.messages.Message import Message
 from com.ankamagames.jerakine.types.enums.Priority import Priority
-from typing import TYPE_CHECKING
-from pyd2bot.models.enums.ServerNotificationTitlesEnum import ServerNotificationTitlesEnum
+from com.ankamagames.jerakine.types.positions.MapPoint import MapPoint
+from pyd2bot.apis.InventoryAPI import InventoryAPI
+from pyd2bot.apis.MoveAPI import MoveAPI
 from pyd2bot.logic.frames.BotAutoTripFrame import BotAutoTripFrame
 from pyd2bot.logic.messages.AutoTripEndedMessage import AutoTripEndedMessage
+from pyd2bot.models.enums.ServerNotificationTitlesEnum import ServerNotificationTitlesEnum
 from pyd2bot.models.farmPaths.AbstractFarmPath import AbstractFarmPath
 
 if TYPE_CHECKING:
-    from com.ankamagames.dofus.logic.game.roleplay.frames.RoleplayInteractivesFrame import (
-        RoleplayInteractivesFrame,
-    )
-    from com.ankamagames.dofus.logic.game.roleplay.frames.RoleplayEntitiesFrame import (
-        RoleplayEntitiesFrame,
-    )
+    from com.ankamagames.dofus.logic.game.roleplay.frames.RoleplayEntitiesFrame import RoleplayEntitiesFrame
+    from com.ankamagames.dofus.logic.game.roleplay.frames.RoleplayInteractivesFrame import RoleplayInteractivesFrame
     from com.ankamagames.dofus.logic.game.roleplay.frames.RoleplayMovementFrame import RoleplayMovementFrame
+    from com.ankamagames.dofus.logic.game.roleplay.frames.RoleplayWorldFrame import RoleplayWorldFrame
 
 logger = Logger("Dofus2")
 
@@ -93,6 +84,10 @@ class BotFarmPathFrame(Frame):
     @property
     def movementFrame(self) -> "RoleplayMovementFrame":
         return self._worker.getFrame("RoleplayMovementFrame")
+
+    @property
+    def worldFrame(self) -> "RoleplayWorldFrame":
+        return self._worker.getFrame("RoleplayWorldFrame")
 
     def pushed(self) -> bool:
         if self._autoStart:
@@ -202,13 +197,12 @@ class BotFarmPathFrame(Frame):
 
     def attackMonsterGroup(self):
         availableMonsterFights = []
-        currPlayerPos = MapPoint.fromCellId(PlayedCharacterManager().currentCellId)
+        currPlayerPos = PlayedCharacterManager().entity.position
         for entityId in self.entitiesFrame._monstersIds:
             if entityId in self._discardedMonstersIds:
                 continue
             infos: GameRolePlayGroupMonsterInformations = self.entitiesFrame.getEntityInfos(entityId)
-            monsterGrpLinkedZoneRp = MapDisplayManager().dataMap.cells[infos.disposition.cellId].linkedZoneRP
-            if monsterGrpLinkedZoneRp == PlayedCharacterManager().currentZoneRp:
+            if self.insideCurrentPlayerZoneRp(infos.disposition.cellId):
                 totalGrpLvl = infos.staticInfos.mainCreatureLightInfos.level + sum(
                     [ul.level for ul in infos.staticInfos.underlings]
                 )
@@ -222,6 +216,10 @@ class BotFarmPathFrame(Frame):
             entityId = availableMonsterFights[0]["info"].contextualId
             self._followinMonsterGroup = entityId
             self.movementFrame.attackMonsters(entityId)
+
+    def insideCurrentPlayerZoneRp(self, cellId):
+        tgtRpZone = MapDisplayManager().dataMap.cells[cellId].linkedZoneRP
+        return tgtRpZone == PlayedCharacterManager().currentZoneRp
 
     def doFarm(self):
         if WorldPathFinder().currPlayerVertex not in self.farmPath:
@@ -237,7 +235,7 @@ class BotFarmPathFrame(Frame):
         if self.farmPath.fightOnly:
             self.attackMonsterGroup()
         else:
-            self.collectResource(skills=self.farmPath.skills)
+            self.collectResource()
         if self._followingIe is None and self._followinMonsterGroup is None:
             self.moveToNextStep()
 
@@ -246,26 +244,39 @@ class BotFarmPathFrame(Frame):
         mirmsg.init(mapId_=MapDisplayManager().currentMapPoint.mapId)
         ConnectionsHandler.getConnection().send(mirmsg)
 
-    def collectResource(self, skills=[]) -> None:
-        ce = None
+    def collectResource(self) -> None:
+        availableResources = []
         for it in self.interactivesFrame.collectables.values():
             if it.enabled:
                 if self.farmPath.jobIds:
                     if it.skill.parentJobId not in self.farmPath.jobIds:
                         continue
-                    logger.debug(f"[BotFarmFrame] Found a resource i can collect with job {it.skill.parentJobId}")
                     if PlayedCharacterManager().jobs[it.skill.parentJobId].jobLevel < it.skill.levelMin:
                         continue
-                    logger.debug(
-                        f"[BotFarmFrame] Resource i can collect with job {it.skill.parentJobId} is level {it.skill.levelMin}"
-                    )
-                ce = it
-                elementId = it.id
-                break
-        if ce is not None and ce.enabled:
-            logger.info(f"[BotFarmFrame] Collecting {ce} ... skillId : {ce.skill.id}")
-            ie = self.interactivesFrame.interactives.get(elementId)
-            if ie is None:
-                raise Exception(f"[BotFarmFrame] InteractiveElement {elementId} not found!!!")
+                ie = self.interactivesFrame.interactives.get(it.id)
+                if not (self.interactivesFrame and self.interactivesFrame.usingInteractive):
+                    playerEntity = PlayedCharacterManager().entity
+                    if not playerEntity:
+                        return
+                    nearestCell, _ = self.worldFrame.getNearestCellToIe(ie.element, ie.position)
+                    if self.insideCurrentPlayerZoneRp(nearestCell.cellId):
+                        availableResources.append(
+                            {
+                                "element": ie,
+                                "distance": PlayedCharacterManager().entity.position.distanceToCell(ie.position),
+                            }
+                        )
+        if availableResources:
+            availableResources.sort(key=lambda x: x["distance"])
+            ie = availableResources[0]["element"]
+            self.movementFrame.setFollowingInteraction(
+                {
+                    "ie": ie.element,
+                    "skillInstanceId": ie.skillUID,
+                    "additionalParam": 0,
+                }
+            )
             self._followingIe = ie
-            self.interactivesFrame.skillClicked(ie)
+            self.movementFrame.resetNextMoveMapChange()
+            self.movementFrame.askMoveTo(nearestCell)
+            logger.info(f"[BotFarmFrame] Collecting {ie.element.elementId} ... skillId : {ie.skillUID}")

@@ -100,9 +100,6 @@ logger = Logger("Dofus2")
 
 
 class PlayedCharacterApi(IApi, metaclass=Singleton):
-
-    MEMORY_LOG: dict = dict()
-
     def __init__(self):
         super().__init__()
 

@@ -16,7 +16,7 @@ class MapLoader(metaclass=Singleton):
     def __init__(self) -> None:
         self._reader = DLM(self.DLM_KEY)
 
-    @lru_cache(maxsize=256)
+    @lru_cache(maxsize=5)
     def load(self, mapId, key=None):
         if key is not None:
             self._reader.setKey(key)

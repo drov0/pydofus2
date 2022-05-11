@@ -1,7 +1,4 @@
-from enum import Enum
-
-
-class FightOptionsEnum(Enum):
+class FightOptionsEnum:
 
     FIGHT_OPTION_SET_SECRET: int = 0
 

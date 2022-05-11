@@ -1,6 +1,10 @@
 import collections
 import math
 import random
+from com.ankamagames.dofus.network.enums.FightOptionsEnum import FightOptionsEnum
+from com.ankamagames.dofus.network.messages.game.context.fight.GameFightOptionToggleMessage import (
+    GameFightOptionToggleMessage,
+)
 from com.ankamagames.dofus.network.messages.game.context.fight.GameFightTurnResumeMessage import (
     GameFightTurnResumeMessage,
 )
@@ -363,6 +367,12 @@ class BotFightFrame(Frame, metaclass=Singleton):
         if isinstance(msg, GameFightJoinMessage):
             self._fightCount += 1
             self._inFight = True
+            gfotmsg = GameFightOptionToggleMessage()
+            gfotmsg.init(FightOptionsEnum.FIGHT_OPTION_SET_SECRET)
+            ConnectionsHandler.getConnection().send(gfotmsg)
+            gfotmsg = GameFightOptionToggleMessage()
+            gfotmsg.init(FightOptionsEnum.FIGHT_OPTION_SET_TO_PARTY_ONLY)
+            ConnectionsHandler.getConnection().send(gfotmsg)
             return False
 
         elif isinstance(msg, GameFightEndMessage):

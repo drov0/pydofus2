@@ -6,11 +6,11 @@ import tracemalloc
 
 
 class MemoryProfiler:
-    LOGRATE = 1 / 10
+    LOGRATE = 1 / 60
     LAST_LOGGED = 0
     SAVED_PROFILES = dict()
     SHOW_LIMIT = 20
-    SAVE_LIMIT = 300
+    SAVE_LIMIT = 20
     LOG_FILE = "./log/memory_usage.log"
     KEY_TYPE = "lineno"
 
@@ -61,7 +61,7 @@ class MemoryProfiler:
 
         now = datetime.datetime.now()
         fieldnames = list(cls.SAVED_PROFILES.keys())
-        with open(f"./log/stats/MemoryStats-{now.strftime('%Y-%m-%d')}.csv", "wb") as fp:
+        with open(f"./log/stats/MemoryStats-{now.strftime('%Y-%m-%d')}.csv", "w") as fp:
             writer = csv.DictWriter(fp, fieldnames=fieldnames)
             writer.writeheader()
             writer.writerows(cls.SAVED_PROFILES)

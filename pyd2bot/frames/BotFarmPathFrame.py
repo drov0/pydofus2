@@ -70,7 +70,7 @@ class BotFarmPathFrame(Frame):
             raise Exception("No parcours loaded")
         super().__init__()
         self._autoStart = autoStart
-        self._followingIe = -1
+        self._followingIe = None
         self._usingInteractive = False
         self._followingMapchange = -1
         self._entities = dict()
@@ -135,6 +135,8 @@ class BotFarmPathFrame(Frame):
             self.doFarm()
 
         elif isinstance(msg, InteractiveUseErrorMessage):
+            if self._inAutoTrip:
+                return False
             logger.error(
                 f"[BotFarmFrame] Error unable to use interactive element {msg.elemId} with the skill {msg.skillInstanceUid}"
             )
@@ -148,9 +150,13 @@ class BotFarmPathFrame(Frame):
             return True
 
         elif isinstance(msg, (FightRequestFailed, MapMoveFailed, MapChangeFailedMessage)):
+            if self._inAutoTrip:
+                return False
             self.requestMapData()
 
         elif isinstance(msg, InteractiveUsedMessage):
+            if self._inAutoTrip:
+                return False
             if PlayedCharacterManager().id == msg.entityId and msg.duration > 0:
                 logger.debug(f"[BotFarmFrame] Inventory weight {InventoryAPI.getWeightPercent():.2f}%")
                 logger.debug(f"[BotFarmFrame] Started using interactive element {msg.elemId} ....")
@@ -162,6 +168,8 @@ class BotFarmPathFrame(Frame):
             return True
 
         elif isinstance(msg, InteractiveUseEndedMessage):
+            if self._inAutoTrip:
+                return False
             if self._entities[msg.elemId] == PlayedCharacterManager().id:
                 logger.debug(f"[BotFarmFrame] Interactive element {msg.elemId} use ended")
                 logger.debug("*" * 100)
@@ -170,12 +178,12 @@ class BotFarmPathFrame(Frame):
             return True
 
         elif isinstance(msg, MapComplementaryInformationsDataMessage):
+            if self._inAutoTrip:
+                return False
             logger.debug("-" * 100)
-            if not self._inAutoTrip:
-                self.reset()
-                self.doFarm()
-                return True
-            return False
+            self.reset()
+            self.doFarm()
+            return True
 
         elif isinstance(msg, NotificationByServerMessage):
             notification = Notification.getNotificationById(msg.id)

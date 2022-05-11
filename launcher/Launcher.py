@@ -1,6 +1,7 @@
 import os
 from subprocess import Popen, PIPE
 import json
+from time import sleep
 import httpx
 from com.ankamagames.jerakine.logger.Logger import Logger
 from com.ankamagames.jerakine.metaclasses.Singleton import Singleton
@@ -72,30 +73,39 @@ class Haapi(metaclass=Singleton):
             self.createAPIKEY(accountId)
         creds = AccountCredsManager.getEntry(accountId)
         cert = self.getCert(creds["login"])
-        response = httpx.get(
-            self.getUrl("GET_LOGIN_TOKEN"),
-            params={
-                "game": game_id,
-                "certificate_id": cert["id"],
-                "certificate_hash": cert["hash"],
-            },
-            headers={
-                "User-Agent": "Zaap1",
-                "Content-Type": "multipart/form-data",
-                "APIKEY": self.APIKEY,
-            },
-        )
-        try:
-            token = response.json()["token"]
-        except json.decoder.JSONDecodeError as e:
-            from bs4 import BeautifulSoup
+        nbrTries = 0
+        while nbrTries < 3:
+            response = httpx.get(
+                self.getUrl("GET_LOGIN_TOKEN"),
+                params={
+                    "game": game_id,
+                    "certificate_id": cert["id"],
+                    "certificate_hash": cert["hash"],
+                },
+                headers={
+                    "User-Agent": "Zaap1",
+                    "Content-Type": "multipart/form-data",
+                    "APIKEY": self.APIKEY,
+                },
+            )
+            try:
+                token =  response.json()["token"]
+                logger.debug("Login Token created")
+                return token
+            except json.decoder.JSONDecodeError as e:
+                from bs4 import BeautifulSoup
 
-            parsed_html = BeautifulSoup(response.content)
-            reason = parsed_html.body.find("div", attrs={"id": "what-happened-section"}).find("p").text
-            raise Exception(f"Error while getting login token: {reason}")
+                parsed_html = BeautifulSoup(response.content)
+                reason = parsed_html.body.find("div", attrs={"id": "what-happened-section"}).find("p").text
+                if (
+                    reason
+                    == "The owner of this website (haapi.ankama.com) has banned you temporarily from accessing this website."
+                ):
+                    logger.debug("Login Token creation failed, reason: %s" % reason)
+                    logger.debug("Retrying in 60 seconds")
+                    sleep(60)
 
-        logger.debug("Login Token created")
-        return token
+        
 
 
 if __name__ == "__main__":

@@ -321,35 +321,25 @@ class BuffManager(metaclass=Singleton):
                     buffItem.onDisabled()
 
     def addBuff(self, buff: basicBuff.BasicBuff, applyBuff: bool = True) -> None:
-        sameBuff = None
-        if not self._buffs.get(buff.targetId):
+        if buff.targetId not in self._buffs:
             self._buffs[buff.targetId] = []
         if GameDebugManager().buffsDebugActivated:
-            logger.debug("[BUFFS DEBUG] Ajout du buff " + str(buff.uid) + " sur " + str(buff.targetId))
-        buffsCount: int = len(self._buffs[buff.targetId])
-        for i in range(buffsCount):
-            actualBuff = self._buffs[buff.targetId][i]
-            if buff.equals(actualBuff):
-                sameBuff = actualBuff
-        if not sameBuff or buff.actionId == ActionIds.ACTION_CHARACTER_BOOST_THRESHOLD:
+            logger.debug(f"[BUFFS DEBUG] Ajout du buff {buff.uid} sur {buff.targetId}")
+        if buff not in self._buffs[buff.targetId] or buff.actionId == ActionIds.ACTION_CHARACTER_BOOST_THRESHOLD:
             self._buffs[buff.targetId].append(buff)
+        elif (
+            isinstance(buff, TriggeredBuff)
+            and buff.effect.triggers.find("|") != -1
+            or buff.castingSpell.spellRank
+            and buff.castingSpell.spellRank.maxStack > 0
+            and buff.stack
+            and len(buff.stack) == buff.castingSpell.spellRank.maxStack
+        ):
+            return
         else:
-            if (
-                isinstance(sameBuff, TriggeredBuff)
-                and sameBuff.effect.triggers.find("|") != -1
-                or sameBuff.castingSpell.spellRank
-                and sameBuff.castingSpell.spellRank.maxStack > 0
-                and sameBuff.stack
-                and len(sameBuff.stack) == sameBuff.castingSpell.spellRank.maxStack
-            ):
-                return
-            sameBuff.add(buff)
+            buff.add(buff)
         if applyBuff:
             buff.onApplied()
-        if not sameBuff:
-            pass
-        else:
-            pass
 
     def updateBuff(self, buff: basicBuff.BasicBuff) -> bool:
         targetId: float = buff.targetId

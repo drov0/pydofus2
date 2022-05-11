@@ -242,9 +242,9 @@ class RoleplayMovementFrame(Frame):
             else:
                 self._isRequestingMovement = False
                 if (PlayedCharacterManager().inventoryWeight / PlayedCharacterManager().inventoryWeightMax) == 1:
-                    pathDuration = max(1, 1.4 * clientMovePath.getCrossingDuration(False))
+                    pathDuration = max(1, 1 * clientMovePath.getCrossingDuration(False))
                 else:
-                    pathDuration = max(1, 1.5 * clientMovePath.getCrossingDuration(True))
+                    pathDuration = max(1, 1 * clientMovePath.getCrossingDuration(True))
                 sleep(pathDuration)
                 Kernel().getWorker().processImmediately(EntityMovementCompleteMessage(movedEntity)),
             return True

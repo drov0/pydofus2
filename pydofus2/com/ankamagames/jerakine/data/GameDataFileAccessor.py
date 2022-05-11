@@ -3,10 +3,8 @@ from typing import TYPE_CHECKING, Any
 from com.ankamagames.dofus import Constants
 
 if TYPE_CHECKING:
-    from ankamagames.jerakine.data.GameDataProcess import GameDataProcess
-    from ankamagames.jerakine.data.GameDataClassDefinition import (
-        GameDataClassDefinition,
-    )
+    from com.ankamagames.jerakine.data.GameDataClassDefinition import GameDataClassDefinition
+    from com.ankamagames.jerakine.data.GameDataProcess import GameDataProcess
 from com.ankamagames.jerakine.data.ModuleReader import ModuleReader
 from com.ankamagames.jerakine.metaclasses.Singleton import Singleton
 from com.ankamagames.jerakine.data.BinaryStream import BinaryStream
@@ -34,9 +32,7 @@ class GameDataFileAccessor(metaclass=Singleton):
             self.initFromModuleName(moduleName)
         return self._modules[moduleName]._gameDataProcessor
 
-    def getClassDefinition(
-        self, moduleName: str, classId: int
-    ) -> "GameDataClassDefinition":
+    def getClassDefinition(self, moduleName: str, classId: int) -> "GameDataClassDefinition":
         return self._modules[moduleName]._classes[classId]
 
     def getCount(self, moduleName: str) -> int:

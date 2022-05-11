@@ -1,4 +1,5 @@
 import sys
+import tracemalloc
 from com.ankamagames.dofus.logic.common.managers.PlayerManager import PlayerManager
 from time import sleep
 import com.ankamagames.dofus.kernel.Kernel as krnl
@@ -15,7 +16,7 @@ from com.ankamagames.dofus.types.entities.AnimatedCharacter import AnimatedChara
 from com.ankamagames.jerakine.data.I18nFileAccessor import I18nFileAccessor
 from com.ankamagames.jerakine.logger.Logger import Logger
 from typing import TYPE_CHECKING
-
+from com.ankamagames.jerakine.logger.MemoryProfiler import MemoryProfiler
 from com.ankamagames.jerakine.metaclasses.Singleton import Singleton
 
 if TYPE_CHECKING:
@@ -27,6 +28,8 @@ logger = Logger("Dofus2")
 
 
 class DofusClient(metaclass=Singleton):
+    LOG_MEMORY_USAGE = False
+
     def __init__(self):
         krnl.Kernel().init()
         self._worker = krnl.Kernel().getWorker()
@@ -39,6 +42,8 @@ class DofusClient(metaclass=Singleton):
         self.login(self._accountId, self._serverId, self._charachterId)
 
     def login(self, accountId, serverId, charachterId=None):
+        if self.LOG_MEMORY_USAGE:
+            tracemalloc.start()
         self._serverId = serverId
         self._charachterId = charachterId
         self._accountId = accountId
@@ -56,9 +61,12 @@ class DofusClient(metaclass=Singleton):
     def join(self):
         while True:
             try:
-                sleep(0.3)
+                sleep(3)
                 if not self.mainConn:
                     sys.exit(0)
+                if self.LOG_MEMORY_USAGE:
+                    snapshot = tracemalloc.take_snapshot()
+                    MemoryProfiler.logMemoryUsage(snapshot)
             except KeyboardInterrupt:
                 self.shutdown()
                 sys.exit(0)

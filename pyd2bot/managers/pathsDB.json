@@ -1,0 +1,52 @@
+{
+    "pioute_astrub_village": {
+        "type": "RandomSubAreaFarmPath",
+        "name": "pioute_astrub_village",
+        "subAreaId": 95,
+        "startVertex": {
+            "mapId": 191104002.0,
+            "mapRpZone": 1
+        },
+        "fightOnly": true,
+        "monsterLvlCoefDiff": 1.5,
+        "jobIds": []
+    },
+    "lumberjack_astrub_forest": {
+        "type": "RandomSubAreaFarmPath",
+        "name": "lumberjack_astrub_forest",
+        "subAreaId": 97,
+        "startVertex": {
+            "mapId": 189532167.0,
+            "mapRpZone": 1
+        },
+        "fightOnly": false,
+        "monsterLvlCoefDiff": 1.5,
+        "jobIds": [
+            2
+        ]
+    },
+    "incarnam_lac_monster": {
+        "type": "RandomSubAreaFarmPath",
+        "name": "incarnam_lac_monster",
+        "subAreaId": 442,
+        "startVertex": {
+            "mapId": 153878786.0,
+            "mapRpZone": 1
+        },
+        "fightOnly": true,
+        "monsterLvlCoefDiff": 1.5,
+        "jobIds": []
+    },
+    "tainela_bouftou": {
+        "type": "RandomSubAreaFarmPath",
+        "name": "tainela_bouftou",
+        "subAreaId": 30,
+        "startVertex": {
+            "mapId": 120062979.0,
+            "mapRpZone": 1
+        },
+        "fightOnly": true,
+        "monsterLvlCoefDiff": 1.5,
+        "jobIds": []
+    }
+}

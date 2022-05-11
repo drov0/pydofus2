@@ -11,6 +11,7 @@ class AbstractFarmPath:
     skills = []
     jobIds = []
     monsterLvlCoefDiff = float("inf")
+    name = "undefined"
 
     def __init__(self) -> None:
         pass
@@ -32,4 +33,11 @@ class AbstractFarmPath:
         raise NotImplementedError()
 
     def neighbors(self, vertex: Vertex) -> Iterator[Vertex]:
+        raise NotImplementedError()
+
+    def to_json(self):
+        raise NotImplementedError()
+
+    @classmethod
+    def from_json(cls, pathJson) -> "AbstractFarmPath":
         raise NotImplementedError()

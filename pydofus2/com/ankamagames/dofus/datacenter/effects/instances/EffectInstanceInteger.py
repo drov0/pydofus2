@@ -13,7 +13,7 @@ logger = Logger("Dofus2")
 
 class EffectInstanceInteger(effinst.EffectInstance, IDataCenter):
 
-    value: int
+    value: int = None
 
     def __init__(self):
         super().__init__()

@@ -315,7 +315,7 @@ class BasicBuff:
         self._disabled = False
         self._removed = False
 
-    def equals(self, other: "BasicBuff", ignoreSpell: bool = False) -> bool:
+    def __eq__(self, other: "BasicBuff", ignoreSpell: bool = False) -> bool:
         sb1: "StateBuff" = None
         sb2: "StateBuff" = None
         if (

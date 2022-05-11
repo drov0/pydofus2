@@ -11,7 +11,7 @@ logger = Logger("Dofus2")
 
 
 if __name__ == "__main__":
-
+    charachterId = "Maniaco-lalcolic(210)"
     dofus2 = DofusClient()
 
     # setup the farm path
@@ -33,6 +33,6 @@ if __name__ == "__main__":
     BotFarmPathFrame.farmPath = pioute_astrub_village
 
     dofus2.registerFrame(BotWorkflowFrame())
-    creds = BotCredsManager.getEntry("foobar")
+    creds = BotCredsManager.getEntry(charachterId)
     dofus2.login(**creds)
     dofus2.join()

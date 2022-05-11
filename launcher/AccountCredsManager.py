@@ -12,7 +12,7 @@ pubkey_p = KEYS_DIR / "id_rsa.pub"
 privatekey_p = KEYS_DIR / "id_rsa"
 
 
-class CredsManager:
+class AccountCredsManager:
     with open(pubkey_p, "rb") as fp:
         _pubkey = RSA.import_key(fp.read())
     with open(privatekey_p, "rb") as fp:
@@ -25,14 +25,14 @@ class CredsManager:
 
     @staticmethod
     def addEntry(name, username, password):
-        password = CredsManager.encryptPasssword(password)
-        CredsManager._creds.update({name: {"login": username, "password": password}})
+        password = AccountCredsManager.encryptPasssword(password)
+        AccountCredsManager._creds.update({name: {"login": username, "password": password}})
         with open(CREDS_DB, "w") as fp:
-            json.dump(CredsManager._creds, fp, indent=4)
+            json.dump(AccountCredsManager._creds, fp, indent=4)
 
     @classmethod
     def getEntry(cls, name):
-        if name not in CredsManager._creds:
+        if name not in AccountCredsManager._creds:
             raise Exception(f"No registred account creds for account {name}")
         result = cls._creds.get(name).copy()
         result["password"] = cls.decryptPasssword(result["password"])
@@ -40,14 +40,14 @@ class CredsManager:
 
     @staticmethod
     def encryptPasssword(password: str) -> list[int]:
-        rsacipher = PKCS1_OAEP.new(CredsManager._pubkey)
+        rsacipher = PKCS1_OAEP.new(AccountCredsManager._pubkey)
         baIn = bytes(password, "utf-8")
         encryptedPass = ByteArray(rsacipher.encrypt(baIn))
         return encryptedPass.to_int8Arr()
 
     @staticmethod
     def decryptPasssword(encryptedPass: list[int]) -> str:
-        cipher = PKCS1_OAEP.new(CredsManager._privatekey)
+        cipher = PKCS1_OAEP.new(AccountCredsManager._privatekey)
         encryptedPass = ByteArray.from_int8Arr(encryptedPass)
         password_ba = cipher.decrypt(encryptedPass)
         password = password_ba.decode("utf-8")
@@ -61,4 +61,4 @@ if __name__ == "__main__":
     entryName = sys.argv[1]
     entryLogin = sys.argv[2]
     entryPassword = sys.argv[3]
-    CredsManager.addEntry(entryName, entryLogin, entryPassword)
+    AccountCredsManager.addEntry(entryName, entryLogin, entryPassword)

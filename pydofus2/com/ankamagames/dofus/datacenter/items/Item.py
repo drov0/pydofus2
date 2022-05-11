@@ -176,6 +176,101 @@ class Item(IPostInit, IDataCenter):
 
     def __init__(self):
         super().__init__()
+        self.id: int = None
+
+        self.nameId: int = None
+
+        self.typeId: int = None
+
+        self.descriptionId: int = None
+
+        self.iconId: int = None
+
+        self.level: int = None
+
+        self.realWeight: int = None
+
+        self.cursed: bool = None
+
+        self.useAnimationId: int = None
+
+        self.usable: bool = None
+
+        self.targetable: bool = None
+
+        self.exchangeable: bool = None
+
+        self.price: float = None
+
+        self.twoHanded: bool = None
+
+        self.etheral: bool = None
+
+        self.itemSetId: int = None
+
+        self.criteria: str = None
+
+        self.criteriaTarget: str = None
+
+        self.hideEffects: bool = None
+
+        self.enhanceable: bool = None
+
+        self.nonUsableOnAnother: bool = None
+
+        self.appearanceId: int = None
+
+        self.secretRecipe: bool = None
+
+        self.dropMonsterIds: list[int] = None
+
+        self.dropTemporisMonsterIds: list[int] = None
+
+        self.recipeSlots: int = None
+
+        self.recipeIds: list[int] = None
+
+        self.objectIsDisplayOnWeb: bool = None
+
+        self.bonusIsSecret: bool = None
+
+        self.possibleEffects: list["EffectInstance"] = None
+
+        self.evolutiveEffectIds: list[int] = None
+
+        self.favoriteSubAreas: list[int] = None
+
+        self.favoriteSubAreasBonus: int = None
+
+        self.craftXpRatio: int = None
+
+        self.craftVisible: str = None
+
+        self.craftConditional: str = None
+
+        self.craftFeasible: str = None
+
+        self.needUseConfirm: bool = None
+
+        self.isDestructible: bool = None
+
+        self.isLegendary: bool = None
+
+        self.isSaleable: bool = None
+
+        self.nuggetsBySubarea: list[list[float]] = None
+
+        self.containerIds: list[int] = None
+
+        self.resourcesBySubarea: list[list[int]] = None
+
+        self.visibility: str = None
+
+        self.importantNoticeId: int = None
+
+        self.changeVersion: str = None
+
+        self.tooltipExpirationDate: float = None
 
     @classmethod
     def getItemById(cls, id: int, returnDefaultItemIfNull: bool = True) -> "Item":

@@ -35,6 +35,6 @@ class WeaponWrapper(ItemWrapper):
 
     @classmethod
     def clone(cls, baseobject: object = None) -> ItemWrapper:
-        result: ItemWrapper = super().clone(WeaponWrapper)
+        result: ItemWrapper = super().clone(baseobject)
         cls._weaponUtil.copy(cls, result)
         return result

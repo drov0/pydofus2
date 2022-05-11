@@ -7,7 +7,7 @@ from com.ankamagames.jerakine.metaclasses.Singleton import Singleton
 import xml.etree.ElementTree as ET
 
 logger = Logger("Dofus2")
-from launcher.CredsManager import CredsManager
+from launcher.AccountCredsManager import AccountCredsManager
 
 
 class Haapi(metaclass=Singleton):
@@ -26,7 +26,7 @@ class Haapi(metaclass=Singleton):
 
     def createAPIKEY(self, accountId, game_id=102) -> str:
         logger.debug("Calling HAAPI to Create APIKEY")
-        creds = CredsManager.getEntry(accountId)
+        creds = AccountCredsManager.getEntry(accountId)
         cert = self.getCert(creds["login"])
         data = {
             "login": creds["login"],
@@ -70,7 +70,7 @@ class Haapi(metaclass=Singleton):
         logger.debug("Calling HAAPI to get Login Token")
         if not self.APIKEY:
             self.createAPIKEY(accountId)
-        creds = CredsManager.getEntry(accountId)
+        creds = AccountCredsManager.getEntry(accountId)
         cert = self.getCert(creds["login"])
         response = httpx.get(
             self.getUrl("GET_LOGIN_TOKEN"),

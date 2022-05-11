@@ -38,14 +38,15 @@ class DofusClient(metaclass=Singleton):
     def relogin(self):
         self.login(self._accountId, self._serverId, self._charachterId)
 
-    def login(self, accountId, serverId, charachterId):
+    def login(self, accountId, serverId, charachterId=None):
         self._serverId = serverId
         self._charachterId = charachterId
         self._accountId = accountId
         self._loginToken = Haapi().getLoginToken(self._accountId)
         auth.AuthentificationManager().setToken(self._loginToken)
-        PlayerManager().allowAutoConnectCharacter = True
-        PlayerManager().autoConnectOfASpecificCharacterId = charachterId
+        if charachterId:
+            PlayerManager().allowAutoConnectCharacter = True
+            PlayerManager().autoConnectOfASpecificCharacterId = charachterId
         for frame in self._registredCustomFrames:
             self._worker.addFrame(frame)
         self._worker.processImmediately(

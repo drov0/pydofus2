@@ -258,7 +258,7 @@ class PlayedCharacterManager(IDestroyable, metaclass=Singleton):
     @property
     def currentCellId(self) -> int:
         if self.entity is None:
-            logger.error("No player entity found")
+            # logger.error("No player entity found")
             return None
         return self.entity.position.cellId
 

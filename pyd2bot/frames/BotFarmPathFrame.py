@@ -199,14 +199,16 @@ class BotFarmPathFrame(Frame):
             if entityId in self._discardedMonstersIds:
                 continue
             infos: GameRolePlayGroupMonsterInformations = self.entitiesFrame.getEntityInfos(entityId)
-            totalGrpLvl = infos.staticInfos.mainCreatureLightInfos.level + sum(
-                [ul.level for ul in infos.staticInfos.underlings]
-            )
-            if totalGrpLvl < self.farmPath.monsterLvlCoefDiff * PlayedCharacterManager().limitedLevel:
-                monsterGroupPos = MapPoint.fromCellId(infos.disposition.cellId)
-                availableMonsterFights.append(
-                    {"info": infos, "distance": currPlayerPos.distanceToCell(monsterGroupPos)}
+            monsterGrpLinkedZoneRp = MapDisplayManager().dataMap.cells[infos.disposition.cellId].linkedZoneRP
+            if monsterGrpLinkedZoneRp == PlayedCharacterManager().currentZoneRp:
+                totalGrpLvl = infos.staticInfos.mainCreatureLightInfos.level + sum(
+                    [ul.level for ul in infos.staticInfos.underlings]
                 )
+                if totalGrpLvl < self.farmPath.monsterLvlCoefDiff * PlayedCharacterManager().limitedLevel:
+                    monsterGroupPos = MapPoint.fromCellId(infos.disposition.cellId)
+                    availableMonsterFights.append(
+                        {"info": infos, "distance": currPlayerPos.distanceToCell(monsterGroupPos)}
+                    )
         if availableMonsterFights:
             availableMonsterFights.sort(key=lambda x: x["distance"])
             entityId = availableMonsterFights[0]["info"].contextualId

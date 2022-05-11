@@ -8,10 +8,10 @@ from pyd2bot.managers.BotCredsManager import BotCredsManager
 logger = Logger("Dofus2")
 
 if __name__ == "__main__":
-    accountId = "aloone95"
+    accountId = "melanco"
     serverId = 210
-    username = "aloone-100"
-    password = "rmrtxha1"
+    username = "maniac.depressif@gmail.com"
+    password = "5hgCd.JMUVwxK-s"
     AccountCredsManager.addEntry(accountId, username, password)
     dofus2 = DofusClient()
     dofus2.login(accountId, serverId)

@@ -1,5 +1,2 @@
-from abc import ABC
-
-
-class INetworkType(ABC):
+class INetworkType:
     pass

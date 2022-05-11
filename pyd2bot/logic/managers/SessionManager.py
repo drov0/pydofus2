@@ -1,6 +1,7 @@
 import json
 import os
-from pyd2bot.Constants import BotConstants
+
+from pyd2bot.BotConstants import BotConstants
 from pyd2bot.models.Session import Session
 
 SESSIONDB = BotConstants.PERSISTENCE_DIR / "sessions.json"

@@ -79,7 +79,7 @@ class MapDisplayManager(metaclass=Singleton):
     def loadMap(self, mapId: int, forceReloadWithoutCache: bool = False, decryptionKey=None) -> None:
         from com.ankamagames.dofus.kernel.Kernel import Kernel
 
-        self.lastDataMap = self.currentDataMap
+        del self.currentDataMap
         self._forceReloadWithoutCache = forceReloadWithoutCache
         self._currentMapRendered = False
         self._nMapLoadStart = perf_counter()

@@ -1,6 +1,3 @@
-from abc import ABC
-
-
-class Poolable(ABC):
+class Poolable:
     def free(self) -> None:
-        pass
+        raise NotImplementedError()

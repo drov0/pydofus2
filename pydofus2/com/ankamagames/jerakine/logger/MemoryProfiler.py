@@ -9,8 +9,8 @@ class MemoryProfiler:
     LOGRATE = 1 / 60
     LAST_LOGGED = 0
     SAVED_PROFILES = dict()
-    SHOW_LIMIT = 20
-    SAVE_LIMIT = 20
+    SHOW_LIMIT = 100
+    SAVE_LIMIT = 100
     LOG_FILE = "./log/memory_usage.log"
     KEY_TYPE = "lineno"
 
@@ -29,7 +29,7 @@ class MemoryProfiler:
                     tracemalloc.Filter(False, "<frozen importlib._bootstrap>"),
                     tracemalloc.Filter(False, "<unknown>"),
                     tracemalloc.Filter(False, "<frozen importlib._bootstrap_external>"),
-                    tracemalloc.Filter(False, "<lib\linecache.py>"),
+                    tracemalloc.Filter(False, "<linecache.py>", 137),
                 )
             )
             top_stats = snapshot.statistics(cls.KEY_TYPE)
@@ -48,20 +48,17 @@ class MemoryProfiler:
             if other:
                 if "other" not in cls.SAVED_PROFILES:
                     cls.SAVED_PROFILES["other"] = []
-                size = sum(stat.size for stat in other) / (1024 * 1024)
+                size = round(sum(stat.size for stat in other) / (1024 * 1024), 2)
                 cls.SAVED_PROFILES["other"].append(size)
                 fp.write("%s other: %.1f MB" % (len(other), size) + "\n")
-            total = sum(stat.size for stat in top_stats)
-            fp.write("Total allocated size: %.1f NB" % (total / (1024 * 1024)) + "\n")
+            total = round(sum(stat.size for stat in top_stats) / (1024 * 1024), 2)
+            fp.write("Total allocated size: %.1f NB" % (total) + "\n")
 
     @classmethod
     def saveCollectedData(cls):
-        import csv
+        import json
         import datetime
 
         now = datetime.datetime.now()
-        fieldnames = list(cls.SAVED_PROFILES.keys())
-        with open(f"./log/stats/MemoryStats-{now.strftime('%Y-%m-%d')}.csv", "w") as fp:
-            writer = csv.DictWriter(fp, fieldnames=fieldnames)
-            writer.writeheader()
-            writer.writerows(cls.SAVED_PROFILES)
+        with open(f"./log/stats/MemoryStats-{now.strftime('%Y-%m-%d')}.json", "w") as fp:
+            json.dump(cls.SAVED_PROFILES, fp, indent=4)

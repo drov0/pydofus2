@@ -1,9 +1,7 @@
 from com.ankamagames.atouin.AtouinConstants import AtouinConstants
-from com.ankamagames.atouin.data.map.MapZones import MapZones
-from com.ankamagames.atouin.data.map.Fixture import Fixture
 from com.ankamagames.atouin.data.map.Cell import Cell
+from com.ankamagames.atouin.data.map.Fixture import Fixture
 from com.ankamagames.atouin.data.map.Layer import Layer
-from com.ankamagames.atouin.utils.CellIdConverter import CellIdConverter
 from com.ankamagames.atouin.utils.DataMapProvider import DataMapProvider
 from com.ankamagames.jerakine.data.BinaryStream import BinaryStream
 from com.ankamagames.jerakine.logger.Logger import Logger
@@ -26,7 +24,6 @@ class Map:
         self.isUsingNewMovementSystem = False
         self._parser = False
         self.fromRaw(raw)
-        self.zones = MapZones(self)
 
     def fromRaw(self, raw: BinaryStream):
         self.relativeId = raw.readUnsignedInt()
@@ -109,24 +106,6 @@ class Map:
                 self.rightArrowCell.add(cellid)
 
         self._parser = True
-
-    def getOutgoingCells(self, direction: DirectionsEnum):
-        return set([i for i in self.OUTCELLS[direction] if self.cells[i].allowsMapChange()])
-
-    def cellOutTowards(self, currCellId, direction: DirectionsEnum):
-        currZone = self.zones.getZone(currCellId)
-        condidateOutCells = self.getBorderCells(direction)
-        mindDist = float("inf")
-        outCellId = None
-        for cellid in condidateOutCells:
-            if self.zones.getZone(cellid) == currZone:
-                mp1 = MapPoint.fromCellId(currCellId)
-                mp2 = MapPoint.fromCellId(cellid)
-                dist = mp1.distanceToCell(mp2)
-                if dist < mindDist:
-                    mindDist = dist
-                    outCellId = cellid
-        return outCellId
 
     def getNeighbourCellFromDirection(cls, srcId: int, direction: DirectionsEnum) -> "Cell":
         if (srcId // AtouinConstants.MAP_WIDTH) % 2 == 0:

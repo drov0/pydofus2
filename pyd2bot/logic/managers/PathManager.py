@@ -1,7 +1,8 @@
 import json
 import os
 from pathlib import Path
-from pyd2bot.Constants import BotConstants
+
+from pyd2bot.BotConstants import BotConstants
 from pyd2bot.models.farmPaths.AbstractFarmPath import AbstractFarmPath
 from pyd2bot.models.farmPaths.RandomSubAreaFarmPath import RandomSubAreaFarmPath
 

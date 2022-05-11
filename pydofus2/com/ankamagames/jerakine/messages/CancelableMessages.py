@@ -1,7 +1,4 @@
-from abc import ABC
-
-
-class CancelableMessage(ABC):
+class CancelableMessage:
     @property
     def cancel(self) -> bool:
-        pass
+        raise NotImplementedError()

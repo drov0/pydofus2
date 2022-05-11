@@ -184,10 +184,10 @@ class DataMapProvider(IDataMapProvider, metaclass=Singleton):
         self._updatedCell[cellId] = canMove
 
     def resetUpdatedCell(self) -> None:
-        self._updatedCell = dict()
+        self._updatedCell.clear()
 
     def setSpecialEffects(self, cellId: int, value: int) -> None:
         self._specialEffects[cellId] = value
 
     def resetSpecialEffects(self) -> None:
-        self._specialEffects = dict()
+        self._specialEffects.clear()

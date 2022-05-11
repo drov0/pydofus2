@@ -43,7 +43,7 @@ class DofusClient(metaclass=Singleton):
 
     def login(self, accountId, serverId, charachterId=None):
         if self.LOG_MEMORY_USAGE:
-            tracemalloc.start()
+            tracemalloc.start(10)
         self._serverId = serverId
         self._charachterId = charachterId
         self._accountId = accountId

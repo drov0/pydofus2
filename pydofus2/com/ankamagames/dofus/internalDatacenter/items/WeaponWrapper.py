@@ -33,8 +33,7 @@ class WeaponWrapper(ItemWrapper):
     def isWeapon(self) -> bool:
         return True
 
-    @classmethod
-    def clone(cls, baseobject: object = None) -> ItemWrapper:
+    def clone(self, baseobject: object = None) -> ItemWrapper:
         result: ItemWrapper = super().clone(baseobject)
-        cls._weaponUtil.copy(cls, result)
+        self._weaponUtil.copy(self, result)
         return result

@@ -607,20 +607,20 @@ class ItemWrapper(Item, ISlotData, ICellZoneProvider, IDataCenter):
             self.livingobjectFoodDate = effect.description
 
         elif effect.effectId == ActionIds.ACTION_ITEM_LIVING_ID:
-            self.livingobjectId = effect.param3
+            self.livingobjectId = EffectInstanceInteger(effect).value
 
         elif effect.effectId == ActionIds.ACTION_ITEM_LIVING_MOOD:
-            self.livingobjectMood = effect.param3
+            self.livingobjectMood = effect.value
 
         elif effect.effectId == ActionIds.ACTION_ITEM_LIVING_SKIN:
-            self.livingobjectSkin = effect.param3
+            self.livingobjectSkin = effect.value
 
         elif effect.effectId == ActionIds.ACTION_ITEM_LIVING_CATEGORY:
-            self.livingobjectCategory = effect.param3
+            self.livingobjectCategory = effect.value
 
         elif effect.effectId == ActionIds.ACTION_ITEM_LIVING_LEVEL:
-            self.livingobjectLevel = self.getLivingobjectLevel(effect.param3)
-            self.livingobjectXp = effect.param3 - self.LEVEL_STEP[self.livingobjectLevel - 1]
+            self.livingobjectLevel = self.getLivingobjectLevel(effect.value)
+            self.livingobjectXp = effect.value - self.LEVEL_STEP[self.livingobjectLevel - 1]
             self.livingobjectMaxXp = (
                 self.LEVEL_STEP[self.livingobjectLevel] - self.LEVEL_STEP[self.livingobjectLevel - 1]
             )
@@ -685,11 +685,11 @@ class ItemWrapper(Item, ISlotData, ICellZoneProvider, IDataCenter):
             ):
                 exchangeable = False
             if effectInstance.effectId == ActionIds.ACTION_ITEM_WRAPPER_COMPATIBLE_OBJ_TYPE:
-                self.wrapperobjectCategory = EffectInstanceInteger(effectInstance).value
+                self.wrapperobjectCategory = effectInstance.value
             if effectInstance.effectId == ActionIds.ACTION_EVOLUTIVE_OBJECT_EXPERIENCE:
-                self.experiencePoints = EffectInstanceDice(effectInstance).value
+                self.experiencePoints = effectInstance.value
             if effectInstance.effectId == ActionIds.ACTION_EVOLUTIVE_PET_LEVEL:
-                self.evolutiveLevel = EffectInstanceDice(effectInstance).value
+                self.evolutiveLevel = effectInstance.value
         if multiUseCheck == 1:
             self.isOkForMultiUse = True
         else:

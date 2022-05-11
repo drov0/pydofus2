@@ -18,6 +18,12 @@ class EffectInstanceInteger(effinst.EffectInstance, IDataCenter):
     def __init__(self):
         super().__init__()
 
+    @classmethod
+    def fromParent(cls, parent: effinst.EffectInstance) -> "EffectInstanceInteger":
+        o = cls()
+        parent.clone(o)
+        return o
+
     def clone(self) -> effinst.EffectInstance:
         o: EffectInstanceInteger = EffectInstanceInteger()
         o.rawZone = self.rawZone

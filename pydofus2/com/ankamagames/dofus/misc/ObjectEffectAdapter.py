@@ -92,38 +92,38 @@ class ObjectEffectAdapter:
             if isinstance(oe, ObjectEffectString):
                 effect = EffectInstanceString()
                 effect.text = oe.value
-            if isinstance(oe, ObjectEffectInteger):
+            elif isinstance(oe, ObjectEffectInteger):
                 effect = EffectInstanceInteger()
-                effect.param3 = oe.value
-            if isinstance(oe, ObjectEffectMinMax):
+                effect.value = oe.value
+            elif isinstance(oe, ObjectEffectMinMax):
                 effect = EffectInstanceMinMax()
                 effect.min = oe.min
                 effect.max = oe.max
-            if isinstance(oe, ObjectEffectDice):
+            elif isinstance(oe, ObjectEffectDice):
                 effect = EffectInstanceDice()
                 effect.diceNum = oe.diceNum
                 effect.diceSide = oe.diceSide
-                effect.param3 = oe.diceConst
-            if isinstance(oe, ObjectEffectDate):
+                effect.value = oe.diceConst
+            elif isinstance(oe, ObjectEffectDate):
                 effect = EffectInstanceDate()
                 effect.year = oe.year
                 effect.month = oe.month + 1
                 effect.day = oe.day
                 effect.hour = oe.hour
                 effect.minute = oe.minute
-            if isinstance(oe, ObjectEffectDuration):
+            elif isinstance(oe, ObjectEffectDuration):
                 effect = EffectInstanceDuration()
                 effect.days = oe.days
                 effect.hours = oe.hours
                 effect.minutes = oe.minutes
-            if isinstance(oe, ObjectEffectLadder):
+            elif isinstance(oe, ObjectEffectLadder):
                 effect = EffectInstanceLadder()
                 effect.monsterFamilyId = oe.monsterFamilyId
                 effect.monsterCount = oe.monsterCount
-            if isinstance(oe, ObjectEffectCreature):
+            elif isinstance(oe, ObjectEffectCreature):
                 effect = EffectInstanceCreature()
                 effect.monsterFamilyId = oe.monsterFamilyId
-            if isinstance(oe, ObjectEffectMount):
+            elif isinstance(oe, ObjectEffectMount):
                 effect = EffectInstanceMount()
                 effect.id = oe.id
                 effect.expirationDate = oe.expirationDate

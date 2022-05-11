@@ -189,8 +189,9 @@ class EffectInstance(IDataCenter):
             self._priority = int(self._effectData.effectPriority) if not not self._effectData else int(0)
         return self._priority
 
-    def clone(self) -> "EffectInstance":
-        o: EffectInstance = EffectInstance()
+    def clone(self, o: "EffectInstance" = None) -> "EffectInstance":
+        if o is None:
+            o: EffectInstance = EffectInstance()
         o.zoneShape = self.zoneShape
         o.zoneSize = self.zoneSize
         o.zoneMinSize = self.zoneMinSize

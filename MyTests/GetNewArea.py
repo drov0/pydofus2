@@ -2,7 +2,7 @@ from time import perf_counter
 from com.ankamagames.atouin.managers.MapDisplayManager import MapDisplayManager
 from com.ankamagames.dofus.datacenter.world.SubArea import SubArea
 
-currMapId = 120062979  
+currMapId = 153878786  
 MapDisplayManager().loadMap(currMapId)
 subareaId = MapDisplayManager().currentDataMap.subareaId
 print(f"SubareaId: {subareaId}")

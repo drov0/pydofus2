@@ -1,19 +1,18 @@
-from abc import ABC
 from typing import Any
 from com.ankamagames.jerakine.newCache.impl.Cache import Cache
 
 
-class ICacheGarbageCollector(ABC):
+class ICacheGarbageCollector:
     @property
     def cache(self) -> Cache:
-        pass
+        raise NotImplementedError()
 
     @cache.setter
     def cache(param1: Cache) -> None:
-        pass
+        raise NotImplementedError()
 
     def used(param1: Any) -> None:
-        pass
+        raise NotImplementedError()
 
     def purge(param1: int) -> None:
-        pass
+        raise NotImplementedError()

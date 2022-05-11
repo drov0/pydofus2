@@ -3,7 +3,7 @@ from pathlib import Path
 from com.ankamagames.atouin.managers.MapDisplayManager import MapDisplayManager
 from com.ankamagames.dofus.datacenter.world.SubArea import SubArea
 
-currDir = Path(__file__).parent
+from pyd2bot.BotConstants import BotConstants
 
 
 class BankInfos:
@@ -15,7 +15,7 @@ class BankInfos:
 
 
 class Localizer:
-    with open(currDir / "areaInfos.json", "r") as f:
+    with open(BotConstants.PERSISTENCE_DIR / "areaInfos.json", "r") as f:
         AREAINFOS: dict = json.load(f)
 
     @classmethod

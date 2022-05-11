@@ -16,11 +16,9 @@ logger = Logger("Dofus2")
 
 class MultiConnection(EventDispatcher):
     def __init__(self):
-        self._connectionByMsg = dict()
         self._connectionByEvent = dict()
         self._connectionById = dict[str, IServerConnection]()
         self._idByConnection = dict()
-        self._connectionByMsg = dict()
         self._connectionByEvent = dict()
         self._idByConnection = dict()
         self._connectionCount = 0
@@ -64,7 +62,6 @@ class MultiConnection(EventDispatcher):
         self._idByConnection[conn] = id
         self._connectionCount += 1
         logger.warn("Adding connection " + str(id))
-        conn.handler = MessageWatcher(self.proccessMsg, conn.handler, conn)
         conn.add_listener(SocketEvent.CONNECT, self.onSubConnectionEvent)
         conn.add_listener(SocketEvent.CLOSE, self.onSubConnectionEvent)
         conn.add_listener(IOErrorEvent.IO_ERROR, self.onSubConnectionEvent)
@@ -93,15 +90,11 @@ class MultiConnection(EventDispatcher):
         if self._mainConnection == conn:
             for otherConn in self._connectionById:
                 self._mainConnection = otherConn
-        if isinstance(conn.handler, MessageWatcher):
-            conn.handler = MessageWatcher(conn.handler).handler
         return True
 
     def getSubConnection(self, idOrMessageOrEvent=None) -> IServerConnection:
         if isinstance(idOrMessageOrEvent, str):
             return self._connectionById[idOrMessageOrEvent]
-        if isinstance(idOrMessageOrEvent, Message):
-            return self._connectionByMsg.get(idOrMessageOrEvent)
         if isinstance(idOrMessageOrEvent, Event):
             return self._connectionByEvent[idOrMessageOrEvent]
         raise TypeError("Can't handle " + idOrMessageOrEvent + " class")
@@ -170,9 +163,6 @@ class MultiConnection(EventDispatcher):
         if self.has_listeners(NetworkSentEvent.EVENT_SENT):
             self.dispatch(NetworkSentEvent.EVENT_SENT, NetworkSentEvent(msg))
 
-    def proccessMsg(self, msg: Message, conn: IServerConnection) -> None:
-        self._connectionByMsg[msg] = conn
-
     def onSubConnectionEvent(self, e: Event) -> None:
         if e.name == SocketEvent.CONNECT:
             self._connectionConnectedCount += 1
@@ -181,27 +171,3 @@ class MultiConnection(EventDispatcher):
         self._connectionByEvent[e] = e.dispatcher
         if self.has_listeners(e.name):
             self.dispatch(e.name, e)
-
-
-class MessageWatcher(MessageHandler):
-
-    watchFunction: FunctionType
-
-    handler: MessageHandler
-
-    conn: IServerConnection
-
-    def __init__(
-        self,
-        watchFunctionType: FunctionType,
-        handler: MessageHandler,
-        conn: IServerConnection,
-    ):
-        super().__init__()
-        self.watchFunction = watchFunctionType
-        self.handler = handler
-        self.conn = conn
-
-    def process(self, msg: Message) -> bool:
-        self.watchFunction(msg, self.conn)
-        return self.handler.process(msg)

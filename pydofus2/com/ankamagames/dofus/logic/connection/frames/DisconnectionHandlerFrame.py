@@ -91,44 +91,43 @@ class DisconnectionHandlerFrame(Frame):
                 logger.debug("The connection was closed before we even receive any message. Will halt.")
                 return False
 
-            if sccmsg.closedConnection == connh.ConnectionsHandler.getConnection().getSubConnection(sccmsg):
-                logger.debug("The connection was closed. Checking reasons.")
-                gsaF.GameServerApproachFrame.authenticationTicketAccepted = False
-                if connh.ConnectionsHandler.hasReceivedMsg:
-                    if (
-                        not connh.ConnectionsHandler.hasReceivedNetworkMsg
-                        and self._numberOfAttemptsAlreadyDone < self.CONNECTION_ATTEMPTS_NUMBER
-                    ):
-                        self.handleUnexpectedNoMsgReceived()
-                    else:
-                        reason = connh.ConnectionsHandler.handleDisconnection()
-                        if not reason.expected:
-                            logger.debug(f"The connection was closed unexpectedly. Reseting.")
-                            self._connectionUnexpectedFailureTimes.append(perf_counter())
-                            StoreDataManager().setData(
-                                Constants.DATASTORE_MODULE_DEBUG,
-                                "connection_fail_times",
-                                self._connectionUnexpectedFailureTimes,
-                            )
-                            if self._timer:
-                                self._timer.cancel()
-                            self._timer = BenchmarkTimer(7, self.reconnect)
-                            self._timer.start()
-                        else:
-                            logger.debug(
-                                f"The connection closure was expected (reason: {reason.reason}). Dispatching the message."
-                            )
-                            if (
-                                reason.reason == DisconnectionReasonEnum.DISCONNECTED_BY_POPUP
-                                or reason.reason == DisconnectionReasonEnum.SWITCHING_TO_HUMAN_VENDOR
-                            ):
-                                krnl.Kernel().reset()
-                            elif reason.reason == DisconnectionReasonEnum.RESTARTING:
-                                self.reconnect()
-                            else:
-                                krnl.Kernel().getWorker().process(ExpectedSocketClosureMessage(reason.reason))
+            logger.debug("The connection was closed. Checking reasons.")
+            gsaF.GameServerApproachFrame.authenticationTicketAccepted = False
+            if connh.ConnectionsHandler.hasReceivedMsg:
+                if (
+                    not connh.ConnectionsHandler.hasReceivedNetworkMsg
+                    and self._numberOfAttemptsAlreadyDone < self.CONNECTION_ATTEMPTS_NUMBER
+                ):
+                    self.handleUnexpectedNoMsgReceived()
                 else:
-                    logger.warn("The connection hasn't even start.")
+                    reason = connh.ConnectionsHandler.handleDisconnection()
+                    if not reason.expected:
+                        logger.debug(f"The connection was closed unexpectedly. Reseting.")
+                        self._connectionUnexpectedFailureTimes.append(perf_counter())
+                        StoreDataManager().setData(
+                            Constants.DATASTORE_MODULE_DEBUG,
+                            "connection_fail_times",
+                            self._connectionUnexpectedFailureTimes,
+                        )
+                        if self._timer:
+                            self._timer.cancel()
+                        self._timer = BenchmarkTimer(7, self.reconnect)
+                        self._timer.start()
+                    else:
+                        logger.debug(
+                            f"The connection closure was expected (reason: {reason.reason}). Dispatching the message."
+                        )
+                        if (
+                            reason.reason == DisconnectionReasonEnum.DISCONNECTED_BY_POPUP
+                            or reason.reason == DisconnectionReasonEnum.SWITCHING_TO_HUMAN_VENDOR
+                        ):
+                            krnl.Kernel().reset()
+                        elif reason.reason == DisconnectionReasonEnum.RESTARTING:
+                            self.reconnect()
+                        else:
+                            krnl.Kernel().getWorker().process(ExpectedSocketClosureMessage(reason.reason))
+            else:
+                logger.warn("The connection hasn't even start.")
             return True
 
         elif isinstance(msg, WrongSocketClosureReasonMessage):

@@ -1,13 +1,12 @@
-from abc import ABC
 from com.ankamagames.jerakine.network.CustomDataWrapper import ByteArray
 
 
-class IPad(ABC):
+class IPad:
     def pad(self, src: ByteArray) -> None:
-        pass
+        raise NotImplementedError()
 
     def unpad(self, src: ByteArray) -> None:
-        pass
+        raise NotImplementedError()
 
     def setBlockSize(self, blockSize: int) -> None:
-        pass
+        raise NotImplementedError()

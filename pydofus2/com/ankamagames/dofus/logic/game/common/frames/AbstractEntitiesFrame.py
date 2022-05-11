@@ -1,18 +1,11 @@
-from abc import abstractmethod
-from xml.dom.minidom import Entity
-from com.ankamagames.dofus.datacenter.monsters.Monster import Monster
-from com.ankamagames.dofus.internalDatacenter.world.WorldPointWrapper import (
-    WorldPointWrapper,
-)
-from com.ankamagames.dofus.logic.common.managers.StatsManager import StatsManager
-from com.ankamagames.atouin.managers.EntitiesManager import EntitiesManager
 import com.ankamagames.dofus.logic.game.common.managers.PlayedCharacterManager as pcm
+from com.ankamagames.atouin.managers.EntitiesManager import EntitiesManager
+from com.ankamagames.dofus.datacenter.monsters.Monster import Monster
+from com.ankamagames.dofus.internalDatacenter.world.WorldPointWrapper import WorldPointWrapper
+from com.ankamagames.dofus.logic.common.managers.StatsManager import StatsManager
 from com.ankamagames.dofus.logic.game.common.misc.DofusEntities import DofusEntities
 from com.ankamagames.dofus.network.messages.game.context.EntityDispositionInformations import (
     EntityDispositionInformations,
-)
-from com.ankamagames.dofus.network.types.game.context.GameContextActorInformations import (
-    GameContextActorInformations,
 )
 from com.ankamagames.dofus.network.types.game.context.fight.GameFightFighterInformations import (
     GameFightFighterInformations,
@@ -20,14 +13,12 @@ from com.ankamagames.dofus.network.types.game.context.fight.GameFightFighterInfo
 from com.ankamagames.dofus.network.types.game.context.fight.GameFightMonsterInformations import (
     GameFightMonsterInformations,
 )
+from com.ankamagames.dofus.network.types.game.context.GameContextActorInformations import GameContextActorInformations
 from com.ankamagames.dofus.network.types.game.context.roleplay.GameRolePlayHumanoidInformations import (
     GameRolePlayHumanoidInformations,
 )
-from com.ankamagames.dofus.network.types.game.interactive.InteractiveElement import (
-    InteractiveElement,
-)
+from com.ankamagames.dofus.network.types.game.interactive.InteractiveElement import InteractiveElement
 from com.ankamagames.dofus.types.entities.AnimatedCharacter import AnimatedCharacter
-from com.ankamagames.jerakine.entities.interfaces.IEntity import IEntity
 from com.ankamagames.jerakine.logger.Logger import Logger
 from com.ankamagames.jerakine.messages.Frame import Frame
 from com.ankamagames.jerakine.messages.Message import Message
@@ -103,9 +94,8 @@ class AbstractEntitiesFrame(Frame):
     def interactiveElements(self) -> list[InteractiveElement]:
         return self._interactiveElements
 
-    @abstractmethod
     def process(msg: Message) -> bool:
-        pass
+        raise NotImplementedError()
 
     def getEntityInfos(self, entityId: float) -> GameContextActorInformations:
         if entityId == 0 or entityId is None:

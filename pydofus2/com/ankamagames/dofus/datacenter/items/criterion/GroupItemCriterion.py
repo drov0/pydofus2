@@ -211,7 +211,7 @@ class GroupItemCriterion(IItemCriterion):
                         next = 0
                         searchingstr = searchingstr[1:]
             self._singleOperatorType = self.checkSingleOperatorType(self._operators)
-        if len(self._operators) >= len(self._criteria) and len((self._operators) > 0 and len(self._criteria) > 0):
+        if len(self._operators) >= len(self._criteria) and len(self._operators) > 0 and len(self._criteria) > 0:
             self._malformated = True
 
     def checkSingleOperatorType(self, pOperators: list[str]) -> bool:

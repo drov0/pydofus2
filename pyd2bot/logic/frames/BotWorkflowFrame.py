@@ -16,11 +16,11 @@ from com.ankamagames.jerakine.logger.Logger import Logger
 from com.ankamagames.jerakine.messages.Message import Message
 from com.ankamagames.jerakine.types.enums.Priority import Priority
 from pyd2bot.apis.InventoryAPI import InventoryAPI
-from pyd2bot.frames.BotFightFrame import BotFightFrame
-from pyd2bot.frames.BotFarmPathFrame import BotFarmPathFrame
-from pyd2bot.frames.BotPhenixAutoRevive import BotPhenixAutoRevive
-from pyd2bot.frames.BotUnloadInBankFrame import BotUnloadInBankFrame
-from pyd2bot.messages.BankUnloadEndedMessage import BankUnloadEndedMessage
+from pyd2bot.logic.frames.BotFightFrame import BotFightFrame
+from pyd2bot.logic.frames.BotFarmPathFrame import BotFarmPathFrame
+from pyd2bot.logic.frames.BotPhenixAutoRevive import BotPhenixAutoRevive
+from pyd2bot.logic.frames.BotUnloadInBankFrame import BotUnloadInBankFrame
+from pyd2bot.logic.messages.BankUnloadEndedMessage import BankUnloadEndedMessage
 
 logger = Logger("Dofus2")
 

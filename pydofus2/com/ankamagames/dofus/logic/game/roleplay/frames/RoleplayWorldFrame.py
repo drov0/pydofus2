@@ -1,4 +1,4 @@
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Tuple
 
 import com.ankamagames.dofus.logic.game.roleplay.frames.RoleplayInteractivesFrame as riF
 from com.ankamagames.atouin.managers.MapDisplayManager import MapDisplayManager
@@ -14,6 +14,7 @@ from com.ankamagames.dofus.logic.game.common.misc.DofusEntities import DofusEnti
 from com.ankamagames.dofus.logic.game.roleplay.messages.InteractiveElementActivationMessage import (
     InteractiveElementActivationMessage,
 )
+from com.ankamagames.dofus.network.types.game.interactive.InteractiveElement import InteractiveElement
 
 if TYPE_CHECKING:
     from com.ankamagames.dofus.logic.game.roleplay.frames.RoleplayContextFrame import (
@@ -185,73 +186,10 @@ class RoleplayWorldFrame(Frame):
             if interactiveFrame.usingInteractive:
                 logger.debug("Interactive element already in use")
             if not (interactiveFrame and interactiveFrame.usingInteractive):
-                playerEntity = DofusEntities.getEntity(PlayedCharacterManager().id)
+                playerEntity = PlayedCharacterManager().entity
                 if not playerEntity:
                     return True
-                forbiddenCellsIds = list()
-                cells = MapDisplayManager().dataMap.cells
-                dmp = DataMapProvider()
-                for i in range(8):
-                    mp = ieamsg.position.getNearestCellInDirection(i)
-                    if mp:
-                        cellData = cells[mp.cellId]
-                        forbidden = not cellData.mov or cellData.farmCell
-                        if not forbidden:
-                            numWalkableCells = 8
-                            for j in range(8):
-                                mp2 = mp.getNearestCellInDirection(j)
-                                if mp2 and (
-                                    not dmp.pointMov(mp2.x, mp2.y, True, mp.cellId)
-                                    or not dmp.pointMov(mp2.x - 1, mp2.y, True, mp.cellId)
-                                    and not dmp.pointMov(mp2.x, mp2.y - 1, True, mp.cellId)
-                                ):
-                                    numWalkableCells -= 1
-                            if not numWalkableCells:
-                                forbidden = True
-                        if forbidden:
-                            if not forbiddenCellsIds:
-                                forbiddenCellsIds = []
-                            forbiddenCellsIds.append(mp.cellId)
-                ieCellData = cells[ieamsg.position.cellId]
-                skills = ieamsg.interactiveElement.enabledSkills
-                minimalRange = 63
-                for skillForRange in skills:
-                    skillData = Skill.getSkillById(skillForRange.skillId)
-                    if skillData:
-                        if not skillData.useRangeInClient:
-                            minimalRange = 1
-                        elif skillData.range < minimalRange:
-                            minimalRange = skillData.range
-                distanceElementToPlayer = ieamsg.position.distanceToCell(playerEntity.position)
-                if distanceElementToPlayer <= minimalRange and (not ieCellData.mov or ieCellData.farmCell):
-                    nearestCell = MapPoint.fromCellId(playerEntity.position.cellId)
-                else:
-                    nearestCell = ieamsg.position.getNearestFreeCellInDirection(
-                        ieamsg.position.advancedOrientationTo(playerEntity.position),
-                        DataMapProvider(),
-                        True,
-                        True,
-                        False,
-                        forbiddenCellsIds,
-                    )
-                    if minimalRange > 1:
-                        for _ in range(minimalRange - 1):
-                            forbiddenCellsIds.append(nearestCell.cellId)
-                            nearestCell = nearestCell.getNearestFreeCellInDirection(
-                                nearestCell.advancedOrientationTo(playerEntity.position, False),
-                                DataMapProvider(),
-                                True,
-                                True,
-                                False,
-                                forbiddenCellsIds,
-                            )
-                            if not nearestCell or nearestCell.cellId == playerEntity.position.cellId:
-                                break
-                if len(skills) == 1 and skills[0].skillId == DataEnum.SKILL_POINT_OUT_EXIT:
-                    nearestCell.cellId = ieamsg.position.cellId
-                    sendInteractiveUseRequest = False
-                if not nearestCell or nearestCell.cellId in forbiddenCellsIds:
-                    nearestCell = ieamsg.position
+                nearestCell, sendInteractiveUseRequest = self.getNearestCellToIe(msg.interactiveElement, msg.position)
                 if sendInteractiveUseRequest:
                     self.roleplayMovementFrame.setFollowingInteraction(
                         {
@@ -279,3 +217,71 @@ class RoleplayWorldFrame(Frame):
         eohvrmsg: ExchangeOnHumanVendorRequestMessage = ExchangeOnHumanVendorRequestMessage()
         eohvrmsg.initExchangeOnHumanVendorRequestMessage(vendorId, vendorCellId)
         ConnectionsHandler.getConnection().send(eohvrmsg)
+
+    def getNearestCellToIe(self, ie: InteractiveElement, iePos: MapPoint) -> Tuple[MapPoint, bool]:
+        forbiddenCellsIds = list()
+        cells = MapDisplayManager().dataMap.cells
+        dmp = DataMapProvider()
+        sendInteractiveUseRequest = True
+        for i in range(8):
+            mp = iePos.getNearestCellInDirection(i)
+            if mp:
+                cellData = cells[mp.cellId]
+                forbidden = not cellData.mov or cellData.farmCell
+                if not forbidden:
+                    numWalkableCells = 8
+                    for j in range(8):
+                        mp2 = mp.getNearestCellInDirection(j)
+                        if mp2 and (
+                            not dmp.pointMov(mp2.x, mp2.y, True, mp.cellId)
+                            or not dmp.pointMov(mp2.x - 1, mp2.y, True, mp.cellId)
+                            and not dmp.pointMov(mp2.x, mp2.y - 1, True, mp.cellId)
+                        ):
+                            numWalkableCells -= 1
+                    if not numWalkableCells:
+                        forbidden = True
+                if forbidden:
+                    if not forbiddenCellsIds:
+                        forbiddenCellsIds = []
+                    forbiddenCellsIds.append(mp.cellId)
+        ieCellData = cells[iePos.cellId]
+        skills = ie.enabledSkills
+        minimalRange = 63
+        for skillForRange in skills:
+            skillData = Skill.getSkillById(skillForRange.skillId)
+            if skillData:
+                if not skillData.useRangeInClient:
+                    minimalRange = 1
+                elif skillData.range < minimalRange:
+                    minimalRange = skillData.range
+        distanceElementToPlayer = iePos.distanceToCell(PlayedCharacterManager().entity.position)
+        if distanceElementToPlayer <= minimalRange and (not ieCellData.mov or ieCellData.farmCell):
+            nearestCell = PlayedCharacterManager().entity.position
+        else:
+            nearestCell = iePos.getNearestFreeCellInDirection(
+                iePos.advancedOrientationTo(PlayedCharacterManager().entity.position),
+                DataMapProvider(),
+                True,
+                True,
+                False,
+                forbiddenCellsIds,
+            )
+            if minimalRange > 1:
+                for _ in range(minimalRange - 1):
+                    forbiddenCellsIds.append(nearestCell.cellId)
+                    nearestCell = nearestCell.getNearestFreeCellInDirection(
+                        nearestCell.advancedOrientationTo(PlayedCharacterManager().entity.position, False),
+                        DataMapProvider(),
+                        True,
+                        True,
+                        False,
+                        forbiddenCellsIds,
+                    )
+                    if not nearestCell or nearestCell.cellId == PlayedCharacterManager().entity.position.cellId:
+                        break
+        if len(skills) == 1 and skills[0].skillId == DataEnum.SKILL_POINT_OUT_EXIT:
+            nearestCell.cellId = PlayedCharacterManager().entity.position.cellId
+            sendInteractiveUseRequest = False
+        if not nearestCell or nearestCell.cellId in forbiddenCellsIds:
+            nearestCell = iePos
+        return nearestCell, sendInteractiveUseRequest

@@ -1,7 +1,4 @@
 class ColorMultiplicator:
-
-    MEMORY_LOG: dict = dict()
-
     red: float
 
     green: float
@@ -18,7 +15,6 @@ class ColorMultiplicator:
         forceCalculation: bool = False,
     ):
         super().__init__()
-        self.MEMORY_LOG[self] = 1
         self.red = redComponent
         self.green = greenComponent
         self.blue = blueComponent

@@ -15,8 +15,6 @@ logger = Logger("Dofus2")
 
 
 class MapDisplayManager(metaclass=Singleton):
-
-    MEMORY_LOG: dict = dict()
     _currentMap: WorldPoint
     _mapInstanceId: float = 0
     _lastMap: WorldPoint

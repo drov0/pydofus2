@@ -61,14 +61,18 @@ class DofusClient(metaclass=Singleton):
     def join(self):
         while True:
             try:
-                sleep(3)
+                sleep(0.3)
                 if not self.mainConn:
+                    if self.LOG_MEMORY_USAGE:
+                        MemoryProfiler.saveCollectedData()
                     sys.exit(0)
                 if self.LOG_MEMORY_USAGE:
                     snapshot = tracemalloc.take_snapshot()
                     MemoryProfiler.logMemoryUsage(snapshot)
             except KeyboardInterrupt:
                 self.shutdown()
+                if self.LOG_MEMORY_USAGE:
+                    MemoryProfiler.saveCollectedData()
                 sys.exit(0)
 
     def registerFrame(self, frame):

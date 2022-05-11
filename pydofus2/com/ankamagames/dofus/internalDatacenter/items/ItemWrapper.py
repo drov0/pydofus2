@@ -137,8 +137,6 @@ class ItemWrapper(Item, ISlotData, ICellZoneProvider, IDataCenter):
 
     evolutiveLevel: int = 0
 
-    MEMORY_LOG = dict()
-
     def __init__(self):
         self.effects = list["EffectInstance"]()
         super().__init__()
@@ -174,7 +172,6 @@ class ItemWrapper(Item, ISlotData, ICellZoneProvider, IDataCenter):
                     cls._cacheGId[objectGID] = item
         else:
             item = cachedItem
-        cls.MEMORY_LOG[item] = 1
         item._nameWithoutAccent = StringUtils.noAccent(refItem.name)
         item.effectsList = newEffects
         item.isPresetobject = objectGID == DataEnum.ITEM_GID_PRESET_SHORTCUT
@@ -223,7 +220,6 @@ class ItemWrapper(Item, ISlotData, ICellZoneProvider, IDataCenter):
                     self._cacheGId[itemFromServer.objectGID] = item
         else:
             item = cachedItem
-        self.MEMORY_LOG[item] = 1
         item._nameWithoutAccent = StringUtils.noAccent(refItem.name)
         item.effectsList = itemFromServer.effects
         item.isPresetobject = itemFromServer.objectGID == DataEnum.ITEM_GID_PRESET_SHORTCUT
@@ -571,7 +567,6 @@ class ItemWrapper(Item, ISlotData, ICellZoneProvider, IDataCenter):
         if baseobject == None:
             baseobject = ItemWrapper
         item: ItemWrapper = baseobject()
-        self.MEMORY_LOG[item] = 1
         item.copy(self, item)
         item.objectUID = self.objectUID
         item.position = self.position

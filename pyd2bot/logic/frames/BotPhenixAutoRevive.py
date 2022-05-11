@@ -15,8 +15,8 @@ from com.ankamagames.dofus.kernel.Kernel import Kernel
 from com.ankamagames.jerakine.logger.Logger import Logger
 from com.ankamagames.jerakine.messages.Message import Message
 from com.ankamagames.jerakine.types.enums.Priority import Priority
-from pyd2bot.frames.BotAutoTripFrame import BotAutoTripFrame
-from pyd2bot.messages.AutoTripEndedMessage import AutoTripEndedMessage
+from pyd2bot.logic.frames.BotAutoTripFrame import BotAutoTripFrame
+from pyd2bot.logic.messages.AutoTripEndedMessage import AutoTripEndedMessage
 from typing import TYPE_CHECKING
 
 from pyd2bot.misc.Localizer import Localizer

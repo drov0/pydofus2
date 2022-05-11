@@ -1,6 +1,10 @@
 import collections
 import math
 import random
+from com.ankamagames.dofus.network.enums.FightOptionsEnum import FightOptionsEnum
+from com.ankamagames.dofus.network.messages.game.context.fight.GameFightOptionToggleMessage import (
+    GameFightOptionToggleMessage,
+)
 from com.ankamagames.dofus.network.messages.game.context.fight.GameFightTurnResumeMessage import (
     GameFightTurnResumeMessage,
 )
@@ -72,7 +76,7 @@ from com.ankamagames.jerakine.types.zones.IZone import IZone
 from com.ankamagames.jerakine.types.zones.Lozenge import Lozenge
 from com.ankamagames.jerakine.utils.display.spellZone.SpellShapeEnum import SpellShapeEnum
 from damageCalculation.tools import StatIds
-from pyd2bot.frames.BotFightTurnFrame import BotFightTurnFrame
+from pyd2bot.logic.frames.BotFightTurnFrame import BotFightTurnFrame
 
 
 if TYPE_CHECKING:
@@ -363,6 +367,12 @@ class BotFightFrame(Frame, metaclass=Singleton):
         if isinstance(msg, GameFightJoinMessage):
             self._fightCount += 1
             self._inFight = True
+            gfotmsg = GameFightOptionToggleMessage()
+            gfotmsg.init(FightOptionsEnum.FIGHT_OPTION_SET_SECRET)
+            ConnectionsHandler.getConnection().send(gfotmsg)
+            gfotmsg = GameFightOptionToggleMessage()
+            gfotmsg.init(FightOptionsEnum.FIGHT_OPTION_SET_TO_PARTY_ONLY)
+            ConnectionsHandler.getConnection().send(gfotmsg)
             return False
 
         elif isinstance(msg, GameFightEndMessage):

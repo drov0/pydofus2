@@ -18,5 +18,35 @@
         "accountId": "melanco",
         "charachterId": 336597024978,
         "serverId": 210
+    },
+    "Moneycreator(210)": {
+        "accountId": "aloone-102",
+        "charachterId": 336919855314,
+        "serverId": 210
+    },
+    "Moneylife(210)": {
+        "accountId": "aloone95",
+        "charachterId": 336919920850,
+        "serverId": 210
+    },
+    "money1": {
+        "accountId": "aloone-100",
+        "charachterId": 336815325394,
+        "serverId": 210
+    },
+    "grinder": {
+        "accountId": "grinder",
+        "charachterId": 329036071122,
+        "serverId": 210
+    },
+    "money": {
+        "accountId": "grinder",
+        "charachterId": 336798351570,
+        "serverId": 210
+    },
+    "Moneyslicer(210)": {
+        "accountId": "aloone-101",
+        "charachterId": 336919789778,
+        "serverId": 210
     }
 }

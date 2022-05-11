@@ -1,7 +1,22 @@
 {
-    "sadida-lumberjacker": {
-        "charachterId": "Maniaco-lalcolic(210)",
+    "money_1": {
+        "charachterId": "money1",
+        "spellId": 13516,
+        "pathId": "tainela_bouftou"
+    },
+    "money_2": {
+        "charachterId": "Moneyslicer(210)",
         "spellId": 13516,
         "pathId": "lumberjack_astrub_forest"
+    },
+    "money_3": {
+        "charachterId": "Moneycreator(210)",
+        "spellId": 13516,
+        "pathId": "pioute_astrub_village"
+    },
+    "money_4": {
+        "charachterId": "Moneylife(210)",
+        "spellId": 13516,
+        "pathId": "pioute_astrub_village"
     }
 }

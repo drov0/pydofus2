@@ -12,7 +12,7 @@ logger = Logger("Dofus2")
 
 if __name__ == "__main__":
     DofusClient.LOG_MEMORY_USAGE = True
-    session = SessionManager.getSession("sadida-lumberjacker")
+    session = SessionManager.getSession("money_2")
     dofus2 = DofusClient()
     BotFightFrame.spellId = session.spellId
     BotFarmPathFrame.farmPath = session.path

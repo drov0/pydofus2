@@ -6,12 +6,14 @@ from pyd2bot.logic.roleplay.frames.BotFarmPathFrame import BotFarmPathFrame
 from pyd2bot.logic.fight.frames.BotFightFrame import BotFightFrame
 from pyd2bot.logic.common.frames.BotWorkflowFrame import BotWorkflowFrame
 from pyd2bot.logic.managers.SessionManager import SessionManager
+import sys
 
 logger = Logger("Dofus2")
 
 if __name__ == "__main__":
+    sessionid = sys.argv[1]
     DofusClient.LOG_MEMORY_USAGE = False
-    session = SessionManager.getSession("sadida-lumberjacker")
+    session = SessionManager.getSession("sessionid")
     dofus2 = DofusClient()
     BotFightFrame.spellId = session.spellId
     BotFarmPathFrame.farmPath = session.path
@@ -19,3 +21,5 @@ if __name__ == "__main__":
     dofus2.registerFrame(BotWorkflowFrame())
     dofus2.login(**session.creds)
     dofus2.join()
+
+

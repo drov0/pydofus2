@@ -1,4 +1,5 @@
 from typing import TYPE_CHECKING
+from com.DofusClient import DofusClient
 
 from com.ankamagames.atouin.managers.MapDisplayManager import MapDisplayManager
 from com.ankamagames.dofus.datacenter.notifications.Notification import Notification
@@ -8,6 +9,9 @@ from com.ankamagames.dofus.logic.game.common.managers.PlayedCharacterManager imp
 from com.ankamagames.dofus.logic.game.fight.messages.FightRequestFailed import FightRequestFailed
 from com.ankamagames.dofus.logic.game.fight.messages.MapMoveFailed import MapMoveFailed
 from com.ankamagames.dofus.modules.utils.pathFinding.world.WorldPathFinder import WorldPathFinder
+from com.ankamagames.dofus.network.messages.game.context.GameMapMovementCancelMessage import (
+    GameMapMovementCancelMessage,
+)
 from com.ankamagames.dofus.network.messages.game.context.notification.NotificationByServerMessage import (
     NotificationByServerMessage,
 )
@@ -35,8 +39,8 @@ from com.ankamagames.jerakine.types.enums.Priority import Priority
 from com.ankamagames.jerakine.types.positions.MapPoint import MapPoint
 from pyd2bot.apis.InventoryAPI import InventoryAPI
 from pyd2bot.apis.MoveAPI import MoveAPI
-from pyd2bot.logic.frames.BotAutoTripFrame import BotAutoTripFrame
-from pyd2bot.logic.messages.AutoTripEndedMessage import AutoTripEndedMessage
+from pyd2bot.logic.roleplay.frames.BotAutoTripFrame import BotAutoTripFrame
+from pyd2bot.logic.roleplay.messages.AutoTripEndedMessage import AutoTripEndedMessage
 from pyd2bot.models.enums.ServerNotificationTitlesEnum import ServerNotificationTitlesEnum
 from pyd2bot.models.farmPaths.AbstractFarmPath import AbstractFarmPath
 
@@ -99,8 +103,8 @@ class BotFarmPathFrame(Frame):
         return True
 
     def reset(self):
-        self._followingMapchange = -1
-        self._followingIe = -1
+        self._followingMapchange = None
+        self._followingIe = None
         self._usingInteractive = False
         self._followinMonsterGroup = None
         self._lastCellId = None
@@ -137,10 +141,20 @@ class BotFarmPathFrame(Frame):
             )
             logger.debug("*" * 80)
             if msg.elemId == self._followingIe.element.elementId:
+                if self._entities.get(msg.elemId):
+                    del self.interactivesFrame._ie[msg.elemId]
+                    del self.interactivesFrame._collectableIe[msg.elemId]
+                    self.doFarm()
+                else:
+                    self.reset()
+                    self.requestMapData()
+            return True
+
+        elif isinstance(msg, GameMapMovementCancelMessage):
+            if self._followingIe:
+                del self.interactivesFrame._ie[self._followingIe.element.elementId]
+                del self.interactivesFrame._collectableIe[self._followingIe.element.elementId]
                 self.reset()
-                logger.debug("Will move on")
-                del self.interactivesFrame._ie[msg.elemId]
-                del self.interactivesFrame._collectableIe[msg.elemId]
                 self.doFarm()
             return True
 
@@ -155,8 +169,6 @@ class BotFarmPathFrame(Frame):
             if PlayedCharacterManager().id == msg.entityId and msg.duration > 0:
                 logger.debug(f"[BotFarmFrame] Inventory weight {InventoryAPI.getWeightPercent():.2f}%")
                 logger.debug(f"[BotFarmFrame] Started using interactive element {msg.elemId} ....")
-                if self._followingIe.element.elementId == msg.elemId:
-                    self._followingIe = None
                 if msg.duration > 0:
                     self._usingInteractive = True
             self._entities[msg.elemId] = msg.entityId
@@ -166,6 +178,8 @@ class BotFarmPathFrame(Frame):
             if self._inAutoTrip:
                 return False
             if self._entities[msg.elemId] == PlayedCharacterManager().id:
+                self._followingIe = None
+                self._usingInteractive = False
                 logger.debug(f"[BotFarmFrame] Interactive element {msg.elemId} use ended")
                 logger.debug("*" * 100)
                 self.doFarm()
@@ -245,7 +259,8 @@ class BotFarmPathFrame(Frame):
         ConnectionsHandler.getConnection().send(mirmsg)
 
     def collectResource(self) -> None:
-        availableResources = []
+        target = None
+        minDist = float("inf")
         for it in self.interactivesFrame.collectables.values():
             if it.enabled:
                 if self.farmPath.jobIds:
@@ -260,23 +275,23 @@ class BotFarmPathFrame(Frame):
                         return
                     nearestCell, _ = self.worldFrame.getNearestCellToIe(ie.element, ie.position)
                     if self.insideCurrentPlayerZoneRp(nearestCell.cellId):
-                        availableResources.append(
-                            {
-                                "element": ie,
-                                "distance": PlayedCharacterManager().entity.position.distanceToCell(ie.position),
-                            }
-                        )
-        if availableResources:
-            availableResources.sort(key=lambda x: x["distance"])
-            ie = availableResources[0]["element"]
-            self.movementFrame.setFollowingInteraction(
-                {
-                    "ie": ie.element,
-                    "skillInstanceId": ie.skillUID,
-                    "additionalParam": 0,
-                }
-            )
+                        dist = PlayedCharacterManager().entity.position.distanceToCell(ie.position)
+                        if dist < minDist:
+                            target = ie
+                            minDist = dist
+
+        if target:
             self._followingIe = ie
-            self.movementFrame.resetNextMoveMapChange()
-            self.movementFrame.askMoveTo(nearestCell)
+            if minDist != 0:
+                self.movementFrame.setFollowingInteraction(
+                    {
+                        "ie": ie.element,
+                        "skillInstanceId": ie.skillUID,
+                        "additionalParam": 0,
+                    }
+                )
+                self.movementFrame.resetNextMoveMapChange()
+                self.movementFrame.askMoveTo(nearestCell)
+            else:
+                self.movementFrame.activateSkill(ie.skillUID, ie.element.elementId, 0)
             logger.info(f"[BotFarmFrame] Collecting {ie.element.elementId} ... skillId : {ie.skillUID}")

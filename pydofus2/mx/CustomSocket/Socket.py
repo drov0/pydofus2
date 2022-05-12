@@ -60,10 +60,11 @@ class Socket(threading.Thread):
         self.dispatcher.dispatch(SocketEvent.CONNECT)
 
     def close(self):
-        self._kill.set()
-        self._sock.close()
-        self.connected = False
-        self.dispatcher.dispatch(SocketEvent.CLOSE)
+        if self.connected:
+            self.connected = False
+            self._kill.set()
+            self._sock.close()
+            self.dispatchEvent(SocketEvent.CLOSE)
 
     def addEventListener(self, event, listener, priority=0):
         self.dispatcher.add_listener(event, listener, priority)

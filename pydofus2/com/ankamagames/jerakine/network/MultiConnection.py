@@ -125,6 +125,7 @@ class MultiConnection(EventDispatcher):
             return
         logger.warn("All connections will be closed...")
         for connection in self._connectionById.values():
+            logger.debug("Closing connection " + str(self._idByConnection[connection]))
             connection.close()
 
     def pause(self, id: str = None) -> None:

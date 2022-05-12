@@ -73,37 +73,15 @@ class InteractiveElementData:
 
 class RoleplayInteractivesFrame(Frame):
 
-    INTERACTIVE_CURSOR_DISABLED_INDEX: int = 999
-
-    INTERACTIVE_CURSOR_WAIT_INDEX: int = 1000
-
-    cursorList: list = list()
-
-    cursorClassList: list
-
-    INTERACTIVE_CURSOR_NAME: str = "interactiveCursor"
-
-    LUMINOSITY_FACTOR: float = 1.2
-
-    ALPHA_MODIFICATOR: float = 0.2
-
     COLLECTABLE_COLLECTING_STATE_ID: int = 2
 
     COLLECTABLE_CUT_STATE_ID: int = 1
 
     ACTION_COLLECTABLE_RESOURCES: int = 1
 
-    _highlightInteractiveElements: bool
-
-    _modContextMenu: object
-
     _ie: dict[int, InteractiveElementData]
 
     _currentUsages: list
-
-    _baseAlpha: float
-
-    i: int
 
     _entities: dict
 
@@ -120,10 +98,6 @@ class RoleplayInteractivesFrame(Frame):
     _currentRequestedElementId: int = -1
 
     _currentUsedElementId: int = -1
-
-    _statedElementsTargetAnimation: dict
-
-    _mouseDown: bool
 
     _collectableIe = dict[int, dict]()
 
@@ -274,21 +248,19 @@ class RoleplayInteractivesFrame(Frame):
         return False
 
     def pulled(self) -> bool:
-        self._entities = dict()
-        self._ie = dict[int, InteractiveElementData]()
-        self._modContextMenu = None
-        self._currentUsages = list()
+        self._entities.clear()
+        self._ie.clear()
+        self._currentUsages.clear()
         self._nextInteractiveUsed = None
-        self._interactiveActionTimers = dict()
-        self._collectableIe = dict[int, CollectableElement]()
+        self._interactiveActionTimers.clear()
+        self._collectableIe.clear()
+        logger.debug("InteractiveElement pulled")
         return True
 
     def enableWorldInteraction(self, pEnable: bool) -> None:
         self._enableWorldInteraction = pEnable
 
     def clear(self) -> None:
-        for timeout in self._currentUsages:
-            clearTimeout(timeout)
         self._ie.clear()
         self._collectableIe.clear()
 

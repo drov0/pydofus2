@@ -2,21 +2,37 @@
     "money_1": {
         "charachterId": "money1",
         "spellId": 13516,
-        "pathId": "tainela_bouftou"
+        "pathId": "tainela_bouftou",
+        "statToUp": 10
     },
     "money_2": {
         "charachterId": "Moneyslicer(210)",
         "spellId": 13516,
-        "pathId": "lumberjack_astrub_forest"
+        "pathId": "lumberjack_astrub_forest",
+        "statToUp": 10
     },
     "money_3": {
         "charachterId": "Moneycreator(210)",
         "spellId": 13516,
-        "pathId": "pioute_astrub_village"
+        "pathId": "pioute_astrub_village",
+        "statToUp": 10
     },
     "money_4": {
         "charachterId": "Moneylife(210)",
         "spellId": 13516,
-        "pathId": "pioute_astrub_village"
+        "pathId": "pioute_astrub_village",
+        "statToUp": 10
+    },
+    "sadida-lumberjacker": {
+        "charachterId": "Maniaco-lalcolic(210)",
+        "spellId": 13516,
+        "pathId": "lumberjack_astrub_forest",
+        "statToUp": 10
+    },
+    "sadida-newbie": {
+        "charachterId": "Plusbellelavie(210)",
+        "spellId": 13516,
+        "pathId": "pioute_astrub_village",
+        "statToUp": 10
     }
 }

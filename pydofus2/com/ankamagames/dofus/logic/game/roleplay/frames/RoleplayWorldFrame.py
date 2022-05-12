@@ -15,6 +15,7 @@ from com.ankamagames.dofus.logic.game.roleplay.messages.InteractiveElementActiva
     InteractiveElementActivationMessage,
 )
 from com.ankamagames.dofus.network.types.game.interactive.InteractiveElement import InteractiveElement
+from com.ankamagames.jerakine.types.enums.DirectionsEnum import DirectionsEnum
 
 if TYPE_CHECKING:
     from com.ankamagames.dofus.logic.game.roleplay.frames.RoleplayContextFrame import (
@@ -215,7 +216,7 @@ class RoleplayWorldFrame(Frame):
 
     def onMerchantPlayerBuyClick(self, vendorId: float, vendorCellId: int) -> None:
         eohvrmsg: ExchangeOnHumanVendorRequestMessage = ExchangeOnHumanVendorRequestMessage()
-        eohvrmsg.initExchangeOnHumanVendorRequestMessage(vendorId, vendorCellId)
+        eohvrmsg.init(vendorId, vendorCellId)
         ConnectionsHandler.getConnection().send(eohvrmsg)
 
     def getNearestCellToIe(self, ie: InteractiveElement, iePos: MapPoint) -> Tuple[MapPoint, bool]:
@@ -244,28 +245,36 @@ class RoleplayWorldFrame(Frame):
                     if not forbiddenCellsIds:
                         forbiddenCellsIds = []
                     forbiddenCellsIds.append(mp.cellId)
+        # logger.debug("Forbidden cells: %s", forbiddenCellsIds)
         ieCellData = cells[iePos.cellId]
-        skills = ie.enabledSkills
-        minimalRange = 63
-        for skillForRange in skills:
-            skillData = Skill.getSkillById(skillForRange.skillId)
-            if skillData:
-                if not skillData.useRangeInClient:
-                    minimalRange = 1
-                elif skillData.range < minimalRange:
-                    minimalRange = skillData.range
+
+        if ie:
+            minimalRange = 63
+            skills = ie.enabledSkills
+            for skillForRange in skills:
+                skillData = Skill.getSkillById(skillForRange.skillId)
+                if skillData:
+                    if not skillData.useRangeInClient:
+                        minimalRange = 1
+                    elif skillData.range < minimalRange:
+                        minimalRange = skillData.range
+        else:
+            minimalRange = 1
         distanceElementToPlayer = iePos.distanceToCell(PlayedCharacterManager().entity.position)
         if distanceElementToPlayer <= minimalRange and (not ieCellData.mov or ieCellData.farmCell):
             nearestCell = PlayedCharacterManager().entity.position
         else:
+            orientationToCell = iePos.advancedOrientationTo(PlayedCharacterManager().entity.position)
+            # logger.debug("Orientation to cell: %s", DirectionsEnum(orientationToCell).name)
             nearestCell = iePos.getNearestFreeCellInDirection(
-                iePos.advancedOrientationTo(PlayedCharacterManager().entity.position),
+                orientationToCell,
                 DataMapProvider(),
                 True,
                 True,
                 False,
                 forbiddenCellsIds,
             )
+            # logger.debug("Nearest cell: %s", nearestCell)
             if minimalRange > 1:
                 for _ in range(minimalRange - 1):
                     forbiddenCellsIds.append(nearestCell.cellId)
@@ -279,9 +288,10 @@ class RoleplayWorldFrame(Frame):
                     )
                     if not nearestCell or nearestCell.cellId == PlayedCharacterManager().entity.position.cellId:
                         break
-        if len(skills) == 1 and skills[0].skillId == DataEnum.SKILL_POINT_OUT_EXIT:
-            nearestCell.cellId = PlayedCharacterManager().entity.position.cellId
-            sendInteractiveUseRequest = False
+        if ie:
+            if len(skills) == 1 and skills[0].skillId == DataEnum.SKILL_POINT_OUT_EXIT:
+                nearestCell.cellId = PlayedCharacterManager().entity.position.cellId
+                sendInteractiveUseRequest = False
         if not nearestCell or nearestCell.cellId in forbiddenCellsIds:
             nearestCell = iePos
         return nearestCell, sendInteractiveUseRequest

@@ -27,7 +27,7 @@ class Job(IDataCenter):
 
     @staticmethod
     def getJobs() -> list["Job"]:
-        return GameData.getobjects(Job.MODULE)
+        return GameData.getObjects(Job.MODULE)
 
     idAccessors: IdAccessors = IdAccessors(getJobById, getJobs)
 

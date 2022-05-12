@@ -18,6 +18,7 @@ class Cell:
         self.bottom_arrow = None
         self.left_arrow = None
         self.right_arrow = None
+        self.linkedZone = 1
         self.read(raw)
 
     @staticmethod

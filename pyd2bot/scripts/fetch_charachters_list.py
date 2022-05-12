@@ -10,9 +10,9 @@ logger = Logger("Dofus2")
 if __name__ == "__main__":
     accountId = "melanco"
     serverId = 210
-    username = "xxxxx"
-    password = "xxxxx"
-    AccountCredsManager.addEntry(accountId, username, password)
+    # username = "xxxxx"
+    # password = "xxxxx"
+    # AccountCredsManager.addEntry(accountId, username, password)
     dofus2 = DofusClient()
     dofus2.login(accountId, serverId)
     while not PlayerManager().charactersList:

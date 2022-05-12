@@ -2,8 +2,6 @@ from time import perf_counter, sleep
 from typing import TYPE_CHECKING
 
 import com.ankamagames.dofus.kernel.net.ConnectionsHandler as connh
-import com.ankamagames.dofus.logic.game.roleplay.frames.RoleplayInteractivesFrame as rif
-from com.ankamagames.atouin.managers.EntitiesManager import EntitiesManager
 from com.ankamagames.atouin.managers.MapDisplayManager import MapDisplayManager
 from com.ankamagames.atouin.messages.EntityMovementCompleteMessage import EntityMovementCompleteMessage
 from com.ankamagames.atouin.messages.EntityMovementStoppedMessage import EntityMovementStoppedMessage
@@ -92,6 +90,8 @@ from com.ankamagames.jerakine.types.positions.MovementPath import MovementPath
 
 if TYPE_CHECKING:
     from com.ankamagames.dofus.logic.game.roleplay.frames.RoleplayEntitiesFrame import RoleplayEntitiesFrame
+    from com.ankamagames.dofus.logic.game.roleplay.frames.RoleplayInteractivesFrame import RoleplayInteractivesFrame
+
 
 logger = Logger("Dofus2")
 
@@ -155,6 +155,10 @@ class RoleplayMovementFrame(Frame):
     def entitiesFrame(self) -> "RoleplayEntitiesFrame":
         return Kernel().getWorker().getFrame("RoleplayEntitiesFrame")
 
+    @property
+    def interactivesFrame(self) -> "RoleplayInteractivesFrame":
+        return Kernel().getWorker().getFrame("RoleplayInteractivesFrame")
+
     def pushed(self) -> bool:
         self._wantToChangeMap = -1
         self._changeMapByAutoTrip = False
@@ -189,7 +193,7 @@ class RoleplayMovementFrame(Frame):
             if self._followingIe:
                 self.activateSkill(
                     self._followingIe["skillInstanceId"],
-                    self._followingIe["ie"],
+                    self._followingIe["ie"].elementId,
                     self._followingIe["additionalParam"],
                 )
                 self._followingIe = None
@@ -245,7 +249,23 @@ class RoleplayMovementFrame(Frame):
                     pathDuration = max(1, 1 * clientMovePath.getCrossingDuration(False))
                 else:
                     pathDuration = max(1, 1 * clientMovePath.getCrossingDuration(True))
-                sleep(pathDuration)
+                start = perf_counter()
+                while perf_counter() - start < pathDuration * 1.3:
+                    if self._followingIe:
+                        usedEntities = self.interactivesFrame._entities
+                        elemId = self._followingIe["ie"].elementId
+                        if elemId in usedEntities and int(usedEntities.get(elemId)) != int(
+                            PlayedCharacterManager().id
+                        ):
+                            self._followingIe = None
+                            self._canMove = True
+                            self._isRequestingMovement = False
+                            cmmsg = GameMapMovementCancelMessage()
+                            cmmsg.init(clientMovePath.end.cellId)
+                            Kernel().getWorker().processImmediately(cmmsg)
+                            ConnectionsHandler.getConnection().send(canceledMoveMessage)
+                            return True
+                    sleep(0.1)
                 Kernel().getWorker().processImmediately(EntityMovementCompleteMessage(movedEntity)),
             return True
 
@@ -255,10 +275,10 @@ class RoleplayMovementFrame(Frame):
 
                 if self.VERBOSE:
                     logger.debug(
-                        f"[RolePlayMovement] Mouvement complete, arrived at {emcmsg.entity.position.cellId}, destination point {self._destinationPoint}"
+                        f"[RolePlayMovement] Mouvement complete, arrived at {emcmsg.entity.position.cellId} and the requested destination was {self._destinationPoint}"
                     )
-                    logger.debug(f"[RolePlayMovement] Wants to atack monsters ? {self._followingMonsterGroup}")
-                    logger.debug(f"[RolePlayMovement] Wants to changemap ? {self._wantToChangeMap}")
+                    # logger.debug(f"[RolePlayMovement] Wants to atack monsters ? {self._followingMonsterGroup}")
+                    # logger.debug(f"[RolePlayMovement] Wants to changemap ? {self._wantToChangeMap}")
                 gmmcmsg = GameMapMovementConfirmMessage()
                 ConnectionsHandler.getConnection().send(gmmcmsg)
 
@@ -282,7 +302,7 @@ class RoleplayMovementFrame(Frame):
                     self._isRequestingMovement = False
                     self.activateSkill(
                         self._followingIe["skillInstanceId"],
-                        self._followingIe["ie"],
+                        self._followingIe["ie"].elementId,
                         self._followingIe["additionalParam"],
                     )
                     self._followingIe = None
@@ -473,7 +493,7 @@ class RoleplayMovementFrame(Frame):
             if self._followingIe:
                 self.activateSkill(
                     self._followingIe["skillInstanceId"],
-                    self._followingIe["ie"],
+                    self._followingIe["ie"].elementId,
                     self._followingIe["additionalParam"],
                 )
                 self._followingIe = None
@@ -546,25 +566,25 @@ class RoleplayMovementFrame(Frame):
             self._changeMapTimeout = BenchmarkTimer(self.CHANGEMAP_TIMEOUT, self.onMapChangeFailed)
             self._changeMapTimeout.start()
 
-    def activateSkill(self, skillInstanceId: int, ie: InteractiveElement, additionalParam: int) -> None:
-        rpInteractivesFrame: rif.RoleplayInteractivesFrame = Kernel().getWorker().getFrame("RoleplayInteractivesFrame")
+    def activateSkill(self, skillInstanceId: int, elementId: int, additionalParam: int = 0) -> None:
+        rpInteractivesFrame: "RoleplayInteractivesFrame" = Kernel().getWorker().getFrame("RoleplayInteractivesFrame")
         if self.VERBOSE:
             logger.debug(
-                f"[RolePlayMovement] requested registred Elm: {rpInteractivesFrame.currentRequestedElementId}, wants to activate {ie.elementId} and already using something {rpInteractivesFrame.usingInteractive}"
+                f"[RolePlayMovement] requested registred Elm: {rpInteractivesFrame.currentRequestedElementId}, wants to activate {elementId} and already using something {rpInteractivesFrame.usingInteractive}"
             )
         if (
             rpInteractivesFrame
-            and rpInteractivesFrame.currentRequestedElementId != ie.elementId
+            and rpInteractivesFrame.currentRequestedElementId != elementId
             and not rpInteractivesFrame.usingInteractive
         ):
-            rpInteractivesFrame.currentRequestedElementId = ie.elementId
+            rpInteractivesFrame.currentRequestedElementId = elementId
             if additionalParam == 0:
                 iurmsg = InteractiveUseRequestMessage()
-                iurmsg.init(ie.elementId, skillInstanceId)
+                iurmsg.init(elementId, skillInstanceId)
                 ConnectionsHandler.getConnection().send(iurmsg)
             else:
                 iuwprmsg = InteractiveUseWithParamRequestMessage()
-                iuwprmsg.init(ie.elementId, skillInstanceId, additionalParam)
+                iuwprmsg.init(elementId, skillInstanceId, additionalParam)
                 ConnectionsHandler.getConnection().send(iuwprmsg)
             self._canMove = False
 

@@ -1,4 +1,3 @@
-from logging import Logger
 from com.ankamagames.jerakine.benchmark.BenchmarkTimer import BenchmarkTimer
 from time import perf_counter
 from com.DofusClient import DofusClient
@@ -9,6 +8,7 @@ from com.ankamagames.dofus.kernel.net.DisconnectionReasonEnum import (
     DisconnectionReasonEnum,
 )
 from com.ankamagames.dofus.logic.connection.managers.AuthentificationManager import AuthentificationManager
+from com.ankamagames.jerakine.logger.Logger import Logger
 from com.ankamagames.jerakine.managers.StoreDataManager import StoreDataManager
 from com.ankamagames.jerakine.messages.Frame import Frame
 from com.ankamagames.jerakine.messages.Message import Message
@@ -59,6 +59,7 @@ class DisconnectionHandlerFrame(Frame):
         self._numberOfAttemptsAlreadyDone = 0
 
     def pushed(self) -> bool:
+        logger.debug("DisconnectionHandlerFrame pushed")
         return True
 
     def handleUnexpectedNoMsgReceived(self):
@@ -115,11 +116,12 @@ class DisconnectionHandlerFrame(Frame):
                         self._timer.start()
                     else:
                         logger.debug(
-                            f"The connection closure was expected (reason: {reason.reason}). Dispatching the message."
+                            f"The connection closure was expected (reason: {reason.reason})."
                         )
                         if (
                             reason.reason == DisconnectionReasonEnum.DISCONNECTED_BY_POPUP
                             or reason.reason == DisconnectionReasonEnum.SWITCHING_TO_HUMAN_VENDOR
+                            or reason.reason == DisconnectionReasonEnum.WANTED_SHUTDOWN
                         ):
                             krnl.Kernel().reset()
                         elif reason.reason == DisconnectionReasonEnum.RESTARTING:
@@ -149,6 +151,7 @@ class DisconnectionHandlerFrame(Frame):
             return True
 
     def reconnect(self) -> None:
+        logger.debug("Reconnecting...")
         krnl.Kernel().reset(reloadData=True, autoRetry=True)
         DofusClient().relogin()
 

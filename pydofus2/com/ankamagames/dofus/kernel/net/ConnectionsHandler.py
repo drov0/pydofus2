@@ -1,26 +1,21 @@
 from ctypes import ArgumentError
-from com.ankamagames.jerakine.benchmark.BenchmarkTimer import BenchmarkTimer
+
 import com.ankamagames.dofus.kernel.Kernel as krnl
-from com.ankamagames.dofus.logic.common.utils.LagometerAck import LagometerAck
-from com.ankamagames.dofus.logic.connection.frames.HandshakeFrame import HandshakeFrame
-from com.ankamagames.jerakine.logger.Logger import Logger
-from com.ankamagames.jerakine.messages.ConnectionResumedMessage import (
-    ConnectionResumedMessage,
-)
-from com.ankamagames.jerakine.network.IConnectionProxy import IConnectionProxy
-from com.ankamagames.jerakine.network.IServerConnection import IServerConnection
 from com.ankamagames.dofus.kernel.net.ConnectionType import ConnectionType
 from com.ankamagames.dofus.kernel.net.DisconnectionReason import DisconnectionReason
-from com.ankamagames.dofus.kernel.net.DisconnectionReasonEnum import (
-    DisconnectionReasonEnum,
-)
+from com.ankamagames.dofus.kernel.net.DisconnectionReasonEnum import DisconnectionReasonEnum
 from com.ankamagames.dofus.logic.common.managers.PlayerManager import PlayerManager
-from com.ankamagames.dofus.network.messages.common.basic.BasicPingMessage import (
-    BasicPingMessage,
-)
+from com.ankamagames.dofus.logic.common.utils.LagometerAck import LagometerAck
+from com.ankamagames.dofus.logic.connection.frames.HandshakeFrame import HandshakeFrame
+from com.ankamagames.dofus.network.MessageReceiver import MessageReceiver
+from com.ankamagames.dofus.network.messages.common.basic.BasicPingMessage import BasicPingMessage
+from com.ankamagames.jerakine.benchmark.BenchmarkTimer import BenchmarkTimer
+from com.ankamagames.jerakine.logger.Logger import Logger
+from com.ankamagames.jerakine.messages.ConnectionResumedMessage import ConnectionResumedMessage
+from com.ankamagames.jerakine.network.IConnectionProxy import IConnectionProxy
+from com.ankamagames.jerakine.network.IServerConnection import IServerConnection
 from com.ankamagames.jerakine.network.MultiConnection import MultiConnection
 from com.ankamagames.jerakine.network.ServerConnection import ServerConnection
-from com.ankamagames.dofus.network.MessageReceiver import MessageReceiver
 
 logger = Logger("Dofus2")
 
@@ -144,6 +139,8 @@ class ConnectionsHandler:
             krnl.Kernel().getWorker().removeFrame(krnl.Kernel().getWorker().getFrame("HandshakeFrame"))
         if cls._currentConnection and cls._currentConnection.connected:
             cls._currentConnection.close()
+        else:
+            logger.debug("Requested close connection but no cuurent Connection is set.")
         cls._currentConnection = None
         cls._currentConnectionType = ConnectionType.DISCONNECTED
 
@@ -202,7 +199,7 @@ class ConnectionsHandler:
             conn = ProxyedServerConnection(proxy, None, 0, id)
         else:
             conn = ServerConnection(None, 0, id)
-        if not cls._currentConnection:
+        if cls._currentConnection is None:
             cls.createConnection()
         conn.lagometer = LagometerAck()
         conn.handler = krnl.Kernel().getWorker()

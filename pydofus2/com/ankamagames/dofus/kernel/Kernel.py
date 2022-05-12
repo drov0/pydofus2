@@ -61,7 +61,8 @@ class Kernel(metaclass=Singleton):
         DofusEntities.reset()
         ItemWrapper.clearCache()
         self._worker.clear()
-        self.addInitialFrames()
+        if reloadData:
+            self.addInitialFrames()
         self.beingInReconection = False
         if messagesToDispatchAfter is not None and len(messagesToDispatchAfter) > 0:
             for msg in messagesToDispatchAfter:

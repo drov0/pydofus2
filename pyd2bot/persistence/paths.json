@@ -34,7 +34,7 @@
             "mapRpZone": 1
         },
         "fightOnly": true,
-        "monsterLvlCoefDiff": 1.5,
+        "monsterLvlCoefDiff": 10,
         "jobIds": []
     },
     "tainela_bouftou": {

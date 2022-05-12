@@ -1,60 +1,42 @@
 from datetime import datetime
 from logging import Logger
 from time import perf_counter
+from typing import TYPE_CHECKING
+
+import com.ankamagames.dofus.internalDatacenter.spells.SpellWrapper as swmod
+import com.ankamagames.dofus.kernel.Kernel as krnl
+import com.ankamagames.dofus.logic.game.common.managers.PlayedCharacterManager as pcm
+import com.ankamagames.dofus.logic.game.roleplay.frames.RoleplayContextFrame as rplCF
 from com.ankamagames.dofus.datacenter.breeds.Breed import Breed
 from com.ankamagames.dofus.datacenter.spells.SpellLevel import SpellLevel
 from com.ankamagames.dofus.datacenter.world.SubArea import SubArea
-import com.ankamagames.dofus.internalDatacenter.spells.SpellWrapper as spellWrapper
 from com.ankamagames.dofus.internalDatacenter.stats.EntityStats import EntityStats
-import com.ankamagames.dofus.kernel.Kernel as krnl
 from com.ankamagames.dofus.logic.common.managers.PlayerManager import PlayerManager
 from com.ankamagames.dofus.logic.common.managers.StatsManager import StatsManager
-from com.ankamagames.dofus.logic.game.common.managers.InventoryManager import (
-    InventoryManager,
-)
-import com.ankamagames.dofus.logic.game.common.managers.PlayedCharacterManager as pcm
+from com.ankamagames.dofus.logic.game.common.managers.InventoryManager import InventoryManager
 from com.ankamagames.dofus.logic.game.common.managers.TimerManager import TimeManager
 from com.ankamagames.dofus.logic.game.common.misc.DofusEntities import DofusEntities
-from com.ankamagames.dofus.logic.game.fight.managers.CurrentPlayedFighterManager import (
-    CurrentPlayedFighterManager,
-)
-from com.ankamagames.dofus.logic.game.fight.managers.SpellModifiersManager import (
-    SpellModifiersManager,
-)
-import com.ankamagames.dofus.logic.game.roleplay.frames.RoleplayContextFrame as rplCF
+from com.ankamagames.dofus.logic.game.fight.managers.CurrentPlayedFighterManager import CurrentPlayedFighterManager
+from com.ankamagames.dofus.logic.game.fight.managers.SpellModifiersManager import SpellModifiersManager
 from com.ankamagames.dofus.network.enums.AggressableStatusEnum import AggressableStatusEnum
 from com.ankamagames.dofus.network.enums.CompassTypeEnum import CompassTypeEnum
-from com.ankamagames.dofus.network.enums.PlayerLifeStatusEnum import (
-    PlayerLifeStatusEnum,
-)
-from com.ankamagames.dofus.network.enums.StatsUpgradeResultEnum import (
-    StatsUpgradeResultEnum,
-)
 from com.ankamagames.dofus.network.enums.GameServerTypeEnum import GameServerTypeEnum
+from com.ankamagames.dofus.network.enums.PlayerLifeStatusEnum import PlayerLifeStatusEnum
+from com.ankamagames.dofus.network.enums.StatsUpgradeResultEnum import StatsUpgradeResultEnum
 from com.ankamagames.dofus.network.messages.game.almanach.AlmanachCalendarDateMessage import (
     AlmanachCalendarDateMessage,
 )
-from com.ankamagames.dofus.network.messages.game.atlas.compass.CompassResetMessage import (
-    CompassResetMessage,
-)
-from com.ankamagames.dofus.network.messages.game.atlas.compass.CompassUpdateMessage import (
-    CompassUpdateMessage,
-)
+from com.ankamagames.dofus.network.messages.game.atlas.compass.CompassResetMessage import CompassResetMessage
+from com.ankamagames.dofus.network.messages.game.atlas.compass.CompassUpdateMessage import CompassUpdateMessage
 from com.ankamagames.dofus.network.messages.game.atlas.compass.CompassUpdatePartyMemberMessage import (
     CompassUpdatePartyMemberMessage,
 )
 from com.ankamagames.dofus.network.messages.game.atlas.compass.CompassUpdatePvpSeekMessage import (
     CompassUpdatePvpSeekMessage,
 )
-from com.ankamagames.dofus.network.messages.game.basic.BasicTimeMessage import (
-    BasicTimeMessage,
-)
-from com.ankamagames.dofus.network.messages.game.character.debt.DebtsDeleteMessage import (
-    DebtsDeleteMessage,
-)
-from com.ankamagames.dofus.network.messages.game.character.debt.DebtsUpdateMessage import (
-    DebtsUpdateMessage,
-)
+from com.ankamagames.dofus.network.messages.game.basic.BasicTimeMessage import BasicTimeMessage
+from com.ankamagames.dofus.network.messages.game.character.debt.DebtsDeleteMessage import DebtsDeleteMessage
+from com.ankamagames.dofus.network.messages.game.character.debt.DebtsUpdateMessage import DebtsUpdateMessage
 from com.ankamagames.dofus.network.messages.game.character.spell.forgettable.ForgettableSpellDeleteMessage import (
     ForgettableSpellDeleteMessage,
 )
@@ -70,23 +52,19 @@ from com.ankamagames.dofus.network.messages.game.character.stats.CharacterExperi
 from com.ankamagames.dofus.network.messages.game.character.stats.CharacterLevelUpInformationMessage import (
     CharacterLevelUpInformationMessage,
 )
-from com.ankamagames.dofus.network.messages.game.character.stats.CharacterLevelUpMessage import (
-    CharacterLevelUpMessage,
-)
+from com.ankamagames.dofus.network.messages.game.character.stats.CharacterLevelUpMessage import CharacterLevelUpMessage
 from com.ankamagames.dofus.network.messages.game.character.stats.CharacterStatsListMessage import (
     CharacterStatsListMessage,
 )
-from com.ankamagames.dofus.network.messages.game.context.GameMapSpeedMovementMessage import (
-    GameMapSpeedMovementMessage,
-)
-from com.ankamagames.dofus.network.messages.game.context.roleplay.MapComplementaryInformationsDataMessage import (
-    MapComplementaryInformationsDataMessage,
-)
+from com.ankamagames.dofus.network.messages.game.context.GameMapSpeedMovementMessage import GameMapSpeedMovementMessage
 from com.ankamagames.dofus.network.messages.game.context.roleplay.death.GameRolePlayGameOverMessage import (
     GameRolePlayGameOverMessage,
 )
 from com.ankamagames.dofus.network.messages.game.context.roleplay.death.GameRolePlayPlayerLifeStatusMessage import (
     GameRolePlayPlayerLifeStatusMessage,
+)
+from com.ankamagames.dofus.network.messages.game.context.roleplay.MapComplementaryInformationsDataMessage import (
+    MapComplementaryInformationsDataMessage,
 )
 from com.ankamagames.dofus.network.messages.game.context.roleplay.stats.StatsUpgradeResultMessage import (
     StatsUpgradeResultMessage,
@@ -100,30 +78,20 @@ from com.ankamagames.dofus.network.messages.game.initialization.ServerExperience
 from com.ankamagames.dofus.network.messages.game.initialization.SetCharacterRestrictionsMessage import (
     SetCharacterRestrictionsMessage,
 )
-from com.ankamagames.dofus.network.messages.game.interactive.zaap.KnownZaapListMessage import (
-    KnownZaapListMessage,
-)
+from com.ankamagames.dofus.network.messages.game.interactive.zaap.KnownZaapListMessage import KnownZaapListMessage
 from com.ankamagames.dofus.network.messages.game.inventory.exchanges.ExchangeMoneyMovementInformationMessage import (
     ExchangeMoneyMovementInformationMessage,
 )
-from com.ankamagames.dofus.network.messages.game.inventory.items.SetUpdateMessage import (
-    SetUpdateMessage,
-)
-from com.ankamagames.dofus.network.messages.game.startup.StartupActionAddMessage import (
-    StartupActionAddMessage,
-)
+from com.ankamagames.dofus.network.messages.game.inventory.items.SetUpdateMessage import SetUpdateMessage
+from com.ankamagames.dofus.network.messages.game.startup.StartupActionAddMessage import StartupActionAddMessage
 from com.ankamagames.dofus.network.messages.game.startup.StartupActionFinishedMessage import (
     StartupActionFinishedMessage,
 )
-from com.ankamagames.dofus.network.messages.game.startup.StartupActionsListMessage import (
-    StartupActionsListMessage,
-)
+from com.ankamagames.dofus.network.messages.game.startup.StartupActionsListMessage import StartupActionsListMessage
 from com.ankamagames.dofus.network.types.game.character.characteristic.CharacterCharacteristicsInformations import (
     CharacterCharacteristicsInformations,
 )
-from com.ankamagames.dofus.network.types.game.context.roleplay.HumanOptionAlliance import (
-    HumanOptionAlliance,
-)
+from com.ankamagames.dofus.network.types.game.context.roleplay.HumanOptionAlliance import HumanOptionAlliance
 from com.ankamagames.dofus.network.types.game.context.roleplay.HumanOptionOrnament import HumanOptionOrnament
 from com.ankamagames.dofus.types.data.PlayerSetInfo import PlayerSetInfo
 from com.ankamagames.jerakine.data.I18n import I18n
@@ -131,13 +99,10 @@ from com.ankamagames.jerakine.messages.Frame import Frame
 from com.ankamagames.jerakine.messages.Message import Message
 from com.ankamagames.jerakine.types.enums.Priority import Priority
 from damageCalculation.tools import StatIds
-from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
     from com.ankamagames.dofus.logic.game.fight.frames.FightBattleFrame import FightBattleFrame
-    from com.ankamagames.dofus.logic.game.roleplay.frames.RoleplayEntitiesFrame import (
-        RoleplayEntitiesFrame,
-    )
+    from com.ankamagames.dofus.logic.game.roleplay.frames.RoleplayEntitiesFrame import RoleplayEntitiesFrame
     from com.ankamagames.dofus.network.types.game.context.roleplay.GameRolePlayHumanoidInformations import (
         GameRolePlayHumanoidInformations,
     )
@@ -275,10 +240,6 @@ class PlayedCharacterUpdatesFrame(Frame):
             previousLevel = pcm.PlayedCharacterManager().infos.level
             pcm.PlayedCharacterManager().infos.level = clumsg.newLevel
             if clumsg.newLevel == 10 and PlayerManager().server.gameTypeId != GameServerTypeEnum.SERVER_TYPE_TEMPORIS:
-                caracPointEarned = 0
-                healPointEarned = 0
-                caracPointEarned = (clumsg.newLevel - previousLevel) * 5
-                healPointEarned = (clumsg.newLevel - previousLevel) * 5
                 newSpellWrappers = []
                 playerBreed = Breed.getBreedById(pcm.PlayedCharacterManager().infos.breed)
                 for spellVariant in playerBreed.breedSpellVariants:
@@ -289,23 +250,16 @@ class PlayedCharacterUpdatesFrame(Frame):
                                 obtentionLevel = spellLevelBreed.minPlayerLevel
                                 if obtentionLevel <= clumsg.newLevel and obtentionLevel > previousLevel:
                                     newSpellWrappers.append(
-                                        spellWrapper.SpellWrapper.create(spellBreed.id, spellLevelBreed.grade, False)
+                                        swmod.SpellWrapper.create(spellBreed.id, spellLevelBreed.grade, False)
                                     )
                 for spellWrapper in pcm.PlayedCharacterManager().spellsInventory:
                     spellWrapper.updateSpellLevelAndEffectsAccordingToPlayerLevel()
-
-                #     if len(newSpellWrappers):
-                #         # new level handle
-                #         pass
-                #     try:
-                #         pass
-                #     except Exception as e:
-                #         pass
 
                 if self.roleplayContextFrame:
                     entityInfos = self.roleplayContextFrame.entitiesFrame.getEntityInfos(
                         pcm.PlayedCharacterManager().id
                     )
+
                 if entityInfos:
                     for option in entityInfos.humanoidInfo.options:
                         if isinstance(option, HumanOptionOrnament):
@@ -567,7 +521,7 @@ class PlayedCharacterUpdatesFrame(Frame):
         if pcm.PlayedCharacterManager().isFighting:
             if CurrentPlayedFighterManager().isRealPlayer():
                 pass
-            spellWrapper.SpellWrapper.refreshAllPlayerSpellHolder(pcm.PlayedCharacterManager().id)
+            swmod.SpellWrapper.refreshAllPlayerSpellHolder(pcm.PlayedCharacterManager().id)
         else:
             pass
 
@@ -575,7 +529,7 @@ class PlayedCharacterUpdatesFrame(Frame):
         playerId: float = pcm.PlayedCharacterManager().id
         if playerId is not targetId:
             return
-        spell = spellWrapper.SpellWrapper.getSpellWrapperById(spellId, playerId)
+        spell = swmod.SpellWrapper.getSpellWrapperById(spellId, playerId)
         if spell is not None:
             spell = spell.clone()
             ++spell.versionNum

@@ -545,12 +545,12 @@ class ServerConnection(IServerConnection):
         self._connected = False
         self._handler.process(ServerConnectionClosedMessage(self))
         self._connecting = False
-        self._outputBuffer = []
+        self._outputBuffer.clear()
         EnterFrameDispatcher().removeEventListener(self.onEnterFrame)
         self._asyncTrees.clear()
         self._asyncMessages.clear()
         self._asyncNetworkDataContainerMessage = None
-        self._input = ByteArray()
+        self._input.clear()
         self._splittedPacket = False
         self._staticHeader = -1
 

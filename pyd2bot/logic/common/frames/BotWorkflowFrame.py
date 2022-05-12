@@ -16,11 +16,12 @@ from com.ankamagames.jerakine.logger.Logger import Logger
 from com.ankamagames.jerakine.messages.Message import Message
 from com.ankamagames.jerakine.types.enums.Priority import Priority
 from pyd2bot.apis.InventoryAPI import InventoryAPI
-from pyd2bot.logic.frames.BotFightFrame import BotFightFrame
-from pyd2bot.logic.frames.BotFarmPathFrame import BotFarmPathFrame
-from pyd2bot.logic.frames.BotPhenixAutoRevive import BotPhenixAutoRevive
-from pyd2bot.logic.frames.BotUnloadInBankFrame import BotUnloadInBankFrame
-from pyd2bot.logic.messages.BankUnloadEndedMessage import BankUnloadEndedMessage
+from pyd2bot.logic.common.frames.BotCharachterUpdatesFrame import BotCharachterUpdatesFrame
+from pyd2bot.logic.fight.frames.BotFightFrame import BotFightFrame
+from pyd2bot.logic.roleplay.frames.BotFarmPathFrame import BotFarmPathFrame
+from pyd2bot.logic.roleplay.frames.BotPhenixAutoRevive import BotPhenixAutoRevive
+from pyd2bot.logic.roleplay.frames.BotUnloadInBankFrame import BotUnloadInBankFrame
+from pyd2bot.logic.roleplay.messages.BankUnloadEndedMessage import BankUnloadEndedMessage
 
 logger = Logger("Dofus2")
 
@@ -33,9 +34,11 @@ class BotWorkflowFrame(Frame):
     def pushed(self) -> bool:
         self._inBankAutoUnload = False
         self._inPhenixAutoRevive = False
+        Kernel().getWorker().addFrame(BotCharachterUpdatesFrame())
         return True
 
     def pulled(self) -> bool:
+        Kernel().getWorker().removeFrameByName("BotCharachterUpdatesFrame")
         return True
 
     @property

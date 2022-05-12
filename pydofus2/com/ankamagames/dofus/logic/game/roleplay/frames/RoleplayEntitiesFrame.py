@@ -225,7 +225,7 @@ class RoleplayEntitiesFrame(AbstractEntitiesFrame, Frame):
             return False
 
         elif isinstance(msg, MapComplementaryInformationsDataMessage):
-            logger.debug("Processing MapComplementaryInformationsDataMessage ...")
+            # logger.debug("Processing MapComplementaryInformationsDataMessage ...")
             mcidmsg = msg
             currentMapHasChanged = False
             currentSubAreaHasChanged = False

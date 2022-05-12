@@ -263,7 +263,7 @@ class RoleplayMovementFrame(Frame):
                             cmmsg = GameMapMovementCancelMessage()
                             cmmsg.init(clientMovePath.end.cellId)
                             Kernel().getWorker().processImmediately(cmmsg)
-                            ConnectionsHandler.getConnection().send(canceledMoveMessage)
+                            ConnectionsHandler.getConnection().send(cmmsg)
                             return True
                     sleep(0.1)
                 Kernel().getWorker().processImmediately(EntityMovementCompleteMessage(movedEntity)),

@@ -11,9 +11,9 @@ import sys
 logger = Logger("Dofus2")
 
 if __name__ == "__main__":
-    sessionid = sys.argv[1]
+    SessionId = sys.argv[1]
     DofusClient.LOG_MEMORY_USAGE = False
-    session = SessionManager.getSession("sessionid")
+    session = SessionManager.getSession(SessionId)
     dofus2 = DofusClient()
     BotFightFrame.spellId = session.spellId
     BotFarmPathFrame.farmPath = session.path

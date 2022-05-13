@@ -9,9 +9,7 @@ class RawDataParser:
     def parse(self, data: ByteArray, msgId: int, msgLen: int) -> INetworkMessage:
         pass
 
-    def parseAsync(
-        self, data: ByteArray, messageId: int, msgLen: int, compute: FunctionType
-    ) -> INetworkMessage:
+    def parseAsync(self, data: ByteArray, messageId: int, msgLen: int, compute: FunctionType) -> INetworkMessage:
         pass
 
     def getUnpackMode(self, param1: int) -> int:

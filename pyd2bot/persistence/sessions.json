@@ -26,10 +26,10 @@
     "sadida-lumberjacker": {
         "charachterId": "Maniaco-lalcolic(210)",
         "spellId": 13516,
-        "pathId": "lumberjack_astrub_forest",
+        "pathId": "lumberjack_cania",
         "statToUp": 10
     },
-    "sadida-newbie": {
+    "sadida-pioutie": {
         "charachterId": "Plusbellelavie(210)",
         "spellId": 13516,
         "pathId": "pioute_astrub_village",

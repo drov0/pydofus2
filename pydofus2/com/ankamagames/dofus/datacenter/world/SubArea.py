@@ -4,7 +4,7 @@ from com.ankamagames.dofus.datacenter.world.WorldMap import WorldMap
 from com.ankamagames.dofus.types.IdAccessors import IdAccessors
 from com.ankamagames.jerakine.data.GameData import GameData
 from com.ankamagames.jerakine.data.I18n import I18n
-from com.ankamagames.jerakine.data.IposInit import IPostInit
+from com.ankamagames.jerakine.data.IPostInit import IPostInit
 from com.ankamagames.jerakine.interfaces.IDataCenter import IDataCenter
 from flash.geom.Point import Point
 from flash.geom.Rectangle import Rectangle

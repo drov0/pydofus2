@@ -1,38 +1,30 @@
 import base64
-from com.ankamagames.jerakine.benchmark.BenchmarkTimer import BenchmarkTimer
-from time import perf_counter, sleep
 import traceback
+from time import perf_counter, sleep
 from types import FunctionType
-from whistle import Event
-from com.ankamagames.jerakine.messages.ConnectedMessage import ConnectedMessage
-from com.ankamagames.jerakine.network.INetworkDataContainerMessage import (
-    INetworkDataContainerMessage,
-)
-from com.ankamagames.jerakine.network.INetworkMessage import INetworkMessage
-from com.ankamagames.dofus.network.messages.common.NetworkDataContainerMessage import (
-    NetworkDataContainerMessage,
-)
+
+from com.ankamagames.dofus.network.messages.common.NetworkDataContainerMessage import NetworkDataContainerMessage
+from com.ankamagames.jerakine.benchmark.BenchmarkTimer import BenchmarkTimer
+from com.ankamagames.jerakine.events.IOErrorEvent import IOErrorEvent
 from com.ankamagames.jerakine.events.ProgressEvent import ProgressEvent
+from com.ankamagames.jerakine.events.SocketEvent import SocketEvent
 from com.ankamagames.jerakine.logger.Logger import Logger
+from com.ankamagames.jerakine.messages.ConnectedMessage import ConnectedMessage
 from com.ankamagames.jerakine.messages.MessageHandler import MessageHandler
 from com.ankamagames.jerakine.network.CustomDataWrapper import ByteArray
 from com.ankamagames.jerakine.network.ILagometer import ILagometer
+from com.ankamagames.jerakine.network.INetworkDataContainerMessage import INetworkDataContainerMessage
+from com.ankamagames.jerakine.network.INetworkMessage import INetworkMessage
 from com.ankamagames.jerakine.network.IServerConnection import IServerConnection
+from com.ankamagames.jerakine.network.messages.ServerConnectionFailedMessage import ServerConnectionFailedMessage
+from com.ankamagames.jerakine.network.NetworkMessage import NetworkMessage
 from com.ankamagames.jerakine.network.RawDataParser import RawDataParser
-from com.ankamagames.jerakine.events.SocketEvent import SocketEvent
-from com.ankamagames.jerakine.events.IOErrorEvent import IOErrorEvent
-from com.ankamagames.jerakine.events.SecurityErrorEvent import SecurityErrorEvent
 from com.ankamagames.jerakine.network.UnpackMode import UnpackMode
-from com.ankamagames.jerakine.network.messages.ServerConnectionFailedMessage import (
-    ServerConnectionFailedMessage,
-)
 from com.ankamagames.jerakine.network.utils.FuncTree import FuncTree
 from com.ankamagames.jerakine.utils.display.EnterFrameConst import EnterFrameConst
-from com.ankamagames.jerakine.utils.display.EnterFrameDispatcher import (
-    EnterFrameDispatcher,
-)
+from com.ankamagames.jerakine.utils.display.EnterFrameDispatcher import EnterFrameDispatcher
 from mx.CustomSocket.Socket import Socket
-from com.ankamagames.jerakine.network.NetworkMessage import NetworkMessage
+from whistle import Event
 
 logger = Logger("ServerConnection")
 
@@ -307,8 +299,11 @@ class ServerConnection(IServerConnection):
                     else:
                         if self.checkClosed() and not self._socket.connected:
                             break
-                        if input.remaining() <= 0:
+                        if input.remaining() < 2:
                             break
+                        logger.debug(
+                            f"[{self._id}] Processed one parsed message from buffer, will low receive the remaining {input.remaining()} bytes"
+                        )
                         msg = self.lowReceive(input)
         except Exception as e:
             logger.error("[" + str(self._id) + "] Error while reading socket. \n", exc_info=True)
@@ -339,7 +334,17 @@ class ServerConnection(IServerConnection):
 
     def readMessageLength(self, staticHeader: int, src: ByteArray) -> int:
         byteLenDynamicHeader: int = staticHeader & NetworkMessage.BIT_MASK
-        messageLength: int = int.from_bytes(src.read(byteLenDynamicHeader), "big")
+        messageLength = 0
+        if byteLenDynamicHeader == 0:
+            pass
+        elif byteLenDynamicHeader == 1:
+            messageLength: int = src.readUnsignedByte()
+        elif byteLenDynamicHeader == 2:
+            messageLength: int = src.readUnsignedShort()
+        elif byteLenDynamicHeader == 3:
+            messageLength: int = (
+                ((src.readByte() & 255) << 16) + ((src.readByte() & 255) << 8) + (src.readByte() & 255)
+            )
         return messageLength
 
     def lowSend(self, msg: NetworkMessage) -> None:
@@ -404,7 +409,7 @@ class ServerConnection(IServerConnection):
                     else:
                         msg = self._rawParser.parse(src, messageId, messageLength)
                         if self.DEBUG_LOW_LEVEL_VERBOSE:
-                            logger.info(f"[{self._id}] Full parsing done")
+                            logger.info(f"[{self._id}] Full parsing done, remaining : {src.remaining()}")
                     return msg
 
                 if self.DEBUG_LOW_LEVEL_VERBOSE:
@@ -458,10 +463,10 @@ class ServerConnection(IServerConnection):
                     self._splittedPacketLength,
                 )
                 if self.DEBUG_LOW_LEVEL_VERBOSE:
-                    logger.info(f"[{self._id}] Full parsing done")
+                    logger.info(f"[{self._id}] Full parsing done, remaining : {src.remaining()}")
 
             self._splittedPacket = False
-            self._inputBuffer = ByteArray()
+            self._inputBuffer.clear()
             return msg
 
         self._inputBuffer += src.read(src.remaining())
@@ -538,9 +543,7 @@ class ServerConnection(IServerConnection):
         BenchmarkTimer(3, self.removeListeners).start()
         if self._lagometer:
             self._lagometer.stop()
-        from com.ankamagames.jerakine.network.ServerConnectionClosedMessage import (
-            ServerConnectionClosedMessage,
-        )
+        from com.ankamagames.jerakine.network.ServerConnectionClosedMessage import ServerConnectionClosedMessage
 
         self._connected = False
         self._handler.process(ServerConnectionClosedMessage(self))

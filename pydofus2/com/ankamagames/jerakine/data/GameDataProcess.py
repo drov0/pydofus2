@@ -23,9 +23,7 @@ class GameDataProcess:
             size = self._stream.remaining()
             fieldName = self._stream.readUTF()
             self._queryableField.append(fieldName)
-            self._searchFieldIndex[fieldName] = (
-                self._stream.readInt() + indexSearchOffset
-            )
+            self._searchFieldIndex[fieldName] = self._stream.readInt() + indexSearchOffset
             self._searchFieldType[fieldName] = self._stream.readInt()
             self._searchFieldCount[fieldName] = self._stream.readInt()
             fieldListSize = fieldListSize - (size - self._stream.remaining())
@@ -65,16 +63,19 @@ class GameDataProcess:
         if not iterable:
             value = [value]
         itemCount: int = self._searchFieldCount[fieldName]
-        self._stream.position = self._searchFieldIndex[fieldName]
+        # print("items count ", itemCount)
+        self._stream.seek(self._searchFieldIndex[fieldName])
         ftype: int = self._searchFieldType[fieldName]
         readFct: FunctionType = self.getReadFunctionType(ftype)
-        if readFct == None:
+        # print("read func ", readFct.__name__)
+        if readFct is None:
             return None
         valueIndex: int = 0
         value.sort()
         currentValue = value[0]
         for _ in range(itemCount):
             readValue = readFct()
+            # print("read value ", readValue)
             while readValue > currentValue:
                 valueIndex += 1
                 if valueIndex == len(value):
@@ -88,7 +89,7 @@ class GameDataProcess:
                     return result
                 currentValue = value[valueIndex]
             else:
-                self._stream.position += self._stream.readInt()
+                self._stream.seek(self._stream.position + self._stream.readInt())
         return result
 
     def sort(self, fieldNames, ids: list[int], ascending=True) -> list[int]:
@@ -104,10 +105,7 @@ class GameDataProcess:
         indexes = list[dict]()
         for i in fieldNames:
             fieldName = fieldNames[i]
-            if (
-                GameDataTypeEnum(self._searchFieldType[fieldName])
-                == GameDataTypeEnum.I18N
-            ):
+            if GameDataTypeEnum(self._searchFieldType[fieldName]) == GameDataTypeEnum.I18N:
                 self.buildI18nSortIndex(fieldName)
             else:
                 self.buildSortIndex(fieldName)
@@ -164,9 +162,7 @@ class GameDataProcess:
                     ref[self._stream.readInt()] = i18nOrder
 
     def readI18n(self) -> str:
-        return I18nFileAccessor.getInstance().getUnDiacriticalText(
-            self._currentStream.readInt()
-        )
+        return I18nFileAccessor.getInstance().getUnDiacriticalText(self._currentStream.readInt())
 
     def getReadFunctionType(self, type: GameDataTypeEnum) -> FunctionType:
         if type == GameDataTypeEnum.INT:

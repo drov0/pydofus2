@@ -16,7 +16,7 @@ class Interactive(IDataCenter):
 
     displayTooltip: bool
 
-    _name: str
+    _name: str = ""
 
     def __init__(self):
         super().__init__()

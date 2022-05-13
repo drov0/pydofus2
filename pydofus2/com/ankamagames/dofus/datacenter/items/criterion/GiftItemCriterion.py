@@ -1,4 +1,9 @@
+from com.ankamagames.dofus.datacenter.alignments.AlignmentGift import AlignmentGift
+from com.ankamagames.dofus.datacenter.alignments.AlignmentRankJntGift import AlignmentRankJntGift
+from com.ankamagames.dofus.datacenter.items.criterion.IItemCriterion import IItemCriterion
 from com.ankamagames.dofus.datacenter.items.criterion.ItemCriterion import ItemCriterion
+from com.ankamagames.dofus.kernel.Kernel import Kernel
+from com.ankamagames.jerakine.data.I18n import I18n
 from com.ankamagames.jerakine.interfaces.IDataCenter import IDataCenter
 
 
@@ -23,9 +28,7 @@ class GiftItemCriterion(ItemCriterion, IDataCenter):
     def isRespected(self) -> bool:
         rgI: int = 0
         rank: int = Kernel().getWorker().getFrame("AlignmentFrame")
-        rankGift: AlignmentRankJntGift = (
-            AlignmentRankJntGift.getAlignmentRankJntGiftById(rank)
-        )
+        rankGift: AlignmentRankJntGift = AlignmentRankJntGift.getAlignmentRankJntGiftById(rank)
         if rankGift and rankGift.gifts:
             for rgI in range(len(rankGift.gifts)):
                 if rankGift.gifts[rgI] == self._aliGiftId:
@@ -39,15 +42,11 @@ class GiftItemCriterion(ItemCriterion, IDataCenter):
     @property
     def text(self) -> str:
         criterionInfo: list = None
-        if _operator.text == ">":
-            criterionInfo = _criterionValueText.split(",")
+        if self._operator.text == ">":
+            criterionInfo = self._criterionValueText.split(",")
             return I18n.getUiText(
                 "ui.pvp.giftRequired",
-                [
-                    AlignmentGift.getAlignmentGiftById(self._aliGiftId).name
-                    + " > "
-                    + self._aliGiftLevel
-                ],
+                [AlignmentGift.getAlignmentGiftById(self._aliGiftId).name + " > " + self._aliGiftLevel],
             )
         return I18n.getUiText(
             "ui.pvp.giftRequired",

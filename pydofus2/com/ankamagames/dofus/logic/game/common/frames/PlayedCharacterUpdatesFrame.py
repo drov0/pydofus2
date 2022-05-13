@@ -176,7 +176,7 @@ class PlayedCharacterUpdatesFrame(Frame):
             if krnl.Kernel().getWorker().getFrame("QuestFrame"):
                 if krnl.Kernel().getWorker().getFrame("QuestFrame").achievmentsListProcessed == False:
                     krnl.Kernel().getWorker().getFrame("QuestFrame")
-            return True
+            return False
 
         if isinstance(msg, MapComplementaryInformationsDataMessage):
             mcidmsg = msg

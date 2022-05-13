@@ -61,11 +61,7 @@ class DofusClient(metaclass=Singleton):
     def join(self):
         while True:
             try:
-                sleep(0.3)
-                if not self.mainConn:
-                    if self.LOG_MEMORY_USAGE:
-                        MemoryProfiler.saveCollectedData()
-                    sys.exit(0)
+                sleep(1)
                 if self.LOG_MEMORY_USAGE:
                     snapshot = tracemalloc.take_snapshot()
                     MemoryProfiler.logMemoryUsage(snapshot)

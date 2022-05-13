@@ -48,7 +48,7 @@ class AStar:
         super().__init__()
 
     @classmethod
-    def search(cls, worldGraph: WorldGraph, src: Vertex, dst: Vertex, callback: FunctionType) -> None:
+    def search(cls, worldGraph: WorldGraph, src: Vertex, dst: Vertex, callback: FunctionType, onFrame=True) -> None:
         logger.info(f"Searching path from {src} to {dst} ...")
         if cls.callback != None:
             raise Exception("Pathfinding already in progress")
@@ -65,6 +65,8 @@ class AStar:
         cls.openDic = dict()
         cls.iterations = 0
         cls.openList.append(Node(src, MapPosition.getMapPositionById(src.mapId)))
+        if not onFrame:
+            return cls.compute()
         EnterFrameDispatcher().addEventListener(cls.compute, EnterFrameConst.COMPUTE_ASTAR)
 
     @classmethod
@@ -84,14 +86,15 @@ class AStar:
             if cls.iterations > cls.MAX_ITERATION:
                 cls.callbackWithResult(None)
                 logger.error("Too many iterations, aborting A*")
-                return
+                return None
             cls.iterations += 1
             current = cls.openList.pop(0)
             cls.openDic[current.vertex] = None
             if current.vertex == cls.dst:
                 logger.info("Goal reached within " + str(cls.iterations) + " iterations")
-                cls.callbackWithResult(cls.buildResultPath(cls.worldGraph, current))
-                return
+                result = cls.buildResultPath(cls.worldGraph, current)
+                cls.callbackWithResult(result)
+                return result
             edges = cls.worldGraph.getOutgoingEdgesFromVertex(current.vertex)
             oldLength = len(cls.openList)
             cost = current.cost + 1
@@ -122,6 +125,7 @@ class AStar:
             if oldLength < len(cls.openList):
                 cls.openList.sort(key=lambda x: x.heuristic)
         cls.callbackWithResult(None)
+        return None
 
     @staticmethod
     def hasValidTransition(edge: Edge) -> bool:

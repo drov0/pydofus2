@@ -6,7 +6,7 @@ from typing import Any, TYPE_CHECKING
 if TYPE_CHECKING:
     from com.ankamagames.jerakine.data.ModuleReader import ModuleReader
 
-from com.ankamagames.jerakine.data.IposInit import IPostInit
+from com.ankamagames.jerakine.data.IPostInit import IPostInit
 from com.ankamagames.jerakine.data.BinaryStream import BinaryStream
 from com.ankamagames.jerakine.data.GameDataField import GameDataField
 

@@ -71,10 +71,10 @@ from com.ankamagames.jerakine.messages.Message import Message
 from com.ankamagames.jerakine.types.DataStoreType import DataStoreType
 from com.ankamagames.jerakine.types.enums.Priority import Priority
 
+logger = Logger("Dofus2")
+
 
 class InventoryManagementFrame(Frame):
-
-    logger = Logger("Dofus2")
 
     CHARACTER_BUILD_PRESET_TYPE: int = 1
 

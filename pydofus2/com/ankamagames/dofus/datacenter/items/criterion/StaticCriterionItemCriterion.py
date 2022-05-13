@@ -1,5 +1,5 @@
-from pyd2bot.dofus.datacenter.items.IItemCriterion import IItemCriterion
-from pyd2bot.dofus.datacenter.items.ItemCriterion import ItemCriterion
+from com.ankamagames.dofus.datacenter.items.criterion.IItemCriterion import IItemCriterion
+from com.ankamagames.dofus.datacenter.items.criterion.ItemCriterion import ItemCriterion
 
 
 class StaticCriterionItemCriterion(ItemCriterion):

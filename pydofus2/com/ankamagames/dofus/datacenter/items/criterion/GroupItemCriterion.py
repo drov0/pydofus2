@@ -34,7 +34,8 @@ class GroupItemCriterion(IItemCriterion):
         self.split()
         self.createNewGroups()
 
-    def create(self, pCriteria: list[IItemCriterion], pOperators: list[str]) -> "GroupItemCriterion":
+    @classmethod
+    def create(cls, pCriteria: list[IItemCriterion], pOperators: list[str]) -> "GroupItemCriterion":
         pair = None
         tabLength: int = len(pCriteria) + len(pOperators)
         textForm: str = ""
@@ -43,7 +44,7 @@ class GroupItemCriterion(IItemCriterion):
         for i in range(0, tabLength, 1):
             pair = i % 2
             if pair == 0:
-                textForm += pCriteria[criterionIndex]
+                textForm += pCriteria[criterionIndex].basicText
                 criterionIndex += 1
             else:
                 textForm += pOperators[operatorIndex]
@@ -138,8 +139,8 @@ class GroupItemCriterion(IItemCriterion):
                     crits.append(copyCriteria[curIndex + 1])
                     ops = list[str]([copyOperators[curIndex]])
                     group = GroupItemCriterion.create(crits, ops)
-                    copyCriteria.splice(curIndex, 2, group)
-                    copyOperators.splice(curIndex, 1)
+                    copyCriteria = copyCriteria[: curIndex - 1] + [group] + copyCriteria[curIndex + 2 :]
+                    del copyOperators[curIndex]
                     curIndex -= 1
                 curIndex += 1
                 if curIndex >= len(copyOperators):
@@ -232,6 +233,8 @@ class GroupItemCriterion(IItemCriterion):
         pCriteria = str.replace(pCriteria, " ", "")
         if pCriteria[0:1] == "(":
             dl = StringUtils.getDelimitedText(pCriteria, "(", ")", True)
+            if not dl:
+                return None
             criterion = GroupItemCriterion(dl[0])
         else:
             ANDindex = pCriteria.find("&")

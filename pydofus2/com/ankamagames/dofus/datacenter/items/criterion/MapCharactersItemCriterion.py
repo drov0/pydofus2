@@ -1,14 +1,19 @@
+import imp
 from com.ankamagames.dofus.datacenter.items.criterion.IItemCriterion import IItemCriterion
 from com.ankamagames.dofus.datacenter.items.criterion.ItemCriterion import ItemCriterion
 from com.ankamagames.dofus.kernel.Kernel import Kernel
 from com.ankamagames.dofus.logic.game.common.managers.PlayedCharacterManager import PlayedCharacterManager
-from com.ankamagames.dofus.logic.game.roleplay.frames.RoleplayEntitiesFrame import RoleplayEntitiesFrame
 from com.ankamagames.dofus.network.types.game.context.GameContextActorInformations import GameContextActorInformations
 from com.ankamagames.dofus.network.types.game.context.roleplay.GameRolePlayActorInformations import (
     GameRolePlayActorInformations,
 )
 from com.ankamagames.jerakine.data.I18n import I18n
 from com.ankamagames.jerakine.interfaces.IDataCenter import IDataCenter
+
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from com.ankamagames.dofus.logic.game.roleplay.frames.RoleplayEntitiesFrame import RoleplayEntitiesFrame
 
 
 class MapCharactersItemCriterion(ItemCriterion, IDataCenter):
@@ -39,7 +44,7 @@ class MapCharactersItemCriterion(ItemCriterion, IDataCenter):
         nbCharacters: int = 0
         entitiesInfos: dict = None
         actorInfo: GameContextActorInformations = None
-        entitiesFrame: RoleplayEntitiesFrame = Kernel().getWorker().getFrame("RoleplayEntitiesFrame")
+        entitiesFrame: "RoleplayEntitiesFrame" = Kernel().getWorker().getFrame("RoleplayEntitiesFrame")
         if entitiesFrame:
             entitiesInfos = entitiesFrame.entities
             for actorInfo in entitiesInfos:

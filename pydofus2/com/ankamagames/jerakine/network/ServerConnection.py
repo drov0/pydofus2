@@ -1,38 +1,30 @@
 import base64
-from com.ankamagames.jerakine.benchmark.BenchmarkTimer import BenchmarkTimer
-from time import perf_counter, sleep
 import traceback
+from time import perf_counter, sleep
 from types import FunctionType
-from whistle import Event
-from com.ankamagames.jerakine.messages.ConnectedMessage import ConnectedMessage
-from com.ankamagames.jerakine.network.INetworkDataContainerMessage import (
-    INetworkDataContainerMessage,
-)
-from com.ankamagames.jerakine.network.INetworkMessage import INetworkMessage
-from com.ankamagames.dofus.network.messages.common.NetworkDataContainerMessage import (
-    NetworkDataContainerMessage,
-)
+
+from com.ankamagames.dofus.network.messages.common.NetworkDataContainerMessage import NetworkDataContainerMessage
+from com.ankamagames.jerakine.benchmark.BenchmarkTimer import BenchmarkTimer
+from com.ankamagames.jerakine.events.IOErrorEvent import IOErrorEvent
 from com.ankamagames.jerakine.events.ProgressEvent import ProgressEvent
+from com.ankamagames.jerakine.events.SocketEvent import SocketEvent
 from com.ankamagames.jerakine.logger.Logger import Logger
+from com.ankamagames.jerakine.messages.ConnectedMessage import ConnectedMessage
 from com.ankamagames.jerakine.messages.MessageHandler import MessageHandler
 from com.ankamagames.jerakine.network.CustomDataWrapper import ByteArray
 from com.ankamagames.jerakine.network.ILagometer import ILagometer
+from com.ankamagames.jerakine.network.INetworkDataContainerMessage import INetworkDataContainerMessage
+from com.ankamagames.jerakine.network.INetworkMessage import INetworkMessage
 from com.ankamagames.jerakine.network.IServerConnection import IServerConnection
+from com.ankamagames.jerakine.network.messages.ServerConnectionFailedMessage import ServerConnectionFailedMessage
+from com.ankamagames.jerakine.network.NetworkMessage import NetworkMessage
 from com.ankamagames.jerakine.network.RawDataParser import RawDataParser
-from com.ankamagames.jerakine.events.SocketEvent import SocketEvent
-from com.ankamagames.jerakine.events.IOErrorEvent import IOErrorEvent
-from com.ankamagames.jerakine.events.SecurityErrorEvent import SecurityErrorEvent
 from com.ankamagames.jerakine.network.UnpackMode import UnpackMode
-from com.ankamagames.jerakine.network.messages.ServerConnectionFailedMessage import (
-    ServerConnectionFailedMessage,
-)
 from com.ankamagames.jerakine.network.utils.FuncTree import FuncTree
 from com.ankamagames.jerakine.utils.display.EnterFrameConst import EnterFrameConst
-from com.ankamagames.jerakine.utils.display.EnterFrameDispatcher import (
-    EnterFrameDispatcher,
-)
+from com.ankamagames.jerakine.utils.display.EnterFrameDispatcher import EnterFrameDispatcher
 from mx.CustomSocket.Socket import Socket
-from com.ankamagames.jerakine.network.NetworkMessage import NetworkMessage
+from whistle import Event
 
 logger = Logger("ServerConnection")
 
@@ -45,7 +37,7 @@ class ServerConnection(IServerConnection):
 
     DEBUG_LOW_LEVEL_VERBOSE: bool = False
 
-    DEBUG_DATA: bool = True
+    DEBUG_DATA: bool = False
 
     LATENCY_AVG_BUFFER_SIZE: int = 50
 
@@ -548,9 +540,7 @@ class ServerConnection(IServerConnection):
         BenchmarkTimer(3, self.removeListeners).start()
         if self._lagometer:
             self._lagometer.stop()
-        from com.ankamagames.jerakine.network.ServerConnectionClosedMessage import (
-            ServerConnectionClosedMessage,
-        )
+        from com.ankamagames.jerakine.network.ServerConnectionClosedMessage import ServerConnectionClosedMessage
 
         self._connected = False
         self._handler.process(ServerConnectionClosedMessage(self))

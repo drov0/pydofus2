@@ -38,7 +38,7 @@ class NetworkMessageEncoder:
             data = ByteArray()
 
         if spec.get("dynamicType"):
-            msg_type = D2PROTOCOL["type"][spec["name"]]
+            msg_type = D2PROTOCOL["type"][spec["typename"]]
             data.writeUnsignedShort(msg_type["protocolId"])
 
         typeId = spec.get("typeId")
@@ -55,7 +55,7 @@ class NetworkMessageEncoder:
             cls._encode(D2PROTOCOL["type"][parent], inst, data)
 
         if "fields" not in spec:
-            spec = D2PROTOCOL["type"][spec["type"]]
+            spec = D2PROTOCOL["type"][spec["typename"]]
 
         cls.writeBooleans(spec["boolfields"], inst, data)
 

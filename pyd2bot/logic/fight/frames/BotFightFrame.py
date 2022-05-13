@@ -84,7 +84,7 @@ class _Target:
         return f"({self.entityId} at {self.pos.cellId})"
 
 
-class BotFightFrame(Frame, metaclass=Singleton):
+class BotFightFrame(Frame):
     VERBOSE = False
 
     ACTION_TIMEOUT = 7

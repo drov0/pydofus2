@@ -126,7 +126,7 @@ class ConnectionsHandler:
         msg: BasicPingMessage = None
         if cls._currentConnection and cls._currentConnection.connected:
             msg = BasicPingMessage()
-            msg.initBasicPingMessage(True)
+            msg.init(True)
             logger.warn(
                 "La connection au serveur de jeu semble longue. On envoit un BasicPingMessage pour essayer de débloquer la situation."
             )

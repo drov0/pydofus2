@@ -301,9 +301,10 @@ class ServerConnection(IServerConnection):
                             break
                         if input.remaining() < 2:
                             break
-                        logger.debug(
-                            f"[{self._id}] Processed one parsed message from buffer, will low receive the remaining {input.remaining()} bytes"
-                        )
+                        if self.DEBUG_LOW_LEVEL_VERBOSE:
+                            logger.debug(
+                                f"[{self._id}] Processed one parsed message from buffer, will low receive the remaining {input.remaining()} bytes"
+                            )
                         msg = self.lowReceive(input)
         except Exception as e:
             logger.error("[" + str(self._id) + "] Error while reading socket. \n", exc_info=True)

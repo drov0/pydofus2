@@ -312,52 +312,6 @@ class PlayedCharacterUpdatesFrame(Frame):
         if isinstance(msg, CompassUpdatePvpSeekMessage):
             pass
 
-        if isinstance(msg, CompassUpdateMessage):
-            cumsg = msg
-            name = "flag_srv" + cumsg.type
-            if cumsg.type == CompassTypeEnum.COMPASS_TYPE_PARTY:
-                memberId = CompassUpdatePartyMemberMessage(msg).memberId
-                active = CompassUpdatePartyMemberMessage(msg).active
-                if memberId == 0 and not active:
-                    for followingPlayerId in pcm.PlayedCharacterManager().followingPlayerIds:
-                        pass
-                    pcm.PlayedCharacterManager().followingPlayerIds = []
-                else:
-                    pmFrame = krnl.Kernel().getWorker().getFrame("PartyManagementFrame")
-                    if pmFrame:
-                        memberInfo = pmFrame.getGroupMemberById(memberId)
-                        if memberInfo:
-                            pass
-                        name += "_" + memberId
-                    if active:
-                        pass
-                    else:
-                        pass
-                return True
-            if cumsg.type == CompassTypeEnum.COMPASS_TYPE_PVP_SEEK:
-                legend = (
-                    I18n.getUiText(
-                        "ui.cartography.positionof",
-                        [CompassUpdatePvpSeekMessage(msg).memberName],
-                    )
-                    + " ("
-                    + CompassUpdatePvpSeekMessage(msg).coords.worldX
-                    + ","
-                    + CompassUpdatePvpSeekMessage(msg).coords.worldY
-                    + ")"
-                )
-
-            if cumsg.type == CompassTypeEnum.COMPASS_TYPE_QUEST:
-                legend = cumsg.coords.worldX + "," + cumsg.coords.worldY
-
-            if cumsg.type == CompassTypeEnum.COMPASS_TYPE_SIMPLE:
-                legend = cumsg.coords.worldX + "," + cumsg.coords.worldY
-
-            if cumsg.type == CompassTypeEnum.COMPASS_TYPE_SPOUSE:
-                socialFrame2 = krnl.Kernel().getWorker().getFrame("SocialFrame")
-                socialFrame2.spouse.followSpouse = True
-            return True
-
         if isinstance(msg, BasicTimeMessage):
             btmsg = msg
             receptionDelay = perf_counter() - btmsg.receptionTime

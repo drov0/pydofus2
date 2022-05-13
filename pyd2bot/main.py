@@ -11,15 +11,9 @@ import sys
 logger = Logger("Dofus2")
 
 if __name__ == "__main__":
-<<<<<<< HEAD
-    #SessionId = sys.argv[1]
-    DofusClient.LOG_MEMORY_USAGE = False
-    session = SessionManager.getSession("money_5")
-=======
     sessionId = sys.argv[1]
     DofusClient.LOG_MEMORY_USAGE = False
     session = SessionManager.getSession(sessionId)
->>>>>>> 5ad21827988922e392c29e570dedd638679d6d00
     dofus2 = DofusClient()
     BotFightFrame.spellId = session.spellId
     BotFarmPathFrame.farmPath = session.path

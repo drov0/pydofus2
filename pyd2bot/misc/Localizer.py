@@ -30,13 +30,6 @@ class Localizer:
         subareaId = MapDisplayManager().currentDataMap.subareaId
         subarea = SubArea.getSubAreaById(subareaId)
         areaId = subarea._area.id
-<<<<<<< HEAD
-<<<<<<< Updated upstream
-        jsonbank = cls.AREAINFOS.get(str(areaId))["bank"]
-        return BankInfos(**jsonbank)
-=======
-=======
->>>>>>> draft
         playerPos = PlayedCharacterManager().currMapPos
         if str(areaId) in cls.AREAINFOS:
             closestBank = cls.AREAINFOS[str(areaId)]["bank"]
@@ -48,11 +41,6 @@ class Localizer:
                 if "bank" in jsonbank:
                     rpZ = 1
                     bankMapId = jsonbank["bank"]["npcMapId"]
-<<<<<<< HEAD
-                    if bankMapId == PlayedCharacterManager().currentMap.mapId:
-                        return BankInfos(**jsonbank["bank"])
-=======
->>>>>>> draft
                     while True:
                         dstV = WorldPathFinder().worldGraph.getVertex(bankMapId, rpZ)
                         if not dstV:
@@ -67,10 +55,6 @@ class Localizer:
                             break
                         rpZ += 1
         return BankInfos(**closestBank)
-<<<<<<< HEAD
->>>>>>> Stashed changes
-=======
->>>>>>> draft
 
     @classmethod
     def getPhenixMapId(cls) -> float:

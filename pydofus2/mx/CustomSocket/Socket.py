@@ -41,7 +41,7 @@ class Socket(threading.Thread):
         logger.info("Socket thread started.")
         while not self._kill.is_set():
             try:
-                rdata = self._sock.recv(1028)
+                rdata = self._sock.recv(2056)
                 if rdata:
                     self._buff += rdata
                     self.dispatcher.dispatch(ProgressEvent.SOCKET_DATA, ProgressEvent(rdata))

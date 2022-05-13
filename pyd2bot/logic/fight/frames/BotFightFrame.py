@@ -1,61 +1,46 @@
 import collections
 import math
 import random
-from com.ankamagames.dofus.network.enums.FightOptionsEnum import FightOptionsEnum
-from com.ankamagames.dofus.network.messages.game.context.fight.GameFightOptionToggleMessage import (
-    GameFightOptionToggleMessage,
-)
-from com.ankamagames.dofus.network.messages.game.context.fight.GameFightTurnResumeMessage import (
-    GameFightTurnResumeMessage,
-)
-from com.ankamagames.dofus.network.messages.game.context.fight.GameFightTurnStartPlayingMessage import (
-    GameFightTurnStartPlayingMessage,
-)
-from com.ankamagames.jerakine.benchmark.BenchmarkTimer import BenchmarkTimer
 from types import FunctionType
+from typing import TYPE_CHECKING, Tuple
+
 from com.ankamagames.atouin.AtouinConstants import AtouinConstants
+from com.ankamagames.atouin.messages.MapLoadedMessage import MapLoadedMessage
 from com.ankamagames.atouin.utils.DataMapProvider import DataMapProvider
 from com.ankamagames.dofus.datacenter.effects.EffectInstance import EffectInstance
 from com.ankamagames.dofus.internalDatacenter.spells.SpellWrapper import SpellWrapper
 from com.ankamagames.dofus.internalDatacenter.stats.EntityStats import EntityStats
+from com.ankamagames.dofus.kernel.Kernel import Kernel
+from com.ankamagames.dofus.kernel.net.ConnectionsHandler import ConnectionsHandler
+from com.ankamagames.dofus.kernel.net.ConnectionType import ConnectionType
+from com.ankamagames.dofus.logic.game.common.managers.PlayedCharacterManager import PlayedCharacterManager
+from com.ankamagames.dofus.logic.game.fight.frames.FightEntitiesFrame import FightEntitiesFrame
 from com.ankamagames.dofus.logic.game.fight.managers.CurrentPlayedFighterManager import CurrentPlayedFighterManager
+from com.ankamagames.dofus.logic.game.fight.miscs.FightReachableCellsMaker import FightReachableCellsMaker
+from com.ankamagames.dofus.network.enums.FightOptionsEnum import FightOptionsEnum
+from com.ankamagames.dofus.network.messages.common.basic.BasicPingMessage import BasicPingMessage
+from com.ankamagames.dofus.network.messages.game.actions.fight.GameActionFightCastRequestMessage import (
+    GameActionFightCastRequestMessage,
+)
 from com.ankamagames.dofus.network.messages.game.actions.fight.GameActionFightNoSpellCastMessage import (
     GameActionFightNoSpellCastMessage,
 )
 from com.ankamagames.dofus.network.messages.game.actions.sequence.SequenceEndMessage import SequenceEndMessage
 from com.ankamagames.dofus.network.messages.game.actions.sequence.SequenceStartMessage import SequenceStartMessage
-from com.ankamagames.dofus.network.types.game.context.GameContextActorInformations import GameContextActorInformations
-from com.ankamagames.jerakine.logger.Logger import Logger
-from com.ankamagames.atouin.messages.MapLoadedMessage import MapLoadedMessage
-from com.ankamagames.dofus.kernel.Kernel import Kernel
-from com.ankamagames.dofus.kernel.net.ConnectionType import ConnectionType
-from com.ankamagames.dofus.kernel.net.ConnectionsHandler import ConnectionsHandler
-from com.ankamagames.dofus.logic.game.common.managers.PlayedCharacterManager import (
-    PlayedCharacterManager,
-)
-from com.ankamagames.dofus.logic.game.fight.frames.FightEntitiesFrame import (
-    FightEntitiesFrame,
-)
-from com.ankamagames.dofus.logic.game.fight.miscs.FightReachableCellsMaker import (
-    FightReachableCellsMaker,
-)
-from com.ankamagames.dofus.network.messages.common.basic.BasicPingMessage import (
-    BasicPingMessage,
-)
-from com.ankamagames.dofus.network.messages.game.actions.fight.GameActionFightCastRequestMessage import (
-    GameActionFightCastRequestMessage,
-)
-from com.ankamagames.dofus.network.messages.game.context.fight.GameFightEndMessage import (
-    GameFightEndMessage,
-)
-from com.ankamagames.dofus.network.messages.game.context.fight.GameFightJoinMessage import (
-    GameFightJoinMessage,
-)
-from com.ankamagames.dofus.network.messages.game.context.fight.GameFightReadyMessage import (
-    GameFightReadyMessage,
-)
 from com.ankamagames.dofus.network.messages.game.context.fight.character.GameFightShowFighterMessage import (
     GameFightShowFighterMessage,
+)
+from com.ankamagames.dofus.network.messages.game.context.fight.GameFightEndMessage import GameFightEndMessage
+from com.ankamagames.dofus.network.messages.game.context.fight.GameFightJoinMessage import GameFightJoinMessage
+from com.ankamagames.dofus.network.messages.game.context.fight.GameFightOptionToggleMessage import (
+    GameFightOptionToggleMessage,
+)
+from com.ankamagames.dofus.network.messages.game.context.fight.GameFightReadyMessage import GameFightReadyMessage
+from com.ankamagames.dofus.network.messages.game.context.fight.GameFightTurnResumeMessage import (
+    GameFightTurnResumeMessage,
+)
+from com.ankamagames.dofus.network.messages.game.context.fight.GameFightTurnStartPlayingMessage import (
+    GameFightTurnStartPlayingMessage,
 )
 from com.ankamagames.dofus.network.messages.game.context.roleplay.MapComplementaryInformationsDataMessage import (
     MapComplementaryInformationsDataMessage,
@@ -63,14 +48,16 @@ from com.ankamagames.dofus.network.messages.game.context.roleplay.MapComplementa
 from com.ankamagames.dofus.network.types.game.context.fight.GameFightMonsterInformations import (
     GameFightMonsterInformations,
 )
+from com.ankamagames.dofus.network.types.game.context.GameContextActorInformations import GameContextActorInformations
+from com.ankamagames.jerakine.benchmark.BenchmarkTimer import BenchmarkTimer
 from com.ankamagames.jerakine.entities.interfaces.IInteractive import IInteractive
+from com.ankamagames.jerakine.logger.Logger import Logger
 from com.ankamagames.jerakine.map.LosDetector import LosDetector
 from com.ankamagames.jerakine.messages.Frame import Frame
 from com.ankamagames.jerakine.messages.Message import Message
 from com.ankamagames.jerakine.metaclasses.Singleton import Singleton
 from com.ankamagames.jerakine.types.enums.Priority import Priority
 from com.ankamagames.jerakine.types.positions.MapPoint import MapPoint
-from typing import TYPE_CHECKING, Tuple
 from com.ankamagames.jerakine.types.zones.Cross import Cross
 from com.ankamagames.jerakine.types.zones.IZone import IZone
 from com.ankamagames.jerakine.types.zones.Lozenge import Lozenge
@@ -78,16 +65,11 @@ from com.ankamagames.jerakine.utils.display.spellZone.SpellShapeEnum import Spel
 from damageCalculation.tools import StatIds
 from pyd2bot.logic.fight.frames.BotFightTurnFrame import BotFightTurnFrame
 
-
 if TYPE_CHECKING:
-    from com.ankamagames.dofus.logic.game.fight.frames.FightTurnFrame import (
-        FightTurnFrame,
-    )
-    from com.ankamagames.dofus.logic.game.fight.frames.FightContextFrame import (
-        FightContextFrame,
-    )
     from com.ankamagames.dofus.logic.game.fight.frames.FightBattleFrame import FightBattleFrame
+    from com.ankamagames.dofus.logic.game.fight.frames.FightContextFrame import FightContextFrame
     from com.ankamagames.dofus.logic.game.fight.frames.FightSpellCastFrame import FightSpellCastFrame
+    from com.ankamagames.dofus.logic.game.fight.frames.FightTurnFrame import FightTurnFrame
 
 
 logger = Logger("Dofus2")

@@ -299,8 +299,11 @@ class ServerConnection(IServerConnection):
                     else:
                         if self.checkClosed() and not self._socket.connected:
                             break
-                        if input.remaining() <= 0:
+                        if input.remaining() < 2:
                             break
+                        logger.debug(
+                            f"[{self._id}] Processed one parsed message from buffer, will low receive the remaining {input.remaining()} bytes"
+                        )
                         msg = self.lowReceive(input)
         except Exception as e:
             logger.error("[" + str(self._id) + "] Error while reading socket. \n", exc_info=True)
@@ -406,7 +409,7 @@ class ServerConnection(IServerConnection):
                     else:
                         msg = self._rawParser.parse(src, messageId, messageLength)
                         if self.DEBUG_LOW_LEVEL_VERBOSE:
-                            logger.info(f"[{self._id}] Full parsing done")
+                            logger.info(f"[{self._id}] Full parsing done, remaining : {src.remaining()}")
                     return msg
 
                 if self.DEBUG_LOW_LEVEL_VERBOSE:
@@ -460,10 +463,10 @@ class ServerConnection(IServerConnection):
                     self._splittedPacketLength,
                 )
                 if self.DEBUG_LOW_LEVEL_VERBOSE:
-                    logger.info(f"[{self._id}] Full parsing done")
+                    logger.info(f"[{self._id}] Full parsing done, remaining : {src.remaining()}")
 
             self._splittedPacket = False
-            self._inputBuffer = ByteArray()
+            self._inputBuffer.clear()
             return msg
 
         self._inputBuffer += src.read(src.remaining())

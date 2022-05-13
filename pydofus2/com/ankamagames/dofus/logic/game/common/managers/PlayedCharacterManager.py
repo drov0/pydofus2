@@ -1,5 +1,6 @@
 from typing import TYPE_CHECKING
 from com.ankamagames.atouin.managers.MapDisplayManager import MapDisplayManager
+from com.ankamagames.dofus.datacenter.world.MapPosition import MapPosition
 import com.ankamagames.dofus.kernel.Kernel as krnl
 from com.ankamagames.dofus.logic.game.common.misc.DofusEntities import DofusEntities
 from com.ankamagames.jerakine.entities.interfaces.IEntity import IEntity
@@ -322,6 +323,10 @@ class PlayedCharacterManager(IDestroyable, metaclass=Singleton):
                 self._currentMap.setOutdoorCoords(self.previousMap.outdoorX, self.previousMap.outdoorY)
         else:
             self._currentMap = map
+
+    @property
+    def currMapPos(self) -> "MapPosition":
+        return MapPosition.getMapPositionById(MapDisplayManager().currentMapPoint.mapId)
 
     @currentSubArea.setter
     def currentSubArea(self, area: "SubArea") -> None:

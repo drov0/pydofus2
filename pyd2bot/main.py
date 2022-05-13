@@ -11,9 +11,9 @@ import sys
 logger = Logger("Dofus2")
 
 if __name__ == "__main__":
-    SessionId = sys.argv[1]
+    sessionId = sys.argv[1]
     DofusClient.LOG_MEMORY_USAGE = False
-    session = SessionManager.getSession(SessionId)
+    session = SessionManager.getSession(sessionId)
     dofus2 = DofusClient()
     BotFightFrame.spellId = session.spellId
     BotFarmPathFrame.farmPath = session.path
@@ -21,5 +21,3 @@ if __name__ == "__main__":
     dofus2.registerFrame(BotWorkflowFrame())
     dofus2.login(**session.creds)
     dofus2.join()
-
-

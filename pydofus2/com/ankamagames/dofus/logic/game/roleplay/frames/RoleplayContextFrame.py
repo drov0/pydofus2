@@ -1,32 +1,19 @@
+import com.ankamagames.dofus.logic.game.roleplay.frames.RoleplayEntitiesFrame as ref
+import com.ankamagames.dofus.logic.game.roleplay.frames.RoleplayInteractivesFrame as rif
+import com.ankamagames.dofus.logic.game.roleplay.frames.RoleplayWorldFrame as rplWF
 from com.ankamagames.atouin.managers.MapDisplayManager import MapDisplayManager
 from com.ankamagames.atouin.messages.MapLoadedMessage import MapLoadedMessage
 from com.ankamagames.dofus.datacenter.world.SubArea import SubArea
-from com.ankamagames.dofus.internalDatacenter.world.WorldPointWrapper import (
-    WorldPointWrapper,
-)
+from com.ankamagames.dofus.internalDatacenter.world.WorldPointWrapper import WorldPointWrapper
 from com.ankamagames.dofus.kernel.Kernel import Kernel
-from com.ankamagames.dofus.kernel.net.ConnectionsHandler import ConnectionsHandler
-from com.ankamagames.dofus.logic.game.common.managers.PlayedCharacterManager import (
-    PlayedCharacterManager,
-)
-from com.ankamagames.dofus.logic.game.common.misc.DofusEntities import DofusEntities
-import com.ankamagames.dofus.logic.game.roleplay.frames.RoleplayEntitiesFrame as ref
-import com.ankamagames.dofus.logic.game.roleplay.frames.RoleplayInteractivesFrame as rif
-from com.ankamagames.dofus.logic.game.roleplay.frames.RoleplayMovementFrame import (
-    RoleplayMovementFrame,
-)
-import com.ankamagames.dofus.logic.game.roleplay.frames.RoleplayWorldFrame as rplWF
-from com.ankamagames.dofus.network.messages.game.context.GameContextDestroyMessage import (
-    GameContextDestroyMessage,
-)
+from com.ankamagames.dofus.logic.game.common.managers.PlayedCharacterManager import PlayedCharacterManager
+from com.ankamagames.dofus.logic.game.roleplay.frames.RoleplayMovementFrame import RoleplayMovementFrame
+from com.ankamagames.dofus.network.messages.game.context.GameContextDestroyMessage import GameContextDestroyMessage
 from com.ankamagames.dofus.network.messages.game.context.roleplay.CurrentMapInstanceMessage import (
     CurrentMapInstanceMessage,
 )
-from com.ankamagames.dofus.network.messages.game.context.roleplay.CurrentMapMessage import (
-    CurrentMapMessage,
-)
+from com.ankamagames.dofus.network.messages.game.context.roleplay.CurrentMapMessage import CurrentMapMessage
 from com.ankamagames.dofus.network.messages.game.inventory.items.ObtainedItemMessage import ObtainedItemMessage
-from com.ankamagames.jerakine.benchmark.BenchmarkTimer import BenchmarkTimer
 from com.ankamagames.jerakine.logger.Logger import Logger
 from com.ankamagames.jerakine.messages.Frame import Frame
 from com.ankamagames.jerakine.messages.Message import Message

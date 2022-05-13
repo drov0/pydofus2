@@ -48,5 +48,19 @@
         "fightOnly": true,
         "monsterLvlCoefDiff": 1.5,
         "jobIds": []
+    },
+    "lumberjack_cania": {
+        "type": "RandomSubAreaFarmPath",
+        "name": "lumberjack_cania",
+        "subAreaId": 69,
+        "startVertex": {
+            "mapId": 155975692.0,
+            "mapRpZone": 1
+        },
+        "fightOnly": false,
+        "monsterLvlCoefDiff": 1.5,
+        "jobIds": [
+            2
+        ]
     }
 }

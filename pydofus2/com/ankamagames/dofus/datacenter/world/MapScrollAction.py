@@ -34,6 +34,6 @@ class MapScrollAction(IDataCenter):
 
     @staticmethod
     def getMapScrollActions() -> list:
-        return GameData.getobjects(MapScrollAction.MODULE)
+        return GameData.getObjects(MapScrollAction.MODULE)
 
     idAccessors: IdAccessors = IdAccessors(getMapScrollActionById, getMapScrollActions)

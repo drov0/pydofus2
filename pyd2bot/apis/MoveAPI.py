@@ -1,9 +1,12 @@
 import random
 from typing import TYPE_CHECKING
+from com.ankamagames.dofus.datacenter.items.criterion.CriterionUtils import CriterionUtils
+from com.ankamagames.dofus.logic.game.common.managers.PlayedCharacterManager import PlayedCharacterManager
 from com.ankamagames.dofus.logic.game.roleplay.frames.RoleplayInteractivesFrame import InteractiveElementData
 from com.ankamagames.dofus.modules.utils.pathFinding.world.Edge import Edge
 
 from com.ankamagames.dofus.modules.utils.pathFinding.world.Transition import Transition
+from com.ankamagames.dofus.modules.utils.pathFinding.world.TransitionTypeEnum import TransitionTypeEnum
 
 from com.ankamagames.dofus.modules.utils.pathFinding.world.WorldPathFinder import (
     WorldPathFinder,
@@ -114,29 +117,29 @@ class MoveAPI:
     @classmethod
     def getTransitionIe(cls, transition: Transition) -> "InteractiveElementData":
         rpframe: "RoleplayInteractivesFrame" = Kernel().getWorker().getFrame("RoleplayInteractivesFrame")
-        ie = rpframe.getIeBySkillId(transition.skillId)
-        ie.position = MapPoint.fromCellId(transition.cell)
+        ie = rpframe.getInteractiveElement(transition.id, transition.skillId)
         return ie
 
     @classmethod
     def followTransition(cls, tr: Transition):
         if not tr.isValid:
             raise Exception("Trying to follow a NON valid transition")
-        if tr.skillId != -1:
+        if TransitionTypeEnum(tr.type) == TransitionTypeEnum.INTERACTIVE:
             logger.debug(f"Activating skill {tr.skillId} to change map towards '{tr.transitionMapId}'")
             ie = cls.getTransitionIe(tr)
             rpmframe: "RoleplayMovementFrame" = Kernel().getWorker().getFrame("RoleplayMovementFrame")
-            rpmframe.setFollowingInteraction(
-                {
-                    "ie": ie.element,
-                    "skillInstanceId": ie.skillUID,
-                    "additionalParam": 0,
-                }
-            )
-            rpmframe.resetNextMoveMapChange()
-            rpmframe.askMoveTo(ie.position)
-        elif tr.cell:
+            if tr.cell != PlayedCharacterManager().entity.position.cellId:
+                rpmframe.setFollowingInteraction(
+                    {
+                        "ie": ie.element,
+                        "skillInstanceId": ie.skillUID,
+                        "additionalParam": 0,
+                    }
+                )
+                rpmframe.resetNextMoveMapChange()
+                rpmframe.askMoveTo(ie.position)
+            else:
+                rpmframe.activateSkill(ie.skillUID, tr.id, 0)
+        else:
             logger.debug(f"Classic map change map towards '{tr.transitionMapId}'")
             cls.sendClickAdjacentMsg(tr.transitionMapId, tr.cell)
-        else:
-            raise Exception("No direction or skill to transit found!!!")

@@ -339,7 +339,17 @@ class ServerConnection(IServerConnection):
 
     def readMessageLength(self, staticHeader: int, src: ByteArray) -> int:
         byteLenDynamicHeader: int = staticHeader & NetworkMessage.BIT_MASK
-        messageLength: int = int.from_bytes(src.read(byteLenDynamicHeader), "big")
+        messageLength = 0
+        if byteLenDynamicHeader == 0:
+            pass
+        elif byteLenDynamicHeader == 1:
+            messageLength: int = src.readUnsignedByte()
+        elif byteLenDynamicHeader == 2:
+            messageLength: int = src.readUnsignedShort()
+        elif byteLenDynamicHeader == 3:
+            messageLength: int = (
+                ((src.readByte() & 255) << 16) + ((src.readByte() & 255) << 8) + (src.readByte() & 255)
+            )
         return messageLength
 
     def lowSend(self, msg: NetworkMessage) -> None:

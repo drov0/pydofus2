@@ -271,8 +271,13 @@ class RoleplayInteractivesFrame(Frame):
     def getInteractiveActionTimer(self, pUser) -> BenchmarkTimer:
         return self._interactiveActionTimers[pUser]
 
-    def getInteractiveElement(self, elementId: int) -> InteractiveElementData:
-        return self._ie.get(elementId)
+    def getInteractiveElement(self, elementId: int, skillId=None) -> InteractiveElementData:
+        ie = self._ie.get(elementId)
+        if skillId is not None:
+            for skill in ie.element.enabledSkills:
+                if skill.skillId == skillId:
+                    ie.skillUID = skill.skillInstanceUid
+        return ie
 
     def registerInteractive(self, ie: InteractiveElement, firstSkill: int) -> None:
         if not MapDisplayManager().isIdentifiedElement(ie.elementId):
@@ -316,6 +321,20 @@ class RoleplayInteractivesFrame(Frame):
                     if skill.skillId == skillId:
                         ie.skillUID = skill.skillInstanceUid
                         return ie
+
+    def getNearestIeToPosition(self, position: MapPoint, skillId: int) -> InteractiveElementData:
+        minDist = float("inf")
+        target = None
+        for ie in self._ie.values():
+            if ie.element.enabledSkills:
+                for skill in ie.element.enabledSkills:
+                    if skill.skillId == skillId:
+                        dist = position.distanceTo(ie.position)
+                        if dist < minDist:
+                            dist = minDist
+                            target = ie
+                            target.skillUID = skill.skillInstanceUid
+        return target
 
     def updateStatedElement(self, se: StatedElement, globalv: bool = False) -> None:
         if se.elementId == self._currentUsedElementId:

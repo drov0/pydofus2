@@ -1,10 +1,17 @@
+from com.ankamagames.dofus.datacenter.items.criterion.IItemCriterion import IItemCriterion
+from com.ankamagames.dofus.datacenter.items.criterion.ItemCriterion import ItemCriterion
+from com.ankamagames.dofus.kernel.Kernel import Kernel
+from com.ankamagames.jerakine.data.I18n import I18n
+from com.ankamagames.jerakine.interfaces.IDataCenter import IDataCenter
+
+
 class GuildItemCriterion(ItemCriterion, IDataCenter):
     def __init__(self, pCriterion: str):
         super().__init__(pCriterion)
 
     @property
     def text(self) -> str:
-        if _criterionValue == 0:
+        if self._criterionValue == 0:
             return I18n.getUiText("ui.criterion.noguild")
         return I18n.getUiText("ui.criterion.hasGuild")
 

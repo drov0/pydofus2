@@ -5,10 +5,15 @@
             "npcId": -20001,
             "npcMapId": 192415750.0,
             "openBankReplyId": 64347
-        },
-        "phenixMapId": 190843392.0
+        }
     },
-    "45": {
-        "phenixMapId": 153879809.0
+    "45": {},
+    "8": {
+        "bank": {
+            "npcActionId": 3,
+            "npcId": -20000,
+            "npcMapId": 217059328.0,
+            "openBankReplyId": 63535
+        }
     }
 }

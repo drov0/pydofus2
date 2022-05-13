@@ -1,6 +1,7 @@
 import math
 from typing import TYPE_CHECKING
 
+
 if TYPE_CHECKING:
     from com.ankamagames.dofus.datacenter.effects.EffectInstance import EffectInstance
 from com.ankamagames.dofus.datacenter.items.criterion.GroupItemCriterion import (
@@ -11,7 +12,7 @@ from com.ankamagames.dofus.datacenter.items.ItemType import ItemType
 from com.ankamagames.dofus.internalDatacenter.DataEnum import DataEnum
 from com.ankamagames.dofus.types.IdAccessors import IdAccessors
 from com.ankamagames.dofus.types.enums.ItemCategoryEnum import ItemCategoryEnum
-from com.ankamagames.jerakine.data.IposInit import IPostInit
+from com.ankamagames.jerakine.data.IPostInit import IPostInit
 from com.ankamagames.jerakine.data.I18n import I18n
 from com.ankamagames.jerakine.data.GameData import GameData
 from com.ankamagames.jerakine.data.GameDataFileAccessor import GameDataFileAccessor
@@ -358,6 +359,8 @@ class Item(IPostInit, IDataCenter):
 
     @property
     def recipes(self) -> list:
+        from com.ankamagames.dofus.datacenter.jobs.Recipe import Recipe
+
         if not self._recipes:
             numRecipes = len(self.recipeIds)
             self._recipes = list()

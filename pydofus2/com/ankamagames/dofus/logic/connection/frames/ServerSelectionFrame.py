@@ -19,6 +19,7 @@ from com.ankamagames.dofus.network.messages.connection.SelectedServerDataExtende
 from com.ankamagames.dofus.network.messages.connection.SelectedServerDataMessage import (
     SelectedServerDataMessage,
 )
+from com.ankamagames.dofus.network.messages.connection.ServerSelectionMessage import ServerSelectionMessage
 from com.ankamagames.dofus.network.messages.connection.ServerStatusUpdateMessage import (
     ServerStatusUpdateMessage,
 )
@@ -113,7 +114,7 @@ class ServerSelectionFrame(Frame):
                 self._serversList.append(ssumsg.server)
                 self._serversList.sort(key=lambda x: x.date)
             logger.info(f"Server {ssumsg.server.id} status changed to {ServerStatusEnum(ssumsg.server.status).name}.")
-            if float(ssumsg.server.id) == float(self._serverSelectionAction.serverId):
+            if float(ssumsg.server.id) == float(AuthentificationManager()._lva.serverId):
                 if ServerStatusEnum(ssumsg.server.status) != ServerStatusEnum.ONLINE:
                     logger.debug(
                         f"Waiting for my server {ssumsg.server.id} to be online current status {ServerStatusEnum(ssumsg.server.status)}."
@@ -121,7 +122,9 @@ class ServerSelectionFrame(Frame):
                     self._waitingServerOnline = True
                 else:
                     self._waitingServerOnline = False
-                    krnl.Kernel().getWorker().processImmediately(self._serverSelectionAction)
+                    ssmsg = ServerSelectionMessage()
+                    ssmsg.init(AuthentificationManager()._lva.serverId)
+                    krnl.Kernel().getWorker().processImmediately(ssmsg)
             self.broadcastServersListUpdate()
             return True
 

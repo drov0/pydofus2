@@ -2,9 +2,8 @@ from com.ankamagames.dofus.datacenter.breeds.BreedRoleByBreed import BreedRoleBy
 from com.ankamagames.dofus.datacenter.spells.Spell import Spell
 from com.ankamagames.dofus.datacenter.spells.SpellVariant import SpellVariant
 from com.ankamagames.jerakine.logger.Logger import Logger
-from re import S
 from com.ankamagames.dofus.types.IdAccessors import IdAccessors
-from com.ankamagames.jerakine.data import I18n
+from com.ankamagames.jerakine.data.I18n import I18n
 from com.ankamagames.jerakine.data.GameData import GameData
 from com.ankamagames.jerakine.interfaces.IDataCenter import IDataCenter
 
@@ -89,8 +88,8 @@ class Breed(IDataCenter):
         return GameData.getObject(Breed.MODULE, id)
 
     @staticmethod
-    def getBreeds() -> list:
-        return GameData.getobjects(Breed.MODULE)
+    def getBreeds() -> list["Breed"]:
+        return GameData.getObjects(Breed.MODULE)
 
     def getBreedFromSkin(self, skin: int) -> "Breed":
         skinKnown = None

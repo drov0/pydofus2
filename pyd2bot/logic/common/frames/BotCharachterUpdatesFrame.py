@@ -1,4 +1,6 @@
+from com.ankamagames.dofus.datacenter.breeds.Breed import Breed
 from com.ankamagames.dofus.kernel.net.ConnectionsHandler import ConnectionsHandler
+from com.ankamagames.dofus.logic.common.managers.StatsManager import StatsManager
 from com.ankamagames.dofus.logic.game.common.managers.PlayedCharacterManager import PlayedCharacterManager
 from com.ankamagames.dofus.network.messages.game.achievement.AchievementFinishedMessage import (
     AchievementFinishedMessage,
@@ -42,7 +44,39 @@ class BotCharachterUpdatesFrame(Frame):
 
     @property
     def priority(self) -> int:
-        return Priority.ULTIMATE_HIGHEST_DEPTH_OF_DOOM
+        return Priority.VERY_LOW
+
+    def boostStat(self, statId: int, points: int):
+        if statId == StatIds.STRENGTH:
+            statFloors = Breed.getBreedById(PlayedCharacterManager().infos.breed).statsPointsForStrength
+        elif statId == StatIds.VITALITY:
+            statFloors = Breed.getBreedById(PlayedCharacterManager().infos.breed).statsPointsForVitality
+        elif statId == StatIds.WISDOM:
+            statFloors = Breed.getBreedById(PlayedCharacterManager().infos.breed).statsPointsForWisdom
+        elif statId == StatIds.INTELLIGENCE:
+            statFloors = Breed.getBreedById(PlayedCharacterManager().infos.breed).statsPointsForIntelligence
+        elif statId == StatIds.AGILITY:
+            statFloors = Breed.getBreedById(PlayedCharacterManager().infos.breed).statsPointsForAgility
+        elif statId == StatIds.CHANCE:
+            statFloors = Breed.getBreedById(PlayedCharacterManager().infos.breed).statsPointsForChance
+        base = PlayedCharacterManager().stats.getStatAdditionalValue(statId)
+        additional = PlayedCharacterManager().stats.getStatBaseValue(statId)
+        logger.debug(f"Stat {statId} has base {base} and additional {additional} so totoal = {base + additional}")
+        capital = base + additional
+        for i in range(len(statFloors)):
+            if i + 1 == len(statFloors):
+                nextFloor = float("inf")
+            else:
+                nextFloor = statFloors[i + 1][0]
+            if statFloors[i][0] <= capital < nextFloor:
+                currentFloorCost = statFloors[i][1]
+                break
+        boost = points // currentFloorCost
+        if boost > 0:
+            logger.debug(f"Boosting {statId} by {boost}")
+            sumsg = StatsUpgradeRequestMessage()
+            sumsg.init(False, statId, boost)
+            ConnectionsHandler.getConnection().send(sumsg)
 
     def process(self, msg: Message) -> bool:
 
@@ -58,17 +92,12 @@ class BotCharachterUpdatesFrame(Frame):
             if self.statIdToUp:
                 previousLevel = PlayedCharacterManager().infos.level
                 PlayedCharacterManager().infos.level = clumsg.newLevel
-                caracPointEarned = (clumsg.newLevel - previousLevel) * 5
-                sumsg = StatsUpgradeRequestMessage()
-                sumsg.init(False, self.statIdToUp, caracPointEarned)
-                ConnectionsHandler.getConnection().send(sumsg)
-                return False
+                pointsEarned = (clumsg.newLevel - previousLevel) * 5
+                self.boostStat(self.statIdToUp, pointsEarned)
+            return True
 
         elif isinstance(msg, CharacterStatsListMessage):
-            for char in msg.stats.characteristics:
-                if isinstance(char, CharacterCharacteristicDetailed) and char.characteristicId == StatIds.STATS_POINTS:
-                    if char.base > 0:
-                        sumsg = StatsUpgradeRequestMessage()
-                        sumsg.init(False, self.statIdToUp, char.base)
-                        ConnectionsHandler.getConnection().send(sumsg)
-                        return False
+            unusedStatPoints = PlayedCharacterManager().stats.getStatBaseValue(StatIds.STATS_POINTS)
+            if unusedStatPoints > 0:
+                self.boostStat(self.statIdToUp, unusedStatPoints)
+            return True

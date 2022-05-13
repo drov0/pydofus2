@@ -23,8 +23,38 @@ class Localizer:
         subareaId = MapDisplayManager().currentDataMap.subareaId
         subarea = SubArea.getSubAreaById(subareaId)
         areaId = subarea._area.id
+<<<<<<< Updated upstream
         jsonbank = cls.AREAINFOS.get(str(areaId))["bank"]
         return BankInfos(**jsonbank)
+=======
+        playerPos = PlayedCharacterManager().currMapPos
+        if str(areaId) in cls.AREAINFOS:
+            closestBank = cls.AREAINFOS[str(areaId)]["bank"]
+        else:
+            minDist = float("inf")
+            srcV = WorldPathFinder().currPlayerVertex
+            closestBank = None
+            for areaId, jsonbank in cls.AREAINFOS.items():
+                if "bank" in jsonbank:
+                    rpZ = 1
+                    bankMapId = jsonbank["bank"]["npcMapId"]
+                    if bankMapId == PlayedCharacterManager().currentMap.mapId:
+                        return BankInfos(**jsonbank["bank"])
+                    while True:
+                        dstV = WorldPathFinder().worldGraph.getVertex(bankMapId, rpZ)
+                        if not dstV:
+                            break
+                        path = AStar.search(WorldPathFinder().worldGraph, srcV, dstV, lambda x: (), False)
+                        if path is not None:
+                            bankMapPos = MapPosition.getMapPositionById(bankMapId)
+                            dist = abs(bankMapPos.posX - playerPos.posX) + abs(bankMapPos.posY - playerPos.posY)
+                            if dist < minDist:
+                                dist = len(path)
+                                closestBank = jsonbank["bank"]
+                            break
+                        rpZ += 1
+        return BankInfos(**closestBank)
+>>>>>>> Stashed changes
 
     @classmethod
     def getPhenixMapId(cls) -> float:

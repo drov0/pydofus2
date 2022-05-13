@@ -34,6 +34,7 @@ class BotWorkflowFrame(Frame):
     def pushed(self) -> bool:
         self._inBankAutoUnload = False
         self._inPhenixAutoRevive = False
+        self._delayedAutoBankUnlaod = False
         Kernel().getWorker().addFrame(BotCharachterUpdatesFrame())
         return True
 
@@ -45,23 +46,36 @@ class BotWorkflowFrame(Frame):
     def priority(self) -> int:
         return Priority.VERY_LOW
 
+    def triggerBankUnload(self):
+        if Kernel().getWorker().getFrame("BotFarmPathFrame"):
+            Kernel().getWorker().removeFrameByName("BotFarmPathFrame")
+        self._inBankAutoUnload = True
+        logger.warn(f"Inventory is almost full {InventoryAPI.getWeightPercent()}, will trigger auto bank unload...")
+        Kernel().getWorker().addFrame(BotUnloadInBankFrame())
+
     def process(self, msg: Message) -> bool:
 
         if isinstance(msg, GameContextCreateMessage):
             self.currentContext = msg.context
+            if self._delayedAutoBankUnlaod:
+                self._delayedAutoBankUnlaod = False
+                self.triggerBankUnload()
+                return True
             if not self._inBankAutoUnload and not self._inPhenixAutoRevive:
                 if self.currentContext == GameContextEnum.ROLE_PLAY:
                     Kernel().getWorker().addFrame(BotFarmPathFrame())
-
                 elif self.currentContext == GameContextEnum.FIGHT:
                     Kernel().getWorker().addFrame(BotFightFrame())
             return True
 
         elif isinstance(msg, GameContextDestroyMessage):
+            if self._delayedAutoBankUnlaod:
+                self._delayedAutoBankUnlaod = False
+                self.triggerBankUnload()
+                return False
             if self.currentContext == GameContextEnum.FIGHT:
                 if Kernel().getWorker().getFrame("BotFightFrame"):
                     Kernel().getWorker().removeFrameByName("BotFightFrame")
-
             elif self.currentContext == GameContextEnum.ROLE_PLAY:
                 if Kernel().getWorker().getFrame("BotFarmPathFrame"):
                     Kernel().getWorker().removeFrameByName("BotFarmPathFrame")
@@ -70,6 +84,10 @@ class BotWorkflowFrame(Frame):
         elif isinstance(msg, InventoryWeightMessage):
             if not self._inBankAutoUnload:
                 if InventoryAPI.getWeightPercent() > 95:
+                    if self.currentContext is None:
+                        self._delayedAutoBankUnlaod = True
+                        logger.debug("Inventory full but context is not created yet so will delay bank unload..")
+                        return False
                     if Kernel().getWorker().getFrame("BotFarmPathFrame"):
                         Kernel().getWorker().removeFrameByName("BotFarmPathFrame")
                     self._inBankAutoUnload = True

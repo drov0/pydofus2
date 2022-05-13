@@ -134,6 +134,10 @@ class PlayedCharacterManager(IDestroyable, metaclass=Singleton):
             callback.exec()
 
     @property
+    def stats(self) -> "EntityStats":
+        return StatsManager().getStats(self.id)
+
+    @property
     def cantMinimize(self) -> bool:
         return self.restrictions.cantMinimize
 

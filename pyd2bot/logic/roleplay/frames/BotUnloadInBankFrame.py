@@ -55,6 +55,7 @@ class BotUnloadInBankFrame(Frame):
         logger.debug("BotUnloadInBankFrame pushed")
         self._askedEnterBank = False
         self._waitmap = True
+        self._requestedUnload = False
         if PlayedCharacterManager().currentMap is not None:
             self._waitmap = False
             self.start()
@@ -91,21 +92,26 @@ class BotUnloadInBankFrame(Frame):
                 self.start()
 
         elif isinstance(msg, NpcDialogCreationMessage):
+            logger.debug("bank man dialog engaged")
             rmsg = NpcDialogReplyMessage()
             rmsg.init(self.infos.openBankReplyId)
             ConnectionsHandler.getConnection().send(rmsg)
+            logger.debug("Bank reply to open bank storage sent")
             return True
 
         elif isinstance(msg, ExchangeStartedWithStorageMessage):
+            self._requestedUnload = True
             rmsg = ExchangeObjectTransfertAllFromInvMessage()
             rmsg.init()
             ConnectionsHandler.getConnection().send(rmsg)
             return True
 
         elif isinstance(msg, InventoryWeightMessage):
-            rmsg = LeaveDialogRequestMessage()
-            rmsg.init()
-            ConnectionsHandler.getConnection().send(rmsg)
+            if self._requestedUnload:
+                self._requestedUnload = False
+                rmsg = LeaveDialogRequestMessage()
+                rmsg.init()
+                ConnectionsHandler.getConnection().send(rmsg)
             return True
 
         elif isinstance(msg, ExchangeLeaveMessage):
@@ -128,3 +134,4 @@ class BotUnloadInBankFrame(Frame):
         rmsg = NpcGenericActionRequestMessage()
         rmsg.init(self.infos.npcId, self.infos.npcActionId, self.infos.npcMapId)
         ConnectionsHandler.getConnection().send(rmsg)
+        logger.debug("Open bank man dialog sent")

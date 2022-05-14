@@ -464,7 +464,7 @@ class BuffManager(metaclass=Singleton):
         fightBattleFrame: "FightBattleFrame" = Kernel().getWorker().getFrame("FightBattleFrame")
         infos: GameFightFighterInformations = entitiesFrame.getEntityInfos(sourceId)
         if GameDebugManager().buffsDebugActivated:
-            logger.debug(f"[BUFFS DEBUG] Retrait des buffs lanc�s par {sourceId}")
+            logger.debug(f"[BUFFS DEBUG] Retrieving all the buffs casted by {sourceId}")
         for buffList in self._buffs.values():
             buffListCopy = buffList.copy()
             for buff in buffListCopy:

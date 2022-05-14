@@ -137,6 +137,7 @@ class BotFightFrame(Frame):
         self._spellw = None
         self._repeatActionTimeout = None
         self._spellCastFails = 0
+        self._tryWithLessRangeOf = 0
         Kernel().getWorker().addFrame(self._botTurnFrame)
         return True
 
@@ -282,6 +283,7 @@ class BotFightFrame(Frame):
         minRange: int = spellw.minimalRange
         if spellw["rangeCanBeBoosted"]:
             range += playerStats.getStatTotalValue(StatIds.RANGE) - playerStats.getStatAdditionalValue(StatIds.RANGE)
+        range -= self._tryWithLessRangeOf
         if range < minRange:
             range = minRange
         range = min(range, AtouinConstants.MAP_WIDTH * AtouinConstants.MAP_HEIGHT)
@@ -324,6 +326,8 @@ class BotFightFrame(Frame):
         self._turnAction.append({"fct": fct, "args": args})
 
     def nextTurnAction(self) -> None:
+        if not self.battleFrame:
+            return
         if self.battleFrame._executingSequence:
             if self.VERBOSE:
                 logger.warn(f"[FightBot] Battle is busy processing sequences")
@@ -374,6 +378,7 @@ class BotFightFrame(Frame):
                 self.turnEnd()
                 return
             self._spellCastFails += 1
+            self._tryWithLessRangeOf += 2
             Timer(1, self.playTurn).start()
             return True
 
@@ -419,6 +424,7 @@ class BotFightFrame(Frame):
                 self._myTurn = True
                 self._turnAction.clear()
                 self._turnPlayed += 1
+                self._tryWithLessRangeOf = 0
                 self.nextTurnAction()
             return True
         return False

@@ -45,9 +45,7 @@ class FightChangeVisibilityStep(AbstractSequencable, IFightStep):
 
     def __init__(self, entityId: float, visibilityState: int):
         super().__init__()
-        fighterInfos: GameFightFighterInformations = (
-            FightEntitiesFrame.getCurrentInstance().getEntityInfos(entityId)
-        )
+        fighterInfos: GameFightFighterInformations = FightEntitiesFrame.getCurrentInstance().getEntityInfos(entityId)
         self._oldVisibilityState = fighterInfos.stats.invisibilityState
         self._entityId = entityId
         self._visibilityState = visibilityState
@@ -63,9 +61,7 @@ class FightChangeVisibilityStep(AbstractSequencable, IFightStep):
 
             if isinstance(invisibleEntity, AnimatedCharacter):
                 invisibleEntityPos = invisibleEntity.position
-                entitiesFrame: FightEntitiesFrame = (
-                    Kernel().getWorker().getFrame(FightEntitiesFrame)
-                )
+                entitiesFrame: FightEntitiesFrame = Kernel().getWorker().getFrame(FightEntitiesFrame)
                 fightEntities = entitiesFrame.entities
                 for entityId in fightEntities:
                     entityInfos = entitiesFrame.getEntityInfos(entityId)
@@ -83,10 +79,8 @@ class FightChangeVisibilityStep(AbstractSequencable, IFightStep):
                 invisibleEntity.canWalkTo = False
 
             if (
-                self._oldVisibilityState
-                == GameActionFightInvisibilityStateEnum.DETECTED
-                or self._oldVisibilityState
-                == GameActionFightInvisibilityStateEnum.INVISIBLE
+                self._oldVisibilityState == GameActionFightInvisibilityStateEnum.DETECTED
+                or self._oldVisibilityState == GameActionFightInvisibilityStateEnum.INVISIBLE
             ):
                 dispatchedState = GameActionFightInvisibilityStateEnum.VISIBLE
 
@@ -117,8 +111,8 @@ class FightChangeVisibilityStep(AbstractSequencable, IFightStep):
             fcf.addToHiddenEntities(self._entityId)
         else:
             fcf.removeFromHiddenEntities(self._entityId)
-        fighterInfos: GameFightFighterInformations = (
-            FightEntitiesFrame.getCurrentInstance().getEntityInfos(self._entityId)
+        fighterInfos: GameFightFighterInformations = FightEntitiesFrame.getCurrentInstance().getEntityInfos(
+            self._entityId
         )
         fighterInfos.stats.invisibilityState = self._visibilityState
         self.executeCallbacks()
@@ -131,22 +125,18 @@ class FightChangeVisibilityStep(AbstractSequencable, IFightStep):
         if FightEntitiesHolder().getEntity(self._entityId):
             return
         entity: IDisplayable = DofusEntities.getEntity(self._entityId)
-        FightEntitiesHolder.holdEntity(entity)
+        FightEntitiesHolder().holdEntity(entity)
         animatedEntity: AnimatedCharacter = entity
         if animatedEntity:
             animatedEntity.hide()
 
     def respawnEntity(self) -> IEntity:
-        tiphonSprite = DofusEntities.getEntity(self._entityId)
-        if tiphonSprite and tiphonSprite.parentSprite:
-            fightEntitiesFrame: "FightEntitiesFrame" = (
-                Kernel().getWorker().getFrame("FightEntitiesFrame")
-            )
-            if fightEntitiesFrame:
-                fightEntitiesFrame.addOrUpdateActor(
-                    fightEntitiesFrame.getEntityInfos(self._entityId)
-                )
-            return tiphonSprite
+        tiphonSprite = DofusEntities().getEntity(self._entityId)
+        # if tiphonSprite and tiphonSprite.parentSprite:
+        #     fightEntitiesFrame: "FightEntitiesFrame" = Kernel().getWorker().getFrame("FightEntitiesFrame")
+        #     if fightEntitiesFrame:
+        #         fightEntitiesFrame.addOrUpdateActor(fightEntitiesFrame.getEntityInfos(self._entityId))
+        #     return tiphonSprite
         if FightEntitiesHolder().getEntity(self._entityId):
             FightEntitiesHolder().unholdEntity(self._entityId)
         return DofusEntities.getEntity(self._entityId)

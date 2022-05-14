@@ -37,8 +37,6 @@ class FightLifeVariationStep(AbstractStatContextualStep, IFightStep):
 
     _elementId: int
 
-    skipTextEvent: bool = False
-
     _fighterInfo: GameFightFighterInformations = None
 
     def __init__(self, entityId: float, delta: int, permanentDamages: int, elementId: int):
@@ -93,31 +91,5 @@ class FightLifeVariationStep(AbstractStatContextualStep, IFightStep):
                 lifePoints - maxLifePoints - stats.getStatTotalValue(StatIds.CUR_PERMANENT_DAMAGE),
             )
         )
-        if self._delta < 0 or self._delta == 0 and not self.skipTextEvent:
-            FightEventsHelper().sendFightEvent(
-                FightEventEnum.FIGHTER_LIFE_LOSS,
-                [self._targetId, abs(self._delta), self._elementId],
-                self._targetId,
-                self.castingSpellId,
-                False,
-                2,
-            )
-        elif self._delta > 0:
-            FightEventsHelper().sendFightEvent(
-                FightEventEnum.FIGHTER_LIFE_GAIN,
-                [self._targetId, abs(self._delta), self._elementId],
-                self._targetId,
-                self.castingSpellId,
-                False,
-                2,
-            )
-        if self._permanentDamages < 0:
-            FightEventsHelper().sendFightEvent(
-                FightEventEnum.FIGHTER_PERMANENT_DAMAGE,
-                [self._targetId, abs(self._permanentDamages), self._elementId],
-                self._targetId,
-                self.castingSpellId,
-                False,
-                2,
-            )
+
         super().start()

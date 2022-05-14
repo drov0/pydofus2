@@ -114,7 +114,7 @@ class Pathfinding:
         itt = 0
         endCellId: int = end.cellId
         startCellId: int = start.cellId
-        logger.debug(f"[CellPathFinding] Looking for path from {startCellId} to {endCellId}")
+        # logger.debug(f"[CellPathFinding] Looking for path from {startCellId} to {endCellId}")
         endX: int = end.x
         endY: int = end.y
         endCellAuxId: int = startCellId

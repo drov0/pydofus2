@@ -146,6 +146,17 @@ class MoveAPI:
             cls.sendClickAdjacentMsg(tr.transitionMapId, tr.cell)
 
     @classmethod
+    def neighborMapIdFromcoords(cls, x: int, y: int) -> int:
+        v = WorldPathFinder().currPlayerVertex
+        outgoingEdges = WorldPathFinder().worldGraph.getOutgoingEdgesFromVertex(v)
+        for edge in outgoingEdges:
+            mp = MapPosition.getMapPositionById(edge.dst.mapId)
+            if mp.posX == x and mp.posY == y:
+                for tr in edge.transitions:
+                    if tr.isValid:
+                        return tr.transitionMapId
+
+    @classmethod
     def changeMapToDstCoords(cls, x: int, y: int) -> None:
         v = WorldPathFinder().currPlayerVertex
         outgoingEdges = WorldPathFinder().worldGraph.getOutgoingEdgesFromVertex(v)

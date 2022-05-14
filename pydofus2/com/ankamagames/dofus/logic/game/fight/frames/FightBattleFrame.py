@@ -627,14 +627,7 @@ class FightBattleFrame(Frame):
 
     def executeNextSequence(self) -> bool:
         if self._executingSequence:
-            # logger.warn("We're already executing a sequence. We can't execute another one!.")
-            runningSequencesIds = [_._instanceId for _ in self._sequenceFrames]
-            # logger.debug(f"Currently running sequenes {runningSequencesIds}")
-            if len(runningSequencesIds) == 1:
-                # logger.error("There's one non treated sequence and its root will consider no sequence running")
-                pass
-            else:
-                return False
+            return False
         if self._sequenceFrames:
             nextSequenceFrame: fseqf.FightSequenceFrame = self._sequenceFrames.pop(0)
             # logger.debug(f"Executing next sequence #{nextSequenceFrame._instanceId}")
@@ -652,9 +645,6 @@ class FightBattleFrame(Frame):
         if characterFrame:
             characterFrame.updateCharacterStatsList(self._delayCslmsg.stats)
         self._delayCslmsg = None
-
-    def waitAnimations(self) -> None:
-        self.sendAcknowledgement()
 
     def onLastAnimationFinished(self, tiphonEvent=None) -> None:
         self.sendAcknowledgement()
@@ -677,8 +667,6 @@ class FightBattleFrame(Frame):
         def function() -> None:
             if self._destroyed:
                 return
-            if self.isFightAboutToEnd:
-                self.waitAnimations()
             if sequenceFrame.mustAck:
                 self._sequenceFrameCached = sequenceFrame
                 if not self.isFightAboutToEnd:

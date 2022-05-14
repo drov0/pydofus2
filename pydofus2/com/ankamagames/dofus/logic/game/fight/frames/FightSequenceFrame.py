@@ -652,7 +652,6 @@ class FightSequenceFrame(Frame, ISpellCastProvider):
 
         if isinstance(msg, GameMapMovementMessage):
             gmmmsg = msg
-            self.keepInMindToUpdateMovementArea()
             self.fighterHasMoved(gmmmsg)
             return False
 
@@ -791,9 +790,9 @@ class FightSequenceFrame(Frame, ISpellCastProvider):
 
         if isinstance(msg, GameActionFightDeathMessage):
             gafdmsg = msg
-            # logger.info(f"{msg.targetId} died")
+            fightEntitiesFrame = FightEntitiesFrame.getCurrentInstance()
+            logger.info(f"{msg.targetId} died")
             fbf: "FightBattleFrame" = Kernel().getWorker().getFrame("FightBattleFrame")
-            fbf._deadTurnsList.append(gafdmsg.targetId)
             self.fighterHasBeenKilled(gafdmsg)
             return True
 
@@ -992,11 +991,10 @@ class FightSequenceFrame(Frame, ISpellCastProvider):
         summonDestroyedWithSummoner: bool = False
         summonerIsMe: bool = False
         entitiesDictionnary = FightEntitiesFrame.getCurrentInstance().entities
-        for gcai in entitiesDictionnary:
-            if isinstance(gcai, GameFightFighterInformations):
-                actorInfo = gcai
+        for actorInfo in entitiesDictionnary.values():
+            if isinstance(actorInfo, GameFightFighterInformations):
                 if actorInfo.spawnInfo.alive and actorInfo.stats.summoner == gafdmsg.targetId:
-                    self.pushStep(FightDeathStep(gcai.contextualId))
+                    self.pushStep(FightDeathStep(actorInfo.contextualId))
         playerId = PlayedCharacterManager().id
         sourceInfos = self.fightEntitiesFrame.getEntityInfos(gafdmsg.sourceId)
         targetInfos = self.fightEntitiesFrame.getEntityInfos(gafdmsg.targetId)
@@ -1017,22 +1015,17 @@ class FightSequenceFrame(Frame, ISpellCastProvider):
             self._fightBattleFrame.slaveId == gafdmsg.targetId or self._fightBattleFrame.masterId == gafdmsg.targetId
         ):
             self._fightBattleFrame.prepareNextPlayableCharacter(gafdmsg.targetId)
-
         entityDeathStepAlreadyInBuffer: bool = False
+
         for step in self._stepsBuffer:
             if isinstance(step, FightDeathStep) and step.entityId == gafdmsg.targetId:
                 entityDeathStepAlreadyInBuffer = True
+                break
         if not entityDeathStepAlreadyInBuffer:
             self.pushStep(FightDeathStep(gafdmsg.targetId))
+
         entityInfos: GameContextActorInformations = FightEntitiesFrame.getCurrentInstance().getEntityInfos(
             gafdmsg.targetId
-        )
-        ftf: FightTurnFrame = Kernel().getWorker().getFrame("FightTurnFrame")
-        updatePath: bool = (
-            ftf
-            and ftf.myTurn
-            and gafdmsg.targetId != playerId
-            and TackleUtil.isTackling(playerInfos, targetInfos, ftf.lastPath)
         )
         currentPlayedFighterManager: CurrentPlayedFighterManager = CurrentPlayedFighterManager()
         if isinstance(entityInfos, GameFightMonsterInformations):
@@ -1052,12 +1045,11 @@ class FightSequenceFrame(Frame, ISpellCastProvider):
                 if currentPlayedFighterManager.checkPlayableEntity(fighterInfos.stats.summoner):
                     currentPlayedFighterManager.removeSummonedCreature(fighterInfos.stats.summoner)
                     SpellWrapper.refreshAllPlayerSpellHolder(fighterInfos.stats.summoner)
-        FightEntitiesFrame.getCurrentInstance().updateRemovedEntity(gafdmsg.targetId)
 
     def fighterHasLeftBattle(self, gaflmsg: GameActionFightLeaveMessage) -> None:
         fightEntityFrame_gaflmsg: FightEntitiesFrame = FightEntitiesFrame.getCurrentInstance()
         entitiesL: dict = fightEntityFrame_gaflmsg.entities
-        for gcaiL in entitiesL:
+        for gcaiL in entitiesL.values():
             if isinstance(gcaiL, GameFightFighterInformations):
                 summonerIdL = gcaiL.stats.summoner
                 if summonerIdL == gaflmsg.targetId:
@@ -1073,7 +1065,7 @@ class FightSequenceFrame(Frame, ISpellCastProvider):
                     currentPlayedFighterManager.removeSummonedCreature(summonedEntityInfosL.stats.summoner)
                 if monster.useBombSlot:
                     currentPlayedFighterManager.removeSummonedBomb(summonedEntityInfosL.stats.summoner)
-        if entityInfosL and entityInfosL is GameFightFighterInformations:
+        if entityInfosL and isinstance(entityInfosL, GameFightFighterInformations):
             fightEntityFrame_gaflmsg.removeSpecificKilledAlly(entityInfosL)
 
     def cellsHasBeenMarked(self, gafmcmsg: GameActionFightMarkCellsMessage) -> None:
@@ -1246,9 +1238,10 @@ class FightSequenceFrame(Frame, ISpellCastProvider):
     def fighterHasMoved(self, gmmmsg: GameMapMovementMessage) -> None:
         movementPath: MovementPath = MapMovementAdapter.getClientMovement(gmmmsg.keyMovements)
         movementPathCells: list[int] = movementPath.getCells()
-        # logger.debug(f"Fighter {gmmmsg.actorId} has moved following the path {movementPathCells}")
+        logger.debug(f"Fighter {gmmmsg.actorId} has moved following the path {movementPathCells}")
         fightContextFrame: "FightContextFrame" = Kernel().getWorker().getFrame("FightContextFrame")
         movingEntity: IMovable = DofusEntities.getEntity(gmmmsg.actorId)
+        movingEntity.position.cellId = movementPath.end.cellId
         nbCells = len(movementPathCells)
         for i in range(1, nbCells):
             mpcell = movementPathCells[i]
@@ -1305,6 +1298,7 @@ class FightSequenceFrame(Frame, ISpellCastProvider):
 
     def fighterHasBeenBuffed(self, gaftbmsg: GameActionFightDispellableEffectMessage) -> None:
         actionId: int = 0
+        myCastingSpell = None
         if GameDebugManager().buffsDebugActivated:
             e = Effect.getEffectById(gaftbmsg.actionId)
             description = ""
@@ -1395,25 +1389,17 @@ class FightSequenceFrame(Frame, ISpellCastProvider):
         removed: bool = False
         deathNumber: int = 0
         cleanedBuffer: list = []
-        deathStepRef: dict = dict()
-        loseLifeStep: dict = dict()
         startStep = []
         endStep = []
         entityAttaqueAnimWait = dict()
-        lifeLoseSum = dict()
-        lifeLoseLastStep = dict()
-        shieldLoseSum = dict()
-        shieldLoseLastStep = dict()
         deathNumber = 0
         for i in range(len(self._stepsBuffer) - 1, -1, -1):
             if removed and step:
                 step.clear()
             removed = True
             step = self._stepsBuffer[i]
-            # logger.debug(f"\r[STEPS DEBUG] processing step {step.__class__.__name__} out of buffer")
             if isinstance(step, FightDeathStep):
                 deathStep = step
-                deathStepRef[deathStep.entityId] = True
                 if deathStep.entityId in self._fightBattleFrame.targetedEntities:
                     self._fightBattleFrame.targetedEntities.remove(deathStep.entityId)
                 deathNumber += 1
@@ -1422,45 +1408,10 @@ class FightSequenceFrame(Frame, ISpellCastProvider):
                 if fapvs.voluntarlyUsed:
                     startStep.append(fapvs)
                     removed = False
-            elif isinstance(step, FightShieldPointsVariationStep):
-                fspvs = step
-                fspvsTarget = fspvs.target
-                if fspvsTarget is None:
-                    pass
-                else:
-                    if fspvs.value < 0:
-                        fspvs.virtual = True
-                        if shieldLoseSum.get(fspvsTarget) is None:
-                            shieldLoseSum[fspvsTarget] = 0
-                        shieldLoseSum[fspvsTarget] += fspvs.value
-                        shieldLoseLastStep[fspvsTarget] = fspvs
-            elif isinstance(step, FightLifeVariationStep):
-                flvs = step
-                flvsTarget = flvs.target
-                if flvsTarget is None:
-                    pass
-                else:
-                    if flvs.delta < 0:
-                        loseLifeStep[flvsTarget] = flvs
-                    if flvsTarget not in lifeLoseSum:
-                        lifeLoseSum[flvsTarget] = 0
-                    lifeLoseSum[flvsTarget] += flvs.delta
-                    lifeLoseLastStep[flvsTarget] = flvs
             removed = False
             cleanedBuffer.insert(0, step)
 
         self._fightBattleFrame.deathPlayingNumber = deathNumber
-        for b in cleanedBuffer:
-            if isinstance(b, FightLifeVariationStep) and lifeLoseSum[b.target] == 0 and b.target in shieldLoseSum:
-                b.skipTextEvent = True
-
-        for index in lifeLoseSum:
-            lifeLoseLastStep[index] = -1
-            lifeLoseSum[index] = 0
-
-        for index in shieldLoseSum:
-            shieldLoseLastStep[index] = -1
-            shieldLoseSum[index] = 0
 
         for waitStep in entityAttaqueAnimWait:
             endStep.append(waitStep)

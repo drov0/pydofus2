@@ -70,5 +70,5 @@ class StatBuff(basicBuff.BasicBuff):
         sb.aliveSource = self.aliveSource
         sb.sourceJustReaffected = self.sourceJustReaffected
         sb.parentBoostUid = self.parentBoostUid
-        sb.initParam(self.param1, self.param2, self.value)
+        sb.initParam(self.param1, self.param2, self.param3)
         return sb

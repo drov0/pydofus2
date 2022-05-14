@@ -126,8 +126,6 @@ class FightEntitiesFrame(AbstractEntitiesFrame, Frame):
 
     _illusionEntities: dict
 
-    _entitiesNumber: dict
-
     _lastKnownPosition: dict
 
     _lastKnownMovementPoint: dict
@@ -159,7 +157,6 @@ class FightEntitiesFrame(AbstractEntitiesFrame, Frame):
         return krnl.Kernel().getWorker().getFrame("FightEntitiesFrame")
 
     def pushed(self) -> bool:
-        self._entitiesNumber = dict()
         self._illusionEntities = dict()
         self._lastKnownPosition = dict()
         self._lastKnownMovementPoint = dict()
@@ -289,7 +286,6 @@ class FightEntitiesFrame(AbstractEntitiesFrame, Frame):
 
         if isinstance(msg, RemoveEntityAction):
             fighterRemovedId = msg.actorId
-            self._entitiesNumber[fighterRemovedId] = None
             self.removeActor(fighterRemovedId)
             del self._realFightersLooks[fighterRemovedId]
             return True
@@ -561,9 +557,6 @@ class FightEntitiesFrame(AbstractEntitiesFrame, Frame):
                 carryingEntity = DofusEntities.getEntity(fedi.carryingCharacterId)
                 if not carryingEntity:
                     self._tempFighterList.append(TmpFighterInfos(fighterInfos.contextualId, fedi.carryingCharacterId))
-
-    def updateRemovedEntity(self, idEntity: float) -> None:
-        self._entitiesNumber[idEntity] = None
 
     @property
     def dematerialization(self) -> bool:

@@ -35,9 +35,6 @@ class FightUpdateStatStep(AbstractSequencable, IFightStep):
         return self._targets
 
     def start(self) -> None:
-        # logger.debug(f"new stats update*")
-        # for stat in self._newStats:
-        #     logger.debug(f"stat -> {json.dumps(stat.to_json(), indent=2)}")
         StatsManager().addRawStats(self._entityId, self._newStats)
         super().start()
         self.executeCallbacks()

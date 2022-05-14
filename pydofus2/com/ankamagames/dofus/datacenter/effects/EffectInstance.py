@@ -328,6 +328,10 @@ class EffectInstance(IDataCenter):
     def parameter0(self):
         return None
 
+    @parameter0.setter
+    def parameter0(self, value):
+        pass
+
     @property
     def parameter1(self):
         return None

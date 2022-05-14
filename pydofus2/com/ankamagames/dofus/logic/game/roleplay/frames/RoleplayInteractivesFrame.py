@@ -4,13 +4,16 @@ from com.ankamagames.atouin.managers.MapDisplayManager import MapDisplayManager
 from com.ankamagames.dofus.datacenter.interactives.Interactive import Interactive
 from com.ankamagames.dofus.datacenter.jobs.Skill import Skill
 from com.ankamagames.dofus.kernel.Kernel import Kernel
+from com.ankamagames.dofus.kernel.net.ConnectionsHandler import ConnectionsHandler
 from com.ankamagames.dofus.logic.game.common.managers.PlayedCharacterManager import PlayedCharacterManager
-from com.ankamagames.dofus.logic.game.roleplay.frames.RoleplayWorldFrame import RoleplayWorldFrame
 from com.ankamagames.dofus.logic.game.roleplay.messages.InteractiveElementActivationMessage import (
     InteractiveElementActivationMessage,
 )
 from com.ankamagames.dofus.network.enums.MapObstacleStateEnum import MapObstacleStateEnum
 from com.ankamagames.dofus.network.messages.game.context.GameContextDestroyMessage import GameContextDestroyMessage
+from com.ankamagames.dofus.network.messages.game.context.GameMapMovementCancelMessage import (
+    GameMapMovementCancelMessage,
+)
 from com.ankamagames.dofus.network.messages.game.context.roleplay.MapObstacleUpdateMessage import (
     MapObstacleUpdateMessage,
 )
@@ -43,6 +46,8 @@ from com.ankamagames.jerakine.types.positions.MapPoint import MapPoint
 
 if TYPE_CHECKING:
     from com.ankamagames.dofus.logic.game.roleplay.frames.RoleplayEntitiesFrame import RoleplayEntitiesFrame
+    from com.ankamagames.dofus.logic.game.roleplay.frames.RoleplayMovementFrame import RoleplayMovementFrame
+    from com.ankamagames.dofus.logic.game.roleplay.frames.RoleplayWorldFrame import RoleplayWorldFrame
 
 logger = Logger("Dofus2")
 
@@ -120,8 +125,12 @@ class RoleplayInteractivesFrame(Frame):
         return Priority.HIGH
 
     @property
-    def roleplayWorldFrame(self) -> RoleplayWorldFrame:
+    def roleplayWorldFrame(self) -> "RoleplayWorldFrame":
         return Kernel().getWorker().getFrame("RoleplayWorldFrame")
+
+    @property
+    def movementFrame(self) -> "RoleplayMovementFrame":
+        return Kernel().getWorker().getFrame("RoleplayMovementFrame")
 
     @property
     def currentRequestedElementId(self) -> int:
@@ -160,7 +169,7 @@ class RoleplayInteractivesFrame(Frame):
         return self._collectableIe
 
     def pushed(self) -> bool:
-        logger.debug("InteractiveElement pushed")
+        # logger.debug("InteractiveElement pushed")
         return True
 
     def process(self, msg: Message) -> bool:
@@ -204,6 +213,12 @@ class RoleplayInteractivesFrame(Frame):
                     if rwf:
                         rwf.cellClickEnabled = False
                 self._entities[iumsg.elemId] = iumsg.entityId
+                if (
+                    self.movementFrame
+                    and self.movementFrame._followingIe
+                    and self.movementFrame._followingIe["ie"].elementId == iumsg.elemId
+                ):
+                    self.movementFrame.cancelFollowingIe()
                 logger.debug(
                     f"[RolePlayInteractives] Interactive element {iumsg.elemId} is being used by the Entity '{'CurrentPlayer' if iumsg.entityId == PlayedCharacterManager().id else iumsg.entityId}'"
                 )
@@ -254,7 +269,7 @@ class RoleplayInteractivesFrame(Frame):
         self._nextInteractiveUsed = None
         self._interactiveActionTimers.clear()
         self._collectableIe.clear()
-        logger.debug("InteractiveElement pulled")
+        # logger.debug("InteractiveElement pulled")
         return True
 
     def enableWorldInteraction(self, pEnable: bool) -> None:

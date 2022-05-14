@@ -87,3 +87,14 @@ class Transition:
 
     def __str__(self) -> str:
         return f"Transition(type={self._type}, direction={self._direction}, skillId={self._skillId}, criterion={self._criterion}, transitionMapId={self._transitionMapId}, cell={self._cell}, id={self._id})"
+
+    def to_json(self):
+        return {
+            "type": self._type,
+            "direction": self._direction,
+            "skillId": self._skillId,
+            "criterion": self._criterion,
+            "transitionMapId": self._transitionMapId,
+            "cell": self._cell,
+            "id": self._id,
+        }

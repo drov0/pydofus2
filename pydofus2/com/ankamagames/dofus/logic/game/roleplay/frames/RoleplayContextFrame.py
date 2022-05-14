@@ -55,7 +55,7 @@ class RoleplayContextFrame(Frame):
         return self._entitiesFrame
 
     def pushed(self) -> bool:
-        self._movementFrame = RoleplayMovementFrame()
+        self.movementFrame = RoleplayMovementFrame()
         self._worldFrame = rplWF.RoleplayWorldFrame()
         self._entitiesFrame = ref.RoleplayEntitiesFrame()
         self._interactivesFrame = rif.RoleplayInteractivesFrame()
@@ -81,8 +81,8 @@ class RoleplayContextFrame(Frame):
                 Kernel().getWorker().removeFrame(self._worldFrame)
             if self._interactivesFrame and Kernel().getWorker().contains("RoleplayInteractivesFrame"):
                 Kernel().getWorker().removeFrame(self._interactivesFrame)
-            if self._movementFrame and Kernel().getWorker().contains("RoleplayMovementFrame"):
-                Kernel().getWorker().removeFrame(self._movementFrame)
+            if self.movementFrame and Kernel().getWorker().contains("RoleplayMovementFrame"):
+                Kernel().getWorker().removeFrame(self.movementFrame)
             if PlayedCharacterManager().isInHouse:
                 wp = WorldPointWrapper(
                     mcmsg.mapId,
@@ -102,7 +102,7 @@ class RoleplayContextFrame(Frame):
             # logger.debug("[RoleplayContext] Map loaded will push other roleplay frames")
             Kernel().getWorker().addFrame(self._entitiesFrame)
             Kernel().getWorker().addFrame(self._worldFrame)
-            Kernel().getWorker().addFrame(self._movementFrame)
+            Kernel().getWorker().addFrame(self.movementFrame)
             Kernel().getWorker().addFrame(self._interactivesFrame)
             # Kernel().getWorker().process(self._listMapNpcsMsg)
             self._listMapNpcsMsg = None
@@ -111,6 +111,7 @@ class RoleplayContextFrame(Frame):
         elif isinstance(msg, GameContextDestroyMessage):
             logger.debug("RoleplayContextFrame: will be retrieved from kernel because we are switching to fight")
             Kernel().getWorker().removeFrame(self)
+
             return False
 
         elif isinstance(msg, ObtainedItemMessage):
@@ -123,7 +124,7 @@ class RoleplayContextFrame(Frame):
         Kernel().getWorker().removeFrame(self._entitiesFrame)
         # Kernel().getWorker().removeFrame(self._delayedActionFrame)
         Kernel().getWorker().removeFrame(self._worldFrame)
-        Kernel().getWorker().removeFrame(self._movementFrame)
+        Kernel().getWorker().removeFrame(self.movementFrame)
         Kernel().getWorker().removeFrame(self._interactivesFrame)
         # logger.debug("RoleplayContextFrame pulled")
         # TODO : Don't forget to uncomment this when those frames are implemented dumpass

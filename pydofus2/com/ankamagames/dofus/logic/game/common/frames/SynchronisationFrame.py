@@ -69,6 +69,10 @@ class SynchronisationFrame(Frame):
                     rplmvf._requestFightTimeout.cancel()
                     rplmvf._requestFighFails = 0
                     rplmvf._followingMonsterGroup = None
+                if rplmvf and rplmvf._joinFightTimer:
+                    rplmvf._joinFightTimer.cancel()
+                if rplmvf and rplmvf._movementAnimTimer:
+                    rplmvf._movementAnimTimer.cancel()
             return False
 
         else:

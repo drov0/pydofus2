@@ -351,7 +351,7 @@ class BuffManager(metaclass=Singleton):
         if i == -1:
             return False
         self._buffs[targetId][i].onRemoved()
-        self._buffs[targetId][i].updateParam(buff.param1, buff.param2, buff.value, buff.id)
+        self._buffs[targetId][i].updateParam(buff.param1, buff.param2, buff.param3, buff.id)
         oldBuff = self._buffs[targetId][i]
         if not oldBuff:
             return False
@@ -432,7 +432,7 @@ class BuffManager(metaclass=Singleton):
                 if buff.actionId == ActionIds.ACTION_BOOST_SPELL_BASE_DMG:
                     buff.param1 = buff.stack[0].param1
                     buff.param2 -= buff.stack[0].param2
-                    buff.value -= buff.stack[0].value
+                    buff.param3 -= buff.stack[0].param3
                 if buff.actionId == ActionIds.ACTION_CHARACTER_PUNISHMENT:
                     buff.param1 -= buff.stack[0].param2
                 if (
@@ -443,7 +443,7 @@ class BuffManager(metaclass=Singleton):
                 else:
                     buff.param1 -= buff.stack[0].param1
                     buff.param2 -= buff.stack[0].param2
-                    buff.value -= buff.stack[0].value
+                    buff.param3 -= buff.stack[0].param3
                 buff.stack.pop(0)
                 buff.refreshDescription()
                 if not isState:
@@ -464,7 +464,7 @@ class BuffManager(metaclass=Singleton):
         fightBattleFrame: "FightBattleFrame" = Kernel().getWorker().getFrame("FightBattleFrame")
         infos: GameFightFighterInformations = entitiesFrame.getEntityInfos(sourceId)
         if GameDebugManager().buffsDebugActivated:
-            logger.debug("[BUFFS DEBUG] Retrait des buffs lanc�s par " + sourceId)
+            logger.debug(f"[BUFFS DEBUG] Retrait des buffs lanc�s par {sourceId}")
         for buffList in self._buffs.values():
             buffListCopy = buffList.copy()
             for buff in buffListCopy:

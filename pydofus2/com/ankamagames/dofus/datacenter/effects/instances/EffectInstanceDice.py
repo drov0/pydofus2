@@ -50,13 +50,25 @@ class EffectInstanceDice(EffectInstanceInteger):
     def parameter0(self) -> object:
         return self.diceNum if self.diceNum != 0 else None
 
+    @parameter0.setter
+    def parameter0(self, value: int):
+        self.diceNum = value
+
     @property
     def parameter1(self) -> object:
         return self.diceSide if self.diceSide != 0 else None
 
+    @parameter1.setter
+    def parameter1(self, value: int):
+        self.diceSide = value
+
     @property
     def parameter2(self) -> object:
         return self.value if self.value != 0 else None
+
+    @parameter2.setter
+    def parameter2(self, value: int):
+        self.value = value
 
     def setParameter(self, paramIndex: int, value) -> None:
         if paramIndex == 0:

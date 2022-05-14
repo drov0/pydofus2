@@ -1,6 +1,7 @@
 import random
 from typing import TYPE_CHECKING
 from com.ankamagames.dofus.datacenter.items.criterion.CriterionUtils import CriterionUtils
+from com.ankamagames.dofus.datacenter.world.MapPosition import MapPosition
 from com.ankamagames.dofus.logic.game.common.managers.PlayedCharacterManager import PlayedCharacterManager
 from com.ankamagames.dofus.logic.game.roleplay.frames.RoleplayInteractivesFrame import InteractiveElementData
 from com.ankamagames.dofus.modules.utils.pathFinding.world.Edge import Edge
@@ -143,3 +144,26 @@ class MoveAPI:
         else:
             logger.debug(f"Classic map change map towards '{tr.transitionMapId}'")
             cls.sendClickAdjacentMsg(tr.transitionMapId, tr.cell)
+
+    @classmethod
+    def neighborMapIdFromcoords(cls, x: int, y: int) -> int:
+        v = WorldPathFinder().currPlayerVertex
+        outgoingEdges = WorldPathFinder().worldGraph.getOutgoingEdgesFromVertex(v)
+        for edge in outgoingEdges:
+            mp = MapPosition.getMapPositionById(edge.dst.mapId)
+            if mp.posX == x and mp.posY == y:
+                for tr in edge.transitions:
+                    if tr.isValid:
+                        return tr.transitionMapId
+
+    @classmethod
+    def changeMapToDstCoords(cls, x: int, y: int) -> None:
+        v = WorldPathFinder().currPlayerVertex
+        outgoingEdges = WorldPathFinder().worldGraph.getOutgoingEdgesFromVertex(v)
+        for edge in outgoingEdges:
+            mp = MapPosition.getMapPositionById(edge.dst.mapId)
+            if mp.posX == x and mp.posY == y:
+                for tr in edge.transitions:
+                    if tr.isValid:
+                        cls.followTransition(tr)
+                        return True

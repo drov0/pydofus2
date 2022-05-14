@@ -28,10 +28,12 @@ class PathManager:
     @classmethod
     def getPath(cls, pathId: str):
         pathJson = cls._db.get(pathId)
-        pathCls = cls._pathClass.get(pathJson["type"])
-        if pathCls:
-            return pathCls.from_json(pathJson)
-        raise Exception("Unknown path type: " + pathJson["type"])
+        if pathJson:
+            pathCls = cls._pathClass.get(pathJson["type"])
+            if pathCls:
+                return pathCls.from_json(pathJson)
+            raise Exception("Unknown path type: " + pathJson["type"])
+        return None
 
 
 if __name__ == "__main__":

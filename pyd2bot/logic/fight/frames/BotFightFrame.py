@@ -1,6 +1,7 @@
 import collections
 import math
 import random
+from threading import Timer
 from types import FunctionType
 from typing import TYPE_CHECKING, Tuple
 
@@ -63,6 +64,7 @@ from com.ankamagames.jerakine.types.zones.IZone import IZone
 from com.ankamagames.jerakine.types.zones.Lozenge import Lozenge
 from com.ankamagames.jerakine.utils.display.spellZone.SpellShapeEnum import SpellShapeEnum
 from damageCalculation.tools import StatIds
+from mapTools import MapTools
 from pyd2bot.logic.fight.frames.BotFightTurnFrame import BotFightTurnFrame
 
 if TYPE_CHECKING:
@@ -84,8 +86,8 @@ class _Target:
         return f"({self.entityId} at {self.pos.cellId})"
 
 
-class BotFightFrame(Frame, metaclass=Singleton):
-    VERBOSE = False
+class BotFightFrame(Frame):
+    VERBOSE = True
 
     ACTION_TIMEOUT = 7
     _frameFightListRequest: bool
@@ -120,6 +122,7 @@ class BotFightFrame(Frame, metaclass=Singleton):
         self._turnAction = []
         self._spellw = None
         self._botTurnFrame = BotFightTurnFrame()
+        self._spellCastFails = 0
         super().__init__()
 
     def pushed(self) -> bool:
@@ -133,6 +136,7 @@ class BotFightFrame(Frame, metaclass=Singleton):
         self._turnPlayed = 0
         self._spellw = None
         self._repeatActionTimeout = None
+        self._spellCastFails = 0
         Kernel().getWorker().addFrame(self._botTurnFrame)
         return True
 
@@ -190,6 +194,10 @@ class BotFightFrame(Frame, metaclass=Singleton):
             # line = MapTools.getCellsCoordBetween(self.fighterPos.cellId, target.pos.cellId)
             # logger.debug(f"Line to target {[l.cellId for l in line]}")
             # logger.debug(f"Los to target {LosDetector.losBetween(DataMapProvider(), self.fighterPos, target.pos)}")
+            # logger.debug(
+            #     f"entities positions : {[entity.disposition.cellId for entity in self.entitiesFrame.entities.values()]}"
+            # )
+            # logger.debug(f"entities ids : {[entity.contextualId for entity in self.entitiesFrame.entities.values()]}")
             if target.pos.distanceTo(self.fighterPos) == 1.0:
                 return target, []
         spellZone = self.getSpellZone(spellw)
@@ -295,6 +303,7 @@ class BotFightFrame(Frame, metaclass=Singleton):
 
     def getSpellZone(self, spellw: SpellWrapper) -> IZone:
         range: int = self.getActualSpellRange(spellw)
+        logger.debug(f"[FightAlgo] Range for spell {spellw.spell.name} is {range}")
         minRange: int = spellw.minimalRange
         spellShape: int = self.getSpellShape(spellw)
         castInLine: bool = spellw["castInLine"] or spellShape == SpellShapeEnum.l
@@ -315,10 +324,9 @@ class BotFightFrame(Frame, metaclass=Singleton):
         self._turnAction.append({"fct": fct, "args": args})
 
     def nextTurnAction(self) -> None:
-        battleSeqStack = self.battleFrame.getSequencesStack()
-        if len(battleSeqStack) > 0:
+        if self.battleFrame._executingSequence:
             if self.VERBOSE:
-                logger.warn(f"[FightBot] Battle is busy processing sequences stack of size {len(battleSeqStack)}")
+                logger.warn(f"[FightBot] Battle is busy processing sequences")
             BenchmarkTimer(0.1, self.nextTurnAction).start()
         else:
             if self.VERBOSE:
@@ -327,8 +335,6 @@ class BotFightFrame(Frame, metaclass=Singleton):
                 action = self._turnAction.pop(0)
                 self._waitingSeqEnd = True
                 action["fct"](*action["args"])
-                # self._repeatActionTimeout = BenchmarkTimer(self.ACTION_TIMEOUT, action["fct"], action["args"])
-                # self._repeatActionTimeout.start()
             else:
                 self.playTurn()
 
@@ -340,8 +346,8 @@ class BotFightFrame(Frame, metaclass=Singleton):
         if CurrentPlayedFighterManager().canCastThisSpell(self.spellId, spellw.spellLevel, targetId, reason):
             return True
         else:
-            if self.VERBOSE:
-                logger.error(f"[FightBot] Unable to cast spell for reason {reason[0]}")
+            # if self.VERBOSE:
+            #     logger.error(f"[FightBot] Unable to cast spell for reason {reason[0]}")
             return False
 
     def process(self, msg: Message) -> bool:
@@ -364,7 +370,11 @@ class BotFightFrame(Frame, metaclass=Singleton):
         elif isinstance(msg, GameActionFightNoSpellCastMessage):
             if self.VERBOSE:
                 logger.debug(f"[FightBot] Failed to cast spell")
-            self.turnEnd()
+            if self._spellCastFails > 5:
+                self.turnEnd()
+                return
+            self._spellCastFails += 1
+            Timer(1, self.playTurn).start()
             return True
 
         elif isinstance(msg, MapComplementaryInformationsDataMessage):
@@ -404,6 +414,7 @@ class BotFightFrame(Frame, metaclass=Singleton):
             if self._botTurnFrame._myTurn:
                 if self.VERBOSE:
                     logger.debug("my turn to play")
+                self._spellCastFails = 0
                 self._seqQueue.clear()
                 self._myTurn = True
                 self._turnAction.clear()

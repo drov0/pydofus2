@@ -1,5 +1,18 @@
+from com.ankamagames.dofus.network.messages.game.context.fight.GameFightUpdateTeamMessage import (
+    GameFightUpdateTeamMessage,
+)
+from com.ankamagames.dofus.network.messages.game.context.roleplay.fight.GameRolePlayRemoveChallengeMessage import (
+    GameRolePlayRemoveChallengeMessage,
+)
+from com.ankamagames.dofus.network.messages.game.context.roleplay.fight.GameRolePlayShowChallengeMessage import (
+    GameRolePlayShowChallengeMessage,
+)
 from com.ankamagames.dofus.network.messages.game.context.roleplay.npc.ListMapNpcsQuestStatusUpdateMessage import (
     ListMapNpcsQuestStatusUpdateMessage,
+)
+from com.ankamagames.dofus.network.types.game.context.fight.FightTeamInformations import FightTeamInformations
+from com.ankamagames.dofus.network.types.game.context.fight.FightTeamMemberInformations import (
+    FightTeamMemberInformations,
 )
 from com.ankamagames.dofus.network.types.game.context.roleplay.GameRolePlayNpcWithQuestInformations import (
     GameRolePlayNpcWithQuestInformations,
@@ -178,11 +191,11 @@ class RoleplayEntitiesFrame(AbstractEntitiesFrame, Frame):
         self._objectsByCellId.clear()
         self._paddockItem.clear()
         self._housesList.clear()
-        logger.debug("RoleplayEntitiesFrame pulled")
+        # logger.debug("RoleplayEntitiesFrame pulled")
         return super().pulled()
 
     def pushed(self) -> bool:
-        logger.debug("RoleplayEntitiesFrame pushed")
+        # logger.debug("RoleplayEntitiesFrame pushed")
         self.initNewMap()
         self._playersId = list()
         self._merchantsList = list()
@@ -463,21 +476,61 @@ class RoleplayEntitiesFrame(AbstractEntitiesFrame, Frame):
                 self.process(fakeShowActorMsg)
             return True
 
+        elif isinstance(msg, GameFightUpdateTeamMessage):
+            gfutmsg = msg
+            self.updateFight(gfutmsg.fightId, gfutmsg.team)
+            return True
+
+        elif isinstance(msg, GameRolePlayShowChallengeMessage):
+            grpsclmsg = msg
+            self.addFight(grpsclmsg.commonsInfos)
+            return True
+
+        elif isinstance(msg, GameRolePlayRemoveChallengeMessage):
+            self.removeFight(msg.fightId)
+
+    def removeFight(self, fightId: int) -> None:
+        fight: Fight = self._fights.get(fightId)
+        if fight is None:
+            return
+        for team in fight.teams:
+            logger.debug(f"Removing the team {team.teamEntity.id}")
+            self.unregisterActor(team.teamEntity.id)
+            del team.teamEntity
+        del self._fights[fightId]
+
+    def updateFight(self, fightId: int, team: FightTeamInformations) -> None:
+        present: bool = False
+        fight: Fight = self._fights.get(fightId)
+        if fight is None:
+            return
+        fightTeam: FightTeam = fight.getTeamById(team.teamId)
+        tInfo: FightTeamInformations = self._entities[fightTeam.teamEntity.id].teamInfos
+        if tInfo.teamMembers == team.teamMembers:
+            return
+        for newMember in team.teamMembers:
+            present = False
+            for teamMember in tInfo.teamMembers:
+                if teamMember.id == newMember.id:
+                    present = True
+            if not present:
+                tInfo.teamMembers.append(newMember)
+
     def isFight(self, entityId: int) -> bool:
         if not self._entities:
             return False
-        return isinstance(self._entities[entityId], "FightTeam")
+        return isinstance(self._entities[entityId], FightTeam)
 
     def getFightId(self, entityId: int) -> int:
-        if isinstance(self._entities[entityId], "FightTeam"):
+        if isinstance(self._entities[entityId], FightTeam):
             return self._entities[entityId].fight.fightId
 
     def getFightLeaderId(self, entityId: int) -> int:
-        if isinstance(self._entities[entityId], "FightTeam"):
+        if isinstance(self._entities[entityId], FightTeam):
             return self._entities[entityId].teamInfos.leaderId
 
     def getFightTeamType(self, entityId: int) -> int:
-        if isinstance(self._entities[entityId], "FightTeam"):
+        if isinstance(self._entities[entityId], FightTeam):
             return self._entities[entityId].teamType
 
     def addFight(self, infos: FightCommonInformations):

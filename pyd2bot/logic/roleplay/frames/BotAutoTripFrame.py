@@ -36,8 +36,9 @@ class BotAutoTripFrame(Frame):
     dstMapId = None
     path = None
 
-    def __init__(self, dstMapId):
+    def __init__(self, dstMapId:int, rpZone:int = 1):
         self.dstMapId = dstMapId
+        self.dstRpZone = rpZone
         self.path = None
         self.changeMapFails = dict()
         self._computed = False
@@ -118,7 +119,7 @@ class BotAutoTripFrame(Frame):
                 print(f"\t\t|- direction : {tr.direction}, skill : {tr.skillId}, cell : {tr.cell}")
             MoveAPI.followEdge(e)
         else:
-            WorldPathFinder().findPath(self.dstMapId, self.onComputeOver)
+            WorldPathFinder().findPath(self.dstMapId, self.onComputeOver, self.dstRpZone)
 
     def onComputeOver(self, *args):
         self._computed = True

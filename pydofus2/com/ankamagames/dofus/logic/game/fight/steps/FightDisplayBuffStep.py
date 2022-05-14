@@ -47,11 +47,7 @@ class FightDisplayBuffStep(AbstractSequencable, IFightStep, ISequencableListener
                         self._buff.targetId, self._buff.delta, False, False, False
                     )
             BuffManager().addBuff(self._buff)
-        if not self._virtualStep:
-            self.executeCallbacks()
-        else:
-            self._virtualStep.addListener(self)
-            self._virtualStep.start()
+        self.executeCallbacks()
 
     def stepFinished(self, step: ISequencable, withTimout: bool = False) -> None:
         self._virtualStep.removeListener(self)

@@ -19,9 +19,7 @@ class FightEnteringStateStep(AbstractSequencable, IFightStep):
 
     _buff: StateBuff
 
-    def __init__(
-        self, fighterId: float, stateId: int, durationString: str, buff: BasicBuff
-    ):
+    def __init__(self, fighterId: float, stateId: int, durationString: str, buff: BasicBuff):
         super().__init__()
         self._fighterId = fighterId
         self._stateId = stateId
@@ -34,15 +32,6 @@ class FightEnteringStateStep(AbstractSequencable, IFightStep):
 
     def start(self) -> None:
         spell: SpellState = SpellState.getSpellStateById(self._stateId)
-        if spell and not spell.isSilent and self._buff.isVisibleInFightLog:
-            FightEventsHelper().sendFightEvent(
-                FightEventEnum.FIGHTER_ENTERING_STATE,
-                [self._fighterId, self._stateId, self._durationString],
-                self._fighterId,
-                -1,
-                False,
-                2,
-            )
         self.executeCallbacks()
 
     @property

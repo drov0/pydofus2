@@ -64,17 +64,15 @@ class StatsManager(metaclass=Singleton):
         # logger.debug(f"Adding rawStats count {len(rawStats)} for entity with ID {entityId}")
         entityKey = str(float(entityId))
         entityStats: EntityStats = self._entityStats.get(entityKey)
-        isCurLifeStatOnly: bool = (
-            len(rawStats) == 1 and rawStats[0] is not None and rawStats[0].characteristicId == StatIds.CUR_LIFE
-        )
+
         if entityStats is None:
             entityStats = EntityStats(float(entityId))
             self.setStats(entityStats)
 
         for rawStat in rawStats:
-            # logger.debug(f"update rawStat {rawStat.__dict__}")
+            if rawStat.characteristicId == StatIds.RANGE:
+                logger.debug(f"update rawStat for entity {entityId} total {rawStat.to_json()}")
             if isinstance(rawStat, CharacterUsableCharacteristicDetailed):
-
                 rawUsableStat = rawStat
                 entityStat = UsableStat(
                     id=rawUsableStat.characteristicId,

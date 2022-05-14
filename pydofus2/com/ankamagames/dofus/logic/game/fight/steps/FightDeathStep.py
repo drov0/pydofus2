@@ -1,37 +1,25 @@
+from typing import TYPE_CHECKING
+
+import com.ankamagames.dofus.logic.game.fight.managers.BuffManager as bffm
+from com.ankamagames.atouin.managers.EntitiesManager import EntitiesManager
 from com.ankamagames.dofus.internalDatacenter.stats.EntityStats import EntityStats
 from com.ankamagames.dofus.internalDatacenter.stats.Stat import Stat
 from com.ankamagames.dofus.kernel.Kernel import Kernel
 from com.ankamagames.dofus.logic.common.managers.StatsManager import StatsManager
 from com.ankamagames.dofus.logic.game.common.misc.DofusEntities import DofusEntities
-from com.ankamagames.dofus.logic.game.fight.fightEvents.FightEventsHelper import (
-    FightEventsHelper,
-)
-from com.ankamagames.dofus.logic.game.fight.frames.FightEntitiesFrame import (
-    FightEntitiesFrame,
-)
-import com.ankamagames.dofus.logic.game.fight.managers.BuffManager as bffm
+from com.ankamagames.dofus.logic.game.fight.frames.FightEntitiesFrame import FightEntitiesFrame
 from com.ankamagames.dofus.logic.game.fight.steps.IFightStep import IFightStep
-from com.ankamagames.dofus.logic.game.fight.types.FightEventEnum import FightEventEnum
 from com.ankamagames.dofus.network.types.game.context.fight.GameFightFighterInformations import (
     GameFightFighterInformations,
 )
 from com.ankamagames.jerakine.entities.interfaces.IEntity import IEntity
 from com.ankamagames.jerakine.logger.Logger import Logger
 from com.ankamagames.jerakine.sequencer.AbstractSequencable import AbstractSequencable
-from com.ankamagames.jerakine.sequencer.ISequencer import ISequencer
-from com.ankamagames.jerakine.types.events.SequencerEvent import SequencerEvent
 from damageCalculation.tools.StatIds import StatIds
-from whistle import Event
-from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
-    from com.ankamagames.dofus.logic.game.fight.frames.FightBattleFrame import (
-        FightBattleFrame,
-    )
-
-    from com.ankamagames.dofus.logic.game.fight.frames.FightContextFrame import (
-        FightContextFrame,
-    )
+    from com.ankamagames.dofus.logic.game.fight.frames.FightBattleFrame import FightBattleFrame
+    from com.ankamagames.dofus.logic.game.fight.frames.FightContextFrame import FightContextFrame
 logger = Logger("Dofus2")
 
 
@@ -39,15 +27,9 @@ class FightDeathStep(AbstractSequencable, IFightStep):
 
     _entityId: float = None
 
-    _deathSubSequence: ISequencer = None
-
     _naturalDeath: bool = None
 
     _targetName: str = None
-
-    _needToWarn: bool = False
-
-    _timeOut: bool = False
 
     def __init__(self, entityId: float, naturalDeath: bool = True):
         super().__init__()
@@ -68,15 +50,13 @@ class FightDeathStep(AbstractSequencable, IFightStep):
         return self._entityId
 
     def start(self) -> None:
+        logger.debug("??????????????? FightDeathStep start")
         dyingEntity: IEntity = DofusEntities.getEntity(self._entityId)
         if not dyingEntity:
             logger.warn("Unable to play death of an unexisting fighter " + self._entityId + ".")
-            self._needToWarn = True
-            self.deathFinished()
             return
-        fighterInfos: GameFightFighterInformations = FightEntitiesFrame.getCurrentInstance().getEntityInfos(
-            self._entityId
-        )
+        fightEntitites = FightEntitiesFrame.getCurrentInstance()
+        fighterInfos: GameFightFighterInformations = fightEntitites.getEntityInfos(self._entityId)
         fighterStats: EntityStats = StatsManager().getStats(fighterInfos.contextualId)
         fightBattleFrame: "FightBattleFrame" = Kernel().getWorker().getFrame("FightBattleFrame")
         if fightBattleFrame:
@@ -92,49 +72,14 @@ class FightDeathStep(AbstractSequencable, IFightStep):
                 -(fighterStats.getMaxHealthPoints() + fighterStats.getStatTotalValue(StatIds.CUR_PERMANENT_DAMAGE)),
             )
         )
-        self.deathFinished()
+        del fighterInfos
+        del fightEntitites.entities[self._entityId]
+        EntitiesManager().removeEntity(self._entityId)
+        self.executeCallbacks()
 
     def clear(self) -> None:
-        if self._deathSubSequence:
-            self._deathSubSequence.clear()
         super().clear()
 
     @property
     def targets(self) -> list[float]:
         return [self._entityId]
-
-    def manualRollOut(self, fighterId: float) -> None:
-        pass
-
-    def onAnimEnd(self, dyingEntity) -> None:
-        pass
-
-    def deathTimeOut(self, e: Event = None) -> None:
-        if self._deathSubSequence:
-            self._deathSubSequence.removeEventListener(SequencerEvent.SEQUENCE_END, self.deathFinished)
-            self._deathSubSequence.removeEventListener(SequencerEvent.SEQUENCE_TIMEOUT, self.deathTimeOut)
-        self._timeOut = True
-
-    def deathFinished(self, e: Event = None) -> None:
-        if self._deathSubSequence:
-            self._deathSubSequence.removeEventListener(SequencerEvent.SEQUENCE_END, self.deathFinished)
-            self._deathSubSequence.removeEventListener(SequencerEvent.SEQUENCE_TIMEOUT, self.deathTimeOut)
-            self._deathSubSequence = None
-        if self._needToWarn:
-            if self._naturalDeath:
-                FightEventsHelper().sendFightEvent(
-                    FightEventEnum.FIGHTER_DEATH,
-                    [self._entityId, self._targetName],
-                    self._entityId,
-                    self.castingSpellId,
-                    self._timeOut,
-                )
-            else:
-                FightEventsHelper().sendFightEvent(
-                    FightEventEnum.FIGHTER_LEAVE,
-                    [self._entityId, self._targetName],
-                    self._entityId,
-                    self.castingSpellId,
-                    self._timeOut,
-                )
-        self.executeCallbacks()

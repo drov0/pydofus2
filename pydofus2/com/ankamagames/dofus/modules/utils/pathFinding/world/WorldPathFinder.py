@@ -59,7 +59,7 @@ class WorldPathFinder(metaclass=Singleton):
         )
         return vertex
 
-    def findPath(self, destinationMapId: float, callback: FunctionType) -> None:
+    def findPath(self, destinationMapId: float, callback: FunctionType, linkedZone: int = 1) -> None:
         if not self.isInitialized():
             callback(None)
             return
@@ -69,7 +69,7 @@ class WorldPathFinder(metaclass=Singleton):
         if self.src is None:
             callback(None)
             return
-        self.linkedZone = 1
+        self.linkedZone = linkedZone
         WorldPathFinder.callback = callback
         self.dst = destinationMapId
         if int(PlayedCharacterManager().currentMap.mapId) == int(self.dst):

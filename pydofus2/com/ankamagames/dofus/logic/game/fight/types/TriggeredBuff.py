@@ -37,15 +37,27 @@ class TriggeredBuff(BasicBuff):
 
     @property
     def param1(self):
-        return self._effect.parameter0
+        return self._effect.setP
+
+    @param1.setter
+    def param1(self, value: int):
+        self._effect.parameter0 = value
 
     @property
     def param2(self):
         return self._effect.parameter1
 
+    @param2.setter
+    def param2(self, value: int):
+        self._effect.parameter1 = value
+
     @property
     def param3(self):
         return self._effect.parameter2
+
+    @param3.setter
+    def param3(self) -> None:
+        self._effect.parameter2 = self.param3
 
     def initParam(self, param1: int, param2: int, param3: int) -> None:
         min: int = 0
@@ -57,16 +69,16 @@ class TriggeredBuff(BasicBuff):
             max = param1 * param2 + param3
             if min == max:
                 self.param1 = min
-                self.value = 0
+                self.param3 = 0
                 self.param2 = 0
             elif min > max:
                 self.param1 = max
                 self.param2 = min
-                self.value = 0
+                self.param3 = 0
             else:
                 self.param1 = min
                 self.param2 = max
-                self.value = 0
+                self.param3 = 0
 
     def clone(self, id: int = 0) -> BasicBuff:
         tb: TriggeredBuff = TriggeredBuff()
@@ -82,7 +94,7 @@ class TriggeredBuff(BasicBuff):
         tb.aliveSource = self.aliveSource
         tb.sourceJustReaffected = self.sourceJustReaffected
         tb.parentBoostUid = self.parentBoostUid
-        tb.initParam(self.param1, self.param2, self.value)
+        tb.initParam(self.param1, self.param2, self.param3)
         tb.delay = self.delay
         tb._effect.delay = self.delay
         return tb

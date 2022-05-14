@@ -37,7 +37,7 @@ class FightMarkTriggeredStep(AbstractSequencable, IFightStep):
     def start(self) -> None:
         mi: MarkInstance = MarkedCellsManager().getMarkDatas(self._markId)
         if not mi:
-            logger.error("Trying to trigger an unknown mark (" + self._markId + "). Aborting.")
+            logger.error(f"Trying to trigger an unknown mark ({self._markId}). Aborting.")
             self.executeCallbacks()
             return
         evt: str = FightEventEnum.UNKNOWN_FIGHT_EVENT

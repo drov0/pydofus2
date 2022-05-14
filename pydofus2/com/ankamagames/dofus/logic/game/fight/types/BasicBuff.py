@@ -138,21 +138,17 @@ class BasicBuff:
         return None
 
     @property
-    def value(self) -> Any:
+    def param3(self) -> Any:
         if isinstance(self._effect, EffectInstanceInteger):
-            return self._effect.param3
+            return self._effect.value
         return None
-
-    @param1.setter
-    def param1(self, v) -> None:
-        self._effect.setParameter(0, None if v == 0 else v)
 
     @param2.setter
     def param2(self, v) -> None:
         self._effect.setParameter(1, None if v == 0 else v)
 
-    @value.setter
-    def value(self, v) -> None:
+    @param3.setter
+    def param3(self, v) -> None:
         self._effect.setParameter(2, None if v == 0 else v)
 
     @property
@@ -231,7 +227,7 @@ class BasicBuff:
             self._effect.duration = self.duration
             self._effect.diceNum = param1
             self._effect.diceSide = param2
-            self._effect.param3 = value
+            self._effect.value = value
             self._effect.trigger = self.trigger
         else:
             self._rawParam3 = value
@@ -240,7 +236,7 @@ class BasicBuff:
             self._effect.effectUid = self.dataUid
             self._effect.effectId = self.actionId
             self._effect.duration = self.duration
-            self._effect.param3 = value
+            self._effect.value = value
             self._effect.trigger = self.trigger
         for slId in self.castingSpell.spell.spellLevels:
             sl = SpellLevel.getLevelById(slId)
@@ -416,12 +412,12 @@ class BasicBuff:
             ActionIds.ACTION_DEBOOST_SPELL_RANGE_MIN,
         ]:
             additionDetails += f"\rparam2 : {self.param2}  & {(str(self.param2) + str(buff.param2))}"
-            additionDetails += f"\rparam3 : {self.value}  & {(str(self.value) + str(buff.value))}"
+            additionDetails += f"\rparam3 : {self.param3}  & {(str(self.param3) + str(buff.param3))}"
             self.param1 = buff.param1
             if self.param2:
                 self.param2 += buff.param2
-            if self.value:
-                self.value += buff.value
+            if self.param3:
+                self.param3 += buff.param3
         if self.actionId == ActionIds.ACTION_CHARACTER_PUNISHMENT:
             additionDetails += f"\rparam1 : {self.param1}  &  {(str(self.param1) + str(buff.param2))}"
             self.param1 += buff.param2
@@ -438,12 +434,12 @@ class BasicBuff:
         else:
             additionDetails += f"\rparam1 : {self.param1} à {str(self.param1) + str(buff.param1)}"
             additionDetails += f"\rparam2 : {self.param2} à {str(self.param2) + str(buff.param2)}"
-            additionDetails += f"\rparam3 : {self.value} à {str(self.value) + str(buff.value)}"
+            additionDetails += f"\rparam3 : {self.param3} à {str(self.param3) + str(buff.param3)}"
             self.param1 += buff.param1
             if self.param2:
                 self.param2 += buff.param2
-            if self.value:
-                self.value += buff.value
+            if self.param3:
+                self.param3 += buff.param3
         if GameDebugManager().buffsDebugActivated:
             logger.debug("[BUFFS DEBUG] Buff {self.uid} : ajout du buff {buff.uid} {additionDetails}")
         self.refreshDescription()
@@ -491,10 +487,10 @@ class BasicBuff:
                     else:
                         stackBuff.param1 = value1
                         stackBuff.param2 = value2
-                        stackBuff.value = value3
+                        stackBuff.param3 = value3
                     p1 += stackBuff.param1
                     p2 += stackBuff.param2
-                    p3 += stackBuff.value
+                    p3 += stackBuff.param3
         else:
             p1 = value1
             p2 = value2
@@ -510,7 +506,7 @@ class BasicBuff:
         else:
             self.param1 = p1
             self.param2 = p2
-            self.value = p3
+            self.param3 = p3
         if GameDebugManager().buffsDebugActivated:
             logger.debug(
                 "[BUFFS DEBUG] Buff "
@@ -520,7 +516,7 @@ class BasicBuff:
                 + ", "
                 + self.param2
                 + ", "
-                + self.value
+                + self.param3
             )
         self.refreshDescription()
 
@@ -573,7 +569,7 @@ class BasicBuff:
         bb.aliveSource = self.aliveSource
         bb.sourceJustReaffected = self.sourceJustReaffected
         bb.parentBoostUid = self.parentBoostUid
-        bb.initParam(self.param1, self.param2, self.value)
+        bb.initParam(self.param1, self.param2, self.param3)
         return bb
 
     def __str__(self) -> str:

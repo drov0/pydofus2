@@ -124,6 +124,7 @@ class BotPartyFrame(Frame):
             if not self.isLeader:
                 if PlayedCharacterManager().currentMap.mapId != self._partyMembers[self.leaderId].mapId:
                     self._isJoiningLeaderMap = True
+                    self.sendPrivateMessage(self.leaderName, "On my way.")
                     af = BotAutoTripFrame(self._partyMembers[self.leaderId].mapId)
                     Kernel().getWorker().pushFrame(af)
             if self.isLeader and len(msg.members) == len(self.followers) + 1:
@@ -143,4 +144,5 @@ class BotPartyFrame(Frame):
                     self._allMemberOnSameMap = False
                     break
             if not self.isLeader and msg.memberId == self.leaderId:
+                self.sendPrivateMessage(self.leaderName, "On my way.")
                 MoveAPI.changeMapToDstCoords(msg.coords.worldX, msg.coords.worldY)

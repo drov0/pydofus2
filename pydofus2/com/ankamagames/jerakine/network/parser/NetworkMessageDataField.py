@@ -9,7 +9,7 @@ logger = Logger("Dofus2")
 
 class NetMsgDataField:
 
-    TRACE = True
+    TRACE = False
 
     dataReader = {
         TypeEnum.INT: "readInt",

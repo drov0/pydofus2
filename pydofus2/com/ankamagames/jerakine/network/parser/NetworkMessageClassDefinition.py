@@ -13,7 +13,7 @@ logger = Logger("Dofus2")
 
 class NetworkMessageClassDefinition:
 
-    TRACE = True
+    TRACE = False
 
     def __init__(self, className: str, raw: ByteArray) -> None:
         if self.TRACE:

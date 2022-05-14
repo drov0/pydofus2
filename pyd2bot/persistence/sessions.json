@@ -34,8 +34,6 @@
         "spellId": 13516,
         "pathId": "pioute_astrub_village",
         "statToUp": 10
-<<<<<<< Updated upstream
-=======
     },
     "money_5": {
         "charachterId": "Hardlett(210)",
@@ -48,6 +46,5 @@
         "spellId": 13516,
         "pathId": "undefined",
         "statToUp": 10
->>>>>>> Stashed changes
     }
 }

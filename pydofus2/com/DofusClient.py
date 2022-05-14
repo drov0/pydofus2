@@ -9,6 +9,7 @@ from com.ankamagames.dofus.logic.connection.actions.LoginValidationWithTokenActi
 )
 import com.ankamagames.dofus.logic.connection.managers.AuthentificationManager as auth
 import com.ankamagames.dofus.kernel.net.ConnectionsHandler as connh
+from com.ankamagames.dofus.logic.game.common.managers.PlayedCharacterManager import PlayedCharacterManager
 from com.ankamagames.dofus.modules.utils.pathFinding.world.WorldPathFinder import (
     WorldPathFinder,
 )
@@ -51,6 +52,7 @@ class DofusClient(metaclass=Singleton):
         auth.AuthentificationManager().setToken(self._loginToken)
         if charachterId:
             PlayerManager().allowAutoConnectCharacter = True
+            PlayedCharacterManager().id = charachterId
             PlayerManager().autoConnectOfASpecificCharacterId = charachterId
         for frame in self._registredCustomFrames:
             self._worker.addFrame(frame)

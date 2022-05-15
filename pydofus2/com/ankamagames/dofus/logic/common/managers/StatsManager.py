@@ -80,18 +80,18 @@ class StatsManager(metaclass=Singleton):
                     additionalValue=rawUsableStat.additional,
                     objectsAndMountBonusValue=rawUsableStat.objectsAndMountBonus,
                     alignGiftBonusValue=rawUsableStat.alignGiftBonus,
-                    contextModifValue=0,
+                    contextModifValue=rawUsableStat.contextModif,
                     usedValue=rawUsableStat.used,
                 )
             elif isinstance(rawStat, CharacterCharacteristicDetailed):
                 rawDetailedStat: CharacterCharacteristicDetailed = rawStat
                 entityStat = DetailedStat(
-                    rawDetailedStat.characteristicId,
-                    rawDetailedStat.base,
-                    rawDetailedStat.additional,
-                    rawDetailedStat.objectsAndMountBonus,
-                    rawDetailedStat.alignGiftBonus,
-                    contextModifValue=0,
+                    id=rawDetailedStat.characteristicId,
+                    baseValue=rawDetailedStat.base,
+                    additionalValue=rawDetailedStat.additional,
+                    objectsAndMountBonusValue=rawDetailedStat.objectsAndMountBonus,
+                    alignGiftBonusValue=rawDetailedStat.alignGiftBonus,
+                    contextModifValue=rawUsableStat.contextModif,
                 )
             else:
                 if not isinstance(rawStat, CharacterCharacteristicValue):

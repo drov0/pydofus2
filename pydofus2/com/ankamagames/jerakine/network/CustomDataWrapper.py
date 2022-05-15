@@ -1,9 +1,28 @@
 import base64
+import math
 from zlib import decompress
 import struct
 
 
 class ByteArray(bytearray):
+    INT_SIZE: int = 32
+
+    SHORT_SIZE: int = 16
+
+    SHORT_MIN_VALUE: int = -32768
+
+    SHORT_MAX_VALUE: int = 32767
+
+    UNSIGNED_SHORT_MAX_VALUE: int = 65536
+
+    CHUNCK_BIT_SIZE: int = 7
+
+    MAX_ENCODING_LENGTH: int = math.ceil(INT_SIZE / CHUNCK_BIT_SIZE)
+
+    MASK_10000000: int = 128
+
+    MASK_01111111: int = 127
+
     def __init__(self, *args, **kwrgs):
         super().__init__(*args, **kwrgs)
         self.position = 0
@@ -153,12 +172,20 @@ class ByteArray(bytearray):
             self.writeUnsignedByte(b)
 
     def readVarInt(self):
-        ans = 0
-        for i in range(0, 32, 7):
-            b = self.readUnsignedByte()
-            ans += (b & 0b01111111) << i
-            if not b & 0b10000000:
-                return ans
+        b = 0
+        value = 0
+        offset = 0
+        hasNext = False
+        while offset < self.INT_SIZE:
+            b = self.readByte()
+            hasNext = (b & self.MASK_10000000) == self.MASK_10000000
+            if offset > 0:
+                value += (b & self.MASK_01111111) << offset
+            else:
+                value += b & self.MASK_01111111
+            offset += self.CHUNCK_BIT_SIZE
+            if not hasNext:
+                return value
         raise Exception("Too much data")
 
     def writeVarInt(self, i):

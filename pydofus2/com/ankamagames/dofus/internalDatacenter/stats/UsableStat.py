@@ -26,7 +26,7 @@ class UsableStat(DetailedStat):
 
     @property
     def totalValue(self) -> float:
-        return super().totalValue - self.usedValue
+        return super().totalValue
 
     def __str__(self) -> str:
         return self.getFormattedMessage(

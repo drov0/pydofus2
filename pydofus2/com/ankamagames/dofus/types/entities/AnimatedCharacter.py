@@ -19,6 +19,7 @@ class AnimatedCharacter(IMovable, IEntity, IObstacle, IDisplayable):
         self.cantWalk8Directions: bool = False
         self._carriedEntity = None
         self._direction = None
+        self.parentSprite = None
         super().__init__()
 
     @property

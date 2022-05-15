@@ -330,7 +330,7 @@ class BotFightFrame(Frame):
         if self.battleFrame._executingSequence:
             if self.VERBOSE:
                 logger.warn(f"[FightBot] Battle is busy processing sequences")
-            BenchmarkTimer(0.05, self.nextTurnAction).start()
+            BenchmarkTimer(0.005, self.nextTurnAction).start()
         else:
             if self.VERBOSE:
                 logger.debug(f"[FightBot] Next turn actions, {[a['fct'].__name__ for a in self._turnAction]}")

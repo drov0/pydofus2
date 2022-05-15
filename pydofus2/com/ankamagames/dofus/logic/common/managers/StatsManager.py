@@ -70,7 +70,7 @@ class StatsManager(metaclass=Singleton):
             self.setStats(entityStats)
 
         for rawStat in rawStats:
-            logger.debug(f"update rawStat for entity {entityId} total {rawStat.to_json()}")
+            # logger.debug(f"update rawStat for entity {entityId} total {rawStat.to_json()}")
             if isinstance(rawStat, CharacterUsableCharacteristicDetailed):
                 rawUsableStat = rawStat
                 entityStat = UsableStat(

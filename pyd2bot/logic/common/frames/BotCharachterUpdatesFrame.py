@@ -24,15 +24,13 @@ from com.ankamagames.jerakine.messages.Message import Message
 from com.ankamagames.jerakine.types.enums.Priority import Priority
 from damageCalculation.tools import StatIds
 
+from pyd2bot.logic.managers.SessionManager import SessionManager
+
 logger = Logger("Dofus2")
 
 
 class BotCharachterUpdatesFrame(Frame):
-    statIdToUp = None
-
     def __init__(self):
-        if self.statIdToUp is None:
-            logger.warning("You didn't define any stat to up")
         self._myTurn = False
         self._statsInitialized = False
         super().__init__()
@@ -104,17 +102,17 @@ class BotCharachterUpdatesFrame(Frame):
 
         elif isinstance(msg, CharacterLevelUpMessage):
             clumsg = msg
-            if self.statIdToUp:
+            if SessionManager().statToUp:
                 previousLevel = PlayedCharacterManager().infos.level
                 PlayedCharacterManager().infos.level = clumsg.newLevel
                 pointsEarned = (clumsg.newLevel - previousLevel) * 5
-                self.boostStat(self.statIdToUp, pointsEarned)
+                self.boostStat(SessionManager().statToUp, pointsEarned)
             return True
 
         elif isinstance(msg, CharacterStatsListMessage):
             if not self._statsInitialized:
                 unusedStatPoints = PlayedCharacterManager().stats.getStatBaseValue(StatIds.STATS_POINTS)
                 if unusedStatPoints > 0:
-                    self.boostStat(self.statIdToUp, unusedStatPoints)
+                    self.boostStat(SessionManager().statToUp, unusedStatPoints)
                 self._statsInitialized = True
             return True

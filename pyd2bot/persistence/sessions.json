@@ -29,22 +29,26 @@
         "pathId": "lumberjack_cania",
         "statToUp": 10
     },
-    "sadida-pioutie": {
-        "charachterId": "Plusbellelavie(210)",
-        "spellId": 13516,
-        "pathId": "pioute_astrub_village",
-        "statToUp": 10
-    },
     "money_5": {
         "charachterId": "Hardlett(210)",
         "spellId": 13516,
         "pathId": "fisher_incarnam_lake",
         "statToUp": 10
     },
-    "bot-follower": {
+    "sadida-follower": {
+        "charachterId": "Maniaco-lalcolic(210)",
+        "spellId": 13516,
+        "leaderName": "Plusbellelavie",
+        "statToUp": 10
+    },
+    "sadida-leader": {
         "charachterId": "Plusbellelavie(210)",
         "spellId": 13516,
-        "pathId": "undefined",
-        "statToUp": 10
+        "pathId": "pioute_astrub_village",
+        "followers": [
+            "Maniaco-lalcolic"
+        ],
+        "statToUp": 10,
+        "isLeader": true
     }
 }

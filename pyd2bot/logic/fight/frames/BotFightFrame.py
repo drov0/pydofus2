@@ -1,10 +1,6 @@
 import collections
-import math
-import random
-from threading import Timer
 from types import FunctionType
 from typing import TYPE_CHECKING, Tuple
-
 from com.ankamagames.atouin.AtouinConstants import AtouinConstants
 from com.ankamagames.atouin.messages.MapLoadedMessage import MapLoadedMessage
 from com.ankamagames.atouin.utils.DataMapProvider import DataMapProvider
@@ -56,7 +52,6 @@ from com.ankamagames.jerakine.logger.Logger import Logger
 from com.ankamagames.jerakine.map.LosDetector import LosDetector
 from com.ankamagames.jerakine.messages.Frame import Frame
 from com.ankamagames.jerakine.messages.Message import Message
-from com.ankamagames.jerakine.metaclasses.Singleton import Singleton
 from com.ankamagames.jerakine.types.enums.Priority import Priority
 from com.ankamagames.jerakine.types.positions.MapPoint import MapPoint
 from com.ankamagames.jerakine.types.zones.Cross import Cross
@@ -64,14 +59,15 @@ from com.ankamagames.jerakine.types.zones.IZone import IZone
 from com.ankamagames.jerakine.types.zones.Lozenge import Lozenge
 from com.ankamagames.jerakine.utils.display.spellZone.SpellShapeEnum import SpellShapeEnum
 from damageCalculation.tools import StatIds
-from mapTools import MapTools
 from pyd2bot.logic.fight.frames.BotFightTurnFrame import BotFightTurnFrame
+from pyd2bot.logic.managers.SessionManager import SessionManager
 
 if TYPE_CHECKING:
     from com.ankamagames.dofus.logic.game.fight.frames.FightBattleFrame import FightBattleFrame
     from com.ankamagames.dofus.logic.game.fight.frames.FightContextFrame import FightContextFrame
     from com.ankamagames.dofus.logic.game.fight.frames.FightSpellCastFrame import FightSpellCastFrame
     from com.ankamagames.dofus.logic.game.fight.frames.FightTurnFrame import FightTurnFrame
+    from pyd2bot.logic.roleplay.frames.BotPartyFrame import BotPartyFrame
 
 
 logger = Logger("BotFightFrame")
@@ -117,11 +113,10 @@ class BotFightFrame(Frame):
     _spellw: SpellWrapper = None
 
     def __init__(self):
-        if not self.spellId:
-            raise Exception("No spellId set")
         self._turnAction = []
         self._spellw = None
         self._botTurnFrame = BotFightTurnFrame()
+        self.spellId = SessionManager().spellId
         self._spellCastFails = 0
         super().__init__()
 
@@ -159,6 +154,10 @@ class BotFightFrame(Frame):
     @property
     def battleFrame(self) -> "FightBattleFrame":
         return Kernel().getWorker().getFrame("FightBattleFrame")
+
+    @property
+    def partyFrame(self) -> "BotPartyFrame":
+        return Kernel().getWorker().getFrame("BotPartyFrame")
 
     def pulled(self) -> bool:
         self._enabled = False
@@ -390,8 +389,13 @@ class BotFightFrame(Frame):
             return False
 
         elif isinstance(msg, GameFightShowFighterMessage):
+            msg.informations.contextualId
             self._turnPlayed = 0
             self._myTurn = False
+            if self.partyFrame and self.partyFrame.isLeader:
+                for memberId in self.partyFrame._partyMembers:
+                    if not self.entitiesFrame.getEntityInfos(memberId):
+                        return True
             startFightMsg = GameFightReadyMessage()
             startFightMsg.init(True)
             ConnectionsHandler.getConnection().send(startFightMsg)

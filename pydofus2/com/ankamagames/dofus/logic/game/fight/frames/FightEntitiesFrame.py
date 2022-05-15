@@ -236,9 +236,6 @@ class FightEntitiesFrame(AbstractEntitiesFrame, Frame):
             else:
                 self.addOrUpdateActor(gfsfmsg.informations)
                 self._illusionEntities[gfsfmsg.informations.contextualId] = False
-            fightContextFrame: "FightContextFrame" = krnl.Kernel().getWorker().getFrame("FightContextFrame")
-            if fightContextFrame.fightersPositionsHistory.get(gfsfmsg.informations.contextualId):
-                pass
             return False
 
         if isinstance(msg, GameFightHumanReadyStateMessage):

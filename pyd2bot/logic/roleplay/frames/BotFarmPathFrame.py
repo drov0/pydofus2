@@ -39,8 +39,11 @@ from com.ankamagames.jerakine.types.enums.Priority import Priority
 from com.ankamagames.jerakine.types.positions.MapPoint import MapPoint
 from pyd2bot.apis.InventoryAPI import InventoryAPI
 from pyd2bot.apis.MoveAPI import MoveAPI
+from pyd2bot.logic.managers.SessionManager import SessionManager
 from pyd2bot.logic.roleplay.frames.BotAutoTripFrame import BotAutoTripFrame
+from pyd2bot.logic.roleplay.frames.BotPartyFrame import BotPartyFrame
 from pyd2bot.logic.roleplay.messages.AutoTripEndedMessage import AutoTripEndedMessage
+from pyd2bot.misc.BotEventsmanager import BotEventsManager
 from pyd2bot.models.enums.ServerNotificationTitlesEnum import ServerNotificationTitlesEnum
 from pyd2bot.models.farmPaths.AbstractFarmPath import AbstractFarmPath
 
@@ -58,11 +61,7 @@ def GetNextMap(path, index):
 
 
 class BotFarmPathFrame(Frame):
-    farmPath: AbstractFarmPath = None
-
     def __init__(self, autoStart: bool = False):
-        if not BotFarmPathFrame.farmPath:
-            raise Exception("No parcours loaded")
         super().__init__()
         self._autoStart = autoStart
         self._followingIe = None
@@ -72,6 +71,10 @@ class BotFarmPathFrame(Frame):
         self._inAutoTrip = False
         self._discardedMonstersIds = []
         self._worker = Kernel().getWorker()
+
+    @property
+    def farmPath(self):
+        return SessionManager().path
 
     @property
     def priority(self) -> int:
@@ -88,6 +91,10 @@ class BotFarmPathFrame(Frame):
     @property
     def movementFrame(self) -> "RoleplayMovementFrame":
         return self._worker.getFrame("RoleplayMovementFrame")
+
+    @property
+    def partyFrame(self) -> "BotPartyFrame":
+        return self._worker.getFrame("BotPartyFrame")
 
     @property
     def worldFrame(self) -> "RoleplayWorldFrame":
@@ -235,7 +242,17 @@ class BotFarmPathFrame(Frame):
         tgtRpZone = MapDisplayManager().dataMap.cells[cellId].linkedZoneRP
         return tgtRpZone == PlayedCharacterManager().currentZoneRp
 
-    def doFarm(self):
+    def doFarm(self, event=None):
+        if not SessionManager().isSolo:
+            if not SessionManager().isLeader:
+                logger.error("[BotFarmFrame] in group mode only the leader can run a farm path")
+                DofusClient().shutdown()
+                return
+            if self.partyFrame:
+                if not self.partyFrame.allMembersOnSameMap:
+                    BotEventsManager().add_listener(BotEventsManager.ALLMEMBERS_ONSAME_MAP, self.doFarm)
+                    return
+        BotEventsManager().remove_listener(BotEventsManager.ALLMEMBERS_ONSAME_MAP, self.doFarm)
         if WorldPathFinder().currPlayerVertex not in self.farmPath:
             logger.debug(
                 f"[BotFarmFrame] Map {WorldPathFinder().currPlayerVertex.mapId} not in farm path will switch to autotrip"

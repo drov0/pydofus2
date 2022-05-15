@@ -1,4 +1,5 @@
 import random
+from threading import Timer
 from typing import TYPE_CHECKING
 from com.ankamagames.dofus.datacenter.items.criterion.CriterionUtils import CriterionUtils
 from com.ankamagames.dofus.datacenter.world.MapPosition import MapPosition
@@ -148,6 +149,9 @@ class MoveAPI:
     @classmethod
     def neighborMapIdFromcoords(cls, x: int, y: int) -> int:
         v = WorldPathFinder().currPlayerVertex
+        if not v:
+            Timer(0.1, cls.neighborMapIdFromcoords, [x, y]).start()
+            return
         outgoingEdges = WorldPathFinder().worldGraph.getOutgoingEdgesFromVertex(v)
         for edge in outgoingEdges:
             mp = MapPosition.getMapPositionById(edge.dst.mapId)

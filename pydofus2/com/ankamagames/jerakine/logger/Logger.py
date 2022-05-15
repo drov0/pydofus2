@@ -1,5 +1,4 @@
 import logging
-from com.ankamagames.jerakine.metaclasses.Singleton import Singleton
 import datetime
 import os
 
@@ -18,7 +17,9 @@ class Logger(logging.Logger):
 
         if not os.path.isdir(dirname):
             os.mkdir(dirname)
-        fileHandler = logging.FileHandler(dirname + f"/log_{self._prefix}" + now.strftime("%Y-%m-%d") + ".log")
+        fileHandler = logging.FileHandler(
+            dirname + f"/log_{self._prefix}_{os.getpid()}" + now.strftime("%Y-%m-%d") + ".log"
+        )
 
         streamHandler = logging.StreamHandler()
 

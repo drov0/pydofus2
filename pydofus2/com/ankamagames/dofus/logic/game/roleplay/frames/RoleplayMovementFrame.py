@@ -137,6 +137,8 @@ class RoleplayMovementFrame(Frame):
 
     _isMoving = False
 
+    _followingActorId = None
+
     def __init__(self):
         self._wantToChangeMap = None
         self._changeMapByAutoTrip = False
@@ -151,7 +153,6 @@ class RoleplayMovementFrame(Frame):
         self._requestFightTimeout = None
         self._requestFighFails = 0
         self._moveRequetFails = 0
-        self._followingActorId = None
         self._isMoving = False
         super().__init__()
 

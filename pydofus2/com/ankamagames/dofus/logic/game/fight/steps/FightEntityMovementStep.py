@@ -58,7 +58,7 @@ class FightEntityMovementStep(AbstractSequencable, IFightStep):
             ftf: "FightTurnFrame" = Kernel().getWorker().getFrame("FightTurnFrame")
             if ftf._playerEntity:
                 ftf._playerEntity.position.cellId = self._path.end.cellId
-            self._entity.position.cellId = self._path.start.cellId
+            self._entity.position.cellId = self._path.end.cellId
             fighterInfos.disposition.cellId = self._path.end.cellId
         else:
             logger.warn(f"Unable to move unknown entity {self._entityId}.")

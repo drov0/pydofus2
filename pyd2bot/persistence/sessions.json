@@ -35,10 +35,25 @@
         "pathId": "fisher_incarnam_lake",
         "statToUp": 10
     },
-    "sadida-follower": {
+    "sadida-follower1": {
         "charachterId": "Maniaco-lalcolic(210)",
         "spellId": 13516,
         "leaderName": "Plusbellelavie",
+        "isLeader": false,
+        "statToUp": 10
+    },
+    "sadida-follower2": {
+        "charachterId": "Moneydicer(210)",
+        "spellId": 13516,
+        "leaderName": "Plusbellelavie",
+        "isLeader": false,
+        "statToUp": 10
+    },
+    "sadida-follower3": {
+        "charachterId": "Them-rats(210)",
+        "spellId": 13516,
+        "leaderName": "Plusbellelavie",
+        "isLeader": false,
         "statToUp": 10
     },
     "sadida-leader": {
@@ -46,7 +61,9 @@
         "spellId": 13516,
         "pathId": "pioute_astrub_village",
         "followers": [
-            "Maniaco-lalcolic"
+            "Maniaco-lalcolic",
+            "Them-rats",
+            "Moneydicer"
         ],
         "statToUp": 10,
         "isLeader": true

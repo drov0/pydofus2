@@ -330,7 +330,7 @@ class PlayedCharacterManager(IDestroyable, metaclass=Singleton):
 
     @property
     def currMapPos(self) -> "MapPosition":
-        return MapPosition.getMapPositionById(MapDisplayManager().currentMapPoint.mapId)
+        return MapPosition.getMapPositionById(self.currentMap.mapId)
 
     @currentSubArea.setter
     def currentSubArea(self, area: "SubArea") -> None:

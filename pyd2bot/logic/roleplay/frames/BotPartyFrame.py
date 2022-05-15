@@ -22,6 +22,7 @@ from com.ankamagames.dofus.network.messages.game.context.roleplay.MapComplementa
 from com.ankamagames.dofus.network.messages.game.context.roleplay.party.PartyAcceptInvitationMessage import (
     PartyAcceptInvitationMessage,
 )
+from com.ankamagames.dofus.network.messages.game.context.roleplay.party.PartyDeletedMessage import PartyDeletedMessage
 from com.ankamagames.dofus.network.messages.game.context.roleplay.party.PartyFollowMemberRequestMessage import (
     PartyFollowMemberRequestMessage,
 )
@@ -32,8 +33,12 @@ from com.ankamagames.dofus.network.messages.game.context.roleplay.party.PartyInv
     PartyInvitationRequestMessage,
 )
 from com.ankamagames.dofus.network.messages.game.context.roleplay.party.PartyJoinMessage import PartyJoinMessage
+from com.ankamagames.dofus.network.messages.game.context.roleplay.party.PartyLeaveMessage import PartyLeaveMessage
 from com.ankamagames.dofus.network.messages.game.context.roleplay.party.PartyMemberInStandardFightMessage import (
     PartyMemberInStandardFightMessage,
+)
+from com.ankamagames.dofus.network.messages.game.context.roleplay.party.PartyMemberRemoveMessage import (
+    PartyMemberRemoveMessage,
 )
 from com.ankamagames.dofus.network.messages.game.context.roleplay.party.PartyNewMemberMessage import (
     PartyNewMemberMessage,
@@ -72,8 +77,9 @@ class BotPartyFrame(Frame):
     ASK_INVITE_MSG = "Hello"
     OMW_MSG = "OMW"
     GO_MSG = "GO"
-    ASK_INVITE_TIMOUT = 5
+    ASK_INVITE_TIMOUT = 10
     CONFIRME_JOIN_TIMEOUT = 5
+    MSG_NUM = 0
     name: str = None
 
     def __init__(self) -> None:
@@ -117,8 +123,6 @@ class BotPartyFrame(Frame):
     def pulled(self):
         self.sendPrivateMessage(self.leaderName, "Goodby buddy. See you next time.")
         self._partyMembers.clear()
-        if self.followers:
-            self.followers.clear()
         if self._partyInviteTimers:
             self._partyInviteTimers.clear()
         return True
@@ -147,6 +151,13 @@ class BotPartyFrame(Frame):
         pi.init(playerName)
         ccmsg.init(pi, message)
         ConnectionsHandler.getConnection().send(ccmsg)
+        self.MSG_NUM += 1
+        logger.info("[BotPartyFrame] Send private message to %s: %s" % (playerName, message))
+
+    def sendAskJoinparty(self):
+        self.sendPrivateMessage(self.leaderName, f"{self.ASK_INVITE_MSG}@{self.MSG_NUM}")
+        self._askInviteTimer = Timer(self.ASK_INVITE_TIMOUT, self.sendAskJoinparty)
+        self._askInviteTimer.start()
 
     def sendPartyInvite(self, playerName):
         pimsg = PartyInvitationRequestMessage()
@@ -182,6 +193,31 @@ class BotPartyFrame(Frame):
                             return
 
     def process(self, msg: Message):
+        if isinstance(msg, PartyMemberRemoveMessage):
+            del self._partyMembers[msg.leavingPlayerId]
+            del self._partyInviteTimers[msg.leavingPlayerId]
+            if msg.leavingPlayerId == self.leaderId:
+                plmsg = PartyLeaveMessage()
+                plmsg.init(self._partyId)
+                ConnectionsHandler.getConnection().send(plmsg)
+            return True
+
+        if isinstance(msg, PartyDeletedMessage):
+            if msg.partyId == self._partyId:
+                self._partyInviteTimers.clear()
+                self._partyId = None
+                self._partyMembers.clear()
+                self._isJoiningLeaderVertex = False
+                self._inParty = False
+                self._allMemberOnSameMap = False
+                self._allMembersJoined = False
+                self._notifiedLeader = False
+                self._wantsToJoinFight = None
+                self._askInviteTimer = None
+            if not self.isLeader:
+                self.sendAskJoinparty()
+                self._notifiedLeader = True
+            return True
 
         if isinstance(msg, PartyInvitationMessage):
             if not self.isLeader and msg.fromName == self.leaderName:
@@ -211,6 +247,7 @@ class BotPartyFrame(Frame):
             return True
 
         elif isinstance(msg, PartyJoinMessage):
+            self._partyMembers.clear()
             logger.debug(f"Party {msg.partyId} of leader {msg.partyLeaderId}")
             if self._askInviteTimer:
                 self._askInviteTimer.cancel()
@@ -282,7 +319,7 @@ class BotPartyFrame(Frame):
                         MoveAPI.changeMapToDstCoords(msg.coords.worldX, msg.coords.worldY)
 
         elif isinstance(msg, ChatServerMessage):
-            if self.isLeader and msg.senderName in self.followers and msg.content == self.ASK_INVITE_MSG:
+            if self.isLeader and msg.senderName in self.followers and self.ASK_INVITE_MSG in msg.content:
                 logger.debug(f"Follower {msg.senderName} asked to join the party")
                 if msg.senderName not in self._partyInviteTimers:
                     self.sendPartyInvite(msg.senderName)
@@ -291,17 +328,20 @@ class BotPartyFrame(Frame):
         elif isinstance(msg, MapComplementaryInformationsDataMessage):
             if self._partyId is None:
                 if not self.isLeader and not self._notifiedLeader:
-                    self.sendPrivateMessage(self.leaderName, self.ASK_INVITE_MSG)
-                    logger.debug("{Notified} leader to ask join his group")
+                    self.sendAskJoinparty()
                     self._notifiedLeader = True
-                    self._askInviteTimer = Timer(
-                        self.ASK_INVITE_TIMOUT, self.sendPrivateMessage, [self.leaderName, self.ASK_INVITE_MSG]
-                    )
-                    self._askInviteTimer.start()
+            else:
+                self.movementFrame.setFollowingActor(self.leaderId)
 
         elif isinstance(msg, PartyMemberInStandardFightMessage):
             if float(msg.memberId) == float(self.leaderId):
                 logger.debug(f"member {msg.memberId} joined fight {msg.fightId}")
+                if (
+                    self.movementFrame._wantToChangeMap is not None
+                    and self.movementFrame._wantToChangeMap == msg.fightId
+                ):
+                    self.joinFight(msg.fightId)
+                    return
                 if float(msg.fightMap.mapId) != float(PlayedCharacterManager().currentMap.mapId):
                     af = BotAutoTripFrame(msg.fightMap.mapId)
                     Kernel().getWorker().pushFrame(af)

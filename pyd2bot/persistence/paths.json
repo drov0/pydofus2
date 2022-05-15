@@ -8,7 +8,7 @@
             "mapRpZone": 1
         },
         "fightOnly": true,
-        "monsterLvlCoefDiff": 1.5,
+        "monsterLvlCoefDiff": 3,
         "jobIds": []
     },
     "lumberjack_astrub_forest": {

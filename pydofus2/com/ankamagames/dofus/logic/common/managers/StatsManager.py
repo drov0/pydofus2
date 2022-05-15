@@ -70,8 +70,7 @@ class StatsManager(metaclass=Singleton):
             self.setStats(entityStats)
 
         for rawStat in rawStats:
-            if rawStat.characteristicId == StatIds.RANGE:
-                logger.debug(f"update rawStat for entity {entityId} total {rawStat.to_json()}")
+            logger.debug(f"update rawStat for entity {entityId} total {rawStat.to_json()}")
             if isinstance(rawStat, CharacterUsableCharacteristicDetailed):
                 rawUsableStat = rawStat
                 entityStat = UsableStat(
@@ -91,7 +90,7 @@ class StatsManager(metaclass=Singleton):
                     additionalValue=rawDetailedStat.additional,
                     objectsAndMountBonusValue=rawDetailedStat.objectsAndMountBonus,
                     alignGiftBonusValue=rawDetailedStat.alignGiftBonus,
-                    contextModifValue=rawUsableStat.contextModif,
+                    contextModifValue=rawDetailedStat.contextModif,
                 )
             else:
                 if not isinstance(rawStat, CharacterCharacteristicValue):

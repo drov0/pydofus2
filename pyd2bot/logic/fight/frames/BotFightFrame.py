@@ -74,7 +74,7 @@ if TYPE_CHECKING:
     from com.ankamagames.dofus.logic.game.fight.frames.FightTurnFrame import FightTurnFrame
 
 
-logger = Logger("Dofus2")
+logger = Logger("BotFightFrame")
 
 
 class _Target:
@@ -137,7 +137,6 @@ class BotFightFrame(Frame):
         self._spellw = None
         self._repeatActionTimeout = None
         self._spellCastFails = 0
-        self._tryWithLessRangeOf = 0
         Kernel().getWorker().addFrame(self._botTurnFrame)
         return True
 
@@ -186,6 +185,10 @@ class BotFightFrame(Frame):
         :param targets: positions of the mobs
         :return: cell of the mob, path to the ldv if any else None
         """
+        logger.debug(
+            f"entities positions : {[entity.disposition.cellId for entity in self.entitiesFrame.entities.values()]}"
+        )
+        logger.debug(f"entities ids : {[entity.contextualId for entity in self.entitiesFrame.entities.values()]}")
         if not targets:
             if self.VERBOSE:
                 logger.debug("[FightAlgo] Not hittable target found")
@@ -195,10 +198,6 @@ class BotFightFrame(Frame):
             # line = MapTools.getCellsCoordBetween(self.fighterPos.cellId, target.pos.cellId)
             # logger.debug(f"Line to target {[l.cellId for l in line]}")
             # logger.debug(f"Los to target {LosDetector.losBetween(DataMapProvider(), self.fighterPos, target.pos)}")
-            # logger.debug(
-            #     f"entities positions : {[entity.disposition.cellId for entity in self.entitiesFrame.entities.values()]}"
-            # )
-            # logger.debug(f"entities ids : {[entity.contextualId for entity in self.entitiesFrame.entities.values()]}")
             if target.pos.distanceTo(self.fighterPos) == 1.0:
                 return target, []
         spellZone = self.getSpellZone(spellw)
@@ -279,11 +278,12 @@ class BotFightFrame(Frame):
 
     def getActualSpellRange(self, spellw: SpellWrapper) -> int:
         playerStats: EntityStats = CurrentPlayedFighterManager().getStats()
-        range: int = spellw.maximalRangeWithBoosts
-        minRange: int = spellw.minimalRange
+        range: int = spellw["range"]
+        minRange: int = spellw["minRange"]
+        logger.debug(f"[FightAlgo] Spell {spellw.spell.name} has range {range}")
         if spellw["rangeCanBeBoosted"]:
             range += playerStats.getStatTotalValue(StatIds.RANGE) - playerStats.getStatAdditionalValue(StatIds.RANGE)
-        range -= self._tryWithLessRangeOf
+        logger.debug(f"[FightAlgo] Spell {spellw.spell.name} Range after apply of buffs is {range}")
         if range < minRange:
             range = minRange
         range = min(range, AtouinConstants.MAP_WIDTH * AtouinConstants.MAP_HEIGHT)
@@ -305,7 +305,6 @@ class BotFightFrame(Frame):
 
     def getSpellZone(self, spellw: SpellWrapper) -> IZone:
         range: int = self.getActualSpellRange(spellw)
-        logger.debug(f"[FightAlgo] Range for spell {spellw.spell.name} is {range}")
         minRange: int = spellw.minimalRange
         spellShape: int = self.getSpellShape(spellw)
         castInLine: bool = spellw["castInLine"] or spellShape == SpellShapeEnum.l
@@ -331,7 +330,7 @@ class BotFightFrame(Frame):
         if self.battleFrame._executingSequence:
             if self.VERBOSE:
                 logger.warn(f"[FightBot] Battle is busy processing sequences")
-            BenchmarkTimer(0.1, self.nextTurnAction).start()
+            BenchmarkTimer(0.05, self.nextTurnAction).start()
         else:
             if self.VERBOSE:
                 logger.debug(f"[FightBot] Next turn actions, {[a['fct'].__name__ for a in self._turnAction]}")
@@ -374,12 +373,12 @@ class BotFightFrame(Frame):
         elif isinstance(msg, GameActionFightNoSpellCastMessage):
             if self.VERBOSE:
                 logger.debug(f"[FightBot] Failed to cast spell")
-            if self._spellCastFails > 5:
+            if self._spellCastFails > 2:
                 self.turnEnd()
                 return
             self._spellCastFails += 1
-            self._tryWithLessRangeOf += 2
-            Timer(1, self.playTurn).start()
+            # self._tryWithLessRangeOf += 2
+            self.playTurn()
             return True
 
         elif isinstance(msg, MapComplementaryInformationsDataMessage):

@@ -172,21 +172,17 @@ class ByteArray(bytearray):
             self.writeUnsignedByte(b)
 
     def readVarInt(self):
-        b = 0
-        value = 0
-        offset = 0
-        hasNext = False
-        while offset < self.INT_SIZE:
-            b = self.readByte()
-            hasNext = (b & self.MASK_10000000) == self.MASK_10000000
-            if offset > 0:
-                value += (b & self.MASK_01111111) << offset
-            else:
-                value += b & self.MASK_01111111
-            offset += self.CHUNCK_BIT_SIZE
-            if not hasNext:
-                return value
-        raise Exception("Too much data")
+        shift = 0
+        result = 0
+        while True:
+            i = self.readByte()
+            result |= (i & 0x7F) << shift
+            shift += 7
+            if not (i & 0x80):
+                break
+        if result > 2147483647:
+            result = result - 4294967295 - 1
+        return result
 
     def writeVarInt(self, i):
         assert i.bit_length() <= 32

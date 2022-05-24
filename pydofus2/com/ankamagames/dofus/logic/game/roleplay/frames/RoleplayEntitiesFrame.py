@@ -465,7 +465,7 @@ class RoleplayEntitiesFrame(AbstractEntitiesFrame, Frame):
             self.addOrUpdateActor(grpsamsg.informations)
             if isinstance(grpsamsg.informations, GameRolePlayMerchantInformations):
                 self._merchantsList.append(grpsamsg.informations)
-                self._merchantsList.sort(lambda e: e.name)
+                self._merchantsList.sort(key=lambda e: e.name)
             return True
 
         if isinstance(msg, GameRolePlayShowMultipleActorsMessage):

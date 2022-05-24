@@ -1,3 +1,4 @@
+from threading import Timer
 from typing import TYPE_CHECKING
 from com.DofusClient import DofusClient
 
@@ -102,7 +103,7 @@ class BotFarmPathFrame(Frame):
 
     def pushed(self) -> bool:
         if self._autoStart:
-            self.doFarm()
+            Timer(5, self.doFarm).start()
         return True
 
     def pulled(self) -> bool:
@@ -246,7 +247,6 @@ class BotFarmPathFrame(Frame):
         if not SessionManager().isSolo:
             if not SessionManager().isLeader:
                 logger.error("[BotFarmFrame] in group mode only the leader can run a farm path")
-                DofusClient().shutdown()
                 return
             if self.partyFrame:
                 if not self.partyFrame.allMembersOnSameMap:

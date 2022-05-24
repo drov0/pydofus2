@@ -177,9 +177,8 @@ class AuthentificationFrame(Frame):
             connexionHosts = []
             for randomHost in tmpHosts:
                 connexionHosts.append(randomHost["host"])
-            defaultPort = int(
-                StoreDataManager().getData(Constants.DATASTORE_COMPUTER_OPTIONS, "defaultConnectionPort")
-            )
+            defaultPort = StoreDataManager().getData(Constants.DATASTORE_COMPUTER_OPTIONS, "defaultConnectionPort")
+            defaultPort = int(defaultPort) if defaultPort else self.HIDDEN_PORT
             self._connexionSequence = list()
             firstConnexionSequence = list()
             for host in connexionHosts:

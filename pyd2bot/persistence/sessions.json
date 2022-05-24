@@ -32,7 +32,9 @@
     "money_5": {
         "charachterId": "Hardlett(210)",
         "spellId": 13516,
-        "pathId": "fisher_incarnam_lake",
+        "pathId": "incarnam_lac_monster",
+        "isLeader": true,
+        "followers": [],
         "statToUp": 10
     },
     "sadida-follower1": {
@@ -56,14 +58,38 @@
         "isLeader": false,
         "statToUp": 10
     },
+    "sadida-follower4": {
+        "charachterId": "Moneyslicer(210)",
+        "spellId": 13516,
+        "leaderName": "Plusbellelavie",
+        "isLeader": false,
+        "statToUp": 10
+    },
+    "sadida-follower5": {
+        "charachterId": "Moneycreator(210)",
+        "spellId": 13516,
+        "leaderName": "Plusbellelavie",
+        "isLeader": false,
+        "statToUp": 10
+    },
+    "sadida-follower6": {
+        "charachterId": "Hardlett(210)",
+        "spellId": 13516,
+        "leaderName": "Plusbellelavie",
+        "isLeader": false,
+        "statToUp": 10
+    },
     "sadida-leader": {
         "charachterId": "Plusbellelavie(210)",
         "spellId": 13516,
         "pathId": "pioute_astrub_village",
         "followers": [
+            "Moneydicer",
             "Maniaco-lalcolic",
             "Them-rats",
-            "Moneydicer"
+            "Moneslicer",
+            "Moneycreator",
+            "Hardlett"
         ],
         "statToUp": 10,
         "isLeader": true

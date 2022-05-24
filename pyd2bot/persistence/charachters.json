@@ -9,11 +9,6 @@
         "charachterId": 335911059666,
         "serverId": 210
     },
-    "Moneydicer(210)": {
-        "accountId": "aloone95",
-        "charachterId": 336815325394,
-        "serverId": 210
-    },
     "Melanco-lalco(210)": {
         "accountId": "melanco",
         "charachterId": 336597024978,
@@ -22,26 +17,6 @@
     "Moneycreator(210)": {
         "accountId": "aloone-102",
         "charachterId": 336919855314,
-        "serverId": 210
-    },
-    "Moneylife(210)": {
-        "accountId": "aloone95",
-        "charachterId": 336919920850,
-        "serverId": 210
-    },
-    "money1": {
-        "accountId": "aloone-100",
-        "charachterId": 336815325394,
-        "serverId": 210
-    },
-    "grinder": {
-        "accountId": "grinder",
-        "charachterId": 329036071122,
-        "serverId": 210
-    },
-    "money": {
-        "accountId": "grinder",
-        "charachterId": 336798351570,
         "serverId": 210
     },
     "Moneyslicer(210)": {
@@ -55,7 +30,7 @@
         "serverId": 210
     },
     "Hardlett(210)": {
-        "accountId": "money_5",
+        "accountId": "aloone-103",
         "charachterId": 337022615762,
         "serverId": 210
     },
@@ -67,6 +42,16 @@
     "Cryptomancer(210)": {
         "accountId": "alone-95",
         "charachterId": 329036071122,
+        "serverId": 210
+    },
+    "Moneylife(210)": {
+        "accountId": "aloone95",
+        "charachterId": 336919920850,
+        "serverId": 210
+    },
+    "Moneydicer(210)": {
+        "accountId": "aloone-100",
+        "charachterId": 336815325394,
         "serverId": 210
     }
 }

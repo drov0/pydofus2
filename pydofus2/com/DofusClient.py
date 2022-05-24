@@ -10,9 +10,6 @@ from com.ankamagames.dofus.logic.connection.actions.LoginValidationWithTokenActi
 import com.ankamagames.dofus.logic.connection.managers.AuthentificationManager as auth
 import com.ankamagames.dofus.kernel.net.ConnectionsHandler as connh
 from com.ankamagames.dofus.logic.game.common.managers.PlayedCharacterManager import PlayedCharacterManager
-from com.ankamagames.dofus.modules.utils.pathFinding.world.WorldPathFinder import (
-    WorldPathFinder,
-)
 from com.ankamagames.dofus.types.entities.AnimatedCharacter import AnimatedCharacter
 from com.ankamagames.jerakine.data.I18nFileAccessor import I18nFileAccessor
 from com.ankamagames.jerakine.logger.Logger import Logger
@@ -37,7 +34,6 @@ class DofusClient(metaclass=Singleton):
         self._registredCustomFrames = []
         I18nFileAccessor().init()
         DataMapProvider().init(AnimatedCharacter)
-        WorldPathFinder().init()
 
     def relogin(self):
         self.login(self._accountId, self._serverId, self._charachterId)

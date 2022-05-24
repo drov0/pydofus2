@@ -1,4 +1,5 @@
 import collections
+from time import perf_counter
 from types import FunctionType
 from typing import TYPE_CHECKING, Tuple
 from com.ankamagames.atouin.AtouinConstants import AtouinConstants
@@ -355,6 +356,7 @@ class BotFightFrame(Frame):
     def process(self, msg: Message) -> bool:
 
         if isinstance(msg, GameFightJoinMessage):
+            SessionManager().lastFightTime = perf_counter()
             self._fightCount += 1
             self._inFight = True
             gfotmsg = GameFightOptionToggleMessage()
@@ -470,6 +472,8 @@ class BotFightFrame(Frame):
 
     def getTargetableEntities(self, spellw: SpellWrapper, targetSum=False) -> list[_Target]:
         result = list[_Target]()
+        if not FightEntitiesFrame.getCurrentInstance():
+            return []
         if self.VERBOSE:
             logger.debug(f"Deads list : {self.battleFrame._deadTurnsList}")
         for entity in FightEntitiesFrame.getCurrentInstance().entities.values():

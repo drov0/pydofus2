@@ -1,5 +1,8 @@
 import json
 import os
+import threading
+from time import perf_counter, sleep
+from com.DofusClient import DofusClient
 from com.ankamagames.jerakine.logger.Logger import Logger
 from com.ankamagames.jerakine.metaclasses.Singleton import Singleton
 from pyd2bot.BotConstants import BotConstants
@@ -8,6 +11,18 @@ from pyd2bot.logic.managers.PathManager import PathManager
 
 SESSIONDB = BotConstants.PERSISTENCE_DIR / "sessions.json"
 logger = Logger("Dofus2")
+
+
+class SessionMonitor(threading.Thread):
+    def __init__(self):
+        super().__init__()
+
+    def run(self) -> None:
+        while True:
+            if perf_counter() - SessionManager().lastFightTime > 60 * 2.5:
+                SessionManager().lastFightTime = perf_counter()
+                DofusClient().restart()
+            sleep(15)
 
 
 class SessionManager(metaclass=Singleton):
@@ -24,6 +39,7 @@ class SessionManager(metaclass=Singleton):
     isLeader: bool = None
     followers: list[str] = None
     leaderName: str = None
+    lastFightTime = 0
 
     def __init__(self) -> None:
         pass
@@ -53,3 +69,5 @@ class SessionManager(metaclass=Singleton):
                 raise Exception("Must provide a leader name for a follower")
 
         self.isSolo = self.isLeader is None and self.followers is None
+        self.monitor = SessionMonitor()
+        self.monitor.start()

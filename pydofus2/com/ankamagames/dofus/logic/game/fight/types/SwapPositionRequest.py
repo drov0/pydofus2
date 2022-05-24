@@ -17,5 +17,5 @@ class SwapPositionRequest:
         self.requestId = pRequestId
         self.requesterId = pRequesterId
         self.requestedId = pRequestedId
-        self._instanceName = "swapPositionRequest#" + pRequestId
+        self._instanceName = "swapPositionRequest#" + str(pRequestId)
         self._timelineInstanceName = "timeline_" + self._instanceName

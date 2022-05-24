@@ -119,6 +119,9 @@ class MoveAPI:
     @classmethod
     def getTransitionIe(cls, transition: Transition) -> "InteractiveElementData":
         rpframe: "RoleplayInteractivesFrame" = Kernel().getWorker().getFrame("RoleplayInteractivesFrame")
+        if not rpframe:
+            Timer(1, cls.getTransitionIe, [transition]).start()
+            return
         ie = rpframe.getInteractiveElement(transition.id, transition.skillId)
         return ie
 
@@ -134,7 +137,7 @@ class MoveAPI:
                 rpmframe.setFollowingInteraction(
                     {
                         "ie": ie.element,
-                        "skillInstanceId": ie.skillUID,
+                        "skillInstanceId": int(ie.skillUID),
                         "additionalParam": 0,
                     }
                 )
@@ -163,6 +166,9 @@ class MoveAPI:
     @classmethod
     def changeMapToDstCoords(cls, x: int, y: int) -> None:
         v = WorldPathFinder().currPlayerVertex
+        if not v:
+            Timer(0.2, cls.changeMapToDstCoords, [x, y]).start()
+            return
         outgoingEdges = WorldPathFinder().worldGraph.getOutgoingEdgesFromVertex(v)
         for edge in outgoingEdges:
             mp = MapPosition.getMapPositionById(edge.dst.mapId)
@@ -171,3 +177,4 @@ class MoveAPI:
                     if tr.isValid:
                         cls.followTransition(tr)
                         return True
+        raise Exception("No valid transition found!!!")

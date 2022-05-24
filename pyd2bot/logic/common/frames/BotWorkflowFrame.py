@@ -50,9 +50,11 @@ class BotWorkflowFrame(Frame):
         return Priority.VERY_LOW
 
     def triggerBankUnload(self):
-        if not SessionManager().leaderName:
+        if SessionManager().isLeader:
             if Kernel().getWorker().getFrame("BotFarmPathFrame"):
                 Kernel().getWorker().removeFrameByName("BotFarmPathFrame")
+        if Kernel().getWorker().getFrame("BotPartyFrame"):
+            Kernel().getWorker().removeFrameByName("BotPartyFrame")
         self._inBankAutoUnload = True
         logger.warn(f"Inventory is almost full {InventoryAPI.getWeightPercent()}, will trigger auto bank unload...")
         Kernel().getWorker().addFrame(BotUnloadInBankFrame())
@@ -94,24 +96,19 @@ class BotWorkflowFrame(Frame):
                         self._delayedAutoBankUnlaod = True
                         logger.debug("Inventory full but context is not created yet so will delay bank unload..")
                         return False
-                    if not SessionManager().leaderName:
-                        if Kernel().getWorker().getFrame("BotFarmPathFrame"):
-                            Kernel().getWorker().removeFrameByName("BotFarmPathFrame")
-                    self._inBankAutoUnload = True
-                    logger.warn(
-                        f"Inventory is almost full {InventoryAPI.getWeightPercent()}, will trigger auto bank unload..."
-                    )
-                    Kernel().getWorker().addFrame(BotUnloadInBankFrame())
+                    self.triggerBankUnload()
                 return True
             else:
                 return False
 
         elif isinstance(msg, BankUnloadEndedMessage):
             self._inBankAutoUnload = False
-            if not Kernel().getWorker().contains("BotFarmPathFrame"):
-                Kernel().getWorker().addFrame(BotFarmPathFrame(True))
+            if SessionManager().isLeader:
+                if not Kernel().getWorker().contains("BotFarmPathFrame"):
+                    Kernel().getWorker().addFrame(BotFarmPathFrame(True))
             if Kernel().getWorker().contains("BotUnloadInBankFrame"):
                 Kernel().getWorker().removeFrameByName("BotUnloadInBankFrame")
+            Kernel().getWorker().addFrame(BotPartyFrame())
 
         elif (
             isinstance(msg, GameRolePlayPlayerLifeStatusMessage)

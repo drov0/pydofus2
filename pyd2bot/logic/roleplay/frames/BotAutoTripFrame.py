@@ -36,7 +36,7 @@ class BotAutoTripFrame(Frame):
     dstMapId = None
     path = None
 
-    def __init__(self, dstMapId:int, rpZone:int = 1):
+    def __init__(self, dstMapId: int, rpZone: int = 1):
         self.dstMapId = dstMapId
         self.dstRpZone = rpZone
         self.path = None
@@ -104,14 +104,14 @@ class BotAutoTripFrame(Frame):
             Timer(0.1, self.walkToNextStep).start()
             return
         elif self._computed:
-            if WorldPathFinder().currPlayerVertex == self.path[-1].dst:
+            if WorldPathFinder().currPlayerVertex.mapId == self.path[-1].dst.mapId:
                 logger.debug("Trip reached destination Map")
                 Kernel().getWorker().removeFrame(self)
                 Kernel().getWorker().processImmediately(AutoTripEndedMessage(self.dstMapId))
                 return True
             logger.debug(f"Current step index: {self.currentEdgeIndex}/{len(self.path)}")
             if self.currentEdgeIndex == len(self.path):
-                raise Exception("Unexpected behavior: asking to move beyond path should have returned before")
+                DofusClient().restart()
             e = self.path[self.currentEdgeIndex]
             logger.debug(f"Moving using next edge")
             print(f"\t|- src {e.src.mapId} -> dst {e.dst.mapId}")

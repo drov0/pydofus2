@@ -73,17 +73,25 @@ class BotUnloadInBankFrame(Frame):
         self.infos = Localizer.getBankInfos()
         logger.debug("Bank infos: %s", self.infos.__dict__)
         currentMapId = PlayedCharacterManager().currentMap.mapId
+        self._startMapId = currentMapId
+        self._startRpZone = PlayedCharacterManager().currentZoneRp
         self._enterBankFails = 0
+        self._startedInBankMap = False
         if currentMapId != self.infos.npcMapId:
             Kernel().getWorker().addFrame(BotAutoTripFrame(self.infos.npcMapId))
         else:
+            self._startedInBankMap = True
             self.talkToBankMan()
 
     def process(self, msg: Message) -> bool:
 
         if isinstance(msg, AutoTripEndedMessage):
             logger.debug("AutoTripEndedMessage received")
-            self.talkToBankMan()
+            if not self._startedInBankMap and msg.mapId == self._startMapId:
+                Kernel().getWorker().removeFrame(self)
+                Kernel().getWorker().processImmediately(BankUnloadEndedMessage())
+            else:
+                self.talkToBankMan()
             return True
 
         elif isinstance(msg, MapComplementaryInformationsDataMessage):
@@ -115,8 +123,11 @@ class BotUnloadInBankFrame(Frame):
             return True
 
         elif isinstance(msg, ExchangeLeaveMessage):
-            Kernel().getWorker().removeFrame(self)
-            Kernel().getWorker().process(BankUnloadEndedMessage())
+            if not self._startedInBankMap:
+                Kernel().getWorker().addFrame(BotAutoTripFrame(self._startMapId, self._startRpZone))
+            else:
+                Kernel().getWorker().removeFrame(self)
+                Kernel().getWorker().processImmediately(BankUnloadEndedMessage())
             return True
 
         elif isinstance(msg, InteractiveUseErrorMessage):

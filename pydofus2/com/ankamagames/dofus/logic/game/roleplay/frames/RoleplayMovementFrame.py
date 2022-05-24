@@ -1,6 +1,7 @@
 from threading import Timer
 from time import perf_counter, sleep
 from typing import TYPE_CHECKING
+from com.DofusClient import DofusClient
 from com.ankamagames.berilia.managers.KernelEventsManager import KernelEventsManager
 
 import com.ankamagames.dofus.kernel.net.ConnectionsHandler as connh
@@ -139,6 +140,8 @@ class RoleplayMovementFrame(Frame):
 
     _followingActorId = None
 
+    _movementAnimTimer = None
+
     def __init__(self):
         self._wantToChangeMap = None
         self._changeMapByAutoTrip = False
@@ -191,9 +194,13 @@ class RoleplayMovementFrame(Frame):
         self._destinationPoint = None
         self._wantsToJoinFight = None
         self._joinFightTimer: Timer = None
+        self._joinFightFails = 0
         return True
 
     def joinFight(self, fighterId: int, fightId: int) -> None:
+        if self._joinFightFails > 3:
+            DofusClient().restart()
+            return
         gfjrmsg = GameFightJoinRequestMessage()
         gfjrmsg.init(fighterId, fightId)
         ConnectionsHandler.getConnection().send(gfjrmsg)
@@ -201,6 +208,7 @@ class RoleplayMovementFrame(Frame):
             self._joinFightTimer.cancel()
         self._joinFightTimer = Timer(self.JOINFIGHT_TIMEOUT, self.joinFight, [fighterId, fightId])
         self._joinFightTimer.start()
+        self._joinFightFails += 1
         logger.debug("Join fight timer started")
 
     def process(self, msg: Message) -> bool:
@@ -233,7 +241,7 @@ class RoleplayMovementFrame(Frame):
             if self._wantsToJoinFight:
                 self.joinFight(self._wantsToJoinFight["fighterId"], self._wantsToJoinFight["fightId"])
 
-            if self._followingIe:
+            elif self._followingIe:
                 self.activateSkill(
                     self._followingIe["skillInstanceId"],
                     self._followingIe["ie"].elementId,
@@ -241,23 +249,23 @@ class RoleplayMovementFrame(Frame):
                 )
                 self._followingIe = None
 
-            if self._followingMonsterGroup:
+            elif self._followingMonsterGroup:
                 self.requestMonsterFight(self._followingMonsterGroup.contextualId)
                 self._followingMonsterGroup = None
+
+            elif self._wantToChangeMap is not None:
+                if self._destinationPoint is not None:
+                    mp = MapPoint.fromCellId(self._destinationPoint)
+                    if newPos == mp:
+                        self.askMapChange()
+                    else:
+                        self.askMoveTo(mp)
+                else:
+                    self.askMapChange()
 
             elif self._followingActorId:
                 self.setFollowingActor(self._followingActorId)
 
-            else:
-                if self._wantToChangeMap is not None:
-                    if self._destinationPoint is not None:
-                        mp = MapPoint.fromCellId(self._destinationPoint)
-                        if newPos == mp:
-                            self.askMapChange()
-                        else:
-                            self.askMoveTo(mp)
-                    else:
-                        self.askMapChange()
             return True
 
         if isinstance(msg, GameMapMovementMessage):
@@ -466,6 +474,7 @@ class RoleplayMovementFrame(Frame):
             self._joinFightTimer.cancel()
         self._destinationPoint = None
         self._followingMove = None
+        self._joinFightTimer = None
         return True
 
     def onMovementAnimEnd(self, movedEntity: IEntity) -> None:
@@ -639,7 +648,7 @@ class RoleplayMovementFrame(Frame):
             rpInteractivesFrame.currentRequestedElementId = elementId
             if additionalParam == 0:
                 iurmsg = InteractiveUseRequestMessage()
-                iurmsg.init(elementId, skillInstanceId)
+                iurmsg.init(int(elementId), int(skillInstanceId))
                 ConnectionsHandler.getConnection().send(iurmsg)
             else:
                 iuwprmsg = InteractiveUseWithParamRequestMessage()

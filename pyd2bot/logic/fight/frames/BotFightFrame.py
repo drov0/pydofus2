@@ -410,7 +410,6 @@ class BotFightFrame(Frame):
                     if not self._seqQueue:
                         if self._waitingSeqEnd:
                             self._waitingSeqEnd = False
-                            # self._repeatActionTimeout.cancel()
                             if self._inFight:
                                 self.nextTurnAction()
             return True

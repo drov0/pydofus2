@@ -220,6 +220,7 @@ class RoleplayMovementFrame(Frame):
             logger.debug("[RolePlayMovement] Server rejected Movement!")
             if self._moveRequetFails > 0:
                 Kernel().getWorker().process(MapMoveFailed())
+                return
             self._moveRequetFails += 1
             if self._changeMapTimeout:
                 self._changeMapTimeout.cancel()

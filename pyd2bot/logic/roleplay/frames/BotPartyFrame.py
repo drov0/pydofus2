@@ -3,11 +3,13 @@ import threading
 from threading import Timer
 from time import sleep
 from typing import TYPE_CHECKING
+from com.DofusClient import DofusClient
 
 from com.ankamagames.atouin.managers.MapDisplayManager import MapDisplayManager
 from com.ankamagames.dofus.kernel.Kernel import Kernel
 from com.ankamagames.dofus.kernel.net.ConnectionsHandler import ConnectionsHandler
 from com.ankamagames.dofus.logic.game.common.managers.PlayedCharacterManager import PlayedCharacterManager
+from com.ankamagames.dofus.logic.game.fight.messages.MapMoveFailed import MapMoveFailed
 from com.ankamagames.dofus.network.messages.game.atlas.compass.CompassUpdatePartyMemberMessage import (
     CompassUpdatePartyMemberMessage,
 )
@@ -18,6 +20,9 @@ from com.ankamagames.dofus.network.messages.game.context.roleplay.MapComplementa
 )
 from com.ankamagames.dofus.network.messages.game.context.roleplay.party.PartyAcceptInvitationMessage import (
     PartyAcceptInvitationMessage,
+)
+from com.ankamagames.dofus.network.messages.game.context.roleplay.party.PartyCancelInvitationMessage import (
+    PartyCancelInvitationMessage,
 )
 from com.ankamagames.dofus.network.messages.game.context.roleplay.party.PartyDeletedMessage import PartyDeletedMessage
 from com.ankamagames.dofus.network.messages.game.context.roleplay.party.PartyFollowMemberRequestMessage import (
@@ -30,7 +35,6 @@ from com.ankamagames.dofus.network.messages.game.context.roleplay.party.PartyInv
     PartyInvitationRequestMessage,
 )
 from com.ankamagames.dofus.network.messages.game.context.roleplay.party.PartyJoinMessage import PartyJoinMessage
-from com.ankamagames.dofus.network.messages.game.context.roleplay.party.PartyLeaveMessage import PartyLeaveMessage
 from com.ankamagames.dofus.network.messages.game.context.roleplay.party.PartyLeaveRequestMessage import (
     PartyLeaveRequestMessage,
 )
@@ -39,6 +43,9 @@ from com.ankamagames.dofus.network.messages.game.context.roleplay.party.PartyMem
 )
 from com.ankamagames.dofus.network.messages.game.context.roleplay.party.PartyMemberRemoveMessage import (
     PartyMemberRemoveMessage,
+)
+from com.ankamagames.dofus.network.messages.game.context.roleplay.party.PartyNewGuestMessage import (
+    PartyNewGuestMessage,
 )
 from com.ankamagames.dofus.network.messages.game.context.roleplay.party.PartyNewMemberMessage import (
     PartyNewMemberMessage,
@@ -49,7 +56,6 @@ from com.ankamagames.dofus.network.messages.game.context.roleplay.party.PartyRef
 from com.ankamagames.dofus.network.types.common.PlayerSearchCharacterNameInformation import (
     PlayerSearchCharacterNameInformation,
 )
-from com.ankamagames.dofus.network.types.game.context.MapCoordinates import MapCoordinates
 from com.ankamagames.dofus.network.types.game.context.roleplay.party.PartyMemberInformations import (
     PartyMemberInformations,
 )
@@ -132,6 +138,7 @@ class BotPartyFrame(Frame):
     def pulled(self):
         if self._inParty:
             self.leaveParty()
+            self._inParty = False
         if self.isLeader:
             self.canFarmMonitor.stopSig.set()
             self.canFarmMonitor.join()
@@ -174,17 +181,25 @@ class BotPartyFrame(Frame):
         ccmsg.init(pi, message)
         ConnectionsHandler.getConnection().send(ccmsg)
 
+    def cancelPartyInvite(self, playerName):
+        if playerName not in self._followerIds:
+            return
+        cpimsg = PartyCancelInvitationMessage()
+        cpimsg.init(int(self._followerIds[playerName]), self._partyId)
+        ConnectionsHandler.getConnection().send(cpimsg)
+
     def sendPartyInvite(self, playerName):
         for member in self._partyMembers.values():
             if member.name == playerName:
                 return
+        if self._partyInviteTimers.get(playerName):
+            self._partyInviteTimers[playerName].cancel()
+            self.cancelPartyInvite(playerName)
         pimsg = PartyInvitationRequestMessage()
         pscni = PlayerSearchCharacterNameInformation()
         pscni.init(playerName)
         pimsg.init(pscni)
         ConnectionsHandler.getConnection().send(pimsg)
-        if self._partyInviteTimers.get(playerName):
-            self._partyInviteTimers[playerName].cancel()
         self._partyInviteTimers[playerName] = Timer(self.CONFIRME_JOIN_TIMEOUT, self.sendPartyInvite, [playerName])
         self._partyInviteTimers[playerName].start()
         logger.debug(f"[BotPartyFrame] Join party invitation sent to {playerName}")
@@ -219,8 +234,16 @@ class BotPartyFrame(Frame):
         ConnectionsHandler.getConnection().send(plmsg)
 
     def process(self, msg: Message):
+        if isinstance(msg, PartyNewGuestMessage):
+            if self.isLeader and msg.guest.name not in self._followerIds:
+                self._followerIds[msg.guest.name] = msg.guest.guestId
+            return True
 
-        if isinstance(msg, PartyMemberRemoveMessage):
+        elif isinstance(msg, MapMoveFailed):
+            DofusClient().restart()
+            return True
+
+        elif isinstance(msg, PartyMemberRemoveMessage):
             logger.debug(f"[BotPartyFrame] {msg.leavingPlayerId} left the party")
             playerName = self._partyMembers[msg.leavingPlayerId].name
             del self._partyMembers[msg.leavingPlayerId]
@@ -302,6 +325,9 @@ class BotPartyFrame(Frame):
             if self._isJoiningLeaderVertex:
                 leaderInfos = self.entitiesFrame.getEntityInfos(self.leaderId)
                 if not leaderInfos:
+                    if self.leaderId not in self._partyMembers:
+                        logger.warning(f"Leader {self.leaderName} is not in party anymore")
+                        return False
                     af = BotAutoTripFrame(self._partyMembers[self.leaderId].mapId)
                     Kernel().getWorker().pushFrame(af)
                     return True

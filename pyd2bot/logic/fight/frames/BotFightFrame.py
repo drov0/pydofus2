@@ -202,7 +202,6 @@ class BotFightFrame(Frame):
                 return target, []
         spellZone = self.getSpellZone(spellw)
         origin = self.fighterPos
-        # logger.debug(f"[FightAlgo] Searching for path to hit some target, origin = {origin.cellId}")
         queue = collections.deque([[origin.cellId]])
         seen = {origin.cellId}
         while queue:
@@ -212,11 +211,8 @@ class BotFightFrame(Frame):
             ldv = set(LosDetector.getCell(DataMapProvider(), currSpellZone, currCellId))
             for target in targets:
                 if target.pos.cellId in ldv:
-                    if self.VERBOSE:
-                        logger.debug(f"[FightAlgo] Found path {path} to hit a target {target}")
                     return target, path[1:]
             currReachableCells = set(FightReachableCellsMaker(self.fighterInfos, currCellId, 1).reachableCells)
-            # logger.debug(f"[FightAlgo] Reachable cells for {currCellId} are {currReachableCells}")
             for cellId in currReachableCells:
                 if cellId not in seen:
                     queue.append(path + [cellId])

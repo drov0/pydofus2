@@ -6,13 +6,13 @@
         <li <% if (active==='dashboard' ) { %> class="active" <% } %>>
                 <a href="#">Dashboard</a>
         </li>
-        <li <% if (active==='bots' ) { %> class="active" <% } %>>
-                <a href="./botManager.ejs">Bots</a>
+        <li <% if (active==='charachters' ) { %> class="active" <% } %>>
+                <a href="<%=accountUrls.manageAccountsUrl%>">Charachters</a>
         </li>
-        <li <% if (active==='dashboard' ) { %> class="sessions" <% } %>>
+        <li <% if (active==='sessions' ) { %> class="sessions" <% } %>>
                 <a href="#">Sessions</a>
         </li>
-        <li <% if (active==='dashboard' ) { %> class="paths" <% } %>>
+        <li <% if (active==='paths' ) { %> class="paths" <% } %>>
                 <a href="#">Paths</a>
         </li>
     </ul>

@@ -11,3 +11,11 @@ function createAccount() {
     }
     ipc.send('newAccount', newAccount)
 }
+
+function saveAccounts() {
+    ipc.send('saveAccounts')
+}
+
+function deleteAccount(key) {
+    ipc.send('deleteAccount', key)
+}

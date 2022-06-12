@@ -1,11 +1,17 @@
 const { app, BrowserWindow, Menu, ipcMain } = require('electron');
-const path = require('path');
+const path = require('path')
 const ejse = require('ejs-electron')
+ejse.data('nodeModulesUrl', "file://" + path.join(__dirname, '..', 'node_modules'));
+ejse.data('sidebarUrl', path.join(__dirname, 'ejs', 'sidebar.ejs'));
+ejse.data('cssUrl', "file://" + path.join(__dirname, 'assets', 'css'));
+ejse.data('persistenceDir', path.join(__dirname, '..', '..', 'pyd2botDB'))
 const charactersDB = require('../../pyd2botDB/charachters.json');
-const accountsDB = require('../../pyd2botDB/accounts.json');
-ejse.data('botsCreds', charactersDB);
-ejse.data('accounts', accountsDB);
+const AccountManager = require("./accounts/AccountManager.js");
+console.log(AccountManager);
 let mainWindow;
+const accountManager = AccountManager.instance;
+ejse.data('charachters', charactersDB);
+ejse.data('accounts', accountManager.accountsDB);
 
 // Handle creating/removing shortcuts on Windows when installing/uninstalling.
 if (require('electron-squirrel-startup')) {
@@ -24,7 +30,7 @@ const createWindow = () => {
     });
 
     // and load the index.html of the app.
-    mainWindow.loadURL("file://" + __dirname + '/main.ejs');
+    mainWindow.loadURL("file://" + path.join(__dirname, 'ejs', 'main.ejs'));
 
     // To maximize the window
     mainWindow.maximize();
@@ -42,12 +48,17 @@ const createWindow = () => {
 // });
 
 ipcMain.on("newAccount", (event, formData) => {
-    console.log(formData);
-    accountsDB[formData.entryId] = {
-        "login": formData.login,
-        "password": formData.password,
-    }
-    mainWindow.loadURL("file://" + __dirname + "/accountManager.ejs");
+    accountManager.newAccount(formData);
+    mainWindow.loadURL(accountManager.manageAccountsUrl);
+});
+
+ipcMain.on("deleteAccount", (event, key) => {
+    accountManager.deleteAccount(key);
+    mainWindow.loadURL(accountManager.manageAccountsUrl);
+});
+
+ipcMain.on("saveAccounts", (event, args) => {
+    accountManager.saveAccounts();
 });
 
 // This method will be called when Electron has finished

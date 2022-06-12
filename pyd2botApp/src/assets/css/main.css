@@ -8,6 +8,9 @@ body {
 .wrapper {
     display: flex;
     align-items: stretch;
+    min-width: 600px;
+    min-height: 720px;
+    background-color: #444444;
 }
 
 #sidebar {

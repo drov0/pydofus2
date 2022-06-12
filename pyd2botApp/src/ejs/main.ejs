@@ -5,19 +5,18 @@
         <meta charset="UTF-8" />
         <title>Grider</title>
         <!-- Bootstrap CSS -->
-        <link rel="stylesheet" href="../node_modules/bootstrap/dist/css/bootstrap.min.css" />
+        <link rel="stylesheet" href="<%= nodeModulesUrl + '/bootstrap/dist/css/bootstrap.min.css'%>" />
         <!-- Custom CSS -->
-        <link rel="stylesheet" href="main.css" />
+        <link rel="stylesheet" href="<%= cssUrl + '/main.css'%>"/>
         <!-- Bootstrap Optional JavaScript -->
         <!-- jQuery first, then Popper.js, then Bootstrap JS -->
         <script>let $ = require('jquery');</script>
         <script>require('popper');</script>
         <script>require('bootstrap');</script>
-        <script defer src="render.js"></script>
     </head>
 
     <body>
-        <h1>Home</h1>
+        <h1>Grinder</h1>
         <div class="wrapper">
             <%- include('./sidebar', {active: 'dashboard' }) %>
         </div>

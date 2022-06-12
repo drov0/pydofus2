@@ -1,0 +1,19 @@
+<nav id="sidebar">
+    <div class="sidebar-header">
+        <h3>Grinder</h3>
+    </div>
+    <ul class="list-unstyled components">
+        <li <% if (active==='dashboard' ) { %> class="active" <% } %>>
+                <a href="#">Dashboard</a>
+        </li>
+        <li <% if (active==='bots' ) { %> class="active" <% } %>>
+                <a href="./botManager.ejs">Bots</a>
+        </li>
+        <li <% if (active==='dashboard' ) { %> class="sessions" <% } %>>
+                <a href="#">Sessions</a>
+        </li>
+        <li <% if (active==='dashboard' ) { %> class="paths" <% } %>>
+                <a href="#">Paths</a>
+        </li>
+    </ul>
+</nav>

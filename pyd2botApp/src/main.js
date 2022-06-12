@@ -1,6 +1,10 @@
 const { app, BrowserWindow, Menu, ipcMain } = require('electron');
 const path = require('path');
-
+const ejse = require('ejs-electron')
+const charactersDB = require('../../pyd2botDB/charachters.json');
+const accountsDB = require('../../pyd2botDB/accounts.json');
+ejse.data('botsCreds', charactersDB);
+ejse.data('accounts', accountsDB);
 let mainWindow;
 
 // Handle creating/removing shortcuts on Windows when installing/uninstalling.
@@ -12,8 +16,6 @@ if (require('electron-squirrel-startup')) {
 const createWindow = () => {
     // Create the browser window.
     mainWindow = new BrowserWindow({
-        width: 800,
-        height: 600,
         webPreferences: {
             nodeIntegration: true,
             contextIsolation: false,
@@ -22,7 +24,7 @@ const createWindow = () => {
     });
 
     // and load the index.html of the app.
-    mainWindow.loadFile(path.join(__dirname, 'main.html'));
+    mainWindow.loadURL("file://" + __dirname + '/main.ejs');
 
     // To maximize the window
     mainWindow.maximize();
@@ -31,13 +33,14 @@ const createWindow = () => {
     const mainMenu = Menu.buildFromTemplate(mainMenuTemplate);
     Menu.setApplicationMenu(mainMenu);
     // Open the DevTools.
-    mainWindow.webContents.openDevTools();
+    // mainWindow.webContents.openDevTools();
 };
 
 
-ipcMain.on("switchToBotManagerView", (event, arg) => {
-    mainWindow.loadFile(path.join(__dirname, "botManager.html"));
-});
+// ipcMain.on("switchToBotManagerView", (event, arg) => {
+//     mainWindow.loadURL("file://" + __dirname + "/botManager.ejs");
+// });
+
 
 // This method will be called when Electron has finished
 // initialization and is ready to create browser windows.

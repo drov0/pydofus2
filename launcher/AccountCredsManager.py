@@ -23,24 +23,24 @@ class AccountCredsManager:
     with open(CREDS_DB, "r") as fp:
         _creds = json.load(fp)
 
-    @staticmethod
-    def addEntry(name, username, password):
-        password = AccountCredsManager.encryptPasssword(password)
-        AccountCredsManager._creds.update({name: {"login": username, "password": password}})
+    @classmethod
+    def addEntry(cls, name, username, password):
+        password = cls.encryptPasssword(password)
+        cls._creds.update({name: {"login": username, "password": password}})
         with open(CREDS_DB, "w") as fp:
-            json.dump(AccountCredsManager._creds, fp, indent=4)
+            json.dump(cls._creds, fp, indent=4)
 
     @classmethod
     def getEntry(cls, name):
-        if name not in AccountCredsManager._creds:
+        if name not in cls._creds:
             raise Exception(f"No registred account creds for account {name}")
         result = cls._creds.get(name).copy()
         result["password"] = cls.decryptPasssword(result["password"])
         return result
 
-    @staticmethod
-    def encryptPasssword(password: str) -> list[int]:
-        rsacipher = PKCS1_OAEP.new(AccountCredsManager._pubkey)
+    @classmethod
+    def encryptPasssword(cls, password: str) -> list[int]:
+        rsacipher = PKCS1_OAEP.new(cls._pubkey)
         baIn = bytes(password, "utf-8")
         encryptedPass = ByteArray(rsacipher.encrypt(baIn))
         return encryptedPass.to_int8Arr()

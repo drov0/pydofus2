@@ -33,7 +33,7 @@ const createWindow = () => {
     const mainMenu = Menu.buildFromTemplate(mainMenuTemplate);
     Menu.setApplicationMenu(mainMenu);
     // Open the DevTools.
-    // mainWindow.webContents.openDevTools();
+    mainWindow.webContents.openDevTools();
 };
 
 
@@ -41,6 +41,14 @@ const createWindow = () => {
 //     mainWindow.loadURL("file://" + __dirname + "/botManager.ejs");
 // });
 
+ipcMain.on("newAccount", (event, formData) => {
+    console.log(formData);
+    accountsDB[formData.entryId] = {
+        "login": formData.login,
+        "password": formData.password,
+    }
+    mainWindow.loadURL("file://" + __dirname + "/accountManager.ejs");
+});
 
 // This method will be called when Electron has finished
 // initialization and is ready to create browser windows.

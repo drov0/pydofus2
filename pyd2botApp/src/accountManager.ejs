@@ -11,7 +11,7 @@
     <!-- Bootstrap Optional JavaScript -->
     <!-- jQuery first, then Popper.js, then Bootstrap JS -->
     <script>let $ = require('jquery');</script>
-    <script>require('popper.js');</script>
+    <script>require('popper');</script>
     <script>require('bootstrap');</script>
     <script defer src="render.js"></script>
 </head>
@@ -20,11 +20,11 @@
     <div class="wrapper">
         <%- include('./sidebar', {active: 'bots' }) %>
         <div class="bodyRightView">
-            <ul class="nav nav-tabs">
+            <ul class="nav nav-tabs" style="background: #262626">
                 <li class="nav-item"><a class="nav-link" aria-current="page" href="./botManager.ejs">Bots</a></li>
                 <li class="nav-item"><a class="nav-link active" aria-current="page" href="#">Accounts</a></li>
             </ul>
-            <table class="table table-dark">
+            <table class="table table-dark table-striped" style="margin-bottom: 0;">
                 <thead>
                     <th scope="col">entryId</th>
                     <th scope="col">username</th>
@@ -50,13 +50,13 @@
                     <% }) %>
                 </tbody>
             </table>
-            <div class="container">
+            <div class="container" style="background: #262626">
                 <div class="row text-center">
                     <div class="col-lg-5">
-                        <button class="btn btn-primary" onclick="">New</button>
+                        <a href="./newAccountForm.ejs"><button class="btn btn-primary" >new</button></a>
                     </div>
                     <div class="col-lg-6">
-                        <button class="btn" onclick=""><i class="bi bi-save"></i></button>
+                        <button class="btn btn-primary" onclick="">save</button>
                     </div>
                 </div>
             </div>

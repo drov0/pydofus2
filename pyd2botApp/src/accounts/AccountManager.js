@@ -47,9 +47,7 @@ class AccountManager {
         this.decrypt.setPrivateKey(this.privateKey)
         this.urls = {
             'manageAccountsUrl': "file://" + path.join(__dirname, 'ejs', 'accountManager.ejs'),
-            'manageCharactersUrl': "file://" + path.join(__dirname, 'ejs', 'charachterManager.ejs'),
             'newAccountUrl': "file://" + path.join(__dirname, 'ejs', 'newAccountForm.ejs'),
-            'newCharachterUrl': "file://" + path.join(__dirname, 'ejs', 'newCharachterForm.ejs')
         }
         ejse.data('accountUrls', this.urls);
     }
@@ -70,6 +68,7 @@ class AccountManager {
             "login": formData.login,
             "password": encryptedPassword,
         }
+        this.accountsPasswords[formData.entryId] = "********"
     }
 
     deleteAccount(key) {

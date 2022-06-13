@@ -31,7 +31,7 @@ const createWindow = () => {
     });
 
     // and load the index.html of the app.
-    mainWindow.loadURL(accountManager.urls.manageCharactersUrl);
+    mainWindow.loadURL(accountManager.urls.manageAccountsUrl);
 
     // To maximize the window
     mainWindow.maximize();

@@ -16,6 +16,7 @@ body {
 #sidebar {
     min-width: 200px;
     max-width: 200px;
+    width: 20%;
 }
 
 #sidebar.active {
@@ -98,4 +99,31 @@ ul ul a {
     display: flex;
     align-items: stretch;
     flex-direction: column;
+    width: 100%
+}
+
+.accountFormsContainer {
+    color: #fff;
+    text-align: center;
+    justify-content: space-around;
+    display: flex;
+    border-radius: 25px;
+    align-items: center;
+    flex-direction: column;
+    border: 5px solid #FFFF00;
+    padding: 7.6%;
+    margin: 10%;
+    width: 70%;
+    row-gap: 20px;
+    position: relative;
+}
+
+.managerBottomButtonsBar {
+    display: flex;
+    justify-content: space-around;
+    text-align: center;
+    flex-direction: row;
+    column-gap: 50px;
+    padding: 5%;
+    align-items: center;
 }

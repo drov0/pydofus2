@@ -19,3 +19,15 @@ function saveAccounts() {
 function deleteAccount(key) {
     ipc.send('deleteAccount', key)
 }
+
+function hideUnhidePassword(key) {
+    ipc.send('hideUnhidePassword', key)
+}
+
+function createCharachter() {
+
+}
+
+function saveCharachters() {
+
+}

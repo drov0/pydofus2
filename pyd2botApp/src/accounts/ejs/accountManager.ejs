@@ -27,7 +27,8 @@
             <table class="table table-dark table-striped" style="margin-bottom: 0;">
                 <thead>
                     <th scope="col">entryId</th>
-                    <th scope="col">username</th>
+                    <th scope="col">login</th>
+                    <th scope="col">password</th>
                     <th scope="col">action</th>
                 </thead>
                 <tbody>
@@ -35,14 +36,16 @@
                     <tr>
                         <td scope="row"><%= key%></td>
                         <td><%= value.login%></td>
+                        <td><%= accountsPasswords[key] %></td>
                         <td>
                             <div class="dropdown">
                                 <a class="btn btn-secondary dropdown-toggle" href="#" role="button" id="dropdownMenuLink" data-bs-toggle="dropdown" aria-expanded="false">
                                 </a>
                                 <ul class="dropdown-menu" aria-labelledby="dropdownMenuLink">
                                   <li><a class="dropdown-item" href="#">edit</a></li>
+                                  <li><a class="dropdown-item" href="#" onclick="hideUnhidePassword('<%= key%>')">hide/unhide password</a></li>
                                   <li><a class="dropdown-item" href="#" onclick="deleteAccount('<%= key%>')">delete</a></li>
-                                  <li><a class="dropdown-item" href="#">fetch</a></li>
+                                  <li><a class="dropdown-item" href="#">fetch charachters</a></li>
                                 </ul>
                             </div>
                         </td>
@@ -50,15 +53,9 @@
                     <% }) %>
                 </tbody>
             </table>
-            <div class="container" style="background: #262626">
-                <div class="row text-center">
-                    <div class="col-lg-5">
-                        <a href="<%=accountUrls.newAccountUrl%>"><button class="btn btn-primary" >new</button></a>
-                    </div>
-                    <div class="col-lg-6">
-                        <button class="btn btn-primary" onclick="saveAccounts()">save</button>
-                    </div>
-                </div>
+            <div class="managerBottomButtonsBar">
+                <a href="<%=accountUrls.newAccountUrl%>"><button class="btn btn-primary" >new</button></a>
+                <button class="btn btn-primary" onclick="saveAccounts()">save</button>
             </div>
         </div>
     </div>

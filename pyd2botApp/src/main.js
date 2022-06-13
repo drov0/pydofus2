@@ -5,6 +5,7 @@ ejse.data('nodeModulesUrl', "file://" + path.join(__dirname, '..', 'node_modules
 ejse.data('sidebarUrl', path.join(__dirname, 'ejs', 'sidebar.ejs'));
 ejse.data('cssUrl', "file://" + path.join(__dirname, 'assets', 'css'));
 ejse.data('persistenceDir', path.join(__dirname, '..', '..', 'pyd2botDB'))
+const mainUrl = "file://" + path.join(__dirname, 'ejs', 'main.ejs')
 const charactersDB = require('../../pyd2botDB/charachters.json');
 const AccountManager = require("./accounts/AccountManager.js");
 console.log(AccountManager);
@@ -12,7 +13,7 @@ let mainWindow;
 const accountManager = AccountManager.instance;
 ejse.data('charachters', charactersDB);
 ejse.data('accounts', accountManager.accountsDB);
-
+ejse.data('accountsPasswords', accountManager.accountsPasswords);
 // Handle creating/removing shortcuts on Windows when installing/uninstalling.
 if (require('electron-squirrel-startup')) {
     // eslint-disable-line global-require
@@ -30,7 +31,7 @@ const createWindow = () => {
     });
 
     // and load the index.html of the app.
-    mainWindow.loadURL("file://" + path.join(__dirname, 'ejs', 'main.ejs'));
+    mainWindow.loadURL(accountManager.urls.manageCharactersUrl);
 
     // To maximize the window
     mainWindow.maximize();
@@ -43,10 +44,7 @@ const createWindow = () => {
 };
 
 
-// ipcMain.on("switchToBotManagerView", (event, arg) => {
-//     mainWindow.loadURL("file://" + __dirname + "/botManager.ejs");
-// });
-
+// Accounts manager ipcs mapping
 ipcMain.on("newAccount", (event, formData) => {
     accountManager.newAccount(formData);
     mainWindow.loadURL(accountManager.urls.manageAccountsUrl);
@@ -59,6 +57,11 @@ ipcMain.on("deleteAccount", (event, key) => {
 
 ipcMain.on("saveAccounts", (event, args) => {
     accountManager.saveAccounts();
+});
+
+ipcMain.on("hideUnhidePassword", (event, key) => {
+    accountManager.hideUnhidePassword(key);
+    mainWindow.loadURL(accountManager.urls.manageAccountsUrl);
 });
 
 // This method will be called when Electron has finished

@@ -20,32 +20,22 @@
     <div class="wrapper">
         <%- include(sidebarUrl, {active: 'charachters' }) %>
         <div class="bodyRightView">
-            <form id="newAccountForm">
+            <div class="accountFormsContainer">
                 <div class="form-group">
                     <label for="accountId">entryId</label>
                     <input type="text" class="form-control" id="accountId" placeholder="Enter entry id">
                 </div>
-                <br>
                 <div class="form-group">
                     <label for="accountLogin">login</label>
                     <input type="text" class="form-control" id="accountLogin" placeholder="Enter login">
                 </div>
-                <br>
                 <div class="form-group">
                     <label for="accountPassword">Password</label>
                     <input type="password" class="form-control" id="accountPassword" placeholder="Password">
                 </div>
-                <br>
-                <br>
-            </form>
-            <div class="container">
-                <div class="row text-center">
-                    <div class="col-lg-5">
-                        <button class="btn btn-primary" onclick="createAccount()">confirm</button>
-                    </div>
-                    <div class="col-lg-6">
-                        <a href="<%=accountUrls.manageAccountsUrl%>"><button class="btn btn-primary">cancel</button></a>
-                    </div>
+                <div class="managerBottomButtonsBar">
+                    <button class="btn btn-primary" onclick="createAccount()">confirm</button>
+                    <a href="<%=accountUrls.manageAccountsUrl%>"><button class="btn btn-primary">cancel</button></a>
                 </div>
             </div>
         </div>

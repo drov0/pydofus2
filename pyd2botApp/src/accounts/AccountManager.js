@@ -12,6 +12,10 @@ class AccountManager {
     constructor() {
         this.dbFile = path.join(ejse.data('persistenceDir'), 'accounts.json')
         this.accountsDB = require(this.dbFile)
+        this.accountsPasswords = {}
+        for (var key in this.accountsDB) {
+            this.accountsPasswords[key] = "********"
+        }
         var keysDir = path.join(process.env.AppData, 'pyd2bot', 'RSA-KEYS', 'password-crypting')
 
         if (!fs.existsSync(path.join(keysDir, 'public.pem')) || !fs.existsSync(path.join(keysDir, 'public.pem'))) {
@@ -44,9 +48,20 @@ class AccountManager {
         this.urls = {
             'manageAccountsUrl': "file://" + path.join(__dirname, 'ejs', 'accountManager.ejs'),
             'manageCharactersUrl': "file://" + path.join(__dirname, 'ejs', 'charachterManager.ejs'),
-            'newAccountUrl': "file://" + path.join(__dirname, 'ejs', 'newAccountForm.ejs')
+            'newAccountUrl': "file://" + path.join(__dirname, 'ejs', 'newAccountForm.ejs'),
+            'newCharachterUrl': "file://" + path.join(__dirname, 'ejs', 'newCharachterForm.ejs')
         }
         ejse.data('accountUrls', this.urls);
+    }
+
+    hideUnhidePassword(key) {
+        if (this.accountsPasswords[key] == "********") {
+            var decryptedPassword = this.decrypt.decrypt(this.accountsDB[key].password)
+            this.accountsPasswords[key] = decryptedPassword
+        }
+        else {
+            this.accountsPasswords[key] = "********"
+        }
     }
 
     newAccount(formData) {

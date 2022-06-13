@@ -49,12 +49,12 @@ const createWindow = () => {
 
 ipcMain.on("newAccount", (event, formData) => {
     accountManager.newAccount(formData);
-    mainWindow.loadURL(accountManager.manageAccountsUrl);
+    mainWindow.loadURL(accountManager.urls.manageAccountsUrl);
 });
 
 ipcMain.on("deleteAccount", (event, key) => {
     accountManager.deleteAccount(key);
-    mainWindow.loadURL(accountManager.manageAccountsUrl);
+    mainWindow.loadURL(accountManager.urls.manageAccountsUrl);
 });
 
 ipcMain.on("saveAccounts", (event, args) => {

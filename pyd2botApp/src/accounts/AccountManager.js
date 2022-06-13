@@ -1,9 +1,8 @@
 const path = require('path')
 const fs = require('fs')
 const ejse = require('ejs-electron')
+globalThis.window = {};
 const JSEncrypt = require('jsencrypt')
-
-
 
 class AccountManager {
     static get instance() {
@@ -14,12 +13,34 @@ class AccountManager {
         this.dbFile = path.join(ejse.data('persistenceDir'), 'accounts.json')
         this.accountsDB = require(this.dbFile)
         var keysDir = path.join(process.env.AppData, 'pyd2bot', 'RSA-KEYS', 'password-crypting')
-        var privateKeyPem = fs.readFileSync(path.join(keysDir, 'id_rsa'), 'utf8')
-        var pubKeyPem = fs.readFileSync(path.join(keysDir, 'id_rsa.pub'), 'utf8')
+
+        if (!fs.existsSync(path.join(keysDir, 'public.pem')) || !fs.existsSync(path.join(keysDir, 'public.pem'))) {
+            console.log('Generating RSA keys...')
+            var encrypt = new JSEncrypt();
+
+            // Generate a RSA key pair using the `JSEncrypt` library.
+            var crypt = new JSEncrypt({ default_key_size: 2048 });
+            var PublicPrivateKey = {
+                PublicKey: crypt.getPublicKey(),
+                PrivateKey: crypt.getPrivateKey()
+            };
+            this.publicKey = PublicPrivateKey.PublicKey;
+            this.privateKey = PublicPrivateKey.PrivateKey;
+
+            // Save the public and private keys to the filesystem.
+            fs.writeFileSync(path.join(keysDir, 'public.pem'), this.publicKey);
+            fs.writeFileSync(path.join(keysDir, 'private.pem'), this.privateKey);
+        }
+        else {
+            console.log('RSA keys already exist.')
+            this.publicKey = fs.readFileSync(path.join(keysDir, 'public.pem'), 'utf8');
+            this.privateKey = fs.readFileSync(path.join(keysDir, 'private.pem'), 'utf8');
+        }
+
         this.encrypt = new JSEncrypt();
         this.decrypt = new JSEncrypt();
-        this.encrypt.setPublicKey(pubKeyPem)
-        this.decrypt.setPrivateKey(privateKeyPem)
+        this.encrypt.setPublicKey(this.publicKey)
+        this.decrypt.setPrivateKey(this.privateKey)
         this.urls = {
             'manageAccountsUrl': "file://" + path.join(__dirname, 'ejs', 'accountManager.ejs'),
             'manageCharactersUrl': "file://" + path.join(__dirname, 'ejs', 'charachterManager.ejs'),
@@ -28,20 +49,11 @@ class AccountManager {
         ejse.data('accountUrls', this.urls);
     }
 
-    getKeyPath() {
-        return path.join(process.env.AppData, 'pyd2bot/keys/')
-    }
-
-    encryptPassword(password) {
-    }
-
-    // decryptPassword(encpassword) {
-    // }
-
     newAccount(formData) {
+        var encryptedPassword = this.encrypt.encrypt(formData.password)
         this.accountsDB[formData.entryId] = {
             "login": formData.login,
-            "password": this.encrypt.encrypt(formData.password),
+            "password": encryptedPassword,
         }
     }
 

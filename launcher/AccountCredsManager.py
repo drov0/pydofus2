@@ -7,7 +7,7 @@ from com.ankamagames.jerakine.network.CustomDataWrapper import ByteArray
 
 CURRDIR = Path(__file__).parent
 KEYS_DIR = Path(os.environ["PASS_ENC_KEYS"])
-CREDS_DB = CURRDIR / "creds.json"
+CREDS_DB = CURRDIR / "../pyd2botDB/accounts.json"
 pubkey_p = KEYS_DIR / "id_rsa.pub"
 privatekey_p = KEYS_DIR / "id_rsa"
 
@@ -55,10 +55,13 @@ class AccountCredsManager:
 
 
 if __name__ == "__main__":
-    import sys
+    # import sys
 
-    print(sys.argv)
-    entryName = sys.argv[1]
-    entryLogin = sys.argv[2]
-    entryPassword = sys.argv[3]
-    AccountCredsManager.addEntry(entryName, entryLogin, entryPassword)
+    # print(sys.argv)
+    # entryName = sys.argv[1]
+    # entryLogin = sys.argv[2]
+    # entryPassword = sys.argv[3]
+    newdb = AccountCredsManager._creds.copy()
+    for key, value in newdb.items():
+        newdb[key]["password"] = AccountCredsManager.decryptPasssword(newdb[key]["password"])
+    print(newdb)

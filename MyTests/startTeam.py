@@ -1,6 +1,6 @@
 from multiprocessing import Process
-from com.DofusClient import DofusClient
-from com.ankamagames.jerakine.logger.Logger import Logger
+from pydofus2.com.DofusClient import DofusClient
+from pydofus2.com.ankamagames.jerakine.logger.Logger import Logger
 from pyd2bot.logic.common.frames.BotWorkflowFrame import BotWorkflowFrame
 from pyd2bot.logic.managers.SessionManager import SessionManager
 

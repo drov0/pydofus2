@@ -1,8 +1,9 @@
-from com.ankamagames.jerakine.logger.Logger import Logger
-from com.DofusClient import DofusClient
+import sys
+from pydofus2.com.ankamagames.jerakine.logger.Logger import Logger
+from pydofus2.com.DofusClient import DofusClient
 from pyd2bot.logic.common.frames.BotWorkflowFrame import BotWorkflowFrame
 from pyd2bot.logic.managers.SessionManager import SessionManager
-import sys
+from pydofus2.com.ankamagames.haapi.Haapi import Haapi
 
 
 def runSession(sessionId):
@@ -10,7 +11,7 @@ def runSession(sessionId):
     Logger.charachter = SessionManager().charachterId
     dofus2 = DofusClient()
     dofus2.registerFrame(BotWorkflowFrame())
-    dofus2.login(**SessionManager().creds)
+    dofus2.login(SessionManager().loginToken, SessionManager().charachter["serverId"], SessionManager().charachter["charachterId"])
     dofus2.join()
 
 

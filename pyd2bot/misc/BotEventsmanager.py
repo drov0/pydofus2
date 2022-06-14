@@ -1,4 +1,4 @@
-from com.ankamagames.jerakine.metaclasses.Singleton import Singleton
+from pydofus2.com.ankamagames.jerakine.metaclasses.Singleton import Singleton
 from whistle import EventDispatcher
 
 

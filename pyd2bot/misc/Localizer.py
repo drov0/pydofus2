@@ -1,13 +1,13 @@
 import json
 from pathlib import Path
-from com.ankamagames.atouin.managers.MapDisplayManager import MapDisplayManager
-from com.ankamagames.dofus.datacenter.world.MapCoordinates import MapCoordinates
-from com.ankamagames.dofus.datacenter.world.MapPosition import MapPosition
-from com.ankamagames.dofus.datacenter.world.Phoenix import Phoenix
-from com.ankamagames.dofus.datacenter.world.SubArea import SubArea
-from com.ankamagames.dofus.logic.game.common.managers.PlayedCharacterManager import PlayedCharacterManager
-from com.ankamagames.dofus.modules.utils.pathFinding.astar.AStar import AStar
-from com.ankamagames.dofus.modules.utils.pathFinding.world.WorldPathFinder import WorldPathFinder
+from pydofus2.com.ankamagames.atouin.managers.MapDisplayManager import MapDisplayManager
+from pydofus2.com.ankamagames.dofus.datacenter.world.MapCoordinates import MapCoordinates
+from pydofus2.com.ankamagames.dofus.datacenter.world.MapPosition import MapPosition
+from pydofus2.com.ankamagames.dofus.datacenter.world.Phoenix import Phoenix
+from pydofus2.com.ankamagames.dofus.datacenter.world.SubArea import SubArea
+from pydofus2.com.ankamagames.dofus.logic.game.common.managers.PlayedCharacterManager import PlayedCharacterManager
+from pydofus2.com.ankamagames.dofus.modules.utils.pathFinding.astar.AStar import AStar
+from pydofus2.com.ankamagames.dofus.modules.utils.pathFinding.world.WorldPathFinder import WorldPathFinder
 
 from pyd2bot.BotConstants import BotConstants
 

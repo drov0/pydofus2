@@ -1,14 +1,14 @@
 from os import path
 from uuid import uuid4 as uuid
 from pprint import pformat
-from com.ankamagames.jerakine.logger.Logger import Logger
+from pydofus2.com.ankamagames.jerakine.logger.Logger import Logger
 import asyncio
 import threading
 from wdom.document import get_document, set_app
 from wdom.server import start_server, start
 from wdom.themes import bootstrap3
 from wdom.themes.bootstrap3 import *
-from com.ankamagames.jerakine.network.NetworkMessage import NetworkMessage
+from pydofus2.com.ankamagames.jerakine.network.NetworkMessage import NetworkMessage
 from .network.message import Message
 from .network.sniffer import DofusSniffer
 

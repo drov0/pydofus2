@@ -2,11 +2,11 @@ import re
 from pathlib import Path
 import sys
 from tqdm import tqdm
-from com.ankamagames.jerakine.network.parser.TypeEnum import TypeEnum
+from pydofus2.com.ankamagames.jerakine.network.parser.TypeEnum import TypeEnum
 from pathlib import Path
 import json
 import os
-import com.ankamagames.dofus.Constants as Constants
+import pydofus2.com.ankamagames.dofus.Constants as Constants
 
 TO_PTYPE = {
     "Array": "list",
@@ -70,7 +70,7 @@ class ProtocolParser:
                 msg_type[name] = {
                     "name": name,
                     "path": as_file_path,
-                    "package": ".".join(
+                    "package": "pydofus2." + ".".join(
                         as_file_path.parts[as_file_path.parts.index("com") : -1]
                         + (name,)
                     ),

@@ -1,11 +1,11 @@
 import collections
 import random
 from typing import Iterator
-from com.ankamagames.dofus.datacenter.world.SubArea import SubArea
-from com.ankamagames.dofus.modules.utils.pathFinding.astar.AStar import AStar
-from com.ankamagames.dofus.modules.utils.pathFinding.world.Transition import Transition
-from com.ankamagames.dofus.modules.utils.pathFinding.world.Vertex import Vertex
-from com.ankamagames.dofus.modules.utils.pathFinding.world.WorldPathFinder import WorldPathFinder
+from pydofus2.com.ankamagames.dofus.datacenter.world.SubArea import SubArea
+from pydofus2.com.ankamagames.dofus.modules.utils.pathFinding.astar.AStar import AStar
+from pydofus2.com.ankamagames.dofus.modules.utils.pathFinding.world.Transition import Transition
+from pydofus2.com.ankamagames.dofus.modules.utils.pathFinding.world.Vertex import Vertex
+from pydofus2.com.ankamagames.dofus.modules.utils.pathFinding.world.WorldPathFinder import WorldPathFinder
 from pyd2bot.models.farmPaths.AbstractFarmPath import AbstractFarmPath
 
 

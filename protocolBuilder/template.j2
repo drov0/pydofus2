@@ -2,7 +2,7 @@
 {% if parent != None -%}
 from {{parent.package}} import {{parent.name}}
 {%- else -%}
-from com.ankamagames.jerakine.network.NetworkMessage import NetworkMessage{% endif %}
+from pydofus2.com.ankamagames.jerakine.network.NetworkMessage import NetworkMessage{% endif %}
 {%- if nonPrimitives %}
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:

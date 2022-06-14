@@ -1,11 +1,11 @@
-from com.ankamagames.dofus.network.MessageReceiver import MessageReceiver
-from com.ankamagames.jerakine.logger.Logger import Logger
-from com.ankamagames.jerakine.network.CustomDataWrapper import ByteArray
-from com.ankamagames.jerakine.network.NetworkMessage import NetworkMessage
-from com.ankamagames.jerakine.network.parser.NetworkMessageClassDefinition import (
+from pydofus2.com.ankamagames.dofus.network.MessageReceiver import MessageReceiver
+from pydofus2.com.ankamagames.jerakine.logger.Logger import Logger
+from pydofus2.com.ankamagames.jerakine.network.CustomDataWrapper import ByteArray
+from pydofus2.com.ankamagames.jerakine.network.NetworkMessage import NetworkMessage
+from pydofus2.com.ankamagames.jerakine.network.parser.NetworkMessageClassDefinition import (
     NetworkMessageClassDefinition,
 )
-from com.ankamagames.jerakine.network.parser.ProtocolSpec import ProtocolSpec
+from pydofus2.com.ankamagames.jerakine.network.parser.ProtocolSpec import ProtocolSpec
 
 logger = Logger("Dofus2")
 

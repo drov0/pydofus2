@@ -1,8 +1,8 @@
 import os
 from pathlib import Path
 from tqdm import tqdm
-import com.ankamagames.dofus.Constants as Constants
-from dataAdapter.d2p import D2PReader
+import pydofus2.com.ankamagames.dofus.Constants as Constants
+from pydofus2.dataAdapter.d2p import D2PReader
 
 work_dir = Path(os.path.dirname(__file__))
 D2P_MAPS_PATH = Constants.DOFUS_CONTENT_DIR / "maps"

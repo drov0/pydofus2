@@ -4,10 +4,10 @@ from types import FunctionType
 import pyshark
 import socket
 from whistle import Event, EventDispatcher
-from com.ankamagames.dofus.network.MessageReceiver import MessageReceiver
-from com.ankamagames.jerakine.logger.Logger import Logger
-from com.ankamagames.jerakine.network.CustomDataWrapper import ByteArray
-from com.ankamagames.jerakine.network.ServerConnection import ServerConnection
+from pydofus2.com.ankamagames.dofus.network.MessageReceiver import MessageReceiver
+from pydofus2.com.ankamagames.jerakine.logger.Logger import Logger
+from pydofus2.com.ankamagames.jerakine.network.CustomDataWrapper import ByteArray
+from pydofus2.com.ankamagames.jerakine.network.ServerConnection import ServerConnection
 from snifferApp.network.message import Message
 import threading
 

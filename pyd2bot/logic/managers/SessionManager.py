@@ -2,9 +2,9 @@ import json
 import os
 import threading
 from time import perf_counter, sleep
-from com.DofusClient import DofusClient
-from com.ankamagames.jerakine.logger.Logger import Logger
-from com.ankamagames.jerakine.metaclasses.Singleton import Singleton
+from pydofus2.com.DofusClient import DofusClient
+from pydofus2.com.ankamagames.jerakine.logger.Logger import Logger
+from pydofus2.com.ankamagames.jerakine.metaclasses.Singleton import Singleton
 from pyd2bot.BotConstants import BotConstants
 from pyd2bot.logic.managers.BotCredsManager import BotCredsManager
 from pyd2bot.logic.managers.PathManager import PathManager
@@ -49,25 +49,23 @@ class SessionManager(metaclass=Singleton):
         if not sessionJson:
             raise ValueError(f"No session with id {sessionId}")
         self.charachterId = sessionJson.get("charachterId")
-        self.creds = BotCredsManager.getEntry(str(self.charachterId))
+        self.charachter = BotCredsManager.getEntry(str(self.charachterId))
         self.spellId = sessionJson.get("spellId")
-        self.pathId = sessionJson.get("charachterId")
+        self.pathId = sessionJson.get("pathId")
         self.statToUp: int = sessionJson.get("statToUp")
         self.isLeader: bool = sessionJson.get("isLeader")
         logger.debug(f"is leader {self.isLeader}")
         self.followers: list[str] = sessionJson.get("followers")
         self.leaderName: str = sessionJson.get("leaderName")
-
         if self.isLeader is not None:
             if not self.pathId:
                 raise ValueError("A leader must have a definded path")
-            self.path = PathManager.getPath(str(sessionJson.get("pathId")))
+            self.path = PathManager.getPath(str(self.pathId))
             if self.followers is None:
                 logger.warn("No followers for leader")
         else:
             if not self.leaderName:
                 raise Exception("Must provide a leader name for a follower")
-
         self.isSolo = self.isLeader is None and self.followers is None
         self.monitor = SessionMonitor()
         self.monitor.start()

@@ -1,15 +1,15 @@
-from com.ankamagames.dofus.logic.game.common.managers.PlayedCharacterManager import PlayedCharacterManager
-from com.ankamagames.dofus.network.enums.GameContextEnum import GameContextEnum
-from com.ankamagames.dofus.network.messages.game.context.GameContextCreateMessage import GameContextCreateMessage
-from com.ankamagames.dofus.network.messages.game.context.GameContextDestroyMessage import GameContextDestroyMessage
-from com.ankamagames.dofus.network.messages.game.context.fight.GameFightTurnStartMessage import (
+from pydofus2.com.ankamagames.dofus.logic.game.common.managers.PlayedCharacterManager import PlayedCharacterManager
+from pydofus2.com.ankamagames.dofus.network.enums.GameContextEnum import GameContextEnum
+from pydofus2.com.ankamagames.dofus.network.messages.game.context.GameContextCreateMessage import GameContextCreateMessage
+from pydofus2.com.ankamagames.dofus.network.messages.game.context.GameContextDestroyMessage import GameContextDestroyMessage
+from pydofus2.com.ankamagames.dofus.network.messages.game.context.fight.GameFightTurnStartMessage import (
     GameFightTurnStartMessage,
 )
-from com.ankamagames.jerakine.messages.Frame import Frame
-from com.ankamagames.dofus.kernel.Kernel import Kernel
-from com.ankamagames.jerakine.logger.Logger import Logger
-from com.ankamagames.jerakine.messages.Message import Message
-from com.ankamagames.jerakine.types.enums.Priority import Priority
+from pydofus2.com.ankamagames.jerakine.messages.Frame import Frame
+from pydofus2.com.ankamagames.dofus.kernel.Kernel import Kernel
+from pydofus2.com.ankamagames.jerakine.logger.Logger import Logger
+from pydofus2.com.ankamagames.jerakine.messages.Message import Message
+from pydofus2.com.ankamagames.jerakine.types.enums.Priority import Priority
 
 logger = Logger("Dofus2")
 

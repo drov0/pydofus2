@@ -1,35 +1,35 @@
 import random
 from threading import Timer
 from typing import TYPE_CHECKING
-from com.ankamagames.dofus.datacenter.items.criterion.CriterionUtils import CriterionUtils
-from com.ankamagames.dofus.datacenter.world.MapPosition import MapPosition
-from com.ankamagames.dofus.logic.game.common.managers.PlayedCharacterManager import PlayedCharacterManager
-from com.ankamagames.dofus.logic.game.roleplay.frames.RoleplayInteractivesFrame import InteractiveElementData
-from com.ankamagames.dofus.modules.utils.pathFinding.world.Edge import Edge
+from pydofus2.com.ankamagames.dofus.datacenter.items.criterion.CriterionUtils import CriterionUtils
+from pydofus2.com.ankamagames.dofus.datacenter.world.MapPosition import MapPosition
+from pydofus2.com.ankamagames.dofus.logic.game.common.managers.PlayedCharacterManager import PlayedCharacterManager
+from pydofus2.com.ankamagames.dofus.logic.game.roleplay.frames.RoleplayInteractivesFrame import InteractiveElementData
+from pydofus2.com.ankamagames.dofus.modules.utils.pathFinding.world.Edge import Edge
 
-from com.ankamagames.dofus.modules.utils.pathFinding.world.Transition import Transition
-from com.ankamagames.dofus.modules.utils.pathFinding.world.TransitionTypeEnum import TransitionTypeEnum
+from pydofus2.com.ankamagames.dofus.modules.utils.pathFinding.world.Transition import Transition
+from pydofus2.com.ankamagames.dofus.modules.utils.pathFinding.world.TransitionTypeEnum import TransitionTypeEnum
 
-from com.ankamagames.dofus.modules.utils.pathFinding.world.WorldPathFinder import (
+from pydofus2.com.ankamagames.dofus.modules.utils.pathFinding.world.WorldPathFinder import (
     WorldPathFinder,
 )
-from com.ankamagames.jerakine.types.positions.MapPoint import MapPoint
+from pydofus2.com.ankamagames.jerakine.types.positions.MapPoint import MapPoint
 
 if TYPE_CHECKING:
-    from com.ankamagames.atouin.data.map.Map import Map
-    from com.ankamagames.dofus.logic.game.roleplay.frames.RoleplayInteractivesFrame import (
+    from pydofus2.com.ankamagames.atouin.data.map.Map import Map
+    from pydofus2.com.ankamagames.dofus.logic.game.roleplay.frames.RoleplayInteractivesFrame import (
         RoleplayInteractivesFrame,
     )
-    from com.ankamagames.dofus.logic.game.roleplay.frames.RoleplayMovementFrame import RoleplayMovementFrame
+    from pydofus2.com.ankamagames.dofus.logic.game.roleplay.frames.RoleplayMovementFrame import RoleplayMovementFrame
 
-import com.ankamagames.atouin.managers.MapDisplayManager as mdm
-from com.ankamagames.atouin.messages.AdjacentMapClickMessage import (
+import pydofus2.com.ankamagames.atouin.managers.MapDisplayManager as mdm
+from pydofus2.com.ankamagames.atouin.messages.AdjacentMapClickMessage import (
     AdjacentMapClickMessage,
 )
-from com.ankamagames.atouin.messages.CellClickMessage import CellClickMessage
-from com.ankamagames.dofus.kernel.Kernel import Kernel
-from com.ankamagames.jerakine.logger.Logger import Logger
-from com.ankamagames.jerakine.types.enums.DirectionsEnum import DirectionsEnum
+from pydofus2.com.ankamagames.atouin.messages.CellClickMessage import CellClickMessage
+from pydofus2.com.ankamagames.dofus.kernel.Kernel import Kernel
+from pydofus2.com.ankamagames.jerakine.logger.Logger import Logger
+from pydofus2.com.ankamagames.jerakine.types.enums.DirectionsEnum import DirectionsEnum
 
 logger = Logger("Dofus2")
 

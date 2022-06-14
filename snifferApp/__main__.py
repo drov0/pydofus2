@@ -1,7 +1,7 @@
 import argparse
 import logging
 import os
-from com.ankamagames.jerakine.logger.Logger import Logger
+from pydofus2.com.ankamagames.jerakine.logger.Logger import Logger
 from . import ui
 import webbrowser
 

@@ -1,28 +1,28 @@
-from com.ankamagames.dofus.datacenter.breeds.Breed import Breed
-from com.ankamagames.dofus.kernel.net.ConnectionsHandler import ConnectionsHandler
-from com.ankamagames.dofus.logic.common.managers.StatsManager import StatsManager
-from com.ankamagames.dofus.logic.game.common.managers.PlayedCharacterManager import PlayedCharacterManager
-from com.ankamagames.dofus.network.messages.game.achievement.AchievementFinishedMessage import (
+from pydofus2.com.ankamagames.dofus.datacenter.breeds.Breed import Breed
+from pydofus2.com.ankamagames.dofus.kernel.net.ConnectionsHandler import ConnectionsHandler
+from pydofus2.com.ankamagames.dofus.logic.common.managers.StatsManager import StatsManager
+from pydofus2.com.ankamagames.dofus.logic.game.common.managers.PlayedCharacterManager import PlayedCharacterManager
+from pydofus2.com.ankamagames.dofus.network.messages.game.achievement.AchievementFinishedMessage import (
     AchievementFinishedMessage,
 )
-from com.ankamagames.dofus.network.messages.game.achievement.AchievementRewardRequestMessage import (
+from pydofus2.com.ankamagames.dofus.network.messages.game.achievement.AchievementRewardRequestMessage import (
     AchievementRewardRequestMessage,
 )
-from com.ankamagames.dofus.network.messages.game.character.stats.CharacterLevelUpMessage import CharacterLevelUpMessage
-from com.ankamagames.dofus.network.messages.game.character.stats.CharacterStatsListMessage import (
+from pydofus2.com.ankamagames.dofus.network.messages.game.character.stats.CharacterLevelUpMessage import CharacterLevelUpMessage
+from pydofus2.com.ankamagames.dofus.network.messages.game.character.stats.CharacterStatsListMessage import (
     CharacterStatsListMessage,
 )
-from com.ankamagames.dofus.network.messages.game.context.roleplay.stats.StatsUpgradeRequestMessage import (
+from pydofus2.com.ankamagames.dofus.network.messages.game.context.roleplay.stats.StatsUpgradeRequestMessage import (
     StatsUpgradeRequestMessage,
 )
-from com.ankamagames.dofus.network.types.game.character.characteristic.CharacterCharacteristicDetailed import (
+from pydofus2.com.ankamagames.dofus.network.types.game.character.characteristic.CharacterCharacteristicDetailed import (
     CharacterCharacteristicDetailed,
 )
-from com.ankamagames.jerakine.messages.Frame import Frame
-from com.ankamagames.jerakine.logger.Logger import Logger
-from com.ankamagames.jerakine.messages.Message import Message
-from com.ankamagames.jerakine.types.enums.Priority import Priority
-from damageCalculation.tools import StatIds
+from pydofus2.com.ankamagames.jerakine.messages.Frame import Frame
+from pydofus2.com.ankamagames.jerakine.logger.Logger import Logger
+from pydofus2.com.ankamagames.jerakine.messages.Message import Message
+from pydofus2.com.ankamagames.jerakine.types.enums.Priority import Priority
+from pydofus2.damageCalculation.tools import StatIds
 
 from pyd2bot.logic.managers.SessionManager import SessionManager
 

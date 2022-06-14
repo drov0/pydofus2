@@ -1,7 +1,7 @@
 from typing import Iterator
-from com.ankamagames.dofus.modules.utils.pathFinding.world.Transition import Transition
-from com.ankamagames.dofus.modules.utils.pathFinding.world.Vertex import Vertex
-from com.ankamagames.dofus.modules.utils.pathFinding.world.WorldPathFinder import WorldPathFinder
+from pydofus2.com.ankamagames.dofus.modules.utils.pathFinding.world.Transition import Transition
+from pydofus2.com.ankamagames.dofus.modules.utils.pathFinding.world.Vertex import Vertex
+from pydofus2.com.ankamagames.dofus.modules.utils.pathFinding.world.WorldPathFinder import WorldPathFinder
 
 
 class AbstractFarmPath:

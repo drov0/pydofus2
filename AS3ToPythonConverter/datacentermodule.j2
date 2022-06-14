@@ -1,6 +1,6 @@
 {% if cls.hasGetObjectById or cls.hasGetObjects -%}
-from com.ankamagames.jerakine.data.GameData import GameData
-from com.ankamagames.dofus.types.IdAccessors import IdAccessors
+from pydofus2.com.ankamagames.jerakine.data.GameData import GameData
+from pydofus2.com.ankamagames.dofus.types.IdAccessors import IdAccessors
 {% endif %}
 
 class {{cls.name}}{% if cls.parent %}({{cls.parent}}){% endif %}:

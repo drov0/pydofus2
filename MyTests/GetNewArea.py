@@ -1,6 +1,6 @@
 from time import perf_counter
-from com.ankamagames.atouin.managers.MapDisplayManager import MapDisplayManager
-from com.ankamagames.dofus.datacenter.world.SubArea import SubArea
+from pydofus2.com.ankamagames.atouin.managers.MapDisplayManager import MapDisplayManager
+from pydofus2.com.ankamagames.dofus.datacenter.world.SubArea import SubArea
 
 currMapId = 153878786  
 MapDisplayManager().loadMap(currMapId)

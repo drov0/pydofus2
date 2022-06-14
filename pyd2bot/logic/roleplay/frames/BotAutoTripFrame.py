@@ -1,32 +1,32 @@
 from threading import Timer
-from com.DofusClient import DofusClient
-from com.ankamagames.atouin.managers.MapDisplayManager import MapDisplayManager
-from com.ankamagames.dofus.kernel.net.ConnectionsHandler import ConnectionsHandler
-from com.ankamagames.dofus.logic.game.common.managers.PlayedCharacterManager import PlayedCharacterManager
-from com.ankamagames.dofus.modules.utils.pathFinding.world.Edge import Edge
-from com.ankamagames.dofus.network.messages.game.context.roleplay.MapInformationsRequestMessage import (
+from pydofus2.com.DofusClient import DofusClient
+from pydofus2.com.ankamagames.atouin.managers.MapDisplayManager import MapDisplayManager
+from pydofus2.com.ankamagames.dofus.kernel.net.ConnectionsHandler import ConnectionsHandler
+from pydofus2.com.ankamagames.dofus.logic.game.common.managers.PlayedCharacterManager import PlayedCharacterManager
+from pydofus2.com.ankamagames.dofus.modules.utils.pathFinding.world.Edge import Edge
+from pydofus2.com.ankamagames.dofus.network.messages.game.context.roleplay.MapInformationsRequestMessage import (
     MapInformationsRequestMessage,
 )
-from com.ankamagames.jerakine.messages.Frame import Frame
-from com.ankamagames.jerakine.messages.Message import Message
+from pydofus2.com.ankamagames.jerakine.messages.Frame import Frame
+from pydofus2.com.ankamagames.jerakine.messages.Message import Message
 from pyd2bot.apis.MoveAPI import MoveAPI
-from com.ankamagames.dofus.kernel.Kernel import Kernel
-from com.ankamagames.dofus.modules.utils.pathFinding.world.WorldPathFinder import (
+from pydofus2.com.ankamagames.dofus.kernel.Kernel import Kernel
+from pydofus2.com.ankamagames.dofus.modules.utils.pathFinding.world.WorldPathFinder import (
     WorldPathFinder,
 )
-from com.ankamagames.dofus.network.messages.game.context.roleplay.MapChangeFailedMessage import (
+from pydofus2.com.ankamagames.dofus.network.messages.game.context.roleplay.MapChangeFailedMessage import (
     MapChangeFailedMessage,
 )
-from com.ankamagames.dofus.network.messages.game.context.roleplay.MapComplementaryInformationsDataMessage import (
+from pydofus2.com.ankamagames.dofus.network.messages.game.context.roleplay.MapComplementaryInformationsDataMessage import (
     MapComplementaryInformationsDataMessage,
 )
-from com.ankamagames.jerakine.logger.Logger import Logger
-from com.ankamagames.jerakine.types.enums.Priority import Priority
+from pydofus2.com.ankamagames.jerakine.logger.Logger import Logger
+from pydofus2.com.ankamagames.jerakine.types.enums.Priority import Priority
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
-    from com.ankamagames.dofus.logic.game.roleplay.frames.RoleplayMovementFrame import RoleplayMovementFrame
-    from com.ankamagames.dofus.logic.game.roleplay.frames.RoleplayInteractivesFrame import RoleplayInteractivesFrame
+    from pydofus2.com.ankamagames.dofus.logic.game.roleplay.frames.RoleplayMovementFrame import RoleplayMovementFrame
+    from pydofus2.com.ankamagames.dofus.logic.game.roleplay.frames.RoleplayInteractivesFrame import RoleplayInteractivesFrame
 from pyd2bot.logic.roleplay.messages.AutoTripEndedMessage import AutoTripEndedMessage
 
 logger = Logger("Dofus2")

@@ -3,66 +3,66 @@ import threading
 from threading import Timer
 from time import sleep
 from typing import TYPE_CHECKING
-from com.DofusClient import DofusClient
+from pydofus2.com.DofusClient import DofusClient
 
-from com.ankamagames.atouin.managers.MapDisplayManager import MapDisplayManager
-from com.ankamagames.dofus.kernel.Kernel import Kernel
-from com.ankamagames.dofus.kernel.net.ConnectionsHandler import ConnectionsHandler
-from com.ankamagames.dofus.logic.game.common.managers.PlayedCharacterManager import PlayedCharacterManager
-from com.ankamagames.dofus.logic.game.fight.messages.MapMoveFailed import MapMoveFailed
-from com.ankamagames.dofus.network.messages.game.atlas.compass.CompassUpdatePartyMemberMessage import (
+from pydofus2.com.ankamagames.atouin.managers.MapDisplayManager import MapDisplayManager
+from pydofus2.com.ankamagames.dofus.kernel.Kernel import Kernel
+from pydofus2.com.ankamagames.dofus.kernel.net.ConnectionsHandler import ConnectionsHandler
+from pydofus2.com.ankamagames.dofus.logic.game.common.managers.PlayedCharacterManager import PlayedCharacterManager
+from pydofus2.com.ankamagames.dofus.logic.game.fight.messages.MapMoveFailed import MapMoveFailed
+from pydofus2.com.ankamagames.dofus.network.messages.game.atlas.compass.CompassUpdatePartyMemberMessage import (
     CompassUpdatePartyMemberMessage,
 )
-from com.ankamagames.dofus.network.messages.game.chat.ChatClientPrivateMessage import ChatClientPrivateMessage
-from com.ankamagames.dofus.network.messages.game.context.roleplay.MapChangeFailedMessage import MapChangeFailedMessage
-from com.ankamagames.dofus.network.messages.game.context.roleplay.MapComplementaryInformationsDataMessage import (
+from pydofus2.com.ankamagames.dofus.network.messages.game.chat.ChatClientPrivateMessage import ChatClientPrivateMessage
+from pydofus2.com.ankamagames.dofus.network.messages.game.context.roleplay.MapChangeFailedMessage import MapChangeFailedMessage
+from pydofus2.com.ankamagames.dofus.network.messages.game.context.roleplay.MapComplementaryInformationsDataMessage import (
     MapComplementaryInformationsDataMessage,
 )
-from com.ankamagames.dofus.network.messages.game.context.roleplay.party.PartyAcceptInvitationMessage import (
+from pydofus2.com.ankamagames.dofus.network.messages.game.context.roleplay.party.PartyAcceptInvitationMessage import (
     PartyAcceptInvitationMessage,
 )
-from com.ankamagames.dofus.network.messages.game.context.roleplay.party.PartyCancelInvitationMessage import (
+from pydofus2.com.ankamagames.dofus.network.messages.game.context.roleplay.party.PartyCancelInvitationMessage import (
     PartyCancelInvitationMessage,
 )
-from com.ankamagames.dofus.network.messages.game.context.roleplay.party.PartyDeletedMessage import PartyDeletedMessage
-from com.ankamagames.dofus.network.messages.game.context.roleplay.party.PartyFollowMemberRequestMessage import (
+from pydofus2.com.ankamagames.dofus.network.messages.game.context.roleplay.party.PartyDeletedMessage import PartyDeletedMessage
+from pydofus2.com.ankamagames.dofus.network.messages.game.context.roleplay.party.PartyFollowMemberRequestMessage import (
     PartyFollowMemberRequestMessage,
 )
-from com.ankamagames.dofus.network.messages.game.context.roleplay.party.PartyInvitationMessage import (
+from pydofus2.com.ankamagames.dofus.network.messages.game.context.roleplay.party.PartyInvitationMessage import (
     PartyInvitationMessage,
 )
-from com.ankamagames.dofus.network.messages.game.context.roleplay.party.PartyInvitationRequestMessage import (
+from pydofus2.com.ankamagames.dofus.network.messages.game.context.roleplay.party.PartyInvitationRequestMessage import (
     PartyInvitationRequestMessage,
 )
-from com.ankamagames.dofus.network.messages.game.context.roleplay.party.PartyJoinMessage import PartyJoinMessage
-from com.ankamagames.dofus.network.messages.game.context.roleplay.party.PartyLeaveRequestMessage import (
+from pydofus2.com.ankamagames.dofus.network.messages.game.context.roleplay.party.PartyJoinMessage import PartyJoinMessage
+from pydofus2.com.ankamagames.dofus.network.messages.game.context.roleplay.party.PartyLeaveRequestMessage import (
     PartyLeaveRequestMessage,
 )
-from com.ankamagames.dofus.network.messages.game.context.roleplay.party.PartyMemberInStandardFightMessage import (
+from pydofus2.com.ankamagames.dofus.network.messages.game.context.roleplay.party.PartyMemberInStandardFightMessage import (
     PartyMemberInStandardFightMessage,
 )
-from com.ankamagames.dofus.network.messages.game.context.roleplay.party.PartyMemberRemoveMessage import (
+from pydofus2.com.ankamagames.dofus.network.messages.game.context.roleplay.party.PartyMemberRemoveMessage import (
     PartyMemberRemoveMessage,
 )
-from com.ankamagames.dofus.network.messages.game.context.roleplay.party.PartyNewGuestMessage import (
+from pydofus2.com.ankamagames.dofus.network.messages.game.context.roleplay.party.PartyNewGuestMessage import (
     PartyNewGuestMessage,
 )
-from com.ankamagames.dofus.network.messages.game.context.roleplay.party.PartyNewMemberMessage import (
+from pydofus2.com.ankamagames.dofus.network.messages.game.context.roleplay.party.PartyNewMemberMessage import (
     PartyNewMemberMessage,
 )
-from com.ankamagames.dofus.network.messages.game.context.roleplay.party.PartyRefuseInvitationMessage import (
+from pydofus2.com.ankamagames.dofus.network.messages.game.context.roleplay.party.PartyRefuseInvitationMessage import (
     PartyRefuseInvitationMessage,
 )
-from com.ankamagames.dofus.network.types.common.PlayerSearchCharacterNameInformation import (
+from pydofus2.com.ankamagames.dofus.network.types.common.PlayerSearchCharacterNameInformation import (
     PlayerSearchCharacterNameInformation,
 )
-from com.ankamagames.dofus.network.types.game.context.roleplay.party.PartyMemberInformations import (
+from pydofus2.com.ankamagames.dofus.network.types.game.context.roleplay.party.PartyMemberInformations import (
     PartyMemberInformations,
 )
-from com.ankamagames.jerakine.logger.Logger import Logger
-from com.ankamagames.jerakine.messages.Frame import Frame
-from com.ankamagames.jerakine.messages.Message import Message
-from com.ankamagames.jerakine.types.enums.Priority import Priority
+from pydofus2.com.ankamagames.jerakine.logger.Logger import Logger
+from pydofus2.com.ankamagames.jerakine.messages.Frame import Frame
+from pydofus2.com.ankamagames.jerakine.messages.Message import Message
+from pydofus2.com.ankamagames.jerakine.types.enums.Priority import Priority
 from pyd2bot.apis.MoveAPI import MoveAPI
 from pyd2bot.logic.managers.SessionManager import SessionManager
 from pyd2bot.logic.roleplay.frames.BotAutoTripFrame import BotAutoTripFrame
@@ -70,8 +70,8 @@ from pyd2bot.logic.roleplay.messages.AutoTripEndedMessage import AutoTripEndedMe
 from pyd2bot.misc.BotEventsmanager import BotEventsManager
 
 if TYPE_CHECKING:
-    from com.ankamagames.dofus.logic.game.roleplay.frames.RoleplayEntitiesFrame import RoleplayEntitiesFrame
-    from com.ankamagames.dofus.logic.game.roleplay.frames.RoleplayMovementFrame import RoleplayMovementFrame
+    from pydofus2.com.ankamagames.dofus.logic.game.roleplay.frames.RoleplayEntitiesFrame import RoleplayEntitiesFrame
+    from pydofus2.com.ankamagames.dofus.logic.game.roleplay.frames.RoleplayMovementFrame import RoleplayMovementFrame
 
 logger = Logger("Dofus2")
 

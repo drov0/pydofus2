@@ -1,7 +1,7 @@
 import json
 import re
 import sys
-import com.ankamagames.dofus.Constants as Constants
+import pydofus2.com.ankamagames.dofus.Constants as Constants
 
 IMPORT_REGX = "^\s*import (?P<module_prefix>\S+(?:\.\S+)*)\.(?P<cls_name>\S+);"
 SHUFFLE_MAPPING_REGX = "^\s*_messagesTypes\[(?P<msgId>\d+)\] = (?P<cls_name>\S+);"
@@ -15,7 +15,7 @@ def main(msgReceiverAs):
             if m:
                 module_prefix = m.group("module_prefix")
                 cls_name = m.group("cls_name")
-                module_path = f"{module_prefix}.{cls_name}"
+                module_path = f"pydofus2.{module_prefix}.{cls_name}"
                 if cls_name == "ProtocolRequired" or (
                     cls_name.endswith("Message") and cls_name not in ["INetworkMessage"]
                 ):

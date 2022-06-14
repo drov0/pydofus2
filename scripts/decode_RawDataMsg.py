@@ -1,6 +1,6 @@
 import hashlib
-from com.hurlan.crypto.Signature import SignatureKey, Signature
-from com.ankamagames.jerakine.network.CustomDataWrapper import ByteArray
+from pydofus2.com.hurlan.crypto.Signature import SignatureKey, Signature
+from pydofus2.com.ankamagames.jerakine.network.CustomDataWrapper import ByteArray
 from Cryptodome.PublicKey import RSA
 
 k1_path = r"C:\Users\majdoub\OneDrive\Documents\pyd2bot\pyd2bot\gameData\binaryData\ServerControlFrame_PUBLIC_KEY_V1.bin"

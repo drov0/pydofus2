@@ -1,7 +1,7 @@
 import logging
 import datetime
 import os
-
+import pydofus2.com.ankamagames.dofus.Constants as Constants
 
 class Logger(logging.Logger):
     _logger = None
@@ -11,21 +11,15 @@ class Logger(logging.Logger):
         self._prefix = log_prefix
         self.setLevel(logging.DEBUG)
         formatter = logging.Formatter("%(asctime)s [%(levelname)s | %(filename)s:%(lineno)s] > %(message)s")
-
         now = datetime.datetime.now()
-        dirname = "./log"
-
-        if not os.path.isdir(dirname):
-            os.mkdir(dirname)
+        if not os.path.isdir(Constants.LOGS_PATH):
+            os.mkdir(Constants.LOGS_PATH)
         fileHandler = logging.FileHandler(
-            dirname + f"/log_{self._prefix}_{os.getpid()}" + now.strftime("%Y-%m-%d") + ".log"
+            Constants.LOGS_PATH / f"/{self._prefix}_{os.getpid()}_{now.strftime('%Y-%m-%d')}.log"
         )
-
         streamHandler = logging.StreamHandler()
-
         fileHandler.setFormatter(formatter)
         streamHandler.setFormatter(formatter)
-
         self.addHandler(fileHandler)
         self.addHandler(streamHandler)
 

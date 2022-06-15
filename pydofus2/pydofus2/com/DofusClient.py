@@ -35,9 +35,9 @@ class DofusClient(metaclass=Singleton):
         DataMapProvider().init(AnimatedCharacter)
 
     def relogin(self):
-        self.login(self._accountId, self._serverId, self._charachterId)
+        self.login(self._loginToken, self._serverId, self._charachterId)
 
-    def login(self, loginToken, serverId, charachterId=None):
+    def login(self, loginToken, serverId=0, charachterId=None):
         if self.LOG_MEMORY_USAGE:
             tracemalloc.start(10)
         self._serverId = serverId
@@ -50,9 +50,14 @@ class DofusClient(metaclass=Singleton):
             PlayerManager().autoConnectOfASpecificCharacterId = charachterId
         for frame in self._registredCustomFrames:
             self._worker.addFrame(frame)
-        self._worker.processImmediately(
-            LoginValidationWithTokenAction.create(autoSelectServer=True, serverId=self._serverId)
-        )
+        if self._serverId == 0:
+            self._worker.processImmediately(
+                LoginValidationWithTokenAction.create(autoSelectServer=False, serverId=self._serverId)
+            )
+        else:
+            self._worker.processImmediately(
+                LoginValidationWithTokenAction.create(autoSelectServer=True, serverId=self._serverId)
+            )
 
     def join(self):
         while True:
@@ -71,6 +76,7 @@ class DofusClient(metaclass=Singleton):
         self._registredCustomFrames.append(frame)
 
     def shutdown(self):
+        logger.info("Shuting down ...")
         connh.ConnectionsHandler.connectionGonnaBeClosed(DisconnectionReasonEnum.WANTED_SHUTDOWN)
         connh.ConnectionsHandler.getConnection().close()
 

@@ -2,7 +2,7 @@ from pathlib import Path
 import site
 import os
 
-ROOTDIR = CURR_DIR = Path(os.getcwd())
+ROOTDIR = CURR_DIR = Path(__file__).parent
 SITEDIR = site.getsitepackages()[0]
 with open(os.path.join(SITEDIR, "pydofus2.pth"), "w+") as fp:
     fp.write(str(ROOTDIR / "pydofus2"))

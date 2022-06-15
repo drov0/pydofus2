@@ -47,7 +47,7 @@ logger = Logger("Dofus2")
 
 class ServerSelectionFrame(Frame):
 
-    _serversList: list[GameServerInformations]
+    _serversList: list[GameServerInformations] = []
 
     _serversUsedList: list[GameServerInformations]
 
@@ -97,7 +97,8 @@ class ServerSelectionFrame(Frame):
             self._serversList = slmsg.servers
             self._serversList.sort(key=lambda x: x.date)
             self.broadcastServersListUpdate()
-            self._worker.process(ServerSelectionAction.create(AuthentificationManager()._lva.serverId))
+            logger.info(AuthentificationManager()._lva.serverId)
+            krnl.Kernel().getWorker().processImmediately(ServerSelectionAction.create(AuthentificationManager()._lva.serverId))
             return False
 
         elif isinstance(msg, ServerStatusUpdateMessage):

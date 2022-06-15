@@ -94,14 +94,15 @@ class DisconnectionHandlerFrame(Frame):
 
             logger.debug("The connection was closed. Checking reasons.")
             gsaF.GameServerApproachFrame.authenticationTicketAccepted = False
+            reason = connh.ConnectionsHandler.handleDisconnection()
             if connh.ConnectionsHandler.hasReceivedMsg:
                 if (
+                    not reason.expected and
                     not connh.ConnectionsHandler.hasReceivedNetworkMsg
                     and self._numberOfAttemptsAlreadyDone < self.CONNECTION_ATTEMPTS_NUMBER
                 ):
                     self.handleUnexpectedNoMsgReceived()
                 else:
-                    reason = connh.ConnectionsHandler.handleDisconnection()
                     if not reason.expected:
                         logger.debug(f"The connection was closed unexpectedly. Reseting.")
                         self._connectionUnexpectedFailureTimes.append(perf_counter())

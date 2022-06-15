@@ -19,15 +19,15 @@ class Haapi(metaclass=Singleton):
             "GET_LOGIN_TOKEN": "/json/Ankama/v5/Account/CreateToken",
         }[request]
 
-    def createAPIKEY(self, cert, login, password, game_id=102) -> str:
+    def createAPIKEY(self, login, password, certId, certHash, game_id=102) -> str:
         logger.debug("Calling HAAPI to Create APIKEY")
         data = {
             "login": login,
             "password": password,
             "game_id": game_id,
             "long_life_token": True,
-            "certificate_id": cert["id"],
-            "certificate_hash": cert["hash"],
+            "certificate_id": certId,
+            "certificate_hash": str(certHash),
             "shop_key": "ZAAP",
             "payment_mode": "OK",
         }
@@ -39,23 +39,28 @@ class Haapi(metaclass=Singleton):
                 "Content-Type": "multipart/form-data",
             },
         )
-        self.APIKEY = response.json()["key"]
+        resposeJson = response.json()
+        if "key" not in resposeJson:
+            logger.error("Error while calling HAAPI to Create APIKEY")
+            logger.error(resposeJson["message"])
+            raise Exception(resposeJson["message"])
+        self.APIKEY = resposeJson["key"]
         logger.debug("APIKEY created")
         return self.APIKEY
 
 
-    def getLoginToken(self, cert, login, password, game_id=1):
+    def getLoginToken(self, login, password, certId, certHash, game_id=1):
         logger.debug("Calling HAAPI to get Login Token")
         if not self.APIKEY:
-            self.createAPIKEY(cert, login, password)
+            self.createAPIKEY(login, password, certId, certHash)
         nbrTries = 0
         while nbrTries < 3:
             response = httpx.get(
                 self.getUrl("GET_LOGIN_TOKEN"),
                 params={
                     "game": game_id,
-                    "certificate_id": cert["id"],
-                    "certificate_hash": cert["hash"],
+                    "certificate_id": certId,
+                    "certificate_hash": certHash,
                 },
                 headers={
                     "User-Agent": "Zaap1",

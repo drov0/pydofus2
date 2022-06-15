@@ -1,7 +1,5 @@
 import os
-from subprocess import PIPE, Popen
-
-path ="../pydofus2/pydofus2"
+path="../pyd2bot/pyd2bot"
 
 for root, dirs, files in os.walk(path):
     for dir in dirs:

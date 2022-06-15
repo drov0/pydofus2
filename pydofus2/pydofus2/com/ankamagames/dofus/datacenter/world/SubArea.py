@@ -7,7 +7,7 @@ from pydofus2.com.ankamagames.jerakine.data.I18n import I18n
 from pydofus2.com.ankamagames.jerakine.data.IPostInit import IPostInit
 from pydofus2.com.ankamagames.jerakine.interfaces.IDataCenter import IDataCenter
 from pydofus2.flash.geom.Point import Point
-from flash.geom.Rectangle import Rectangle
+from pydofus2.flash.geom.Rectangle import Rectangle
 
 
 class SubArea(IDataCenter, IPostInit):

@@ -45,6 +45,8 @@ ROOTDIR = Path(os.path.dirname(__file__))
 
 MAPS_PATH = Path(os.getenv("APPDATA")) / "pydofus2" / "content" / "maps"
 
+LOGS_PATH = Path(os.getenv("APPDATA")) / "pydofus2" / "logs"
+
 DOFUS_ROOTDIR = Path(os.getenv("LOCALAPPDATA")) / "Ankama" / "Dofus"
 
 DOFUS_DATA_DIR = DOFUS_ROOTDIR / "data"

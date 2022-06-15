@@ -139,8 +139,6 @@ class ConnectionsHandler:
             krnl.Kernel().getWorker().removeFrame(krnl.Kernel().getWorker().getFrame("HandshakeFrame"))
         if cls._currentConnection and cls._currentConnection.connected:
             cls._currentConnection.close()
-        else:
-            logger.debug("Requested close connection but no cuurent Connection is set.")
         cls._currentConnection = None
         cls._currentConnectionType = ConnectionType.DISCONNECTED
 

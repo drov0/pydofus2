@@ -46,7 +46,7 @@ class ProtocolParser:
         r"\s*this.(?P<name>\w+) = BooleanByteWrapper\.getFlag\(.*;\n"
     )
 
-    json = {"type": {}, "msg_by_id": {}, "type_by_id": {}}
+    json:dict = {"type": {}, "msg_by_id": {}, "type_by_id": {}}
 
     def run(self, src_paths):
         self.getMsgTypesFromSrcs(src_paths)

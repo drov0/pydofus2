@@ -14,7 +14,7 @@ from pydofus2.com.ankamagames.jerakine.data.GameDataField import GameDataField
 class GameDataClassDefinition:
     def __init__(self, packageName: str, className: str, moduleReader: "ModuleReader") -> None:
         self._fields = list()
-        moduleName = packageName + "." + className
+        moduleName = f"pydofus2.{packageName}.{className}"
         try:
             module = sys.modules[moduleName]
         except:

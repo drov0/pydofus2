@@ -67,6 +67,7 @@ class Kernel(metaclass=Singleton):
         if messagesToDispatchAfter is not None and len(messagesToDispatchAfter) > 0:
             for msg in messagesToDispatchAfter:
                 self._worker.process(msg)
+        logger.debug("[KERNEL] Reseted")
 
     def addInitialFrames(self) -> None:
         import pydofus2.com.ankamagames.dofus.logic.connection.frames.DisconnectionHandlerFrame as dhF

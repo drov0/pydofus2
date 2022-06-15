@@ -33,6 +33,6 @@ setup(
         "Py3AMF",
         "httpx",
         "xmltodict",
-        "BeautifulSoup4"
+        "lxml"
     ],
 )

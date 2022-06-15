@@ -5,7 +5,7 @@ from time import perf_counter, sleep
 from pydofus2.com.DofusClient import DofusClient
 from pydofus2.com.ankamagames.jerakine.logger.Logger import Logger
 from pydofus2.com.ankamagames.jerakine.metaclasses.Singleton import Singleton
-from pyd2bot.pyd2bot.BotConstants import BotConstants
+from pyd2bot.BotConstants import BotConstants
 from pyd2bot.logic.managers.CharachtersManager import CharachtersManager
 from pyd2bot.logic.managers.PathManager import PathManager
 from pydofus2.com.ankamagames.haapi.Haapi import Haapi

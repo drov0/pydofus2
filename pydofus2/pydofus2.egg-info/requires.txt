@@ -1,0 +1,6 @@
+pycryptodomex
+whistle
+Py3AMF
+httpx
+xmltodict
+BeautifulSoup4

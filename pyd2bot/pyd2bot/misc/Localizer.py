@@ -6,8 +6,7 @@ from pydofus2.com.ankamagames.dofus.datacenter.world.SubArea import SubArea
 from pydofus2.com.ankamagames.dofus.logic.game.common.managers.PlayedCharacterManager import PlayedCharacterManager
 from pydofus2.com.ankamagames.dofus.modules.utils.pathFinding.astar.AStar import AStar
 from pydofus2.com.ankamagames.dofus.modules.utils.pathFinding.world.WorldPathFinder import WorldPathFinder
-
-from pyd2bot.pyd2bot.BotConstants import BotConstants
+from pyd2bot.BotConstants import BotConstants
 
 
 class BankInfos:

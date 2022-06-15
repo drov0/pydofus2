@@ -1,6 +1,6 @@
 import json
 import os
-from pyd2bot.pyd2bot.BotConstants import BotConstants
+from pyd2bot.BotConstants import BotConstants
 
 BOTSDB = BotConstants.PERSISTENCE_DIR / "charachters.json"
 

@@ -73,10 +73,10 @@ class Haapi(metaclass=Singleton):
                 logger.debug("Login Token created")
                 return token
             except json.decoder.JSONDecodeError as e:
-                from bs4 import BeautifulSoup
+                import lxml.html
 
-                parsed_html = BeautifulSoup(response.content)
-                reason = parsed_html.body.find("div", attrs={"id": "what-happened-section"}).find("p").text
+                root = lxml.html.parse(response.content)
+                reason = root.xpath('//div[@id="what-happened-section"]//p/@text')[0]
                 if (
                     reason
                     == "The owner of this website (haapi.ankama.com) has banned you temporarily from accessing this website."

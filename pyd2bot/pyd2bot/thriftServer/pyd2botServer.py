@@ -23,14 +23,20 @@ class Pyd2botServer:
         loginToken = Haapi().getLoginToken(login, password, certId, certHash)
         result = list()
         dofus2.login(loginToken)
+        ssf = None
         start = perf_counter()          
         while not PlayerManager().serversList:
             sleep(1)
             if perf_counter() - start > 10:
                 dofus2.shutdown()
                 raise Exception("timeout")
-        ssf : 'ServerSelectionFrame' = Kernel().getWorker().getFrame("ServerSelectionFrame")
-        usedServers = ssf.usedServers.copy()
+        while not ssf:
+            sleep(1)
+            if perf_counter() - start > 10:
+                dofus2.shutdown()
+                raise Exception("timeout")
+            ssf : 'ServerSelectionFrame' = Kernel().getWorker().getFrame("ServerSelectionFrame")
+        usedServers = ssf._serversUsedList.copy()
         for server in usedServers:
             if ServerStatusEnum(server.status) == ServerStatusEnum.ONLINE or ServerStatusEnum(server.status) == ServerStatusEnum.NOJOIN:
                 dofus2._loginToken = Haapi().getLoginToken(login, password, certId, certHash)

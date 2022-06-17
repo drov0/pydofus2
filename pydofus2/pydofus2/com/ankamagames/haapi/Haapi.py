@@ -84,3 +84,7 @@ class Haapi(metaclass=Singleton):
                     logger.debug("Login Token creation failed, reason: %s" % reason)
                     logger.debug("Retrying in 60 seconds")
                     sleep(60)
+            except KeyError as e:
+                logger.error("Error while calling HAAPI to get Login Token")
+                logger.error(response)
+                raise Exception(e)

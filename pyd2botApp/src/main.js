@@ -1,6 +1,8 @@
 const { app, BrowserWindow, Menu, ipcMain } = require('electron');
 const path = require('path')
 const ejse = require('ejs-electron')
+const thrift = require('thrift');
+const Pyd2botService = require('./pyd2botService/Pyd2botService.js');
 ejse.data('nodeModulesUrl', "file://" + path.join(__dirname, '..', 'node_modules'));
 ejse.data('sidebarUrl', path.join(__dirname, 'ejs', 'sidebar.ejs'));
 ejse.data('cssUrl', "file://" + path.join(__dirname, 'assets', 'css'));
@@ -64,6 +66,31 @@ ipcMain.on("hideUnhidePassword", (event, key) => {
     mainWindow.loadURL(accountManager.urls.manageAccountsUrl);
 });
 
+ipcMain.on("fetchCharachters", (event, key) => {
+    console.log("fetchCharachters " + key);
+    var transport = thrift.TBufferedTransport;
+    var protocol = thrift.TBinaryProtocol;
+    var connection = thrift.createConnection("127.0.0.1", 9999, {
+        transport : transport,
+        protocol : protocol
+      });
+    connection.on('error', function(err) {
+        if (err)
+            console.log(err);
+            throw err; 
+    });
+    var client = thrift.createClient(Pyd2botService, connection);
+    var creds = accountManager.getAccountCreds(key);
+    client.fetchAccountCharachters(creds.login, creds.password, creds.certId.toString(), creds.certHash, function(err, response) {
+        connection.end();
+        response.forEach(charachter => {
+            accountManager.addCharachter(key, charachter);
+        });
+        accountManager.saveCharachters();
+    });
+      
+
+});
 // This method will be called when Electron has finished
 // initialization and is ready to create browser windows.
 // Some APIs can only be used after this event occurs.

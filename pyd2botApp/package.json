@@ -56,6 +56,7 @@
         "fontawesome-free": "^1.0.4",
         "jquery": "^3.6.0",
         "jsencrypt": "^3.2.1",
-        "popper": "^1.0.1"
+        "popper": "^1.0.1",
+        "thrift": "^0.16.0"
     }
 }

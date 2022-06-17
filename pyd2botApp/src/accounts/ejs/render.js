@@ -31,3 +31,7 @@ function createCharachter() {
 function saveCharachters() {
 
 }
+
+function fetchCharachters(key) {  
+    ipc.send('fetchCharachters', key)
+}

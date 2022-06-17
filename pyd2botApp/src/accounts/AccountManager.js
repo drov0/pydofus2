@@ -3,6 +3,9 @@ const fs = require('fs')
 const ejse = require('ejs-electron')
 globalThis.window = {};
 const JSEncrypt = require('jsencrypt')
+const AuthHelper = require("../auth/AuthHelper.js");
+
+
 
 class AccountManager {
     static get instance() {
@@ -10,9 +13,13 @@ class AccountManager {
     }
 
     constructor() {
-        this.dbFile = path.join(ejse.data('persistenceDir'), 'accounts.json')
-        this.accountsDB = require(this.dbFile)
+        this.accountsDbFile = path.join(ejse.data('persistenceDir'), 'accounts.json')
+        this.charachtersDbFile = path.join(ejse.data('persistenceDir'), 'charachters.json')
+        this.accountsDB = require(this.accountsDbFile)
+        this.charachtersDB = require(this.charachtersDbFile)
         this.accountsPasswords = {}
+        this.authHelper = new AuthHelper();
+
         for (var key in this.accountsDB) {
             this.accountsPasswords[key] = "********"
         }
@@ -76,13 +83,44 @@ class AccountManager {
         delete this.accountsDB[key]
     }
 
+    getAccountCreds(key) {
+        var account = this.accountsDB[key]
+        var r = this.authHelper.getStoredCertificate(account.login)
+        var certId = r.certificate.id
+        var certHash = this.authHelper.generateHashFromCertif(r.certificate)
+        return {
+            "login": account.login,
+            "password": this.decrypt.decrypt(account.password),
+            "certId": certId,
+            "certHash": certHash
+        }
+    }
+
     saveAccounts() {
         var saveJson = JSON.stringify(this.accountsDB, null, 2);
-        fs.writeFile(this.dbFile, saveJson, 'utf8', (err) => {
+        fs.writeFile(this.accountsDbFile, saveJson, 'utf8', (err) => {
             if (err) {
                 console.log(err)
             }
         })
+    }
+
+    saveCharachters() {
+        var saveJson = JSON.stringify(this.charachtersDB, null, 2);
+        fs.writeFile(this.charachtersDbFile, saveJson, 'utf8', (err) => {
+            if (err) {
+                console.log(err)
+            }
+        })
+    }
+
+    addCharachter(accountId, charachter) {
+        this.charachtersDB[`${charachter.name}(${charachter.serverId})`] = {
+            "characterName": charachter.name,
+            "accountId": accountId,
+            "charachterId": parseFloat(charachter.id),
+            "serverId": parseInt(charachter.serverId)
+        }
     }
 
 }

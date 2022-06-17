@@ -3,13 +3,15 @@ FFDEC = $(CURDIR)/FFDec/ffdec.bat
 DOFUS_SRC = $(CURDIR)/protocolBuilder/sources
 SELECTCLASS = com.ankamagames.dofus.BuildInfos,com.ankamagames.dofus.network.++,com.ankamagames.jerakine.network.++
 PYDOFUS_DIR = $(CURDIR)/pydofus2
-PYD2BOT_DIR = $(CURDIR)
+PYD2BOT_DIR = $(CURDIR)/pyd2bot
 
 .ONESHELL:
 .PHONY: setup
 setup:
 	python -m venv .venv
 	source .venv/Scripts/activate
+	pip install --upgrade pip
+	pip install --upgrade setuptools
 	echo "$(PYDOFUS_DIR)" >> .venv/pydofus2.pth
 	echo "$(PYD2BOT_DIR)" >> .venv/pyd2bot.pth
 	pip install -r requirements.txt
@@ -51,19 +53,14 @@ sniff:
 	source .venv/Scripts/activate
 	@python -m snifferApp 
 
-activate:
-	. .venv/Scripts/activate
-
-createAccount:
-	@python $(CURDIR)/launcher/AccountCredsManager.py $(entryName) $(login) $(password)
-
-createBot:
-	@python $(CURDIR)/pyd2bot/managers/BotCredsManager.py $(botName) $(account) $(serverId) $(charachterId)
-
-genKeys:
-	@ssh-keygen -t rsa -b 2056 -m PEM -f $(PASS_ENC_KEYS)/id_rsa
-
-test:
+build:
 	source .venv/Scripts/activate
-	@python $(CURDIR)/pyd2bot/main.py $(bot)
+	python $(CURDIR)/pyd2bot/build.py build
 
+serve:
+	source .venv/Scripts/activate
+	python $(CURDIR)/pyd2bot/pyd2bot/thriftServer/pyd2botServer.py
+
+testClient:
+	source .venv/Scripts/activate
+	python $(CURDIR)/pyd2bot/pyd2bot/thriftServer/pyd2botClient.py

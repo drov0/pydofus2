@@ -47,6 +47,7 @@ class AccountManager {
         this.decrypt.setPrivateKey(this.privateKey)
         this.urls = {
             'manageAccountsUrl': "file://" + path.join(__dirname, 'ejs', 'accountManager.ejs'),
+            'manageCharachtersUrl': "file://" + path.join(__dirname, 'ejs', 'charachterManager.ejs'),
             'newAccountUrl': "file://" + path.join(__dirname, 'ejs', 'newAccountForm.ejs'),
         }
         ejse.data('accountUrls', this.urls);

@@ -49,7 +49,7 @@ class ServerSelectionFrame(Frame):
 
     _serversList: list[GameServerInformations] = []
 
-    _serversUsedList: list[GameServerInformations]
+    _serversUsedList: list[GameServerInformations] = []
 
     _serversTypeAvailableSlots: dict
 
@@ -147,9 +147,12 @@ class ServerSelectionFrame(Frame):
                         ssmsg = ServerSelectionMessage()
                         ssmsg.init(ssaction.serverId)
                         connh.ConnectionsHandler.getConnection().send(ssmsg)
-                else:
-                    logger.error(f"Can't connect to server {ssaction.serverId} : Status {ServerStatusEnum(server.status).name}.")
-                    return True
+                        return True
+                    else:
+                        logger.debug(f"Server {server.id} not online but has status {ServerStatusEnum(server.status).name}.")
+                        return True
+            logger.error(f"Can't connect to server {ssaction.serverId} : Status {ServerStatusEnum(server.status).name}.")
+            return True
 
         elif isinstance(msg, SelectedServerDataExtendedMessage):
             ssdemsg = msg

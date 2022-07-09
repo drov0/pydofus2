@@ -12,7 +12,7 @@ package com.ankamagames.dofus.network.messages.game.character.stats
     public class FighterStatsListMessage extends NetworkMessage implements INetworkMessage
     {
         
-        public static const protocolId:uint = 7062;
+        public static const protocolId:uint = 478;
          
         
         private var _isInitialized:Boolean = false;
@@ -34,7 +34,7 @@ package com.ankamagames.dofus.network.messages.game.character.stats
         
         override public function getMessageId() : uint
         {
-            return 7062;
+            return 478;
         }
         
         public function initFighterStatsListMessage(stats:CharacterCharacteristicsInformations = null) : FighterStatsListMessage

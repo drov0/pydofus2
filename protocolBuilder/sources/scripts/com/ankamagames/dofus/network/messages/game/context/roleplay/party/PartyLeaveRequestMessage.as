@@ -10,7 +10,7 @@ package com.ankamagames.dofus.network.messages.game.context.roleplay.party
     public class PartyLeaveRequestMessage extends AbstractPartyMessage implements INetworkMessage
     {
         
-        public static const protocolId:uint = 1863;
+        public static const protocolId:uint = 875;
          
         
         private var _isInitialized:Boolean = false;
@@ -27,7 +27,7 @@ package com.ankamagames.dofus.network.messages.game.context.roleplay.party
         
         override public function getMessageId() : uint
         {
-            return 1863;
+            return 875;
         }
         
         public function initPartyLeaveRequestMessage(partyId:uint = 0) : PartyLeaveRequestMessage

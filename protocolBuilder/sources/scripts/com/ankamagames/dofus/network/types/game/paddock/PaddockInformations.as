@@ -8,7 +8,7 @@ package com.ankamagames.dofus.network.types.game.paddock
     public class PaddockInformations implements INetworkType
     {
         
-        public static const protocolId:uint = 9595;
+        public static const protocolId:uint = 1618;
          
         
         public var maxOutdoorMount:uint = 0;
@@ -22,7 +22,7 @@ package com.ankamagames.dofus.network.types.game.paddock
         
         public function getTypeId() : uint
         {
-            return 9595;
+            return 1618;
         }
         
         public function initPaddockInformations(maxOutdoorMount:uint = 0, maxItems:uint = 0) : PaddockInformations

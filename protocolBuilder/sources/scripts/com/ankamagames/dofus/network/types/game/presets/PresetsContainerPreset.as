@@ -9,7 +9,7 @@ package com.ankamagames.dofus.network.types.game.presets
     public class PresetsContainerPreset extends Preset implements INetworkType
     {
         
-        public static const protocolId:uint = 2058;
+        public static const protocolId:uint = 9143;
          
         
         public var presets:Vector.<Preset>;
@@ -24,7 +24,7 @@ package com.ankamagames.dofus.network.types.game.presets
         
         override public function getTypeId() : uint
         {
-            return 2058;
+            return 9143;
         }
         
         public function initPresetsContainerPreset(id:int = 0, presets:Vector.<Preset> = null) : PresetsContainerPreset

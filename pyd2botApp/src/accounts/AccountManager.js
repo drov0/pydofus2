@@ -26,7 +26,6 @@ class AccountManager {
         var keysDir = path.join(process.env.AppData, 'pyd2bot', 'RSA-KEYS', 'password-crypting')
 
         if (!fs.existsSync(path.join(keysDir, 'public.pem')) || !fs.existsSync(path.join(keysDir, 'public.pem'))) {
-            console.log('Generating RSA keys...')
             var encrypt = new JSEncrypt();
 
             // Generate a RSA key pair using the `JSEncrypt` library.

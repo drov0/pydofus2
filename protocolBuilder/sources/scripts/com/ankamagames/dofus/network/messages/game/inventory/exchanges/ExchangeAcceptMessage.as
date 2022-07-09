@@ -11,7 +11,7 @@ package com.ankamagames.dofus.network.messages.game.inventory.exchanges
     public class ExchangeAcceptMessage extends NetworkMessage implements INetworkMessage
     {
         
-        public static const protocolId:uint = 9837;
+        public static const protocolId:uint = 295;
          
         
         public function ExchangeAcceptMessage()
@@ -26,7 +26,7 @@ package com.ankamagames.dofus.network.messages.game.inventory.exchanges
         
         override public function getMessageId() : uint
         {
-            return 9837;
+            return 295;
         }
         
         public function initExchangeAcceptMessage() : ExchangeAcceptMessage

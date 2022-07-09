@@ -8,12 +8,12 @@ ejse.data('sidebarUrl', path.join(__dirname, 'ejs', 'sidebar.ejs'));
 ejse.data('cssUrl', "file://" + path.join(__dirname, 'assets', 'css'));
 ejse.data('persistenceDir', path.join(__dirname, '..', '..', 'pyd2botDB'))
 const mainUrl = "file://" + path.join(__dirname, 'ejs', 'main.ejs')
-const charactersDB = require('../../pyd2botDB/charachters.json');
+const PathsManager = require('./paths/PathManager.js');
 const AccountManager = require("./accounts/AccountManager.js");
-console.log(AccountManager);
 let mainWindow;
 const accountManager = AccountManager.instance;
-ejse.data('charachters', charactersDB);
+ejse.data('charachters', accountManager.charachtersDB);
+
 ejse.data('accounts', accountManager.accountsDB);
 ejse.data('accountsPasswords', accountManager.accountsPasswords);
 // Handle creating/removing shortcuts on Windows when installing/uninstalling.
@@ -73,15 +73,21 @@ ipcMain.on("fetchCharachters", (event, key) => {
     var connection = thrift.createConnection("127.0.0.1", 9999, {
         transport : transport,
         protocol : protocol
-      });
+    });
     connection.on('error', function(err) {
-        if (err)
+        if (err) {
             console.log(err);
             throw err; 
+        }
     });
     var client = thrift.createClient(Pyd2botService, connection);
     var creds = accountManager.getAccountCreds(key);
     client.fetchAccountCharachters(creds.login, creds.password, creds.certId.toString(), creds.certHash, function(err, response) {
+        if (err) {
+            connection.end();
+            console.log(err);
+            throw err; 
+        }
         connection.end();
         response.forEach(charachter => {
             accountManager.addCharachter(key, charachter);

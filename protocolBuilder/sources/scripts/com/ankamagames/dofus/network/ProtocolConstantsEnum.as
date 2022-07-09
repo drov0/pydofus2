@@ -119,6 +119,8 @@ package com.ankamagames.dofus.network
         
         public static const MAX_PRESET_COUNT:int = 18;
         
+        public static const MAX_FORGETTABLE_SPELLS_PRESET_COUNT:int = 50;
+        
         public static const MAX_IDOLS_PRESET_IDOL_COUNT:int = 6;
         
         public static const MIN_OBJ_COUNT_BY_XFERT:int = 1;
@@ -169,7 +171,7 @@ package com.ankamagames.dofus.network
         
         public static const MAX_SHORT_VALUE:int = 32767;
         
-        public static const MAX_GUILD_RIGHTS:int = 31;
+        public static const MAX_GUILD_RIGHTS:int = 40;
         
         public static const MIN_RANK_NAME_LENGTH:int = 1;
         
@@ -178,6 +180,8 @@ package com.ankamagames.dofus.network
         public static const MIN_GUILD_RANKS:int = 2;
         
         public static const MAX_GUILD_RANKS:int = 30;
+        
+        public static const MAX_GUILD_CHEST_TAB_NAME_LEN:int = 12;
          
         
         public function ProtocolConstantsEnum()

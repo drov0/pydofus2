@@ -8,7 +8,7 @@ package com.ankamagames.dofus.network.types.game.context
     public class FightEntityDispositionInformations extends EntityDispositionInformations implements INetworkType
     {
         
-        public static const protocolId:uint = 1731;
+        public static const protocolId:uint = 2021;
          
         
         public var carryingCharacterId:Number = 0;
@@ -20,7 +20,7 @@ package com.ankamagames.dofus.network.types.game.context
         
         override public function getTypeId() : uint
         {
-            return 1731;
+            return 2021;
         }
         
         public function initFightEntityDispositionInformations(cellId:int = 0, direction:uint = 1, carryingCharacterId:Number = 0) : FightEntityDispositionInformations

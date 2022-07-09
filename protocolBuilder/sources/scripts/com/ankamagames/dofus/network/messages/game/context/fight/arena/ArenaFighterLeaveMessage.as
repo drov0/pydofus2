@@ -12,7 +12,7 @@ package com.ankamagames.dofus.network.messages.game.context.fight.arena
     public class ArenaFighterLeaveMessage extends NetworkMessage implements INetworkMessage
     {
         
-        public static const protocolId:uint = 4416;
+        public static const protocolId:uint = 4191;
          
         
         private var _isInitialized:Boolean = false;
@@ -34,7 +34,7 @@ package com.ankamagames.dofus.network.messages.game.context.fight.arena
         
         override public function getMessageId() : uint
         {
-            return 4416;
+            return 4191;
         }
         
         public function initArenaFighterLeaveMessage(leaver:CharacterBasicMinimalInformations = null) : ArenaFighterLeaveMessage

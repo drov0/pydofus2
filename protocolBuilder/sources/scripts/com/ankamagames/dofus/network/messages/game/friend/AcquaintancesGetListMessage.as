@@ -11,7 +11,7 @@ package com.ankamagames.dofus.network.messages.game.friend
     public class AcquaintancesGetListMessage extends NetworkMessage implements INetworkMessage
     {
         
-        public static const protocolId:uint = 2546;
+        public static const protocolId:uint = 7459;
          
         
         public function AcquaintancesGetListMessage()
@@ -26,7 +26,7 @@ package com.ankamagames.dofus.network.messages.game.friend
         
         override public function getMessageId() : uint
         {
-            return 2546;
+            return 7459;
         }
         
         public function initAcquaintancesGetListMessage() : AcquaintancesGetListMessage

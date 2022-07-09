@@ -11,7 +11,7 @@ package com.ankamagames.dofus.network.messages.game.context.roleplay.party
     public class DungeonPartyFinderListenRequestMessage extends NetworkMessage implements INetworkMessage
     {
         
-        public static const protocolId:uint = 3379;
+        public static const protocolId:uint = 613;
          
         
         private var _isInitialized:Boolean = false;
@@ -30,7 +30,7 @@ package com.ankamagames.dofus.network.messages.game.context.roleplay.party
         
         override public function getMessageId() : uint
         {
-            return 3379;
+            return 613;
         }
         
         public function initDungeonPartyFinderListenRequestMessage(dungeonId:uint = 0) : DungeonPartyFinderListenRequestMessage

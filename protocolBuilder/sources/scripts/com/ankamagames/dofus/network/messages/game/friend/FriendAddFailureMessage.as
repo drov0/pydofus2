@@ -11,7 +11,7 @@ package com.ankamagames.dofus.network.messages.game.friend
     public class FriendAddFailureMessage extends NetworkMessage implements INetworkMessage
     {
         
-        public static const protocolId:uint = 7228;
+        public static const protocolId:uint = 6238;
          
         
         private var _isInitialized:Boolean = false;
@@ -30,7 +30,7 @@ package com.ankamagames.dofus.network.messages.game.friend
         
         override public function getMessageId() : uint
         {
-            return 7228;
+            return 6238;
         }
         
         public function initFriendAddFailureMessage(reason:uint = 0) : FriendAddFailureMessage

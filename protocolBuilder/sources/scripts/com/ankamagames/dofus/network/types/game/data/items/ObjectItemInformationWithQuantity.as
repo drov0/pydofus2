@@ -9,7 +9,7 @@ package com.ankamagames.dofus.network.types.game.data.items
     public class ObjectItemInformationWithQuantity extends ObjectItemMinimalInformation implements INetworkType
     {
         
-        public static const protocolId:uint = 1820;
+        public static const protocolId:uint = 1686;
          
         
         public var quantity:uint = 0;
@@ -21,7 +21,7 @@ package com.ankamagames.dofus.network.types.game.data.items
         
         override public function getTypeId() : uint
         {
-            return 1820;
+            return 1686;
         }
         
         public function initObjectItemInformationWithQuantity(objectGID:uint = 0, effects:Vector.<ObjectEffect> = null, quantity:uint = 0) : ObjectItemInformationWithQuantity

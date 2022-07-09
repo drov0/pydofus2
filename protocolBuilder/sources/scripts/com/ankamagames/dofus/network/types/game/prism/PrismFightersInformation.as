@@ -11,7 +11,7 @@ package com.ankamagames.dofus.network.types.game.prism
     public class PrismFightersInformation implements INetworkType
     {
         
-        public static const protocolId:uint = 1752;
+        public static const protocolId:uint = 9870;
          
         
         public var subAreaId:uint = 0;
@@ -38,7 +38,7 @@ package com.ankamagames.dofus.network.types.game.prism
         
         public function getTypeId() : uint
         {
-            return 1752;
+            return 9870;
         }
         
         public function initPrismFightersInformation(subAreaId:uint = 0, waitingForHelpInfo:ProtectedEntityWaitingForHelpInfo = null, allyCharactersInformations:Vector.<CharacterMinimalPlusLookInformations> = null, enemyCharactersInformations:Vector.<CharacterMinimalPlusLookInformations> = null) : PrismFightersInformation

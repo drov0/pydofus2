@@ -12,7 +12,7 @@ package com.ankamagames.dofus.network.messages.game.context.mount
     public class GameDataPaddockObjectAddMessage extends NetworkMessage implements INetworkMessage
     {
         
-        public static const protocolId:uint = 6633;
+        public static const protocolId:uint = 3922;
          
         
         private var _isInitialized:Boolean = false;
@@ -34,7 +34,7 @@ package com.ankamagames.dofus.network.messages.game.context.mount
         
         override public function getMessageId() : uint
         {
-            return 6633;
+            return 3922;
         }
         
         public function initGameDataPaddockObjectAddMessage(paddockItemDescription:PaddockItem = null) : GameDataPaddockObjectAddMessage

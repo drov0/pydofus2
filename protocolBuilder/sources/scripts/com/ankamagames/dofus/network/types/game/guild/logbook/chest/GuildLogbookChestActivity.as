@@ -10,7 +10,7 @@ package com.ankamagames.dofus.network.types.game.guild.logbook.chest
     public class GuildLogbookChestActivity extends GuildLogbookEntryBasicInformation implements INetworkType
     {
         
-        public static const protocolId:uint = 6293;
+        public static const protocolId:uint = 4492;
          
         
         public var playerId:Number = 0;
@@ -23,6 +23,10 @@ package com.ankamagames.dofus.network.types.game.guild.logbook.chest
         
         public var object:ObjectItemNotInContainer;
         
+        public var sourceTabId:uint = 0;
+        
+        public var destinationTabId:uint = 0;
+        
         private var _objecttree:FuncTree;
         
         public function GuildLogbookChestActivity()
@@ -33,10 +37,10 @@ package com.ankamagames.dofus.network.types.game.guild.logbook.chest
         
         override public function getTypeId() : uint
         {
-            return 6293;
+            return 4492;
         }
         
-        public function initGuildLogbookChestActivity(id:uint = 0, date:Number = 0, playerId:Number = 0, playerName:String = "", eventType:uint = 0, quantity:uint = 0, object:ObjectItemNotInContainer = null) : GuildLogbookChestActivity
+        public function initGuildLogbookChestActivity(id:uint = 0, date:Number = 0, playerId:Number = 0, playerName:String = "", eventType:uint = 0, quantity:uint = 0, object:ObjectItemNotInContainer = null, sourceTabId:uint = 0, destinationTabId:uint = 0) : GuildLogbookChestActivity
         {
             super.initGuildLogbookEntryBasicInformation(id,date);
             this.playerId = playerId;
@@ -44,6 +48,8 @@ package com.ankamagames.dofus.network.types.game.guild.logbook.chest
             this.eventType = eventType;
             this.quantity = quantity;
             this.object = object;
+            this.sourceTabId = sourceTabId;
+            this.destinationTabId = destinationTabId;
             return this;
         }
         
@@ -55,6 +61,7 @@ package com.ankamagames.dofus.network.types.game.guild.logbook.chest
             this.eventType = 0;
             this.quantity = 0;
             this.object = new ObjectItemNotInContainer();
+            this.destinationTabId = 0;
         }
         
         override public function serialize(output:ICustomDataOutput) : void
@@ -78,6 +85,16 @@ package com.ankamagames.dofus.network.types.game.guild.logbook.chest
             }
             output.writeInt(this.quantity);
             this.object.serializeAs_ObjectItemNotInContainer(output);
+            if(this.sourceTabId < 0)
+            {
+                throw new Error("Forbidden value (" + this.sourceTabId + ") on element sourceTabId.");
+            }
+            output.writeInt(this.sourceTabId);
+            if(this.destinationTabId < 0)
+            {
+                throw new Error("Forbidden value (" + this.destinationTabId + ") on element destinationTabId.");
+            }
+            output.writeInt(this.destinationTabId);
         }
         
         override public function deserialize(input:ICustomDataInput) : void
@@ -94,6 +111,8 @@ package com.ankamagames.dofus.network.types.game.guild.logbook.chest
             this._quantityFunc(input);
             this.object = new ObjectItemNotInContainer();
             this.object.deserialize(input);
+            this._sourceTabIdFunc(input);
+            this._destinationTabIdFunc(input);
         }
         
         override public function deserializeAsync(tree:FuncTree) : void
@@ -109,6 +128,8 @@ package com.ankamagames.dofus.network.types.game.guild.logbook.chest
             tree.addChild(this._eventTypeFunc);
             tree.addChild(this._quantityFunc);
             this._objecttree = tree.addChild(this._objecttreeFunc);
+            tree.addChild(this._sourceTabIdFunc);
+            tree.addChild(this._destinationTabIdFunc);
         }
         
         private function _playerIdFunc(input:ICustomDataInput) : void
@@ -147,6 +168,24 @@ package com.ankamagames.dofus.network.types.game.guild.logbook.chest
         {
             this.object = new ObjectItemNotInContainer();
             this.object.deserializeAsync(this._objecttree);
+        }
+        
+        private function _sourceTabIdFunc(input:ICustomDataInput) : void
+        {
+            this.sourceTabId = input.readInt();
+            if(this.sourceTabId < 0)
+            {
+                throw new Error("Forbidden value (" + this.sourceTabId + ") on element of GuildLogbookChestActivity.sourceTabId.");
+            }
+        }
+        
+        private function _destinationTabIdFunc(input:ICustomDataInput) : void
+        {
+            this.destinationTabId = input.readInt();
+            if(this.destinationTabId < 0)
+            {
+                throw new Error("Forbidden value (" + this.destinationTabId + ") on element of GuildLogbookChestActivity.destinationTabId.");
+            }
         }
     }
 }

@@ -10,14 +10,18 @@ package com.ankamagames.dofus.network.types.game.guild.logbook.global
     public class GuildPlayerRankUpdateActivity extends GuildLogbookEntryBasicInformation implements INetworkType
     {
         
-        public static const protocolId:uint = 6214;
+        public static const protocolId:uint = 222;
          
         
         public var guildRankMinimalInfos:GuildRankMinimalInformation;
         
-        public var playerId:Number = 0;
+        public var sourcePlayerId:Number = 0;
         
-        public var playerName:String = "";
+        public var targetPlayerId:Number = 0;
+        
+        public var sourcePlayerName:String = "";
+        
+        public var targetPlayerName:String = "";
         
         private var _guildRankMinimalInfostree:FuncTree;
         
@@ -29,15 +33,17 @@ package com.ankamagames.dofus.network.types.game.guild.logbook.global
         
         override public function getTypeId() : uint
         {
-            return 6214;
+            return 222;
         }
         
-        public function initGuildPlayerRankUpdateActivity(id:uint = 0, date:Number = 0, guildRankMinimalInfos:GuildRankMinimalInformation = null, playerId:Number = 0, playerName:String = "") : GuildPlayerRankUpdateActivity
+        public function initGuildPlayerRankUpdateActivity(id:uint = 0, date:Number = 0, guildRankMinimalInfos:GuildRankMinimalInformation = null, sourcePlayerId:Number = 0, targetPlayerId:Number = 0, sourcePlayerName:String = "", targetPlayerName:String = "") : GuildPlayerRankUpdateActivity
         {
             super.initGuildLogbookEntryBasicInformation(id,date);
             this.guildRankMinimalInfos = guildRankMinimalInfos;
-            this.playerId = playerId;
-            this.playerName = playerName;
+            this.sourcePlayerId = sourcePlayerId;
+            this.targetPlayerId = targetPlayerId;
+            this.sourcePlayerName = sourcePlayerName;
+            this.targetPlayerName = targetPlayerName;
             return this;
         }
         
@@ -45,7 +51,9 @@ package com.ankamagames.dofus.network.types.game.guild.logbook.global
         {
             super.reset();
             this.guildRankMinimalInfos = new GuildRankMinimalInformation();
-            this.playerName = "";
+            this.targetPlayerId = 0;
+            this.sourcePlayerName = "";
+            this.targetPlayerName = "";
         }
         
         override public function serialize(output:ICustomDataOutput) : void
@@ -57,12 +65,18 @@ package com.ankamagames.dofus.network.types.game.guild.logbook.global
         {
             super.serializeAs_GuildLogbookEntryBasicInformation(output);
             this.guildRankMinimalInfos.serializeAs_GuildRankMinimalInformation(output);
-            if(this.playerId < 0 || this.playerId > 9007199254740992)
+            if(this.sourcePlayerId < 0 || this.sourcePlayerId > 9007199254740992)
             {
-                throw new Error("Forbidden value (" + this.playerId + ") on element playerId.");
+                throw new Error("Forbidden value (" + this.sourcePlayerId + ") on element sourcePlayerId.");
             }
-            output.writeVarLong(this.playerId);
-            output.writeUTF(this.playerName);
+            output.writeVarLong(this.sourcePlayerId);
+            if(this.targetPlayerId < 0 || this.targetPlayerId > 9007199254740992)
+            {
+                throw new Error("Forbidden value (" + this.targetPlayerId + ") on element targetPlayerId.");
+            }
+            output.writeVarLong(this.targetPlayerId);
+            output.writeUTF(this.sourcePlayerName);
+            output.writeUTF(this.targetPlayerName);
         }
         
         override public function deserialize(input:ICustomDataInput) : void
@@ -75,8 +89,10 @@ package com.ankamagames.dofus.network.types.game.guild.logbook.global
             super.deserialize(input);
             this.guildRankMinimalInfos = new GuildRankMinimalInformation();
             this.guildRankMinimalInfos.deserialize(input);
-            this._playerIdFunc(input);
-            this._playerNameFunc(input);
+            this._sourcePlayerIdFunc(input);
+            this._targetPlayerIdFunc(input);
+            this._sourcePlayerNameFunc(input);
+            this._targetPlayerNameFunc(input);
         }
         
         override public function deserializeAsync(tree:FuncTree) : void
@@ -88,8 +104,10 @@ package com.ankamagames.dofus.network.types.game.guild.logbook.global
         {
             super.deserializeAsync(tree);
             this._guildRankMinimalInfostree = tree.addChild(this._guildRankMinimalInfostreeFunc);
-            tree.addChild(this._playerIdFunc);
-            tree.addChild(this._playerNameFunc);
+            tree.addChild(this._sourcePlayerIdFunc);
+            tree.addChild(this._targetPlayerIdFunc);
+            tree.addChild(this._sourcePlayerNameFunc);
+            tree.addChild(this._targetPlayerNameFunc);
         }
         
         private function _guildRankMinimalInfostreeFunc(input:ICustomDataInput) : void
@@ -98,18 +116,32 @@ package com.ankamagames.dofus.network.types.game.guild.logbook.global
             this.guildRankMinimalInfos.deserializeAsync(this._guildRankMinimalInfostree);
         }
         
-        private function _playerIdFunc(input:ICustomDataInput) : void
+        private function _sourcePlayerIdFunc(input:ICustomDataInput) : void
         {
-            this.playerId = input.readVarUhLong();
-            if(this.playerId < 0 || this.playerId > 9007199254740992)
+            this.sourcePlayerId = input.readVarUhLong();
+            if(this.sourcePlayerId < 0 || this.sourcePlayerId > 9007199254740992)
             {
-                throw new Error("Forbidden value (" + this.playerId + ") on element of GuildPlayerRankUpdateActivity.playerId.");
+                throw new Error("Forbidden value (" + this.sourcePlayerId + ") on element of GuildPlayerRankUpdateActivity.sourcePlayerId.");
             }
         }
         
-        private function _playerNameFunc(input:ICustomDataInput) : void
+        private function _targetPlayerIdFunc(input:ICustomDataInput) : void
         {
-            this.playerName = input.readUTF();
+            this.targetPlayerId = input.readVarUhLong();
+            if(this.targetPlayerId < 0 || this.targetPlayerId > 9007199254740992)
+            {
+                throw new Error("Forbidden value (" + this.targetPlayerId + ") on element of GuildPlayerRankUpdateActivity.targetPlayerId.");
+            }
+        }
+        
+        private function _sourcePlayerNameFunc(input:ICustomDataInput) : void
+        {
+            this.sourcePlayerName = input.readUTF();
+        }
+        
+        private function _targetPlayerNameFunc(input:ICustomDataInput) : void
+        {
+            this.targetPlayerName = input.readUTF();
         }
     }
 }

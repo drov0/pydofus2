@@ -12,7 +12,7 @@ package com.ankamagames.dofus.network.messages.game.inventory.exchanges
     public class ExchangeStartOkMountWithOutPaddockMessage extends NetworkMessage implements INetworkMessage
     {
         
-        public static const protocolId:uint = 3486;
+        public static const protocolId:uint = 5476;
          
         
         private var _isInitialized:Boolean = false;
@@ -34,7 +34,7 @@ package com.ankamagames.dofus.network.messages.game.inventory.exchanges
         
         override public function getMessageId() : uint
         {
-            return 3486;
+            return 5476;
         }
         
         public function initExchangeStartOkMountWithOutPaddockMessage(stabledMountsDescription:Vector.<MountClientData> = null) : ExchangeStartOkMountWithOutPaddockMessage

@@ -3,7 +3,7 @@ from pathlib import Path
 from jinja2 import Template
 import json
 from tqdm import tqdm
-import com.ankamagames.dofus.Constants as Constants
+import pydofus2.com.ankamagames.dofus.Constants as Constants
 
 PRIMITIVES = ["int", "float", "bool", "str", "list", "dict", "bytearray"]
 ROOTDIR = Path(os.path.dirname(__file__))

@@ -20,49 +20,42 @@
     <div class="wrapper">
         <%- include(sidebarUrl, {active: 'paths'}) %>
         <div class="bodyRightView">
-            <div class="accountFormsContainer">
+            <div class="pathsFormsContainer">
                 <div class="form-group">
                     <label for="pathName">name</label>
-                    <input type="text" class="form-control" id="pathName" placeholder="Enter entry id">
+                    <input type="text" id="pathName" placeholder="path name">
                 </div>
                 <div class="form-group">
                     <label for="pathType">type</label>
                     <select id="pathType">
-                        <% Object.keys(ejse.data('pathTypes')).forEach(pathType => { %>
+                        <% paths.types.forEach(pathType => { %>
                         <option value="<%=pathType%>"><%=pathType%></option>
                         <% }) %>
                     </select>
                 </div>
                 <div class="form-group">
                     <label for="fightOnly">fightOnly</label>
-                    <input type="checkbox" class="form-control" id="fightOnly">
+                    <input type="checkbox" id="fightOnly">
                 </div>                
                 <div class="form-group">
                     <label for="monsterLvlCoefDiff">monsterLvlCoefDiff</label>
-                    <input type="number" class="form-control" id="monsterLvlCoefDiff" placeholder="Enter monsterLvlCoefDiff">
+                    <input type="number" id="monsterLvlCoefDiff" placeholder="">
                 </div>
                 <div class="form-group">
-                    <div>
-                        <select id="leftValues" size="5" multiple></select>
-                    </div>
-                    <div>
-                        <input type="button" id="btnLeft" value="&lt;&lt;" />
-                        <input type="button" id="btnRight" value="&gt;&gt;" />
-                    </div>
-                    <div>
-                        <select id="rightValues" size="4" multiple>
-                            <option>1</option>
-                            <option>2</option>
-                            <option>3</option>
-                        </select>
-                        <div>
-                            <input type="text" id="txtRight" />
-                        </div>
-                    </div>
+                    <label for="startMapId">startMapId</label>
+                    <input type="number" id="startMapId" placeholder="">
+                </div>
+                <div class="form-group">
+                    <label for="startMapRpZone">startMapRpZone</label>
+                    <input type="number" id="startMapRpZone" placeholder="">
+                </div>
+                <div class="form-group">
+                    <label for="subAreaId">subAreaId</label>
+                    <input type="number" id="subAreaId" placeholder="">
                 </div>
                 <div class="managerBottomButtonsBar">
                     <button class="btn btn-primary" onclick="createPath()">confirm</button>
-                    <a href="<%=accountUrls.managePathsUrl%>"><button class="btn btn-primary">cancel</button></a>
+                    <a href="<%=paths.urls.managePathsUrl%>"><button class="btn btn-primary">cancel</button></a>
                 </div>
             </div>
         </div>

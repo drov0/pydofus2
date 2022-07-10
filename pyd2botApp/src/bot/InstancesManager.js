@@ -47,7 +47,7 @@ class InstancesManager {
         var instance = child_process.execFile(this.pyd2botExePath, ['--host', '0.0.0.0', '--port', port],
             (error, stdout, stderr) => {
                 if (error) {
-                console.log("Error while spawning server : " + error);
+                    console.log("Error while spawning server : " + error);
                 }
                 if (stdout) {
                     console.log("Server stdout : " + stdout);

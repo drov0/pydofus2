@@ -15,7 +15,6 @@ body {
 
 #sidebar {
     min-width: 200px;
-    max-width: 200px;
     width: 20%;
 }
 
@@ -116,6 +115,28 @@ ul ul a {
     width: 70%;
     row-gap: 20px;
     position: relative;
+}
+
+.pathsFormsContainer {
+    color: #fff;
+    text-align: center;
+    justify-content: space-around;
+    display: flex;
+    border-radius: 25px;
+    align-items: flex-start;
+    flex-direction: column;
+    border: 5px solid #FFFF00;
+    padding: 7.6%;
+    margin: 10%;
+    width: 70%;
+    row-gap: 20px;
+    position: relative;
+}
+
+.pathsFormsContainer label {
+    width: 200px;
+    float:left;
+    text-align: left;
 }
 
 .managerBottomButtonsBar {

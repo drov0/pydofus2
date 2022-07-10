@@ -32,10 +32,10 @@
                     <th scope="col">action</th>
                 </thead>
                 <tbody>
-                    <% Object.keys(ejse.data('accounts')).forEach(key=> { let value=ejse.data('accounts')[key]%>
+                    <% Object.entries(accounts).forEach(([key, account]) => {%>
                     <tr>
                         <td scope="row"><%= key%></td>
-                        <td><%= value.login%></td>
+                        <td><%= account.login%></td>
                         <td><%= accountsPasswords[key] %></td>
                         <td>
                             <div class="dropdown">

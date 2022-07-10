@@ -59,6 +59,10 @@ class AccountManager {
             'newAccountUrl': "file://" + path.join(__dirname, 'ejs', 'newAccountForm.ejs'),
         }
         ejse.data('accountUrls', this.urls);
+        ejse.data('characters', this.charactersDB);
+        ejse.data('currentEditedAccount', this.currentEditedAccount);
+        ejse.data('accounts', this.accountsDB);
+        ejse.data('accountsPasswords', this.accountsPasswords);
     }
 
     getAccountPassword(key) {

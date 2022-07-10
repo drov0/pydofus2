@@ -27,16 +27,16 @@
                     <th scope="col">action</th>
                 </thead>
                 <tbody>
-                    <% Object.keys(ejse.data('paths')).forEach(key=> { let value=ejse.data('accounts')[key]%>
+                    <% Object.entries(paths.pathsDB).forEach(([key, path])=> {%>
                     <tr>
-                        <td scope="row"><%= value.name%></td>
-                        <td><%= value.type%></td>
+                        <td scope="row"><%=path.name%></td>
+                        <td><%=path.type%></td>
                         <td>
                             <div class="dropdown">
                                 <a class="btn btn-secondary dropdown-toggle" href="#" role="button" id="dropdownMenuLink" data-bs-toggle="dropdown" aria-expanded="false">
                                 </a>
                                 <ul class="dropdown-menu" aria-labelledby="dropdownMenuLink">
-                                  <li><a class="dropdown-item" href="#">edit</a></li>
+                                  <li><a class="dropdown-item" href="#" onclick="editPath('<%= key%>')">edit</a></li>
                                   <li><a class="dropdown-item" href="#" onclick="deletePath('<%= key%>')">delete</a></li>
                                 </ul>
                             </div>
@@ -46,7 +46,7 @@
                 </tbody>
             </table>
             <div class="managerBottomButtonsBar">
-                <a href="<%=pathsUrls.newPathUrl%>"><button class="btn btn-primary" >new</button></a>
+                <a href="<%=paths.urls.newPathUrl%>"><button class="btn btn-primary" >new</button></a>
                 <button class="btn btn-primary" onclick="savePaths()">save</button>
             </div>
         </div>

@@ -10,15 +10,12 @@ const mainUrl = "file://" + path.join(__dirname, 'ejs', 'main.ejs')
 const PathsManager = require('./paths/PathManager.js');
 const AccountManager = require("./accounts/AccountManager.js");
 const InstancesManager = require("./bot/InstancesManager.js");
-const { syncBuiltinESMExports } = require('module');
  
 let mainWindow;
 const accountManager = AccountManager.instance;
 const instancesManager = InstancesManager.instance;
-ejse.data('characters', accountManager.charactersDB);
-ejse.data('currentEditedAccount', accountManager.currentEditedAccount);
-ejse.data('accounts', accountManager.accountsDB);
-ejse.data('accountsPasswords', accountManager.accountsPasswords);
+const pathsManager = PathsManager.instance;
+
 // Handle creating/removing shortcuts on Windows when installing/uninstalling.
 if (require('electron-squirrel-startup')) {
     // eslint-disable-line global-require
@@ -36,7 +33,7 @@ const createWindow = () => {
     });
 
     // and load the index.html of the app.
-    mainWindow.loadURL(accountManager.urls.manageAccountsUrl);
+    mainWindow.loadURL(pathsManager.urls.newPathUrl);
 
     // To maximize the window
     mainWindow.maximize();
@@ -45,7 +42,7 @@ const createWindow = () => {
     const mainMenu = Menu.buildFromTemplate(mainMenuTemplate);
     Menu.setApplicationMenu(mainMenu);
     // Open the DevTools.
-    mainWindow.webContents.openDevTools();
+    //mainWindow.webContents.openDevTools();
 };
 
 
@@ -99,6 +96,8 @@ ipcMain.on("fetchCharacters", (event, key) => {
     }, 5000);
 });
 
+
+// characters ipc handling
 ipcMain.on("saveCharacters", (event, args) => {
     accountManager.saveCharacters();
 });
@@ -112,6 +111,22 @@ ipcMain.on("deleteCharacter", (event, key) => {
     accountManager.deleteCharacter(key);
     mainWindow.loadURL(accountManager.urls.manageCharactersUrl);
 });
+
+// paths ipc handling
+ipcMain.on("savePath", (event, args) => {
+    pathsManager.savepaths();
+});
+
+ipcMain.on("deletePath", (event, key) => {
+    pathsManager.deletePath(key);
+    mainWindow.loadURL(pathsManager.urls.managePaths);
+});
+
+ipcMain.on("editPath", (event, key) => {
+    ejse.data('currentEditedPath', {"key" : key, "value": pathsManager.pathsDB[key]});
+    mainWindow.loadURL(accountManager.urls.newAccountUrl);
+});
+
 // This method will be called when Electron has finished
 // initialization and is ready to create browser windows.
 // Some APIs can only be used after this event occurs.

@@ -4,7 +4,7 @@ const ejse = require('ejs-electron')
 
 class PathManager {
     static get instance() {
-        return AccountManager._instance || (AccountManager._instance = new AccountManager()), AccountManager._instance
+        return PathManager._instance || (PathManager._instance = new PathManager()), PathManager._instance
     }
 
     constructor() {
@@ -14,7 +14,9 @@ class PathManager {
             'managePathsUrl': "file://" + path.join(__dirname, 'ejs', 'pathsManager.ejs'),
             'newPathUrl': "file://" + path.join(__dirname, 'ejs', 'newPathForm.ejs'),
         }
-        ejse.data('pathsUrls', this.urls);
+        this.types = ['SubAreaRandomPath']
+        this.currentEditedPath = null
+        ejse.data('paths', this);
     }
 
     newPath(formData) {

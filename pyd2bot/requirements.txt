@@ -1,0 +1,2 @@
+thrift
+cx-Freeze

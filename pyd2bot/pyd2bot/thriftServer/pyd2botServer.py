@@ -11,14 +11,14 @@ from thrift.transport import TTransport
 from thrift.protocol import TBinaryProtocol
 from thrift.server import TServer
 from pydofus2.com.ankamagames.haapi.Haapi import Haapi
-from pyd2bot.thriftServer.pyd2botService.ttypes import Charachter
+from pyd2bot.thriftServer.pyd2botService.ttypes import Character
 
 class Pyd2botServer:
     def __init__(self):
         pass
     
-    def fetchAccountCharachters(self, login:str, password:str, certId:str, certHash:str) -> list[Charachter]:
-        logger.info("fetchAccountCharachters called")
+    def fetchAccountCharacters(self, login:str, password:str, certId:str, certHash:str) -> list[Character]:
+        logger.info("fetchAccountCharacters called")
         dofus2 = DofusClient()
         loginToken = Haapi().getLoginToken(login, password, certId, certHash)
         result = list()
@@ -48,8 +48,8 @@ class Pyd2botServer:
                     if perf_counter() - start > 10:
                         dofus2.shutdown()
                         raise Exception("timeout")
-                for charachter in PlayerManager().charactersList:
-                    result.append(Charachter(charachter.name, str(charachter.id), str(server.id)))
+                for character in PlayerManager().charactersList:
+                    result.append(Character(character.name, str(character.id), str(server.id)))
             else:
                 logger.debug(f"Server {server.id} not online but has status {ServerStatusEnum(server.status).name}.")
         dofus2.shutdown()

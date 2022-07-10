@@ -7,14 +7,18 @@ if TYPE_CHECKING:
 
 class GuildPlayerRankUpdateActivity(GuildLogbookEntryBasicInformation):
     guildRankMinimalInfos:'GuildRankMinimalInformation'
-    playerId:int
-    playerName:str
+    sourcePlayerId:int
+    targetPlayerId:int
+    sourcePlayerName:str
+    targetPlayerName:str
     
 
-    def init(self, guildRankMinimalInfos_:'GuildRankMinimalInformation', playerId_:int, playerName_:str, id_:int, date_:int):
+    def init(self, guildRankMinimalInfos_:'GuildRankMinimalInformation', sourcePlayerId_:int, targetPlayerId_:int, sourcePlayerName_:str, targetPlayerName_:str, id_:int, date_:int):
         self.guildRankMinimalInfos = guildRankMinimalInfos_
-        self.playerId = playerId_
-        self.playerName = playerName_
+        self.sourcePlayerId = sourcePlayerId_
+        self.targetPlayerId = targetPlayerId_
+        self.sourcePlayerName = sourcePlayerName_
+        self.targetPlayerName = targetPlayerName_
         
         super().init(id_, date_)
     

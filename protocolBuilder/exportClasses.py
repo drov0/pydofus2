@@ -57,6 +57,7 @@ def main():
 
             path_to = "pydofus2/" + msg["package"].replace(".", "/")
             path_to = "{}.py".format(path_to)
+            print(path_to)
             if not os.path.exists(Path(path_to).parent):
                 os.makedirs(Path(path_to).parent)
             with open(path_to, "w") as f:

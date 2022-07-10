@@ -24,7 +24,7 @@ if len(sys.argv) <= 1 or sys.argv[1] == '--help':
     print('Usage: ' + sys.argv[0] + ' [-h host[:port]] [-u url] [-f[ramed]] [-s[sl]] [-novalidate] [-ca_certs certs] [-keyfile keyfile] [-certfile certfile] function [arg1 [arg2...]]')
     print('')
     print('Functions:')
-    print('  CharachterList fetchAccountCharachters(string login, string password, string certId, string certHash)')
+    print('  CharacterList fetchAccountCharacters(string login, string password, string certId, string certHash)')
     print('  void runSession(string login, string password, string certId, string certHash, string sessionId)')
     print('')
     sys.exit(0)
@@ -105,11 +105,11 @@ protocol = TBinaryProtocol(transport)
 client = Pyd2botService.Client(protocol)
 transport.open()
 
-if cmd == 'fetchAccountCharachters':
+if cmd == 'fetchAccountCharacters':
     if len(args) != 4:
-        print('fetchAccountCharachters requires 4 args')
+        print('fetchAccountCharacters requires 4 args')
         sys.exit(1)
-    pp.pprint(client.fetchAccountCharachters(args[0], args[1], args[2], args[3],))
+    pp.pprint(client.fetchAccountCharacters(args[0], args[1], args[2], args[3],))
 
 elif cmd == 'runSession':
     if len(args) != 5:

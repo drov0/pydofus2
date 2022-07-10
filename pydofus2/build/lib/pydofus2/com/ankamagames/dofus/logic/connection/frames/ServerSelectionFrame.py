@@ -49,7 +49,7 @@ class ServerSelectionFrame(Frame):
 
     _serversList: list[GameServerInformations] = []
 
-    _serversUsedList: list[GameServerInformations]
+    _serversUsedList: list[GameServerInformations] = []
 
     _serversTypeAvailableSlots: dict
 
@@ -97,7 +97,6 @@ class ServerSelectionFrame(Frame):
             self._serversList = slmsg.servers
             self._serversList.sort(key=lambda x: x.date)
             self.broadcastServersListUpdate()
-            logger.info(AuthentificationManager()._lva.serverId)
             krnl.Kernel().getWorker().processImmediately(ServerSelectionAction.create(AuthentificationManager()._lva.serverId))
             return False
 
@@ -138,24 +137,21 @@ class ServerSelectionFrame(Frame):
                 self.serverAlreadyInName = Server.getServerById(self._alreadyConnectedToServerId).name
                 self.serverSelectedName = Server.getServerById(ssaction.serverId).name
                 return True
-
             for server in self._serversList:
-                if server.id == ssaction.serverId:
+                logger.info(f"Server {server.id} status {ServerStatusEnum(server.status).name}.")
+                if str(server.id) == str(ssaction.serverId):
                     if (
                         ServerStatusEnum(server.status) == ServerStatusEnum.ONLINE
                         or ServerStatusEnum(server.status) == ServerStatusEnum.NOJOIN
                     ):
-                        ssmsg = NetworkMessage.from_json(
-                            {
-                                "__type__": "ServerSelectionMessage",
-                                "serverId": ssaction.serverId,
-                            }
-                        )
+                        ssmsg = ServerSelectionMessage()
+                        ssmsg.init(ssaction.serverId)
                         connh.ConnectionsHandler.getConnection().send(ssmsg)
+                        return True
                     else:
-                        errorText = "Status " + ServerStatusEnum(server.status).name
-                else:
-                    errorText = "Status Unknown"
+                        logger.debug(f"Server {server.id} not online but has status {ServerStatusEnum(server.status).name}.")
+                        return True
+            logger.error(f"Can't connect to server {ssaction.serverId} : Status {ServerStatusEnum(server.status).name}.")
             return True
 
         elif isinstance(msg, SelectedServerDataExtendedMessage):

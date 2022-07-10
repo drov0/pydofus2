@@ -185,8 +185,8 @@ class GameServerApproachFrame(Frame):
                 self._charactersList.append(chi)
             PlayerManager().charactersList = self._charactersList
             if PlayerManager().allowAutoConnectCharacter:
-                charachterId = PlayerManager().autoConnectOfASpecificCharacterId
-                krnl.Kernel().getWorker().process(CharacterSelectionAction.create(charachterId, False))
+                characterId = PlayerManager().autoConnectOfASpecificCharacterId
+                krnl.Kernel().getWorker().process(CharacterSelectionAction.create(characterId, False))
             return False
 
         elif isinstance(msg, ServerConnectionFailedMessage):

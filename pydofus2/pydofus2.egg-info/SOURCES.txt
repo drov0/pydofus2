@@ -807,6 +807,11 @@ pydofus2/com/ankamagames/dofus/network/messages/game/character/alignment/war/eff
 pydofus2/com/ankamagames/dofus/network/messages/game/character/alignment/war/effort/CharacterAlignmentWarEffortProgressionMessage.py
 pydofus2/com/ankamagames/dofus/network/messages/game/character/alignment/war/effort/CharacterAlignmentWarEffortProgressionRequestMessage.py
 pydofus2/com/ankamagames/dofus/network/messages/game/character/alignment/war/effort/__init__.py
+pydofus2/com/ankamagames/dofus/network/messages/game/character/alteration/AlterationAddedMessage.py
+pydofus2/com/ankamagames/dofus/network/messages/game/character/alteration/AlterationRemovedMessage.py
+pydofus2/com/ankamagames/dofus/network/messages/game/character/alteration/AlterationsMessage.py
+pydofus2/com/ankamagames/dofus/network/messages/game/character/alteration/AlterationsUpdatedMessage.py
+pydofus2/com/ankamagames/dofus/network/messages/game/character/alteration/__init__.py
 pydofus2/com/ankamagames/dofus/network/messages/game/character/choice/BasicCharactersListMessage.py
 pydofus2/com/ankamagames/dofus/network/messages/game/character/choice/CharacterFirstSelectionMessage.py
 pydofus2/com/ankamagames/dofus/network/messages/game/character/choice/CharacterReplayWithRemodelRequestMessage.py
@@ -1044,6 +1049,7 @@ pydofus2/com/ankamagames/dofus/network/messages/game/context/roleplay/MapRunning
 pydofus2/com/ankamagames/dofus/network/messages/game/context/roleplay/MapRunningFightListMessage.py
 pydofus2/com/ankamagames/dofus/network/messages/game/context/roleplay/MapRunningFightListRequestMessage.py
 pydofus2/com/ankamagames/dofus/network/messages/game/context/roleplay/StopToListenRunningFightRequestMessage.py
+pydofus2/com/ankamagames/dofus/network/messages/game/context/roleplay/SubareaRewardRateMessage.py
 pydofus2/com/ankamagames/dofus/network/messages/game/context/roleplay/TeleportOnSameMapMessage.py
 pydofus2/com/ankamagames/dofus/network/messages/game/context/roleplay/__init__.py
 pydofus2/com/ankamagames/dofus/network/messages/game/context/roleplay/alignment/__init__.py
@@ -1051,6 +1057,7 @@ pydofus2/com/ankamagames/dofus/network/messages/game/context/roleplay/alignment/
 pydofus2/com/ankamagames/dofus/network/messages/game/context/roleplay/alignment/war/effort/AlignmentWarEffortProgressionMessage.py
 pydofus2/com/ankamagames/dofus/network/messages/game/context/roleplay/alignment/war/effort/AlignmentWarEffortProgressionRequestMessage.py
 pydofus2/com/ankamagames/dofus/network/messages/game/context/roleplay/alignment/war/effort/__init__.py
+pydofus2/com/ankamagames/dofus/network/messages/game/context/roleplay/anomaly/AnomalyOpenedMessage.py
 pydofus2/com/ankamagames/dofus/network/messages/game/context/roleplay/anomaly/AnomalyStateMessage.py
 pydofus2/com/ankamagames/dofus/network/messages/game/context/roleplay/anomaly/MapComplementaryInformationsAnomalyMessage.py
 pydofus2/com/ankamagames/dofus/network/messages/game/context/roleplay/anomaly/__init__.py
@@ -1388,12 +1395,16 @@ pydofus2/com/ankamagames/dofus/network/messages/game/guild/GuildBulletinSetError
 pydofus2/com/ankamagames/dofus/network/messages/game/guild/GuildBulletinSetRequestMessage.py
 pydofus2/com/ankamagames/dofus/network/messages/game/guild/GuildChangeMemberParametersMessage.py
 pydofus2/com/ankamagames/dofus/network/messages/game/guild/GuildCharacsUpgradeRequestMessage.py
+pydofus2/com/ankamagames/dofus/network/messages/game/guild/GuildChestTabContributionMessage.py
+pydofus2/com/ankamagames/dofus/network/messages/game/guild/GuildChestTabContributionsMessage.py
+pydofus2/com/ankamagames/dofus/network/messages/game/guild/GuildChestTabLastContributionMessage.py
 pydofus2/com/ankamagames/dofus/network/messages/game/guild/GuildCreationResultMessage.py
 pydofus2/com/ankamagames/dofus/network/messages/game/guild/GuildCreationStartedMessage.py
 pydofus2/com/ankamagames/dofus/network/messages/game/guild/GuildCreationValidMessage.py
 pydofus2/com/ankamagames/dofus/network/messages/game/guild/GuildFactsErrorMessage.py
 pydofus2/com/ankamagames/dofus/network/messages/game/guild/GuildFactsMessage.py
 pydofus2/com/ankamagames/dofus/network/messages/game/guild/GuildFactsRequestMessage.py
+pydofus2/com/ankamagames/dofus/network/messages/game/guild/GuildGetChestTabContributionsRequestMessage.py
 pydofus2/com/ankamagames/dofus/network/messages/game/guild/GuildGetInformationsMessage.py
 pydofus2/com/ankamagames/dofus/network/messages/game/guild/GuildHouseRemoveMessage.py
 pydofus2/com/ankamagames/dofus/network/messages/game/guild/GuildHouseUpdateInformationMessage.py
@@ -1431,11 +1442,17 @@ pydofus2/com/ankamagames/dofus/network/messages/game/guild/GuildPaddockRemovedMe
 pydofus2/com/ankamagames/dofus/network/messages/game/guild/GuildPaddockTeleportRequestMessage.py
 pydofus2/com/ankamagames/dofus/network/messages/game/guild/GuildRanksMessage.py
 pydofus2/com/ankamagames/dofus/network/messages/game/guild/GuildRanksRequestMessage.py
+pydofus2/com/ankamagames/dofus/network/messages/game/guild/GuildSelectChestTabRequestMessage.py
 pydofus2/com/ankamagames/dofus/network/messages/game/guild/GuildSpellUpgradeRequestMessage.py
 pydofus2/com/ankamagames/dofus/network/messages/game/guild/GuildSummaryMessage.py
 pydofus2/com/ankamagames/dofus/network/messages/game/guild/GuildSummaryRequestMessage.py
+pydofus2/com/ankamagames/dofus/network/messages/game/guild/GuildUpdateChestTabRequestMessage.py
 pydofus2/com/ankamagames/dofus/network/messages/game/guild/GuildVersatileInfoListMessage.py
 pydofus2/com/ankamagames/dofus/network/messages/game/guild/RemoveGuildRankRequestMessage.py
+pydofus2/com/ankamagames/dofus/network/messages/game/guild/StartGuildChestContributionMessage.py
+pydofus2/com/ankamagames/dofus/network/messages/game/guild/StartListenGuildChestStructureMessage.py
+pydofus2/com/ankamagames/dofus/network/messages/game/guild/StopGuildChestContributionMessage.py
+pydofus2/com/ankamagames/dofus/network/messages/game/guild/StopListenGuildChestStructureMessage.py
 pydofus2/com/ankamagames/dofus/network/messages/game/guild/UpdateAllGuildRankRequestMessage.py
 pydofus2/com/ankamagames/dofus/network/messages/game/guild/UpdateGuildRankRequestMessage.py
 pydofus2/com/ankamagames/dofus/network/messages/game/guild/UpdateGuildRightsMessage.py
@@ -1514,9 +1531,15 @@ pydofus2/com/ankamagames/dofus/network/messages/game/interactive/InteractiveUsed
 pydofus2/com/ankamagames/dofus/network/messages/game/interactive/StatedElementUpdatedMessage.py
 pydofus2/com/ankamagames/dofus/network/messages/game/interactive/StatedMapUpdateMessage.py
 pydofus2/com/ankamagames/dofus/network/messages/game/interactive/__init__.py
+pydofus2/com/ankamagames/dofus/network/messages/game/interactive/meeting/GroupTeleportPlayerAnswerMessage.py
+pydofus2/com/ankamagames/dofus/network/messages/game/interactive/meeting/GroupTeleportPlayerCloseMessage.py
+pydofus2/com/ankamagames/dofus/network/messages/game/interactive/meeting/GroupTeleportPlayerOfferMessage.py
 pydofus2/com/ankamagames/dofus/network/messages/game/interactive/meeting/TeleportBuddiesAnswerMessage.py
 pydofus2/com/ankamagames/dofus/network/messages/game/interactive/meeting/TeleportBuddiesMessage.py
 pydofus2/com/ankamagames/dofus/network/messages/game/interactive/meeting/TeleportBuddiesRequestedMessage.py
+pydofus2/com/ankamagames/dofus/network/messages/game/interactive/meeting/TeleportPlayerAnswerMessage.py
+pydofus2/com/ankamagames/dofus/network/messages/game/interactive/meeting/TeleportPlayerCloseMessage.py
+pydofus2/com/ankamagames/dofus/network/messages/game/interactive/meeting/TeleportPlayerOfferMessage.py
 pydofus2/com/ankamagames/dofus/network/messages/game/interactive/meeting/TeleportToBuddyAnswerMessage.py
 pydofus2/com/ankamagames/dofus/network/messages/game/interactive/meeting/TeleportToBuddyCloseMessage.py
 pydofus2/com/ankamagames/dofus/network/messages/game/interactive/meeting/TeleportToBuddyOfferMessage.py
@@ -1531,6 +1554,7 @@ pydofus2/com/ankamagames/dofus/network/messages/game/interactive/zaap/ZaapRespaw
 pydofus2/com/ankamagames/dofus/network/messages/game/interactive/zaap/ZaapRespawnUpdatedMessage.py
 pydofus2/com/ankamagames/dofus/network/messages/game/interactive/zaap/__init__.py
 pydofus2/com/ankamagames/dofus/network/messages/game/inventory/KamasUpdateMessage.py
+pydofus2/com/ankamagames/dofus/network/messages/game/inventory/MultiTabStorageMessage.py
 pydofus2/com/ankamagames/dofus/network/messages/game/inventory/ObjectAveragePricesErrorMessage.py
 pydofus2/com/ankamagames/dofus/network/messages/game/inventory/ObjectAveragePricesGetMessage.py
 pydofus2/com/ankamagames/dofus/network/messages/game/inventory/ObjectAveragePricesMessage.py
@@ -1588,6 +1612,7 @@ pydofus2/com/ankamagames/dofus/network/messages/game/inventory/exchanges/Exchang
 pydofus2/com/ankamagames/dofus/network/messages/game/inventory/exchanges/ExchangeObjectMoveKamaMessage.py
 pydofus2/com/ankamagames/dofus/network/messages/game/inventory/exchanges/ExchangeObjectMoveMessage.py
 pydofus2/com/ankamagames/dofus/network/messages/game/inventory/exchanges/ExchangeObjectMovePricedMessage.py
+pydofus2/com/ankamagames/dofus/network/messages/game/inventory/exchanges/ExchangeObjectMoveToTabMessage.py
 pydofus2/com/ankamagames/dofus/network/messages/game/inventory/exchanges/ExchangeObjectTransfertAllFromInvMessage.py
 pydofus2/com/ankamagames/dofus/network/messages/game/inventory/exchanges/ExchangeObjectTransfertAllToInvMessage.py
 pydofus2/com/ankamagames/dofus/network/messages/game/inventory/exchanges/ExchangeObjectTransfertExistingFromInvMessage.py
@@ -1639,6 +1664,7 @@ pydofus2/com/ankamagames/dofus/network/messages/game/inventory/exchanges/Exchang
 pydofus2/com/ankamagames/dofus/network/messages/game/inventory/exchanges/ExchangeStartedMessage.py
 pydofus2/com/ankamagames/dofus/network/messages/game/inventory/exchanges/ExchangeStartedMountStockMessage.py
 pydofus2/com/ankamagames/dofus/network/messages/game/inventory/exchanges/ExchangeStartedTaxCollectorShopMessage.py
+pydofus2/com/ankamagames/dofus/network/messages/game/inventory/exchanges/ExchangeStartedWithMultiTabStorageMessage.py
 pydofus2/com/ankamagames/dofus/network/messages/game/inventory/exchanges/ExchangeStartedWithPodsMessage.py
 pydofus2/com/ankamagames/dofus/network/messages/game/inventory/exchanges/ExchangeStartedWithStorageMessage.py
 pydofus2/com/ankamagames/dofus/network/messages/game/inventory/exchanges/ExchangeStoppedMessage.py
@@ -1913,6 +1939,8 @@ pydofus2/com/ankamagames/dofus/network/types/game/character/__init__.py
 pydofus2/com/ankamagames/dofus/network/types/game/character/alignment/ActorAlignmentInformations.py
 pydofus2/com/ankamagames/dofus/network/types/game/character/alignment/ActorExtendedAlignmentInformations.py
 pydofus2/com/ankamagames/dofus/network/types/game/character/alignment/__init__.py
+pydofus2/com/ankamagames/dofus/network/types/game/character/alteration/AlterationInfo.py
+pydofus2/com/ankamagames/dofus/network/types/game/character/alteration/__init__.py
 pydofus2/com/ankamagames/dofus/network/types/game/character/characteristic/CharacterCharacteristic.py
 pydofus2/com/ankamagames/dofus/network/types/game/character/characteristic/CharacterCharacteristicDetailed.py
 pydofus2/com/ankamagames/dofus/network/types/game/character/characteristic/CharacterCharacteristicValue.py
@@ -1959,6 +1987,7 @@ pydofus2/com/ankamagames/dofus/network/types/game/context/fight/FightAllianceTea
 pydofus2/com/ankamagames/dofus/network/types/game/context/fight/FightCommonInformations.py
 pydofus2/com/ankamagames/dofus/network/types/game/context/fight/FightExternalInformations.py
 pydofus2/com/ankamagames/dofus/network/types/game/context/fight/FightLoot.py
+pydofus2/com/ankamagames/dofus/network/types/game/context/fight/FightLootObject.py
 pydofus2/com/ankamagames/dofus/network/types/game/context/fight/FightOptionsInformations.py
 pydofus2/com/ankamagames/dofus/network/types/game/context/fight/FightResultAdditionalData.py
 pydofus2/com/ankamagames/dofus/network/types/game/context/fight/FightResultExperienceData.py
@@ -2037,6 +2066,7 @@ pydofus2/com/ankamagames/dofus/network/types/game/context/roleplay/HumanOptionGu
 pydofus2/com/ankamagames/dofus/network/types/game/context/roleplay/HumanOptionObjectUse.py
 pydofus2/com/ankamagames/dofus/network/types/game/context/roleplay/HumanOptionOrnament.py
 pydofus2/com/ankamagames/dofus/network/types/game/context/roleplay/HumanOptionSkillUse.py
+pydofus2/com/ankamagames/dofus/network/types/game/context/roleplay/HumanOptionSpeedMultiplier.py
 pydofus2/com/ankamagames/dofus/network/types/game/context/roleplay/HumanOptionTitle.py
 pydofus2/com/ankamagames/dofus/network/types/game/context/roleplay/MonsterBoosts.py
 pydofus2/com/ankamagames/dofus/network/types/game/context/roleplay/MonsterInGroupInformations.py
@@ -2143,6 +2173,7 @@ pydofus2/com/ankamagames/dofus/network/types/game/friend/FriendSpouseOnlineInfor
 pydofus2/com/ankamagames/dofus/network/types/game/friend/IgnoredInformations.py
 pydofus2/com/ankamagames/dofus/network/types/game/friend/IgnoredOnlineInformations.py
 pydofus2/com/ankamagames/dofus/network/types/game/friend/__init__.py
+pydofus2/com/ankamagames/dofus/network/types/game/guild/Contribution.py
 pydofus2/com/ankamagames/dofus/network/types/game/guild/GuildEmblem.py
 pydofus2/com/ankamagames/dofus/network/types/game/guild/GuildMember.py
 pydofus2/com/ankamagames/dofus/network/types/game/guild/GuildRankInformation.py
@@ -2162,6 +2193,7 @@ pydofus2/com/ankamagames/dofus/network/types/game/guild/logbook/global/GuildPadd
 pydofus2/com/ankamagames/dofus/network/types/game/guild/logbook/global/GuildPlayerFlowActivity.py
 pydofus2/com/ankamagames/dofus/network/types/game/guild/logbook/global/GuildPlayerRankUpdateActivity.py
 pydofus2/com/ankamagames/dofus/network/types/game/guild/logbook/global/GuildRankActivity.py
+pydofus2/com/ankamagames/dofus/network/types/game/guild/logbook/global/GuildUnlockNewTabActivity.py
 pydofus2/com/ankamagames/dofus/network/types/game/guild/logbook/global/__init__.py
 pydofus2/com/ankamagames/dofus/network/types/game/guild/recruitment/GuildRecruitmentInformation.py
 pydofus2/com/ankamagames/dofus/network/types/game/guild/recruitment/__init__.py
@@ -2203,6 +2235,8 @@ pydofus2/com/ankamagames/dofus/network/types/game/interactive/skill/SkillActionD
 pydofus2/com/ankamagames/dofus/network/types/game/interactive/skill/__init__.py
 pydofus2/com/ankamagames/dofus/network/types/game/interactive/zaap/TeleportDestination.py
 pydofus2/com/ankamagames/dofus/network/types/game/interactive/zaap/__init__.py
+pydofus2/com/ankamagames/dofus/network/types/game/inventory/StorageTabInformation.py
+pydofus2/com/ankamagames/dofus/network/types/game/inventory/UpdatedStorageTabInformation.py
 pydofus2/com/ankamagames/dofus/network/types/game/inventory/__init__.py
 pydofus2/com/ankamagames/dofus/network/types/game/inventory/exchanges/RecycledItem.py
 pydofus2/com/ankamagames/dofus/network/types/game/inventory/exchanges/__init__.py
@@ -2309,7 +2343,6 @@ pydofus2/com/ankamagames/jerakine/data/GameDataFileAccessor.py
 pydofus2/com/ankamagames/jerakine/data/GameDataProcess.py
 pydofus2/com/ankamagames/jerakine/data/I18n.py
 pydofus2/com/ankamagames/jerakine/data/I18nFileAccessor.py
-pydofus2/com/ankamagames/jerakine/data/I18nUpdater.py
 pydofus2/com/ankamagames/jerakine/data/IPostInit.py
 pydofus2/com/ankamagames/jerakine/data/ModuleReader.py
 pydofus2/com/ankamagames/jerakine/data/XmlConfig.py

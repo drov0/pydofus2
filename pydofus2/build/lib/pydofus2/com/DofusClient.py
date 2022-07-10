@@ -35,19 +35,19 @@ class DofusClient(metaclass=Singleton):
         DataMapProvider().init(AnimatedCharacter)
 
     def relogin(self):
-        self.login(self._loginToken, self._serverId, self._charachterId)
+        self.login(self._loginToken, self._serverId, self._characterId)
 
-    def login(self, loginToken, serverId=0, charachterId=None):
+    def login(self, loginToken, serverId=0, characterId=None):
         if self.LOG_MEMORY_USAGE:
             tracemalloc.start(10)
         self._serverId = serverId
-        self._charachterId = charachterId
+        self._characterId = characterId
         self._loginToken = loginToken
         auth.AuthentificationManager().setToken(self._loginToken)
-        if charachterId:
+        if characterId:
             PlayerManager().allowAutoConnectCharacter = True
-            PlayedCharacterManager().id = charachterId
-            PlayerManager().autoConnectOfASpecificCharacterId = charachterId
+            PlayedCharacterManager().id = characterId
+            PlayerManager().autoConnectOfASpecificCharacterId = characterId
         for frame in self._registredCustomFrames:
             self._worker.addFrame(frame)
         if self._serverId == 0:

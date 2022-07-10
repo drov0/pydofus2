@@ -6,7 +6,7 @@ from pydofus2.com.DofusClient import DofusClient
 from pydofus2.com.ankamagames.jerakine.logger.Logger import Logger
 from pydofus2.com.ankamagames.jerakine.metaclasses.Singleton import Singleton
 from pyd2bot.BotConstants import BotConstants
-from pyd2bot.logic.managers.CharachtersManager import CharachtersManager
+from pyd2bot.logic.managers.CharactersManager import CharactersManager
 from pyd2bot.logic.managers.PathManager import PathManager
 from pydofus2.com.ankamagames.haapi.Haapi import Haapi
 
@@ -32,7 +32,7 @@ class SessionManager(metaclass=Singleton):
             json.dump({}, fp)
     with open(SESSIONDB, "r") as fp:
         _db = json.load(fp)
-    charachterId: str = None
+    characterId: str = None
     creds: dict = None
     spellId: int = None
     pathId: int = None
@@ -52,8 +52,8 @@ class SessionManager(metaclass=Singleton):
         sessionJson = self._db.get(sessionId)
         if not sessionJson:
             raise ValueError(f"No session with id {sessionId}")
-        self.charachterId = sessionJson.get("charachterId")
-        self.charachter = CharachtersManager.getEntry(str(self.charachterId))
+        self.characterId = sessionJson.get("characterId")
+        self.character = CharactersManager.getEntry(str(self.characterId))
         self.spellId = sessionJson.get("spellId")
         self.pathId = sessionJson.get("pathId")
         self.statToUp: int = sessionJson.get("statToUp")

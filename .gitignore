@@ -12,7 +12,7 @@ unpacked_raw_msg
 /.venv/
 /.vscode/
 creds.json
-botCharachtersDB.json
+botCharactersDB.json
 content\maps
 test.sh
 /my_tests/

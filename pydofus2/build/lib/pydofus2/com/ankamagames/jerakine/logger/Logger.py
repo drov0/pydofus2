@@ -15,7 +15,7 @@ class Logger(logging.Logger):
         if not os.path.isdir(Constants.LOGS_PATH):
             os.mkdir(Constants.LOGS_PATH)
         fileHandler = logging.FileHandler(
-            Constants.LOGS_PATH / f"/{self._prefix}_{os.getpid()}_{now.strftime('%Y-%m-%d')}.log"
+            Constants.LOGS_PATH / f"{self._prefix}_{os.getpid()}_{now.strftime('%Y-%m-%d')}.log"
         )
         streamHandler = logging.StreamHandler()
         fileHandler.setFormatter(formatter)

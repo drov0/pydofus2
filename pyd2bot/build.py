@@ -15,5 +15,5 @@ setup(
     version="0.1",
     description="pyd2bot",
     options={"build_exe": build_exe_options},
-    executables=[Executable("main.py", base=base)],
+    executables=[Executable("pyd2bot.py", base=base)],
 )

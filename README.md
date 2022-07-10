@@ -82,12 +82,12 @@ make createAccount entryName='grinder' login='myAccountAwsomeLogin' password='ke
 
 > :warning: Make sure to put the password inside single quotes to avoid having problems with special chars.
 
-### Create an entry for the bot charachter infos
+### Create an entry for the bot character infos
 
 Example:
 
 ```bash
-make createBot botName='grinder' account='grinder' charachterId='335911059666' serverId='210'
+make createBot botName='grinder' account='grinder' characterId='335911059666' serverId='210'
 ```
 
 > Here the 'account' arg should correspond to the entryName you chose for your account creds.

@@ -1,19 +1,22 @@
 const { app, BrowserWindow, Menu, ipcMain } = require('electron');
 const path = require('path')
 const ejse = require('ejs-electron')
-const thrift = require('thrift');
-const Pyd2botService = require('./pyd2botService/Pyd2botService.js');
 ejse.data('nodeModulesUrl', "file://" + path.join(__dirname, '..', 'node_modules'));
 ejse.data('sidebarUrl', path.join(__dirname, 'ejs', 'sidebar.ejs'));
 ejse.data('cssUrl', "file://" + path.join(__dirname, 'assets', 'css'));
 ejse.data('persistenceDir', path.join(__dirname, '..', '..', 'pyd2botDB'))
+ejse.data('pyd2botDir', )
 const mainUrl = "file://" + path.join(__dirname, 'ejs', 'main.ejs')
 const PathsManager = require('./paths/PathManager.js');
 const AccountManager = require("./accounts/AccountManager.js");
+const InstancesManager = require("./bot/InstancesManager.js");
+const { syncBuiltinESMExports } = require('module');
+ 
 let mainWindow;
 const accountManager = AccountManager.instance;
-ejse.data('charachters', accountManager.charachtersDB);
-
+const instancesManager = InstancesManager.instance;
+ejse.data('characters', accountManager.charactersDB);
+ejse.data('currentEditedAccount', accountManager.currentEditedAccount);
 ejse.data('accounts', accountManager.accountsDB);
 ejse.data('accountsPasswords', accountManager.accountsPasswords);
 // Handle creating/removing shortcuts on Windows when installing/uninstalling.
@@ -52,6 +55,16 @@ ipcMain.on("newAccount", (event, formData) => {
     mainWindow.loadURL(accountManager.urls.manageAccountsUrl);
 });
 
+ipcMain.on("editAccount", (event, key) => {
+    account = accountManager.accountsDB[key]
+    ejse.data('currentEditedAccount', { 
+        "id" : key, 
+        "login" : account.login,
+        "password" : accountManager.getAccountPassword(key)	
+    });
+    mainWindow.loadURL(accountManager.urls.newAccountUrl);
+});
+
 ipcMain.on("deleteAccount", (event, key) => {
     accountManager.deleteAccount(key);
     mainWindow.loadURL(accountManager.urls.manageAccountsUrl);
@@ -66,36 +79,38 @@ ipcMain.on("hideUnhidePassword", (event, key) => {
     mainWindow.loadURL(accountManager.urls.manageAccountsUrl);
 });
 
-ipcMain.on("fetchCharachters", (event, key) => {
-    console.log("fetchCharachters " + key);
-    var transport = thrift.TBufferedTransport;
-    var protocol = thrift.TBinaryProtocol;
-    var connection = thrift.createConnection("127.0.0.1", 9999, {
-        transport : transport,
-        protocol : protocol
-    });
-    connection.on('error', function(err) {
-        if (err) {
-            console.log(err);
-            throw err; 
-        }
-    });
-    var client = thrift.createClient(Pyd2botService, connection);
-    var creds = accountManager.getAccountCreds(key);
-    client.fetchAccountCharachters(creds.login, creds.password, creds.certId.toString(), creds.certHash, function(err, response) {
-        if (err) {
-            connection.end();
-            console.log(err);
-            throw err; 
-        }
-        connection.end();
-        response.forEach(charachter => {
-            accountManager.addCharachter(key, charachter);
+ipcMain.on("fetchCharacters", (event, key) => {
+    instancesManager.spawnServer(key);
+    console.log("fetchCharacters " + key);
+    setTimeout(() => {
+        var client = instancesManager.spawnClient(key);
+        var creds = accountManager.getAccountCreds(key);
+        client.fetchAccountCharacters(creds.login, creds.password, creds.certId.toString(), creds.certHash, function(err, response) {
+            if (err) {
+                console.log("Error while callling fetch : " + err);
+            }
+            console.log("fetched characters : " + JSON.stringify(response));
+            instancesManager.killInstance(key);
+            response.forEach(character => {
+                accountManager.addCharacter(key, character);
+            });
+            accountManager.saveCharacters();
         });
-        accountManager.saveCharachters();
-    });
-      
+    }, 5000);
+});
 
+ipcMain.on("saveCharacters", (event, args) => {
+    accountManager.saveCharacters();
+});
+
+ipcMain.on("clearCharacters", (event, args) => {
+    accountManager.clearCharacters();
+    mainWindow.loadURL(accountManager.urls.manageCharactersUrl); 
+});
+
+ipcMain.on("deleteCharacter", (event, key) => {
+    accountManager.deleteCharacter(key);
+    mainWindow.loadURL(accountManager.urls.manageCharactersUrl);
 });
 // This method will be called when Electron has finished
 // initialization and is ready to create browser windows.

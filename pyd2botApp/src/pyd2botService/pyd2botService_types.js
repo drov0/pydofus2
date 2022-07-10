@@ -12,7 +12,7 @@ var Int64 = require('node-int64');
 
 
 var ttypes = module.exports = {};
-var Charachter = module.exports.Charachter = function(args) {
+var Character = module.exports.Character = function(args) {
   this.name = null;
   this.id = null;
   this.serverId = null;
@@ -28,8 +28,8 @@ var Charachter = module.exports.Charachter = function(args) {
     }
   }
 };
-Charachter.prototype = {};
-Charachter.prototype.read = function(input) {
+Character.prototype = {};
+Character.prototype.read = function(input) {
   input.readStructBegin();
   while (true) {
     var ret = input.readFieldBegin();
@@ -69,8 +69,8 @@ Charachter.prototype.read = function(input) {
   return;
 };
 
-Charachter.prototype.write = function(output) {
-  output.writeStructBegin('Charachter');
+Character.prototype.write = function(output) {
+  output.writeStructBegin('Character');
   if (this.name !== null && this.name !== undefined) {
     output.writeFieldBegin('name', Thrift.Type.STRING, 1);
     output.writeString(this.name);

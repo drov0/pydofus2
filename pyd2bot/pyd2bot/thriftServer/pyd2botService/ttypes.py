@@ -16,7 +16,7 @@ from thrift.transport import TTransport
 all_structs = []
 
 
-class Charachter(object):
+class Character(object):
     """
     Attributes:
      - name
@@ -64,7 +64,7 @@ class Charachter(object):
         if oprot._fast_encode is not None and self.thrift_spec is not None:
             oprot.trans.write(oprot._fast_encode(self, [self.__class__, self.thrift_spec]))
             return
-        oprot.writeStructBegin('Charachter')
+        oprot.writeStructBegin('Character')
         if self.name is not None:
             oprot.writeFieldBegin('name', TType.STRING, 1)
             oprot.writeString(self.name.encode('utf-8') if sys.version_info[0] == 2 else self.name)
@@ -93,8 +93,8 @@ class Charachter(object):
 
     def __ne__(self, other):
         return not (self == other)
-all_structs.append(Charachter)
-Charachter.thrift_spec = (
+all_structs.append(Character)
+Character.thrift_spec = (
     None,  # 0
     (1, TType.STRING, 'name', 'UTF8', None, ),  # 1
     (2, TType.STRING, 'id', 'UTF8', None, ),  # 2

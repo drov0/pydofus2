@@ -1,5 +1,6 @@
 from time import sleep
 from pydofus2.com.ankamagames.dofus.logic.common.frames.LatencyFrame import LatencyFrame
+from pydofus2.com.ankamagames.dofus.logic.common.managers.PlayerManager import PlayerManager
 from pydofus2.com.ankamagames.dofus.logic.common.managers.StatsManager import StatsManager
 from pydofus2.com.ankamagames.dofus.logic.connection.managers.AuthentificationManager import (
     AuthentificationManager,
@@ -58,6 +59,7 @@ class Kernel(metaclass=Singleton):
         FightersStateManager().endFight()
         cpfm.CurrentPlayedFighterManager().endFight()
         pcm.PlayedCharacterManager.clear()
+        PlayerManager.clear()
         DofusEntities.reset()
         ItemWrapper.clearCache()
         self._worker.clear()

@@ -4,6 +4,7 @@ DOFUS_SRC = $(CURDIR)/protocolBuilder/sources
 SELECTCLASS = com.ankamagames.dofus.BuildInfos,com.ankamagames.dofus.network.++,com.ankamagames.jerakine.network.++
 PYDOFUS_DIR = $(CURDIR)/pydofus2
 PYD2BOT_DIR = $(CURDIR)/pyd2bot
+PYD2BOT_DIST_DIR = "$(APPDATA)"/pyd2bot/
 
 .ONESHELL:
 .PHONY: setup
@@ -53,9 +54,18 @@ sniff:
 	source .venv/Scripts/activate
 	@python -m snifferApp 
 
-build:
-	source .venv/Scripts/activate
-	python $(CURDIR)/pyd2bot/build.py build
+bdist:
+	@cd $(PYD2BOT_DIR)
+	@python -m venv .buildEnv
+	@source .buildEnv/Scripts/activate
+	@cd $(PYDOFUS_DIR)
+	@pip install .
+	@cd $(PYD2BOT_DIR)
+	@pip install -r requirements.txt
+	@python build.py build
+	@cp -a $(PYD2BOT_DIR)/build/exe.win-amd64-3.9/* $(PYD2BOT_DIST_DIR)
+	@deactivate
+	@rm -rf .buildEnv
 
 serve:
 	source .venv/Scripts/activate
@@ -64,3 +74,4 @@ serve:
 testClient:
 	source .venv/Scripts/activate
 	python $(CURDIR)/pyd2bot/pyd2bot/thriftServer/pyd2botClient.py
+

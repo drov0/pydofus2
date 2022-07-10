@@ -14,11 +14,13 @@ class AccountManager {
 
     constructor() {
         this.accountsDbFile = path.join(ejse.data('persistenceDir'), 'accounts.json')
-        this.charachtersDbFile = path.join(ejse.data('persistenceDir'), 'charachters.json')
+        this.charactersDbFile = path.join(ejse.data('persistenceDir'), 'characters.json')
         this.accountsDB = require(this.accountsDbFile)
-        this.charachtersDB = require(this.charachtersDbFile)
+        this.charactersDB = require(this.charactersDbFile)
         this.accountsPasswords = {}
         this.authHelper = new AuthHelper();
+        this.currentEditedAccount = null
+        this.charactersChanged = false
 
         for (var key in this.accountsDB) {
             this.accountsPasswords[key] = "********"
@@ -53,29 +55,48 @@ class AccountManager {
         this.decrypt.setPrivateKey(this.privateKey)
         this.urls = {
             'manageAccountsUrl': "file://" + path.join(__dirname, 'ejs', 'accountManager.ejs'),
-            'manageCharachtersUrl': "file://" + path.join(__dirname, 'ejs', 'charachterManager.ejs'),
+            'manageCharactersUrl': "file://" + path.join(__dirname, 'ejs', 'characterManager.ejs'),
             'newAccountUrl': "file://" + path.join(__dirname, 'ejs', 'newAccountForm.ejs'),
         }
         ejse.data('accountUrls', this.urls);
     }
 
+    getAccountPassword(key) {
+        return this.decrypt.decrypt(this.accountsDB[key].password)
+    }
+
     hideUnhidePassword(key) {
+        console.log("before huide " + this.accountsPasswords[key])
         if (this.accountsPasswords[key] == "********") {
-            var decryptedPassword = this.decrypt.decrypt(this.accountsDB[key].password)
+            var decryptedPassword = this.getAccountPassword(key)
             this.accountsPasswords[key] = decryptedPassword
         }
         else {
             this.accountsPasswords[key] = "********"
         }
+        console.log("after huide " + this.accountsPasswords[key])
     }
 
     newAccount(formData) {
         var encryptedPassword = this.encrypt.encrypt(formData.password)
+        var currentAccount = ejse.data('currentEditedAccount')
+        if (currentAccount != null) {
+            if (formData.entryId != currentAccount.id) {
+                delete this.accountsDB[currentAccount.id]
+                for (var [key, character] of Object.entries(this.charactersDB)) {
+                    if (currentAccount.id == character.accountId) {
+                        this.charactersDB[key].accountId = formData.entryId
+                    }
+                }
+                this.charactersChanged = true
+            }
+        }
         this.accountsDB[formData.entryId] = {
             "login": formData.login,
             "password": encryptedPassword,
         }
         this.accountsPasswords[formData.entryId] = "********"
+        ejse.data('currentEditedAccount' , null) 
     }
 
     deleteAccount(key) {
@@ -102,23 +123,37 @@ class AccountManager {
                 console.log(err)
             }
         })
+        if (this.charactersChanged) {
+            this.saveCharacters()
+            this.charactersChanged = false
+        }
     }
 
-    saveCharachters() {
-        var saveJson = JSON.stringify(this.charachtersDB, null, 2);
-        fs.writeFile(this.charachtersDbFile, saveJson, 'utf8', (err) => {
+    saveCharacters() {
+        var saveJson = JSON.stringify(this.charactersDB, null, 2);
+        fs.writeFile(this.charactersDbFile, saveJson, 'utf8', (err) => {
             if (err) {
                 console.log(err)
             }
         })
     }
 
-    addCharachter(accountId, charachter) {
-        this.charachtersDB[`${charachter.name}(${charachter.serverId})`] = {
-            "characterName": charachter.name,
+    addCharacter(accountId, character) {
+        this.charactersDB[`${character.name}(${character.serverId})`] = {
+            "characterName": character.name,
             "accountId": accountId,
-            "charachterId": parseFloat(charachter.id),
-            "serverId": parseInt(charachter.serverId)
+            "characterId": parseFloat(character.id),
+            "serverId": parseInt(character.serverId)
+        }
+    }
+
+    deleteCharacter(key) {
+        delete this.charactersDB[key]
+    }
+
+    clearCharacters() {
+        for (var key in this.charactersDB) {
+            delete this.charactersDB[key]
         }
     }
 

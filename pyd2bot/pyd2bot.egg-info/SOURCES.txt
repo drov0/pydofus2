@@ -1,9 +1,0 @@
-MANIFEST.in
-README.txt
-build.py
-setup.py
-pyd2bot.egg-info/PKG-INFO
-pyd2bot.egg-info/SOURCES.txt
-pyd2bot.egg-info/dependency_links.txt
-pyd2bot.egg-info/top_level.txt
-pyd2bot/launcher/package.json

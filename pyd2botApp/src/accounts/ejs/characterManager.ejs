@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html>
+
+    <head>
+        <meta charset="UTF-8" />
+        <title>Grider</title>
+        <!-- Bootstrap CSS -->
+        <link rel="stylesheet" href="<%= nodeModulesUrl + '/bootstrap/dist/css/bootstrap.min.css'%>" />
+        <!-- Custom CSS -->
+        <link rel="stylesheet" href="<%= cssUrl + '/main.css'%>"/>
+        <!-- Bootstrap Optional JavaScript -->
+        <!-- jQuery first, then Popper.js, then Bootstrap JS -->
+        <script>let $ = require('jquery');</script>
+        <script>require('popper');</script>
+        <script>require('bootstrap');</script>
+        <script defer src="render.js"></script>
+    </head>
+
+<body>
+    <div class="wrapper">
+        <%- include(sidebarUrl, {active: 'characters' }) %>
+        <div class="bodyRightView">
+            <ul class="nav nav-tabs" style="background: #262626">
+                <li class="nav-item"><a class="nav-link active" aria-current="page" href="#">Characters</a></li>
+                <li class="nav-item"><a class="nav-link" aria-current="page" href="<%=accountUrls.manageAccountsUrl%>">Accounts</a></li>
+            </ul>
+            <table class="table table-dark table-striped" style="margin-bottom: 0;">
+                <thead>
+                    <th scope="col">Name</th>
+                    <th scope="col">Id</th>
+                    <th scope="col">serverId</th>
+                    <th scope="col">accountId</th>
+                    <th scope="col">action</th>
+                </thead>
+                <tbody>
+                    <% Object.keys(ejse.data('characters')).forEach(key => { let value=ejse.data('characters')[key] %>
+                    <tr>
+                        <td scope="row"><%= value.characterName%></td>
+                        <td><%= value.characterId%></td>
+                        <td><%= value.serverId%></td>
+                        <td><%= value.accountId%></td>
+                        <td><button class="btn btn-primary" onclick="deleteCharacter('<%= key%>')">delete</button></td>
+                    </tr>
+                    <% }) %>
+                </tbody>
+            </table>
+            <div class="managerBottomButtonsBar">
+                <a href="<%=accountUrls.newCharacterUrl%>"><button class="btn btn-primary" >new</button></a>
+                <button class="btn btn-primary" onclick="saveCharacters()">save</button>
+                <button class="btn btn-primary" onclick="clearCharacters()">clear</button>
+            </div>
+        </div>
+    </div>
+</body>
+
+</html>

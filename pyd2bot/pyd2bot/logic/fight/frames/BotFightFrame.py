@@ -326,7 +326,8 @@ class BotFightFrame(Frame):
         if self.battleFrame._executingSequence:
             if self.VERBOSE:
                 logger.warn(f"[FightBot] Battle is busy processing sequences")
-            BenchmarkTimer(0.005, self.nextTurnAction).start()
+            BenchmarkTimer(0.1, self.nextTurnAction).start()
+            return
         else:
             if self.VERBOSE:
                 logger.debug(f"[FightBot] Next turn actions, {[a['fct'].__name__ for a in self._turnAction]}")
@@ -387,10 +388,12 @@ class BotFightFrame(Frame):
             return False
 
         elif isinstance(msg, GameFightShowFighterMessage):
+            # when a fighter is added to the fight
             msg.informations.contextualId
             self._turnPlayed = 0
             self._myTurn = False
             if self.partyFrame and self.partyFrame.isLeader:
+                # if bot is in fight and in a prrty and is the leader, check if all party members are in fight
                 for memberId in self.partyFrame._partyMembers:
                     if not self.entitiesFrame.getEntityInfos(memberId):
                         return True

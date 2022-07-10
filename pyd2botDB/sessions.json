@@ -1,36 +1,36 @@
 {
     "money_1": {
-        "charachterId": "money1",
+        "characterId": "money1",
         "spellId": 13516,
         "pathId": "pioute_astrub_village",
         "statToUp": 10
     },
     "money_2": {
-        "charachterId": "Moneyslicer(210)",
+        "characterId": "Moneyslicer(210)",
         "spellId": 13516,
         "pathId": "lumberjack_astrub_forest",
         "statToUp": 10
     },
     "money_3": {
-        "charachterId": "Moneycreator(210)",
+        "characterId": "Moneycreator(210)",
         "spellId": 13516,
         "pathId": "pioute_astrub_village",
         "statToUp": 10
     },
     "money_4": {
-        "charachterId": "Moneylife(210)",
+        "characterId": "Moneylife(210)",
         "spellId": 13516,
         "pathId": "pioute_astrub_village",
         "statToUp": 10
     },
     "sadida-lumberjacker": {
-        "charachterId": "Maniaco-lalcolic(210)",
+        "characterId": "Maniaco-lalcolic(210)",
         "spellId": 13516,
         "pathId": "lumberjack_cania",
         "statToUp": 10
     },
     "money_5": {
-        "charachterId": "Hardlett(210)",
+        "characterId": "Hardlett(210)",
         "spellId": 13516,
         "pathId": "incarnam_lac_monster",
         "isLeader": true,
@@ -38,49 +38,49 @@
         "statToUp": 10
     },
     "sadida-follower1": {
-        "charachterId": "Maniaco-lalcolic(210)",
+        "characterId": "Maniaco-lalcolic(210)",
         "spellId": 13516,
         "leaderName": "Plusbellelavie",
         "isLeader": false,
         "statToUp": 10
     },
     "sadida-follower2": {
-        "charachterId": "Moneydicer(210)",
+        "characterId": "Moneydicer(210)",
         "spellId": 13516,
         "leaderName": "Plusbellelavie",
         "isLeader": false,
         "statToUp": 10
     },
     "sadida-follower3": {
-        "charachterId": "Them-rats(210)",
+        "characterId": "Them-rats(210)",
         "spellId": 13516,
         "leaderName": "Plusbellelavie",
         "isLeader": false,
         "statToUp": 10
     },
     "sadida-follower4": {
-        "charachterId": "Moneyslicer(210)",
+        "characterId": "Moneyslicer(210)",
         "spellId": 13516,
         "leaderName": "Plusbellelavie",
         "isLeader": false,
         "statToUp": 10
     },
     "sadida-follower5": {
-        "charachterId": "Moneycreator(210)",
+        "characterId": "Moneycreator(210)",
         "spellId": 13516,
         "leaderName": "Plusbellelavie",
         "isLeader": false,
         "statToUp": 10
     },
     "sadida-follower6": {
-        "charachterId": "Hardlett(210)",
+        "characterId": "Hardlett(210)",
         "spellId": 13516,
         "leaderName": "Plusbellelavie",
         "isLeader": false,
         "statToUp": 10
     },
     "sadida-leader": {
-        "charachterId": "Plusbellelavie(210)",
+        "characterId": "Plusbellelavie(210)",
         "spellId": 13516,
         "pathId": "pioute_astrub_village",
         "followers": [

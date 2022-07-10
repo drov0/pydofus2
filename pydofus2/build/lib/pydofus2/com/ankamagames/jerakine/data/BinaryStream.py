@@ -25,8 +25,8 @@ class BinaryStream:
     def writeBytes(self, value):
         self._stream.write(value)
 
-    def seek(self, value: int):
-        self._stream.seek(value)
+    def seek(self, value: int, flag: int = 0):
+        self._stream.seek(value, flag)
 
     def close(self):
         self._stream.close()
@@ -84,9 +84,9 @@ class BinaryStream:
     def readDouble(self) -> float:
         return self._unpack("d", 8)
 
-    def readUTF(self) -> str:
+    def readUTF(self, encoding="utf-8") -> str:
         length = self.readUnsignedShort()
-        return self._unpack(str(length) + "s", length).decode("utf-8")
+        return self._unpack(str(length) + "s", length).decode(encoding)
 
     def readUTFBytes(self, length) -> str:
         return self._unpack(str(length) + "s", length)

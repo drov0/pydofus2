@@ -19,7 +19,7 @@ all_structs = []
 
 
 class Iface(object):
-    def fetchAccountCharachters(self, login, password, certId, certHash):
+    def fetchAccountCharacters(self, login, password, certId, certHash):
         """
         Parameters:
          - login
@@ -50,7 +50,7 @@ class Client(Iface):
             self._oprot = oprot
         self._seqid = 0
 
-    def fetchAccountCharachters(self, login, password, certId, certHash):
+    def fetchAccountCharacters(self, login, password, certId, certHash):
         """
         Parameters:
          - login
@@ -59,12 +59,12 @@ class Client(Iface):
          - certHash
 
         """
-        self.send_fetchAccountCharachters(login, password, certId, certHash)
-        return self.recv_fetchAccountCharachters()
+        self.send_fetchAccountCharacters(login, password, certId, certHash)
+        return self.recv_fetchAccountCharacters()
 
-    def send_fetchAccountCharachters(self, login, password, certId, certHash):
-        self._oprot.writeMessageBegin('fetchAccountCharachters', TMessageType.CALL, self._seqid)
-        args = fetchAccountCharachters_args()
+    def send_fetchAccountCharacters(self, login, password, certId, certHash):
+        self._oprot.writeMessageBegin('fetchAccountCharacters', TMessageType.CALL, self._seqid)
+        args = fetchAccountCharacters_args()
         args.login = login
         args.password = password
         args.certId = certId
@@ -73,7 +73,7 @@ class Client(Iface):
         self._oprot.writeMessageEnd()
         self._oprot.trans.flush()
 
-    def recv_fetchAccountCharachters(self):
+    def recv_fetchAccountCharacters(self):
         iprot = self._iprot
         (fname, mtype, rseqid) = iprot.readMessageBegin()
         if mtype == TMessageType.EXCEPTION:
@@ -81,12 +81,12 @@ class Client(Iface):
             x.read(iprot)
             iprot.readMessageEnd()
             raise x
-        result = fetchAccountCharachters_result()
+        result = fetchAccountCharacters_result()
         result.read(iprot)
         iprot.readMessageEnd()
         if result.success is not None:
             return result.success
-        raise TApplicationException(TApplicationException.MISSING_RESULT, "fetchAccountCharachters failed: unknown result")
+        raise TApplicationException(TApplicationException.MISSING_RESULT, "fetchAccountCharacters failed: unknown result")
 
     def runSession(self, login, password, certId, certHash, sessionId):
         """
@@ -117,7 +117,7 @@ class Processor(Iface, TProcessor):
     def __init__(self, handler):
         self._handler = handler
         self._processMap = {}
-        self._processMap["fetchAccountCharachters"] = Processor.process_fetchAccountCharachters
+        self._processMap["fetchAccountCharacters"] = Processor.process_fetchAccountCharacters
         self._processMap["runSession"] = Processor.process_runSession
         self._on_message_begin = None
 
@@ -141,13 +141,13 @@ class Processor(Iface, TProcessor):
             self._processMap[name](self, seqid, iprot, oprot)
         return True
 
-    def process_fetchAccountCharachters(self, seqid, iprot, oprot):
-        args = fetchAccountCharachters_args()
+    def process_fetchAccountCharacters(self, seqid, iprot, oprot):
+        args = fetchAccountCharacters_args()
         args.read(iprot)
         iprot.readMessageEnd()
-        result = fetchAccountCharachters_result()
+        result = fetchAccountCharacters_result()
         try:
-            result.success = self._handler.fetchAccountCharachters(args.login, args.password, args.certId, args.certHash)
+            result.success = self._handler.fetchAccountCharacters(args.login, args.password, args.certId, args.certHash)
             msg_type = TMessageType.REPLY
         except TTransport.TTransportException:
             raise
@@ -159,7 +159,7 @@ class Processor(Iface, TProcessor):
             logging.exception('Unexpected exception in handler')
             msg_type = TMessageType.EXCEPTION
             result = TApplicationException(TApplicationException.INTERNAL_ERROR, 'Internal error')
-        oprot.writeMessageBegin("fetchAccountCharachters", msg_type, seqid)
+        oprot.writeMessageBegin("fetchAccountCharacters", msg_type, seqid)
         result.write(oprot)
         oprot.writeMessageEnd()
         oprot.trans.flush()
@@ -178,7 +178,7 @@ class Processor(Iface, TProcessor):
 # HELPER FUNCTIONS AND STRUCTURES
 
 
-class fetchAccountCharachters_args(object):
+class fetchAccountCharacters_args(object):
     """
     Attributes:
      - login
@@ -233,7 +233,7 @@ class fetchAccountCharachters_args(object):
         if oprot._fast_encode is not None and self.thrift_spec is not None:
             oprot.trans.write(oprot._fast_encode(self, [self.__class__, self.thrift_spec]))
             return
-        oprot.writeStructBegin('fetchAccountCharachters_args')
+        oprot.writeStructBegin('fetchAccountCharacters_args')
         if self.login is not None:
             oprot.writeFieldBegin('login', TType.STRING, 1)
             oprot.writeString(self.login.encode('utf-8') if sys.version_info[0] == 2 else self.login)
@@ -266,8 +266,8 @@ class fetchAccountCharachters_args(object):
 
     def __ne__(self, other):
         return not (self == other)
-all_structs.append(fetchAccountCharachters_args)
-fetchAccountCharachters_args.thrift_spec = (
+all_structs.append(fetchAccountCharacters_args)
+fetchAccountCharacters_args.thrift_spec = (
     None,  # 0
     (1, TType.STRING, 'login', 'UTF8', None, ),  # 1
     (2, TType.STRING, 'password', 'UTF8', None, ),  # 2
@@ -276,7 +276,7 @@ fetchAccountCharachters_args.thrift_spec = (
 )
 
 
-class fetchAccountCharachters_result(object):
+class fetchAccountCharacters_result(object):
     """
     Attributes:
      - success
@@ -301,7 +301,7 @@ class fetchAccountCharachters_result(object):
                     self.success = []
                     (_etype3, _size0) = iprot.readListBegin()
                     for _i4 in range(_size0):
-                        _elem5 = Charachter()
+                        _elem5 = Character()
                         _elem5.read(iprot)
                         self.success.append(_elem5)
                     iprot.readListEnd()
@@ -316,7 +316,7 @@ class fetchAccountCharachters_result(object):
         if oprot._fast_encode is not None and self.thrift_spec is not None:
             oprot.trans.write(oprot._fast_encode(self, [self.__class__, self.thrift_spec]))
             return
-        oprot.writeStructBegin('fetchAccountCharachters_result')
+        oprot.writeStructBegin('fetchAccountCharacters_result')
         if self.success is not None:
             oprot.writeFieldBegin('success', TType.LIST, 0)
             oprot.writeListBegin(TType.STRUCT, len(self.success))
@@ -340,9 +340,9 @@ class fetchAccountCharachters_result(object):
 
     def __ne__(self, other):
         return not (self == other)
-all_structs.append(fetchAccountCharachters_result)
-fetchAccountCharachters_result.thrift_spec = (
-    (0, TType.LIST, 'success', (TType.STRUCT, [Charachter, None], False), None, ),  # 0
+all_structs.append(fetchAccountCharacters_result)
+fetchAccountCharacters_result.thrift_spec = (
+    (0, TType.LIST, 'success', (TType.STRUCT, [Character, None], False), None, ),  # 0
 )
 
 

@@ -12,6 +12,10 @@ function createAccount() {
     ipc.send('newAccount', newAccount)
 }
 
+function editAccount(key) {
+    ipc.send('editAccount', key)
+}
+
 function saveAccounts() {
     ipc.send('saveAccounts')
 }
@@ -24,14 +28,22 @@ function hideUnhidePassword(key) {
     ipc.send('hideUnhidePassword', key)
 }
 
-function createCharachter() {
+function createCharacter() {
 
 }
 
-function saveCharachters() {
+function saveCharacters() {
 
 }
 
-function fetchCharachters(key) {  
-    ipc.send('fetchCharachters', key)
+function fetchCharacters(key) {  
+    ipc.send('fetchCharacters', key)
+}
+
+function deleteCharacter(key) {
+    ipc.send('deleteCharacter', key)
+}
+
+function clearCharacters() {
+    ipc.send('clearCharacters')
 }

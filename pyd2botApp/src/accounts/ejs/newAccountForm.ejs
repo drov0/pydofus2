@@ -18,26 +18,26 @@
 
 <body>
     <div class="wrapper">
-        <%- include(sidebarUrl, {active: 'charachters' }) %>
+        <%- include(sidebarUrl, {active: 'characters' }) %>
         <div class="bodyRightView">
             <div class="accountFormsContainer">
                 <div class="form-group">
                     <label for="accountId">entryId</label>
-                    <input type="text" class="form-control" id="accountId" placeholder="Enter entry id">
+                    <input type="text" class="form-control" id="accountId" placeholder='<%=currentEditedAccount ? '' : "Enter entry id"%>' value="<%=currentEditedAccount ? currentEditedAccount.id : ""%>" >
                 </div>
                 <div class="form-group">
                     <label for="accountLogin">login</label>
-                    <input type="text" class="form-control" id="accountLogin" placeholder="Enter login">
+                    <input type="text" class="form-control" id="accountLogin" placeholder='<%=currentEditedAccount ? '' : "Enter account login"%>' value='<%=currentEditedAccount ? currentEditedAccount.login : ""%>'>
                 </div>
                 <div class="form-group">
                     <label for="accountPassword">Password</label>
-                    <input type="password" class="form-control" id="accountPassword" placeholder="Password">
+                    <input type="password" class="form-control" id="accountPassword" placeholder='<%=currentEditedAccount ? '' : "Enter account password"%>' value='<%=currentEditedAccount ? currentEditedAccount.password : ""%>'>
                 </div>
                 <div class="managerBottomButtonsBar">
                     <button class="btn btn-primary" onclick="createAccount()">confirm</button>
                     <a href="<%=accountUrls.manageAccountsUrl%>"><button class="btn btn-primary">cancel</button></a>
                 </div>
-            </div>
+            </div>twi
         </div>
     </div>
 </body>

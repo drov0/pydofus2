@@ -14,7 +14,7 @@ var Int64 = require('node-int64');
 var ttypes = require('./pyd2botService_types');
 //HELPER FUNCTIONS AND STRUCTURES
 
-var Pyd2botService_fetchAccountCharachters_args = function(args) {
+var Pyd2botService_fetchAccountCharacters_args = function(args) {
   this.login = null;
   this.password = null;
   this.certId = null;
@@ -34,8 +34,8 @@ var Pyd2botService_fetchAccountCharachters_args = function(args) {
     }
   }
 };
-Pyd2botService_fetchAccountCharachters_args.prototype = {};
-Pyd2botService_fetchAccountCharachters_args.prototype.read = function(input) {
+Pyd2botService_fetchAccountCharacters_args.prototype = {};
+Pyd2botService_fetchAccountCharacters_args.prototype.read = function(input) {
   input.readStructBegin();
   while (true) {
     var ret = input.readFieldBegin();
@@ -82,8 +82,8 @@ Pyd2botService_fetchAccountCharachters_args.prototype.read = function(input) {
   return;
 };
 
-Pyd2botService_fetchAccountCharachters_args.prototype.write = function(output) {
-  output.writeStructBegin('Pyd2botService_fetchAccountCharachters_args');
+Pyd2botService_fetchAccountCharacters_args.prototype.write = function(output) {
+  output.writeStructBegin('Pyd2botService_fetchAccountCharacters_args');
   if (this.login !== null && this.login !== undefined) {
     output.writeFieldBegin('login', Thrift.Type.STRING, 1);
     output.writeString(this.login);
@@ -109,16 +109,16 @@ Pyd2botService_fetchAccountCharachters_args.prototype.write = function(output) {
   return;
 };
 
-var Pyd2botService_fetchAccountCharachters_result = function(args) {
+var Pyd2botService_fetchAccountCharacters_result = function(args) {
   this.success = null;
   if (args) {
     if (args.success !== undefined && args.success !== null) {
-      this.success = Thrift.copyList(args.success, [ttypes.Charachter]);
+      this.success = Thrift.copyList(args.success, [ttypes.Character]);
     }
   }
 };
-Pyd2botService_fetchAccountCharachters_result.prototype = {};
-Pyd2botService_fetchAccountCharachters_result.prototype.read = function(input) {
+Pyd2botService_fetchAccountCharacters_result.prototype = {};
+Pyd2botService_fetchAccountCharacters_result.prototype.read = function(input) {
   input.readStructBegin();
   while (true) {
     var ret = input.readFieldBegin();
@@ -135,7 +135,7 @@ Pyd2botService_fetchAccountCharachters_result.prototype.read = function(input) {
         var _size0 = _rtmp31.size || 0;
         for (var _i2 = 0; _i2 < _size0; ++_i2) {
           var elem3 = null;
-          elem3 = new ttypes.Charachter();
+          elem3 = new ttypes.Character();
           elem3.read(input);
           this.success.push(elem3);
         }
@@ -156,8 +156,8 @@ Pyd2botService_fetchAccountCharachters_result.prototype.read = function(input) {
   return;
 };
 
-Pyd2botService_fetchAccountCharachters_result.prototype.write = function(output) {
-  output.writeStructBegin('Pyd2botService_fetchAccountCharachters_result');
+Pyd2botService_fetchAccountCharacters_result.prototype.write = function(output) {
+  output.writeStructBegin('Pyd2botService_fetchAccountCharacters_result');
   if (this.success !== null && this.success !== undefined) {
     output.writeFieldBegin('success', Thrift.Type.LIST, 0);
     output.writeListBegin(Thrift.Type.STRUCT, this.success.length);
@@ -321,7 +321,7 @@ Pyd2botServiceClient.prototype = {};
 Pyd2botServiceClient.prototype.seqid = function() { return this._seqid; };
 Pyd2botServiceClient.prototype.new_seqid = function() { return this._seqid += 1; };
 
-Pyd2botServiceClient.prototype.fetchAccountCharachters = function(login, password, certId, certHash, callback) {
+Pyd2botServiceClient.prototype.fetchAccountCharacters = function(login, password, certId, certHash, callback) {
   this._seqid = this.new_seqid();
   if (callback === undefined) {
     var _defer = Q.defer();
@@ -332,15 +332,15 @@ Pyd2botServiceClient.prototype.fetchAccountCharachters = function(login, passwor
         _defer.resolve(result);
       }
     };
-    this.send_fetchAccountCharachters(login, password, certId, certHash);
+    this.send_fetchAccountCharacters(login, password, certId, certHash);
     return _defer.promise;
   } else {
     this._reqs[this.seqid()] = callback;
-    this.send_fetchAccountCharachters(login, password, certId, certHash);
+    this.send_fetchAccountCharacters(login, password, certId, certHash);
   }
 };
 
-Pyd2botServiceClient.prototype.send_fetchAccountCharachters = function(login, password, certId, certHash) {
+Pyd2botServiceClient.prototype.send_fetchAccountCharacters = function(login, password, certId, certHash) {
   var output = new this.pClass(this.output);
   var params = {
     login: login,
@@ -348,9 +348,9 @@ Pyd2botServiceClient.prototype.send_fetchAccountCharachters = function(login, pa
     certId: certId,
     certHash: certHash
   };
-  var args = new Pyd2botService_fetchAccountCharachters_args(params);
+  var args = new Pyd2botService_fetchAccountCharacters_args(params);
   try {
-    output.writeMessageBegin('fetchAccountCharachters', Thrift.MessageType.CALL, this.seqid());
+    output.writeMessageBegin('fetchAccountCharacters', Thrift.MessageType.CALL, this.seqid());
     args.write(output);
     output.writeMessageEnd();
     return this.output.flush();
@@ -364,7 +364,7 @@ Pyd2botServiceClient.prototype.send_fetchAccountCharachters = function(login, pa
   }
 };
 
-Pyd2botServiceClient.prototype.recv_fetchAccountCharachters = function(input,mtype,rseqid) {
+Pyd2botServiceClient.prototype.recv_fetchAccountCharacters = function(input,mtype,rseqid) {
   var callback = this._reqs[rseqid] || function() {};
   delete this._reqs[rseqid];
   if (mtype == Thrift.MessageType.EXCEPTION) {
@@ -373,14 +373,14 @@ Pyd2botServiceClient.prototype.recv_fetchAccountCharachters = function(input,mty
     input.readMessageEnd();
     return callback(x);
   }
-  var result = new Pyd2botService_fetchAccountCharachters_result();
+  var result = new Pyd2botService_fetchAccountCharacters_result();
   result.read(input);
   input.readMessageEnd();
 
   if (null !== result.success) {
     return callback(null, result.success);
   }
-  return callback('fetchAccountCharachters failed: unknown result');
+  return callback('fetchAccountCharacters failed: unknown result');
 };
 
 Pyd2botServiceClient.prototype.runSession = function(login, password, certId, certHash, sessionId, callback) {
@@ -446,39 +446,39 @@ Pyd2botServiceProcessor.prototype.process = function(input, output) {
     output.flush();
   }
 };
-Pyd2botServiceProcessor.prototype.process_fetchAccountCharachters = function(seqid, input, output) {
-  var args = new Pyd2botService_fetchAccountCharachters_args();
+Pyd2botServiceProcessor.prototype.process_fetchAccountCharacters = function(seqid, input, output) {
+  var args = new Pyd2botService_fetchAccountCharacters_args();
   args.read(input);
   input.readMessageEnd();
-  if (this._handler.fetchAccountCharachters.length === 4) {
-    Q.fcall(this._handler.fetchAccountCharachters.bind(this._handler),
+  if (this._handler.fetchAccountCharacters.length === 4) {
+    Q.fcall(this._handler.fetchAccountCharacters.bind(this._handler),
       args.login,
       args.password,
       args.certId,
       args.certHash
     ).then(function(result) {
-      var result_obj = new Pyd2botService_fetchAccountCharachters_result({success: result});
-      output.writeMessageBegin("fetchAccountCharachters", Thrift.MessageType.REPLY, seqid);
+      var result_obj = new Pyd2botService_fetchAccountCharacters_result({success: result});
+      output.writeMessageBegin("fetchAccountCharacters", Thrift.MessageType.REPLY, seqid);
       result_obj.write(output);
       output.writeMessageEnd();
       output.flush();
     }).catch(function (err) {
       var result;
       result = new Thrift.TApplicationException(Thrift.TApplicationExceptionType.UNKNOWN, err.message);
-      output.writeMessageBegin("fetchAccountCharachters", Thrift.MessageType.EXCEPTION, seqid);
+      output.writeMessageBegin("fetchAccountCharacters", Thrift.MessageType.EXCEPTION, seqid);
       result.write(output);
       output.writeMessageEnd();
       output.flush();
     });
   } else {
-    this._handler.fetchAccountCharachters(args.login, args.password, args.certId, args.certHash, function (err, result) {
+    this._handler.fetchAccountCharacters(args.login, args.password, args.certId, args.certHash, function (err, result) {
       var result_obj;
       if ((err === null || typeof err === 'undefined')) {
-        result_obj = new Pyd2botService_fetchAccountCharachters_result((err !== null || typeof err === 'undefined') ? err : {success: result});
-        output.writeMessageBegin("fetchAccountCharachters", Thrift.MessageType.REPLY, seqid);
+        result_obj = new Pyd2botService_fetchAccountCharacters_result((err !== null || typeof err === 'undefined') ? err : {success: result});
+        output.writeMessageBegin("fetchAccountCharacters", Thrift.MessageType.REPLY, seqid);
       } else {
         result_obj = new Thrift.TApplicationException(Thrift.TApplicationExceptionType.UNKNOWN, err.message);
-        output.writeMessageBegin("fetchAccountCharachters", Thrift.MessageType.EXCEPTION, seqid);
+        output.writeMessageBegin("fetchAccountCharacters", Thrift.MessageType.EXCEPTION, seqid);
       }
       result_obj.write(output);
       output.writeMessageEnd();

@@ -9,6 +9,7 @@ if TYPE_CHECKING:
 class GuildMember(CharacterMinimalInformations):
     breed:int
     rankId:int
+    enrollmentDate:int
     givenExperience:int
     experienceGivenPercent:int
     connected:int
@@ -25,9 +26,10 @@ class GuildMember(CharacterMinimalInformations):
     havenBagShared:bool
     
 
-    def init(self, breed_:int, rankId_:int, givenExperience_:int, experienceGivenPercent_:int, connected_:int, alignmentSide_:int, hoursSinceLastConnection_:int, moodSmileyId_:int, accountId_:int, achievementPoints_:int, status_:'PlayerStatus', note_:'PlayerNote', sex_:bool, havenBagShared_:bool, level_:int, name_:str, id_:int):
+    def init(self, breed_:int, rankId_:int, enrollmentDate_:int, givenExperience_:int, experienceGivenPercent_:int, connected_:int, alignmentSide_:int, hoursSinceLastConnection_:int, moodSmileyId_:int, accountId_:int, achievementPoints_:int, status_:'PlayerStatus', note_:'PlayerNote', sex_:bool, havenBagShared_:bool, level_:int, name_:str, id_:int):
         self.breed = breed_
         self.rankId = rankId_
+        self.enrollmentDate = enrollmentDate_
         self.givenExperience = givenExperience_
         self.experienceGivenPercent = experienceGivenPercent_
         self.connected = connected_

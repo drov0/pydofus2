@@ -11,6 +11,6 @@ if __name__ == '__main__':
     protocol = TBinaryProtocol.TBinaryProtocol(transport)
     client = Pyd2botService.Client(protocol)
     transport.open()
-    recv = client.fetchAccountCharachters('aloone-100', 'rmrtxha1', '126200687', '7f5bc8707c07b2d86303c608c6b80c5abd7c64df2f26e11569c51b9bc9094f45')
+    recv = client.fetchAccountCharacters('aloone-100', 'rmrtxha1', '126200687', '7f5bc8707c07b2d86303c608c6b80c5abd7c64df2f26e11569c51b9bc9094f45')
     print(recv)
     transport.close()

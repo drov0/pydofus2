@@ -16,7 +16,7 @@ from pydofus2.com.ankamagames.jerakine.logger.Logger import Logger
 from pydofus2.com.ankamagames.jerakine.messages.Message import Message
 from pydofus2.com.ankamagames.jerakine.types.enums.Priority import Priority
 from pyd2bot.apis.InventoryAPI import InventoryAPI
-from pyd2bot.logic.common.frames.BotCharachterUpdatesFrame import BotCharachterUpdatesFrame
+from pyd2bot.logic.common.frames.BotCharacterUpdatesFrame import BotCharacterUpdatesFrame
 from pyd2bot.logic.fight.frames.BotFightFrame import BotFightFrame
 from pyd2bot.logic.managers.SessionManager import SessionManager
 from pyd2bot.logic.roleplay.frames.BotFarmPathFrame import BotFarmPathFrame
@@ -37,12 +37,12 @@ class BotWorkflowFrame(Frame):
         self._inBankAutoUnload = False
         self._inPhenixAutoRevive = False
         self._delayedAutoBankUnlaod = False
-        Kernel().getWorker().addFrame(BotCharachterUpdatesFrame())
+        Kernel().getWorker().addFrame(BotCharacterUpdatesFrame())
         Kernel().getWorker().addFrame(BotPartyFrame())
         return True
 
     def pulled(self) -> bool:
-        Kernel().getWorker().removeFrameByName("BotCharachterUpdatesFrame")
+        Kernel().getWorker().removeFrameByName("BotCharacterUpdatesFrame")
         return True
 
     @property

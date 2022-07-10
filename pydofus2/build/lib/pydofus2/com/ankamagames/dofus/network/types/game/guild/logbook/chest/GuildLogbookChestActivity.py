@@ -11,14 +11,18 @@ class GuildLogbookChestActivity(GuildLogbookEntryBasicInformation):
     eventType:int
     quantity:int
     object:'ObjectItemNotInContainer'
+    sourceTabId:int
+    destinationTabId:int
     
 
-    def init(self, playerId_:int, playerName_:str, eventType_:int, quantity_:int, object_:'ObjectItemNotInContainer', id_:int, date_:int):
+    def init(self, playerId_:int, playerName_:str, eventType_:int, quantity_:int, object_:'ObjectItemNotInContainer', sourceTabId_:int, destinationTabId_:int, id_:int, date_:int):
         self.playerId = playerId_
         self.playerName = playerName_
         self.eventType = eventType_
         self.quantity = quantity_
         self.object = object_
+        self.sourceTabId = sourceTabId_
+        self.destinationTabId = destinationTabId_
         
         super().init(id_, date_)
     

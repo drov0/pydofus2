@@ -15,6 +15,11 @@ function deleteSession(key) {
 function cancelCreateSession() {
     ipc.send('cancelCreateSession')
 }
+
+function runSession(key) {
+    ipc.send('runSession', key)
+}
+
 function createSession() {
     let newSession = {
         "name": document.getElementById("name").value,

@@ -23,11 +23,11 @@
             <div class="pathsFormsContainer">
                 <div class="myform-group">
                     <label for="name">name : </label>
-                    <input type="text" id="name" value='<%=paths.currentEditedSession ? paths.currentEditedSession.name : ""%>'>
+                    <input type="text" id="name" value='<%=sessions.currentEditedSession ? sessions.currentEditedSession.name : ""%>'>
                 </div>
                 <div class="myform-group">
                     <label for="characterId">characterId : </label>
-                    <select id="characterId" value='<%=sessions.currentEditedSession ? paths.currentEditedSession.characterId : ""%>'>
+                    <select id="characterId" value='<%=sessions.currentEditedSession ? sessions.currentEditedSession.characterId : ""%>'>
                         <% Object.keys(characters).forEach(key => { %>
                         <option value="<%=key%>"><%=key%></option>
                         <% }) %>
@@ -35,19 +35,19 @@
                 </div>
                 <div class="myform-group">
                     <label for="spellId">spellId : </label>
-                    <input type="number" id="spellId" value='<%=paths.currentEditedSession ? paths.currentEditedSession.spellId : ""%>'>
+                    <input type="number" id="spellId" value='<%=sessions.currentEditedSession ? sessions.currentEditedSession.spellId : ""%>'>
                 </div>
                 <div class="myform-group">
                     <label for="pathId">pathId : </label>
-                    <select id="pathId" value='<%=paths.currentEditedSession ? paths.currentEditedSession.pathId : ""%>'>
-                        <% Object.keys(paths.pathsDB).forEach(key => { %>
+                    <select id="pathId" value='<%=sessions.currentEditedSession ? sessions.currentEditedSession.pathId : ""%>'>
+                        <% Object.keys(sessions.sessionsDB).forEach(key => { %>
                         <option value="<%=key%>"><%=key%></option>
                         <% }) %>
                     </select>
                 </div>
                 <div class="myform-group">
                     <label for="statToUp">statToUp : </label>
-                    <input type="number" id="statToUp" value='<%=paths.currentEditedSession ? paths.currentEditedSession.statToUp : ""%>'>
+                    <input type="number" id="statToUp" value='<%=sessions.currentEditedSession ? sessions.currentEditedSession.statToUp : ""%>'>
                 </div>      
                 <div class="managerBottomButtonsBar">
                     <button class="btn btn-primary" onclick="createSession()">confirm</button>

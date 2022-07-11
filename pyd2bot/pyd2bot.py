@@ -1,11 +1,7 @@
 import logging
 import sys
 import threading
-from pyd2bot.logic.common.frames.BotWorkflowFrame import BotWorkflowFrame
 from pyd2bot.thriftServer.pyd2botServer import Pyd2botServer
-from pydofus2.com.ankamagames.jerakine.logger.Logger import Logger
-from pydofus2.com.DofusClient import DofusClient
-from pyd2bot.logic.managers.SessionManager import SessionManager
 import pyd2bot.thriftServer.pyd2botService.Pyd2botService as Pyd2botService
 from thrift.transport import TSocket
 from thrift.transport import TTransport
@@ -16,13 +12,6 @@ from thrift.protocol.THeaderProtocol import THeaderProtocolFactory
 logger = logging.getLogger(__name__)
 
 
-def runSession(sessionId):
-    SessionManager().load(sessionId)
-    Logger.character = SessionManager().characterId
-    dofus2 = DofusClient()
-    dofus2.registerFrame(BotWorkflowFrame())
-    dofus2.login(SessionManager().loginToken, SessionManager().character["serverId"], SessionManager().character["characterId"])
-    dofus2.join()
 
 
 if __name__ == "__main__":

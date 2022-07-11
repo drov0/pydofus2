@@ -143,7 +143,7 @@ class AccountManager {
     }
 
     addCharacter(character) {
-        this.charactersDB[character.id] = character
+        this.charactersDB[character.characterId] = character
     }
 
     deleteCharacter(key) {

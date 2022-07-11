@@ -33,7 +33,7 @@ const createWindow = () => {
     });
 
     // and load the index.html of the app.
-    mainWindow.loadURL(pathsManager.urls.newPathUrl);
+    mainWindow.loadURL(sessionsManager.urls.newSessionUrl);
 
     // To maximize the window
     mainWindow.maximize();
@@ -143,6 +143,31 @@ ipcMain.on("cancelCreatePath", (event, args) => {
 });
 
 // sessions ipc handling
+ipcMain.on("runSession", (event, key) => {
+    instancesManager.spawnServer(key);
+    console.log("fetchCharacters " + key);
+    setTimeout(() => {
+        var client = instancesManager.spawnClient(key);
+        var creds = accountManager.getAccountCreds(key);
+        client.runSession(creds.login, creds.password, creds.certId.toString(), creds.certHash, function(err, response) {
+            if (err) {
+                console.log("Error while callling fetch : " + err);
+            }
+            console.log("fetched characters : " + JSON.stringify(response));
+            instancesManager.killInstance(key);
+            response.forEach(character => {
+                accountManager.addCharacter({
+                    "characterName": character.name,
+                    "accountId": key,
+                    "characterId": parseFloat(character.id),
+                    "serverId": parseInt(character.serverId)
+                });
+            });
+            accountManager.saveCharacters();
+        });
+    }, 5000);
+});
+
 ipcMain.on("createSession", (event, newSession) => {
     sessionsManager.createSession(newSession);
     mainWindow.loadURL(sessionsManager.urls.manageSessionsUrl);
@@ -158,7 +183,7 @@ ipcMain.on("deleteSession", (event, key) => {
 });
 
 ipcMain.on("editSession", (event, key) => {
-    sessionsManager.currentEditedPath = sessionsManager.SessionsDB[key];
+    sessionsManager.currentEditedSession = sessionsManager.sessionsDB[key];
     mainWindow.loadURL(sessionsManager.urls.newSessionUrl);
 });
 

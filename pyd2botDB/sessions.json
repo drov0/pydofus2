@@ -1,66 +1,66 @@
 {
-    "sadida-follower1": {
-        "name": "sadida-follower1",
-        "characterId": "Maniaco-lalcolic(210)",
-        "spellId": 13516,
-        "leaderName": "Plusbellelavie",
-        "isLeader": false,
-        "statToUp": 10
-    },
-    "sadida-follower2": {
-        "name": "sadida-follower2",
-        "characterId": "Moneydicer(210)",
-        "spellId": 13516,
-        "leaderName": "Plusbellelavie",
-        "isLeader": false,
-        "statToUp": 10
-    },
-    "sadida-follower3": {
-        "name": "sadida-follower3",
-        "characterId": "Them-rats(210)",
-        "spellId": 13516,
-        "leaderName": "Plusbellelavie",
-        "isLeader": false,
-        "statToUp": 10
-    },
-    "sadida-follower4": {
-        "name": "sadida-follower4",
-        "characterId": "Moneyslicer(210)",
-        "spellId": 13516,
-        "leaderName": "Plusbellelavie",
-        "isLeader": false,
-        "statToUp": 10
-    },
-    "sadida-follower5": {
-        "name": "sadida-follower5",
-        "characterId": "Moneycreator(210)",
-        "spellId": 13516,
-        "leaderName": "Plusbellelavie",
-        "isLeader": false,
-        "statToUp": 10
-    },
-    "sadida-follower6": {
-        "name": "sadida-follower6",
-        "characterId": "Hardlett(210)",
-        "spellId": 13516,
-        "leaderName": "Plusbellelavie",
-        "isLeader": false,
-        "statToUp": 10
-    },
-    "sadida-leader": {
-        "name": "sadida-leader",
-        "characterId": "Plusbellelavie(210)",
-        "spellId": 13516,
-        "pathId": "pioute_astrub_village",
-        "followers": [
-            "Moneydicer",
-            "Maniaco-lalcolic",
-            "Them-rats",
-            "Moneslicer",
-            "Moneycreator",
-            "Hardlett"
-        ],
-        "statToUp": 10,
-        "isLeader": true
-    }
+  "sadida-follower1": {
+    "name": "sadida-follower1",
+    "characterId": "Maniaco-lalcolic(210)",
+    "spellId": 13516,
+    "leaderName": "Plusbellelavie",
+    "isLeader": false,
+    "statToUp": 10
+  },
+  "sadida-follower2": {
+    "name": "sadida-follower2",
+    "characterId": "Moneydicer(210)",
+    "spellId": 13516,
+    "leaderName": "Plusbellelavie",
+    "isLeader": false,
+    "statToUp": 10
+  },
+  "sadida-follower3": {
+    "name": "sadida-follower3",
+    "characterId": "Them-rats(210)",
+    "spellId": 13516,
+    "leaderName": "Plusbellelavie",
+    "isLeader": false,
+    "statToUp": 10
+  },
+  "sadida-follower4": {
+    "name": "sadida-follower4",
+    "characterId": "Moneyslicer(210)",
+    "spellId": 13516,
+    "leaderName": "Plusbellelavie",
+    "isLeader": false,
+    "statToUp": 10
+  },
+  "sadida-follower5": {
+    "name": "sadida-follower5",
+    "characterId": "Moneycreator(210)",
+    "spellId": 13516,
+    "leaderName": "Plusbellelavie",
+    "isLeader": false,
+    "statToUp": 10
+  },
+  "sadida-follower6": {
+    "name": "sadida-follower6",
+    "characterId": "Hardlett(210)",
+    "spellId": 13516,
+    "leaderName": "Plusbellelavie",
+    "isLeader": false,
+    "statToUp": 10
+  },
+  "sadida-leader": {
+    "name": "sadida-leader",
+    "characterId": "Plusbellelavie(210)",
+    "spellId": 13516,
+    "pathId": "pioute_astrub_village",
+    "followers": [
+      "Moneydicer",
+      "Maniaco-lalcolic",
+      "Them-rats",
+      "Moneslicer",
+      "Moneycreator",
+      "Hardlett"
+    ],
+    "statToUp": 10,
+    "isLeader": true
+  }
 }

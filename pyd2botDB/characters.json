@@ -1,68 +1,80 @@
 {
-  "Maniaco-lalcolic(210)": {
-    "characterName": "Maniaco-lalcolic",
-    "accountId": "slicer-the-dicer",
-    "characterId": 336140370130,
+  "336986964178": {
+    "characterName": "Plusbellelavie",
+    "accountId": "melanco-lalco",
+    "characterId": 336986964178,
     "serverId": 210
   },
-  "Skilled-champ(210)": {
-    "characterName": "Skilled-champ",
-    "accountId": "slicer-the-dicer",
-    "characterId": 335911059666,
+  "336597024978": {
+    "characterName": "Melanco-lalco",
+    "accountId": "melanco-lalco",
+    "characterId": 336597024978,
     "serverId": 210
   },
-  "Moneylife(210)": {
-    "characterName": "Moneylife",
-    "accountId": "twistedFater",
-    "characterId": 336919920850,
+  "336919789778": {
+    "characterName": "Moneslicer",
+    "accountId": "Exodios-arc",
+    "characterId": 336919789778,
     "serverId": 210
   },
-  "Hardlett(210)": {
-    "characterName": "Hardlett",
-    "accountId": "Money",
-    "characterId": 337022615762,
-    "serverId": 210
-  },
-  "Moneycreator(210)": {
-    "characterName": "Moneycreator",
-    "accountId": "Exodios-panda",
-    "characterId": 336919855314,
-    "serverId": 210
-  },
-  "Moneydicer(210)": {
-    "characterName": "Moneydicer",
-    "accountId": "Exodios-cra",
-    "characterId": 336815325394,
-    "serverId": 210
-  },
-  "Moneydicer(207)": {
-    "characterName": "Moneydicer",
-    "accountId": "Exodios-cra",
-    "characterId": 474147979471,
-    "serverId": 207
-  },
-  "Pipo-ar(36)": {
+  "650339221540": {
     "characterName": "Pipo-ar",
     "accountId": "TheGrinder",
     "characterId": 650339221540,
     "serverId": 36
   },
-  "Them-rats(210)": {
+  "336798351570": {
     "characterName": "Them-rats",
     "accountId": "TheGrinder",
     "characterId": 336798351570,
     "serverId": 210
   },
-  "Cryptomancer(210)": {
+  "329036071122": {
     "characterName": "Cryptomancer",
     "accountId": "TheGrinder",
     "characterId": 329036071122,
     "serverId": 210
   },
-  "Moneslicer(210)": {
-    "characterName": "Moneslicer",
-    "accountId": "aloone-101",
-    "characterId": 336919789778,
+  "336919855314": {
+    "characterName": "Moneycreator",
+    "accountId": "Exodios-panda",
+    "characterId": 336919855314,
+    "serverId": 210
+  },
+  "336815325394": {
+    "characterName": "Moneydicer",
+    "accountId": "Exodios-cra",
+    "characterId": 336815325394,
+    "serverId": 210
+  },
+  "474147979471": {
+    "characterName": "Moneydicer",
+    "accountId": "Exodios-cra",
+    "characterId": 474147979471,
+    "serverId": 207
+  },
+  "337022615762": {
+    "characterName": "Hardlett",
+    "accountId": "Money",
+    "characterId": 337022615762,
+    "serverId": 210
+  },
+  "336919920850": {
+    "characterName": "Moneylife",
+    "accountId": "twistedFater",
+    "characterId": 336919920850,
+    "serverId": 210
+  },
+  "336140370130": {
+    "characterName": "Maniaco-lalcolic",
+    "accountId": "slicer-the-dicer",
+    "characterId": 336140370130,
+    "serverId": 210
+  },
+  "335911059666": {
+    "characterName": "Skilled-champ",
+    "accountId": "slicer-the-dicer",
+    "characterId": 335911059666,
     "serverId": 210
   }
 }

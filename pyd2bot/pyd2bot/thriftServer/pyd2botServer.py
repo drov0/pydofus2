@@ -56,4 +56,14 @@ class Pyd2botServer:
         return result
         
     def runSession(self, login:str, password:str, certId:str, certHash:str, sessionId:str) -> None:
-        pass
+        from pydofus2.com.ankamagames.jerakine.logger.Logger import Logger
+        Logger.prefix = login
+        from pydofus2.com.ankamagames.haapi.Haapi import Haapi
+        from pydofus2.com.DofusClient import DofusClient
+        SessionManager().load(sessionId)
+        Logger.character = SessionManager().characterId
+        dofus2 = DofusClient()
+        dofus2.registerFrame(BotWorkflowFrame())
+        dofus2.login(SessionManager().loginToken, SessionManager().character["serverId"], SessionManager().character["characterId"])
+        dofus2.join()
+

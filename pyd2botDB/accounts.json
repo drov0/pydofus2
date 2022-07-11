@@ -1,12 +1,4 @@
 {
-  "maniac.depressif": {
-    "login": "maniac.depressif@gmail.com",
-    "password": "MfowT5adK9VhvnRr+jj74MbRAYRLxVaHsen0wismPZ+sp0kMypwl/b4G4HU09i3KrVAFAbdm+GU5Q/qs8wVySWac9eRRMAWL/PyAQf1YZptWzHLx4dwFneigkUhDEUNFifhmcdO/zcmtYsoKEGpxocFzrI7WnwmmbzcuG91umrRgs6+7WPRJjvdReTzuz62SQsSPUmpr8X9E4BeESRvgwK4k7S/n/IVKHRij7iGEr6hToYOLcUcULPWQkXCzxRo6onJ/Y+rOeHHHQRit0LGcuCo7uEx1e8ksDXd8EG2gVvM9lh2a7/7Mv3KCxbRoRg+3DXlJ2+LrQ4YAHrhfDIqgow=="
-  },
-  "aloone-101": {
-    "login": "aloone-101",
-    "password": "XKOoSgbKvWHPiapESO3KD2bL/eetlMs/6qomoQPxmPspN5FLDyyE6Pf9km0jdta/QVXWjO4PZNNFlp0/1mD99CWPaMdA5WEYs/x4QB3CAb4CdfQBEXL48sFgI7VDv6ReNjsk87x2s4hR6sPwLB5nYC30+RRVTrhJw7LEVtSC2rRppouDqTQTn7DRSg1F5qdjB7qKkA21U5daziQCmx/7nQHe1w+N0S10s5z/+hgHrtrC/QMV8oLc+QFYaFjyCp1bY9gs393qPeowXbvaZToOzYTsXQzZorOAh1kio4O7lJgUo3lfHR9YU2xD9fFbT5wfEQGqQ3Y27i567kJwzTdH7A=="
-  },
   "slicer-the-dicer": {
     "login": "shooter.jhon92@gmail.com",
     "password": "S5URRnasNoE3YeIBd4JMHyG0RoqH2f9JoWSmxVAF/jbtgvejJvm1M7NnXpNEeJy87ANVCfkRga4nsOlyufrDxJ9fN5wpDsop3aTC00JCXWPaj9YKZHsIcmCA6qZY9kO9+TZzaM8sw001Bmp32XpM/RLe1oTw5cPEpo0lHEd13ZfPLiLPQpmtWFZCdlb/oxm3IGw8sfSRh+ZvANNRp44DafpJGJAFCNhrEAvwRxQp5YSsAIaN+zcpNfguIH4JZ7fxkctex+wHZ4cATPHakNDhtETJqSYd0yB6/5Py9KwURmpNZWyzJz0AliYtWzz7/4ATWPOrCjnA3r6pZ/RYczzsng=="
@@ -30,5 +22,13 @@
   "TheGrinder": {
     "login": "alone-95",
     "password": "aO3WlVlrRxR6m1iX5QiLTViMR+d62lYwflVTUEr7x43ddIalZE0H1PL+AqYHAL253rFIOGLKeE8i3bnOxb1Qtw7WX7hiEILxsfeV/ejZ6tNfEuxd5NF+akdOGxHUAmUUiTklJgV2Rv0JBeV5XBmzVDEbvhsxGQbyIIXY+ggsKFGxukl4Dvld4Esj0VDHv0jL+9XzlULpaq/7b5BjWV3QDowSv9lOB8x0jKSdW1ntVBJ+zukRqWXRq1DSIei4LIEF8EZbJpJvr2zD7kJYZn8mW6YOpxY01c9FLKo5isiCMuETfh8prsp3c641if30hV7uL+dj4Va4v+v3LmOEZl/1BQ=="
+  },
+  "Exodios-arc": {
+    "login": "aloone-101",
+    "password": "c4ZQlcvP1203AddJ+jYI7DEldpNxEWzw+itpnMXiYyG2l0/Ny+dBHh3FF7/VnE0VIFaCbkosb3MQ8oIIew9C12x2VNeeHviyB49kfL2P4UCBZGPWlWkGfCPUC68kHZPSuzro0B3GrWikTm37JudWRhCodBwzyjx56rpqVtlrMMUBNoeUZAkigwwClnoV2Ks4fo+qXmrsII9cdIUN1g43618lVhMk4wppSXDr8lwYrK9FYbMkS2EqJjWFtIRsvzq2iFiHOUvpmZ/H4KCCoOp080cKNcW7YLHYzScH5Y74nu5kR1mwRMQojT9gEgd/Ks7so3hcA4vgRnx8yLKPXDseMQ=="
+  },
+  "melanco-lalco": {
+    "login": "maniac.depressif@gmail.com",
+    "password": "in1incZdp7MxMoCFokencsN57Zju4eD6RWfbM2oKYsKBK9UfB/HBf9i5Hkv5UGIa065Qpv2640LQfe1ZadrgiDMmcypNQoic0ut4DJX3sqzQ6UipsIHE8Oo9CVRaT1xq5lVkiOGXTe1cJc3XwsOFEgi4yIXdqq5feMiWFoh7XMpJLETOEkIQkDVgXVpvH9DY0x22S84iBvyf7aQquJLDyIWirW/jvJ0QADqAjqkOpL2mE9obmopMIqwTJjqkzrxdvCW21i/pHKU6t0FdUOWzXIk1CQFLnjv3Qsnem6gtiPEzqV9QIqenSpq833lxqE7RFwhdSs8QBLgfTEs09Ke3/g=="
   }
 }

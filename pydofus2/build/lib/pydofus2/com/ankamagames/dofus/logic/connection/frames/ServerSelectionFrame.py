@@ -131,7 +131,6 @@ class ServerSelectionFrame(Frame):
 
         elif isinstance(msg, ServerSelectionAction):
             ssaction = msg
-
             if self._alreadyConnectedToServerId > 0 and ssaction.serverId != self._alreadyConnectedToServerId:
                 self._serverSelectionAction = ssaction
                 self.serverAlreadyInName = Server.getServerById(self._alreadyConnectedToServerId).name
@@ -151,7 +150,6 @@ class ServerSelectionFrame(Frame):
                     else:
                         logger.debug(f"Server {server.id} not online but has status {ServerStatusEnum(server.status).name}.")
                         return True
-            logger.error(f"Can't connect to server {ssaction.serverId} : Status {ServerStatusEnum(server.status).name}.")
             return True
 
         elif isinstance(msg, SelectedServerDataExtendedMessage):

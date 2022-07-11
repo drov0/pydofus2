@@ -21,41 +21,41 @@
         <%- include(sidebarUrl, {active: 'paths'}) %>
         <div class="bodyRightView">
             <div class="pathsFormsContainer">
-                <div class="form-group">
-                    <label for="pathName">name</label>
-                    <input type="text" id="pathName" placeholder="path name">
+                <div class="myform-group">
+                    <label for="pathName">name : </label>
+                    <input type="text" id="pathName" placeholder="path name" value='<%=paths.currentEditedPath ? paths.currentEditedPath.name : ""%>'>
                 </div>
-                <div class="form-group">
-                    <label for="pathType">type</label>
-                    <select id="pathType">
+                <div class="myform-group">
+                    <label for="pathType">type : </label>
+                    <select id="pathType" value='<%=paths.currentEditedPath ? paths.currentEditedPath.type : ""%>'>
                         <% paths.types.forEach(pathType => { %>
                         <option value="<%=pathType%>"><%=pathType%></option>
                         <% }) %>
                     </select>
                 </div>
-                <div class="form-group">
-                    <label for="fightOnly">fightOnly</label>
-                    <input type="checkbox" id="fightOnly">
+                <div class="myform-group">
+                    <label for="fightOnly">fightOnly : </label>
+                    <input type="checkbox" id="fightOnly" <%if (paths.currentEditedPath && paths.currentEditedPath.fightOnly) {%> checked<%}%>>
                 </div>                
-                <div class="form-group">
-                    <label for="monsterLvlCoefDiff">monsterLvlCoefDiff</label>
-                    <input type="number" id="monsterLvlCoefDiff" placeholder="">
+                <div class="myform-group">
+                    <label for="monsterLvlCoefDiff">monsterLvlCoefDiff : </label>
+                    <input type="number" id="monsterLvlCoefDiff" value='<%=paths.currentEditedPath ? paths.currentEditedPath.monsterLvlCoefDiff : ""%>'>
                 </div>
-                <div class="form-group">
-                    <label for="startMapId">startMapId</label>
-                    <input type="number" id="startMapId" placeholder="">
+                <div class="myform-group">
+                    <label for="startMapId">startMapId : </label>
+                    <input type="number" id="startMapId" value='<%=paths.currentEditedPath ? paths.currentEditedPath.startVertex.mapId : ""%>'>
                 </div>
-                <div class="form-group">
-                    <label for="startMapRpZone">startMapRpZone</label>
-                    <input type="number" id="startMapRpZone" placeholder="">
+                <div class="myform-group">
+                    <label for="startMapRpZone">startMapRpZone : </label>
+                    <input type="number" id="startMapRpZone" value='<%=paths.currentEditedPath ? paths.currentEditedPath.startVertex.mapRpZone : ""%>'>
                 </div>
-                <div class="form-group">
-                    <label for="subAreaId">subAreaId</label>
-                    <input type="number" id="subAreaId" placeholder="">
+                <div class="myform-group">
+                    <label for="subAreaId">subAreaId : </label>
+                    <input type="number" id="subAreaId" value='<%=paths.currentEditedPath ? paths.currentEditedPath.subAreaId : ""%>'>
                 </div>
                 <div class="managerBottomButtonsBar">
                     <button class="btn btn-primary" onclick="createPath()">confirm</button>
-                    <a href="<%=paths.urls.managePathsUrl%>"><button class="btn btn-primary">cancel</button></a>
+                    <button class="btn btn-primary" onclick="cancelCreatePath()">cancel</button>
                 </div>
             </div>
         </div>

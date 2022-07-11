@@ -24,6 +24,9 @@
                 <thead>
                     <th scope="col">name</th>
                     <th scope="col">type</th>
+                    <th scope="col">subAreaId</th>
+                    <th scope="col">startMapId</th>
+                    <th scope="col">startMapRpZone</th>
                     <th scope="col">action</th>
                 </thead>
                 <tbody>
@@ -31,6 +34,9 @@
                     <tr>
                         <td scope="row"><%=path.name%></td>
                         <td><%=path.type%></td>
+                        <td><%=path.subAreaId%></td>
+                        <td><%=path.startVertex.mapId%></td>
+                        <td><%=path.startVertex.mapRpZone%></td>
                         <td>
                             <div class="dropdown">
                                 <a class="btn btn-secondary dropdown-toggle" href="#" role="button" id="dropdownMenuLink" data-bs-toggle="dropdown" aria-expanded="false">

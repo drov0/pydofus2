@@ -33,13 +33,13 @@
                     <th scope="col">action</th>
                 </thead>
                 <tbody>
-                    <% Object.keys(ejse.data('characters')).forEach(key => { let value=ejse.data('characters')[key] %>
+                    <% Object.values(characters).forEach(character => { %>
                     <tr>
-                        <td scope="row"><%= value.characterName%></td>
-                        <td><%= value.characterId%></td>
-                        <td><%= value.serverId%></td>
-                        <td><%= value.accountId%></td>
-                        <td><button class="btn btn-primary" onclick="deleteCharacter('<%= key%>')">delete</button></td>
+                        <td scope="row"><%= character.characterName%></td>
+                        <td><%= character.characterId%></td>
+                        <td><%= character.serverId%></td>
+                        <td><%= character.accountId%></td>
+                        <td><button class="btn btn-primary" onclick="deleteCharacter('<%= character.characterId%>')">delete</button></td>
                     </tr>
                     <% }) %>
                 </tbody>

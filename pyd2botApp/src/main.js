@@ -10,12 +10,12 @@ const mainUrl = "file://" + path.join(__dirname, 'ejs', 'main.ejs')
 const PathsManager = require('./paths/PathManager.js');
 const AccountManager = require("./accounts/AccountManager.js");
 const InstancesManager = require("./bot/InstancesManager.js");
- 
+const SessionsManager = require("./sessions/SessionsManager.js");
 let mainWindow;
 const accountManager = AccountManager.instance;
 const instancesManager = InstancesManager.instance;
 const pathsManager = PathsManager.instance;
-
+const sessionsManager = SessionsManager.instance;
 // Handle creating/removing shortcuts on Windows when installing/uninstalling.
 if (require('electron-squirrel-startup')) {
     // eslint-disable-line global-require
@@ -42,7 +42,7 @@ const createWindow = () => {
     const mainMenu = Menu.buildFromTemplate(mainMenuTemplate);
     Menu.setApplicationMenu(mainMenu);
     // Open the DevTools.
-    //mainWindow.webContents.openDevTools();
+    mainWindow.webContents.openDevTools();
 };
 
 
@@ -89,7 +89,12 @@ ipcMain.on("fetchCharacters", (event, key) => {
             console.log("fetched characters : " + JSON.stringify(response));
             instancesManager.killInstance(key);
             response.forEach(character => {
-                accountManager.addCharacter(key, character);
+                accountManager.addCharacter({
+                    "characterName": character.name,
+                    "accountId": key,
+                    "characterId": parseFloat(character.id),
+                    "serverId": parseInt(character.serverId)
+                });
             });
             accountManager.saveCharacters();
         });
@@ -113,20 +118,54 @@ ipcMain.on("deleteCharacter", (event, key) => {
 });
 
 // paths ipc handling
-ipcMain.on("savePath", (event, args) => {
-    pathsManager.savepaths();
+ipcMain.on("createPath", (event, newPath) => {
+    pathsManager.createPath(newPath);
+    mainWindow.loadURL(pathsManager.urls.managePathsUrl);
+});
+
+ipcMain.on("savePaths", (event, args) => {
+    pathsManager.savePaths();
 });
 
 ipcMain.on("deletePath", (event, key) => {
     pathsManager.deletePath(key);
-    mainWindow.loadURL(pathsManager.urls.managePaths);
+    mainWindow.loadURL(pathsManager.urls.managePathsUrl);
 });
 
 ipcMain.on("editPath", (event, key) => {
-    ejse.data('currentEditedPath', {"key" : key, "value": pathsManager.pathsDB[key]});
-    mainWindow.loadURL(accountManager.urls.newAccountUrl);
+    pathsManager.currentEditedPath = pathsManager.pathsDB[key];
+    mainWindow.loadURL(pathsManager.urls.newPathUrl);
 });
 
+ipcMain.on("cancelCreatePath", (event, args) => {
+    pathsManager.currentEditedPath = null;
+    mainWindow.loadURL(pathsManager.urls.managePathsUrl);
+});
+
+// sessions ipc handling
+ipcMain.on("createSession", (event, newSession) => {
+    sessionsManager.createSession(newSession);
+    mainWindow.loadURL(sessionsManager.urls.manageSessionsUrl);
+});
+
+ipcMain.on("saveSessions", (event, args) => {
+    sessionsManager.saveSessions();
+});
+
+ipcMain.on("deleteSession", (event, key) => {
+    sessionsManager.deleteSession(key);
+    mainWindow.loadURL(sessionsManager.urls.manageSessionsUrl);
+});
+
+ipcMain.on("editSession", (event, key) => {
+    sessionsManager.currentEditedPath = sessionsManager.SessionsDB[key];
+    mainWindow.loadURL(sessionsManager.urls.newSessionUrl);
+});
+
+ipcMain.on("cancelCreateSession", (event, args) => {
+    sessionsManager.currentEditedSession = null;
+    mainWindow.loadURL(sessionsManager.urls.manageSessionsUrl);
+});
 // This method will be called when Electron has finished
 // initialization and is ready to create browser windows.
 // Some APIs can only be used after this event occurs.

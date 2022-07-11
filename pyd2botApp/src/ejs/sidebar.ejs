@@ -3,16 +3,16 @@
         <h3>Grinder</h3>
     </div>
     <ul class="list-unstyled components">
-        <li <% if (active==='dashboard' ) { %> class="active" <% } %>>
+        <li <% if (active==='dashboard') { %> class="active" <% } %>>
                 <a href="#">Dashboard</a>
         </li>
-        <li <% if (active==='characters' ) { %> class="active" <% } %>>
+        <li <% if (active==='characters') { %> class="active" <% } %>>
                 <a href="<%=accountUrls.manageAccountsUrl%>">Accounts</a>
         </li>
-        <li <% if (active==='sessions' ) { %> class="sessions" <% } %>>
-                <a href="#">Sessions</a>
+        <li <% if (active==='sessions') { %> class="active" <% } %>>
+                <a href="<%=sessions.urls.manageSessionsUrl%>">Sessions</a>
         </li>
-        <li <% if (active==='paths' ) { %> class="paths" <% } %>>
+        <li <% if (active==='paths') { %> class="active" <% } %>>
                 <a href="<%=paths.urls.managePathsUrl%>">Paths</a>
         </li>
     </ul>

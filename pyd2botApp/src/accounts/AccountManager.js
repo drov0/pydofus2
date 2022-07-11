@@ -142,13 +142,8 @@ class AccountManager {
         })
     }
 
-    addCharacter(accountId, character) {
-        this.charactersDB[`${character.name}(${character.serverId})`] = {
-            "characterName": character.name,
-            "accountId": accountId,
-            "characterId": parseFloat(character.id),
-            "serverId": parseInt(character.serverId)
-        }
+    addCharacter(character) {
+        this.charactersDB[character.id] = character
     }
 
     deleteCharacter(key) {

@@ -1,41 +1,42 @@
 from asyncio.log import logger
 from time import perf_counter, sleep
-from pydofus2.com.DofusClient import DofusClient
-from pydofus2.com.ankamagames.dofus.kernel.Kernel import Kernel
-from pydofus2.com.ankamagames.dofus.logic.common.managers.PlayerManager import PlayerManager
-import pyd2bot.thriftServer.pyd2botService.Pyd2botService as Pyd2botService
-from pydofus2.com.ankamagames.dofus.logic.connection.frames.ServerSelectionFrame import ServerSelectionFrame
-from pydofus2.com.ankamagames.dofus.network.enums.ServerStatusEnum import ServerStatusEnum
-from thrift.transport import TSocket
-from thrift.transport import TTransport
-from thrift.protocol import TBinaryProtocol
-from thrift.server import TServer
-from pydofus2.com.ankamagames.haapi.Haapi import Haapi
 from pyd2bot.thriftServer.pyd2botService.ttypes import Character
+
 
 class Pyd2botServer:
     def __init__(self):
         pass
     
     def fetchAccountCharacters(self, login:str, password:str, certId:str, certHash:str) -> list[Character]:
+        from pydofus2.com.ankamagames.jerakine.logger.Logger import Logger
+        Logger.prefix = login
+        from pydofus2.com.ankamagames.haapi.Haapi import Haapi
+        from pydofus2.com.DofusClient import DofusClient
+        from pydofus2.com.ankamagames.dofus.kernel.Kernel import Kernel
+        from pydofus2.com.ankamagames.dofus.logic.common.managers.PlayerManager import PlayerManager
+        from pydofus2.com.ankamagames.dofus.logic.connection.frames.ServerSelectionFrame import ServerSelectionFrame
+        from pydofus2.com.ankamagames.dofus.network.enums.ServerStatusEnum import ServerStatusEnum
         logger.info("fetchAccountCharacters called")
-        dofus2 = DofusClient()
+        rate = 2.
+        timeout = 10.
         loginToken = Haapi().getLoginToken(login, password, certId, certHash)
         result = list()
+        dofus2 = DofusClient()
         dofus2.login(loginToken)
-        ssf = None
-        start = perf_counter()          
+        start = perf_counter()
         while not PlayerManager().serversList:
-            sleep(1)
-            if perf_counter() - start > 10:
-                dofus2.shutdown()
-                raise Exception("timeout")
-        while not ssf:
-            sleep(1)
-            if perf_counter() - start > 10:
-                dofus2.shutdown()
-                raise Exception("timeout")
-            ssf : 'ServerSelectionFrame' = Kernel().getWorker().getFrame("ServerSelectionFrame")
+            sleep(1/rate)
+            if perf_counter() - start > timeout:
+                raise TimeoutError("timeout")
+        start = perf_counter()
+        ssf = None
+        while True:
+            ssf : 'ServerSelectionFrame' = Kernel().getWorker().getFrame('ServerSelectionFrame')
+            if ssf:
+                break
+            sleep(1/rate)
+            if perf_counter() - start > timeout:
+                raise TimeoutError("timeout")
         usedServers = ssf._serversUsedList.copy()
         for server in usedServers:
             if ServerStatusEnum(server.status) == ServerStatusEnum.ONLINE or ServerStatusEnum(server.status) == ServerStatusEnum.NOJOIN:
@@ -44,10 +45,9 @@ class Pyd2botServer:
                 dofus2.restart()
                 start = perf_counter()
                 while not PlayerManager().charactersList:
-                    sleep(1)
-                    if perf_counter() - start > 10:
-                        dofus2.shutdown()
-                        raise Exception("timeout")
+                    sleep(1/rate)
+                    if perf_counter() - start > timeout:
+                        raise TimeoutError("timeout")
                 for character in PlayerManager().charactersList:
                     result.append(Character(character.name, str(character.id), str(server.id)))
             else:
@@ -57,13 +57,3 @@ class Pyd2botServer:
         
     def runSession(self, login:str, password:str, certId:str, certHash:str, sessionId:str) -> None:
         pass
-
-if __name__ == '__main__':
-    handler = Pyd2botServer()
-    processor = Pyd2botService.Processor(handler)
-    transport = TSocket.TServerSocket(host="0.0.0.0", port=9999)
-    tfactory = TTransport.TBufferedTransportFactory()
-    pfactory = TBinaryProtocol.TBinaryProtocolFactory()
-    server = TServer.TThreadPoolServer(processor, transport, tfactory, pfactory)
-    server.setNumThreads(5)
-    server.serve()

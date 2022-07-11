@@ -19,15 +19,23 @@ class PathManager {
         ejse.data('paths', this);
     }
 
-    newPath(formData) {
-        this.pathsDB[formData.name] = {
-            "name": formData.name,
-            "type": formData.type,
+    createPath(path) {
+        if (this.currentEditedPath != null) {
+            if (path.name != this.currentEditedPath.name) {
+                delete this.pathsDB[this.currentEditedPath.name]
+            }
         }
+        this.currentEditedPath = null
+        this.pathsDB[path.name] = path
     }
 
     deletePath(key) {
-        delete this.pathsDB[key]
+        if (this.pathsDB[key]) {
+            delete this.pathsDB[key]
+        }
+        else {
+            console.log('Path not found')
+        }
     }
 
     savePaths() {

@@ -123,7 +123,7 @@ ul ul a {
     justify-content: space-around;
     display: flex;
     border-radius: 25px;
-    align-items: flex-start;
+    align-items: center;
     flex-direction: column;
     border: 5px solid #FFFF00;
     padding: 7.6%;
@@ -133,10 +133,22 @@ ul ul a {
     position: relative;
 }
 
-.pathsFormsContainer label {
-    width: 200px;
+.myform-group label {
+    width: 250px;
     float:left;
     text-align: left;
+}
+
+.myform-group input {
+    float:right;
+    text-align: left;
+}
+
+.myform-group {
+    justify-content: stretch;
+    display: flex;
+    width: 100%;
+    flex-direction: row;
 }
 
 .managerBottomButtonsBar {

@@ -64,8 +64,12 @@ bdist:
 	@pip install -r requirements.txt
 	@python build.py build
 	@cp -a $(PYD2BOT_DIR)/build/exe.win-amd64-3.9/* $(PYD2BOT_DIST_DIR)
-	@deactivate
-	@rm -rf .buildEnv
+
+rebuild:
+	@cd $(PYD2BOT_DIR)
+	@source .buildEnv/Scripts/activate
+	@python build.py build
+	@cp -a $(PYD2BOT_DIR)/build/exe.win-amd64-3.9/* $(PYD2BOT_DIST_DIR)
 
 serve:
 	source .venv/Scripts/activate
@@ -75,3 +79,6 @@ testClient:
 	source .venv/Scripts/activate
 	python $(CURDIR)/pyd2bot/pyd2bot/thriftServer/pyd2botClient.py
 
+run:
+	cd pyd2botApp
+	npm start

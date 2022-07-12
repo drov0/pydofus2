@@ -163,6 +163,7 @@ ul ul a {
 .characterProfileHeader {
     display: flex;
     flex-direction: row;
+    row-gap: 5px;
 }
 
 .characterProfileHeader h {

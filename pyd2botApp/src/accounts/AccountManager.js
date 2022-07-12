@@ -60,37 +60,13 @@ class AccountManager {
             'newAccountUrl': "file://" + path.join(__dirname, 'ejs', 'newAccountForm.ejs'),
             'characterProfileUrl': "file://" + path.join(__dirname, 'ejs', 'characterProfile.ejs'),
         }
-        this.breedName = {    
-            1 : 'Feca',
-            2 : 'Osamodas',
-            3 : 'Enutrof',
-            4 : 'Sram',
-            5 : 'Xelor',
-            6 : 'Ecaflip',
-            7 : 'Eniripsa',
-            8 : 'Iop',
-            9 : 'Cra',
-            10 : 'Sadida',
-            11 : 'Sacrieur',
-            12 : 'Pandawa',
-            13 : 'Roublard',
-            14 : 'Zobal',
-            15 : 'Steamer',
-            16 : 'Eliotrope',
-            17 : 'Huppermage',
-            18 : 'Ouginak'
-        }
         ejse.data('accounts', this);
 
     }
 
     getClassIcon(key) {
         var character = this.charactersDB[key]
-        return path.join(this.classesIconsDir, `symbole_${character.breedId}.png`)
-    }
-
-    getCharacterBreedName(breedId) {
-
+        return path.join(this.classesIconsDir, `symbol_${character.breedId}.png`)
     }
 
     getAccountPassword(key) {
@@ -190,25 +166,27 @@ class AccountManager {
         setTimeout(() => {
             var client = instancesManager.spawnClient(key);
             var creds = this.getAccountCreds(key);
-            console.log(creds)
+            var db = this.charactersDB;
             client.fetchAccountCharacters(creds.login, creds.password, creds.certId, creds.certHash, function(err, response) {
                 if (err) {
                     console.log("Error while callling fetch : " + err);
                 }
                 console.log("fetched characters : " + JSON.stringify(response));
-                instancesManager.killInstance(key);
                 response.forEach(character => {
-                    this.addCharacter({
-                        "characterName": character.name,
-                        "accountId": key,
-                        "characterId": character.id,
-                        "breedId": character.breedId,
-                        "breedName": character.breedId,
-                        "serverId": character.serverId,
-                        "serverName": character.serverName,
+                    var spells = {}
+                    Object.values(character.spells).forEach(spell => {
+                        spells[spell.name] = spell
                     });
+                    character.spells = spells
+                    character.accountId = key
+                    if (character.breedName == "Sadida") {
+                        character.primarySpell = character.spells["Ronce"]
+                        character.primaryStatId = 10 // force
+                    }
+                    db[character.id] = character
                 });
-                this.saveCharacters();
+                AccountManager.instance.saveCharacters();
+                instancesManager.killInstance(key);
             });
         }, 5000);
     }

@@ -28,12 +28,8 @@ function hideUnhidePassword(key) {
     ipc.send('hideUnhidePassword', key)
 }
 
-function createCharacter() {
-
-}
-
 function saveCharacters() {
-
+    ipc.send('saveCharacters')
 }
 
 function fetchCharacters(key) {  

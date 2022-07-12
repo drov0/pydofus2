@@ -16,26 +16,109 @@ from thrift.transport import TTransport
 all_structs = []
 
 
+class Spell(object):
+    """
+    Attributes:
+     - id
+     - name
+     - description
+
+    """
+
+
+    def __init__(self, id=None, name=None, description=None,):
+        self.id = id
+        self.name = name
+        self.description = description
+
+    def read(self, iprot):
+        if iprot._fast_decode is not None and isinstance(iprot.trans, TTransport.CReadableTransport) and self.thrift_spec is not None:
+            iprot._fast_decode(self, iprot, [self.__class__, self.thrift_spec])
+            return
+        iprot.readStructBegin()
+        while True:
+            (fname, ftype, fid) = iprot.readFieldBegin()
+            if ftype == TType.STOP:
+                break
+            if fid == 1:
+                if ftype == TType.I32:
+                    self.id = iprot.readI32()
+                else:
+                    iprot.skip(ftype)
+            elif fid == 2:
+                if ftype == TType.STRING:
+                    self.name = iprot.readString().decode('utf-8', errors='replace') if sys.version_info[0] == 2 else iprot.readString()
+                else:
+                    iprot.skip(ftype)
+            elif fid == 3:
+                if ftype == TType.STRING:
+                    self.description = iprot.readString().decode('utf-8', errors='replace') if sys.version_info[0] == 2 else iprot.readString()
+                else:
+                    iprot.skip(ftype)
+            else:
+                iprot.skip(ftype)
+            iprot.readFieldEnd()
+        iprot.readStructEnd()
+
+    def write(self, oprot):
+        if oprot._fast_encode is not None and self.thrift_spec is not None:
+            oprot.trans.write(oprot._fast_encode(self, [self.__class__, self.thrift_spec]))
+            return
+        oprot.writeStructBegin('Spell')
+        if self.id is not None:
+            oprot.writeFieldBegin('id', TType.I32, 1)
+            oprot.writeI32(self.id)
+            oprot.writeFieldEnd()
+        if self.name is not None:
+            oprot.writeFieldBegin('name', TType.STRING, 2)
+            oprot.writeString(self.name.encode('utf-8') if sys.version_info[0] == 2 else self.name)
+            oprot.writeFieldEnd()
+        if self.description is not None:
+            oprot.writeFieldBegin('description', TType.STRING, 3)
+            oprot.writeString(self.description.encode('utf-8') if sys.version_info[0] == 2 else self.description)
+            oprot.writeFieldEnd()
+        oprot.writeFieldStop()
+        oprot.writeStructEnd()
+
+    def validate(self):
+        return
+
+    def __repr__(self):
+        L = ['%s=%r' % (key, value)
+             for key, value in self.__dict__.items()]
+        return '%s(%s)' % (self.__class__.__name__, ', '.join(L))
+
+    def __eq__(self, other):
+        return isinstance(other, self.__class__) and self.__dict__ == other.__dict__
+
+    def __ne__(self, other):
+        return not (self == other)
+
+
 class Character(object):
     """
     Attributes:
      - name
      - id
+     - level
      - breedId
      - breedName
      - serverId
      - serverName
+     - spells
 
     """
 
 
-    def __init__(self, name=None, id=None, breedId=None, breedName=None, serverId=None, serverName=None,):
+    def __init__(self, name=None, id=None, level=None, breedId=None, breedName=None, serverId=None, serverName=None, spells=None,):
         self.name = name
         self.id = id
+        self.level = level
         self.breedId = breedId
         self.breedName = breedName
         self.serverId = serverId
         self.serverName = serverName
+        self.spells = spells
 
     def read(self, iprot):
         if iprot._fast_decode is not None and isinstance(iprot.trans, TTransport.CReadableTransport) and self.thrift_spec is not None:
@@ -58,22 +141,38 @@ class Character(object):
                     iprot.skip(ftype)
             elif fid == 3:
                 if ftype == TType.I32:
-                    self.breedId = iprot.readI32()
+                    self.level = iprot.readI32()
                 else:
                     iprot.skip(ftype)
             elif fid == 4:
+                if ftype == TType.I32:
+                    self.breedId = iprot.readI32()
+                else:
+                    iprot.skip(ftype)
+            elif fid == 5:
                 if ftype == TType.STRING:
                     self.breedName = iprot.readString().decode('utf-8', errors='replace') if sys.version_info[0] == 2 else iprot.readString()
                 else:
                     iprot.skip(ftype)
-            elif fid == 5:
+            elif fid == 6:
                 if ftype == TType.I32:
                     self.serverId = iprot.readI32()
                 else:
                     iprot.skip(ftype)
-            elif fid == 6:
+            elif fid == 7:
                 if ftype == TType.STRING:
                     self.serverName = iprot.readString().decode('utf-8', errors='replace') if sys.version_info[0] == 2 else iprot.readString()
+                else:
+                    iprot.skip(ftype)
+            elif fid == 8:
+                if ftype == TType.LIST:
+                    self.spells = []
+                    (_etype3, _size0) = iprot.readListBegin()
+                    for _i4 in range(_size0):
+                        _elem5 = Spell()
+                        _elem5.read(iprot)
+                        self.spells.append(_elem5)
+                    iprot.readListEnd()
                 else:
                     iprot.skip(ftype)
             else:
@@ -94,21 +193,32 @@ class Character(object):
             oprot.writeFieldBegin('id', TType.DOUBLE, 2)
             oprot.writeDouble(self.id)
             oprot.writeFieldEnd()
+        if self.level is not None:
+            oprot.writeFieldBegin('level', TType.I32, 3)
+            oprot.writeI32(self.level)
+            oprot.writeFieldEnd()
         if self.breedId is not None:
-            oprot.writeFieldBegin('breedId', TType.I32, 3)
+            oprot.writeFieldBegin('breedId', TType.I32, 4)
             oprot.writeI32(self.breedId)
             oprot.writeFieldEnd()
         if self.breedName is not None:
-            oprot.writeFieldBegin('breedName', TType.STRING, 4)
+            oprot.writeFieldBegin('breedName', TType.STRING, 5)
             oprot.writeString(self.breedName.encode('utf-8') if sys.version_info[0] == 2 else self.breedName)
             oprot.writeFieldEnd()
         if self.serverId is not None:
-            oprot.writeFieldBegin('serverId', TType.I32, 5)
+            oprot.writeFieldBegin('serverId', TType.I32, 6)
             oprot.writeI32(self.serverId)
             oprot.writeFieldEnd()
         if self.serverName is not None:
-            oprot.writeFieldBegin('serverName', TType.STRING, 6)
+            oprot.writeFieldBegin('serverName', TType.STRING, 7)
             oprot.writeString(self.serverName.encode('utf-8') if sys.version_info[0] == 2 else self.serverName)
+            oprot.writeFieldEnd()
+        if self.spells is not None:
+            oprot.writeFieldBegin('spells', TType.LIST, 8)
+            oprot.writeListBegin(TType.STRUCT, len(self.spells))
+            for iter6 in self.spells:
+                iter6.write(oprot)
+            oprot.writeListEnd()
             oprot.writeFieldEnd()
         oprot.writeFieldStop()
         oprot.writeStructEnd()
@@ -126,15 +236,24 @@ class Character(object):
 
     def __ne__(self, other):
         return not (self == other)
+all_structs.append(Spell)
+Spell.thrift_spec = (
+    None,  # 0
+    (1, TType.I32, 'id', None, None, ),  # 1
+    (2, TType.STRING, 'name', 'UTF8', None, ),  # 2
+    (3, TType.STRING, 'description', 'UTF8', None, ),  # 3
+)
 all_structs.append(Character)
 Character.thrift_spec = (
     None,  # 0
     (1, TType.STRING, 'name', 'UTF8', None, ),  # 1
     (2, TType.DOUBLE, 'id', None, None, ),  # 2
-    (3, TType.I32, 'breedId', None, None, ),  # 3
-    (4, TType.STRING, 'breedName', 'UTF8', None, ),  # 4
-    (5, TType.I32, 'serverId', None, None, ),  # 5
-    (6, TType.STRING, 'serverName', 'UTF8', None, ),  # 6
+    (3, TType.I32, 'level', None, None, ),  # 3
+    (4, TType.I32, 'breedId', None, None, ),  # 4
+    (5, TType.STRING, 'breedName', 'UTF8', None, ),  # 5
+    (6, TType.I32, 'serverId', None, None, ),  # 6
+    (7, TType.STRING, 'serverName', 'UTF8', None, ),  # 7
+    (8, TType.LIST, 'spells', (TType.STRUCT, [Spell, None], False), None, ),  # 8
 )
 fix_spec(all_structs)
 del all_structs

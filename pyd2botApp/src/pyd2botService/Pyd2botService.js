@@ -131,13 +131,13 @@ Pyd2botService_fetchAccountCharacters_result.prototype.read = function(input) {
       case 0:
       if (ftype == Thrift.Type.LIST) {
         this.success = [];
-        var _rtmp31 = input.readListBegin();
-        var _size0 = _rtmp31.size || 0;
-        for (var _i2 = 0; _i2 < _size0; ++_i2) {
-          var elem3 = null;
-          elem3 = new ttypes.Character();
-          elem3.read(input);
-          this.success.push(elem3);
+        var _rtmp36 = input.readListBegin();
+        var _size5 = _rtmp36.size || 0;
+        for (var _i7 = 0; _i7 < _size5; ++_i7) {
+          var elem8 = null;
+          elem8 = new ttypes.Character();
+          elem8.read(input);
+          this.success.push(elem8);
         }
         input.readListEnd();
       } else {
@@ -161,10 +161,10 @@ Pyd2botService_fetchAccountCharacters_result.prototype.write = function(output) 
   if (this.success !== null && this.success !== undefined) {
     output.writeFieldBegin('success', Thrift.Type.LIST, 0);
     output.writeListBegin(Thrift.Type.STRUCT, this.success.length);
-    for (var iter4 in this.success) {
-      if (this.success.hasOwnProperty(iter4)) {
-        iter4 = this.success[iter4];
-        iter4.write(output);
+    for (var iter9 in this.success) {
+      if (this.success.hasOwnProperty(iter9)) {
+        iter9 = this.success[iter9];
+        iter9.write(output);
       }
     }
     output.writeListEnd();

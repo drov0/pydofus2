@@ -1,87 +1,704 @@
 {
-  "336986964178": {
-    "characterName": "Plusbellelavie",
-    "accountId": "melanco-lalco",
-    "characterId": 336986964178,
-    "serverId": 210
-  },
-  "336597024978": {
-    "characterName": "Melanco-lalco",
-    "accountId": "melanco-lalco",
-    "characterId": 336597024978,
-    "serverId": 210,
-    "breedId": 1,
-    "fight" : {
-        "spellId": ""
-    },
-    "roleplay": {
-        "statToUp": ""
-    }
-  },
-  "336919789778": {
-    "characterName": "Moneslicer",
-    "accountId": "Exodios-arc",
-    "characterId": 336919789778,
-    "serverId": 210
-  },
   "650339221540": {
-    "characterName": "Pipo-ar",
-    "accountId": "TheGrinder",
-    "characterId": 650339221540,
-    "serverId": 36
+    "name": "Pipo-ar",
+    "id": 650339221540,
+    "level": 1,
+    "breedId": 17,
+    "breedName": "Huppermage",
+    "serverId": 36,
+    "serverName": "Agride",
+    "spells": {
+      "Onde Tellurique": {
+        "id": 13668,
+        "name": "Onde Tellurique",
+        "description": "Occasionne des dommages Terre et fixe l'état Terre.\nPose une rune de Terre à l'emplacement de la cible.\n\nL'état élémentaire de la cible modifie les effets qu'elle subit :\n• Air : vole 3 Portée (1 tour)\n• Eau : - 3 PM (1 tour)\n• Feu : + 15% dommages subis (1 tour)"
+      },
+      "Cataracte": {
+        "id": 13711,
+        "name": "Cataracte",
+        "description": "Occasionne des dommages Eau puis Feu et fixe l'état Eau puis Feu. \nPose une rune de Feu à l'emplacement de la cible.\n\nL'état élémentaire de la cible modifie les effets qu'elle subit :\n• Feu : - 60 Fuite (1 tour)\n• Air : - 15% dommages occasionnés (1 tour)\n• Terre : - 3 PM (1 tour)"
+      },
+      "Éther": {
+        "id": 13669,
+        "name": "Éther",
+        "description": "Occasionne des dommages Air et fixe l'état Air. Pose une rune d'Air à l'emplacement de la cible.\n\nSuivant l'état élémentaire de la cible, elle subit les effets suivants :\n• Eau : - 15% dommages (1 tour)\n• Feu : - 3 PA (1 tour)\n• Terre : vole 3 Portée (1 tour)"
+      },
+      "Dard": {
+        "id": 13709,
+        "name": "Dard",
+        "description": "Occasionne des dommages Terre puis Eau et fixe l'état Terre puis Eau. \nPose une rune d'Eau à l'emplacement de la cible.\n\nL'état élémentaire de la cible modifie les effets qu'elle subit :\n• Eau : - 3 PM (1 tour)\n• Air : vole 3 Portée (1 tour)\n• Feu : + 15% dommages subis (1 tour)"
+      },
+      "Runification": {
+        "id": 13670,
+        "name": "Runification",
+        "description": "Déclenche toutes les runes élémentaires : elles occasionnent des dommages, fixent l'état de leur élément et améliorent les caractéristiques du lanceur.\nPeut générer des combinaisons élémentaires."
+      },
+      "Manifestation": {
+        "id": 13710,
+        "name": "Manifestation",
+        "description": "Déclenche la rune ciblée.\nSi la cellule est vide, invoque une Manifestation pendant 1 tour :\n• Eau : les entités à 3 cases ou moins de la Manifestation sont attirées de 3 cases.\n• Air : les entités à 3 cases ou moins de la Manifestation sont téléportées par symétrie.\n• Feu : le lanceur échange de position avec la Manifestation.\n• Terre : les entités à 3 cases ou moins de la Manifestation sont repoussées de 3 cases.\nÀ sa mort, applique son élément à 3 cases autour d'elle."
+      },
+      "Lance-Flamme": {
+        "id": 13666,
+        "name": "Lance-Flamme",
+        "description": "Occasionne des dommages Feu et fixe l'état Feu. Pose une rune de Feu à l'emplacement de la cible.\n\nL'état élémentaire de la cible modifie les effets qu'elle subit :\n• Eau : - 60 Fuite (1 tour)\n• Air : - 3 PA (1 tour)\n• Terre : + 15% dommages subis (1 tour)"
+      },
+      "Onde Céleste": {
+        "id": 13708,
+        "name": "Onde Céleste",
+        "description": "Occasionne des dommages Air puis Terre et fixe l'état Air puis Terre. \nPose une rune de Terre à l'emplacement de la cible.\n\nL'état élémentaire de la cible modifie les effets qu'elle subit :\n• Eau : - 15% dommages (1 tour)\n• Terre : vole 3 Portée (1 tour)\n• Feu : - 3 PA (1 tour)"
+      },
+      "Stalagmite": {
+        "id": 13667,
+        "name": "Stalagmite",
+        "description": "Occasionne des dommages Eau et fixe l'état Eau. Pose une rune d'Eau à l'emplacement de la cible.\n\nSuivant l'état élémentaire de la cible, elle subit les effets suivants :\n• Air : - 15% dommages (1 tour)\n• Feu : - 60 Fuite (1 tour)\n• Terre : - 3 PM (1 tour)"
+      },
+      "Tison": {
+        "id": 13712,
+        "name": "Tison",
+        "description": "Occasionne des dommages Feu puis Air et fixe l'état Feu puis Air. \nPose une rune d'Air à l'emplacement de la cible.\n\nSuivant l'état élémentaire de la cible, elle subit les effets suivants :\n• Eau : - 60 Fuite (1 tour)\n• Air : - 3 PA (1 tour)\n• Terre : + 15% dommages subis (1 tour)"
+      },
+      "Orage": {
+        "id": 13674,
+        "name": "Orage",
+        "description": "Vole de la vie dans l'élément Terre en zone et fixe l'état Terre.\nPose une rune de Terre à l'emplacement de la cible.\n\nL'état élémentaire de la cible modifie les effets qu'elle subit :\n• Air : vole 3 Portée (1 tour)\n• Eau : - 3 PM (1 tour)\n• Feu : + 15% dommages subis (1 tour)"
+      },
+      "Brèche Tectonique": {
+        "id": 13725,
+        "name": "Brèche Tectonique",
+        "description": "Vole de la vie dans l'élément Terre et fixe l'état Terre. Pose une rune de Terre à l'emplacement de la cible.\n\nL'état élémentaire de la cible modifie les effets qu'elle subit :\n• Air : vole 3 Portée (1 tour)\n• Eau : - 3 PM (1 tour)\n• Feu : + 15% dommages subis (1 tour)"
+      },
+      "Lame Astrale": {
+        "id": 13679,
+        "name": "Lame Astrale",
+        "description": "Occasionne des dommages Air et fixe l'état Air aux ennemis.\nRéduit la portée des ennemis, augmente la portée des alliés.\nPose une rune d'Air à l'emplacement de la cible.\n\nSuivant l'état élémentaire de la cible, elle subit les effets suivants :\n• Eau : - 15% dommages (1 tour)\n• Feu : - 3 PA (1 tour)\n• Terre : vole 3 Portée (1 tour)"
+      },
+      "Lame Tellurique": {
+        "id": 13715,
+        "name": "Lame Tellurique",
+        "description": "Occasionne des dommages Terre et fixe l'état Terre. Pose une rune de Terre à l'emplacement de la cible.\nRéduit la probabilité de critique des ennemis et augmente la probabilité de critique des alliés.\n\nL'état élémentaire de la cible modifie les effets qu'elle subit :\n• Air : vole 3 Portée (1 tour)\n• Eau : - 3 PM (1 tour)\n• Feu : + 15% dommages subis (1 tour)"
+      },
+      "Polarité": {
+        "id": 13696,
+        "name": "Polarité",
+        "description": "Attire les ennemis qui sont dans l'état \"Eau\".\nRepousse les ennemis qui sont dans l'état \"Terre\".\nÉchange sa position avec un ennemi dans l'état \"Feu\".\nSe téléporte symétriquement par rapport à un ennemi dans l'état \"Air\".\n\nConsomme les états élémentaires des ennemis affectés."
+      },
+      "Courant Quadramental": {
+        "id": 13716,
+        "name": "Courant Quadramental",
+        "description": "Consomme l'état élémentaire de la cible et lui applique un malus en fonction de son élément  :\n• Eau : 20% d'érosion\n• Air : -30 Tacle\n• Terre : -3PM\n• Feu : -2PA"
+      },
+      "Trait Ardent": {
+        "id": 13680,
+        "name": "Trait Ardent",
+        "description": "Vole de la vie dans l'élément Feu en zone et fixe l'état Feu. Pose une rune de Feu à l'emplacement des cibles touchées.\n\nSuivant l'état élémentaire des cibles, elles subissent les effets suivants :\n• Eau : - 60 Fuite (1 tour)\n• Air : - 3 PA (1 tour)\n• Terre : + 15% dommages subis (1 tour)"
+      },
+      "Volcan": {
+        "id": 13718,
+        "name": "Volcan",
+        "description": "Vole de la vie dans l'élément Feu et fixe l'état Feu. Pose une rune de Feu à l'emplacement de la cible.\n\nL'état élémentaire de la cible modifie les effets qu'elle subit :\n• Eau : - 60 Fuite (1 tour)\n• Air : - 3 PA (1 tour)\n• Terre : + 15% dommages subis (1 tour)"
+      },
+      "Glacier": {
+        "id": 13676,
+        "name": "Glacier",
+        "description": "Occasionne des dommages Eau en zone et fixe l'état Eau. Pose une rune d'Eau à l'emplacement des cibles touchées.\n\nSuivant l'état élémentaire des cibles, elles subissent les effets suivants :\n• Air : - 15% dommages (1 tour)\n• Feu : - 60 Fuite (1 tour)\n• Terre : - 3 PM (1 tour)"
+      },
+      "Stalactite": {
+        "id": 13717,
+        "name": "Stalactite",
+        "description": "Vole de la vie dans l'élément Eau et fixe l'état Eau. Pose une rune d'Eau à l'emplacement de la cible.\n\nL'état élémentaire de la cible modifie les effets qu'elle subit :\n• Air : -  15% dommages (1 tour)\n• Feu : - 60 Fuite (1 tour)\n• Terre : - 3 PM (1 tour)"
+      },
+      "Propagation": {
+        "id": 13695,
+        "name": "Propagation",
+        "description": "Fixe l'état élémentaire de la cible sur tous les ennemis dans un rayon de 3 cases.\nPeut générer des combinaisons élémentaires."
+      },
+      "Piège Élémentaire": {
+        "id": 13719,
+        "name": "Piège Élémentaire",
+        "description": "Pose un piège qui applique des effets en zone pour 1 tour en fonction de l'élément des cibles :\n• Feu : les prochains soins reçus sont divisés par 2\n• Air : retire 4 PO\n• Terre : réduit la durée des effets actifs de 1 tour\n• Eau : applique l'état Pesanteur"
+      },
+      "Bouclier Élémentaire": {
+        "id": 13682,
+        "name": "Bouclier Élémentaire",
+        "description": "La cible gagne des résistances élémentaires.\nÀ chaque fois qu'elle subit des dommages, elle perd de la résistance à l'élément de l'attaque subie ; mais son attaquant entre dans l'état élémentaire lié à son attaque.\n\nPeut générer des combinaisons élémentaires."
+      },
+      "Gardien Élémentaire": {
+        "id": 13720,
+        "name": "Gardien Élémentaire",
+        "description": "Invoque un Gardien Élémentaire maîtrisable dont la puissance augmente à chaque fois qu'un combo élémentaire différent est généré.\nIl attaque dans l'élément de la cible."
+      },
+      "Déflagration": {
+        "id": 13681,
+        "name": "Déflagration",
+        "description": "Occasionne des dommages Feu et fixe l'état Feu aux ennemis. Réduit la durée des effets de la cible de 1 tour.\nPose une rune Feu à l'emplacement de la cible.\n\nL'état élémentaire de la cible modifie les effets qu'elle subit :\n• Eau : - 60 Fuite (1 tour)\n• Air : - 3 PA (1 tour)\n• Terre : + 15% dommages subis (1 tour)"
+      },
+      "Déluge": {
+        "id": 13721,
+        "name": "Déluge",
+        "description": "Occasionne des dommages Eau et fixe l'état Eau. Rapproche le lanceur de sa cible.\nPose une rune d'Eau à l'emplacement de la cible.\n\nL'état élémentaire de la cible modifie les effets qu'elle subit :\n• Air : - 15% dommages (1 tour)\n• Feu : - 60 Fuite (1 tour)\n• Terre : - 3 PM (1 tour)"
+      },
+      "Contribution": {
+        "id": 13701,
+        "name": "Contribution",
+        "description": "La cible gagne des bonus (cumulables 2 fois) en fonction des états élémentaires des ennemis :\n• Eau : 150 Puissance.\n• Feu : 240% du niveau du lanceur en points de bouclier.\n• Air : 1 PA.\n• Terre : 1PM.\n\nLes ennemis perdent leur état élémentaire."
+      },
+      "Création": {
+        "id": 13727,
+        "name": "Création",
+        "description": "Pose une rune sur la cellule ciblée.\nL'élément de la rune correspond à celui de la dernière rune posée."
+      },
+      "Éclats Glacés": {
+        "id": 13677,
+        "name": "Éclats Glacés",
+        "description": "Occasionne des dommages Eau et fixe l'état Eau aux ennemis. Attire la cible de 2 cases.\nPose une rune Eau à l'emplacement de la cible.\n\nL'état élémentaire de la cible modifie les effets qu'elle subit :\n• Air : - 15% dommages (1 tour)\n• Feu : - 60 Fuite (1 tour)\n• Terre : - 3 PM (1 tour)"
+      },
+      "Lance Solaire": {
+        "id": 13723,
+        "name": "Lance Solaire",
+        "description": "Occasionne des dommages Feu, échange de position avec la cible et fixe l'état Feu.\nPose une rune de Feu à l'emplacement de la cible.\n\nL'état élémentaire de la cible modifie les effets qu'elle subit :\n• Eau : - 60 Fuite (1 tour)\n• Air : - 3 PA (1 tour)\n• Terre : + 15% dommages subis (1 tour)"
+      },
+      "Traitement Runique": {
+        "id": 13684,
+        "name": "Traitement Runique",
+        "description": "La cible alliée est soignée en fonction du nombre de runes présentes. Le soin est moins important sur le lanceur.\n\nConsomme toutes les runes sans activer leurs effets."
+      },
+      "Surcharge Runique": {
+        "id": 13724,
+        "name": "Surcharge Runique",
+        "description": "Consomme toutes les runes sans activer leurs effets.\nLa cible subit des dommages en fonction du nombre et de l'élément des runes consommées."
+      },
+      "Rafale Transperçante": {
+        "id": 13678,
+        "name": "Rafale Transperçante",
+        "description": "Vole de la vie dans l'élément Air en zone et fixe l'état Air.\nPose une rune Air à l'emplacement des cibles touchées.\n\nL'état élémentaire de la cible modifie les effets qu'elle subit :\n• Eau : - 15% dommages (1 tour)\n• Feu : - 3 PA (1 tour)\n• Terre : vole 3 Portée (1 tour)"
+      },
+      "Ouragan": {
+        "id": 13714,
+        "name": "Ouragan",
+        "description": "Vole de la vie dans l'élément Air et fixe l'état Air. Pose une rune d'Air à l'emplacement de la cible.\n\nL'état élémentaire de la cible modifie les effets qu'elle subit :\n• Eau : - 15% dommages (1 tour)\n• Feu : - 3 PA (1 tour)\n• Terre : vole 3 Portée (1 tour)"
+      },
+      "Météore Percutant": {
+        "id": 13675,
+        "name": "Météore Percutant",
+        "description": "Occasionne des dommages Terre et fixe l'état Terre aux ennemis. Repousse la cible.\nPose une rune Terre à l'emplacement de la cible.\n\nL'état élémentaire de la cible modifie les effets qu'elle subit :\n• Air : vole 3 Portée (1 tour)\n• Eau : - 3 PM (1 tour)\n• Feu : + 15% dommages subis (1 tour)"
+      },
+      "Comète": {
+        "id": 13726,
+        "name": "Comète",
+        "description": "Occasionne des dommages Air, éloigne le lanceur et fixe l'état Air.\nPose une rune d'Air à l'emplacement de la cible.\n\nL'état élémentaire de la cible modifie les effets qu'elle subit :\n• Eau : - 15% dommages (1 tour)\n• Feu : - 3 PA (1 tour)\n• Terre : vole 3 Portée (1 tour)"
+      },
+      "Empreinte": {
+        "id": 13697,
+        "name": "Empreinte",
+        "description": "Pose une rune pour chaque ennemi affecté par un état élémentaire.\nLa puissance de la rune dépend du niveau d'Empreinte."
+      },
+      "Cycle Élémentaire": {
+        "id": 13722,
+        "name": "Cycle Élémentaire",
+        "description": "Change l'élément de la cible en fonction de son élément actuel :\nTerre -> Eau -> Feu -> Air -> Terre\nLe coût en PA du sort est remboursé, mais ne l'est plus à partir du second lancer sur une même cible dans le même tour."
+      },
+      "Traversée": {
+        "id": 13683,
+        "name": "Traversée",
+        "description": "Téléporte sur la cellule ciblée.\nLes cibles comprises entre la cellule initiale et la cellule d'arrivée subissent des dommages en fonction de leur état élémentaire."
+      },
+      "Répulsion Runique": {
+        "id": 13728,
+        "name": "Répulsion Runique",
+        "description": "Repousse en croix pour chaque rune présente sur le terrain.\nConsomme les runes sans déclencher leurs effets."
+      },
+      "Drain Élémentaire": {
+        "id": 13672,
+        "name": "Drain Élémentaire",
+        "description": "Occasionne des dommages et vole des caractéristiques dans un élément qui dépend de l'état élémentaire de la cible. \n\nConsomme l'état élémentaire de la cible."
+      },
+      "Morph": {
+        "id": 13713,
+        "name": "Morph",
+        "description": "Occasionne des dommages en fonction de l'état élémentaire de l'ennemi, puis modifie son élément : Eau -> Terre -> Air -> Feu -> Eau\nLes contraintes de lancer du sort sont modifiées pendant 3 tours, en fonction de l'élément initial :\n• Eau : Réduit le coût en PA de 1\n• Feu : Augmente les dommages de base de 10\n• Air : Augmente la Portée de 4\n• Terre : Augmente le nombre de lancers par cible de 1"
+      },
+      "Tribut": {
+        "id": 14341,
+        "name": "Tribut",
+        "description": "Le lanceur gagne des bonus en fonction de l'état élémentaire de la cible : \n• Eau : 150 Puissance. \n• Feu : 240% du niveau du lanceur en points de bouclier. \n• Air : 1 PA. \n• Terre : 1PM.\n\nL'état élémentaire de la cible est consommé."
+      },
+      "Torrent Arcanique": {
+        "id": 14342,
+        "name": "Torrent Arcanique",
+        "description": "Pour chaque combinaison élémentaire générée, les dommages de Torrent Arcanique sont augmentés. Le bonus de dommages disparait quand le sort est lancé. Ne génère pas de combinaisons élémentaires.\n\nGénérer au moins une combinaison est nécessaire pour lancer le sort."
+      }
+    },
+    "accountId": "TheGrinder"
   },
   "336798351570": {
-    "characterName": "Them-rats",
+    "name": "Them-rats",
+    "id": 336798351570,
+    "level": 53,
+    "breedId": 10,
+    "breedName": "Sadida",
+    "serverId": 210,
+    "serverName": "Merkator",
+    "spells": {
+      "Folle": {
+        "id": 13564,
+        "name": "Folle",
+        "description": "Invoque une Folle maîtrisable qui retire des PA et applique l'état Infecté.\n\nSi un ennemi dans l'état Infecté est touché par un sort monocible du Sadida : tous les ennemis qui sont dans l'état Infecté sont affectés par ce sort.\n\nLes dommages occasionnés aux ennemis secondaires infectés peuvent être déclenchés 3 fois par tour."
+      },
+      "Folle Transmutée": {
+        "id": 13515,
+        "name": "Folle Transmutée",
+        "description": "Remplace un Arbre Feuillu allié par une Folle maîtrisable qui retire des PA et applique l'état Infecté.\n\nSi un ennemi dans l'état Infecté est touché par un sort monocible du Sadida : tous les ennemis qui sont dans l'état Infecté sont affectés par ce sort.\n\nLes dommages occasionnés aux ennemis secondaires infectés peuvent être déclenchés 3 fois par tour.\n\nÀ sa mort, la Folle redevient un Arbre."
+      },
+      "Arbre": {
+        "id": 13519,
+        "name": "Arbre",
+        "description": "Plante un Arbre.\nAprès 1 tour, l'Arbre devient Feuillu et peut être utilisé comme intermédiaire pour lancer des sorts Sadida (mais ne peut plus être poussé ou attiré)."
+      },
+      "Arbre Feuillu": {
+        "id": 13560,
+        "name": "Arbre Feuillu",
+        "description": "Plante un Arbre Feuillu qui peut être utilisé comme intermédiaire pour lancer des sorts Sadida (mais ne peut plus être poussé ou attiré)."
+      },
+      "Ronce": {
+        "id": 13516,
+        "name": "Ronce",
+        "description": "Occasionne des dommages Terre.\n\nSur un Arbre Feuillu allié, lui applique également l'état Substitution Poupesque. Cet état permet à une Bloqueuse alliée d'échanger sa position avec l'Arbre ciblé et de se rendre Invulnérable.\n\nSur un ennemi dans l'état Infecté : occasionne des dommages Terre à tous les ennemis dans l'état Infecté."
+      },
+      "Broussaille Empoisonnée": {
+        "id": 13559,
+        "name": "Broussaille Empoisonnée",
+        "description": "Applique un poison Terre de début de tour sur l'ennemi ciblé.\n\nSur un Arbre Feuillu allié : applique l'état Substitution Poupesque. Cet état permet à une Bloqueuse alliée d'échanger sa position avec l'Arbre ciblé et de se rendre Invulnérable.\n\nSur un ennemi dans l'état Infecté : applique un poison Terre de début de tour sur tous les ennemis dans l'état Infecté."
+      },
+      "Braises Épineuses": {
+        "id": 14393,
+        "name": "Braises Épineuses",
+        "description": "Occasionne des dommages Feu. \n\nSur un Arbre Feuillu allié : retire le Feuillage de l'Arbre (le Feuillage ne revient pas de lui-même).\n\nSur un ennemi dans l'état Infecté : occasionne des dommages Feu à tous les ennemis dans l'état Infecté."
+      },
+      "Mangrove": {
+        "id": 14396,
+        "name": "Mangrove",
+        "description": "Occasionne des dommages Eau aux ennemis en zone.\n\nSur un Arbre Feuillu allié : occasionne des dommages Eau plus importants aux ennemis dans une zone de 2 cases en croix.\nRetire le Feuillage de l'Arbre (le Feuillage ne revient pas de lui-même)."
+      },
+      "Bloqueuse": {
+        "id": 13561,
+        "name": "Bloqueuse",
+        "description": "Invoque une Bloqueuse maîtrisable qui cherchera à aller au contact des adversaires pour les gêner.\n\nElle peut également échanger sa position avec un Arbre allié et se rendre invulnérable si cet Arbre est dans l'état Substitution Poupesque."
+      },
+      "Bloqueuse Transmutée": {
+        "id": 13526,
+        "name": "Bloqueuse Transmutée",
+        "description": "Remplace un Arbre Feuillu allié par une Bloqueuse maîtrisable qui cherchera à aller au contact des adversaires pour les gêner.\n\nElle peut également échanger sa position avec un Arbre allié et se rendre invulnérable si cet Arbre est dans l'état Substitution Poupesque.\n\nÀ sa mort, la Bloqueuse redevient un Arbre."
+      },
+      "Larme": {
+        "id": 13528,
+        "name": "Larme",
+        "description": "Occasionne des dommages Eau.\n\nSur un Arbre Chétif allié : le transforme en Arbre Feuillu.\n\nSur un ennemi dans l'état Infecté : occasionne des dommages Eau à tous les ennemis dans l'état Infecté."
+      },
+      "Montée de Sève": {
+        "id": 13563,
+        "name": "Montée de Sève",
+        "description": "Vole de la vie dans l'élément Eau aux ennemis en zone.\n\nSur des Arbres Chétifs alliés : les transforme en Arbres Feuillus."
+      },
+      "Poison Paralysant": {
+        "id": 13533,
+        "name": "Poison Paralysant",
+        "description": "Applique un poison Feu de fin de tour sur la cible.\nSi la cible est un ennemi, lui applique également l'état Infecté.\n\nSi un ennemi dans l'état Infecté est touché par un sort monocible du Sadida : tous les ennemis qui sont dans l'état Infecté sont affectés par ce sort.\n\nLes dommages occasionnés aux ennemis secondaires infectés peuvent être déclenchés 3 fois par tour."
+      },
+      "Poison de Proximité": {
+        "id": 13562,
+        "name": "Poison de Proximité",
+        "description": "Applique l'état Infecté sur tous les ennemis à 2 cases ou moins d'une poupée ou d'un Arbre Feuillu allié(e).\n\nSi un ennemi dans l'état Infecté est touché par un sort monocible du Sadida : tous les ennemis qui sont dans l'état Infecté sont affectés par ce sort.\n\nLes dommages occasionnés aux ennemis secondaires infectés peuvent être déclenchés 3 fois par tour."
+      },
+      "Ronce Apaisante": {
+        "id": 13525,
+        "name": "Ronce Apaisante",
+        "description": "Retire des PM aux ennemis ou soigne les alliés.\n\nSur un ennemi dans l'état Infecté : retire des PM à tous les ennemis dans l'état Infecté.\nLa perte de PM est plus faible sur les ennemis infectés autres que la cible."
+      },
+      "Rempotage": {
+        "id": 13565,
+        "name": "Rempotage",
+        "description": "Téléporte l'Arbre Feuillu du lanceur ciblé sur la première case disponible entre le lanceur et lui.\nPlante un Arbre à l'emplacement ciblé."
+      },
+      "Puissance Sylvestre": {
+        "id": 13530,
+        "name": "Puissance Sylvestre",
+        "description": "Remplace un Arbre Feuillu allié par un Arbre contrôlable qui peut :\n• Repousser une cible\n• Réduire la durée des effets\n• Soigner en zone (3 cases)\n\nÀ la fin de son tour, il redevient un Arbre."
+      },
+      "Influence Végétale": {
+        "id": 13566,
+        "name": "Influence Végétale",
+        "description": "Remplace un Arbre Feuillu allié par un Arbre contrôlable qui peut :\n• Attirer une cible\n• Retirer des PM en zone (2 cases autour de lui) en appliquant l'état Infecté \n\nÀ la fin de son tour, il redevient un Arbre."
+      },
+      "Sacrifiée": {
+        "id": 13567,
+        "name": "Sacrifiée",
+        "description": "Invoque une Sacrifiée maîtrisable qui meurt en occasionnant des dommages Air et en appliquant l'état Infecté.\n\nPour chaque tour où la Sacrifiée reste en vie, sa Vitalité et les dommages qu'elle occasionne augmentent."
+      },
+      "Sacrifiée Transmutée": {
+        "id": 13522,
+        "name": "Sacrifiée Transmutée",
+        "description": "Remplace un Arbre Feuillu allié par une Sacrifiée maîtrisable qui meurt en occasionnant des dommages Air et en appliquant l'état Infecté.\n\nPour chaque tour où la Sacrifiée reste en vie, sa Vitalité et les dommages qu'elle occasionne augmentent.\n\nÀ sa mort, la Sacrifiée redevient un Arbre."
+      },
+      "Tremblement": {
+        "id": 13514,
+        "name": "Tremblement",
+        "description": "Dans une zone de 3 cases autour de chaque Arbre Feuillu allié :\n • Attire les cibles\n • Occasionne des dommages Feu aux ennemis\n • Dévoile les invisibles"
+      },
+      "Secousse": {
+        "id": 13568,
+        "name": "Secousse",
+        "description": "Dans une zone de 2 cases autour de chaque Arbre Feuillu allié :\n • Occasionne des dommages Air aux ennemis\n • Donne 1 PM au lanceur par ennemi touché"
+      },
+      "Don Naturel": {
+        "id": 13532,
+        "name": "Don Naturel",
+        "description": "Partage les dommages entre les alliés et les soigne dans une zone de 2 cases autour d'un Arbre Feuillu allié.\nTue l'Arbre Feuillu allié ciblé.\n\nLe partage de dommages n'affecte pas les invocations."
+      },
+      "Inoculation": {
+        "id": 13569,
+        "name": "Inoculation",
+        "description": "Occasionne des dommages Air aux ennemis et leur applique l'état Infecté dans une zone de 2 cases autour d'un Arbre Feuillu allié.\nTue l'Arbre Feuillu allié ciblé.\n\nSur un ennemi dans l'état Infecté : occasionne des dommages Air plus faibles aux ennemis et leur applique l'état Infecté dans une zone de 2 cases."
+      },
+      "Ronces Multiples": {
+        "id": 13524,
+        "name": "Ronces Multiples",
+        "description": "Occasionne des dommages Terre en zone.\nN'affecte pas le lanceur et ses invocations."
+      },
+      "Force de la Nature": {
+        "id": 13570,
+        "name": "Force de la Nature",
+        "description": "Occasionne des dommages Terre.\n\nSur un ennemi dans l'état Infecté : occasionne des dommages Terre à tous les ennemis dans l'état Infecté.\n\nLes dommages du sort augmentent selon le nombre d'Arbres Feuillus du lanceur présents sur le terrain."
+      },
+      "Sacrifice Poupesque": {
+        "id": 13531,
+        "name": "Sacrifice Poupesque",
+        "description": "Occasionne des dommages Eau aux ennemis.\nVole de la vie dans l'élément Eau aux alliés et aux invocations.\n\nSur un ennemi dans l'état Infecté : occasionne des dommages Eau à tous les ennemis dans l'état Infecté.\nVole de la vie dans l'élément Eau à toutes les invocations ennemies dans l'état Infecté."
+      },
+      "Fléau": {
+        "id": 13571,
+        "name": "Fléau",
+        "description": "Occasionne des dommages Eau.\n\nSur un ennemi dans l'état Infecté : vole de la vie dans l'élément Eau à tous les ennemis dans l'état Infecté."
+      },
+      "Vent Empoisonné": {
+        "id": 13529,
+        "name": "Vent Empoisonné",
+        "description": "Tue une poupée du lanceur pour la transformer en Arbre."
+      },
+      "Altruisme Végétal": {
+        "id": 13572,
+        "name": "Altruisme Végétal",
+        "description": "Tue un Arbre Feuillu allié pour augmenter la Vitalité des poupées du lanceur et soigner le lanceur."
+      },
+      "Gonflable": {
+        "id": 13573,
+        "name": "Gonflable",
+        "description": "Invoque une Gonflable maîtrisable qui soigne dans une zone de 3 cases autour d'elle et donne des PM aux alliés.\n\nElle soigne également tous les alliés au contact des Arbres Feuillus alliés."
+      },
+      "Gonflable Transmutée": {
+        "id": 13523,
+        "name": "Gonflable Transmutée",
+        "description": "Remplace un Arbre Feuillu allié par une Gonflable maîtrisable qui soigne dans une zone de 3 cases autour d'elle et donne des PM aux alliés.\n\nElle soigne également tous les alliés au contact des Arbres Feuillus alliés.\n\nÀ sa mort, la Gonflable redevient un Arbre."
+      },
+      "Ronces Agressives": {
+        "id": 13527,
+        "name": "Ronces Agressives",
+        "description": "Occasionne des dommages Terre.\n\nSur un ennemi dans l'état Infecté : occasionne des dommages Terre à tous les ennemis dans l'état Infecté.\n\nDonne 1 PM au lanceur par ennemi touché."
+      },
+      "Ronce Harcelante": {
+        "id": 13574,
+        "name": "Ronce Harcelante",
+        "description": "Occasionne des dommages Terre et retire des PM aux ennemis dans une zone de 2 cases autour d'un Arbre Feuillu allié."
+      },
+      "Arbre de Vie": {
+        "id": 13534,
+        "name": "Arbre de Vie",
+        "description": "Transforme un Arbre Feuillu allié en Arbre de Vie et augmente sa Vitalité.\n\nPendant 2 tours :\n• Les alliés qui attaquent l'Arbre de Vie sont soignés d'une partie des dommages occasionnés.\n• Soigne les invocations Sadida alliées à chaque fin de tour du lanceur.\n\nL'Arbre de Vie redevient un Arbre Feuillu 2 tours après sa transformation."
+      },
+      "Harmonie": {
+        "id": 13579,
+        "name": "Harmonie",
+        "description": "Applique l'état Enraciné sur le lanceur et l'immobilise à la fin du tour pour le tour suivant.\nPartage les dommages entre le lanceur et ses poupées présentes sur le terrain au lancer du sort."
+      },
+      "Feu de Brousse": {
+        "id": 13517,
+        "name": "Feu de Brousse",
+        "description": "Occasionne des dommages Feu et Eau.\n\nSur un ennemi dans l'état Infecté : occasionne des dommages Feu et Eau à tous les ennemis dans l'état Infecté."
+      },
+      "Malédiction Vaudou": {
+        "id": 13576,
+        "name": "Malédiction Vaudou",
+        "description": "Occasionne des dommages Feu et Eau aux ennemis.\n\nSur l'ennemi pendant 2 tours :\n• Occasionne des dommages Feu s'il subit une tentative de retrait de PM\n• Occasionne des dommages Eau s'il subit une tentative de retrait de PA\n\nLes dommages de chaque élément peuvent être déclenchés 3 fois par tour.\n\nSur un ennemi dans l'état Infecté : applique les effets du sort sur tous les ennemis dans l'état Infecté."
+      },
+      "Ronce Insolente": {
+        "id": 13521,
+        "name": "Ronce Insolente",
+        "description": "Réduit la durée des effets sur la cible.\n\nSur un ennemi dans l'état Infecté : réduit la durée des effets sur tous les ennemis dans l'état Infecté."
+      },
+      "Ronce Paralysante": {
+        "id": 13577,
+        "name": "Ronce Paralysante",
+        "description": "Occasionne des dommages Air et retire des PM.\n\nSur un ennemi dans l'état Infecté : occasionne des dommages Air et retire des PM à tous les ennemis dans l'état Infecté."
+      },
+      "Herbe Folle": {
+        "id": 13518,
+        "name": "Herbe Folle",
+        "description": "Retire des PM et occasionne des dommages Feu en zone.\nN'affecte pas le lanceur."
+      },
+      "Contagion": {
+        "id": 13575,
+        "name": "Contagion",
+        "description": "Occasionne des dommages Air. \n\nSur un ennemi dans l'état Infecté : occasionne des dommages Air à tous les ennemis dans l'état Infecté.\n\nPropage l'état Infecté dans une zone de 2 cases autour des ennemis touchés avant de leur occasionner des dommages."
+      },
+      "Surpuissante": {
+        "id": 13578,
+        "name": "Surpuissante",
+        "description": "Invoque une Surpuissante maîtrisable qui retire des PM et de l'Esquive PM aux ennemis en zone.\n\nElle retire également des PM à tous les ennemis au contact des Arbres Feuillus alliés."
+      },
+      "Surpuissante Transmutée": {
+        "id": 13520,
+        "name": "Surpuissante Transmutée",
+        "description": "Remplace un Arbre Feuillu allié par une Surpuissante maîtrisable qui retire des PM et de l'Esquive PM aux ennemis en zone.\n\nElle retire également des PM à tous les ennemis au contact des Arbres Feuillus alliés.\n\nÀ sa mort, la Surpuissante redevient un Arbre."
+      }
+    },
     "accountId": "TheGrinder",
-    "characterId": 336798351570,
-    "serverId": 210
+    "primarySpell": {
+      "id": 13516,
+      "name": "Ronce",
+      "description": "Occasionne des dommages Terre.\n\nSur un Arbre Feuillu allié, lui applique également l'état Substitution Poupesque. Cet état permet à une Bloqueuse alliée d'échanger sa position avec l'Arbre ciblé et de se rendre Invulnérable.\n\nSur un ennemi dans l'état Infecté : occasionne des dommages Terre à tous les ennemis dans l'état Infecté."
+    },
+    "primaryStatId": 10
   },
   "329036071122": {
-    "characterName": "Cryptomancer",
-    "accountId": "TheGrinder",
-    "characterId": 329036071122,
-    "serverId": 210
-  },
-  "336919855314": {
-    "characterName": "Moneycreator",
-    "accountId": "Exodios-panda",
-    "characterId": 336919855314,
-    "serverId": 210
-  },
-  "336815325394": {
-    "characterName": "Moneydicer",
-    "accountId": "Exodios-cra",
-    "characterId": 336815325394,
-    "serverId": 210
-  },
-  "474147979471": {
-    "characterName": "Moneydicer",
-    "accountId": "Exodios-cra",
-    "characterId": 474147979471,
-    "serverId": 207
-  },
-  "337022615762": {
-    "characterName": "Hardlett",
-    "accountId": "Money",
-    "characterId": 337022615762,
-    "serverId": 210
-  },
-  "336919920850": {
-    "characterName": "Moneylife",
-    "accountId": "twistedFater",
-    "characterId": 336919920850,
-    "serverId": 210
-  },
-  "336140370130": {
-    "characterName": "Maniaco-lalcolic",
-    "accountId": "slicer-the-dicer",
-    "characterId": 336140370130,
-    "serverId": 210
-  },
-  "335911059666": {
-    "characterName": "Skilled-champ",
-    "accountId": "slicer-the-dicer",
-    "characterId": 335911059666,
-    "serverId": 210
+    "name": "Cryptomancer",
+    "id": 329036071122,
+    "level": 7,
+    "breedId": 4,
+    "breedName": "Sram",
+    "serverId": 210,
+    "serverName": "Merkator",
+    "spells": {
+      "Invisibilité": {
+        "id": 12913,
+        "name": "Invisibilité",
+        "description": "Rend invisible l'allié ciblé et augmente ses PM."
+      },
+      "Brume": {
+        "id": 12930,
+        "name": "Brume",
+        "description": "Pose un glyphe-aura qui rend invisibles les alliés."
+      },
+      "Piège Sournois": {
+        "id": 12906,
+        "name": "Piège Sournois",
+        "description": "Pose un piège qui occasionne des dommages Feu aux ennemis et attire les entités vers son centre."
+      },
+      "Coupe-gorge": {
+        "id": 12935,
+        "name": "Coupe-gorge",
+        "description": "Occasionne des dommages Feu.\nAugmente la Puissance du lanceur et de ses alliés dans une zone de deux cases autour de lui."
+      },
+      "Truanderie": {
+        "id": 12902,
+        "name": "Truanderie",
+        "description": "Occasionne des dommages Terre."
+      },
+      "Chausse-trappe": {
+        "id": 12932,
+        "name": "Chausse-trappe",
+        "description": "Occasionne des dommages Terre.\nLes dommages sont augmentés pour chaque piège du lanceur déclenché.\nLes effets sont retirés après utilisation du sort."
+      },
+      "Poison Insidieux": {
+        "id": 12907,
+        "name": "Poison Insidieux",
+        "description": "Applique un poison Air de début de tour."
+      },
+      "Toxines": {
+        "id": 12933,
+        "name": "Toxines",
+        "description": "Applique un poison Air de fin de tour sur l'ennemi ciblé.\nTant que le poison est actif, il peut être réappliqué et ses dommages sont augmentés à chaque fois que la cible subit un piège Sram du lanceur.\nCet effet peut être déclenché une seule fois par tour.\n\nIl ne peut y avoir qu'un seul ennemi sous les effets du sort.\nLe poison est cumulable une fois maximum."
+      },
+      "Piège Répulsif": {
+        "id": 12914,
+        "name": "Piège Répulsif",
+        "description": "Pose un piège qui repousse les entités et occasionne des dommages Air aux ennemis en zone."
+      },
+      "Poisse": {
+        "id": 12922,
+        "name": "Poisse",
+        "description": "Vole de la vie dans l'élément Eau et minimise les effets aléatoires de la cible."
+      },
+      "Coup Sournois": {
+        "id": 12904,
+        "name": "Coup Sournois",
+        "description": "Occasionne des dommages Feu aux ennemis et repousse la cible."
+      },
+      "Guet-apens": {
+        "id": 12939,
+        "name": "Guet-apens",
+        "description": "Occasionne des dommages Feu aux ennemis et attire la cible vers le double du lanceur."
+      },
+      "Double": {
+        "id": 12915,
+        "name": "Double",
+        "description": "Invoque un double contrôlable qui possède les mêmes caractéristiques que l'invocateur.\nIl n'attaque pas et meurt à la fin de son troisième tour en échangeant de position avec son invocateur."
+      },
+      "Comploteur": {
+        "id": 12936,
+        "name": "Comploteur",
+        "description": "Invoque un double contrôlable qui possède les mêmes caractéristiques que l'invocateur.\nIl n'attaque pas et meurt à la fin de son troisième tour en occasionnant des dommages dans le meilleur élément d'attaque du lanceur aux entités à son contact.\nLes dommages à la mort du Comploteur augmentent pour chaque piège déclenché du lanceur."
+      },
+      "Piège Fangeux": {
+        "id": 12916,
+        "name": "Piège Fangeux",
+        "description": "Pose un piège qui occasionne des dommages Eau.\nSoigne les alliés à hauteur de 50% des dommages occasionnés à l'entité qui le déclenche dans une zone de 2 cases autour d'elle."
+      },
+      "Larcin": {
+        "id": 12937,
+        "name": "Larcin",
+        "description": "Vole de la Chance et occasionne des dommages Eau en zone.\nN'affecte pas le lanceur."
+      },
+      "Piège de Masse": {
+        "id": 12920,
+        "name": "Piège de Masse",
+        "description": "Pose un piège mono-cellule qui occasionne des dommages Terre dans une zone de 3 cases.\nN'affecte pas l'allié qui déclenche le piège."
+      },
+      "Extorsion": {
+        "id": 12938,
+        "name": "Extorsion",
+        "description": "Vole de la Force et occasionne des dommages Terre."
+      },
+      "Cruauté": {
+        "id": 12919,
+        "name": "Cruauté",
+        "description": "Occasionne des dommages Eau et donne 1 PM au lanceur."
+      },
+      "Piège de Dérive": {
+        "id": 12942,
+        "name": "Piège de Dérive",
+        "description": "Pose un piège qui occasionne des dommages Feu aux ennemis et repousse les entités depuis le centre de la zone."
+      },
+      "Piège Funeste": {
+        "id": 12948,
+        "name": "Piège Funeste",
+        "description": "Pose un piège qui occasionne des dommages Terre.\nLes dommages du sort sont augmentés pour chaque ennemi dans une zone de 2 cases autour du piège."
+      },
+      "Épidémie": {
+        "id": 12943,
+        "name": "Épidémie",
+        "description": "Applique un poison Air de fin de tour sur l'ennemi ciblé.\nÀ la fin de son tour, propage le poison sur les ennemis dans une zone de 2 cases autour de lui.\n\nLe double du lanceur peut servir de cible pour propager le poison.\n\nLes effets ne peuvent pas être désenvoûtés."
+      },
+      "Piège d'Immobilisation": {
+        "id": 12910,
+        "name": "Piège d'Immobilisation",
+        "description": "Pose un piège qui retire des PM aux ennemis en zone."
+      },
+      "Fosse Commune": {
+        "id": 14314,
+        "name": "Fosse Commune",
+        "description": "Pose un piège mono-cellule qui applique l'état Pesanteur dans une zone de 2 cases."
+      },
+      "Fourvoiement": {
+        "id": 12909,
+        "name": "Fourvoiement",
+        "description": "Érode les cibles et occasionne des dommages Air en zone.\nN'affecte pas le lanceur."
+      },
+      "Injection Toxique": {
+        "id": 12940,
+        "name": "Injection Toxique",
+        "description": "Applique un poison Air de début de tour. \nLe temps de relance du sort est réduit pour chaque piège déclenché du lanceur."
+      },
+      "Piège Insidieux": {
+        "id": 12918,
+        "name": "Piège Insidieux",
+        "description": "Pose un piège mono-cellule qui pose un glyphe de fin de tour sur une zone de 3 cases qui occasionne des dommages Air aux ennemis."
+      },
+      "Arnaque": {
+        "id": 12911,
+        "name": "Arnaque",
+        "description": "Vole de l'Agilité et occasionne des dommages Air."
+      },
+      "Peur": {
+        "id": 12908,
+        "name": "Peur",
+        "description": "Pousse la cible jusqu'à la case ciblée."
+      },
+      "Méprise": {
+        "id": 12945,
+        "name": "Méprise",
+        "description": "Échange les positions de la cible et du double du lanceur.\nDissipe l'invisibilité du lanceur."
+      },
+      "Concentration de Chakra": {
+        "id": 12903,
+        "name": "Concentration de Chakra",
+        "description": "Pendant 1 tour, vole de la vie dans le meilleur élément d'attaque du lanceur à chaque fois que la cible subit un piège Sram du lanceur.\nDissipe l'invisibilité du lanceur.\n\nLes effets ne peuvent pas être désenvoûtés."
+      },
+      "Manigance": {
+        "id": 14741,
+        "name": "Manigance",
+        "description": "Augmente la Fuite et les Dommages de l'allié ciblé."
+      },
+      "Attaque Mortelle": {
+        "id": 12917,
+        "name": "Attaque Mortelle",
+        "description": "Occasionne des dommages Terre.\nLes dommages sont plus importants sur les cibles ayant moins de 25% de leurs points de vie."
+      },
+      "Effraction": {
+        "id": 14742,
+        "name": "Effraction",
+        "description": "Occasionne des dommages Feu et réduit les Résistances Poussée."
+      },
+      "Dérobade": {
+        "id": 14312,
+        "name": "Dérobade",
+        "description": "Rend Intaclable l'allié ciblé.\nPendant 1 tour, si l'allié ciblé subit des dommages en mêlée :\n• Se fait pousser par son attaquant\n• Augmente ses PM\n• Le rend invisible\n\nLe lanceur ne peut pas déclencher les effets du sort sur lui-même avec ses pièges."
+      },
+      "Marque Mortuaire": {
+        "id": 14313,
+        "name": "Marque Mortuaire",
+        "description": "Érode la cible.\nL'Érosion est plus importante selon le nombre de pièges déclenchés du lanceur.\nDissipe l'invisibilité du lanceur."
+      },
+      "Piège à Fragmentation": {
+        "id": 12941,
+        "name": "Piège à Fragmentation",
+        "description": "Pose un piège mono-cellule qui occasionne des dommages Feu dans une zone de 3 cases.\nLes dommages sont plus importants selon la distance avec le centre de la zone d'effet.\nN'affecte pas l'allié qui déclenche le piège."
+      },
+      "Fourberie": {
+        "id": 12905,
+        "name": "Fourberie",
+        "description": "Vole de l'Intelligence et occasionne des dommages Feu en zone.\nN'affecte pas le lanceur."
+      },
+      "Pillage": {
+        "id": 12934,
+        "name": "Pillage",
+        "description": "Vole de la vie dans l'élément Eau.\nSoigne les alliés à hauteur de 50% des dommages occasionnés à l'ennemi ciblé dans une zone de 2 cases autour de lui. N'affecte pas le lanceur."
+      },
+      "Calamité": {
+        "id": 12950,
+        "name": "Calamité",
+        "description": "Pose un piège mono-cellule qui occasionne des dommages Eau et retire de la Fuite aux ennemis dans une zone d'une case en carré."
+      },
+      "Piège Mortel": {
+        "id": 12921,
+        "name": "Piège Mortel",
+        "description": "Occasionne des dommages Terre.\nLes dommages sont plus importants sur les entités ayant moins de 25% de leurs points de vie."
+      },
+      "Perfidie": {
+        "id": 12949,
+        "name": "Perfidie",
+        "description": "Occasionne des dommages Terre.\nLe coût en PA du sort est réduit pour chaque piège déclenché du lanceur.\nLes effets sont retirés après utilisation du sort."
+      },
+      "Piège Scélérat": {
+        "id": 12931,
+        "name": "Piège Scélérat",
+        "description": "Pose un piège mono-cellule qui attire les entités vers son centre et occasionne des dommages Eau aux ennemis dans une zone de 3 cases en croix."
+      },
+      "Perquisition": {
+        "id": 12947,
+        "name": "Perquisition",
+        "description": "Repousse la cible et vole de la vie dans l'élément Eau aux ennemis.\nSoigne les alliés à hauteur de 50% des dommages occasionnés à l'ennemi ciblé dans une zone de 2 cases autour de lui. N'affecte pas le lanceur."
+      }
+    },
+    "accountId": "TheGrinder"
   }
 }

@@ -256,9 +256,9 @@ class GameServerApproachFrame(Frame):
                 flashKeyMsg = ClientKeyMessage()
                 flashKeyMsg.init(InterClientManager().flashKey)
                 connh.ConnectionsHandler.getConnection().send(flashKeyMsg)
-            if self._cssmsg is not None:
-                PlayedCharacterManager().infos = self._cssmsg.infos
-                DataStoreType.CHARACTER_ID = str(self._cssmsg.infos.id)
+            self._cssmsg = cssmsg
+            PlayedCharacterManager().infos = self._cssmsg.infos
+            DataStoreType.CHARACTER_ID = str(self._cssmsg.infos.id)
             krnl.Kernel().getWorker().removeFrame(self)
             gccrmsg = GameContextCreateRequestMessage()
             connh.ConnectionsHandler.getConnection().send(gccrmsg)

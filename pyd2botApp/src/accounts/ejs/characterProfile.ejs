@@ -26,24 +26,43 @@
                     <img src="<%=accounts.getClassIcon(accounts.selectedCharacterKey)%>" width="200" height="200">
                     <div>
                         <h><%= selectedCharacter.name%></h>
-                        <p><%= accounts.breedName[selectedCharacter.breedId]%></p>
+                        <h2><%= selectedCharacter.breedName%> lvl <%= selectedCharacter.level%></h2>
                     </div>
                 </div>
                 <div class="characterProfileSection">
                     <h>General</h>
-                    <hr size="8" width="90%" color="red">  
-                    <label>name : </label>
-                    <label>breed : </label>
-                    <label>serverId : </label>
-                    <label>account : </label>
+                    <hr size="8" width="90%" color="red"> 
+                    <div class="myform-group">
+                        <label>name :</label> 
+                        <label><%= selectedCharacter.name%>
+                    </div>
+                    <div class="myform-group">
+                        <label>breed :</label> 
+                        <label><%= selectedCharacter.breedName%></label>
+                    </div>
+                    <div class="myform-group">
+                        <label>server :</label> 
+                        <label><%= selectedCharacter.serverName%></label>
+                    </div>
+                    <div class="myform-group">
+                        <label>account :</label> 
+                        <label><%= selectedCharacter.accountId%></label>
+                    </div>
                 </div>
                 <div class="characterProfileSection">
                     <h>Fight</h>
-                    <hr size="8" width="90%" color="red">  
-                    <label>primary spell : </label>
+                    <hr size="8" width="70%" color="red">
+                    <div class="myform-group">
+                        <label>primary spell : </label>
+                        <select id="spellId" value='<%=selectedCharacter.primarySpell ? selectedCharacter.primarySpell.name : ""%>'>
+                            <% Object.entries(selectedCharacter.spells).forEach(([key, spell]) => { %>
+                            <option value="<%=spell.id%>"><%=spell.name%></option>
+                            <% }) %>
+                        </select>
+                    </div>
                 </div>
                 <div class="characterProfileSection">
-                    <h>RolePlay</h>
+                    <h>Roleplay</h>
                     <hr size="8" width="90%" color="red">  
                     <label>primary stat : </label>
                 </div>

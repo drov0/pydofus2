@@ -33,7 +33,7 @@ const createWindow = () => {
     });
 
     // and load the index.html of the app.
-    mainWindow.loadURL(sessionsManager.urls.newSessionUrl);
+    mainWindow.loadURL(sessionsManager.urls.manageSessionsUrl);
 
     // To maximize the window
     mainWindow.maximize();
@@ -77,28 +77,7 @@ ipcMain.on("hideUnhidePassword", (event, key) => {
 });
 
 ipcMain.on("fetchCharacters", (event, key) => {
-    instancesManager.spawnServer(key);
-    console.log("fetchCharacters " + key);
-    setTimeout(() => {
-        var client = instancesManager.spawnClient(key);
-        var creds = accountManager.getAccountCreds(key);
-        client.fetchAccountCharacters(creds.login, creds.password, creds.certId.toString(), creds.certHash, function(err, response) {
-            if (err) {
-                console.log("Error while callling fetch : " + err);
-            }
-            console.log("fetched characters : " + JSON.stringify(response));
-            instancesManager.killInstance(key);
-            response.forEach(character => {
-                accountManager.addCharacter({
-                    "characterName": character.name,
-                    "accountId": key,
-                    "characterId": parseFloat(character.id),
-                    "serverId": parseInt(character.serverId)
-                });
-            });
-            accountManager.saveCharacters();
-        });
-    }, 5000);
+    accountManager.fetchCharacters(key);
 });
 
 
@@ -143,29 +122,12 @@ ipcMain.on("cancelCreatePath", (event, args) => {
 });
 
 // sessions ipc handling
-ipcMain.on("runSession", (event, key) => {
-    instancesManager.spawnServer(key);
-    console.log("fetchCharacters " + key);
-    setTimeout(() => {
-        var client = instancesManager.spawnClient(key);
-        var creds = accountManager.getAccountCreds(key);
-        client.runSession(creds.login, creds.password, creds.certId.toString(), creds.certHash, function(err, response) {
-            if (err) {
-                console.log("Error while callling fetch : " + err);
-            }
-            console.log("fetched characters : " + JSON.stringify(response));
-            instancesManager.killInstance(key);
-            response.forEach(character => {
-                accountManager.addCharacter({
-                    "characterName": character.name,
-                    "accountId": key,
-                    "characterId": parseFloat(character.id),
-                    "serverId": parseInt(character.serverId)
-                });
-            });
-            accountManager.saveCharacters();
-        });
-    }, 5000);
+ipcMain.on("runSession", (event, sessionkey) => {
+    sessionsManager.runSession(sessionkey);
+});
+
+ipcMain.on("stopSession", (event, sessionkey) => {
+    sessionsManager.stopSession(sessionkey);
 });
 
 ipcMain.on("createSession", (event, newSession) => {

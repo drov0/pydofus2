@@ -3,7 +3,7 @@ const child_process = require('child_process');
 const process = require('process');
 const thrift = require('thrift');
 const Pyd2botService = require('../pyd2botService/Pyd2botService.js');
-
+const ejse = require('ejs-electron')
 
 class InstancesManager {
 
@@ -16,30 +16,27 @@ class InstancesManager {
         this.pyd2botExePath = path.join(process.env.AppData, 'pyd2bot', 'pyd2bot.exe');
         this.runningInstances = {};
         this.freePorts = Array(100).fill().map((element, index) => index + 9999);
+        ejse.data('runningInstances', this.runningInstances);
     }
 
     spawnClient(instanceId) {
-        if (this.runningInstances[instanceId]) {
-            var inst = this.runningInstances[instanceId];
-            var transport = thrift.TBufferedTransport;
-            var protocol = thrift.TBinaryProtocol;
-            var connection = thrift.createConnection("127.0.0.1", inst.port, {
-                transport : transport,
-                protocol : protocol
-            });
-            connection.on('error', function(err) {
-                console.log("Error in client : " + err);
-            });
-            var client = thrift.createClient(Pyd2botService, connection);
-            if (inst.connection) {
-                inst.connection.end();
-            }
-            inst.connection = connection;
-            inst.client = client;
-            return client;
-        }
-        console.log("No server for Instance " + instanceId + " found");
-        return null;
+        // var inst = this.runningInstances[instanceId];
+        var transport = thrift.TBufferedTransport;
+        var protocol = thrift.TBinaryProtocol;
+        var connection = thrift.createConnection("127.0.0.1", "9999", {
+            transport : transport,
+            protocol : protocol
+        });
+        connection.on('error', function(err) {
+            console.log("Error in client : " + err);
+        });
+        var client = thrift.createClient(Pyd2botService, connection);
+        // if (inst.connection) {
+        //     inst.connection.end();
+        // }
+        // inst.connection = connection;
+        // inst.client = client;
+        return client;
     }
 
     spawnServer(instanceId) {

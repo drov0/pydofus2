@@ -136,6 +136,8 @@ class ItemWrapper(Item, ISlotData, ICellZoneProvider, IDataCenter):
     experiencePoints: int = 0
 
     evolutiveLevel: int = 0
+    
+    dropPriority: int = 0
 
     def __init__(self):
         self.effects = list["EffectInstance"]()
@@ -150,6 +152,7 @@ class ItemWrapper(Item, ISlotData, ICellZoneProvider, IDataCenter):
         quantity: int,
         newEffects: list[ObjectEffect],
         useCache: bool = True,
+        dropPriotrity: int = 0,
     ) -> "ItemWrapper":
         item: ItemWrapper = None
         effect: "EffectInstance" = None
@@ -174,11 +177,10 @@ class ItemWrapper(Item, ISlotData, ICellZoneProvider, IDataCenter):
             item = cachedItem
         item._nameWithoutAccent = StringUtils.noAccent(refItem.name)
         item.effectsList = newEffects
-        item.isPresetobject = objectGID == DataEnum.ITEM_GID_PRESET_SHORTCUT
+        item.isPresetobject = (objectGID == DataEnum.ITEM_GID_PRESET_SHORTCUT)
         if item.objectGID != objectGID:
             item._uri = None
             item._uriPngMode = None
-
         refItem.copy(refItem, item)
         item.position = position
         item.objectGID = objectGID
@@ -192,7 +194,8 @@ class ItemWrapper(Item, ISlotData, ICellZoneProvider, IDataCenter):
         item.updateEffects(newEffects)
         for effect in item.effects:
             if effect.effectId == ActionIds.ACTION_SUPERFOOD_EXPERIENCE:
-                item.givenExperienceAsSuperFood += effect
+                item.givenExperienceAsSuperFood += effect.value
+        item.dropPriority = dropPriotrity
         return item
 
     def createFromServer(self, itemFromServer: ObjectItem, useCache: bool = True) -> "ItemWrapper":

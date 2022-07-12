@@ -180,7 +180,7 @@ var Pyd2botService_runSession_args = function(args) {
   this.password = null;
   this.certId = null;
   this.certHash = null;
-  this.sessionId = null;
+  this.sessionJson = null;
   if (args) {
     if (args.login !== undefined && args.login !== null) {
       this.login = args.login;
@@ -194,8 +194,8 @@ var Pyd2botService_runSession_args = function(args) {
     if (args.certHash !== undefined && args.certHash !== null) {
       this.certHash = args.certHash;
     }
-    if (args.sessionId !== undefined && args.sessionId !== null) {
-      this.sessionId = args.sessionId;
+    if (args.sessionJson !== undefined && args.sessionJson !== null) {
+      this.sessionJson = args.sessionJson;
     }
   }
 };
@@ -240,7 +240,7 @@ Pyd2botService_runSession_args.prototype.read = function(input) {
       break;
       case 5:
       if (ftype == Thrift.Type.STRING) {
-        this.sessionId = input.readString();
+        this.sessionJson = input.readString();
       } else {
         input.skip(ftype);
       }
@@ -276,9 +276,9 @@ Pyd2botService_runSession_args.prototype.write = function(output) {
     output.writeString(this.certHash);
     output.writeFieldEnd();
   }
-  if (this.sessionId !== null && this.sessionId !== undefined) {
-    output.writeFieldBegin('sessionId', Thrift.Type.STRING, 5);
-    output.writeString(this.sessionId);
+  if (this.sessionJson !== null && this.sessionJson !== undefined) {
+    output.writeFieldBegin('sessionJson', Thrift.Type.STRING, 5);
+    output.writeString(this.sessionJson);
     output.writeFieldEnd();
   }
   output.writeFieldStop();
@@ -383,7 +383,7 @@ Pyd2botServiceClient.prototype.recv_fetchAccountCharacters = function(input,mtyp
   return callback('fetchAccountCharacters failed: unknown result');
 };
 
-Pyd2botServiceClient.prototype.runSession = function(login, password, certId, certHash, sessionId, callback) {
+Pyd2botServiceClient.prototype.runSession = function(login, password, certId, certHash, sessionJson, callback) {
   this._seqid = this.new_seqid();
   if (callback === undefined) {
     var _defer = Q.defer();
@@ -394,22 +394,22 @@ Pyd2botServiceClient.prototype.runSession = function(login, password, certId, ce
         _defer.resolve(result);
       }
     };
-    this.send_runSession(login, password, certId, certHash, sessionId);
+    this.send_runSession(login, password, certId, certHash, sessionJson);
     return _defer.promise;
   } else {
     this._reqs[this.seqid()] = callback;
-    this.send_runSession(login, password, certId, certHash, sessionId);
+    this.send_runSession(login, password, certId, certHash, sessionJson);
   }
 };
 
-Pyd2botServiceClient.prototype.send_runSession = function(login, password, certId, certHash, sessionId) {
+Pyd2botServiceClient.prototype.send_runSession = function(login, password, certId, certHash, sessionJson) {
   var output = new this.pClass(this.output);
   var params = {
     login: login,
     password: password,
     certId: certId,
     certHash: certHash,
-    sessionId: sessionId
+    sessionJson: sessionJson
   };
   var args = new Pyd2botService_runSession_args(params);
   try {
@@ -490,5 +490,5 @@ Pyd2botServiceProcessor.prototype.process_runSession = function(seqid, input, ou
   var args = new Pyd2botService_runSession_args();
   args.read(input);
   input.readMessageEnd();
-  this._handler.runSession(args.login, args.password, args.certId, args.certHash, args.sessionId);
+  this._handler.runSession(args.login, args.password, args.certId, args.certHash, args.sessionJson);
 };

@@ -1,3 +1,4 @@
+import json
 from thrift import Thrift
 from thrift.transport import TSocket
 from thrift.transport import TTransport
@@ -11,6 +12,40 @@ if __name__ == '__main__':
     protocol = TBinaryProtocol.TBinaryProtocol(transport)
     client = Pyd2botService.Client(protocol)
     transport.open()
-    recv = client.fetchAccountCharacters('aloone-100', 'rmrtxha1', '126200687', '7f5bc8707c07b2d86303c608c6b80c5abd7c64df2f26e11569c51b9bc9094f45')
+    session = {
+        "name":"sadida-leader",
+        "characterId":336986964178,
+        "spellId":13516,
+        "pathId":"pioute_astrub_village",
+        "followers":["Moneydicer"],
+        "statToUp":10,
+        "isLeader":True,
+        "character":{
+            "characterName":"Plusbellelavie",
+            "accountId":"melanco-lalco",
+            "characterId":336986964178,
+            "serverId":210
+        },
+        "path":{
+            "type":"RandomSubAreaFarmPath",
+            "name":"pioute_astrub_village",
+            "subAreaId":95,
+            "startVertex":{
+                "mapId":191104002,
+                "mapRpZone":1
+            },
+            "fightOnly":True,
+            "monsterLvlCoefDiff":3,
+            "jobIds":[]
+        }
+    }
+    sessionStr = json.dumps(session)
+    recv = client.runSession(
+        "maniac.depressif@gmail.com", 
+        "5hgCd.JMUVwxK-s", 
+        "126142784", 
+        "aed578dee4dbb4aec9ddab79dedb14b91ed5c40313e846e1fb80616051f39aa5",
+        sessionStr
+    )
     print(recv)
     transport.close()

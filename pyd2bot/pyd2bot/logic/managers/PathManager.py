@@ -32,6 +32,13 @@ class PathManager:
                 return pathCls.from_json(pathJson)
             raise Exception("Unknown path type: " + pathJson["type"])
         return None
+    
+    @classmethod
+    def from_json(cls, json_obj):
+        pathCls = cls._pathClass.get(json_obj["type"])
+        if pathCls:
+            return pathCls.from_json(json_obj)
+        raise Exception("Unknown path type: " + json_obj["type"])
 
 
 if __name__ == "__main__":

@@ -20,6 +20,10 @@ function runSession(key) {
     ipc.send('runSession', key)
 }
 
+function stopSession(key) {
+    ipc.send('stopSession', key)
+}
+
 function createSession() {
     let newSession = {
         "name": document.getElementById("name").value,

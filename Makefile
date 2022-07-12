@@ -4,6 +4,7 @@ DOFUS_SRC = $(CURDIR)/protocolBuilder/sources
 SELECTCLASS = com.ankamagames.dofus.BuildInfos,com.ankamagames.dofus.network.++,com.ankamagames.jerakine.network.++
 PYDOFUS_DIR = $(CURDIR)/pydofus2
 PYD2BOT_DIR = $(CURDIR)/pyd2bot
+PYD2BOTAPP_DIR = $(CURDIR)/pyd2botApp
 PYD2BOT_DIST_DIR = "$(APPDATA)"/pyd2bot/
 
 .ONESHELL:
@@ -73,7 +74,7 @@ rebuild:
 
 serve:
 	source .venv/Scripts/activate
-	python $(CURDIR)/pyd2bot/pyd2bot/thriftServer/pyd2botServer.py
+	python $(CURDIR)/pyd2bot/pyd2bot.py
 
 testClient:
 	source .venv/Scripts/activate
@@ -82,3 +83,9 @@ testClient:
 run:
 	cd pyd2botApp
 	npm start
+
+gen-thrift:
+	@$(PYD2BOT_DIR)/pyd2bot/thriftServer/thrift-0.16.0.exe -r --gen js:node $(PYD2BOT_DIR)/pyd2bot/thriftServer/pyd2botService.thrift
+	mv gen-nodejs pyd2botService
+	rm -rf $(PYD2BOTAPP_DIR)/src/pyd2botService
+	mv pyd2botService $(PYD2BOTAPP_DIR)/src/

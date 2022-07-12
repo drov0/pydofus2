@@ -44,59 +44,55 @@ class PakProtocol2:
         self.indexes = None
         self.streams = None
         self._loaded = False
-        nextFilePath = filePath
         # Load the D2P
-        while nextFilePath is not None and nextFilePath.exists():
-            print("-------------------------------------------------")
-            print("working on file {}".format(nextFilePath))
-            fs = BinaryStream(nextFilePath.open("rb"), True)
-            vMax = fs.readUnsignedByte()
-            vMin = fs.readUnsignedByte()
-            if vMax != 2 or vMin != 1:
-                raise InvalidD2PFile("Invalid d2p file header.") 
-            print("vMin: ", vMin, "vMax : ", vMax)        
-            fs.seek(-24, 2)  # Set position to end - 24 bytes
+        print("-------------------------------------------------")
+        print("working on file {}".format(filePath))
+        fs = BinaryStream(filePath.open("rb"), True)
+        vMax = fs.readUnsignedByte()
+        vMin = fs.readUnsignedByte()
+        if vMax != 2 or vMin != 1:
+            raise InvalidD2PFile("Invalid d2p file header.") 
+        print("vMin: ", vMin, "vMax : ", vMax)        
+        fs.seek(-24, 2)  # Set position to end - 24 bytes
 
-            self.dataOffset = fs.readUnsignedInt()
-            self.dataCount = fs.readUnsignedInt()
-            self.indexOffset = fs.readUnsignedInt()
-            self.indexCount = fs.readUnsignedInt()
-            self.propertiesOffset = fs.readUnsignedInt()
-            self.propertiesCount = fs.readUnsignedInt()
-            print("dataOffset: ", self.dataOffset, "dataCount : ", self.dataCount)
-            print("indexOffset: ", self.indexOffset, "indexCount : ", self.indexCount)
-            print("propertiesOffset: ", self.propertiesOffset, "propertiesCount : ", self.propertiesCount)
-            if ((self.dataOffset == b"" or self.dataCount == b"" or
-                self.indexOffset == b"" or self.indexCount == b"" or
-                self.propertiesOffset == b"" or self.propertiesCount == b"")):
-                raise InvalidD2PFile("The file doesn't match the D2P pattern.")
+        self.dataOffset = fs.readUnsignedInt()
+        self.dataCount = fs.readUnsignedInt()
+        self.indexOffset = fs.readUnsignedInt()
+        self.indexCount = fs.readUnsignedInt()
+        self.propertiesOffset = fs.readUnsignedInt()
+        self.propertiesCount = fs.readUnsignedInt()
+        print("dataOffset: ", self.dataOffset, "dataCount : ", self.dataCount)
+        print("indexOffset: ", self.indexOffset, "indexCount : ", self.indexCount)
+        print("propertiesOffset: ", self.propertiesOffset, "propertiesCount : ", self.propertiesCount)
+        if ((self.dataOffset == b"" or self.dataCount == b"" or
+            self.indexOffset == b"" or self.indexCount == b"" or
+            self.propertiesOffset == b"" or self.propertiesCount == b"")):
+            raise InvalidD2PFile("The file doesn't match the D2P pattern.")
 
-            # Read properties
-            print("reading properties")
-            fs.seek(self.propertiesOffset, 0)
-            self.properties = OrderedDict()
-            filePath = nextFilePath
-            nextFilePath = None
-            for _ in range(self.propertiesCount):
-                try:
-                    propertyName = fs.readUTF("latin1")
-                    propertyValue = fs.readUTF("latin1")
-                    if propertyName == "link":
-                        nextFilePath = filePath.parent / propertyValue
-                    self.properties[propertyName] = propertyValue
-                except Exception as e:
-                    print("Error while reading properties: ", e)
+        # Read properties
+        print("reading properties")
+        fs.seek(self.propertiesOffset, 0)
+        self.properties = OrderedDict()
+        filePath = filePath
+        filePath = None
+        for _ in range(self.propertiesCount):
+            try:
+                propertyName = fs.readUTF()
+                propertyValue = fs.readUTF()
+                self.properties[propertyName] = propertyValue
+            except Exception as e:
+                print("Error while reading properties: ", e)
 
-            # Read indexes
-            fs.seek(self.indexOffset, 0)
-            self.indexes = OrderedDict[str, Index]()
-            for _ in range(self.indexCount):
-                filePath = fs.readUTF()
-                fileOffset = fs.readInt()
-                fileLength = fs.readInt()
-                if filePath == b"" or fileOffset == b"" or fileLength == b"":
-                    raise InvalidD2PFile("The file appears to be corrupt.")
-                self.indexes[filePath] = Index(fileOffset + self.dataOffset, fileLength, fs)
+        # Read indexes
+        fs.seek(self.indexOffset, 0)
+        self.indexes = OrderedDict[str, Index]()
+        for _ in range(self.indexCount):
+            filePath = fs.readUTF()
+            fileOffset = fs.readInt()
+            fileLength = fs.readInt()
+            if filePath == b"" or fileOffset == b"" or fileLength == b"":
+                raise InvalidD2PFile("The file appears to be corrupt.")
+            self.indexes[filePath] = Index(fileOffset + self.dataOffset, fileLength, fs)
 
     def iterStreams(self):
         for filePath, index in self.indexes.items():

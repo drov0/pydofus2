@@ -11,6 +11,7 @@ from pydofus2.com.ankamagames.dofus.logic.game.common.managers.PlayedCharacterMa
 from pydofus2.com.ankamagames.dofus.network.enums.AggressableStatusEnum import (
     AggressableStatusEnum,
 )
+from pydofus2.com.ankamagames.jerakine.data.I18n import I18n
 from pydofus2.com.ankamagames.jerakine.interfaces.IDataCenter import IDataCenter
 
 

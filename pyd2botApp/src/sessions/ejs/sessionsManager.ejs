@@ -27,6 +27,7 @@
                     <th scope="col">spellId</th>
                     <th scope="col">pathId</th>
                     <th scope="col">statToUp</th>
+                    <th scope="col">status</th>
                 </thead>
                 <tbody>
                     <% Object.entries(sessions.sessionsDB).forEach(([key, session])=> {%>
@@ -36,14 +37,23 @@
                         <td><%=session.spellId%></td>
                         <td><%=session.pathId%></td>
                         <td><%=session.statToUp%></td>
+                        <% if (runningInstances[key]) {%>
+                            <td>running</td>
+                        <% } else {%>
+                            <td>idle</td>
+                        <% } %>
                         <td>
                             <div class="dropdown">
                                 <a class="btn btn-secondary dropdown-toggle" href="#" role="button" id="dropdownMenuLink" data-bs-toggle="dropdown" aria-expanded="false">
                                 </a>
                                 <ul class="dropdown-menu" aria-labelledby="dropdownMenuLink">
-                                  <li><a class="dropdown-item" href="#" onclick="editSession('<%=key%>')">edit</a></li>
-                                  <li><a class="dropdown-item" href="#" onclick="deleteSession('<%=key%>')">delete</a></li>
-                                  <li><a class="dropdown-item" href="#" onclick="runSession('<%=key%>')">run</a></li>
+                                    <li><a class="dropdown-item" href="#" onclick="editSession('<%=key%>')">edit</a></li>
+                                    <li><a class="dropdown-item" href="#" onclick="deleteSession('<%=key%>')">delete</a></li>
+                                    <% if (runningInstances[key]) {%>
+                                        <li><a class="dropdown-item" href="#" onclick="stopSession('<%=key%>')">stop</a></li>
+                                    <% } else {%>
+                                        <li><a class="dropdown-item" href="#" onclick="runSession('<%=key%>')">run</a></li>
+                                    <% } %>
                                 </ul>
                             </div>
                         </td>

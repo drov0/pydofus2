@@ -11,7 +11,7 @@ patterns = {
     "^\n?(\s*)(?:public|override) (?:static|public) function get(\S+)s\(\)\s*:\s*Array\n?\s*{\n?\s*return\s*GameData\.getObjects\(\s*MODULE\s*\)\s*;\n?\s*}\n?$$": r"\n\1@classmethod\1def get\2s(cls) -> list['\2']:\1\treturn GameData.getObjects(cls.MODULE)\n",
     "for each\((\S+) in (.*)\)": r"for \1 in \2:",
     "\((\S+) as (\S+)\)": r"\1",
-    "^\s*from pydofus2.com.ankamagames.jerakine.logger.Log import Log": "",
+    "^\s*from com.ankamagames.jerakine.logger.Log import Log": "",
     "^\s*import com.ankamagames.jerakine.logger.Logger;": "from pydofus2.com.ankamagames.jerakine.logger.Logger import Logger",
     "package \S+\n?": "",
     "String\((.*?)\)": r"str(\1)",
@@ -337,5 +337,5 @@ ROOTDIR = pathlib.Path(os.path.dirname(__file__))
 # )
 
 t = perf_counter()
-parseFile(ROOTDIR / "target.as", ROOTDIR / "PartyManagementFrame.py")
+parseFile(ROOTDIR / "target.as", ROOTDIR / "SmileyPack.py")
 print("parsing took:", perf_counter() - t)

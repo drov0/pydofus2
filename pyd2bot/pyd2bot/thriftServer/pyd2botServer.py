@@ -1,6 +1,8 @@
 from asyncio.log import logger
+import json
 from time import perf_counter, sleep
 from pyd2bot.thriftServer.pyd2botService.ttypes import Character
+
 
 
 class Pyd2botServer:
@@ -55,15 +57,18 @@ class Pyd2botServer:
         dofus2.shutdown()
         return result
         
-    def runSession(self, login:str, password:str, certId:str, certHash:str, sessionId:str) -> None:
+    def runSession(self, login:str, password:str, certId:str, certHash:str, sessionJson:str) -> None:
         from pydofus2.com.ankamagames.jerakine.logger.Logger import Logger
-        Logger.prefix = login
+        session = json.loads(sessionJson)
+        Logger.prefix = session["name"]
         from pydofus2.com.ankamagames.haapi.Haapi import Haapi
         from pydofus2.com.DofusClient import DofusClient
-        SessionManager().load(sessionId)
-        Logger.character = SessionManager().characterId
+        from pyd2bot.logic.common.frames.BotWorkflowFrame import BotWorkflowFrame
+        from pyd2bot.logic.managers.SessionManager import SessionManager
+        SessionManager().load(sessionJson)
         dofus2 = DofusClient()
         dofus2.registerFrame(BotWorkflowFrame())
-        dofus2.login(SessionManager().loginToken, SessionManager().character["serverId"], SessionManager().character["characterId"])
+        loginToken = Haapi().getLoginToken(login, password, certId, certHash)
+        dofus2.login(loginToken, SessionManager().character["serverId"], SessionManager().character["characterId"])
         dofus2.join()
 

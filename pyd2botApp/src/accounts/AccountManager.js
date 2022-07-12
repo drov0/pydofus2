@@ -4,8 +4,8 @@ const ejse = require('ejs-electron')
 globalThis.window = {};
 const JSEncrypt = require('jsencrypt')
 const AuthHelper = require("../auth/AuthHelper.js");
-
-
+const InstancesManager = require("../bot/InstancesManager.js");
+const instancesManager = InstancesManager.instance;
 
 class AccountManager {
     static get instance() {
@@ -156,5 +156,29 @@ class AccountManager {
         }
     }
 
+    fetchCharacters(key) {
+        instancesManager.spawnServer(key);
+        console.log("fetchCharacters " + key);
+        setTimeout(() => {
+            var client = instancesManager.spawnClient(key);
+            var creds = this.getAccountCreds(key);
+            client.fetchAccountCharacters(creds.login, creds.password, creds.certId.toString(), creds.certHash, function(err, response) {
+                if (err) {
+                    console.log("Error while callling fetch : " + err);
+                }
+                console.log("fetched characters : " + JSON.stringify(response));
+                instancesManager.killInstance(key);
+                response.forEach(character => {
+                    this.addCharacter({
+                        "characterName": character.name,
+                        "accountId": key,
+                        "characterId": parseFloat(character.id),
+                        "serverId": parseInt(character.serverId)
+                    });
+                });
+                this.saveCharacters();
+            });
+        }, 5000);
+    }
 }
 module.exports = AccountManager;

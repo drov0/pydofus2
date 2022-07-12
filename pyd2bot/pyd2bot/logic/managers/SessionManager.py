@@ -27,11 +27,6 @@ class SessionMonitor(threading.Thread):
 
 
 class SessionManager(metaclass=Singleton):
-    if not os.path.exists(SESSIONDB):
-        with open(SESSIONDB, "w") as fp:
-            json.dump({}, fp)
-    with open(SESSIONDB, "r") as fp:
-        _db = json.load(fp)
     characterId: str = None
     creds: dict = None
     spellId: int = None
@@ -48,23 +43,21 @@ class SessionManager(metaclass=Singleton):
     def generateLoginToken(self, login, password, certId, certHash):
         self.loginToken = Haapi().getLoginToken(login, password, certId, certHash)
         
-    def load(self, sessionId: str):
-        sessionJson = self._db.get(sessionId)
-        if not sessionJson:
-            raise ValueError(f"No session with id {sessionId}")
-        self.characterId = sessionJson.get("characterId")
-        self.character = CharactersManager.getEntry(str(self.characterId))
-        self.spellId = sessionJson.get("spellId")
-        self.pathId = sessionJson.get("pathId")
+    def load(self, sessionstr: str):
+        sessionJson = json.loads(sessionstr)
+        self.characterId : str = sessionJson.get("characterId")
+        self.character : str = sessionJson.get("character")
+        self.spellId : str = sessionJson.get("spellId")
+        self.pathId : str = sessionJson.get("pathId")
         self.statToUp: int = sessionJson.get("statToUp")
         self.isLeader: bool = sessionJson.get("isLeader")
         logger.debug(f"is leader {self.isLeader}")
         self.followers: list[str] = sessionJson.get("followers")
         self.leaderName: str = sessionJson.get("leaderName")
         if self.isLeader is not None:
-            if not self.pathId:
+            if "path" not in sessionJson:
                 raise ValueError("A leader must have a definded path")
-            self.path = PathManager.getPath(str(self.pathId))
+            self.path = PathManager.from_json(sessionJson["path"])
             if self.followers is None:
                 logger.warn("No followers for leader")
         else:

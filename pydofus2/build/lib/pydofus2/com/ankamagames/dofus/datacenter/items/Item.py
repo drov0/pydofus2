@@ -275,6 +275,8 @@ class Item(IPostInit, IDataCenter):
 
     @classmethod
     def getItemById(cls, id: int, returnDefaultItemIfNull: bool = True) -> "Item":
+        if type(id) is not int:
+            raise TypeError("id must be an int")
         item: Item = GameData.getObject(cls.MODULE, id)
         if item or not returnDefaultItemIfNull:
             return item

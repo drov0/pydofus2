@@ -6,16 +6,13 @@ ejse.data('sidebarUrl', path.join(__dirname, 'ejs', 'sidebar.ejs'));
 ejse.data('cssUrl', "file://" + path.join(__dirname, 'assets', 'css'));
 ejse.data('persistenceDir', path.join(__dirname, '..', '..', 'pyd2botDB'))
 ejse.data('pyd2botDir', )
+ejse.data('appDir', path.join(__dirname));
 const mainUrl = "file://" + path.join(__dirname, 'ejs', 'main.ejs')
-const PathsManager = require('./paths/PathManager.js');
-const AccountManager = require("./accounts/AccountManager.js");
-const InstancesManager = require("./bot/InstancesManager.js");
-const SessionsManager = require("./sessions/SessionsManager.js");
+const pathsManager = require('./paths/PathManager.js').instance;
+const accountManager = require("./accounts/AccountManager.js").instance;
+const sessionsManager = require("./sessions/SessionsManager.js").instance;
 let mainWindow;
-const accountManager = AccountManager.instance;
-const instancesManager = InstancesManager.instance;
-const pathsManager = PathsManager.instance;
-const sessionsManager = SessionsManager.instance;
+
 // Handle creating/removing shortcuts on Windows when installing/uninstalling.
 if (require('electron-squirrel-startup')) {
     // eslint-disable-line global-require
@@ -33,7 +30,7 @@ const createWindow = () => {
     });
 
     // and load the index.html of the app.
-    mainWindow.loadURL(sessionsManager.urls.manageSessionsUrl);
+    mainWindow.loadURL(accountManager.urls.manageCharactersUrl);
 
     // To maximize the window
     mainWindow.maximize();
@@ -54,11 +51,11 @@ ipcMain.on("newAccount", (event, formData) => {
 
 ipcMain.on("editAccount", (event, key) => {
     account = accountManager.accountsDB[key]
-    ejse.data('currentEditedAccount', { 
+    accountManager.currentEditedAccount = { 
         "id" : key, 
         "login" : account.login,
         "password" : accountManager.getAccountPassword(key)	
-    });
+    }
     mainWindow.loadURL(accountManager.urls.newAccountUrl);
 });
 
@@ -96,6 +93,16 @@ ipcMain.on("deleteCharacter", (event, key) => {
     mainWindow.loadURL(accountManager.urls.manageCharactersUrl);
 });
 
+ipcMain.on("goToCharacterProfile", (event, key) => {
+    accountManager.selectedCharacterKey = key;
+    mainWindow.loadURL(accountManager.urls.characterProfileUrl);
+});
+
+ipcMain.on("cancelCharacterProfileEdit", (event, args) => {
+    accountManager.selectedCharacterKey = null;
+    mainWindow.loadURL(accountManager.urls.manageCharactersUrl);
+});
+
 // paths ipc handling
 ipcMain.on("createPath", (event, newPath) => {
     pathsManager.createPath(newPath);
@@ -124,10 +131,13 @@ ipcMain.on("cancelCreatePath", (event, args) => {
 // sessions ipc handling
 ipcMain.on("runSession", (event, sessionkey) => {
     sessionsManager.runSession(sessionkey);
+    mainWindow.loadURL(sessionsManager.urls.manageSessionsUrl);
 });
 
 ipcMain.on("stopSession", (event, sessionkey) => {
     sessionsManager.stopSession(sessionkey);
+    mainWindow.loadURL(sessionsManager.urls.manageSessionsUrl);
+
 });
 
 ipcMain.on("createSession", (event, newSession) => {

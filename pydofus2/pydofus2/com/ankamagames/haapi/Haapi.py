@@ -26,7 +26,7 @@ class Haapi(metaclass=Singleton):
             "password": password,
             "game_id": game_id,
             "long_life_token": True,
-            "certificate_id": certId,
+            "certificate_id": str(certId),
             "certificate_hash": str(certHash),
             "shop_key": "ZAAP",
             "payment_mode": "OK",
@@ -86,5 +86,5 @@ class Haapi(metaclass=Singleton):
                     sleep(60)
             except KeyError as e:
                 logger.error("Error while calling HAAPI to get Login Token")
-                logger.error(response)
+                logger.error(response.content)
                 raise Exception(e)

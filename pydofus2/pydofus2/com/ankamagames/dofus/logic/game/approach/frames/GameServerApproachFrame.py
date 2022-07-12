@@ -4,6 +4,8 @@ from pydofus2.com.ankamagames.dofus.logic.game.common.frames.AveragePricesFrame 
 from pydofus2.com.ankamagames.dofus.logic.game.common.frames.InventoryManagementFrame import InventoryManagementFrame
 from pydofus2.com.ankamagames.dofus.logic.game.common.frames.JobsFrame import JobsFrame
 from pydofus2.com.ankamagames.dofus.logic.game.common.frames.SpellInventoryManagementFrame import SpellInventoryManagementFrame
+from pydofus2.com.ankamagames.dofus.logic.game.common.managers.FeatureManager import FeatureManager
+from pydofus2.com.ankamagames.dofus.network.enums.GameServerTypeEnum import GameServerTypeEnum
 from pydofus2.com.ankamagames.jerakine.benchmark.BenchmarkTimer import BenchmarkTimer
 import time
 from pydofus2.com.ankamagames.dofus.internalDatacenter.connection.BasicCharacterWrapper import (
@@ -180,10 +182,26 @@ class GameServerApproachFrame(Frame):
 
         elif isinstance(msg, CharactersListMessage):
             clmsg = msg
-            self._charactersList = list[BasicCharacterWrapper]()
-            for chi in clmsg.characters:
-                self._charactersList.append(chi)
-            PlayerManager().charactersList = self._charactersList
+            self._charactersList = clmsg.characters
+            server = PlayerManager().server;
+            if FeatureManager().isFeatureWithKeywordEnabled("server.heroic") or server.gameTypeId == GameServerTypeEnum.SERVER_TYPE_EPIC:
+                for chi in clmsg.characters:
+                    if chi.deathMaxLevel > chi.level:
+                        bonusXp = 6
+                    else:
+                        bonusXp = 3
+                    o = BasicCharacterWrapper.create(chi.id,chi.name,chi.level,chi.entityLook,chi.breed,chi.sex,chi.deathState,chi.deathCount,chi.deathMaxLevel,bonusXp,False);
+                    PlayerManager().charactersList.append(o)
+            else:
+                bonusXpFeatureActivated = FeatureManager().isFeatureWithKeywordEnabled("character.xp.bonusForYoungerCharacters")
+                for cbi in clmsg.characters:
+                    bonusXp = 1
+                    if bonusXpFeatureActivated:
+                        for cbi2 in clmsg.characters:
+                            if cbi2.id != cbi.id and cbi2.level > cbi.level and bonusXp < 4: 
+                                bonusXp += 1
+                    o = BasicCharacterWrapper.create(cbi.id,cbi.name,cbi.level,cbi.entityLook,cbi.breed,cbi.sex,0,0,0,bonusXp, False)
+                    PlayerManager().charactersList.append(o)
             if PlayerManager().allowAutoConnectCharacter:
                 characterId = PlayerManager().autoConnectOfASpecificCharacterId
                 krnl.Kernel().getWorker().process(CharacterSelectionAction.create(characterId, False))

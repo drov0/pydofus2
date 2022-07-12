@@ -200,6 +200,6 @@ class GameDataQuery:
                 gameDataobjectName = gameDataobject.__name__
                 if gameDataobjectName == className:
                     return GameDataField.getobjectByName(gameDataobjectName)
-        elif moduleName.find("com.ankamagames.dofus.datacenter") != 0:
+        elif moduleName.find("pydofus2.com.ankamagames.dofus.datacenter") != 0:
             raise Exception(target.__name__ + " is queryable (note found in datacenter package).")
         return target

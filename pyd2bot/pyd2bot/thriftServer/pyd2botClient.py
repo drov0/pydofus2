@@ -40,12 +40,18 @@ if __name__ == '__main__':
         }
     }
     sessionStr = json.dumps(session)
-    recv = client.runSession(
+    recv = client.fetchAccountCharacters(
         "maniac.depressif@gmail.com", 
         "5hgCd.JMUVwxK-s", 
-        "126142784", 
-        "aed578dee4dbb4aec9ddab79dedb14b91ed5c40313e846e1fb80616051f39aa5",
-        sessionStr
+        126142784, 
+        "aed578dee4dbb4aec9ddab79dedb14b91ed5c40313e846e1fb80616051f39aa5"
     )
+    # recv = client.runSession(
+    #     "maniac.depressif@gmail.com", 
+    #     "5hgCd.JMUVwxK-s", 
+    #     126142784, 
+    #     "aed578dee4dbb4aec9ddab79dedb14b91ed5c40313e846e1fb80616051f39aa5",
+    #     sessionStr
+    # )
     print(recv)
     transport.close()

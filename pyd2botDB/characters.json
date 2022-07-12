@@ -9,7 +9,14 @@
     "characterName": "Melanco-lalco",
     "accountId": "melanco-lalco",
     "characterId": 336597024978,
-    "serverId": 210
+    "serverId": 210,
+    "breedId": 1,
+    "fight" : {
+        "spellId": ""
+    },
+    "roleplay": {
+        "statToUp": ""
+    }
   },
   "336919789778": {
     "characterName": "Moneslicer",

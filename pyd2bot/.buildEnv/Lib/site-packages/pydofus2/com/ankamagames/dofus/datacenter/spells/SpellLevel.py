@@ -74,7 +74,7 @@ class SpellLevel(ICellZoneProvider, IDataCenter):
 
     playAnimation: bool
 
-    statesRequired: list[int]
+    stateCriterion : str
 
     statesAuthorized: list[int]
 

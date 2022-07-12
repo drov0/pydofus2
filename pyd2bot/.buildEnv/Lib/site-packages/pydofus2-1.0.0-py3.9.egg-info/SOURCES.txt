@@ -76,6 +76,7 @@ pydofus2/com/ankamagames/dofus/datacenter/breeds/__init__.py
 pydofus2/com/ankamagames/dofus/datacenter/characteristics/Characteristic.py
 pydofus2/com/ankamagames/dofus/datacenter/characteristics/__init__.py
 pydofus2/com/ankamagames/dofus/datacenter/communication/NamingRule.py
+pydofus2/com/ankamagames/dofus/datacenter/communication/SmileyPack.py
 pydofus2/com/ankamagames/dofus/datacenter/communication/__init__.py
 pydofus2/com/ankamagames/dofus/datacenter/effects/Effect.py
 pydofus2/com/ankamagames/dofus/datacenter/effects/EffectInstance.py
@@ -175,6 +176,7 @@ pydofus2/com/ankamagames/dofus/datacenter/items/criterion/SmileyPackItemCriterio
 pydofus2/com/ankamagames/dofus/datacenter/items/criterion/SoulStoneItemCriterion.py
 pydofus2/com/ankamagames/dofus/datacenter/items/criterion/SpecializationItemCriterion.py
 pydofus2/com/ankamagames/dofus/datacenter/items/criterion/SpellItemCriterion.py
+pydofus2/com/ankamagames/dofus/datacenter/items/criterion/StateCriterion.py
 pydofus2/com/ankamagames/dofus/datacenter/items/criterion/StaticCriterionItemCriterion.py
 pydofus2/com/ankamagames/dofus/datacenter/items/criterion/SubareaItemCriterion.py
 pydofus2/com/ankamagames/dofus/datacenter/items/criterion/SubscribeItemCriterion.py

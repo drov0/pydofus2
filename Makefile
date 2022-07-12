@@ -85,7 +85,11 @@ run:
 	npm start
 
 gen-thrift:
-	@$(PYD2BOT_DIR)/pyd2bot/thriftServer/thrift-0.16.0.exe -r --gen js:node $(PYD2BOT_DIR)/pyd2bot/thriftServer/pyd2botService.thrift
-	mv gen-nodejs pyd2botService
-	rm -rf $(PYD2BOTAPP_DIR)/src/pyd2botService
-	mv pyd2botService $(PYD2BOTAPP_DIR)/src/
+	@cd $(PYD2BOT_DIR)/pyd2bot/thriftServer
+	@./thrift-0.16.0.exe -r --gen js:node $(PYD2BOT_DIR)/pyd2bot/thriftServer/pyd2botService.thrift
+	@mv gen-nodejs pyd2botService
+	@rm -rf $(PYD2BOTAPP_DIR)/src/pyd2botService
+	@mv pyd2botService $(PYD2BOTAPP_DIR)/src/
+	@./thrift-0.16.0.exe -r --gen py $(PYD2BOT_DIR)/pyd2bot/thriftServer/pyd2botService.thrift
+	@mv gen-py/pyd2botService/ ./
+	@rm -rd gen-py

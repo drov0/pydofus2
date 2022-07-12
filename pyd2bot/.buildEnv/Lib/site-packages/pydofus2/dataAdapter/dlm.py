@@ -36,7 +36,6 @@ class DLM:
             self.encrypted = dlm_raw.readbool()
             self.encryptionVersion = dlm_raw.readByte()
             self.dataLen = dlm_raw.readInt()
-
             if self.encrypted:
                 logger.debug(f"Map is encrypted with version {self.encryptionVersion}")
                 if not self._key:
@@ -49,8 +48,8 @@ class DLM:
                     )
                 cleanData = io.BytesIO(decryptedData)
                 raw = BinaryStream(cleanData, True)
-        else:
-            raw = dlm_raw        
+            else:
+                raw = dlm_raw      
         map = Map(raw, id, map_version)
         dlm_uncompressed.close()
         del dlm_raw

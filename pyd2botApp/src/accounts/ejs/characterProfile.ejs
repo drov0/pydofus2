@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html>
+
+    <head>
+        <meta charset="UTF-8" />
+        <title>Grider</title>
+        <!-- Bootstrap CSS -->
+        <link rel="stylesheet" href="<%= nodeModulesUrl + '/bootstrap/dist/css/bootstrap.min.css'%>" />
+        <!-- Custom CSS -->
+        <link rel="stylesheet" href="<%= cssUrl + '/main.css'%>"/>
+        <!-- Bootstrap Optional JavaScript -->
+        <!-- jQuery first, then Popper.js, then Bootstrap JS -->
+        <script>let $ = require('jquery');</script>
+        <script>require('popper');</script>
+        <script>require('bootstrap');</script>
+        <script defer src="render.js"></script>
+    </head>
+
+<body>
+    <div class="wrapper">
+        <%- include(sidebarUrl, {active: 'characters' }) %>
+        <% var selectedCharacter = accounts.charactersDB[accounts.selectedCharacterKey]%>
+        <div class="bodyRightView">
+            <div class="characterProfileContainer">
+                <div class="characterProfileHeader">
+                    <img src="<%=accounts.getClassIcon(accounts.selectedCharacterKey)%>" width="200" height="200">
+                    <div>
+                        <h><%= selectedCharacter.name%></h>
+                        <p><%= accounts.breedName[selectedCharacter.breedId]%></p>
+                    </div>
+                </div>
+                <div class="characterProfileSection">
+                    <h>General</h>
+                    <hr size="8" width="90%" color="red">  
+                    <label>name : </label>
+                    <label>breed : </label>
+                    <label>serverId : </label>
+                    <label>account : </label>
+                </div>
+                <div class="characterProfileSection">
+                    <h>Fight</h>
+                    <hr size="8" width="90%" color="red">  
+                    <label>primary spell : </label>
+                </div>
+                <div class="characterProfileSection">
+                    <h>RolePlay</h>
+                    <hr size="8" width="90%" color="red">  
+                    <label>primary stat : </label>
+                </div>
+
+                <div class="managerBottomButtonsBar">
+                    <button class="btn btn-primary" onclick="saveCharacterProfile()">save</button>
+                    <button class="btn btn-primary" onclick="cancelCharacterProfileEdit()">cancel</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+
+</html>

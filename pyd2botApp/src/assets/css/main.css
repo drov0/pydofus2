@@ -160,3 +160,29 @@ ul ul a {
     padding: 5%;
     align-items: center;
 }
+.characterProfileHeader {
+    display: flex;
+    flex-direction: row;
+}
+
+.characterProfileHeader h {
+    font-size: 50px;
+}
+.characterProfileContainer {
+    color: #fff;
+    justify-content: start;
+    display: flex;
+    border-radius: 25px;
+    align-items: left;
+    flex-direction: column;
+    padding: 0%;
+    margin: 0%;
+    width: 100%;
+    row-gap: 20px;
+    position: relative;
+}
+
+.characterProfileSection {
+    display: flex;
+    flex-direction: column;
+}

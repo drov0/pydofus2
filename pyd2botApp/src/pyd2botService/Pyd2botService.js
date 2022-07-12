@@ -60,8 +60,8 @@ Pyd2botService_fetchAccountCharacters_args.prototype.read = function(input) {
       }
       break;
       case 3:
-      if (ftype == Thrift.Type.STRING) {
-        this.certId = input.readString();
+      if (ftype == Thrift.Type.I32) {
+        this.certId = input.readI32();
       } else {
         input.skip(ftype);
       }
@@ -95,8 +95,8 @@ Pyd2botService_fetchAccountCharacters_args.prototype.write = function(output) {
     output.writeFieldEnd();
   }
   if (this.certId !== null && this.certId !== undefined) {
-    output.writeFieldBegin('certId', Thrift.Type.STRING, 3);
-    output.writeString(this.certId);
+    output.writeFieldBegin('certId', Thrift.Type.I32, 3);
+    output.writeI32(this.certId);
     output.writeFieldEnd();
   }
   if (this.certHash !== null && this.certHash !== undefined) {
@@ -225,8 +225,8 @@ Pyd2botService_runSession_args.prototype.read = function(input) {
       }
       break;
       case 3:
-      if (ftype == Thrift.Type.STRING) {
-        this.certId = input.readString();
+      if (ftype == Thrift.Type.I32) {
+        this.certId = input.readI32();
       } else {
         input.skip(ftype);
       }
@@ -267,8 +267,8 @@ Pyd2botService_runSession_args.prototype.write = function(output) {
     output.writeFieldEnd();
   }
   if (this.certId !== null && this.certId !== undefined) {
-    output.writeFieldBegin('certId', Thrift.Type.STRING, 3);
-    output.writeString(this.certId);
+    output.writeFieldBegin('certId', Thrift.Type.I32, 3);
+    output.writeI32(this.certId);
     output.writeFieldEnd();
   }
   if (this.certHash !== null && this.certHash !== undefined) {

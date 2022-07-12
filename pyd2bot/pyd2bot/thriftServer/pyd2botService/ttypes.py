@@ -21,15 +21,21 @@ class Character(object):
     Attributes:
      - name
      - id
+     - breedId
+     - breedName
      - serverId
+     - serverName
 
     """
 
 
-    def __init__(self, name=None, id=None, serverId=None,):
+    def __init__(self, name=None, id=None, breedId=None, breedName=None, serverId=None, serverName=None,):
         self.name = name
         self.id = id
+        self.breedId = breedId
+        self.breedName = breedName
         self.serverId = serverId
+        self.serverName = serverName
 
     def read(self, iprot):
         if iprot._fast_decode is not None and isinstance(iprot.trans, TTransport.CReadableTransport) and self.thrift_spec is not None:
@@ -46,13 +52,28 @@ class Character(object):
                 else:
                     iprot.skip(ftype)
             elif fid == 2:
-                if ftype == TType.STRING:
-                    self.id = iprot.readString().decode('utf-8', errors='replace') if sys.version_info[0] == 2 else iprot.readString()
+                if ftype == TType.DOUBLE:
+                    self.id = iprot.readDouble()
                 else:
                     iprot.skip(ftype)
             elif fid == 3:
+                if ftype == TType.I32:
+                    self.breedId = iprot.readI32()
+                else:
+                    iprot.skip(ftype)
+            elif fid == 4:
                 if ftype == TType.STRING:
-                    self.serverId = iprot.readString().decode('utf-8', errors='replace') if sys.version_info[0] == 2 else iprot.readString()
+                    self.breedName = iprot.readString().decode('utf-8', errors='replace') if sys.version_info[0] == 2 else iprot.readString()
+                else:
+                    iprot.skip(ftype)
+            elif fid == 5:
+                if ftype == TType.I32:
+                    self.serverId = iprot.readI32()
+                else:
+                    iprot.skip(ftype)
+            elif fid == 6:
+                if ftype == TType.STRING:
+                    self.serverName = iprot.readString().decode('utf-8', errors='replace') if sys.version_info[0] == 2 else iprot.readString()
                 else:
                     iprot.skip(ftype)
             else:
@@ -70,12 +91,24 @@ class Character(object):
             oprot.writeString(self.name.encode('utf-8') if sys.version_info[0] == 2 else self.name)
             oprot.writeFieldEnd()
         if self.id is not None:
-            oprot.writeFieldBegin('id', TType.STRING, 2)
-            oprot.writeString(self.id.encode('utf-8') if sys.version_info[0] == 2 else self.id)
+            oprot.writeFieldBegin('id', TType.DOUBLE, 2)
+            oprot.writeDouble(self.id)
+            oprot.writeFieldEnd()
+        if self.breedId is not None:
+            oprot.writeFieldBegin('breedId', TType.I32, 3)
+            oprot.writeI32(self.breedId)
+            oprot.writeFieldEnd()
+        if self.breedName is not None:
+            oprot.writeFieldBegin('breedName', TType.STRING, 4)
+            oprot.writeString(self.breedName.encode('utf-8') if sys.version_info[0] == 2 else self.breedName)
             oprot.writeFieldEnd()
         if self.serverId is not None:
-            oprot.writeFieldBegin('serverId', TType.STRING, 3)
-            oprot.writeString(self.serverId.encode('utf-8') if sys.version_info[0] == 2 else self.serverId)
+            oprot.writeFieldBegin('serverId', TType.I32, 5)
+            oprot.writeI32(self.serverId)
+            oprot.writeFieldEnd()
+        if self.serverName is not None:
+            oprot.writeFieldBegin('serverName', TType.STRING, 6)
+            oprot.writeString(self.serverName.encode('utf-8') if sys.version_info[0] == 2 else self.serverName)
             oprot.writeFieldEnd()
         oprot.writeFieldStop()
         oprot.writeStructEnd()
@@ -97,8 +130,11 @@ all_structs.append(Character)
 Character.thrift_spec = (
     None,  # 0
     (1, TType.STRING, 'name', 'UTF8', None, ),  # 1
-    (2, TType.STRING, 'id', 'UTF8', None, ),  # 2
-    (3, TType.STRING, 'serverId', 'UTF8', None, ),  # 3
+    (2, TType.DOUBLE, 'id', None, None, ),  # 2
+    (3, TType.I32, 'breedId', None, None, ),  # 3
+    (4, TType.STRING, 'breedName', 'UTF8', None, ),  # 4
+    (5, TType.I32, 'serverId', None, None, ),  # 5
+    (6, TType.STRING, 'serverName', 'UTF8', None, ),  # 6
 )
 fix_spec(all_structs)
 del all_structs

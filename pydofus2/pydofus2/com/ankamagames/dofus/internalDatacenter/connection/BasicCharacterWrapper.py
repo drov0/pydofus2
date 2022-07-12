@@ -1,3 +1,4 @@
+from pydofus2.com.ankamagames.dofus.datacenter.breeds.Breed import Breed
 from pydofus2.com.ankamagames.dofus.network.types.game.look.EntityLook import EntityLook
 from pydofus2.com.ankamagames.jerakine.interfaces.IDataCenter import IDataCenter
 
@@ -24,13 +25,14 @@ class BasicCharacterWrapper(IDataCenter):
 
     unusable: bool
 
-    # _breed:Breed
+    _breed:Breed
 
     def __init__(self):
         super().__init__()
 
+    @classmethod
     def create(
-        self,
+        cls,
         id: float,
         name: str,
         level: int,
@@ -43,12 +45,12 @@ class BasicCharacterWrapper(IDataCenter):
         bonusXp: int = 0,
         unusable: bool = False,
     ) -> "BasicCharacterWrapper":
-        obj: BasicCharacterWrapper = BasicCharacterWrapper()
+        obj: BasicCharacterWrapper = cls()
         obj.id = id
         obj.name = name
         obj.level = level
         obj.breedId = breed
-        # obj._breed = Breed.getBreedById(obj.breedId)
+        obj._breed = Breed.getBreedById(obj.breedId)
         obj.sex = sex
         obj.deathState = deathState
         obj.deathCount = deathCount
@@ -57,11 +59,11 @@ class BasicCharacterWrapper(IDataCenter):
         obj.unusable = unusable
         return obj
 
-    # @property
-    # def breed(self) -> Breed:
-    #    if not self._breed:
-    #       self._breed = Breed.getBreedById(self.breedId)
-    #    return self._breed
+    @property
+    def breed(self) -> Breed:
+       if not self._breed:
+          self._breed = Breed.getBreedById(self.breedId)
+       return self._breed
 
     def __str__(self) -> str:
-        return "[BasicCharacterWrapper#" + self.id + "_" + self.name + "]"
+        return f"[BasicCharacterWrapper#{self.id}_{self.name}]"

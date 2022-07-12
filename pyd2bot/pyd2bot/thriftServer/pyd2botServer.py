@@ -51,7 +51,8 @@ class Pyd2botServer:
                     if perf_counter() - start > timeout:
                         raise TimeoutError("timeout")
                 for character in PlayerManager().charactersList:
-                    result.append(Character(character.name, str(character.id), str(server.id)))
+                    print(character.name, character.id, character.breedId, character.breed.name, server.id, PlayerManager().server.name)
+                    result.append(Character(character.name, character.id, character.breedId, server.id))
             else:
                 logger.debug(f"Server {server.id} not online but has status {ServerStatusEnum(server.status).name}.")
         dofus2.shutdown()

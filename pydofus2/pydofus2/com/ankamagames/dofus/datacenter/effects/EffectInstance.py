@@ -104,7 +104,7 @@ class EffectInstance(IDataCenter):
 
     _category: int = -2
 
-    _description: str = "None"
+    _description: str = UNDEFINED_DESCRIPTION
 
     _theoricDescription: str = "None"
 
@@ -125,12 +125,12 @@ class EffectInstance(IDataCenter):
 
     @property
     def description(self) -> str:
-        #  if self._description == self.UNDEFINED_DESCRIPTION:
+        # if self._description == self.UNDEFINED_DESCRIPTION:
         #     if not self._effectData:
-        #        self._effectData = Effect.getEffectById(self.effectId)
+        #         self._effectData = Effect.getEffectById(self.effectId)
         #     if not self._effectData:
-        #        self._description = None
-        #        return None
+        #         self._description = None
+        #         return None
         #     self._description = self.prepareDescription(self._effectData.description, self.effectId)
         return self._description
 

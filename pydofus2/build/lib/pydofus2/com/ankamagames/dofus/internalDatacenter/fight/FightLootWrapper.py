@@ -15,15 +15,16 @@ class FightLootWrapper(IDataCenter):
     def __init__(self, loot: FightLoot):
         super().__init__()
         self.objects = list()
-        for i in range(0, len(loot.objects), 2):
+        for reward in loot.objects:
             self.objects.append(
                 ItemWrapper.create(
                     63,
                     0,
-                    loot.objects[i],
-                    loot.objects[i + 1],
+                    reward.objectId,
+                    reward.quantity,
                     list[ObjectEffect](),
                     False,
+                    reward.priorityHint
                 )
             )
         self.kamas = loot.kamas

@@ -16,26 +16,34 @@ class InstancesManager {
         this.pyd2botExePath = path.join(process.env.AppData, 'pyd2bot', 'pyd2bot.exe');
         this.runningInstances = {};
         this.freePorts = Array(100).fill().map((element, index) => index + 9999);
+        this.wantsToKillServer = {};
+        this.wantsToKillClient = {};
         ejse.data('runningInstances', this.runningInstances);
     }
 
     spawnClient(instanceId) {
-        // var inst = this.runningInstances[instanceId];
+        var inst = this.runningInstances[instanceId];
         var transport = thrift.TBufferedTransport;
         var protocol = thrift.TBinaryProtocol;
-        var connection = thrift.createConnection("127.0.0.1", "9999", {
+        var connection = thrift.createConnection("127.0.0.1", inst.port, {
             transport : transport,
             protocol : protocol
         });
         connection.on('error', function(err) {
-            console.log("Error in client : " + err);
+            if (this.wantsToKillClient[instanceId]) {
+                this.wantsToKillClient[instanceId] = false;
+            }
+            else {
+                console.log("Error in client : " + err);
+            }
         });
         var client = thrift.createClient(Pyd2botService, connection);
-        // if (inst.connection) {
-        //     inst.connection.end();
-        // }
-        // inst.connection = connection;
-        // inst.client = client;
+        if (inst.connection) {
+            this.wantsToKillClient[instanceId] = true;
+            inst.connection.end();
+        }
+        inst.connection = connection;
+        inst.client = client;
         return client;
     }
 
@@ -44,13 +52,23 @@ class InstancesManager {
         var instance = child_process.execFile(this.pyd2botExePath, ['--host', '0.0.0.0', '--port', port],
             (error, stdout, stderr) => {
                 if (error) {
-                    console.log("Error while spawning server : " + error);
+                    if (this.wantsToKillServer[instanceId]) {
+                        this.wantsToKillServer[instanceId] = false;
+                    }
+                    else {
+                        console.log("Error while spawning server : " + error);
+                    }
                 }
                 if (stdout) {
                     console.log("Server stdout : " + stdout);
                 }
                 if (stderr) {
-                    console.log("Server stderr : " + stderr);
+                    if (this.wantsToKillServer[instanceId]) {
+                        this.wantsToKillServer[instanceId] = false;
+                    }
+                    else {
+                        console.log("Server stderr : " + stderr);
+                    }
                 }
             }
         );
@@ -66,12 +84,17 @@ class InstancesManager {
 
     killInstance(instanceId) {
         if (this.runningInstances[instanceId]) {
+            
+            
             var i = this.runningInstances[instanceId]
             if (i.connection) {
+                console.log("Killing client for instance " + instanceId);
+                this.wantsToKillClient[instanceId] = true;
                 i.connection.end();
             }
             if (i.server) {
                 console.log("Killing server for instance " + instanceId);
+                this.wantsToKillServer[instanceId] = true;
                 i.server.kill()
             }
             this.freePorts.push(i.port);

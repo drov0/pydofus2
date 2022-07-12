@@ -30,14 +30,14 @@ class Iface(object):
         """
         pass
 
-    def runSession(self, login, password, certId, certHash, sessionId):
+    def runSession(self, login, password, certId, certHash, sessionJson):
         """
         Parameters:
          - login
          - password
          - certId
          - certHash
-         - sessionId
+         - sessionJson
 
         """
         pass
@@ -88,26 +88,26 @@ class Client(Iface):
             return result.success
         raise TApplicationException(TApplicationException.MISSING_RESULT, "fetchAccountCharacters failed: unknown result")
 
-    def runSession(self, login, password, certId, certHash, sessionId):
+    def runSession(self, login, password, certId, certHash, sessionJson):
         """
         Parameters:
          - login
          - password
          - certId
          - certHash
-         - sessionId
+         - sessionJson
 
         """
-        self.send_runSession(login, password, certId, certHash, sessionId)
+        self.send_runSession(login, password, certId, certHash, sessionJson)
 
-    def send_runSession(self, login, password, certId, certHash, sessionId):
+    def send_runSession(self, login, password, certId, certHash, sessionJson):
         self._oprot.writeMessageBegin('runSession', TMessageType.ONEWAY, self._seqid)
         args = runSession_args()
         args.login = login
         args.password = password
         args.certId = certId
         args.certHash = certHash
-        args.sessionId = sessionId
+        args.sessionJson = sessionJson
         args.write(self._oprot)
         self._oprot.writeMessageEnd()
         self._oprot.trans.flush()
@@ -169,7 +169,7 @@ class Processor(Iface, TProcessor):
         args.read(iprot)
         iprot.readMessageEnd()
         try:
-            self._handler.runSession(args.login, args.password, args.certId, args.certHash, args.sessionId)
+            self._handler.runSession(args.login, args.password, args.certId, args.certHash, args.sessionJson)
         except TTransport.TTransportException:
             raise
         except Exception:
@@ -215,8 +215,8 @@ class fetchAccountCharacters_args(object):
                 else:
                     iprot.skip(ftype)
             elif fid == 3:
-                if ftype == TType.STRING:
-                    self.certId = iprot.readString().decode('utf-8', errors='replace') if sys.version_info[0] == 2 else iprot.readString()
+                if ftype == TType.I32:
+                    self.certId = iprot.readI32()
                 else:
                     iprot.skip(ftype)
             elif fid == 4:
@@ -243,8 +243,8 @@ class fetchAccountCharacters_args(object):
             oprot.writeString(self.password.encode('utf-8') if sys.version_info[0] == 2 else self.password)
             oprot.writeFieldEnd()
         if self.certId is not None:
-            oprot.writeFieldBegin('certId', TType.STRING, 3)
-            oprot.writeString(self.certId.encode('utf-8') if sys.version_info[0] == 2 else self.certId)
+            oprot.writeFieldBegin('certId', TType.I32, 3)
+            oprot.writeI32(self.certId)
             oprot.writeFieldEnd()
         if self.certHash is not None:
             oprot.writeFieldBegin('certHash', TType.STRING, 4)
@@ -271,7 +271,7 @@ fetchAccountCharacters_args.thrift_spec = (
     None,  # 0
     (1, TType.STRING, 'login', 'UTF8', None, ),  # 1
     (2, TType.STRING, 'password', 'UTF8', None, ),  # 2
-    (3, TType.STRING, 'certId', 'UTF8', None, ),  # 3
+    (3, TType.I32, 'certId', None, None, ),  # 3
     (4, TType.STRING, 'certHash', 'UTF8', None, ),  # 4
 )
 
@@ -353,17 +353,17 @@ class runSession_args(object):
      - password
      - certId
      - certHash
-     - sessionId
+     - sessionJson
 
     """
 
 
-    def __init__(self, login=None, password=None, certId=None, certHash=None, sessionId=None,):
+    def __init__(self, login=None, password=None, certId=None, certHash=None, sessionJson=None,):
         self.login = login
         self.password = password
         self.certId = certId
         self.certHash = certHash
-        self.sessionId = sessionId
+        self.sessionJson = sessionJson
 
     def read(self, iprot):
         if iprot._fast_decode is not None and isinstance(iprot.trans, TTransport.CReadableTransport) and self.thrift_spec is not None:
@@ -385,8 +385,8 @@ class runSession_args(object):
                 else:
                     iprot.skip(ftype)
             elif fid == 3:
-                if ftype == TType.STRING:
-                    self.certId = iprot.readString().decode('utf-8', errors='replace') if sys.version_info[0] == 2 else iprot.readString()
+                if ftype == TType.I32:
+                    self.certId = iprot.readI32()
                 else:
                     iprot.skip(ftype)
             elif fid == 4:
@@ -396,7 +396,7 @@ class runSession_args(object):
                     iprot.skip(ftype)
             elif fid == 5:
                 if ftype == TType.STRING:
-                    self.sessionId = iprot.readString().decode('utf-8', errors='replace') if sys.version_info[0] == 2 else iprot.readString()
+                    self.sessionJson = iprot.readString().decode('utf-8', errors='replace') if sys.version_info[0] == 2 else iprot.readString()
                 else:
                     iprot.skip(ftype)
             else:
@@ -418,16 +418,16 @@ class runSession_args(object):
             oprot.writeString(self.password.encode('utf-8') if sys.version_info[0] == 2 else self.password)
             oprot.writeFieldEnd()
         if self.certId is not None:
-            oprot.writeFieldBegin('certId', TType.STRING, 3)
-            oprot.writeString(self.certId.encode('utf-8') if sys.version_info[0] == 2 else self.certId)
+            oprot.writeFieldBegin('certId', TType.I32, 3)
+            oprot.writeI32(self.certId)
             oprot.writeFieldEnd()
         if self.certHash is not None:
             oprot.writeFieldBegin('certHash', TType.STRING, 4)
             oprot.writeString(self.certHash.encode('utf-8') if sys.version_info[0] == 2 else self.certHash)
             oprot.writeFieldEnd()
-        if self.sessionId is not None:
-            oprot.writeFieldBegin('sessionId', TType.STRING, 5)
-            oprot.writeString(self.sessionId.encode('utf-8') if sys.version_info[0] == 2 else self.sessionId)
+        if self.sessionJson is not None:
+            oprot.writeFieldBegin('sessionJson', TType.STRING, 5)
+            oprot.writeString(self.sessionJson.encode('utf-8') if sys.version_info[0] == 2 else self.sessionJson)
             oprot.writeFieldEnd()
         oprot.writeFieldStop()
         oprot.writeStructEnd()
@@ -450,9 +450,9 @@ runSession_args.thrift_spec = (
     None,  # 0
     (1, TType.STRING, 'login', 'UTF8', None, ),  # 1
     (2, TType.STRING, 'password', 'UTF8', None, ),  # 2
-    (3, TType.STRING, 'certId', 'UTF8', None, ),  # 3
+    (3, TType.I32, 'certId', None, None, ),  # 3
     (4, TType.STRING, 'certHash', 'UTF8', None, ),  # 4
-    (5, TType.STRING, 'sessionId', 'UTF8', None, ),  # 5
+    (5, TType.STRING, 'sessionJson', 'UTF8', None, ),  # 5
 )
 fix_spec(all_structs)
 del all_structs

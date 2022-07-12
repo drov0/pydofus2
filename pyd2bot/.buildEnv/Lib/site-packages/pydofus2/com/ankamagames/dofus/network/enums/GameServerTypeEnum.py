@@ -1,7 +1,6 @@
-from enum import Enum
 
 
-class GameServerTypeEnum(Enum):
+class GameServerTypeEnum:
     SERVER_TYPE_UNDEFINED: int = -1
 
     SERVER_TYPE_CLASSICAL: int = 0

@@ -1,66 +1,10 @@
 {
-  "sadida-follower1": {
-    "name": "sadida-follower1",
-    "characterId": 336140370130,
-    "spellId": 13516,
-    "leaderName": "Plusbellelavie",
-    "isLeader": false,
-    "statToUp": 10
-  },
-  "sadida-follower2": {
-    "name": "sadida-follower2",
-    "characterId": 336815325394,
-    "spellId": 13516,
-    "leaderName": "Plusbellelavie",
-    "isLeader": false,
-    "statToUp": 10
-  },
-  "sadida-follower3": {
-    "name": "sadida-follower3",
-    "characterId": 336798351570,
-    "spellId": 13516,
-    "leaderName": "Plusbellelavie",
-    "isLeader": false,
-    "statToUp": 10
-  },
-  "sadida-follower4": {
-    "name": "sadida-follower4",
-    "characterId": 336919789778,
-    "spellId": 13516,
-    "leaderName": "Plusbellelavie",
-    "isLeader": false,
-    "statToUp": 10
-  },
-  "sadida-follower5": {
-    "name": "sadida-follower5",
-    "characterId": 336919855314,
-    "spellId": 13516,
-    "leaderName": "Plusbellelavie",
-    "isLeader": false,
-    "statToUp": 10
-  },
-  "sadida-follower6": {
-    "name": "sadida-follower6",
-    "characterId": 337022615762,
-    "spellId": 13516,
-    "leaderName": "Plusbellelavie",
-    "isLeader": false,
-    "statToUp": 10
-  },
-  "sadida-leader": {
+  "pioute-astrub-frarmgroup": {
     "name": "sadida-leader",
-    "characterId": 336986964178,
-    "spellId": 13516,
     "pathId": "pioute_astrub_village",
-    "followers": [
-      "Moneydicer",
-      "Maniaco-lalcolic",
-      "Them-rats",
-      "Moneslicer",
-      "Moneycreator",
-      "Hardlett"
-    ],
-    "statToUp": 10,
-    "isLeader": true
+    "leaderId" : 336986964178,
+    "followersIds": [
+        336815325394
+    ]
   }
 }

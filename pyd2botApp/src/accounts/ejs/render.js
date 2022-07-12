@@ -47,3 +47,11 @@ function deleteCharacter(key) {
 function clearCharacters() {
     ipc.send('clearCharacters')
 }
+
+function goToCharacterProfile(key) {  
+    ipc.send('goToCharacterProfile', key)
+}
+
+function cancelCharacterProfileEdit() {
+    ipc.send('cancelCharacterProfileEdit')
+}

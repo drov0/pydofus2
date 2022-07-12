@@ -49,26 +49,35 @@ class SessionsManager {
         })
     }
 
-    runSession(key) {
+    async runSession(key) {
         if (instancesManager.runningInstances[key]) {
-            
+            instancesManager.killInstance(key);
         }
-        //instancesManager.spawnServer(key);
+        instancesManager.spawnServer(key);
         console.log("running session : " + key);
-        setTimeout(() => {
-            var client = instancesManager.spawnClient(key);
-            var session = this.sessionsDB[key];
-            session.character = accountManager.charactersDB[session.characterId.toString()]
-            session.path = pathsManager.pathsDB[session.pathId]
-            var creds = accountManager.getAccountCreds(session.character.accountId);
-            var sessionStr = JSON.stringify(session);
-            console.log(creds.login, creds.password, creds.certId.toString(), creds.certHash, sessionStr);
-            client.runSession(creds.login, creds.password, creds.certId.toString(), creds.certHash, sessionStr, function(err, response) {
-                if (err) {
-                    console.log("Error while running session : " + err);
-                }
-            });
-        }, 5000);
+        var result = await (new Promise(resolve => { 
+            setTimeout(() => {
+                var client = instancesManager.spawnClient(key);
+                var session = this.sessionsDB[key];
+                session.character = accountManager.charactersDB[session.characterId.toString()]
+                session.path = pathsManager.pathsDB[session.pathId]
+                var creds = accountManager.getAccountCreds(session.character.accountId);
+                var sessionStr = JSON.stringify(session);
+                client.runSession(creds.login, creds.password, creds.certId.toString(), creds.certHash, sessionStr, function(err, response) {
+                    if (err) {
+                        resolve('start failed : ' + err);
+                    }
+                });
+                resolve('started');
+            }, 5000);
+        }));
+        if (result == 'started') {
+            return true;
+        }
+        else {
+            console.log(result);
+            return false;
+        }
     }
 
     stopSession(key) {

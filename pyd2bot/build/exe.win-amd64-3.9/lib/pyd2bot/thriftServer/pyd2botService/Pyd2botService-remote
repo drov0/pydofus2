@@ -24,8 +24,8 @@ if len(sys.argv) <= 1 or sys.argv[1] == '--help':
     print('Usage: ' + sys.argv[0] + ' [-h host[:port]] [-u url] [-f[ramed]] [-s[sl]] [-novalidate] [-ca_certs certs] [-keyfile keyfile] [-certfile certfile] function [arg1 [arg2...]]')
     print('')
     print('Functions:')
-    print('  CharacterList fetchAccountCharacters(string login, string password, string certId, string certHash)')
-    print('  void runSession(string login, string password, string certId, string certHash, string sessionId)')
+    print('  CharacterList fetchAccountCharacters(string login, string password, int certId, string certHash)')
+    print('  void runSession(string login, string password, int certId, string certHash, string sessionJson)')
     print('')
     sys.exit(0)
 
@@ -109,13 +109,13 @@ if cmd == 'fetchAccountCharacters':
     if len(args) != 4:
         print('fetchAccountCharacters requires 4 args')
         sys.exit(1)
-    pp.pprint(client.fetchAccountCharacters(args[0], args[1], args[2], args[3],))
+    pp.pprint(client.fetchAccountCharacters(args[0], args[1], eval(args[2]), args[3],))
 
 elif cmd == 'runSession':
     if len(args) != 5:
         print('runSession requires 5 args')
         sys.exit(1)
-    pp.pprint(client.runSession(args[0], args[1], args[2], args[3], args[4],))
+    pp.pprint(client.runSession(args[0], args[1], eval(args[2]), args[3], args[4],))
 
 else:
     print('Unrecognized method %s' % cmd)

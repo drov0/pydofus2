@@ -1,5 +1,7 @@
 from typing import TYPE_CHECKING
 from pydofus2.com.ankamagames.dofus.datacenter.items.Item import Item
+from pydofus2.com.ankamagames.dofus.datacenter.items.criterion.GroupItemCriterion import GroupItemCriterion
+from pydofus2.com.ankamagames.dofus.datacenter.items.criterion.ItemCriterionOperator import ItemCriterionOperator
 from pydofus2.com.ankamagames.dofus.logic.game.fight.managers.SpellModifiersManager import SpellModifiersManager
 from pydofus2.com.ankamagames.dofus.network.ProtocolConstantsEnum import ProtocolConstantsEnum
 from pydofus2.com.ankamagames.dofus.network.enums.CharacterSpellModificationTypeEnum import CharacterSpellModificationTypeEnum
@@ -243,38 +245,28 @@ class CurrentPlayedFighterManager(metaclass=Singleton):
                             "ui.fightAutomsg.spellcast.stateForbidden", [spellName, currentState.name]
                         )
                     return False
-            if spellLevel.statesForbidden and state in spellLevel.statesForbidden:
+            if currentState.preventsSpellCast:
+                if not spellLevel.statesCriterion or spellLevel.statesCriterion == "":
+                    if result:
+                        result[0] = I18n.getUiText(
+                            "ui.fightAutomsg.spellcast.stateForbidden", [spellName, currentState.name]
+                        )
+                    return False
+                criterion = GroupItemCriterion(spellLevel.statesCriterion)
+                isRequired = False
+                for requiredStateCriterion in criterion.criteria:
+                    if isinstance(requiredStateCriterion, StateCriterion) and  requiredStateCriterion.operatorText == ItemCriterionOperator.EQUAL:
+                        if int(requiredStateCriterion.criterionValue == currentState.id):
+                            isRequired = True
+                            break
+                if not isRequired:
+                    break
+            gic = GroupItemCriterion(spellLevel.statesCriterion)
+            if not gic.isRespected:
                 if result:
                     result[0] = I18n.getUiText(
-                        "ui.fightAutomsg.spellcast.stateForbidden", [spellName, currentState.name]
+                        "ui.fightAutomsg.spellcast.notAvailable", [spellName]
                     )
-                return False
-            if currentState.preventsSpellCast:
-                if not (spellLevel.statesRequired or spellLevel.statesAuthorized):
-                    if result:
-                        result[0] = I18n.getUiText(
-                            "ui.fightAutomsg.spellcast.stateForbidden", [spellName, currentState.name]
-                        )
-                    return False
-                if (
-                    not spellLevel.statesRequired
-                    or len(spellLevel.statesRequired) == 0
-                    or state not in spellLevel.statesRequired
-                ) and (
-                    not spellLevel.statesAuthorized
-                    or len(spellLevel.statesAuthorized) == 0
-                    or state not in spellLevel.statesAuthorized
-                ):
-                    if result:
-                        result[0] = I18n.getUiText(
-                            "ui.fightAutomsg.spellcast.stateForbidden", [spellName, currentState.name]
-                        )
-                    return False
-        for stateRequired in spellLevel.statesRequired:
-            if stateRequired not in states:
-                stateReq = SpellState.getSpellStateById(stateRequired)
-                if result:
-                    result[0] = I18n.getUiText("ui.fightAutomsg.spellcast.stateRequired", [spellName, stateReq.name])
                 return False
         if not spell.bypassSummoningLimit and spellLevel.canSummon and not self.canSummon():
             if result:

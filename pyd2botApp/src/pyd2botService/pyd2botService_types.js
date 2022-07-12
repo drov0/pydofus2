@@ -15,7 +15,10 @@ var ttypes = module.exports = {};
 var Character = module.exports.Character = function(args) {
   this.name = null;
   this.id = null;
+  this.breedId = null;
+  this.breedName = null;
   this.serverId = null;
+  this.serverName = null;
   if (args) {
     if (args.name !== undefined && args.name !== null) {
       this.name = args.name;
@@ -23,8 +26,17 @@ var Character = module.exports.Character = function(args) {
     if (args.id !== undefined && args.id !== null) {
       this.id = args.id;
     }
+    if (args.breedId !== undefined && args.breedId !== null) {
+      this.breedId = args.breedId;
+    }
+    if (args.breedName !== undefined && args.breedName !== null) {
+      this.breedName = args.breedName;
+    }
     if (args.serverId !== undefined && args.serverId !== null) {
       this.serverId = args.serverId;
+    }
+    if (args.serverName !== undefined && args.serverName !== null) {
+      this.serverName = args.serverName;
     }
   }
 };
@@ -47,15 +59,36 @@ Character.prototype.read = function(input) {
       }
       break;
       case 2:
-      if (ftype == Thrift.Type.STRING) {
-        this.id = input.readString();
+      if (ftype == Thrift.Type.DOUBLE) {
+        this.id = input.readDouble();
       } else {
         input.skip(ftype);
       }
       break;
       case 3:
+      if (ftype == Thrift.Type.I32) {
+        this.breedId = input.readI32();
+      } else {
+        input.skip(ftype);
+      }
+      break;
+      case 4:
       if (ftype == Thrift.Type.STRING) {
-        this.serverId = input.readString();
+        this.breedName = input.readString();
+      } else {
+        input.skip(ftype);
+      }
+      break;
+      case 5:
+      if (ftype == Thrift.Type.I32) {
+        this.serverId = input.readI32();
+      } else {
+        input.skip(ftype);
+      }
+      break;
+      case 6:
+      if (ftype == Thrift.Type.STRING) {
+        this.serverName = input.readString();
       } else {
         input.skip(ftype);
       }
@@ -77,13 +110,28 @@ Character.prototype.write = function(output) {
     output.writeFieldEnd();
   }
   if (this.id !== null && this.id !== undefined) {
-    output.writeFieldBegin('id', Thrift.Type.STRING, 2);
-    output.writeString(this.id);
+    output.writeFieldBegin('id', Thrift.Type.DOUBLE, 2);
+    output.writeDouble(this.id);
+    output.writeFieldEnd();
+  }
+  if (this.breedId !== null && this.breedId !== undefined) {
+    output.writeFieldBegin('breedId', Thrift.Type.I32, 3);
+    output.writeI32(this.breedId);
+    output.writeFieldEnd();
+  }
+  if (this.breedName !== null && this.breedName !== undefined) {
+    output.writeFieldBegin('breedName', Thrift.Type.STRING, 4);
+    output.writeString(this.breedName);
     output.writeFieldEnd();
   }
   if (this.serverId !== null && this.serverId !== undefined) {
-    output.writeFieldBegin('serverId', Thrift.Type.STRING, 3);
-    output.writeString(this.serverId);
+    output.writeFieldBegin('serverId', Thrift.Type.I32, 5);
+    output.writeI32(this.serverId);
+    output.writeFieldEnd();
+  }
+  if (this.serverName !== null && this.serverName !== undefined) {
+    output.writeFieldBegin('serverName', Thrift.Type.STRING, 6);
+    output.writeString(this.serverName);
     output.writeFieldEnd();
   }
   output.writeFieldStop();

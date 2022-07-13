@@ -134,13 +134,12 @@ ul ul a {
 }
 
 .myform-group label {
-    width: 250px;
-    float:left;
+    width: 25%;
     text-align: left;
 }
 
-.myform-group input {
-    float:right;
+.myform-group .myfg-input {
+    width: 75%;
     text-align: left;
 }
 
@@ -186,4 +185,9 @@ ul ul a {
 .characterProfileSection {
     display: flex;
     flex-direction: column;
+}
+
+.mylist-select-and-button {
+    display: flex;
+    flex-direction: row;
 }

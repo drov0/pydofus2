@@ -15,7 +15,8 @@ class SessionsManager {
         this.sessionsDB = require(this.sessionsDbFile)
         this.urls = {
             'manageSessionsUrl': "file://" + path.join(__dirname, 'ejs', 'sessionsManager.ejs'),
-            'newSessionUrl': "file://" + path.join(__dirname, 'ejs', 'newSessionForm.ejs'),
+            'farmSessionFormUrl': "file://" + path.join(__dirname, 'ejs', 'newFarmSessionForm.ejs'),
+            'fightSessionFormUrl': "file://" + path.join(__dirname, 'ejs', 'newFightSessionForm.ejs'),
         }
         this.currentEditedSession = null
         ejse.data('sessions', this);

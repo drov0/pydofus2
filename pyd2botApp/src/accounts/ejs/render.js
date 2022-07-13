@@ -1,5 +1,7 @@
 const ipc = window.require('electron').ipcRenderer;
 
+
+// accounts
 function createAccount() {
     let accountId = document.getElementById("accountId").value;
     let accountLogin = document.getElementById("accountLogin").value;
@@ -28,6 +30,7 @@ function hideUnhidePassword(key) {
     ipc.send('hideUnhidePassword', key)
 }
 
+// characters
 function saveCharacters() {
     ipc.send('saveCharacters')
 }
@@ -51,3 +54,4 @@ function goToCharacterProfile(key) {
 function cancelCharacterProfileEdit() {
     ipc.send('cancelCharacterProfileEdit')
 }
+

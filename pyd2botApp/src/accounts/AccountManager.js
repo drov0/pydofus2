@@ -60,6 +60,14 @@ class AccountManager {
             'newAccountUrl': "file://" + path.join(__dirname, 'ejs', 'newAccountForm.ejs'),
             'characterProfileUrl': "file://" + path.join(__dirname, 'ejs', 'characterProfile.ejs'),
         }
+        this.stats = {
+            "strength": 10,
+            "agility": 14,
+            "vitality": 11,
+            "intelligence": 15,
+            "wisdom": 12,
+            "chance": 13,
+        }
         ejse.data('accounts', this);
 
     }
@@ -183,7 +191,7 @@ class AccountManager {
                         character.primarySpell = character.spells["Ronce"]
                         character.primaryStatId = 10 // force
                     }
-                    db[character.id] = character
+                    db[aracter.id] = character
                 });
                 AccountManager.instance.saveCharacters();
                 instancesManager.killInstance(key);

@@ -30,7 +30,7 @@ const createWindow = () => {
     });
 
     // and load the index.html of the app.
-    mainWindow.loadURL(accountManager.urls.manageCharactersUrl);
+    mainWindow.loadURL(sessionsManager.urls.fightSessionFormUrl);
 
     // To maximize the window
     mainWindow.maximize();
@@ -155,8 +155,12 @@ ipcMain.on("deleteSession", (event, key) => {
 });
 
 ipcMain.on("editSession", (event, key) => {
-    sessionsManager.currentEditedSession = sessionsManager.sessionsDB[key];
-    mainWindow.loadURL(sessionsManager.urls.newSessionUrl);
+    var session = sessionsManager.sessionsDB[key];
+    sessionsManager.currentEditedSession = session;
+    if (session.type == "fight") 
+        mainWindow.loadURL(sessionsManager.urls.farmSessionFormUrl);
+    else if (session.type == "farm") 
+        mainWindow.loadURL(sessionsManager.urls.fightSessionFormUrl);
 });
 
 ipcMain.on("cancelCreateSession", (event, args) => {

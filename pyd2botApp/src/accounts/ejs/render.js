@@ -24,10 +24,13 @@ function saveAccounts() {
 
 function deleteAccount(key) {
     ipc.send('deleteAccount', key)
+    document.getElementById(`account-${key}`).remove()
 }
 
 function hideUnhidePassword(key) {
-    ipc.send('hideUnhidePassword', key)
+    pwd = ipc.sendSync('hideUnhidePassword', key)
+    document.getElementById(`${key}-password`).innerHTML = pwd
+    document.getElementById(`${key}-togglePwd`).classList.toggle("fa-eye-slash")
 }
 
 // characters
@@ -54,7 +57,7 @@ function goToCharacterProfile(key) {
 }
 
 function cancelCharacterProfileEdit() {
-    ipc.send('cancelCharacterProfileEdit')
+    ipc.sendSync('cancelCharacterProfileEdit')
 }
 
 function switchToAccountsView() {
@@ -68,3 +71,4 @@ function switchToCharactersView() {
     document.getElementById("charactersView").style.display = "flex";
     currentVisible = "characters";
 }
+

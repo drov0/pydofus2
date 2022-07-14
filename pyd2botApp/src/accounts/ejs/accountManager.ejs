@@ -6,6 +6,7 @@
         <title>Grider</title>
         <!-- Bootstrap CSS -->
         <link rel="stylesheet" href="<%= nodeModulesUrl + '/bootstrap/dist/css/bootstrap.min.css'%>" />
+        <link rel="stylesheet" href="<%= nodeModulesUrl + '/fontawesome-free/css/all.min.css'%>" />
         <!-- Custom CSS -->
         <link rel="stylesheet" href="<%= cssUrl + '/main.css'%>"/>
         <!-- Bootstrap Optional JavaScript -->
@@ -33,19 +34,17 @@
                 </thead>
                 <tbody>
                     <% Object.entries(accounts.accountsDB).forEach(([key, account]) => {%>
-                    <tr>
+                    <tr id=<%= `account-${key}` %>>
                         <td scope="row"><%= key%></td>
-                        <td><%= account.login%></td>
-                        <td><%= accounts.accountsPasswords[key] %></td>
+                        <td><%= account.login %></td>
+                        <td><text id=<%= `${key}-password` %>><%= accounts.accountsPasswords[key] %></text><i class="far fa-eye" id=<%=`${key}-togglePwd`%> style="margin-left: 10px; cursor: pointer;" onclick="hideUnhidePassword('<%= key%>')"></i></td>
                         <td>
                             <div class="dropdown">
-                                <a class="btn btn-secondary dropdown-toggle" href="#" role="button" id="dropdownMenuLink" data-bs-toggle="dropdown" aria-expanded="false">
-                                </a>
+                                <i class='fa fa-ellipsis-v' role="button" id="dropdownMenuLink" data-bs-toggle="dropdown" aria-expanded="false"></i>
                                 <ul class="dropdown-menu" aria-labelledby="dropdownMenuLink">
-                                  <li><a class="dropdown-item" href="#" onclick="editAccount('<%= key%>')">edit</a></li>
-                                  <li><a class="dropdown-item" href="#" onclick="hideUnhidePassword('<%= key%>')">hide/unhide password</a></li>
-                                  <li><a class="dropdown-item" href="#" onclick="deleteAccount('<%= key%>')">delete</a></li>
-                                  <li><a class="dropdown-item" href="#" onclick="fetchCharacters('<%= key%>')">fetch characters</a></li>
+                                  <li><a class="dropdown-item" style="cursor: pointer;" onclick="editAccount('<%= key %>')"><i class="fas fa-edit" style="margin-left: -5px;"></i>  edit</a></li>
+                                  <li><a class="dropdown-item" style="cursor: pointer;" onclick="deleteAccount('<%= key %>')"><i class="fas fa-trash-alt" style="margin-left: -5px;"></i>  delete</a></li>
+                                  <li><a class="dropdown-item" style="cursor: pointer;" onclick="fetchCharacters('<%= key %>')"><i class="fas fa-sync-alt" style="margin-left: -5px;"></i>  import characters</a></li>
                                 </ul>
                             </div>
                         </td>

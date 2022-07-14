@@ -7,13 +7,13 @@ const AuthHelper = require("../auth/AuthHelper.js");
 const InstancesManager = require("../bot/InstancesManager.js");
 const instancesManager = InstancesManager.instance;
 const defaultBreedConfig = {
-    10: {
-        "primarySpell" : 13516,
-        "primaryStat" : 10
+    10: { // sadida
+        "primarySpell" : 13516, // ronce
+        "primaryStat" : 10 // force
     },
-    4 : {
-        "primarySpell" : 12902,
-        "primaryStat" : 10
+    4 : { // sram
+        "primarySpell" : 12902, // Truanderie
+        "primaryStat" : 10 // force
     },
 }
 class AccountManager {
@@ -24,8 +24,6 @@ class AccountManager {
     constructor() {
         this.accountsDbFile = path.join(ejse.data('persistenceDir'), 'accounts.json')
         this.charactersDbFile = path.join(ejse.data('persistenceDir'), 'characters.json')
-        this.breedSpellsFile = path.join(ejse.data('persistenceDir'), 'breedSpells.json')
-        this.breedSpells = require(this.breedSpellsFile)
         this.accountsDB = require(this.accountsDbFile)
         this.charactersDB = require(this.charactersDbFile)
         this.accountsPasswords = {}
@@ -34,6 +32,7 @@ class AccountManager {
         this.charactersChanged = false
         this.selectedAccount = null
         this.classesIconsDir = path.join(ejse.data('appDir'), 'assets', 'images', 'classes')
+        this.currentView = "accounts"
         for (var key in this.accountsDB) {
             this.accountsPasswords[key] = "********"
         }
@@ -71,14 +70,6 @@ class AccountManager {
             'newAccountUrl': "file://" + path.join(__dirname, 'ejs', 'newAccountForm.ejs'),
             'characterProfileUrl': "file://" + path.join(__dirname, 'ejs', 'characterProfile.ejs'),
         }
-        this.stats = {
-            "strength": 10,
-            "agility": 14,
-            "vitality": 11,
-            "intelligence": 15,
-            "wisdom": 12,
-            "chance": 13,
-        }
         ejse.data('accounts', this);
 
     }
@@ -93,7 +84,6 @@ class AccountManager {
     }
 
     hideUnhidePassword(key) {
-        console.log("before huide " + this.accountsPasswords[key])
         if (this.accountsPasswords[key] == "********") {
             var decryptedPassword = this.getAccountPassword(key)
             this.accountsPasswords[key] = decryptedPassword
@@ -101,7 +91,6 @@ class AccountManager {
         else {
             this.accountsPasswords[key] = "********"
         }
-        console.log("after huide " + this.accountsPasswords[key])
     }
 
     newAccount(formData) {
@@ -166,8 +155,8 @@ class AccountManager {
     }
 
     saveBreedSpells() {
-        var saveJson = JSON.stringify(this.breedSpells, null, 2);
-        fs.writeFile(this.breedSpellsFile, saveJson, 'utf8', (err) => {
+        var saveJson = JSON.stringify(ejse.data('dofus2Data').breedSpells, null, 2);
+        fs.writeFile(path.join(ejse.data('persistenceDir'), 'breedSpells.json'), saveJson, 'utf8', (err) => {
             if (err) {
                 console.log(err)
             }
@@ -198,18 +187,15 @@ class AccountManager {
         for (let ck in response) {
             var character = response[ck]
             console.log("character: " + JSON.stringify(character))
-            if (!AccountManager.instance.breedSpells[character.breedId])
+            if (!ejse.data('dofus2Data').breedSpells[character.breedId])
             {
                 var spells = {}
-                console.log("fetch breed spells " + key)
                 var breedSpellsResponse = await client.fetchBreedSpells(character.breedId)
-                console.log("fetched breed spells result")
                 Object.values(breedSpellsResponse).forEach(spell => {
-                    spells[spell.name] = spell
+                    spells[spell.id] = spell
                 })
-                AccountManager.instance.breedSpells[character.breedId]= spells
-                AccountManager.instance.saveBreedSpells()
-                console.log("fetch breed spells ended")
+                ejse.data('dofus2Data').breedSpells[character.breedId] = spells
+                this.saveBreedSpells()
             }  
             character.accountId = key
             character.primarySpell = defaultBreedConfig[character.breedId].primarySpell

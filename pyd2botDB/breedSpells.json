@@ -1,358 +1,358 @@
 {
   "4": {
-    "Invisibilité": {
-      "id": 12913,
-      "name": "Invisibilité"
-    },
-    "Brume": {
-      "id": 12930,
-      "name": "Brume"
-    },
-    "Piège Sournois": {
-      "id": 12906,
-      "name": "Piège Sournois"
-    },
-    "Coupe-gorge": {
-      "id": 12935,
-      "name": "Coupe-gorge"
-    },
-    "Truanderie": {
+    "12902": {
       "id": 12902,
       "name": "Truanderie"
     },
-    "Chausse-trappe": {
-      "id": 12932,
-      "name": "Chausse-trappe"
-    },
-    "Poison Insidieux": {
-      "id": 12907,
-      "name": "Poison Insidieux"
-    },
-    "Toxines": {
-      "id": 12933,
-      "name": "Toxines"
-    },
-    "Piège Répulsif": {
-      "id": 12914,
-      "name": "Piège Répulsif"
-    },
-    "Poisse": {
-      "id": 12922,
-      "name": "Poisse"
-    },
-    "Coup Sournois": {
-      "id": 12904,
-      "name": "Coup Sournois"
-    },
-    "Guet-apens": {
-      "id": 12939,
-      "name": "Guet-apens"
-    },
-    "Double": {
-      "id": 12915,
-      "name": "Double"
-    },
-    "Comploteur": {
-      "id": 12936,
-      "name": "Comploteur"
-    },
-    "Piège Fangeux": {
-      "id": 12916,
-      "name": "Piège Fangeux"
-    },
-    "Larcin": {
-      "id": 12937,
-      "name": "Larcin"
-    },
-    "Piège de Masse": {
-      "id": 12920,
-      "name": "Piège de Masse"
-    },
-    "Extorsion": {
-      "id": 12938,
-      "name": "Extorsion"
-    },
-    "Cruauté": {
-      "id": 12919,
-      "name": "Cruauté"
-    },
-    "Piège de Dérive": {
-      "id": 12942,
-      "name": "Piège de Dérive"
-    },
-    "Piège Funeste": {
-      "id": 12948,
-      "name": "Piège Funeste"
-    },
-    "Épidémie": {
-      "id": 12943,
-      "name": "Épidémie"
-    },
-    "Piège d'Immobilisation": {
-      "id": 12910,
-      "name": "Piège d'Immobilisation"
-    },
-    "Fosse Commune": {
-      "id": 14314,
-      "name": "Fosse Commune"
-    },
-    "Fourvoiement": {
-      "id": 12909,
-      "name": "Fourvoiement"
-    },
-    "Injection Toxique": {
-      "id": 12940,
-      "name": "Injection Toxique"
-    },
-    "Piège Insidieux": {
-      "id": 12918,
-      "name": "Piège Insidieux"
-    },
-    "Arnaque": {
-      "id": 12911,
-      "name": "Arnaque"
-    },
-    "Peur": {
-      "id": 12908,
-      "name": "Peur"
-    },
-    "Méprise": {
-      "id": 12945,
-      "name": "Méprise"
-    },
-    "Concentration de Chakra": {
+    "12903": {
       "id": 12903,
       "name": "Concentration de Chakra"
     },
-    "Manigance": {
-      "id": 14741,
-      "name": "Manigance"
+    "12904": {
+      "id": 12904,
+      "name": "Coup Sournois"
     },
-    "Attaque Mortelle": {
-      "id": 12917,
-      "name": "Attaque Mortelle"
-    },
-    "Effraction": {
-      "id": 14742,
-      "name": "Effraction"
-    },
-    "Dérobade": {
-      "id": 14312,
-      "name": "Dérobade"
-    },
-    "Marque Mortuaire": {
-      "id": 14313,
-      "name": "Marque Mortuaire"
-    },
-    "Piège à Fragmentation": {
-      "id": 12941,
-      "name": "Piège à Fragmentation"
-    },
-    "Fourberie": {
+    "12905": {
       "id": 12905,
       "name": "Fourberie"
     },
-    "Pillage": {
-      "id": 12934,
-      "name": "Pillage"
+    "12906": {
+      "id": 12906,
+      "name": "Piège Sournois"
     },
-    "Calamité": {
-      "id": 12950,
-      "name": "Calamité"
+    "12907": {
+      "id": 12907,
+      "name": "Poison Insidieux"
     },
-    "Piège Mortel": {
+    "12908": {
+      "id": 12908,
+      "name": "Peur"
+    },
+    "12909": {
+      "id": 12909,
+      "name": "Fourvoiement"
+    },
+    "12910": {
+      "id": 12910,
+      "name": "Piège d'Immobilisation"
+    },
+    "12911": {
+      "id": 12911,
+      "name": "Arnaque"
+    },
+    "12913": {
+      "id": 12913,
+      "name": "Invisibilité"
+    },
+    "12914": {
+      "id": 12914,
+      "name": "Piège Répulsif"
+    },
+    "12915": {
+      "id": 12915,
+      "name": "Double"
+    },
+    "12916": {
+      "id": 12916,
+      "name": "Piège Fangeux"
+    },
+    "12917": {
+      "id": 12917,
+      "name": "Attaque Mortelle"
+    },
+    "12918": {
+      "id": 12918,
+      "name": "Piège Insidieux"
+    },
+    "12919": {
+      "id": 12919,
+      "name": "Cruauté"
+    },
+    "12920": {
+      "id": 12920,
+      "name": "Piège de Masse"
+    },
+    "12921": {
       "id": 12921,
       "name": "Piège Mortel"
     },
-    "Perfidie": {
-      "id": 12949,
-      "name": "Perfidie"
+    "12922": {
+      "id": 12922,
+      "name": "Poisse"
     },
-    "Piège Scélérat": {
+    "12930": {
+      "id": 12930,
+      "name": "Brume"
+    },
+    "12931": {
       "id": 12931,
       "name": "Piège Scélérat"
     },
-    "Perquisition": {
+    "12932": {
+      "id": 12932,
+      "name": "Chausse-trappe"
+    },
+    "12933": {
+      "id": 12933,
+      "name": "Toxines"
+    },
+    "12934": {
+      "id": 12934,
+      "name": "Pillage"
+    },
+    "12935": {
+      "id": 12935,
+      "name": "Coupe-gorge"
+    },
+    "12936": {
+      "id": 12936,
+      "name": "Comploteur"
+    },
+    "12937": {
+      "id": 12937,
+      "name": "Larcin"
+    },
+    "12938": {
+      "id": 12938,
+      "name": "Extorsion"
+    },
+    "12939": {
+      "id": 12939,
+      "name": "Guet-apens"
+    },
+    "12940": {
+      "id": 12940,
+      "name": "Injection Toxique"
+    },
+    "12941": {
+      "id": 12941,
+      "name": "Piège à Fragmentation"
+    },
+    "12942": {
+      "id": 12942,
+      "name": "Piège de Dérive"
+    },
+    "12943": {
+      "id": 12943,
+      "name": "Épidémie"
+    },
+    "12945": {
+      "id": 12945,
+      "name": "Méprise"
+    },
+    "12947": {
       "id": 12947,
       "name": "Perquisition"
+    },
+    "12948": {
+      "id": 12948,
+      "name": "Piège Funeste"
+    },
+    "12949": {
+      "id": 12949,
+      "name": "Perfidie"
+    },
+    "12950": {
+      "id": 12950,
+      "name": "Calamité"
+    },
+    "14312": {
+      "id": 14312,
+      "name": "Dérobade"
+    },
+    "14313": {
+      "id": 14313,
+      "name": "Marque Mortuaire"
+    },
+    "14314": {
+      "id": 14314,
+      "name": "Fosse Commune"
+    },
+    "14741": {
+      "id": 14741,
+      "name": "Manigance"
+    },
+    "14742": {
+      "id": 14742,
+      "name": "Effraction"
     }
   },
   "10": {
-    "Folle": {
-      "id": 13564,
-      "name": "Folle"
-    },
-    "Folle Transmutée": {
-      "id": 13515,
-      "name": "Folle Transmutée"
-    },
-    "Arbre": {
-      "id": 13519,
-      "name": "Arbre"
-    },
-    "Arbre Feuillu": {
-      "id": 13560,
-      "name": "Arbre Feuillu"
-    },
-    "Ronce": {
-      "id": 13516,
-      "name": "Ronce"
-    },
-    "Broussaille Empoisonnée": {
-      "id": 13559,
-      "name": "Broussaille Empoisonnée"
-    },
-    "Braises Épineuses": {
-      "id": 14393,
-      "name": "Braises Épineuses"
-    },
-    "Mangrove": {
-      "id": 14396,
-      "name": "Mangrove"
-    },
-    "Bloqueuse": {
-      "id": 13561,
-      "name": "Bloqueuse"
-    },
-    "Bloqueuse Transmutée": {
-      "id": 13526,
-      "name": "Bloqueuse Transmutée"
-    },
-    "Larme": {
-      "id": 13528,
-      "name": "Larme"
-    },
-    "Montée de Sève": {
-      "id": 13563,
-      "name": "Montée de Sève"
-    },
-    "Poison Paralysant": {
-      "id": 13533,
-      "name": "Poison Paralysant"
-    },
-    "Poison de Proximité": {
-      "id": 13562,
-      "name": "Poison de Proximité"
-    },
-    "Ronce Apaisante": {
-      "id": 13525,
-      "name": "Ronce Apaisante"
-    },
-    "Rempotage": {
-      "id": 13565,
-      "name": "Rempotage"
-    },
-    "Puissance Sylvestre": {
-      "id": 13530,
-      "name": "Puissance Sylvestre"
-    },
-    "Influence Végétale": {
-      "id": 13566,
-      "name": "Influence Végétale"
-    },
-    "Sacrifiée": {
-      "id": 13567,
-      "name": "Sacrifiée"
-    },
-    "Sacrifiée Transmutée": {
-      "id": 13522,
-      "name": "Sacrifiée Transmutée"
-    },
-    "Tremblement": {
+    "13514": {
       "id": 13514,
       "name": "Tremblement"
     },
-    "Secousse": {
-      "id": 13568,
-      "name": "Secousse"
+    "13515": {
+      "id": 13515,
+      "name": "Folle Transmutée"
     },
-    "Don Naturel": {
-      "id": 13532,
-      "name": "Don Naturel"
+    "13516": {
+      "id": 13516,
+      "name": "Ronce"
     },
-    "Inoculation": {
-      "id": 13569,
-      "name": "Inoculation"
-    },
-    "Ronces Multiples": {
-      "id": 13524,
-      "name": "Ronces Multiples"
-    },
-    "Force de la Nature": {
-      "id": 13570,
-      "name": "Force de la Nature"
-    },
-    "Sacrifice Poupesque": {
-      "id": 13531,
-      "name": "Sacrifice Poupesque"
-    },
-    "Fléau": {
-      "id": 13571,
-      "name": "Fléau"
-    },
-    "Vent Empoisonné": {
-      "id": 13529,
-      "name": "Vent Empoisonné"
-    },
-    "Altruisme Végétal": {
-      "id": 13572,
-      "name": "Altruisme Végétal"
-    },
-    "Gonflable": {
-      "id": 13573,
-      "name": "Gonflable"
-    },
-    "Gonflable Transmutée": {
-      "id": 13523,
-      "name": "Gonflable Transmutée"
-    },
-    "Ronces Agressives": {
-      "id": 13527,
-      "name": "Ronces Agressives"
-    },
-    "Ronce Harcelante": {
-      "id": 13574,
-      "name": "Ronce Harcelante"
-    },
-    "Arbre de Vie": {
-      "id": 13534,
-      "name": "Arbre de Vie"
-    },
-    "Harmonie": {
-      "id": 13579,
-      "name": "Harmonie"
-    },
-    "Feu de Brousse": {
+    "13517": {
       "id": 13517,
       "name": "Feu de Brousse"
     },
-    "Malédiction Vaudou": {
-      "id": 13576,
-      "name": "Malédiction Vaudou"
-    },
-    "Ronce Insolente": {
-      "id": 13521,
-      "name": "Ronce Insolente"
-    },
-    "Ronce Paralysante": {
-      "id": 13577,
-      "name": "Ronce Paralysante"
-    },
-    "Herbe Folle": {
+    "13518": {
       "id": 13518,
       "name": "Herbe Folle"
     },
-    "Contagion": {
+    "13519": {
+      "id": 13519,
+      "name": "Arbre"
+    },
+    "13520": {
+      "id": 13520,
+      "name": "Surpuissante Transmutée"
+    },
+    "13521": {
+      "id": 13521,
+      "name": "Ronce Insolente"
+    },
+    "13522": {
+      "id": 13522,
+      "name": "Sacrifiée Transmutée"
+    },
+    "13523": {
+      "id": 13523,
+      "name": "Gonflable Transmutée"
+    },
+    "13524": {
+      "id": 13524,
+      "name": "Ronces Multiples"
+    },
+    "13525": {
+      "id": 13525,
+      "name": "Ronce Apaisante"
+    },
+    "13526": {
+      "id": 13526,
+      "name": "Bloqueuse Transmutée"
+    },
+    "13527": {
+      "id": 13527,
+      "name": "Ronces Agressives"
+    },
+    "13528": {
+      "id": 13528,
+      "name": "Larme"
+    },
+    "13529": {
+      "id": 13529,
+      "name": "Vent Empoisonné"
+    },
+    "13530": {
+      "id": 13530,
+      "name": "Puissance Sylvestre"
+    },
+    "13531": {
+      "id": 13531,
+      "name": "Sacrifice Poupesque"
+    },
+    "13532": {
+      "id": 13532,
+      "name": "Don Naturel"
+    },
+    "13533": {
+      "id": 13533,
+      "name": "Poison Paralysant"
+    },
+    "13534": {
+      "id": 13534,
+      "name": "Arbre de Vie"
+    },
+    "13559": {
+      "id": 13559,
+      "name": "Broussaille Empoisonnée"
+    },
+    "13560": {
+      "id": 13560,
+      "name": "Arbre Feuillu"
+    },
+    "13561": {
+      "id": 13561,
+      "name": "Bloqueuse"
+    },
+    "13562": {
+      "id": 13562,
+      "name": "Poison de Proximité"
+    },
+    "13563": {
+      "id": 13563,
+      "name": "Montée de Sève"
+    },
+    "13564": {
+      "id": 13564,
+      "name": "Folle"
+    },
+    "13565": {
+      "id": 13565,
+      "name": "Rempotage"
+    },
+    "13566": {
+      "id": 13566,
+      "name": "Influence Végétale"
+    },
+    "13567": {
+      "id": 13567,
+      "name": "Sacrifiée"
+    },
+    "13568": {
+      "id": 13568,
+      "name": "Secousse"
+    },
+    "13569": {
+      "id": 13569,
+      "name": "Inoculation"
+    },
+    "13570": {
+      "id": 13570,
+      "name": "Force de la Nature"
+    },
+    "13571": {
+      "id": 13571,
+      "name": "Fléau"
+    },
+    "13572": {
+      "id": 13572,
+      "name": "Altruisme Végétal"
+    },
+    "13573": {
+      "id": 13573,
+      "name": "Gonflable"
+    },
+    "13574": {
+      "id": 13574,
+      "name": "Ronce Harcelante"
+    },
+    "13575": {
       "id": 13575,
       "name": "Contagion"
     },
-    "Surpuissante": {
+    "13576": {
+      "id": 13576,
+      "name": "Malédiction Vaudou"
+    },
+    "13577": {
+      "id": 13577,
+      "name": "Ronce Paralysante"
+    },
+    "13578": {
       "id": 13578,
       "name": "Surpuissante"
     },
-    "Surpuissante Transmutée": {
-      "id": 13520,
-      "name": "Surpuissante Transmutée"
+    "13579": {
+      "id": 13579,
+      "name": "Harmonie"
+    },
+    "14393": {
+      "id": 14393,
+      "name": "Braises Épineuses"
+    },
+    "14396": {
+      "id": 14396,
+      "name": "Mangrove"
     }
   }
 }

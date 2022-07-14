@@ -3,16 +3,18 @@
 
     <head>
         <meta charset="UTF-8" />
-        <title>Grider</title>
+        <title>Grinder</title>
         <!-- Bootstrap CSS -->
-        <link rel="stylesheet" href="<%= nodeModulesUrl + '/bootstrap/dist/css/bootstrap.min.css'%>" />
+        <link rel="stylesheet" href="<%= nodeModulesUrl + '/bootstrap/dist/css/bootstrap.min.css' %>" />
+        <link rel="stylesheet" href="<%= nodeModulesUrl + '/fontawesome-free/css/all.min.css' %>" />
         <!-- Custom CSS -->
-        <link rel="stylesheet" href="<%= cssUrl + '/main.css'%>"/>
+        <link rel="stylesheet" href="<%= cssUrl + '/main.css' %>"/>
         <!-- Bootstrap Optional JavaScript -->
         <!-- jQuery first, then Popper.js, then Bootstrap JS -->
         <script>let $ = require('jquery');</script>
         <script>require('popper');</script>
         <script>require('bootstrap');</script>
+        <script>require('ejs-electron')</script>
         <script defer src="render.js"></script>
     </head>
 
@@ -32,24 +34,20 @@
                     <% Object.entries(sessions.sessionsDB).forEach(([key, session])=> {%>
                     <tr>
                         <td scope="row"><%=session.name%></td>
-                        <td><%=session.path%></td>
-                        <td><%=session.type%></td>
-                        <% if (runningInstances[key]) {%>
-                            <td>running</td>
-                        <% } else {%>
-                            <td>idle</td>
-                        <% } %>
+                        <td><%= session.path %></td>
+                        <td><%= session.type %></td>
+                        <td><%= runningInstances[key] ? 'running' : 'idle' %></td>
+                        
                         <td>
                             <div class="dropdown">
-                                <a class="btn btn-secondary dropdown-toggle" href="#" role="button" id="dropdownMenuLink" data-bs-toggle="dropdown" aria-expanded="false">
-                                </a>
+                                <a class="btn btn-secondary dropdown-toggle" href="#" role="button" id="dropdownMenuLink" data-bs-toggle="dropdown" aria-expanded="false"></a>
                                 <ul class="dropdown-menu" aria-labelledby="dropdownMenuLink">
-                                    <li><a class="dropdown-item" href="#" onclick="editSession('<%=key%>')">edit</a></li>
-                                    <li><a class="dropdown-item" href="#" onclick="deleteSession('<%=key%>')">delete</a></li>
+                                    <li><a class="dropdown-item" href="#" onclick="editSession('<%= key %>')">edit</a></li>
+                                    <li><a class="dropdown-item" href="#" onclick="deleteSession('<%= key %>')">delete</a></li>
                                     <% if (runningInstances[key]) {%>
-                                        <li><a class="dropdown-item" href="#" onclick="stopSession('<%=key%>')">stop</a></li>
+                                        <li><a class="dropdown-item" href="#" onclick="stopSession('<%= key %>')">stop</a></li>
                                     <% } else {%>
-                                        <li><a class="dropdown-item" href="#" onclick="runSession('<%=key%>')">run</a></li>
+                                        <li><a class="dropdown-item" href="#" onclick="runSession('<%= key %>')">run</a></li>
                                     <% } %>
                                 </ul>
                             </div>
@@ -61,8 +59,8 @@
             <div class="managerBottomButtonsBar">
                 <a class="btn btn-primary dropdown-toggle" href="#" role="button" id="dropdownMenuLink" data-bs-toggle="dropdown" aria-expanded="false">new</a>
                 <ul class="dropdown-menu" aria-labelledby="dropdownMenuLink">
-                    <li><a class="dropdown-item" href="<%=sessions.urls.farmSessionFormUrl%>">farmSession</a></li>
-                    <li><a class="dropdown-item" href="<%=sessions.urls.fightSessionFormUrl%>">fightSession</a></li>
+                    <li><a class="dropdown-item" href="<%=sessions.urls.farmSessionFormUrl%>"><img src="../images/226.png" height="30px" width="30px"></img>  farm session</a></li>
+                    <li><a class="dropdown-item" href="<%=sessions.urls.fightSessionFormUrl%>"><img src="../images/227.png" height="30px" width="30px"></img>  fight session</a></li>
                 </ul>
                 <button class="btn btn-primary" onclick="saveSessions()">save</button>
             </div>

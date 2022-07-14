@@ -6,6 +6,7 @@
     <title>Grider</title>
     <!-- Bootstrap CSS -->
     <link rel="stylesheet" href="<%= nodeModulesUrl + '/bootstrap/dist/css/bootstrap.min.css'%>" />
+    <link rel="stylesheet" href="<%= nodeModulesUrl + '/fontawesome-free/css/all.min.css'%>" />
     <!-- Custom CSS -->
     <link rel="stylesheet" href="<%= cssUrl + '/main.css'%>"/>
     <!-- Bootstrap Optional JavaScript -->
@@ -13,22 +14,23 @@
     <script>let $ = require('jquery');</script>
     <script>require('popper');</script>
     <script>require('bootstrap');</script>
-    <script defer src="render.js"></script>
+    <script src="render.js"></script>
 </head>
 
 <body>
     <div class="wrapper">
         <%- include(sidebarUrl, {active: 'sessions'}) %>
+        <% var curr = sessions.currentEditedSession %>
         <div class="bodyRightView">
             <div class="pathsFormsContainer">
                 <h>Enter session config</h>
                 <div class="myform-group">
                     <label for="name">name : </label>
-                    <input class="myfg-input form-control" type="text" id="name" value='<%=sessions.currentEditedSession ? sessions.currentEditedSession.name : ""%>'>
+                    <input class="myfg-input form-control" type="text" id="name" value='<%= curr ? curr.name : ""%>'>
                 </div>
                 <div class="myform-group">
                     <label for="path">path : </label>
-                    <select class="myfg-input form-select" id="path" value='<%=sessions.currentEditedSession ? sessions.currentEditedSession.pathId : ""%>'>
+                    <select class="myfg-input form-select" id="path" value='<%=curr ? curr.pathId : ""%>'>
                         <% Object.keys(paths.pathsDB).forEach(key => { %>
                         <option value="<%=key%>"><%=key%></option>
                         <% }) %>
@@ -37,12 +39,16 @@
                 <div class="myform-group">
                     <label for="sessionType">type : </label>
                     <label id="sessionType" class="myfg-input" value="fight">fight</label>
+                </div>              
+                <div class="myform-group">
+                    <label for="monsterLvlCoefDiff">monsterLvlCoefDiff : </label>
+                    <input class="myfg-input form-control" type="number" id="monsterLvlCoefDiff" value='<%= curr ? curr.monsterLvlCoefDiff : "" %>'>
                 </div>
                 <div class="myform-group">
                     <label for="leader">leader : </label>
-                    <select id="leader" class="myfg-input form-select" value='<%=sessions.currentEditedSession ? sessions.currentEditedSession.characterId : ""%>'>
+                    <select id="leader" onchange="populateFollowersSelect()" class="myfg-input form-select" value=<%= curr ? JSON.stringify(curr.leader) : ""%>>
                         <% Object.entries(accounts.charactersDB).forEach(([key, ch]) => { %>
-                        <option value="<%=JSON.stringify(ch)%>"><%=ch.name%> (<%=ch.serverName%>, <%=ch.breedName%>)</option>
+                        <option value=<%= JSON.stringify(ch) %>><%=ch.name%> (<%=ch.serverName%>, <%=ch.breedName%>)</option>
                         <% }) %>
                     </select>
                 </div>
@@ -50,11 +56,7 @@
                     <label>followers : </label>
                     <div class="myfg-input">
                         <div class="mylist-select-and-button">
-                            <select id="follower" class="form-select">
-                                <% Object.entries(accounts.charactersDB).forEach(([key, ch]) => { %>
-                                <option value="<%=JSON.stringify(ch)%>"><%=ch.name%> (<%=ch.serverName%>, <%=ch.breedName%>)</option>
-                                <% }) %>
-                            </select>
+                            <select id="follower" class="form-select"></select>
                             <input type='button' class="bi bi-plus" value='+' id='addFollower' onclick="addFollower()"/>
                         </div>
                         <ul class="list-group" id='followers'></ul>
@@ -68,5 +70,8 @@
             </div>
         </div>
     </div>
+    <script>
+        populateFollowersSelect();
+    </script>
 </body>
 </html>

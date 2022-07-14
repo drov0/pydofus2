@@ -1,4 +1,40 @@
 {
+  "336986964178": {
+    "name": "Plusbellelavie",
+    "id": 336986964178,
+    "level": 65,
+    "breedId": 10,
+    "breedName": "Sadida",
+    "serverId": 210,
+    "serverName": "Merkator",
+    "accountId": "melanco-lalco",
+    "primarySpell": 13516,
+    "primaryStatId": 10
+  },
+  "336597024978": {
+    "name": "Melanco-lalco",
+    "id": 336597024978,
+    "level": 16,
+    "breedId": 4,
+    "breedName": "Sram",
+    "serverId": 210,
+    "serverName": "Merkator",
+    "accountId": "melanco-lalco",
+    "primarySpell": 12902,
+    "primaryStatId": 10
+  },
+  "336919789778": {
+    "name": "Moneslicer",
+    "id": 336919789778,
+    "level": 49,
+    "breedId": 10,
+    "breedName": "Sadida",
+    "serverId": 210,
+    "serverName": "Merkator",
+    "accountId": "Exodios-arc",
+    "primarySpell": 13516,
+    "primaryStatId": 10
+  },
   "336815325394": {
     "name": "Moneydicer",
     "id": 336815325394,
@@ -20,6 +56,18 @@
     "serverId": 207,
     "serverName": "Ush",
     "accountId": "Exodios-cra",
+    "primarySpell": 13516,
+    "primaryStatId": 10
+  },
+  "336919920850": {
+    "name": "Moneylife",
+    "id": 336919920850,
+    "level": 54,
+    "breedId": 10,
+    "breedName": "Sadida",
+    "serverId": 210,
+    "serverName": "Merkator",
+    "accountId": "twistedFater",
     "primarySpell": 13516,
     "primaryStatId": 10
   }

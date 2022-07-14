@@ -9,6 +9,15 @@ ejse.data('pyd2botDir', )
 ejse.data('appDir', path.join(__dirname));
 ejse.data('dofus2Data', {
     "skills": require(path.join(ejse.data('persistenceDir'), 'skills.json')),
+    "stats": {
+        "strength": 10,
+        "agility": 14,
+        "vitality": 11,
+        "intelligence": 15,
+        "wisdom": 12,
+        "chance": 13,
+    },
+    'breedSpells': require(path.join(ejse.data('persistenceDir'), 'breedSpells.json')),
 })
 const mainUrl = "file://" + path.join(__dirname, 'ejs', 'main.ejs')
 const pathsManager = require('./paths/PathManager.js').instance;
@@ -33,7 +42,7 @@ const createWindow = () => {
     });
 
     // and load the index.html of the app.
-    mainWindow.loadURL(accountManager.urls.manageAccountsUrl);
+    mainWindow.loadURL(sessionsManager.urls.fightSessionFormUrl);
 
     // To maximize the window
     mainWindow.maximize();
@@ -64,7 +73,6 @@ ipcMain.on("editAccount", (event, key) => {
 
 ipcMain.on("deleteAccount", (event, key) => {
     accountManager.deleteAccount(key);
-    mainWindow.loadURL(accountManager.urls.manageAccountsUrl);
 });
 
 ipcMain.on("saveAccounts", (event, args) => {
@@ -73,11 +81,12 @@ ipcMain.on("saveAccounts", (event, args) => {
 
 ipcMain.on("hideUnhidePassword", (event, key) => {
     accountManager.hideUnhidePassword(key);
-    mainWindow.loadURL(accountManager.urls.manageAccountsUrl);
+    event.returnValue = accountManager.accountsPasswords[key]
 });
 
-ipcMain.on("fetchCharacters", (event, key) => {
-    accountManager.fetchCharacters(key);
+ipcMain.on("fetchCharacters", async (event, key) => {
+    await accountManager.fetchCharacters(key)
+    mainWindow.loadURL(accountManager.urls.manageAccountsUrl);
 });
 
 // characters ipc handling
@@ -98,9 +107,14 @@ ipcMain.on("goToCharacterProfile", (event, key) => {
     mainWindow.loadURL(accountManager.urls.characterProfileUrl);
 });
 
+ipcMain.on("getCharactersData", (event) => {
+    event.returnValue = accountManager.charactersDB;
+});
+
 ipcMain.on("cancelCharacterProfileEdit", (event, args) => {
     accountManager.selectedCharacterKey = null;
-    mainWindow.loadURL(accountManager.urls.manageCharactersUrl);
+    accountManager.currentView = "characters";
+    mainWindow.loadURL(accountManager.urls.manageAccountsUrl);
 });
 
 // paths ipc handling

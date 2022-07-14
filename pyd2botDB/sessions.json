@@ -1,1 +1,13 @@
-{}
+{
+  "gfgfgf": {
+    "name": "gfgfgf",
+    "path": "pioute_astrub_village",
+    "type": "fight",
+    "monsterLvlCoefDiff": "",
+    "leader": 336986964178,
+    "followers": [
+      336919789778,
+      336815325394
+    ]
+  }
+}

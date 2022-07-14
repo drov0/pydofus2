@@ -21,15 +21,13 @@ class Spell(object):
     Attributes:
      - id
      - name
-     - description
 
     """
 
 
-    def __init__(self, id=None, name=None, description=None,):
+    def __init__(self, id=None, name=None,):
         self.id = id
         self.name = name
-        self.description = description
 
     def read(self, iprot):
         if iprot._fast_decode is not None and isinstance(iprot.trans, TTransport.CReadableTransport) and self.thrift_spec is not None:
@@ -50,11 +48,6 @@ class Spell(object):
                     self.name = iprot.readString().decode('utf-8', errors='replace') if sys.version_info[0] == 2 else iprot.readString()
                 else:
                     iprot.skip(ftype)
-            elif fid == 3:
-                if ftype == TType.STRING:
-                    self.description = iprot.readString().decode('utf-8', errors='replace') if sys.version_info[0] == 2 else iprot.readString()
-                else:
-                    iprot.skip(ftype)
             else:
                 iprot.skip(ftype)
             iprot.readFieldEnd()
@@ -72,10 +65,6 @@ class Spell(object):
         if self.name is not None:
             oprot.writeFieldBegin('name', TType.STRING, 2)
             oprot.writeString(self.name.encode('utf-8') if sys.version_info[0] == 2 else self.name)
-            oprot.writeFieldEnd()
-        if self.description is not None:
-            oprot.writeFieldBegin('description', TType.STRING, 3)
-            oprot.writeString(self.description.encode('utf-8') if sys.version_info[0] == 2 else self.description)
             oprot.writeFieldEnd()
         oprot.writeFieldStop()
         oprot.writeStructEnd()
@@ -105,12 +94,11 @@ class Character(object):
      - breedName
      - serverId
      - serverName
-     - spells
 
     """
 
 
-    def __init__(self, name=None, id=None, level=None, breedId=None, breedName=None, serverId=None, serverName=None, spells=None,):
+    def __init__(self, name=None, id=None, level=None, breedId=None, breedName=None, serverId=None, serverName=None,):
         self.name = name
         self.id = id
         self.level = level
@@ -118,7 +106,6 @@ class Character(object):
         self.breedName = breedName
         self.serverId = serverId
         self.serverName = serverName
-        self.spells = spells
 
     def read(self, iprot):
         if iprot._fast_decode is not None and isinstance(iprot.trans, TTransport.CReadableTransport) and self.thrift_spec is not None:
@@ -164,17 +151,6 @@ class Character(object):
                     self.serverName = iprot.readString().decode('utf-8', errors='replace') if sys.version_info[0] == 2 else iprot.readString()
                 else:
                     iprot.skip(ftype)
-            elif fid == 8:
-                if ftype == TType.LIST:
-                    self.spells = []
-                    (_etype3, _size0) = iprot.readListBegin()
-                    for _i4 in range(_size0):
-                        _elem5 = Spell()
-                        _elem5.read(iprot)
-                        self.spells.append(_elem5)
-                    iprot.readListEnd()
-                else:
-                    iprot.skip(ftype)
             else:
                 iprot.skip(ftype)
             iprot.readFieldEnd()
@@ -213,13 +189,6 @@ class Character(object):
             oprot.writeFieldBegin('serverName', TType.STRING, 7)
             oprot.writeString(self.serverName.encode('utf-8') if sys.version_info[0] == 2 else self.serverName)
             oprot.writeFieldEnd()
-        if self.spells is not None:
-            oprot.writeFieldBegin('spells', TType.LIST, 8)
-            oprot.writeListBegin(TType.STRUCT, len(self.spells))
-            for iter6 in self.spells:
-                iter6.write(oprot)
-            oprot.writeListEnd()
-            oprot.writeFieldEnd()
         oprot.writeFieldStop()
         oprot.writeStructEnd()
 
@@ -241,7 +210,6 @@ Spell.thrift_spec = (
     None,  # 0
     (1, TType.I32, 'id', None, None, ),  # 1
     (2, TType.STRING, 'name', 'UTF8', None, ),  # 2
-    (3, TType.STRING, 'description', 'UTF8', None, ),  # 3
 )
 all_structs.append(Character)
 Character.thrift_spec = (
@@ -253,7 +221,6 @@ Character.thrift_spec = (
     (5, TType.STRING, 'breedName', 'UTF8', None, ),  # 5
     (6, TType.I32, 'serverId', None, None, ),  # 6
     (7, TType.STRING, 'serverName', 'UTF8', None, ),  # 7
-    (8, TType.LIST, 'spells', (TType.STRUCT, [Spell, None], False), None, ),  # 8
 )
 fix_spec(all_structs)
 del all_structs

@@ -6,7 +6,16 @@ const JSEncrypt = require('jsencrypt')
 const AuthHelper = require("../auth/AuthHelper.js");
 const InstancesManager = require("../bot/InstancesManager.js");
 const instancesManager = InstancesManager.instance;
-
+const defaultBreedConfig = {
+    10: {
+        "primarySpell" : 13516,
+        "primaryStat" : 10
+    },
+    4 : {
+        "primarySpell" : 12902,
+        "primaryStat" : 10
+    },
+}
 class AccountManager {
     static get instance() {
         return AccountManager._instance || (AccountManager._instance = new AccountManager()), AccountManager._instance
@@ -15,6 +24,8 @@ class AccountManager {
     constructor() {
         this.accountsDbFile = path.join(ejse.data('persistenceDir'), 'accounts.json')
         this.charactersDbFile = path.join(ejse.data('persistenceDir'), 'characters.json')
+        this.breedSpellsFile = path.join(ejse.data('persistenceDir'), 'breedSpells.json')
+        this.breedSpells = require(this.breedSpellsFile)
         this.accountsDB = require(this.accountsDbFile)
         this.charactersDB = require(this.charactersDbFile)
         this.accountsPasswords = {}
@@ -154,6 +165,15 @@ class AccountManager {
         })
     }
 
+    saveBreedSpells() {
+        var saveJson = JSON.stringify(this.breedSpells, null, 2);
+        fs.writeFile(this.breedSpellsFile, saveJson, 'utf8', (err) => {
+            if (err) {
+                console.log(err)
+            }
+        })
+    }
+
     addCharacter(character) {
         this.charactersDB[character.characterId] = character
     }
@@ -168,35 +188,37 @@ class AccountManager {
         }
     }
 
-    fetchCharacters(key) {
-        instancesManager.spawnServer(key);
-        console.log("fetchCharacters " + key);
-        setTimeout(() => {
-            var client = instancesManager.spawnClient(key);
-            var creds = this.getAccountCreds(key);
-            var db = this.charactersDB;
-            client.fetchAccountCharacters(creds.login, creds.password, creds.certId, creds.certHash, function(err, response) {
-                if (err) {
-                    console.log("Error while callling fetch : " + err);
-                }
-                console.log("fetched characters : " + JSON.stringify(response));
-                response.forEach(character => {
-                    var spells = {}
-                    Object.values(character.spells).forEach(spell => {
-                        spells[spell.name] = spell
-                    });
-                    character.spells = spells
-                    character.accountId = key
-                    if (character.breedName == "Sadida") {
-                        character.primarySpell = character.spells["Ronce"]
-                        character.primaryStatId = 10 // force
-                    }
-                    db[aracter.id] = character
-                });
-                AccountManager.instance.saveCharacters();
-                instancesManager.killInstance(key);
-            });
-        }, 5000);
+    async fetchCharacters(key) {
+        var server = await instancesManager.spawnServer(key)
+        console.log("fetchCharacters " + key)
+        var client = await instancesManager.spawnClient(key)
+        var creds = this.getAccountCreds(key)
+        var response = await client.fetchAccountCharacters(creds.login, creds.password, creds.certId, creds.certHash)
+        console.log("fetcheCharacters result: " + JSON.stringify(response))
+        for (let ck in response) {
+            var character = response[ck]
+            console.log("character: " + JSON.stringify(character))
+            if (!AccountManager.instance.breedSpells[character.breedId])
+            {
+                var spells = {}
+                console.log("fetch breed spells " + key)
+                var breedSpellsResponse = await client.fetchBreedSpells(character.breedId)
+                console.log("fetched breed spells result")
+                Object.values(breedSpellsResponse).forEach(spell => {
+                    spells[spell.name] = spell
+                })
+                AccountManager.instance.breedSpells[character.breedId]= spells
+                AccountManager.instance.saveBreedSpells()
+                console.log("fetch breed spells ended")
+            }  
+            character.accountId = key
+            character.primarySpell = defaultBreedConfig[character.breedId].primarySpell
+            character.primaryStatId = defaultBreedConfig[character.breedId].primaryStat
+            this.charactersDB[character.id] = character
+        }
+        console.log("fetch characters ended")
+        AccountManager.instance.saveCharacters()
+        instancesManager.killInstance(key)
     }
 }
 module.exports = AccountManager;

@@ -1,5 +1,5 @@
 const ipc = window.require('electron').ipcRenderer;
-
+var currentVisible = "accounts";
 
 // accounts
 function createAccount() {
@@ -40,10 +40,12 @@ function fetchCharacters(key) {
 }
 
 function deleteCharacter(key) {
+    document.getElementById(key).remove()
     ipc.send('deleteCharacter', key)
 }
 
 function clearCharacters() {
+    document.getElementById("accountsTableBody").innerHTML = "";
     ipc.send('clearCharacters')
 }
 
@@ -55,3 +57,14 @@ function cancelCharacterProfileEdit() {
     ipc.send('cancelCharacterProfileEdit')
 }
 
+function switchToAccountsView() {
+    document.getElementById("accountsView").style.display = "flex";
+    document.getElementById("charactersView").style.display = "none";
+    currentVisible = "accounts";
+}
+
+function switchToCharactersView() {
+    document.getElementById("accountsView").style.display = "none";
+    document.getElementById("charactersView").style.display = "flex";
+    currentVisible = "characters";
+}

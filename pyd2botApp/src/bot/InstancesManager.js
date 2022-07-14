@@ -3,7 +3,8 @@ const child_process = require('child_process');
 const process = require('process');
 const thrift = require('thrift');
 const Pyd2botService = require('../pyd2botService/Pyd2botService.js');
-const ejse = require('ejs-electron')
+const ejse = require('ejs-electron');
+const { emit } = require('process');
 
 class InstancesManager {
 
@@ -23,54 +24,83 @@ class InstancesManager {
         ejse.data('runningInstances', this.runningInstances);
     }
 
-    spawnClient(instanceId) {
-        var inst = this.runningInstances[instanceId];
-        var transport = thrift.TBufferedTransport;
-        var protocol = thrift.TBinaryProtocol;
-        var connection = thrift.createConnection("127.0.0.1", inst.port, {
-            transport : transport,
-            protocol : protocol
-        });
-        connection.on('error', function(err) {
-            if (InstancesManager.instance.wantsToKillClient[instanceId]) {
-                InstancesManager.instance.wantsToKillClient[instanceId] = false;
+    async spawnClient(instanceId) {
+        const max_attempts = 3;
+        var attempt = 0;
+        var connect_timeout = 1000;
+        var execFunc = (resolve, reject) => {
+            var inst = this.runningInstances[instanceId];
+            if (!inst) {
+                console.log("Instance " + instanceId + " not found");
+                return
             }
-            else {
-                console.log("Error in client : " + err);
-            }
-        });
-        var client = thrift.createClient(Pyd2botService, connection);
-        if (inst.connection) {
-            this.wantsToKillClient[instanceId] = true;
-            inst.connection.end();
+            var transport = thrift.TBufferedTransport;
+            var protocol = thrift.TBinaryProtocol;
+            var connection = thrift.createConnection("127.0.0.1", inst.port, {
+                transport : transport,
+                protocol : protocol
+            });
+            connection.on('error', (err) => {
+                if (InstancesManager.instance.wantsToKillClient[instanceId]) {
+                    InstancesManager.instance.wantsToKillClient[instanceId] = false;
+                }
+                else {
+                    reject("Could not connect client to instance " + instanceId);
+                }
+            });
+            connection.on('connect', () => {
+                console.log("Connected the client to instance " + instanceId  + " server");
+                var client = thrift.createClient(Pyd2botService, connection);
+                if (inst.connection) {
+                    this.wantsToKillClient[instanceId] = true;
+                    inst.connection.end();
+                }
+                inst.connection = connection;
+                inst.client = client;
+                resolve(client)
+            })
         }
-        inst.connection = connection;
-        inst.client = client;
-        return client;
+        while (attempt < max_attempts) {
+            try {
+                var promise = new Promise(execFunc);
+                return await promise;
+            }
+            catch (err) {
+                attempt++;
+                await new Promise(resolve => setTimeout(resolve, connect_timeout));
+            }
+        }
+        throw "Could not connect client to instance " + instanceId;
     }
 
-    spawnServer(instanceId) {
-        var port = this.freePorts.pop();
-        var cmd = `source ${this.pyd2botDevEnvPath} && python ${this.pyd2botDevPath} --host 0.0.0.0 --port ${port}`
-        console.log(cmd);
-        var log = "";
-        var instance = child_process.execFile(this.pyd2botExePath, ["--port", port, "--host", "0.0.0.0"])
-        this.runningInstances[instanceId] = {"port": port, "server" : instance, "client" : null, "connection" : null};
-        instance.stdout.on('data', (stdout) => {
-            log += stdout;
-            console.log(stdout.toString());
-        });
-        instance.stderr.on('data', (stderr) => {
-            console.log("Error : " + stderr.toString());
-        });
-        instance.on('close', (code) => {
-            console.log(`child process exited with code ${code}`);
-            if (instance.connection){
-                instance.connection.end();
-            }
-            this.freePorts.push(port);
-        });
-        return instance
+    async spawnServer(instanceId) {
+        var execFunc = (resolve, reject) => {
+            var port = this.freePorts.pop();
+            var instance = child_process.execFile(this.pyd2botExePath, ["--port", port, "--host", "0.0.0.0"])
+            this.runningInstances[instanceId] = {"port": port, "server" : instance, "client" : null, "connection" : null};
+            instance.stdout.on('data', (stdout) => {
+                if (stdout.toString().includes("Server started")) {
+                    console.log("Instance " + instanceId + " server started");
+                    resolve(instance);
+                }
+            });
+            instance.stderr.on('data', (stderr) => {
+                console.log("Error : " + stderr.toString());
+            });
+            instance.on('close', (code) => {
+                console.log(`child process exited with code ${code}`);
+                if (instance.connection){
+                    instance.connection.end();
+                }
+                this.freePorts.push(port);
+            });
+            setTimeout(() => {
+                this.freePorts.push(port);
+                reject("Timeout : Could not start instance " + instanceId);
+            }, 20000)
+        }
+        var promise = new Promise(execFunc);
+        return await promise;
     }
 
     clear() {

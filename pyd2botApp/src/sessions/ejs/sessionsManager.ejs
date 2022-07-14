@@ -32,13 +32,13 @@
                     <% Object.entries(sessions.sessionsDB).forEach(([key, session])=> {%>
                     <tr>
                         <td scope="row"><%=session.name%></td>
-                        <td><%=session.pathId%></td>
+                        <td><%=session.path%></td>
+                        <td><%=session.type%></td>
                         <% if (runningInstances[key]) {%>
                             <td>running</td>
                         <% } else {%>
                             <td>idle</td>
                         <% } %>
-                        <td><%=session.type%></td>
                         <td>
                             <div class="dropdown">
                                 <a class="btn btn-secondary dropdown-toggle" href="#" role="button" id="dropdownMenuLink" data-bs-toggle="dropdown" aria-expanded="false">

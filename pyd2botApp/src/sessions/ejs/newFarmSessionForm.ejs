@@ -21,26 +21,51 @@
         <%- include(sidebarUrl, {active: 'sessions'}) %>
         <div class="bodyRightView">
             <div class="pathsFormsContainer">
+                <h>Enter session config</h>
                 <div class="myform-group">
                     <label for="name">name : </label>
-                    <input type="text" id="name" value='<%=sessions.currentEditedSession ? sessions.currentEditedSession.name : ""%>'>
+                    <input class="myfg-input form-control" type="text" id="name" value='<%=sessions.currentEditedSession ? sessions.currentEditedSession.name : ""%>'>
                 </div>
                 <div class="myform-group">
-                    <label for="type">type : </label>
-                    <label id="type">farm</label>
-                </div>
-                <div class="myform-group">
-                    <label for="pathId">pathId : </label>
-                    <select id="pathId" value='<%=sessions.currentEditedSession ? sessions.currentEditedSession.pathId : ""%>'>
+                    <label for="path">path : </label>
+                    <select class="myfg-input form-select" id="path" value='<%=sessions.currentEditedSession ? sessions.currentEditedSession.pathId : ""%>'>
                         <% Object.keys(paths.pathsDB).forEach(key => { %>
                         <option value="<%=key%>"><%=key%></option>
                         <% }) %>
                     </select>
                 </div>
-            </div>
-            <div class="managerBottomButtonsBar">
-                <button class="btn btn-primary" onclick="createSession()">confirm</button>
-                <button class="btn btn-primary" onclick="cancelCreateSession()">cancel</button>
+                <div class="myform-group">
+                    <label for="sessionType">type : </label>
+                    <label id="sessionType" class="myfg-input" value="farm">farm</label>
+                </div>
+                <div class="myform-group">
+                    <label>jobs : </label>
+                    <div class="myfg-input">
+                        <div class="mylist-select-and-button">
+                            <select id="job" class="form-select">
+                                <% Object.entries(dofus2Data.skills).forEach(([key, skill]) => { %>
+                                <option value="<%=skill.id%>"><%=skill.name%></option>
+                                <% }) %>
+                            </select>
+                            <input type='button' value='+' id='addJob' onclick="addJob()"/>
+                        </div>
+                        <ul class="list-group" id='jobs'></ul>
+                    </div>
+                </div>
+                <div class="myform-group">
+                    <label>Resources : </label>
+                    <div class="myfg-input">
+                        <div class="mylist-select-and-button">
+                            <select id="resources" class="form-select"></select>
+                            <input type='button' value='+' id='addResource' onclick="addResource()"/>
+                        </div>
+                        <ul class="list-group" id='resources'></ul>
+                    </div>
+                </div>
+                <div class="managerBottomButtonsBar">
+                    <button class="btn btn-primary" onclick="createSession()">confirm</button>
+                    <button class="btn btn-primary" onclick="cancelCreateSession()">cancel</button>
+                </div>
             </div>
         </div>
     </div>

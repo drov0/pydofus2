@@ -29,7 +29,8 @@ class SessionsManager {
             }
         }
         this.currentEditedSession = null
-        this.sessionsDB[session.name] = path
+        this.sessionsDB[session.name] = session
+        console.log(session)
     }
 
     deleteSession(key) {

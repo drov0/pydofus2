@@ -27,22 +27,22 @@
                     <input class="myfg-input form-control" type="text" id="name" value='<%=sessions.currentEditedSession ? sessions.currentEditedSession.name : ""%>'>
                 </div>
                 <div class="myform-group">
-                    <label for="pathId">path : </label>
-                    <select class="myfg-input form-select" id="pathId" value='<%=sessions.currentEditedSession ? sessions.currentEditedSession.pathId : ""%>'>
+                    <label for="path">path : </label>
+                    <select class="myfg-input form-select" id="path" value='<%=sessions.currentEditedSession ? sessions.currentEditedSession.pathId : ""%>'>
                         <% Object.keys(paths.pathsDB).forEach(key => { %>
                         <option value="<%=key%>"><%=key%></option>
                         <% }) %>
                     </select>
                 </div>
                 <div class="myform-group">
-                    <label for="type">type : </label>
-                    <label id="type" class="myfg-input">fight</label>
+                    <label for="sessionType">type : </label>
+                    <label id="sessionType" class="myfg-input" value="fight">fight</label>
                 </div>
                 <div class="myform-group">
                     <label for="leader">leader : </label>
                     <select id="leader" class="myfg-input form-select" value='<%=sessions.currentEditedSession ? sessions.currentEditedSession.characterId : ""%>'>
                         <% Object.entries(accounts.charactersDB).forEach(([key, ch]) => { %>
-                        <option value="<%=key%>"><%=ch.name%> (<%=ch.serverName%>, <%=ch.breedName%>)</option>
+                        <option value="<%=JSON.stringify(ch)%>"><%=ch.name%> (<%=ch.serverName%>, <%=ch.breedName%>)</option>
                         <% }) %>
                     </select>
                 </div>
@@ -52,7 +52,7 @@
                         <div class="mylist-select-and-button">
                             <select id="follower" class="form-select">
                                 <% Object.entries(accounts.charactersDB).forEach(([key, ch]) => { %>
-                                <option value="<%=ch.name%> (<%=ch.serverName%>, <%=ch.breedName%>)"><%=ch.name%> (<%=ch.serverName%>, <%=ch.breedName%>)</option>
+                                <option value="<%=JSON.stringify(ch)%>"><%=ch.name%> (<%=ch.serverName%>, <%=ch.breedName%>)</option>
                                 <% }) %>
                             </select>
                             <input type='button' class="bi bi-plus" value='+' id='addFollower' onclick="addFollower()"/>

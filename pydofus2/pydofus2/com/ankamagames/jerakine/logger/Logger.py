@@ -19,11 +19,8 @@ class Logger(logging.Logger):
         fileHandler = logging.FileHandler(
             self.LOGS_PATH / f"{self.prefix}_{now.strftime('%Y-%m-%d')}.log"
         )
-        streamHandler = logging.StreamHandler()
         fileHandler.setFormatter(formatter)
-        streamHandler.setFormatter(formatter)
         self.addHandler(fileHandler)
-        self.addHandler(streamHandler)
 
     def get_logger(self):
         return self

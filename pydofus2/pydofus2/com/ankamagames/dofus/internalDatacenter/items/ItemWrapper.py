@@ -381,7 +381,7 @@ class ItemWrapper(Item, ISlotData, ICellZoneProvider, IDataCenter):
         return spellEffects
 
     def __str__(self) -> str:
-        return "[ItemWrapper#" + self.objectUID + "_" + self.name + "]"
+        return f"[ItemWrapper#{self.objectUID}_{self.name}]"
 
     @property
     def isCertificate(self) -> bool:

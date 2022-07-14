@@ -1,5 +1,6 @@
 const ipc = window.require('electron').ipcRenderer;
 
+var followersIds = Array();
 function editSession(key) {
     ipc.send('editSession', key)
 }
@@ -25,17 +26,13 @@ function stopSession(key) {
 }
 
 function createSession() {
-    var listfollowers = document.getElementById("followers").childNodes;
-    var followersNames = [];
-    listfollowers.forEach(function(li) {
-        followersNames.push(li.textContent.split(" (")[0]);
-    });
+    var leader = JSON.parse(document.getElementById("leader").value);
     let newSession = {
         "name": document.getElementById("name").value,
-        "pathId": document.getElementById("pathId").value,
-        "type": document.getElementById("type").value,
-        "leader": document.getElementById("leader").value,
-        "followers": followersNames
+        "path": document.getElementById("path").value,
+        "type": document.getElementById("sessionType").textContent,
+        "leader": leader.id,
+        "followers": followersIds
     }
     ipc.send('createSession', newSession)
 }
@@ -43,15 +40,15 @@ function createSession() {
 function addFollower() { 
     var followerList = document.getElementById("followers");
     var liNode = document.createElement("Li");
-    var follower = document.getElementById("follower").value;
-    var leader = document.getElementById("leader").value;
-    if (follower == leader) {
+    var follower = JSON.parse(document.getElementById("follower").value);
+    var leader = JSON.parse(document.getElementById("leader").value);
+    if (follower.id == leader.id) {
         alert("A follower must be different than the leader");
         return;
     }
     try {
         followerList.childNodes.forEach(function(li) { 
-            if (li.nodeType == Node.ELEMENT_NODE &&  follower == li.textContent) {
+            if (li.nodeType == Node.ELEMENT_NODE &&  `${follower.name} (${follower.serverName})` == li.textContent) {
                 throw "already in list of followers";
             }
         });
@@ -60,13 +57,12 @@ function addFollower() {
         alert(err);
         return;
     }
-    var textnode = document.createTextNode(follower);
-    liNode.appendChild(textnode);
+    followersIds.push(follower.id);
     liNode.className = "list-group-item";
     liNode.addEventListener('mouseover', (event) => {
         liNode.className = "list-group-item active";
     })
-    liNode.textContent = follower;
+    liNode.textContent = `${follower.name} (${follower.serverName})`;
     liNode.addEventListener('mouseout', (event) => {
         liNode.className = "list-group-item";
     })
@@ -75,7 +71,7 @@ function addFollower() {
     liNode.style.justifyContent = "space-between";
     var button = document.createElement("input");
     button.type = "button";
-    button.value = "-";
+    button.value = "x";
     button.className = "bi bi-minus";
     button.id = "removeFollower";
     liNode.appendChild(button);

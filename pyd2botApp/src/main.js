@@ -7,6 +7,9 @@ ejse.data('cssUrl', "file://" + path.join(__dirname, 'assets', 'css'));
 ejse.data('persistenceDir', path.join(__dirname, '..', '..', 'pyd2botDB'))
 ejse.data('pyd2botDir', )
 ejse.data('appDir', path.join(__dirname));
+ejse.data('dofus2Data', {
+    "skills": require(path.join(ejse.data('persistenceDir'), 'skills.json')),
+})
 const mainUrl = "file://" + path.join(__dirname, 'ejs', 'main.ejs')
 const pathsManager = require('./paths/PathManager.js').instance;
 const accountManager = require("./accounts/AccountManager.js").instance;
@@ -30,7 +33,7 @@ const createWindow = () => {
     });
 
     // and load the index.html of the app.
-    mainWindow.loadURL(sessionsManager.urls.fightSessionFormUrl);
+    mainWindow.loadURL(accountManager.urls.manageAccountsUrl);
 
     // To maximize the window
     mainWindow.maximize();
@@ -77,7 +80,6 @@ ipcMain.on("fetchCharacters", (event, key) => {
     accountManager.fetchCharacters(key);
 });
 
-
 // characters ipc handling
 ipcMain.on("saveCharacters", (event, args) => {
     accountManager.saveCharacters();
@@ -85,12 +87,10 @@ ipcMain.on("saveCharacters", (event, args) => {
 
 ipcMain.on("clearCharacters", (event, args) => {
     accountManager.clearCharacters();
-    mainWindow.loadURL(accountManager.urls.manageCharactersUrl); 
 });
 
 ipcMain.on("deleteCharacter", (event, key) => {
     accountManager.deleteCharacter(key);
-    mainWindow.loadURL(accountManager.urls.manageCharactersUrl);
 });
 
 ipcMain.on("goToCharacterProfile", (event, key) => {

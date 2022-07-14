@@ -13,7 +13,6 @@ logger = logging.getLogger(__name__)
 
 
 
-
 if __name__ == "__main__":
     import argparse
     parser = argparse.ArgumentParser()
@@ -28,13 +27,13 @@ if __name__ == "__main__":
     tfactory = TTransport.TBufferedTransportFactory()
     pfactory = TBinaryProtocol.TBinaryProtocolFactory()
     server = TServer.TSimpleServer(processor, transport, tfactory, pfactory)
-    print("Server started on {}:{}".format(args.host, args.port))
     def handler(signum, frame):
         print('Signal handler called with signal', signum)
         stop.set()
         sys.exit(0)
     signal.signal(signal.SIGINT, handler)
     server.serverTransport.listen()
+    print("Server started on {}:{}".format(args.host, args.port), flush=True)
     while not stop.is_set():
         client = server.serverTransport.accept()
         if not client:

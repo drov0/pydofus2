@@ -26,6 +26,8 @@ if len(sys.argv) <= 1 or sys.argv[1] == '--help':
     print('Functions:')
     print('   fetchAccountCharacters(string login, string password, int certId, string certHash)')
     print('  void runSession(string login, string password, int certId, string certHash, string sessionJson)')
+    print('   fetchBreedSpells(int breedId)')
+    print('  string fetchJobsInfosJson()')
     print('')
     sys.exit(0)
 
@@ -116,6 +118,18 @@ elif cmd == 'runSession':
         print('runSession requires 5 args')
         sys.exit(1)
     pp.pprint(client.runSession(args[0], args[1], eval(args[2]), args[3], args[4],))
+
+elif cmd == 'fetchBreedSpells':
+    if len(args) != 1:
+        print('fetchBreedSpells requires 1 args')
+        sys.exit(1)
+    pp.pprint(client.fetchBreedSpells(eval(args[0]),))
+
+elif cmd == 'fetchJobsInfosJson':
+    if len(args) != 0:
+        print('fetchJobsInfosJson requires 0 args')
+        sys.exit(1)
+    pp.pprint(client.fetchJobsInfosJson())
 
 else:
     print('Unrecognized method %s' % cmd)

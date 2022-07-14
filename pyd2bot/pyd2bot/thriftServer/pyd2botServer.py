@@ -2,6 +2,7 @@ from asyncio.log import logger
 import json
 from time import perf_counter, sleep
 from pyd2bot.thriftServer.pyd2botService.ttypes import Character, Spell
+from pydofus2.com.ankamagames.dofus.datacenter.breeds.Breed import Breed
 
 
 
@@ -51,10 +52,6 @@ class Pyd2botServer:
                     if perf_counter() - start > timeout:
                         raise TimeoutError("timeout")
                 for character in PlayerManager().charactersList:
-                    spells = []
-                    for spellVariant in character.breed.breedSpellVariants:
-                        for spellBreed in spellVariant.spells:
-                            spells.append(Spell(spellBreed.id, spellBreed.name, spellBreed.description))
                     chkwrgs = {
                         "name": character.name, 
                         "id": character.id, 
@@ -62,8 +59,7 @@ class Pyd2botServer:
                         "breedId": character.breedId, 
                         "breedName": character.breed.name, 
                         "serverId": server.id, 
-                        "serverName": PlayerManager().server.name,
-                        "spells": spells
+                        "serverName": PlayerManager().server.name
                     }
                     result.append(Character(**chkwrgs))
             else:
@@ -86,3 +82,30 @@ class Pyd2botServer:
         dofus2.login(loginToken, SessionManager().character["serverId"], SessionManager().character["characterId"])
         dofus2.join()
 
+    def fetchBreedSpells(self, breedId:int) -> list[Spell]:
+        spells = []
+        breed = Breed.getBreedById(breedId)
+        if not breed:
+            raise Exception(f"Breed {breedId} not found.")
+        for spellVariant in breed.breedSpellVariants:
+            for spellBreed in spellVariant.spells:
+                spells.append(Spell(spellBreed.id, spellBreed.name))
+        return spells
+    
+    def fetchJobsInfosJson(self) -> str:
+        import json
+        from pydofus2.com.ankamagames.dofus.datacenter.jobs.Skill import Skill
+        res = {}
+        skills = Skill.getSkills()
+        for skill in skills:
+            if skill.gatheredRessource:
+                if skill.parentJobId not in res:
+                    res[skill.parentJobId] = { 
+                        "id" : skill.parentJobId,
+                        "name": skill.parentJob.name,
+                        "gatheredRessources": [] 
+                    }
+                gr = {"name": skill.gatheredRessource.name, "id": skill.gatheredRessource.id, "levelMin": skill.levelMin}
+                if gr not in res[skill.parentJobId]["gatheredRessources"]:
+                    res[skill.parentJobId]["gatheredRessources"].append(gr)
+        return json.dumps(res)

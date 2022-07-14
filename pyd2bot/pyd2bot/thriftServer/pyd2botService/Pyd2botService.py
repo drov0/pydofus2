@@ -42,6 +42,17 @@ class Iface(object):
         """
         pass
 
+    def fetchBreedSpells(self, breedId):
+        """
+        Parameters:
+         - breedId
+
+        """
+        pass
+
+    def fetchJobsInfosJson(self):
+        pass
+
 
 class Client(Iface):
     def __init__(self, iprot, oprot=None):
@@ -112,6 +123,64 @@ class Client(Iface):
         self._oprot.writeMessageEnd()
         self._oprot.trans.flush()
 
+    def fetchBreedSpells(self, breedId):
+        """
+        Parameters:
+         - breedId
+
+        """
+        self.send_fetchBreedSpells(breedId)
+        return self.recv_fetchBreedSpells()
+
+    def send_fetchBreedSpells(self, breedId):
+        self._oprot.writeMessageBegin('fetchBreedSpells', TMessageType.CALL, self._seqid)
+        args = fetchBreedSpells_args()
+        args.breedId = breedId
+        args.write(self._oprot)
+        self._oprot.writeMessageEnd()
+        self._oprot.trans.flush()
+
+    def recv_fetchBreedSpells(self):
+        iprot = self._iprot
+        (fname, mtype, rseqid) = iprot.readMessageBegin()
+        if mtype == TMessageType.EXCEPTION:
+            x = TApplicationException()
+            x.read(iprot)
+            iprot.readMessageEnd()
+            raise x
+        result = fetchBreedSpells_result()
+        result.read(iprot)
+        iprot.readMessageEnd()
+        if result.success is not None:
+            return result.success
+        raise TApplicationException(TApplicationException.MISSING_RESULT, "fetchBreedSpells failed: unknown result")
+
+    def fetchJobsInfosJson(self):
+        self.send_fetchJobsInfosJson()
+        return self.recv_fetchJobsInfosJson()
+
+    def send_fetchJobsInfosJson(self):
+        self._oprot.writeMessageBegin('fetchJobsInfosJson', TMessageType.CALL, self._seqid)
+        args = fetchJobsInfosJson_args()
+        args.write(self._oprot)
+        self._oprot.writeMessageEnd()
+        self._oprot.trans.flush()
+
+    def recv_fetchJobsInfosJson(self):
+        iprot = self._iprot
+        (fname, mtype, rseqid) = iprot.readMessageBegin()
+        if mtype == TMessageType.EXCEPTION:
+            x = TApplicationException()
+            x.read(iprot)
+            iprot.readMessageEnd()
+            raise x
+        result = fetchJobsInfosJson_result()
+        result.read(iprot)
+        iprot.readMessageEnd()
+        if result.success is not None:
+            return result.success
+        raise TApplicationException(TApplicationException.MISSING_RESULT, "fetchJobsInfosJson failed: unknown result")
+
 
 class Processor(Iface, TProcessor):
     def __init__(self, handler):
@@ -119,6 +188,8 @@ class Processor(Iface, TProcessor):
         self._processMap = {}
         self._processMap["fetchAccountCharacters"] = Processor.process_fetchAccountCharacters
         self._processMap["runSession"] = Processor.process_runSession
+        self._processMap["fetchBreedSpells"] = Processor.process_fetchBreedSpells
+        self._processMap["fetchJobsInfosJson"] = Processor.process_fetchJobsInfosJson
         self._on_message_begin = None
 
     def on_message_begin(self, func):
@@ -174,6 +245,52 @@ class Processor(Iface, TProcessor):
             raise
         except Exception:
             logging.exception('Exception in oneway handler')
+
+    def process_fetchBreedSpells(self, seqid, iprot, oprot):
+        args = fetchBreedSpells_args()
+        args.read(iprot)
+        iprot.readMessageEnd()
+        result = fetchBreedSpells_result()
+        try:
+            result.success = self._handler.fetchBreedSpells(args.breedId)
+            msg_type = TMessageType.REPLY
+        except TTransport.TTransportException:
+            raise
+        except TApplicationException as ex:
+            logging.exception('TApplication exception in handler')
+            msg_type = TMessageType.EXCEPTION
+            result = ex
+        except Exception:
+            logging.exception('Unexpected exception in handler')
+            msg_type = TMessageType.EXCEPTION
+            result = TApplicationException(TApplicationException.INTERNAL_ERROR, 'Internal error')
+        oprot.writeMessageBegin("fetchBreedSpells", msg_type, seqid)
+        result.write(oprot)
+        oprot.writeMessageEnd()
+        oprot.trans.flush()
+
+    def process_fetchJobsInfosJson(self, seqid, iprot, oprot):
+        args = fetchJobsInfosJson_args()
+        args.read(iprot)
+        iprot.readMessageEnd()
+        result = fetchJobsInfosJson_result()
+        try:
+            result.success = self._handler.fetchJobsInfosJson()
+            msg_type = TMessageType.REPLY
+        except TTransport.TTransportException:
+            raise
+        except TApplicationException as ex:
+            logging.exception('TApplication exception in handler')
+            msg_type = TMessageType.EXCEPTION
+            result = ex
+        except Exception:
+            logging.exception('Unexpected exception in handler')
+            msg_type = TMessageType.EXCEPTION
+            result = TApplicationException(TApplicationException.INTERNAL_ERROR, 'Internal error')
+        oprot.writeMessageBegin("fetchJobsInfosJson", msg_type, seqid)
+        result.write(oprot)
+        oprot.writeMessageEnd()
+        oprot.trans.flush()
 
 # HELPER FUNCTIONS AND STRUCTURES
 
@@ -299,11 +416,11 @@ class fetchAccountCharacters_result(object):
             if fid == 0:
                 if ftype == TType.LIST:
                     self.success = []
-                    (_etype10, _size7) = iprot.readListBegin()
-                    for _i11 in range(_size7):
-                        _elem12 = Character()
-                        _elem12.read(iprot)
-                        self.success.append(_elem12)
+                    (_etype3, _size0) = iprot.readListBegin()
+                    for _i4 in range(_size0):
+                        _elem5 = Character()
+                        _elem5.read(iprot)
+                        self.success.append(_elem5)
                     iprot.readListEnd()
                 else:
                     iprot.skip(ftype)
@@ -320,8 +437,8 @@ class fetchAccountCharacters_result(object):
         if self.success is not None:
             oprot.writeFieldBegin('success', TType.LIST, 0)
             oprot.writeListBegin(TType.STRUCT, len(self.success))
-            for iter13 in self.success:
-                iter13.write(oprot)
+            for iter6 in self.success:
+                iter6.write(oprot)
             oprot.writeListEnd()
             oprot.writeFieldEnd()
         oprot.writeFieldStop()
@@ -453,6 +570,242 @@ runSession_args.thrift_spec = (
     (3, TType.I32, 'certId', None, None, ),  # 3
     (4, TType.STRING, 'certHash', 'UTF8', None, ),  # 4
     (5, TType.STRING, 'sessionJson', 'UTF8', None, ),  # 5
+)
+
+
+class fetchBreedSpells_args(object):
+    """
+    Attributes:
+     - breedId
+
+    """
+
+
+    def __init__(self, breedId=None,):
+        self.breedId = breedId
+
+    def read(self, iprot):
+        if iprot._fast_decode is not None and isinstance(iprot.trans, TTransport.CReadableTransport) and self.thrift_spec is not None:
+            iprot._fast_decode(self, iprot, [self.__class__, self.thrift_spec])
+            return
+        iprot.readStructBegin()
+        while True:
+            (fname, ftype, fid) = iprot.readFieldBegin()
+            if ftype == TType.STOP:
+                break
+            if fid == 1:
+                if ftype == TType.I32:
+                    self.breedId = iprot.readI32()
+                else:
+                    iprot.skip(ftype)
+            else:
+                iprot.skip(ftype)
+            iprot.readFieldEnd()
+        iprot.readStructEnd()
+
+    def write(self, oprot):
+        if oprot._fast_encode is not None and self.thrift_spec is not None:
+            oprot.trans.write(oprot._fast_encode(self, [self.__class__, self.thrift_spec]))
+            return
+        oprot.writeStructBegin('fetchBreedSpells_args')
+        if self.breedId is not None:
+            oprot.writeFieldBegin('breedId', TType.I32, 1)
+            oprot.writeI32(self.breedId)
+            oprot.writeFieldEnd()
+        oprot.writeFieldStop()
+        oprot.writeStructEnd()
+
+    def validate(self):
+        return
+
+    def __repr__(self):
+        L = ['%s=%r' % (key, value)
+             for key, value in self.__dict__.items()]
+        return '%s(%s)' % (self.__class__.__name__, ', '.join(L))
+
+    def __eq__(self, other):
+        return isinstance(other, self.__class__) and self.__dict__ == other.__dict__
+
+    def __ne__(self, other):
+        return not (self == other)
+all_structs.append(fetchBreedSpells_args)
+fetchBreedSpells_args.thrift_spec = (
+    None,  # 0
+    (1, TType.I32, 'breedId', None, None, ),  # 1
+)
+
+
+class fetchBreedSpells_result(object):
+    """
+    Attributes:
+     - success
+
+    """
+
+
+    def __init__(self, success=None,):
+        self.success = success
+
+    def read(self, iprot):
+        if iprot._fast_decode is not None and isinstance(iprot.trans, TTransport.CReadableTransport) and self.thrift_spec is not None:
+            iprot._fast_decode(self, iprot, [self.__class__, self.thrift_spec])
+            return
+        iprot.readStructBegin()
+        while True:
+            (fname, ftype, fid) = iprot.readFieldBegin()
+            if ftype == TType.STOP:
+                break
+            if fid == 0:
+                if ftype == TType.LIST:
+                    self.success = []
+                    (_etype10, _size7) = iprot.readListBegin()
+                    for _i11 in range(_size7):
+                        _elem12 = Spell()
+                        _elem12.read(iprot)
+                        self.success.append(_elem12)
+                    iprot.readListEnd()
+                else:
+                    iprot.skip(ftype)
+            else:
+                iprot.skip(ftype)
+            iprot.readFieldEnd()
+        iprot.readStructEnd()
+
+    def write(self, oprot):
+        if oprot._fast_encode is not None and self.thrift_spec is not None:
+            oprot.trans.write(oprot._fast_encode(self, [self.__class__, self.thrift_spec]))
+            return
+        oprot.writeStructBegin('fetchBreedSpells_result')
+        if self.success is not None:
+            oprot.writeFieldBegin('success', TType.LIST, 0)
+            oprot.writeListBegin(TType.STRUCT, len(self.success))
+            for iter13 in self.success:
+                iter13.write(oprot)
+            oprot.writeListEnd()
+            oprot.writeFieldEnd()
+        oprot.writeFieldStop()
+        oprot.writeStructEnd()
+
+    def validate(self):
+        return
+
+    def __repr__(self):
+        L = ['%s=%r' % (key, value)
+             for key, value in self.__dict__.items()]
+        return '%s(%s)' % (self.__class__.__name__, ', '.join(L))
+
+    def __eq__(self, other):
+        return isinstance(other, self.__class__) and self.__dict__ == other.__dict__
+
+    def __ne__(self, other):
+        return not (self == other)
+all_structs.append(fetchBreedSpells_result)
+fetchBreedSpells_result.thrift_spec = (
+    (0, TType.LIST, 'success', (TType.STRUCT, [Spell, None], False), None, ),  # 0
+)
+
+
+class fetchJobsInfosJson_args(object):
+
+
+    def read(self, iprot):
+        if iprot._fast_decode is not None and isinstance(iprot.trans, TTransport.CReadableTransport) and self.thrift_spec is not None:
+            iprot._fast_decode(self, iprot, [self.__class__, self.thrift_spec])
+            return
+        iprot.readStructBegin()
+        while True:
+            (fname, ftype, fid) = iprot.readFieldBegin()
+            if ftype == TType.STOP:
+                break
+            else:
+                iprot.skip(ftype)
+            iprot.readFieldEnd()
+        iprot.readStructEnd()
+
+    def write(self, oprot):
+        if oprot._fast_encode is not None and self.thrift_spec is not None:
+            oprot.trans.write(oprot._fast_encode(self, [self.__class__, self.thrift_spec]))
+            return
+        oprot.writeStructBegin('fetchJobsInfosJson_args')
+        oprot.writeFieldStop()
+        oprot.writeStructEnd()
+
+    def validate(self):
+        return
+
+    def __repr__(self):
+        L = ['%s=%r' % (key, value)
+             for key, value in self.__dict__.items()]
+        return '%s(%s)' % (self.__class__.__name__, ', '.join(L))
+
+    def __eq__(self, other):
+        return isinstance(other, self.__class__) and self.__dict__ == other.__dict__
+
+    def __ne__(self, other):
+        return not (self == other)
+all_structs.append(fetchJobsInfosJson_args)
+fetchJobsInfosJson_args.thrift_spec = (
+)
+
+
+class fetchJobsInfosJson_result(object):
+    """
+    Attributes:
+     - success
+
+    """
+
+
+    def __init__(self, success=None,):
+        self.success = success
+
+    def read(self, iprot):
+        if iprot._fast_decode is not None and isinstance(iprot.trans, TTransport.CReadableTransport) and self.thrift_spec is not None:
+            iprot._fast_decode(self, iprot, [self.__class__, self.thrift_spec])
+            return
+        iprot.readStructBegin()
+        while True:
+            (fname, ftype, fid) = iprot.readFieldBegin()
+            if ftype == TType.STOP:
+                break
+            if fid == 0:
+                if ftype == TType.STRING:
+                    self.success = iprot.readString().decode('utf-8', errors='replace') if sys.version_info[0] == 2 else iprot.readString()
+                else:
+                    iprot.skip(ftype)
+            else:
+                iprot.skip(ftype)
+            iprot.readFieldEnd()
+        iprot.readStructEnd()
+
+    def write(self, oprot):
+        if oprot._fast_encode is not None and self.thrift_spec is not None:
+            oprot.trans.write(oprot._fast_encode(self, [self.__class__, self.thrift_spec]))
+            return
+        oprot.writeStructBegin('fetchJobsInfosJson_result')
+        if self.success is not None:
+            oprot.writeFieldBegin('success', TType.STRING, 0)
+            oprot.writeString(self.success.encode('utf-8') if sys.version_info[0] == 2 else self.success)
+            oprot.writeFieldEnd()
+        oprot.writeFieldStop()
+        oprot.writeStructEnd()
+
+    def validate(self):
+        return
+
+    def __repr__(self):
+        L = ['%s=%r' % (key, value)
+             for key, value in self.__dict__.items()]
+        return '%s(%s)' % (self.__class__.__name__, ', '.join(L))
+
+    def __eq__(self, other):
+        return isinstance(other, self.__class__) and self.__dict__ == other.__dict__
+
+    def __ne__(self, other):
+        return not (self == other)
+all_structs.append(fetchJobsInfosJson_result)
+fetchJobsInfosJson_result.thrift_spec = (
+    (0, TType.STRING, 'success', 'UTF8', None, ),  # 0
 )
 fix_spec(all_structs)
 del all_structs

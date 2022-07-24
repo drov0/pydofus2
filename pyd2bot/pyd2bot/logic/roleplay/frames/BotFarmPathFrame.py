@@ -46,7 +46,6 @@ from pyd2bot.logic.roleplay.frames.BotPartyFrame import BotPartyFrame
 from pyd2bot.logic.roleplay.messages.AutoTripEndedMessage import AutoTripEndedMessage
 from pyd2bot.misc.BotEventsmanager import BotEventsManager
 from pyd2bot.models.enums.ServerNotificationTitlesEnum import ServerNotificationTitlesEnum
-from pyd2bot.models.farmPaths.AbstractFarmPath import AbstractFarmPath
 
 if TYPE_CHECKING:
     from pydofus2.com.ankamagames.dofus.logic.game.roleplay.frames.RoleplayEntitiesFrame import RoleplayEntitiesFrame
@@ -102,6 +101,7 @@ class BotFarmPathFrame(Frame):
         return self._worker.getFrame("RoleplayWorldFrame")
 
     def pushed(self) -> bool:
+        logger.info("BotFarmPathFrame pushed")
         if self._autoStart:
             Timer(5, self.doFarm).start()
         return True
@@ -244,14 +244,17 @@ class BotFarmPathFrame(Frame):
         return tgtRpZone == PlayedCharacterManager().currentZoneRp
 
     def doFarm(self, event=None):
-        if not SessionManager().isSolo:
-            if not SessionManager().isLeader:
-                logger.error("[BotFarmFrame] in group mode only the leader can run a farm path")
+        logger.debug("[BotFarmFrame] doFarm called")
+        if SessionManager().type == "fight" and not SessionManager().isLeader:
+            logger.error("[BotFarmFrame] in fight mode only the leader can run a farm path")
+            return
+        if self.partyFrame:
+            logger.debug("[BotFarmFrame] Party found")
+            if not self.partyFrame.allMembersOnSameMap:
+                logger.error("[BotFarmFrame] Party members are not on the same map")
+                BotEventsManager().add_listener(BotEventsManager.ALLMEMBERS_ONSAME_MAP, self.doFarm)
                 return
-            if self.partyFrame:
-                if not self.partyFrame.allMembersOnSameMap:
-                    BotEventsManager().add_listener(BotEventsManager.ALLMEMBERS_ONSAME_MAP, self.doFarm)
-                    return
+        logger.debug("[BotFarmFrame] Party found and all members on the same map")
         BotEventsManager().remove_listener(BotEventsManager.ALLMEMBERS_ONSAME_MAP, self.doFarm)
         if WorldPathFinder().currPlayerVertex not in self.farmPath:
             logger.debug(
@@ -263,9 +266,9 @@ class BotFarmPathFrame(Frame):
         self._followinMonsterGroup = None
         self._followingIe = None
         self._lastCellId = PlayedCharacterManager().currentCellId
-        if self.farmPath.fightOnly:
+        if SessionManager().type == 'fight':
             self.attackMonsterGroup()
-        else:
+        elif SessionManager().type == 'farm':
             self.collectResource()
         if self._followingIe is None and self._followinMonsterGroup is None:
             self.moveToNextStep()
@@ -280,11 +283,14 @@ class BotFarmPathFrame(Frame):
         minDist = float("inf")
         for it in self.interactivesFrame.collectables.values():
             if it.enabled:
-                if self.farmPath.jobIds:
-                    if it.skill.parentJobId not in self.farmPath.jobIds:
+                if SessionManager().jobIds:
+                    if it.skill.parentJobId not in SessionManager().jobIds:
                         continue
                     if PlayedCharacterManager().jobs[it.skill.parentJobId].jobLevel < it.skill.levelMin:
                         continue
+                    if SessionManager().resourceIds:
+                        if it.skill.gatheredRessource.id not in SessionManager().resourceIds:
+                            continue
                 ie = self.interactivesFrame.interactives.get(it.id)
                 if not (self.interactivesFrame and self.interactivesFrame.usingInteractive):
                     playerEntity = PlayedCharacterManager().entity

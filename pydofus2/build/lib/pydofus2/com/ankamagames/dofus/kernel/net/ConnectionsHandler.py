@@ -41,6 +41,8 @@ class ConnectionsHandler:
     _hasReceivedNetworkMsg: bool = False
 
     _connectionTimeout = None
+    
+    _disconnectMessage = ""
 
     @property
     @classmethod
@@ -145,15 +147,16 @@ class ConnectionsHandler:
     @classmethod
     def handleDisconnection(cls) -> DisconnectionReason:
         cls.closeConnection()
-        reason: DisconnectionReason = DisconnectionReason(cls._wantedSocketLost, cls._wantedSocketLostReason)
+        reason: DisconnectionReason = DisconnectionReason(cls._wantedSocketLost, cls._wantedSocketLostReason, cls._disconnectMessage)
         cls._wantedSocketLost = False
         cls._wantedSocketLostReason = DisconnectionReasonEnum.UNEXPECTED
         return reason
 
     @classmethod
-    def connectionGonnaBeClosed(cls, expectedReason: int) -> None:
+    def connectionGonnaBeClosed(cls, expectedReason: int, msg: str = "") -> None:
         cls._wantedSocketLostReason = expectedReason
         cls._wantedSocketLost = True
+        cls._disconnectMessage = msg
 
     @classmethod
     def pause(cls) -> None:

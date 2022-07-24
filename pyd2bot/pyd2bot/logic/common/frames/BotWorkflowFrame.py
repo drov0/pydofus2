@@ -62,6 +62,7 @@ class BotWorkflowFrame(Frame):
     def process(self, msg: Message) -> bool:
 
         if isinstance(msg, GameContextCreateMessage):
+            logger.debug("*************************************** GameContext Changed ************************************************")
             self.currentContext = msg.context
             if self._delayedAutoBankUnlaod:
                 self._delayedAutoBankUnlaod = False
@@ -69,13 +70,14 @@ class BotWorkflowFrame(Frame):
                 return True
             if not self._inBankAutoUnload and not self._inPhenixAutoRevive:
                 if self.currentContext == GameContextEnum.ROLE_PLAY:
-                    if not SessionManager().leaderName:
+                    if SessionManager().path:
                         Kernel().getWorker().addFrame(BotFarmPathFrame())
                 elif self.currentContext == GameContextEnum.FIGHT:
                     Kernel().getWorker().addFrame(BotFightFrame())
             return True
 
         elif isinstance(msg, GameContextDestroyMessage):
+            logger.debug("*************************************** GameContext Destroyed ************************************************")
             if self._delayedAutoBankUnlaod:
                 self._delayedAutoBankUnlaod = False
                 self.triggerBankUnload()
@@ -84,9 +86,8 @@ class BotWorkflowFrame(Frame):
                 if Kernel().getWorker().getFrame("BotFightFrame"):
                     Kernel().getWorker().removeFrameByName("BotFightFrame")
             elif self.currentContext == GameContextEnum.ROLE_PLAY:
-                if not SessionManager().leaderName:
-                    if Kernel().getWorker().getFrame("BotFarmPathFrame"):
-                        Kernel().getWorker().removeFrameByName("BotFarmPathFrame")
+                if Kernel().getWorker().getFrame("BotFarmPathFrame"):
+                    Kernel().getWorker().removeFrameByName("BotFarmPathFrame")
             return True
 
         elif isinstance(msg, InventoryWeightMessage):
@@ -103,7 +104,7 @@ class BotWorkflowFrame(Frame):
 
         elif isinstance(msg, BankUnloadEndedMessage):
             self._inBankAutoUnload = False
-            if SessionManager().isLeader:
+            if SessionManager().path:
                 if not Kernel().getWorker().contains("BotFarmPathFrame"):
                     Kernel().getWorker().addFrame(BotFarmPathFrame(True))
             if Kernel().getWorker().contains("BotUnloadInBankFrame"):
@@ -119,9 +120,8 @@ class BotWorkflowFrame(Frame):
         ) or isinstance(msg, GameRolePlayGameOverMessage):
             logger.debug(f"Player is dead, auto reviving...")
             self._inPhenixAutoRevive = True
-            if not SessionManager().leaderName:
-                if Kernel().getWorker().contains("BotFarmPathFrame"):
-                    Kernel().getWorker().removeFrameByName("BotFarmPathFrame")
+            if Kernel().getWorker().contains("BotFarmPathFrame"):
+                Kernel().getWorker().removeFrameByName("BotFarmPathFrame")
             PlayedCharacterManager().state = PlayerLifeStatusEnum(msg.state)
             Kernel().getWorker().addFrame(BotPhenixAutoRevive())
             return False
@@ -134,7 +134,7 @@ class BotWorkflowFrame(Frame):
             self._inPhenixAutoRevive = False
             if Kernel().getWorker().contains("BotPhenixAutoRevive"):
                 Kernel().getWorker().removeFrameByName("BotPhenixAutoRevive")
-            if not SessionManager().leaderName:
+            if SessionManager().path:
                 if not Kernel().getWorker().contains("BotFarmPathFrame"):
                     Kernel().getWorker().addFrame(BotFarmPathFrame(True))
             return True

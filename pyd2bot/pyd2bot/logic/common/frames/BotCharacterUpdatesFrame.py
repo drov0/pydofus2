@@ -97,17 +97,17 @@ class BotCharacterUpdatesFrame(Frame):
 
         elif isinstance(msg, CharacterLevelUpMessage):
             clumsg = msg
-            if SessionManager().statToUp:
+            if SessionManager().character["primaryStatId"]:
                 previousLevel = PlayedCharacterManager().infos.level
                 PlayedCharacterManager().infos.level = clumsg.newLevel
                 pointsEarned = (clumsg.newLevel - previousLevel) * 5
-                self.boostStat(SessionManager().statToUp, pointsEarned)
+                self.boostStat(SessionManager().character["primaryStatId"], pointsEarned)
             return True
 
         elif isinstance(msg, CharacterStatsListMessage):
             if not self._statsInitialized:
                 unusedStatPoints = PlayedCharacterManager().stats.getStatBaseValue(StatIds.STATS_POINTS)
                 if unusedStatPoints > 0:
-                    self.boostStat(SessionManager().statToUp, unusedStatPoints)
+                    self.boostStat(SessionManager().character["primaryStatId"], unusedStatPoints)
                 self._statsInitialized = True
             return True

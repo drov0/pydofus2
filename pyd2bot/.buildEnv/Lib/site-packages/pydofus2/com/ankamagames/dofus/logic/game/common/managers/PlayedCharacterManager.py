@@ -219,6 +219,11 @@ class PlayedCharacterManager(IDestroyable, metaclass=Singleton):
         return self.restrictions.cantAttackMonster
 
     @property
+    def isInFight(self) -> bool:
+        from pydofus2.com.ankamagames.dofus.kernel.Kernel import Kernel
+        return Kernel().getWorker().getFrame("FightContextFrame")
+    
+    @property
     def isInKoli(self) -> bool:
         from pydofus2.com.ankamagames.dofus.logic.game.fight.frames.FightContextFrame import (
             FightContextFrame,

@@ -21,6 +21,10 @@ class Logger(logging.Logger):
         )
         fileHandler.setFormatter(formatter)
         self.addHandler(fileHandler)
+        
+        streamHandler = logging.StreamHandler()
+        streamHandler.setFormatter(formatter)
+        self.addHandler(streamHandler)
 
     def get_logger(self):
         return self

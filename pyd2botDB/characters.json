@@ -8,7 +8,7 @@
     "serverId": 210,
     "serverName": "Merkator",
     "accountId": "melanco-lalco",
-    "primarySpell": 13516,
+    "primarySpellId": 13516,
     "primaryStatId": 10
   },
   "336597024978": {
@@ -20,7 +20,7 @@
     "serverId": 210,
     "serverName": "Merkator",
     "accountId": "melanco-lalco",
-    "primarySpell": 12902,
+    "primarySpellId": 12902,
     "primaryStatId": 10
   },
   "336919789778": {
@@ -32,7 +32,7 @@
     "serverId": 210,
     "serverName": "Merkator",
     "accountId": "Exodios-arc",
-    "primarySpell": 13516,
+    "primarySpellId": 13516,
     "primaryStatId": 10
   },
   "336815325394": {
@@ -44,7 +44,7 @@
     "serverId": 210,
     "serverName": "Merkator",
     "accountId": "Exodios-cra",
-    "primarySpell": 13516,
+    "primarySpellId": 13516,
     "primaryStatId": 10
   },
   "474147979471": {
@@ -56,7 +56,7 @@
     "serverId": 207,
     "serverName": "Ush",
     "accountId": "Exodios-cra",
-    "primarySpell": 13516,
+    "primarySpellId": 13516,
     "primaryStatId": 10
   },
   "336919920850": {
@@ -68,7 +68,7 @@
     "serverId": 210,
     "serverName": "Merkator",
     "accountId": "twistedFater",
-    "primarySpell": 13516,
+    "primarySpellId": 13516,
     "primaryStatId": 10
   }
 }

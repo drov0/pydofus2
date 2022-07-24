@@ -42,7 +42,7 @@ const createWindow = () => {
     });
 
     // and load the index.html of the app.
-    mainWindow.loadURL(sessionsManager.urls.fightSessionFormUrl);
+    mainWindow.loadURL(sessionsManager.urls.manageSessionsUrl);
 
     // To maximize the window
     mainWindow.maximize();
@@ -107,9 +107,7 @@ ipcMain.on("goToCharacterProfile", (event, key) => {
     mainWindow.loadURL(accountManager.urls.characterProfileUrl);
 });
 
-ipcMain.on("getCharactersData", (event) => {
-    event.returnValue = accountManager.charactersDB;
-});
+
 
 ipcMain.on("cancelCharacterProfileEdit", (event, args) => {
     accountManager.selectedCharacterKey = null;
@@ -165,7 +163,6 @@ ipcMain.on("saveSessions", (event, args) => {
 
 ipcMain.on("deleteSession", (event, key) => {
     sessionsManager.deleteSession(key);
-    mainWindow.loadURL(sessionsManager.urls.manageSessionsUrl);
 });
 
 ipcMain.on("editSession", (event, key) => {
@@ -180,6 +177,10 @@ ipcMain.on("editSession", (event, key) => {
 ipcMain.on("cancelCreateSession", (event, args) => {
     sessionsManager.currentEditedSession = null;
     mainWindow.loadURL(sessionsManager.urls.manageSessionsUrl);
+});
+
+ipcMain.on("getData", (event, key) => {
+    event.returnValue = ejse.data(key);
 });
 // This method will be called when Electron has finished
 // initialization and is ready to create browser windows.

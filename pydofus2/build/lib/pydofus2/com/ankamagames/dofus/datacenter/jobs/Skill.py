@@ -45,11 +45,11 @@ class Skill(IDataCenter):
 
     _name: str = None
 
-    _parentJob: Job
+    _parentJob: Job = None
 
     _interactive: Interactive = None
 
-    _gatheredRessource: ItemWrapper
+    _gatheredRessource: ItemWrapper = None
 
     def __init__(self):
         super().__init__()
@@ -86,6 +86,6 @@ class Skill(IDataCenter):
     def gatheredRessource(self) -> ItemWrapper:
         if not self._gatheredRessource and self.gatheredRessourceItem != -1:
             self._gatheredRessource = ItemWrapper.create(
-                0, 0, self.gatheredRessourceItem, 1, None, False
+                0, 0, self.gatheredRessourceItem, 1, [], False
             )
         return self._gatheredRessource

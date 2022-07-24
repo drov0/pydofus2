@@ -49,7 +49,7 @@ class InstancesManager {
                 }
             });
             connection.on('connect', () => {
-                console.log("Connected the client to instance " + instanceId  + " server");
+                console.log("Connected the client to instance " + instanceId  + " server" + "on port " + inst.port);
                 var client = thrift.createClient(Pyd2botService, connection);
                 if (inst.connection) {
                     this.wantsToKillClient[instanceId] = true;
@@ -76,23 +76,39 @@ class InstancesManager {
     async spawnServer(instanceId) {
         var execFunc = (resolve, reject) => {
             var port = this.freePorts.pop();
-            var instance = child_process.execFile(this.pyd2botExePath, ["--port", port, "--host", "0.0.0.0"])
-            this.runningInstances[instanceId] = {"port": port, "server" : instance, "client" : null, "connection" : null};
-            instance.stdout.on('data', (stdout) => {
+            var pyd2bot_process = child_process.execFile(this.pyd2botExePath, ["--port", port, "--host", "0.0.0.0"])
+            this.runningInstances[instanceId] = {"port": port, "server" : pyd2bot_process, "client" : null, "connection" : null, "childs" : []};
+            pyd2bot_process.stdout.on('data', (stdout) => {
                 if (stdout.toString().includes("Server started")) {
                     console.log("Instance " + instanceId + " server started");
-                    resolve(instance);
+                    resolve(pyd2bot_process);
                 }
             });
-            instance.stderr.on('data', (stderr) => {
+            pyd2bot_process.stderr.on('data', (stderr) => {
                 console.log("Error : " + stderr.toString());
             });
-            instance.on('close', (code) => {
-                console.log(`child process exited with code ${code}`);
-                if (instance.connection){
-                    instance.connection.end();
-                }
+            pyd2bot_process.on('close', async (code) => {
+                console.log(`Server ${instanceId} exited with code ${code}`);
                 this.freePorts.push(port);
+                var instance = this.runningInstances[instanceId];
+                instance.serverClosed = true
+                if (!instance) {
+                    console.log("Instance " + instanceId + " not found");
+                }
+                else {
+                    if (instance.connection){
+                        instance.connection.end();
+                    }
+                    if (this.wantsToKillServer[instanceId]) {
+                        this.wantsToKillClient[instanceId] = false;
+                    }
+                    else if (instance.runningSession) {
+                        console.log("Instance " + instanceId + " server crashed");
+                        console.log("running session : " + JSON.stringify(instance.runningSession))
+                        const sessionsManager = require("../sessions/SessionsManager.js").instance;
+                        sessionsManager.runSession(instance.runningSession)
+                    }
+                }
             });
             setTimeout(() => {
                 this.freePorts.push(port);
@@ -110,19 +126,27 @@ class InstancesManager {
     }
 
     killInstance(instanceId) {
-        if (this.runningInstances[instanceId]) {
-            var i = this.runningInstances[instanceId]
-            if (i.connection) {
+        var instance = this.runningInstances[instanceId]
+        if (instance) {
+            if (instance.connection) {
                 console.log("Killing client for instance " + instanceId);
                 this.wantsToKillClient[instanceId] = true;
-                i.connection.end();
+                instance.connection.end();
             }
-            if (i.server) {
+            if (instance.server) {
                 console.log("Killing server for instance " + instanceId);
-                this.wantsToKillServer[instanceId] = true;
-                i.server.kill('SIGINT')
+                if (!instance.ServerClosed) {
+                    this.wantsToKillServer[instanceId] = true;
+                    instance.server.kill('SIGINT')
+                }
             }
-            this.freePorts.push(i.port);
+            if (instance.childs) {
+                console.log("Killing childs for instance " + instanceId);
+                instance.childs.forEach(child => {
+                    this.killInstance(child);
+                })
+            }
+            this.freePorts.push(instance.port);
             delete this.runningInstances[instanceId];
         }
     }

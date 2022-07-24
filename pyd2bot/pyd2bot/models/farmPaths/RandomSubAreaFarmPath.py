@@ -15,18 +15,12 @@ class RandomSubAreaFarmPath(AbstractFarmPath):
         name: str,
         subAreaId: int,
         startVertex: Vertex,
-        fightOnly: bool = False,
-        monsterLvlCoefDiff: float = float("inf"),
-        jobIds: list[int] = [],
     ) -> None:
         self.name = name
-        self.fightOnly = fightOnly
         self.startVertex = startVertex
         self.subArea = SubArea.getSubAreaById(subAreaId)
         self._currentVertex = None
         self._verticies = list[Vertex]()
-        self.monsterLvlCoefDiff = monsterLvlCoefDiff
-        self.jobIds = jobIds
 
     def __next__(self) -> Transition:
         outgoingEdges = WorldPathFinder().worldGraph.getOutgoingEdgesFromVertex(self.currentVertex)
@@ -84,9 +78,6 @@ class RandomSubAreaFarmPath(AbstractFarmPath):
                 "mapId": self.startVertex.mapId,
                 "mapRpZone": self.startVertex.zoneId,
             },
-            "fightOnly": self.fightOnly,
-            "monsterLvlCoefDiff": self.monsterLvlCoefDiff,
-            "jobIds": self.jobIds,
         }
 
     @classmethod
@@ -96,7 +87,4 @@ class RandomSubAreaFarmPath(AbstractFarmPath):
             pathJson["name"],
             pathJson["subAreaId"],
             startVertex,
-            pathJson["fightOnly"],
-            pathJson["monsterLvlCoefDiff"],
-            pathJson["jobIds"],
         )

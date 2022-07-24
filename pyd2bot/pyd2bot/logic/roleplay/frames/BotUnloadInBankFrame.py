@@ -1,5 +1,6 @@
 from threading import Timer
 from pydofus2.com.ankamagames.atouin.managers.MapDisplayManager import MapDisplayManager
+from pydofus2.com.ankamagames.dofus.datacenter.npcs.NpcMessage import NpcMessage
 from pydofus2.com.ankamagames.dofus.kernel.net.ConnectionsHandler import ConnectionsHandler
 from pydofus2.com.ankamagames.dofus.logic.game.common.managers.PlayedCharacterManager import PlayedCharacterManager
 from pydofus2.com.ankamagames.dofus.network.messages.game.context.roleplay.MapComplementaryInformationsDataMessage import (
@@ -11,6 +12,7 @@ from pydofus2.com.ankamagames.dofus.network.messages.game.context.roleplay.MapIn
 from pydofus2.com.ankamagames.dofus.network.messages.game.context.roleplay.npc.NpcDialogCreationMessage import (
     NpcDialogCreationMessage,
 )
+from pydofus2.com.ankamagames.dofus.network.messages.game.context.roleplay.npc.NpcDialogQuestionMessage import NpcDialogQuestionMessage
 from pydofus2.com.ankamagames.dofus.network.messages.game.context.roleplay.npc.NpcDialogReplyMessage import (
     NpcDialogReplyMessage,
 )
@@ -21,7 +23,6 @@ from pydofus2.com.ankamagames.dofus.network.messages.game.dialog.LeaveDialogRequ
 from pydofus2.com.ankamagames.dofus.network.messages.game.interactive.InteractiveUseErrorMessage import (
     InteractiveUseErrorMessage,
 )
-from pydofus2.com.ankamagames.dofus.network.messages.game.interactive.InteractiveUsedMessage import InteractiveUsedMessage
 from pydofus2.com.ankamagames.dofus.network.messages.game.inventory.exchanges.ExchangeLeaveMessage import ExchangeLeaveMessage
 from pydofus2.com.ankamagames.dofus.network.messages.game.inventory.exchanges.ExchangeObjectTransfertAllFromInvMessage import (
     ExchangeObjectTransfertAllFromInvMessage,
@@ -30,6 +31,7 @@ from pydofus2.com.ankamagames.dofus.network.messages.game.inventory.exchanges.Ex
     ExchangeStartedWithStorageMessage,
 )
 from pydofus2.com.ankamagames.dofus.network.messages.game.inventory.items.InventoryWeightMessage import InventoryWeightMessage
+from pydofus2.com.ankamagames.jerakine.data.I18n import I18n
 
 from pydofus2.com.ankamagames.jerakine.messages.Frame import Frame
 from pydofus2.com.ankamagames.dofus.kernel.Kernel import Kernel
@@ -41,6 +43,7 @@ from pyd2bot.logic.roleplay.messages.AutoTripEndedMessage import AutoTripEndedMe
 from pyd2bot.logic.roleplay.messages.BankUnloadEndedMessage import BankUnloadEndedMessage
 from pyd2bot.logic.roleplay.messages.BankUnloadFailedMessage import BankUnloadFailedMessage
 from pyd2bot.misc.Localizer import Localizer
+from pydofus2.com.ankamagames.jerakine.utils.pattern.PatternDecoder import PatternDecoder
 
 logger = Logger("Dofus2")
 
@@ -56,6 +59,8 @@ class BotUnloadInBankFrame(Frame):
         self._askedEnterBank = False
         self._waitmap = True
         self._requestedUnload = False
+        self._openExchangeTimer = None
+        self._waitingForQuestion = False
         if PlayedCharacterManager().currentMap is not None:
             self._waitmap = False
             self.start()
@@ -100,14 +105,25 @@ class BotUnloadInBankFrame(Frame):
                 self.start()
 
         elif isinstance(msg, NpcDialogCreationMessage):
-            logger.debug("bank man dialog engaged")
-            rmsg = NpcDialogReplyMessage()
-            rmsg.init(self.infos.openBankReplyId)
-            ConnectionsHandler.getConnection().send(rmsg)
-            logger.debug("Bank reply to open bank storage sent")
-            return True
+            self._waitingForQuestion = True
+    
+        elif isinstance(msg, NpcDialogQuestionMessage):
+            if self._waitingForQuestion:
+                self._waitingForQuestion = False
+                for replyId in msg.visibleReplies:
+                    r = PatternDecoder.decode(I18n.getUiText(replyId))
+                    logger.debug("NpcDialogQuestionMessage: %s", r)
+                logger.debug("bank man dialog engaged")
+                self.openBankExchange()
+                self._openExchangeTimer = Timer(3, self.openBankExchange())
+                self._openExchangeTimer.start()
+                logger.debug("Bank reply to open bank storage sent")
+                return True
 
+            
         elif isinstance(msg, ExchangeStartedWithStorageMessage):
+            if self._openExchangeTimer:
+                self._openExchangeTimer.cancel()
             self._requestedUnload = True
             rmsg = ExchangeObjectTransfertAllFromInvMessage()
             rmsg.init()
@@ -146,3 +162,9 @@ class BotUnloadInBankFrame(Frame):
         rmsg.init(self.infos.npcId, self.infos.npcActionId, self.infos.npcMapId)
         ConnectionsHandler.getConnection().send(rmsg)
         logger.debug("Open bank man dialog sent")
+
+    def openBankExchange(self):
+        rmsg = NpcDialogReplyMessage()
+        logger.debug(f"Reply id {self.infos.openBankReplyId} sent")
+        rmsg.init(self.infos.openBankReplyId)
+        ConnectionsHandler.getConnection().send(rmsg)

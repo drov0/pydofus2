@@ -13,40 +13,45 @@
     <script>let $ = require('jquery');</script>
     <script>require('popper');</script>
     <script>require('bootstrap');</script>
-    <script defer src="render.js"></script>
+    <script src="render.js"></script>
 </head>
 
 <body>
     <div class="wrapper">
         <%- include(sidebarUrl, {active: 'sessions'}) %>
+        <% var curr = sessions.currentEditedSession %>
         <div class="bodyRightView">
             <div class="pathsFormsContainer">
                 <h>Enter session config</h>
                 <div class="myform-group">
-                    <label for="name">name : </label>
-                    <input class="myfg-input form-control" type="text" id="name" value='<%=sessions.currentEditedSession ? sessions.currentEditedSession.name : ""%>'>
+                    <label for="name">Name : </label>
+                    <input class="myfg-input form-control" type="text" id="name" value='<%= curr ? curr.name : ""%>'>
                 </div>
                 <div class="myform-group">
-                    <label for="path">path : </label>
-                    <select class="myfg-input form-select" id="path" value='<%=sessions.currentEditedSession ? sessions.currentEditedSession.pathId : ""%>'>
+                    <label for="path">Path : </label>
+                    <select class="myfg-input form-select" id="path" value='<%= curr ? curr.path : ""%>'>
                         <% Object.keys(paths.pathsDB).forEach(key => { %>
-                        <option value="<%=key%>"><%=key%></option>
+                        <option value="<%= key %>"><%= key %></option>
                         <% }) %>
                     </select>
                 </div>
                 <div class="myform-group">
-                    <label for="sessionType">type : </label>
+                    <label for="sessionType">Type : </label>
                     <label id="sessionType" class="myfg-input" value="farm">farm</label>
                 </div>
                 <div class="myform-group">
-                    <label>jobs : </label>
+                    <label for="farmer">Farmer : </label>
+                    <select id="farmer" class="myfg-input form-select" value=<%= curr ? JSON.stringify(curr.farmer) : ""%>>
+                        <% Object.entries(accounts.charactersDB).forEach(([key, ch]) => { %>
+                        <option value=<%= JSON.stringify(ch) %>><%=ch.name%> (<%=ch.serverName%>, <%=ch.breedName%>)</option>
+                        <% }) %>
+                    </select>
+                </div>
+                <div class="myform-group">
+                    <label>Jobs : </label>
                     <div class="myfg-input">
                         <div class="mylist-select-and-button">
-                            <select id="job" class="form-select">
-                                <% Object.entries(dofus2Data.skills).forEach(([key, skill]) => { %>
-                                <option value="<%=skill.id%>"><%=skill.name%></option>
-                                <% }) %>
-                            </select>
+                            <select id="jobSelect" class="form-select" onchange="populateResourcesSelect()"></select>
                             <input type='button' value='+' id='addJob' onclick="addJob()"/>
                         </div>
                         <ul class="list-group" id='jobs'></ul>
@@ -56,7 +61,7 @@
                     <label>Resources : </label>
                     <div class="myfg-input">
                         <div class="mylist-select-and-button">
-                            <select id="resources" class="form-select"></select>
+                            <select id="resourceSelect" class="form-select"></select>
                             <input type='button' value='+' id='addResource' onclick="addResource()"/>
                         </div>
                         <ul class="list-group" id='resources'></ul>
@@ -69,5 +74,8 @@
             </div>
         </div>
     </div>
+    <script>
+        populateJobsSelect();
+    </script>
 </body>
 </html>

@@ -8,11 +8,11 @@ const InstancesManager = require("../bot/InstancesManager.js");
 const instancesManager = InstancesManager.instance;
 const defaultBreedConfig = {
     10: { // sadida
-        "primarySpell" : 13516, // ronce
+        "primarySpellId" : 13516, // ronce
         "primaryStat" : 10 // force
     },
     4 : { // sram
-        "primarySpell" : 12902, // Truanderie
+        "primarySpellId" : 12902, // Truanderie
         "primaryStat" : 10 // force
     },
 }
@@ -198,7 +198,7 @@ class AccountManager {
                 this.saveBreedSpells()
             }  
             character.accountId = key
-            character.primarySpell = defaultBreedConfig[character.breedId].primarySpell
+            character.primarySpellId = defaultBreedConfig[character.breedId].primarySpellId
             character.primaryStatId = defaultBreedConfig[character.breedId].primaryStat
             this.charactersDB[character.id] = character
         }

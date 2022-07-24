@@ -2,7 +2,7 @@ import base64
 import traceback
 from time import perf_counter, sleep
 from types import FunctionType
-
+from pydofus2.com.ankamagames.dofus.kernel.net.DisconnectionReasonEnum import DisconnectionReasonEnum
 from pydofus2.com.ankamagames.dofus.network.messages.common.NetworkDataContainerMessage import NetworkDataContainerMessage
 from pydofus2.com.ankamagames.jerakine.benchmark.BenchmarkTimer import BenchmarkTimer
 from pydofus2.com.ankamagames.jerakine.events.IOErrorEvent import IOErrorEvent
@@ -307,8 +307,17 @@ class ServerConnection(IServerConnection):
                             )
                         msg = self.lowReceive(input)
         except Exception as e:
+            import pydofus2.com.ankamagames.dofus.kernel.net.ConnectionsHandler as connh
+
             logger.error("[" + str(self._id) + "] Error while reading socket. \n", exc_info=True)
-            self.close()
+            import sys
+            import traceback
+
+            exc_type, exc_value, exc_traceback = sys.exc_info()
+            traceback_in_var = traceback.format_tb(exc_traceback)
+            error_trace = '\n'.join(traceback_in_var)
+            connh.ConnectionsHandler.connectionGonnaBeClosed(DisconnectionReasonEnum.EXCEPTION_THROWN, error_trace)
+            connh.ConnectionsHandler.getConnection().close()
 
     def checkClosed(self) -> bool:
         if self._willClose:

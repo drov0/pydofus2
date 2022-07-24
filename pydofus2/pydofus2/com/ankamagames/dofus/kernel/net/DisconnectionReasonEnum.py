@@ -1,4 +1,5 @@
 from enum import Enum
+from tkinter import EXCEPTION
 
 
 class DisconnectionReasonEnum(Enum):
@@ -18,3 +19,5 @@ class DisconnectionReasonEnum(Enum):
     NEVER_CONNECTED: int = 4
 
     WANTED_SHUTDOWN = 7
+    
+    EXCEPTION_THROWN = 8

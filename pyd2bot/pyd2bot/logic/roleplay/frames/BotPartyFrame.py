@@ -77,23 +77,38 @@ logger = Logger("Dofus2")
 
 
 class AllOnSameMapMonitor(threading.Thread):
+    _runningMonitors = list['AllOnSameMapMonitor']()
     def __init__(self, bpframe: "BotPartyFrame"):
         super().__init__()
+        while self._runningMonitors:
+            monitor = self._runningMonitors.pop()
+            monitor.stopSig.set()
         self.bpframe = bpframe
         self.stopSig = threading.Event()
-
+        self._runningMonitors.append(self)
+        
     def run(self) -> None:
+        logger.debug("AllOnSameMapMonitor started")
         while not self.stopSig.is_set():
-            if self.bpframe:
-                if not PlayedCharacterManager().isFighting and self.bpframe.allMembersOnSameMap:
+            if PlayedCharacterManager().isInFight:
+                logger.debug("AllOnSameMapMonitor: isFighting")
+            else:                
+                if not self.bpframe:
+                    logger.debug("AllOnSameMapMonitor: No BotPartyFrame found")
+                    break
+                elif self.bpframe.allMembersOnSameMap:
                     BotEventsManager().dispatch(BotEventsManager.ALLMEMBERS_ONSAME_MAP)
             sleep(5)
+        logger.debug("AllOnSameMapMonitor: died")
+        self._runningMonitors.remove(self)
 
 
 class BotPartyFrame(Frame):
     ASK_INVITE_TIMOUT = 10
     CONFIRME_JOIN_TIMEOUT = 10
     name: str = None
+    changingMap: bool = False
+    mapChangesQueue = []
 
     def __init__(self) -> None:
         super().__init__()
@@ -108,7 +123,7 @@ class BotPartyFrame(Frame):
 
     @property
     def leaderName(self):
-        return SessionManager().leaderName
+        return SessionManager().character["name"] if self.isLeader else SessionManager().leader["name"]
 
     @property
     def priority(self) -> int:
@@ -125,6 +140,7 @@ class BotPartyFrame(Frame):
     @property
     def allMembersOnSameMap(self):
         if self.entitiesFrame is None:
+            logger.debug("No RoleplayEntitiesFrame found")
             return False
         for follower in self.followers:
             if follower not in self._followerIds:
@@ -132,7 +148,9 @@ class BotPartyFrame(Frame):
             memberId = self._followerIds[follower]
             entity = self.entitiesFrame.getEntityInfos(memberId)
             if not entity:
+                logger.debug("Member %s not found", follower)
                 return False
+        logger.debug("All members on same map")
         return True
 
     def pulled(self):
@@ -148,15 +166,12 @@ class BotPartyFrame(Frame):
                 timer.cancel()
         self._partyId = None
         self._partyInviteTimers.clear()
+        self.mapChangesQueue.clear()
         logger.debug("BotPartyFrame pulled")
         return True
 
     def pushed(self):
         logger.debug("BotPartyFrame pushed")
-        if self.isLeader is None:
-            raise Exception("[BotPartyFrame] isLeader flag must be set")
-        if self.isLeader and self.followers is None:
-            raise Exception("[BotPartyFrame] followers must be defined for leaders")
         self._partyInviteTimers = dict[str, Timer]()
         self._partyId = None
         self._partyMembers = dict[int, PartyMemberInformations]()
@@ -167,9 +182,10 @@ class BotPartyFrame(Frame):
         self._wantsToJoinFight = None
         self._followerIds = {}
         if self.isLeader:
+            logger.debug("Bot is leader")
             self.canFarmMonitor = AllOnSameMapMonitor(self)
             self.canFarmMonitor.start()
-        if self.isLeader:
+            logger.debug(f"Send party invite to all followers {self.followers}")
             for follower in self.followers:
                 self.sendPartyInvite(follower)
         return True
@@ -344,11 +360,8 @@ class BotPartyFrame(Frame):
         elif isinstance(msg, CompassUpdatePartyMemberMessage):
             self._partyMembers[msg.memberId].worldX = msg.coords.worldX
             self._partyMembers[msg.memberId].worldY = msg.coords.worldY
-            dstMapId = MoveAPI.neighborMapIdFromcoords(msg.coords.worldX, msg.coords.worldY)
             logger.debug(f"Member {msg.memberId} moved to map {(msg.coords.worldX, msg.coords.worldY)}")
             mapPos = PlayedCharacterManager().currMapPos
-            if self.isLeader and self.allMembersOnSameMap:
-                BotEventsManager().dispatch(BotEventsManager.ALLMEMBERS_ONSAME_MAP)
             if not self.isLeader and not self._isJoiningLeaderVertex and msg.memberId == self.leaderId:
                 logger.debug(
                     f"Leader moved to map {(msg.coords.worldX, msg.coords.worldY)}, my current pos {(mapPos.posX, mapPos.posY)} will follow him"
@@ -356,13 +369,23 @@ class BotPartyFrame(Frame):
                 if mapPos.posX != msg.coords.worldX or mapPos.posY != msg.coords.worldY:
                     if self.movementFrame._isMoving:
                         self.movementFrame.cancelFollowingActor()
-                    MoveAPI.changeMapToDstCoords(msg.coords.worldX, msg.coords.worldY)
+                    if self.changingMap:
+                        logger.debug("Already changing map, queueing")
+                        self.mapChangesQueue.append((msg.coords.worldX, msg.coords.worldY))
+                    else:
+                        MoveAPI.changeMapToDstCoords(msg.coords.worldX, msg.coords.worldY)
+                        self.changingMap = True
             else:
                 logger.debug("nothing to do")
             return True
 
         elif isinstance(msg, MapComplementaryInformationsDataMessage):
-            if self._partyId is not None and not self.isLeader:
+            self.changingMap = False
+            if self.mapChangesQueue:
+                cx, xy = self.mapChangesQueue.pop(0)
+                MoveAPI.changeMapToDstCoords(cx, xy)
+                self.changingMap = True
+            elif self._partyId is not None and not self.isLeader:
                 self.setFollowLeader()
 
         elif isinstance(msg, PartyMemberInStandardFightMessage):
@@ -386,6 +409,7 @@ class BotPartyFrame(Frame):
             leaderPosX = self._partyMembers[self.leaderId].worldX
             leaderPosY = self._partyMembers[self.leaderId].worldY
             MoveAPI.changeMapToDstCoords(leaderPosX, leaderPosY)
+            self.changingMap = True
 
     def setFollowLeader(self):
         if not self.isLeader:

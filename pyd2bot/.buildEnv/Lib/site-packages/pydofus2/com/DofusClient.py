@@ -1,5 +1,7 @@
 import sys
+import threading
 import tracemalloc
+from pydofus2.com.ankamagames.dofus.kernel.net.DisconnectionReason import DisconnectionReason
 from pydofus2.com.ankamagames.dofus.logic.common.managers.PlayerManager import PlayerManager
 from time import sleep
 import pydofus2.com.ankamagames.dofus.kernel.Kernel as krnl
@@ -25,8 +27,10 @@ logger = Logger("Dofus2")
 
 
 class DofusClient(metaclass=Singleton):
-    LOG_MEMORY_USAGE = False
-
+    LOG_MEMORY_USAGE : bool= False
+    _stop = threading.Event()
+    _stopReason : DisconnectionReason = None
+    
     def __init__(self):
         krnl.Kernel().init()
         self._worker = krnl.Kernel().getWorker()
@@ -60,8 +64,9 @@ class DofusClient(metaclass=Singleton):
             )
 
     def join(self):
-        while True:
+        while not self._stop.is_set():
             try:
+                
                 sleep(1)
                 if self.LOG_MEMORY_USAGE:
                     snapshot = tracemalloc.take_snapshot()
@@ -71,7 +76,10 @@ class DofusClient(metaclass=Singleton):
                 if self.LOG_MEMORY_USAGE:
                     MemoryProfiler.saveCollectedData()
                 sys.exit(0)
-
+        
+        if self._stopReason.reason == DisconnectionReasonEnum.EXCEPTION_THROWN:
+            raise Exception(self._stopReason.message)
+            
     def registerFrame(self, frame):
         self._registredCustomFrames.append(frame)
 
@@ -84,6 +92,10 @@ class DofusClient(metaclass=Singleton):
         connh.ConnectionsHandler.connectionGonnaBeClosed(DisconnectionReasonEnum.RESTARTING)
         connh.ConnectionsHandler.getConnection().close()
 
+    def interrupt(self, reason: DisconnectionReason):
+        self._stopReason = reason
+        self._stop.set()
+        
     @property
     def mainConn(self) -> "ServerConnection":
         return connh.ConnectionsHandler.getConnection().mainConnection

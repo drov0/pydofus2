@@ -51,35 +51,72 @@ class SessionsManager {
         })
     }
 
+    async runFollowerSession(follower, leader) {
+        var key = follower.id
+        if (instancesManager.runningInstances[key]) {
+            instancesManager.killInstance(key);
+        }
+        var server = await instancesManager.spawnServer(key);
+        var client = await instancesManager.spawnClient(key);
+        console.log("running session : " + key);
+        var creds = accountManager.getAccountCreds(follower.accountId);
+        var sessionStr = JSON.stringify({
+            "name": follower.name,
+            "type": "fight",
+            "character": follower,
+            "leader": leader,
+        })
+        client.runSession(creds.login, creds.password, creds.certId, creds.certHash, sessionStr);
+    }
+
     async runSession(key) {
         if (instancesManager.runningInstances[key]) {
             instancesManager.killInstance(key);
         }
-        instancesManager.spawnServer(key);
+        var server = await instancesManager.spawnServer(key);
+        var client = await instancesManager.spawnClient(key);
+        var instance = instancesManager.runningInstances[key];
         console.log("running session : " + key);
-        var result = await (new Promise(resolve => { 
-            setTimeout(() => {
-                var client = instancesManager.spawnClient(key);
-                var session = this.sessionsDB[key];
-                session.character = accountManager.charactersDB[session.characterId.toString()]
-                session.path = pathsManager.pathsDB[session.pathId]
-                var creds = accountManager.getAccountCreds(session.character.accountId);
-                var sessionStr = JSON.stringify(session);
-                client.runSession(creds.login, creds.password, creds.certId.toString(), creds.certHash, sessionStr, function(err, response) {
-                    if (err) {
-                        resolve('start failed : ' + err);
-                    }
-                });
-                resolve('started');
-            }, 5000);
-        }));
-        if (result == 'started') {
-            return true;
+        var session = this.sessionsDB[key];
+        if (!session) {
+            console.log("Session " + key + " not found")
+            return
         }
-        else {
-            console.log(result);
-            return false;
+        var leader = accountManager.charactersDB[session.leaderId]
+        var path = pathsManager.pathsDB[session.pathId]
+        var creds = accountManager.getAccountCreds(leader.accountId);
+        if (session.type == "farm") {
+            var sessionStr = JSON.stringify({
+                "name": session.name,
+                "type": session.type,
+                "character": leader,
+                "path": path,
+                "jobIds": session.jobIds,
+                "resourceIds": session.resourceIds
+            })
         }
+        else if (session.type == "fight") {
+            var followers = undefined
+            if (session.followersIds && session.followersIds.length > 0) {
+                followers = []
+                for (var i = 0; i < session.followersIds.length; i++) {
+                    var follower = accountManager.charactersDB[session.followersIds[i]]
+                    followers.push(follower.name)
+                    instancesManager.runningInstances[key].childs.push(follower.id)
+                    await this.runFollowerSession(follower, leader)
+                }
+            }
+            var sessionStr = JSON.stringify({
+                "name": session.name,
+                "type": session.type,
+                "character": leader,
+                "path": path,
+                "monsterLvlCoefDiff": session.monsterLvlCoefDiff,
+                "followers": followers
+            })
+        }
+        instance.runningSession = key;
+        client.runSession(creds.login, creds.password, creds.certId, creds.certHash, sessionStr);
     }
 
     stopSession(key) {

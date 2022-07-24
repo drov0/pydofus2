@@ -117,7 +117,7 @@ class BotFightFrame(Frame):
         self._turnAction = []
         self._spellw = None
         self._botTurnFrame = BotFightTurnFrame()
-        self.spellId = SessionManager().spellId
+        self.spellId = SessionManager().character["primarySpellId"]
         self._spellCastFails = 0
         super().__init__()
 

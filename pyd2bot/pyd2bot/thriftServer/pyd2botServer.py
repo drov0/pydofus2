@@ -1,5 +1,6 @@
 from asyncio.log import logger
 import json
+import logging
 from time import perf_counter, sleep
 from pyd2bot.thriftServer.pyd2botService.ttypes import Character, Spell
 from pydofus2.com.ankamagames.dofus.datacenter.breeds.Breed import Breed
@@ -19,7 +20,7 @@ class Pyd2botServer:
         from pydofus2.com.ankamagames.dofus.logic.common.managers.PlayerManager import PlayerManager
         from pydofus2.com.ankamagames.dofus.logic.connection.frames.ServerSelectionFrame import ServerSelectionFrame
         from pydofus2.com.ankamagames.dofus.network.enums.ServerStatusEnum import ServerStatusEnum
-        logger.info("fetchAccountCharacters called")
+        logging.info("fetchAccountCharacters called")
         rate = 2.
         timeout = 10.
         loginToken = Haapi().getLoginToken(login, password, certId, certHash)
@@ -63,12 +64,13 @@ class Pyd2botServer:
                     }
                     result.append(Character(**chkwrgs))
             else:
-                logger.debug(f"Server {server.id} not online but has status {ServerStatusEnum(server.status).name}.")
+                logging.debug(f"Server {server.id} not online but has status {ServerStatusEnum(server.status).name}.")
         dofus2.shutdown()
         return result
         
     def runSession(self, login:str, password:str, certId:str, certHash:str, sessionJson:str) -> None:
         from pydofus2.com.ankamagames.jerakine.logger.Logger import Logger
+        print(f"runSession called with login {login}")
         session = json.loads(sessionJson)
         Logger.prefix = session["name"]
         from pydofus2.com.ankamagames.haapi.Haapi import Haapi
@@ -79,8 +81,14 @@ class Pyd2botServer:
         dofus2 = DofusClient()
         dofus2.registerFrame(BotWorkflowFrame())
         loginToken = Haapi().getLoginToken(login, password, certId, certHash)
-        dofus2.login(loginToken, SessionManager().character["serverId"], SessionManager().character["characterId"])
-        dofus2.join()
+        print(f"loginToken: {loginToken}")
+        dofus2.login(loginToken, SessionManager().character["serverId"], SessionManager().character["id"])
+        try:
+            dofus2.join()
+        except Exception as e:
+            logger.error(f"Error while running session: {e}", exc_info=True)
+            from pyd2bot.PyD2Bot import PyD2Bot
+            PyD2Bot().stop()
 
     def fetchBreedSpells(self, breedId:int) -> list[Spell]:
         spells = []

@@ -1,6 +1,6 @@
 from datetime import datetime
 from time import perf_counter
-from pydofus2.com.ankamagames.dofus.kernel.net.ConnectionsHandler import ConnectionsHandler
+import pydofus2.com.ankamagames.dofus.kernel.net.ConnectionsHandler as connh
 from pydofus2.com.ankamagames.dofus.network.messages.common.basic.BasicPongMessage import (
     BasicPongMessage,
 )
@@ -52,14 +52,14 @@ class LatencyFrame(Frame):
             return True
         elif isinstance(msg, BasicLatencyStatsRequestMessage):
             blsrmsg = msg
-            connection = ConnectionsHandler.getConnection().getSubConnection(blsrmsg.sourceConnection)
+            connection = connh.ConnectionsHandler.getConnection().getSubConnection(blsrmsg.sourceConnection)
             blsmsg = BasicLatencyStatsMessage()
             blsmsg.init(
                 min(32767, int(connection.latencyAvg)),
                 connection.latencySamplesCount,
                 connection.latencySamplesMax,
             )
-            ConnectionsHandler.getConnection().send(blsmsg, blsrmsg.sourceConnection)
+            connh.ConnectionsHandler.getConnection().send(blsmsg, blsrmsg.sourceConnection)
             return True
         else:
             return False

@@ -28,14 +28,14 @@ class I18n(AbstractDataManager):
             return None
         txt: str = I18nFileAccessor().getUnDiacriticalText(id)
         if txt == None or txt == "None":
-            return "[UNKNOWN_TEXT_ID_" + id + "]"
+            return "[UNKNOWN_TEXT_ID_" + str(id) + "]"
         return I18n.replaceParams(txt, params, replace)
 
     @classmethod
     def getUiText(cls, textId: str, params: list = None, replace: str = "%") -> str:
         txt: str = I18nFileAccessor().getNamedText(textId)
         if txt == None or txt == "None":
-            return "[UNKNOWN_TEXT_NAME_" + textId + "]"
+            return "[UNKNOWN_TEXT_NAME_" + str(textId) + "]"
         return cls.replaceParams(txt, params, replace)
 
     @classmethod

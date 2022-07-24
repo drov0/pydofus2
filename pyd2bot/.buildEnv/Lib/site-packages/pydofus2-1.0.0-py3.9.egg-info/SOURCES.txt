@@ -207,6 +207,7 @@ pydofus2/com/ankamagames/dofus/datacenter/notifications/Notification.py
 pydofus2/com/ankamagames/dofus/datacenter/notifications/__init__.py
 pydofus2/com/ankamagames/dofus/datacenter/npcs/AnimFunNpcData.py
 pydofus2/com/ankamagames/dofus/datacenter/npcs/Npc.py
+pydofus2/com/ankamagames/dofus/datacenter/npcs/NpcMessage.py
 pydofus2/com/ankamagames/dofus/datacenter/npcs/TaxCollectorFirstname.py
 pydofus2/com/ankamagames/dofus/datacenter/npcs/TaxCollectorName.py
 pydofus2/com/ankamagames/dofus/datacenter/npcs/__init__.py

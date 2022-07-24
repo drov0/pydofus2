@@ -123,8 +123,11 @@ class DisconnectionHandlerFrame(Frame):
                             reason.reason == DisconnectionReasonEnum.DISCONNECTED_BY_POPUP
                             or reason.reason == DisconnectionReasonEnum.SWITCHING_TO_HUMAN_VENDOR
                             or reason.reason == DisconnectionReasonEnum.WANTED_SHUTDOWN
+                            or reason.reason == DisconnectionReasonEnum.EXCEPTION_THROWN
                         ):
+                            logger.debug(reason.message)
                             krnl.Kernel().reset()
+                            DofusClient().interrupt(reason)
                         elif reason.reason == DisconnectionReasonEnum.RESTARTING:
                             self.reconnect()
                         else:

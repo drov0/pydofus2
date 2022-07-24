@@ -18,10 +18,11 @@ class PatternDecoder:
         }
         return self.decodeCombine(str, oParams)
 
-    def decode(self, str: str, params: list) -> str:
+    @classmethod
+    def decode(cls, str: str, params: dict = {}) -> str:
         if not str:
             return ""
-        return self.decodeCombine(str, params)
+        return cls.decodeCombine(str, params)
 
     def replace(self, sSrc: str, sPattern: str) -> str:
         aTmp2: list = None
@@ -132,7 +133,8 @@ class PatternDecoder:
             return self.combine(aStr, aParams[5], aParams[6], aParams[7])
         return ""
 
-    def decodeCombine(self, aStr: str, oParams: dict) -> str:
+    @classmethod
+    def decodeCombine(cls, aStr: str, oParams: dict) -> str:
         nextTilde: int = 0
         nextBrace: int = 0
         key: str = None
@@ -158,7 +160,7 @@ class PatternDecoder:
                 if (
                     twoDotsPos == -1 or twoDotsPos + 1 > len(content) or content[twoDotsPos + 1] != ":"
                 ) and "~" in content:
-                    rstr = self.decodeCombine(content, oParams)
+                    rstr = cls.decodeCombine(content, oParams)
                     if content != rstr:
                         aStr = aStr[0:nextBrace] + rstr + aStr[: pos + 1]
                     actualIndex = nextBrace

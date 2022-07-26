@@ -356,12 +356,13 @@ class BotFightFrame(Frame):
             SessionManager().lastFightTime = perf_counter()
             self._fightCount += 1
             self._inFight = True
-            gfotmsg = GameFightOptionToggleMessage()
-            gfotmsg.init(FightOptionsEnum.FIGHT_OPTION_SET_SECRET)
-            ConnectionsHandler.getConnection().send(gfotmsg)
-            gfotmsg = GameFightOptionToggleMessage()
-            gfotmsg.init(FightOptionsEnum.FIGHT_OPTION_SET_TO_PARTY_ONLY)
-            ConnectionsHandler.getConnection().send(gfotmsg)
+            if SessionManager().isLeader:
+                gfotmsg = GameFightOptionToggleMessage()
+                gfotmsg.init(FightOptionsEnum.FIGHT_OPTION_SET_SECRET)
+                ConnectionsHandler.getConnection().send(gfotmsg)
+                gfotmsg = GameFightOptionToggleMessage()
+                gfotmsg.init(FightOptionsEnum.FIGHT_OPTION_SET_TO_PARTY_ONLY)
+                ConnectionsHandler.getConnection().send(gfotmsg)
             return False
 
         elif isinstance(msg, GameFightEndMessage):

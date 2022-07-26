@@ -3,7 +3,6 @@ import json
 import logging
 from time import perf_counter, sleep
 from pyd2bot.thriftServer.pyd2botService.ttypes import Character, Spell
-from pydofus2.com.ankamagames.dofus.datacenter.breeds.Breed import Breed
 
 
 
@@ -72,25 +71,31 @@ class Pyd2botServer:
         from pydofus2.com.ankamagames.jerakine.logger.Logger import Logger
         print(f"runSession called with login {login}")
         session = json.loads(sessionJson)
-        Logger.prefix = session["name"]
+        Logger.prefix = f"{session['character']['name']}({session['character']['id']})"
         from pydofus2.com.ankamagames.haapi.Haapi import Haapi
         from pydofus2.com.DofusClient import DofusClient
         from pyd2bot.logic.common.frames.BotWorkflowFrame import BotWorkflowFrame
         from pyd2bot.logic.managers.SessionManager import SessionManager
+        from pyd2bot.logic.common.frames.BotCharacterUpdatesFrame import BotCharacterUpdatesFrame
+        from pyd2bot.logic.roleplay.frames.BotPartyFrame import BotPartyFrame
         SessionManager().load(sessionJson)
         dofus2 = DofusClient()
-        dofus2.registerFrame(BotWorkflowFrame())
+        dofus2.registerInitFrame(BotWorkflowFrame)
+        dofus2.registerGameStartFrame(BotCharacterUpdatesFrame)
+        dofus2.registerGameStartFrame(BotPartyFrame)
+
         loginToken = Haapi().getLoginToken(login, password, certId, certHash)
         print(f"loginToken: {loginToken}")
         dofus2.login(loginToken, SessionManager().character["serverId"], SessionManager().character["id"])
         try:
             dofus2.join()
         except Exception as e:
-            logger.error(f"Error while running session: {e}", exc_info=True)
+            print(f"Error while running session: {e}")
             from pyd2bot.PyD2Bot import PyD2Bot
             PyD2Bot().stop()
 
-    def fetchBreedSpells(self, breedId:int) -> list[Spell]:
+    def fetchBreedSpells(self, breedId:int) -> list['Spell']:
+        from pydofus2.com.ankamagames.dofus.datacenter.breeds.Breed import Breed
         spells = []
         breed = Breed.getBreedById(breedId)
         if not breed:

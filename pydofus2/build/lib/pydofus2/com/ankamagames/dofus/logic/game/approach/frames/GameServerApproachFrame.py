@@ -1,4 +1,5 @@
 from datetime import datetime
+from pydofus2.com.DofusClient import DofusClient
 from pydofus2.com.ankamagames.dofus.logic.common.frames.QuestFrame import QuestFrame
 from pydofus2.com.ankamagames.dofus.logic.game.common.frames.AveragePricesFrame import AveragePricesFrame
 from pydofus2.com.ankamagames.dofus.logic.game.common.frames.InventoryManagementFrame import InventoryManagementFrame
@@ -242,6 +243,8 @@ class GameServerApproachFrame(Frame):
             krnl.Kernel().getWorker().addFrame(SpellInventoryManagementFrame())
             krnl.Kernel().getWorker().addFrame(InventoryManagementFrame())
             krnl.Kernel().getWorker().addFrame(ContextChangeFrame())
+            for f in DofusClient().registeredGameStartFrames:
+                krnl.Kernel().getWorker().addFrame(f())
             # TODO : krnl.Kernel().getWorker().addFrame(ChatFrame())
             krnl.Kernel().getWorker().addFrame(JobsFrame())
             krnl.Kernel().getWorker().addFrame(QuestFrame())

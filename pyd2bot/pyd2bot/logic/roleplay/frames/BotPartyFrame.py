@@ -95,12 +95,14 @@ class AllOnSameMapMonitor(threading.Thread):
             else:                
                 if not self.bpframe:
                     logger.debug("AllOnSameMapMonitor: No BotPartyFrame found")
-                    break
                 elif self.bpframe.allMembersOnSameMap:
                     BotEventsManager().dispatch(BotEventsManager.ALLMEMBERS_ONSAME_MAP)
-            sleep(5)
+                    logger.debug("AllOnSameMapMonitor: all members are on same map")
+            sleep(1)
         logger.debug("AllOnSameMapMonitor: died")
         self._runningMonitors.remove(self)
+        raise Exception("AllOnSameMapMonitor: died")
+        
 
 
 class BotPartyFrame(Frame):
@@ -143,14 +145,12 @@ class BotPartyFrame(Frame):
             logger.debug("No RoleplayEntitiesFrame found")
             return False
         for follower in self.followers:
-            if follower not in self._followerIds:
-                return False
-            memberId = self._followerIds[follower]
-            entity = self.entitiesFrame.getEntityInfos(memberId)
+            logger.debug(f"Checking follower if {follower['name']} is on same map")
+            entity = self.entitiesFrame.getEntityInfos(follower["id"])
             if not entity:
-                logger.debug("Member %s not found", follower)
+                logger.debug("Member %s not found in the current map", follower)
                 return False
-        logger.debug("All members on same map")
+        logger.debug("All members are on the same map")
         return True
 
     def pulled(self):
@@ -180,14 +180,13 @@ class BotPartyFrame(Frame):
         self._allMemberOnSameMap = False
         self._allMembersJoined = False
         self._wantsToJoinFight = None
-        self._followerIds = {}
         if self.isLeader:
             logger.debug("Bot is leader")
             self.canFarmMonitor = AllOnSameMapMonitor(self)
             self.canFarmMonitor.start()
             logger.debug(f"Send party invite to all followers {self.followers}")
             for follower in self.followers:
-                self.sendPartyInvite(follower)
+                self.sendPartyInvite(follower["name"])
         return True
 
     def sendPrivateMessage(self, playerName, message):
@@ -198,11 +197,12 @@ class BotPartyFrame(Frame):
         ConnectionsHandler.getConnection().send(ccmsg)
 
     def cancelPartyInvite(self, playerName):
-        if playerName not in self._followerIds:
-            return
         cpimsg = PartyCancelInvitationMessage()
-        cpimsg.init(int(self._followerIds[playerName]), self._partyId)
-        ConnectionsHandler.getConnection().send(cpimsg)
+        for follower in self.followers:
+            if follower["name"] == playerName:
+                cpimsg.init(follower["id"], self._partyId)
+                ConnectionsHandler.getConnection().send(cpimsg)
+                break
 
     def sendPartyInvite(self, playerName):
         for member in self._partyMembers.values():
@@ -251,8 +251,6 @@ class BotPartyFrame(Frame):
 
     def process(self, msg: Message):
         if isinstance(msg, PartyNewGuestMessage):
-            if self.isLeader and msg.guest.name not in self._followerIds:
-                self._followerIds[msg.guest.name] = msg.guest.guestId
             return True
 
         elif isinstance(msg, MapMoveFailed):
@@ -270,7 +268,7 @@ class BotPartyFrame(Frame):
         elif isinstance(msg, PartyDeletedMessage):
             if self.isLeader:
                 for follower in self.followers:
-                    self.sendPartyInvite(follower)
+                    self.sendPartyInvite(follower["name"])
             return True
 
         elif isinstance(msg, PartyInvitationMessage):
@@ -292,7 +290,6 @@ class BotPartyFrame(Frame):
             self._inParty = True
             self._partyId = msg.partyId
             self._partyMembers[msg.memberInformations.id] = msg.memberInformations
-            self._followerIds[msg.memberInformations.name] = msg.memberInformations.id
             if self.isLeader and msg.memberInformations.id != self.leaderId:
                 self.sendFollowMember(msg.memberInformations.id)
                 if msg.memberInformations.name in self._partyInviteTimers:

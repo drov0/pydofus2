@@ -101,7 +101,7 @@ class SessionsManager {
                 followers = []
                 for (var i = 0; i < session.followersIds.length; i++) {
                     var follower = accountManager.charactersDB[session.followersIds[i]]
-                    followers.push(follower.name)
+                    followers.push({"name": follower.name, "id": follower.id})
                     instancesManager.runningInstances[key].childs.push(follower.id)
                     await this.runFollowerSession(follower, leader)
                 }

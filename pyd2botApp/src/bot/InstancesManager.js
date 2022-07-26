@@ -76,7 +76,7 @@ class InstancesManager {
     async spawnServer(instanceId) {
         var execFunc = (resolve, reject) => {
             var port = this.freePorts.pop();
-            var pyd2bot_process = child_process.execFile(this.pyd2botExePath, ["--port", port, "--host", "0.0.0.0"])
+            var pyd2bot_process = child_process.execFile(this.pyd2botExePath, ["--port", port, "--host", "0.0.0.0"], {"detached": true});
             this.runningInstances[instanceId] = {"port": port, "server" : pyd2bot_process, "client" : null, "connection" : null, "childs" : []};
             pyd2bot_process.stdout.on('data', (stdout) => {
                 if (stdout.toString().includes("Server started")) {
@@ -85,17 +85,20 @@ class InstancesManager {
                 }
             });
             pyd2bot_process.stderr.on('data', (stderr) => {
-                console.log("Error : " + stderr.toString());
+                if (!stderr.toString().includes("DEBUG") && !stderr.toString().includes("INFO") && !stderr.toString().includes("WARNING") && !stderr.toString().includes("ERROR")) {
+                    console.log("Error : " + stderr.toString());
+                    pyd2bot_process.kill()
+                }
             });
             pyd2bot_process.on('close', async (code) => {
                 console.log(`Server ${instanceId} exited with code ${code}`);
                 this.freePorts.push(port);
                 var instance = this.runningInstances[instanceId];
-                instance.serverClosed = true
                 if (!instance) {
                     console.log("Instance " + instanceId + " not found");
                 }
                 else {
+                    instance.serverClosed = true
                     if (instance.connection){
                         instance.connection.end();
                     }

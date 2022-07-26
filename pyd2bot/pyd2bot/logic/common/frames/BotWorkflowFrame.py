@@ -37,8 +37,6 @@ class BotWorkflowFrame(Frame):
         self._inBankAutoUnload = False
         self._inPhenixAutoRevive = False
         self._delayedAutoBankUnlaod = False
-        Kernel().getWorker().addFrame(BotCharacterUpdatesFrame())
-        Kernel().getWorker().addFrame(BotPartyFrame())
         return True
 
     def pulled(self) -> bool:
@@ -88,6 +86,7 @@ class BotWorkflowFrame(Frame):
             elif self.currentContext == GameContextEnum.ROLE_PLAY:
                 if Kernel().getWorker().getFrame("BotFarmPathFrame"):
                     Kernel().getWorker().removeFrameByName("BotFarmPathFrame")
+
             return True
 
         elif isinstance(msg, InventoryWeightMessage):
@@ -109,7 +108,8 @@ class BotWorkflowFrame(Frame):
                     Kernel().getWorker().addFrame(BotFarmPathFrame(True))
             if Kernel().getWorker().contains("BotUnloadInBankFrame"):
                 Kernel().getWorker().removeFrameByName("BotUnloadInBankFrame")
-            Kernel().getWorker().addFrame(BotPartyFrame())
+            if not Kernel().getWorker().contains("BotPartyFrame"):
+                Kernel().getWorker().addFrame(BotPartyFrame())
 
         elif (
             isinstance(msg, GameRolePlayPlayerLifeStatusMessage)

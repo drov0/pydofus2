@@ -8,7 +8,7 @@ from pyd2bot.logic.managers.SessionManager import SessionManager
 def runSession(sessionId):
     SessionManager().load(sessionId)
     dofus2 = DofusClient()
-    dofus2.registerFrame(BotWorkflowFrame())
+    dofus2.registerInitFrame(BotWorkflowFrame())
     dofus2.login(**SessionManager().creds)
     dofus2.join()
 

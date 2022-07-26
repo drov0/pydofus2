@@ -25,7 +25,7 @@ class SessionManager(metaclass=Singleton):
     def load(self, sessionstr: str):
         sessionJson = json.loads(sessionstr)
         self.type = sessionJson.get("type")
-        self.character : str = sessionJson.get("character")
+        self.character = sessionJson.get("character")
         if self.type == "farm":
             self.path = sessionJson.get("path")
             self.jobIds = sessionJson.get("jobIds")

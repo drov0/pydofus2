@@ -1,6 +1,7 @@
 import logging
 import datetime
 import os
+import sys
 
 from anyio import Path
 
@@ -22,7 +23,7 @@ class Logger(logging.Logger):
         fileHandler.setFormatter(formatter)
         self.addHandler(fileHandler)
         
-        streamHandler = logging.StreamHandler()
+        streamHandler = logging.StreamHandler(sys.stdout)
         streamHandler.setFormatter(formatter)
         self.addHandler(streamHandler)
 

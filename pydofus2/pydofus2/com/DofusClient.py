@@ -34,7 +34,8 @@ class DofusClient(metaclass=Singleton):
     def __init__(self):
         krnl.Kernel().init()
         self._worker = krnl.Kernel().getWorker()
-        self._registredCustomFrames = []
+        self._registredInitFrames = []
+        self._registredGameStartFrames = []
         I18nFileAccessor().init()
         DataMapProvider().init(AnimatedCharacter)
 
@@ -52,8 +53,8 @@ class DofusClient(metaclass=Singleton):
             PlayerManager().allowAutoConnectCharacter = True
             PlayedCharacterManager().id = characterId
             PlayerManager().autoConnectOfASpecificCharacterId = characterId
-        for frame in self._registredCustomFrames:
-            self._worker.addFrame(frame)
+        for frame in self._registredInitFrames:
+            self._worker.addFrame(frame())
         if self._serverId == 0:
             self._worker.processImmediately(
                 LoginValidationWithTokenAction.create(autoSelectServer=False, serverId=self._serverId)
@@ -66,7 +67,6 @@ class DofusClient(metaclass=Singleton):
     def join(self):
         while not self._stop.is_set():
             try:
-                
                 sleep(1)
                 if self.LOG_MEMORY_USAGE:
                     snapshot = tracemalloc.take_snapshot()
@@ -80,9 +80,12 @@ class DofusClient(metaclass=Singleton):
         if self._stopReason.reason == DisconnectionReasonEnum.EXCEPTION_THROWN:
             raise Exception(self._stopReason.message)
             
-    def registerFrame(self, frame):
-        self._registredCustomFrames.append(frame)
+    def registerInitFrame(self, frame):
+        self._registredInitFrames.append(frame)
 
+    def registerGameStartFrame(self, frame):
+        self._registredGameStartFrames.append(frame)
+        
     def shutdown(self):
         logger.info("Shuting down ...")
         connh.ConnectionsHandler.connectionGonnaBeClosed(DisconnectionReasonEnum.WANTED_SHUTDOWN)
@@ -99,3 +102,11 @@ class DofusClient(metaclass=Singleton):
     @property
     def mainConn(self) -> "ServerConnection":
         return connh.ConnectionsHandler.getConnection().mainConnection
+    
+    @property
+    def registeredInitFrames(self) -> list:
+        return self._registredInitFrames
+    
+    @property
+    def registeredGameStartFrames(self) -> list:
+        return self._registredGameStartFrames

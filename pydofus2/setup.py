@@ -31,7 +31,7 @@ setup(
         "pycryptodomex",
         "whistle",
         "Py3AMF",
-        "httpx",
+        "httpx[http2]",
         "xmltodict",
         "lxml"
     ],

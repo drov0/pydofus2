@@ -9,6 +9,7 @@ from pydofus2.com.ankamagames.dofus.kernel.net.ConnectionsHandler import Connect
 from pydofus2.com.ankamagames.dofus.logic.game.common.managers.PlayedCharacterManager import PlayedCharacterManager
 from pydofus2.com.ankamagames.dofus.logic.game.fight.messages.FightRequestFailed import FightRequestFailed
 from pydofus2.com.ankamagames.dofus.logic.game.fight.messages.MapMoveFailed import MapMoveFailed
+from pydofus2.com.ankamagames.dofus.logic.game.roleplay.messages.MovementRequestTimeoutMessage import MovementRequestTimeoutMessage
 from pydofus2.com.ankamagames.dofus.modules.utils.pathFinding.world.WorldPathFinder import WorldPathFinder
 from pydofus2.com.ankamagames.dofus.network.messages.game.context.GameMapMovementCancelMessage import (
     GameMapMovementCancelMessage,
@@ -53,7 +54,7 @@ if TYPE_CHECKING:
     from pydofus2.com.ankamagames.dofus.logic.game.roleplay.frames.RoleplayMovementFrame import RoleplayMovementFrame
     from pydofus2.com.ankamagames.dofus.logic.game.roleplay.frames.RoleplayWorldFrame import RoleplayWorldFrame
 
-logger = Logger("Dofus2")
+logger = Logger()
 
 
 def GetNextMap(path, index):
@@ -166,7 +167,7 @@ class BotFarmPathFrame(Frame):
                 self.doFarm()
             return True
 
-        elif isinstance(msg, (FightRequestFailed, MapMoveFailed, MapChangeFailedMessage)):
+        elif isinstance(msg, (FightRequestFailed, MapMoveFailed, MapChangeFailedMessage, MovementRequestTimeoutMessage)):
             if self._inAutoTrip:
                 return False
             self.requestMapData()
@@ -246,12 +247,12 @@ class BotFarmPathFrame(Frame):
     def doFarm(self, event=None):
         logger.debug("[BotFarmFrame] doFarm called")
         if SessionManager().type == "fight" and not SessionManager().isLeader:
-            logger.error("[BotFarmFrame] in fight mode only the leader can run a farm path")
+            logger.warning("[BotFarmFrame] in fight mode only the leader can run a farm path")
             return
         if self.partyFrame:
             logger.debug("[BotFarmFrame] Party found")
             if not self.partyFrame.allMembersOnSameMap:
-                logger.error("[BotFarmFrame] Party members are not on the same map")
+                logger.warning("[BotFarmFrame] Party members are not on the same map")
                 BotEventsManager().add_listener(BotEventsManager.ALLMEMBERS_ONSAME_MAP, self.doFarm)
                 return
         logger.debug("[BotFarmFrame] Party found and all members on the same map")

@@ -66,6 +66,8 @@ class SessionsManager {
             "character": follower,
             "leader": leader,
         })
+        var instance = instancesManager.runningInstances[key];
+        instance.runningSession = {"key": key, "creds": creds, sessionStr: sessionStr};
         client.runSession(creds.login, creds.password, creds.certId, creds.certHash, sessionStr);
     }
 
@@ -115,8 +117,18 @@ class SessionsManager {
                 "followers": followers
             })
         }
-        instance.runningSession = key;
-        client.runSession(creds.login, creds.password, creds.certId, creds.certHash, sessionStr);
+        instance.runningSession = {"key": key, "creds": creds, sessionStr: sessionStr};
+        await client.runSession(creds.login, creds.password, creds.certId, creds.certHash, sessionStr);
+    }
+
+    async restartSession(sessionArgs) {
+        var server = await instancesManager.spawnServer(sessionArgs.key);
+        var client = await instancesManager.spawnClient(sessionArgs.key);
+        console.log("restarting session : " + sessionArgs.key);
+        var instance = instancesManager.runningInstances[sessionArgs.key];
+        instance.runningSession = sessionArgs
+        instance.serverClosed = false
+        client.runSession(sessionArgs.creds.login, sessionArgs.creds.password, sessionArgs.creds.certId, sessionArgs.creds.certHash, sessionArgs.sessionStr);
     }
 
     stopSession(key) {

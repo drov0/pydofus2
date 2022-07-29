@@ -1,18 +1,20 @@
 import logging
 import datetime
 import os
+import sys
 
 from anyio import Path
+from pydofus2.com.ankamagames.jerakine.metaclasses.Singleton import Singleton
 
-class Logger(logging.Logger):
+class Logger(logging.Logger, metaclass=Singleton):
     _logger = None
     prefix = None
     LOGS_PATH = Path(os.getenv("APPDATA")) / "pydofus2" / "logs"
     def __init__(self, log_prefix=""):
         super().__init__("logger")
-        self._prefix = log_prefix
+        self.prefix = log_prefix
         self.setLevel(logging.DEBUG)
-        formatter = logging.Formatter("%(asctime)s [%(levelname)s | %(filename)s:%(lineno)s] > %(message)s")
+        formatter = logging.Formatter("%(asctime)s | %(levelname)s | %(filename)s:%(lineno)s | %(message)s")
         now = datetime.datetime.now()
         if not os.path.isdir(self.LOGS_PATH):
             os.mkdir(self.LOGS_PATH)
@@ -22,7 +24,7 @@ class Logger(logging.Logger):
         fileHandler.setFormatter(formatter)
         self.addHandler(fileHandler)
         
-        streamHandler = logging.StreamHandler()
+        streamHandler = logging.StreamHandler(sys.stdout)
         streamHandler.setFormatter(formatter)
         self.addHandler(streamHandler)
 

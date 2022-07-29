@@ -30,39 +30,8 @@ class PyD2Bot(metaclass=Singleton):
         signal.signal(signal.SIGINT, handler)
         server.serverTransport.listen()
         print("Server started on {}:{}".format(host, port), flush=True)
-        while not self._stop.is_set():
-            client = server.serverTransport.accept()
-            if not client:
-                continue
-
-            itrans = server.inputTransportFactory.getTransport(client)
-            iprot = server.inputProtocolFactory.getProtocol(itrans)
-
-            # for THeaderProtocol, we must use the same protocol instance for
-            # input and output so that the response is in the same dialect that
-            # the server detected the request was in.
-            if isinstance(server.inputProtocolFactory, THeaderProtocolFactory):
-                otrans = None
-                oprot = iprot
-            else:
-                otrans = server.outputTransportFactory.getTransport(client)
-                oprot = server.outputProtocolFactory.getProtocol(otrans)
-
-            try:
-                while not self._stop.is_set():
-                    server.processor.process(iprot, oprot)
-            except TTransport.TTransportException:
-                pass
-            except Exception as x:
-                print("Exception occured : ", x)
-                logger.exception(x)
-
-            itrans.close()
-            if otrans:
-                otrans.close()
-        print("Server stopped")
-        return 0
-
+        server.serve()
+        
     def stop(self):
         self._stop.set()
         print("Server stopped")

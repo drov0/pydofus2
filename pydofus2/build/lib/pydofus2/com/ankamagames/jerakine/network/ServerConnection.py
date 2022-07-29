@@ -26,7 +26,7 @@ from pydofus2.com.ankamagames.jerakine.utils.display.EnterFrameDispatcher import
 from pydofus2.mx.CustomSocket.Socket import Socket
 from whistle import Event
 
-logger = Logger("ServerConnection")
+logger = Logger()
 
 
 class ServerConnection(IServerConnection):
@@ -37,7 +37,7 @@ class ServerConnection(IServerConnection):
 
     DEBUG_LOW_LEVEL_VERBOSE: bool = False
 
-    DEBUG_DATA: bool = True
+    DEBUG_DATA: bool = False
 
     LATENCY_AVG_BUFFER_SIZE: int = 50
 

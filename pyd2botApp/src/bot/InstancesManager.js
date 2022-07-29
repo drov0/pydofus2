@@ -16,7 +16,7 @@ class InstancesManager {
     constructor() {
         this.pyd2botExePath = path.join(process.env.AppData, 'pyd2bot', 'pyd2bot.exe');
         this.pyd2botDevPath = path.join(ejse.data("appDir"), '..', '..', 'pyd2bot','pyd2bot.py');
-        this.pyd2botDevEnvPath = path.join(ejse.data("appDir"), '..', '..', '.venv', 'Scripts', 'activate');
+        this.pyd2botDevEnvPath = path.join(ejse.data("appDir"), '..', '..', '.venv', 'Scripts', 'python.exe');
         this.runningInstances = {};
         this.freePorts = Array(100).fill().map((element, index) => index + 9999);
         this.wantsToKillServer = {};
@@ -76,20 +76,32 @@ class InstancesManager {
     async spawnServer(instanceId) {
         var execFunc = (resolve, reject) => {
             var port = this.freePorts.pop();
-            var pyd2bot_process = child_process.execFile(this.pyd2botExePath, ["--port", port, "--host", "0.0.0.0"], {"detached": true});
+            // var pyd2bot_process = child_process.spawn(`${this.pyd2botDevEnvPath} ${this.pyd2botDevPath} --port ${port} --host 0.0.0.0`, {"shell": true});
+            var pyd2bot_process = child_process.execFile(this.pyd2botExePath, ['--port', port, '--host', '0.0.0.0'])
             this.runningInstances[instanceId] = {"port": port, "server" : pyd2bot_process, "client" : null, "connection" : null, "childs" : []};
+            
             pyd2bot_process.stdout.on('data', (stdout) => {
                 if (stdout.toString().includes("Server started")) {
                     console.log("Instance " + instanceId + " server started");
                     resolve(pyd2bot_process);
                 }
-            });
-            pyd2bot_process.stderr.on('data', (stderr) => {
-                if (!stderr.toString().includes("DEBUG") && !stderr.toString().includes("INFO") && !stderr.toString().includes("WARNING") && !stderr.toString().includes("ERROR")) {
-                    console.log("Error : " + stderr.toString());
-                    pyd2bot_process.kill()
+                else if (stdout.toString().includes("Error while reading socket")) {
+                    console.log("Error in bot exec" + stdout.toString());
+                }
+                else {
+                    console.log("stdout - " + stdout.toString());
                 }
             });
+            pyd2bot_process.stderr.on('data', (stderr) => {
+                if (!stderr.toString().includes("DEBUG") && !stderr.toString().includes("INFO") && !stderr.toString().includes("WARNING")) {
+                    console.log("stderr - " + stderr.toString());
+                }
+            });
+
+            pyd2bot_process.on('exit', function(code) {
+                console.log("Detected Crash " + code);
+            });
+
             pyd2bot_process.on('close', async (code) => {
                 console.log(`Server ${instanceId} exited with code ${code}`);
                 this.freePorts.push(port);
@@ -109,7 +121,10 @@ class InstancesManager {
                         console.log("Instance " + instanceId + " server crashed");
                         console.log("running session : " + JSON.stringify(instance.runningSession))
                         const sessionsManager = require("../sessions/SessionsManager.js").instance;
-                        sessionsManager.runSession(instance.runningSession)
+                        sessionsManager.restartSession(instance.runningSession)
+                    }
+                    else {
+                        console.log("Instance " + instanceId + " has no running session");
                     }
                 }
             });

@@ -71,7 +71,7 @@ if TYPE_CHECKING:
     from pyd2bot.logic.roleplay.frames.BotPartyFrame import BotPartyFrame
 
 
-logger = Logger("BotFightFrame")
+logger = Logger()
 
 
 class _Target:
@@ -353,6 +353,7 @@ class BotFightFrame(Frame):
     def process(self, msg: Message) -> bool:
 
         if isinstance(msg, GameFightJoinMessage):
+            logger.debug(f"****************** Joined fight ******************************************")
             SessionManager().lastFightTime = perf_counter()
             self._fightCount += 1
             self._inFight = True
@@ -422,7 +423,7 @@ class BotFightFrame(Frame):
         elif isinstance(msg, (GameFightTurnStartPlayingMessage, GameFightTurnResumeMessage)):
             if self._botTurnFrame._myTurn:
                 if self.VERBOSE:
-                    logger.debug("my turn to play")
+                    logger.debug("******************** bot turn to play *********************************")
                 self._spellCastFails = 0
                 self._seqQueue.clear()
                 self._myTurn = True

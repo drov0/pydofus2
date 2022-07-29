@@ -71,7 +71,7 @@ class Pyd2botServer:
         from pydofus2.com.ankamagames.jerakine.logger.Logger import Logger
         print(f"runSession called with login {login}")
         session = json.loads(sessionJson)
-        Logger.prefix = f"{session['character']['name']}({session['character']['id']})"
+        logger = Logger(f"{session['character']['name']}({session['character']['id']})")
         from pydofus2.com.ankamagames.haapi.Haapi import Haapi
         from pydofus2.com.DofusClient import DofusClient
         from pyd2bot.logic.common.frames.BotWorkflowFrame import BotWorkflowFrame
@@ -79,18 +79,19 @@ class Pyd2botServer:
         from pyd2bot.logic.common.frames.BotCharacterUpdatesFrame import BotCharacterUpdatesFrame
         from pyd2bot.logic.roleplay.frames.BotPartyFrame import BotPartyFrame
         SessionManager().load(sessionJson)
+        logger.debug("Session loaded")
         dofus2 = DofusClient()
         dofus2.registerInitFrame(BotWorkflowFrame)
         dofus2.registerGameStartFrame(BotCharacterUpdatesFrame)
         dofus2.registerGameStartFrame(BotPartyFrame)
-
+        logger.debug("Frames registered")
         loginToken = Haapi().getLoginToken(login, password, certId, certHash)
         print(f"loginToken: {loginToken}")
         dofus2.login(loginToken, SessionManager().character["serverId"], SessionManager().character["id"])
         try:
             dofus2.join()
         except Exception as e:
-            print(f"Error while running session: {e}")
+            logger.error(f"Error while running session: {e}")
             from pyd2bot.PyD2Bot import PyD2Bot
             PyD2Bot().stop()
 

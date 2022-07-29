@@ -23,7 +23,7 @@ if TYPE_CHECKING:
     from pydofus2.com.ankamagames.jerakine.network.ServerConnection import ServerConnection
 from pydofus2.com.ankamagames.atouin.utils.DataMapProvider import DataMapProvider
 
-logger = Logger("Dofus2")
+logger = Logger()
 
 
 class DofusClient(metaclass=Singleton):

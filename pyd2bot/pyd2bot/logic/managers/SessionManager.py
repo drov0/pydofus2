@@ -3,7 +3,7 @@ from pydofus2.com.ankamagames.jerakine.logger.Logger import Logger
 from pydofus2.com.ankamagames.jerakine.metaclasses.Singleton import Singleton
 from pyd2bot.logic.managers.PathManager import PathManager
 from pydofus2.com.ankamagames.haapi.Haapi import Haapi
-logger = Logger("Dofus2")
+logger = Logger()
 
 
 

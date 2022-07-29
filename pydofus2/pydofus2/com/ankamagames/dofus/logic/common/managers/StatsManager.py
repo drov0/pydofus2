@@ -22,7 +22,7 @@ from pydofus2.com.ankamagames.jerakine.types.DataStoreType import DataStoreType
 from pydofus2.com.ankamagames.jerakine.types.enums.DataStoreEnum import DataStoreEnum
 from pydofus2.damageCalculation.tools.StatIds import StatIds
 
-logger = Logger("Dofus2")
+logger = Logger()
 
 
 class StatsManager(metaclass=Singleton):
@@ -103,7 +103,6 @@ class StatsManager(metaclass=Singleton):
     def deleteStats(self, entityId: float) -> bool:
         entityKey = str(float(entityId))
         if entityKey not in self._entityStats:
-            logger.error("Tried to del stats for entity with ID " + entityKey + ", but none were found. Aborting")
             return False
         del self._entityStats[entityKey]
         logger.info("Stats for entity with ID " + entityKey + " deleted")

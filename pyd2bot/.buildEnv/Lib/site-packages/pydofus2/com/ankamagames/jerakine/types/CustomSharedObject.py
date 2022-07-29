@@ -5,7 +5,7 @@ import os
 from pydofus2.com.ankamagames.dofus import Constants as Constants
 import pyamf
 
-logger = Logger("Dofus2")
+logger = Logger()
 
 
 class CustomSharedObjectFileFormatError(Exception):
@@ -103,7 +103,7 @@ class CustomSharedObject:
             except Exception as e:
                 if self._fileStream:
                     self._fileStream.close()
-                logger.error(str(e))
+                logger.warning(str(e))
                 if self.throwException:
                     raise CustomSharedObjectFileFormatError("Malformated file : " + self._file)
         if not self.data:

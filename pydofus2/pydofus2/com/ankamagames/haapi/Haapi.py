@@ -4,7 +4,7 @@ import httpx
 from pydofus2.com.ankamagames.jerakine.logger.Logger import Logger
 from pydofus2.com.ankamagames.jerakine.metaclasses.Singleton import Singleton
 
-logger = Logger("Haapi")
+logger = Logger()
 
 
 class Haapi(metaclass=Singleton):
@@ -30,23 +30,38 @@ class Haapi(metaclass=Singleton):
             "certificate_hash": str(certHash),
             "shop_key": "ZAAP",
             "payment_mode": "OK",
+            "lang" : "fr"
         }
-        response = httpx.post(
-            self.getUrl("CREATE_API_KEY"),
-            data=data,
-            headers={
-                "User-Agent": "Zaap",
-                "Content-Type": "multipart/form-data",
-            },
-        )
-        resposeJson = response.json()
-        if "key" not in resposeJson:
-            logger.error("Error while calling HAAPI to Create APIKEY")
-            logger.error(resposeJson["message"])
-            raise Exception(resposeJson["message"])
-        self.APIKEY = resposeJson["key"]
-        logger.debug("APIKEY created")
-        return self.APIKEY
+        nbrTries = 0
+        with httpx.Client(http2=True) as client:
+            while nbrTries < 3:
+                response = client.post(
+                    self.getUrl("CREATE_API_KEY"),
+                    data=data,
+                    headers={
+                        "User-Agent": "Zaap 3.6.2",
+                        "Content-Type": "multipart/form-data",
+                        "cache-control": "no-cache",
+                    },
+                )
+                print(response.http_version)
+                try:
+                    key = response.json()["key"]
+                    self.APIKEY = key
+                    return key
+                except json.decoder.JSONDecodeError as e:
+                    from lxml import html
+                    root = html.fromstring(response.content.decode('UTF-8'))
+                    error = root.xpath('//span[@class="error-description"]')[0].text
+                    errorCode = root.xpath('//span[@class="code-label"]//span')[0].text
+                    logger.debug(f"Login Token creation for login {login} failed, reason: %s\nerror code %s" % (error, errorCode))
+                    logger.debug("Retrying in 2 minutes")
+                    raise
+                    # sleep(2 * 60)
+                except KeyError as e:
+                    logger.debug("Error while calling HAAPI to get Login Token")
+                    logger.debug(response.content)
+                    raise Exception(e)
 
 
     def getLoginToken(self, login, password, certId, certHash, game_id=1):
@@ -54,37 +69,38 @@ class Haapi(metaclass=Singleton):
         if not self.APIKEY:
             self.createAPIKEY(login, password, certId, certHash)
         nbrTries = 0
-        while nbrTries < 3:
-            response = httpx.get(
-                self.getUrl("GET_LOGIN_TOKEN"),
-                params={
-                    "game": game_id,
-                    "certificate_id": certId,
-                    "certificate_hash": certHash,
-                },
-                headers={
-                    "User-Agent": "Zaap1",
-                    "Content-Type": "multipart/form-data",
-                    "APIKEY": self.APIKEY,
-                },
-            )
-            try:
-                token = response.json()["token"]
-                logger.debug("Login Token created")
-                return token
-            except json.decoder.JSONDecodeError as e:
-                import lxml.html
-
-                root = lxml.html.parse(response.content)
-                reason = root.xpath('//div[@id="what-happened-section"]//p/@text')[0]
-                if (
-                    reason
-                    == "The owner of this website (haapi.ankama.com) has banned you temporarily from accessing this website."
-                ):
-                    logger.debug("Login Token creation failed, reason: %s" % reason)
-                    logger.debug("Retrying in 60 seconds")
-                    sleep(60)
-            except KeyError as e:
-                logger.error("Error while calling HAAPI to get Login Token")
-                logger.error(response.content)
-                raise Exception(e)
+        with httpx.Client(http2=True) as client:
+            while nbrTries < 3:
+                response = client.get(
+                    self.getUrl("GET_LOGIN_TOKEN"),
+                    params={
+                        "game": game_id,
+                        "certificate_id": certId,
+                        "certificate_hash": certHash,
+                    },
+                    headers={
+                        "User-Agent": "Zaap1",
+                        "Content-Type": "multipart/form-data",
+                        "APIKEY": self.APIKEY,
+                    },
+                )
+                logger.debug(response.content)
+                try:
+                    token = response.json()["token"]
+                    logger.debug("Login Token created")
+                    return token
+                except json.decoder.JSONDecodeError as e:
+                    from lxml import html
+                    root = html.fromstring(response.content.decode('UTF-8'))
+                    error = root.xpath('//div[@id="what-happened-section"]//p/@text')[0]
+                    if (
+                        error
+                        == "The owner of this website (haapi.ankama.com) has banned you temporarily from accessing this website."
+                    ):
+                        logger.debug("Login Token creation failed, reason: %s" % error)
+                        logger.debug("Retrying in 60 seconds")
+                        raise Exception(error)
+                except KeyError as e:
+                    logger.error("Error while calling HAAPI to get Login Token")
+                    logger.error(response.content)
+                    raise Exception(e)

@@ -18,6 +18,7 @@ from pydofus2.com.ankamagames.dofus.network.messages.game.context.roleplay.MapCh
 from pydofus2.com.ankamagames.dofus.network.messages.game.context.roleplay.MapComplementaryInformationsDataMessage import (
     MapComplementaryInformationsDataMessage,
 )
+from pydofus2.com.ankamagames.dofus.network.messages.game.context.roleplay.MapInformationsRequestMessage import MapInformationsRequestMessage
 from pydofus2.com.ankamagames.dofus.network.messages.game.context.roleplay.party.PartyAcceptInvitationMessage import (
     PartyAcceptInvitationMessage,
 )
@@ -73,7 +74,7 @@ if TYPE_CHECKING:
     from pydofus2.com.ankamagames.dofus.logic.game.roleplay.frames.RoleplayEntitiesFrame import RoleplayEntitiesFrame
     from pydofus2.com.ankamagames.dofus.logic.game.roleplay.frames.RoleplayMovementFrame import RoleplayMovementFrame
 
-logger = Logger("Dofus2")
+logger = Logger()
 
 
 class AllOnSameMapMonitor(threading.Thread):
@@ -101,7 +102,6 @@ class AllOnSameMapMonitor(threading.Thread):
             sleep(1)
         logger.debug("AllOnSameMapMonitor: died")
         self._runningMonitors.remove(self)
-        raise Exception("AllOnSameMapMonitor: died")
         
 
 
@@ -141,11 +141,11 @@ class BotPartyFrame(Frame):
 
     @property
     def allMembersOnSameMap(self):
-        if self.entitiesFrame is None:
-            logger.debug("No RoleplayEntitiesFrame found")
-            return False
         for follower in self.followers:
             logger.debug(f"Checking follower if {follower['name']} is on same map")
+            if self.entitiesFrame is None:
+                logger.debug("No RoleplayEntitiesFrame found")
+                return False
             entity = self.entitiesFrame.getEntityInfos(follower["id"])
             if not entity:
                 logger.debug("Member %s not found in the current map", follower)
@@ -186,6 +186,8 @@ class BotPartyFrame(Frame):
             self.canFarmMonitor.start()
             logger.debug(f"Send party invite to all followers {self.followers}")
             for follower in self.followers:
+                if follower["name"] == None or follower["id"] == None:
+                    raise Exception("Follower name or id is None")
                 self.sendPartyInvite(follower["name"])
         return True
 
@@ -254,7 +256,9 @@ class BotPartyFrame(Frame):
             return True
 
         elif isinstance(msg, MapMoveFailed):
-            DofusClient().restart()
+            mirmsg = MapInformationsRequestMessage()
+            mirmsg.init(mapId_=MapDisplayManager().currentMapPoint.mapId)
+            ConnectionsHandler.getConnection().send(mirmsg)
             return True
 
         elif isinstance(msg, PartyMemberRemoveMessage):

@@ -116,7 +116,7 @@ from pydofus2.com.ankamagames.jerakine.network.messages.ServerConnectionFailedMe
 from pydofus2.com.ankamagames.jerakine.types.DataStoreType import DataStoreType
 from pydofus2.com.ankamagames.jerakine.types.enums.Priority import Priority
 
-logger = Logger("Dofus2")
+logger = Logger()
 
 
 class GameServerApproachFrame(Frame):

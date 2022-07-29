@@ -122,6 +122,10 @@ class AccountManager {
     getAccountCreds(key) {
         var account = this.accountsDB[key]
         var r = this.authHelper.getStoredCertificate(account.login)
+        if (!r) {
+            alertt("No certificate found for account " + account.login)
+            return
+        }
         var certId = r.certificate.id
         var certHash = this.authHelper.generateHashFromCertif(r.certificate)
         return {
@@ -133,6 +137,12 @@ class AccountManager {
     }
 
     saveAccounts() {
+        for (var [key, account] of Object.entries(this.accountsDB)) {
+            this.accountsDB[key] = {
+                "login": account.login,
+                "password": this.encrypt.encrypt(account.password)
+            }
+        }
         var saveJson = JSON.stringify(this.accountsDB, null, 2);
         fs.writeFile(this.accountsDbFile, saveJson, 'utf8', (err) => {
             if (err) {
@@ -182,6 +192,7 @@ class AccountManager {
         console.log("fetchCharacters " + key)
         var client = await instancesManager.spawnClient(key)
         var creds = this.getAccountCreds(key)
+        console.log(creds)
         var response = await client.fetchAccountCharacters(creds.login, creds.password, creds.certId, creds.certHash)
         console.log("fetcheCharacters result: " + JSON.stringify(response))
         for (let ck in response) {

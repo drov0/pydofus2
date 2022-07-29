@@ -25,7 +25,7 @@ from pyd2bot.logic.roleplay.frames.BotPhenixAutoRevive import BotPhenixAutoReviv
 from pyd2bot.logic.roleplay.frames.BotUnloadInBankFrame import BotUnloadInBankFrame
 from pyd2bot.logic.roleplay.messages.BankUnloadEndedMessage import BankUnloadEndedMessage
 
-logger = Logger("Dofus2")
+logger = Logger()
 
 
 class BotWorkflowFrame(Frame):
@@ -91,7 +91,8 @@ class BotWorkflowFrame(Frame):
 
         elif isinstance(msg, InventoryWeightMessage):
             if not self._inBankAutoUnload:
-                if InventoryAPI.getWeightPercent() > 95:
+                WeightPercent = round((msg.inventoryWeight / msg.weightMax) * 100, 2)
+                if WeightPercent > 95:
                     if self.currentContext is None:
                         self._delayedAutoBankUnlaod = True
                         logger.debug("Inventory full but context is not created yet so will delay bank unload..")

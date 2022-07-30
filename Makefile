@@ -18,7 +18,7 @@ setup:
 	echo "$(PYD2BOT_DIR)" >> .venv/pyd2bot.pth
 	pip install -r requirements.txt
 
-update: decompile gen-protocol gen-msgClasses gen-msgShuffle extract-keys unpack-maps
+update: gen-protocol gen-msgClasses gen-msgShuffle extract-keys unpack-maps bdist
 
 decompile:
 	@$(FFDEC) -config parallelSpeedUp=true -selectclass $(SELECTCLASS) -export script $(DOFUS_SRC) $(DOFUSINVOKER)
@@ -29,26 +29,31 @@ extract-keys:
 	@$(FFDEC) -config parallelSpeedUp=true -export binaryData $(PYDOFUS_DIR)/binaryData $(DOFUSINVOKER)
 
 gen-protocol:
+	source .venv/Scripts/activate
 	@echo "Generating protocol..."
 	@python protocolBuilder/protocolParser.py $(DOFUS_SRC)
 	@echo "Protocol generated"
 
 gen-msgClasses:
+	source .venv/Scripts/activate
 	@echo "Generating msgClasses..."
 	@python protocolBuilder/exportClasses.py
 	@echo "msgClasses generated"
 
 gen-msgShuffle:
+	source .venv/Scripts/activate
 	@echo "Generating msgShuffle..."
 	@python protocolBuilder/extractMsgShuffle.py $(DOFUS_SRC)/scripts/com/ankamagames/dofus/network/MessageReceiver.as
 	@echo "msgShuffle generated"
 
 unpack-maps:
+	source .venv/Scripts/activate
 	@echo "Unpacking maps..."
 	@python scripts/unpack_maps.py $(DOFUS_SRC)
 	@echo "Maps unpacked"
 
 deps:
+	source .venv/Scripts/activate
 	@pip install -r requirements.txt
 
 sniff:

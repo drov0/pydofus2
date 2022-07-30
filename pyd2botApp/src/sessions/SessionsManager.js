@@ -51,84 +51,83 @@ class SessionsManager {
         })
     }
 
-    async runFollowerSession(follower, leader) {
-        var key = follower.id
-        if (instancesManager.runningInstances[key]) {
-            instancesManager.killInstance(key);
-        }
-        var server = await instancesManager.spawnServer(key);
-        var client = await instancesManager.spawnClient(key);
-        console.log("running session : " + key);
-        var creds = accountManager.getAccountCreds(follower.accountId);
-        var sessionStr = JSON.stringify({
-            "name": follower.name,
+    async runFollowerSession(character, leader, leaderInstance) {
+        var instanceKey = `${character.name}(${character.id})`
+        console.log("running follower session : " + instanceKey);
+        var session = {
+            "key": instanceKey,
             "type": "fight",
-            "character": follower,
-            "leader": leader,
-        })
-        var instance = instancesManager.runningInstances[key];
-        instance.runningSession = {"key": key, "creds": creds, sessionStr: sessionStr};
-        client.runSession(creds.login, creds.password, creds.certId, creds.certHash, sessionStr);
+            "character": character,
+            "leader": leader
+        }
+        await this.runSessionLow(session)
+        console.log("Done running session : " + instanceKey)
+        leaderInstance.childs.push(character.id)
     }
 
-    async runSession(key) {
-        if (instancesManager.runningInstances[key]) {
-            instancesManager.killInstance(key);
-        }
-        var server = await instancesManager.spawnServer(key);
-        var client = await instancesManager.spawnClient(key);
-        var instance = instancesManager.runningInstances[key];
-        console.log("running session : " + key);
-        var session = this.sessionsDB[key];
-        if (!session) {
-            console.log("Session " + key + " not found")
+    async runSession(sessionKey) {
+        console.log("running session : " + sessionKey);
+        var sessionData = this.sessionsDB[sessionKey];
+        if (!sessionData) {
+            console.log("Session " + sessionKey + " not found")
             return
         }
-        var leader = accountManager.charactersDB[session.leaderId]
-        var path = pathsManager.pathsDB[session.pathId]
-        var creds = accountManager.getAccountCreds(leader.accountId);
-        if (session.type == "farm") {
-            var sessionStr = JSON.stringify({
-                "name": session.name,
-                "type": session.type,
-                "character": leader,
-                "path": path,
-                "jobIds": session.jobIds,
-                "resourceIds": session.resourceIds
-            })
+        var leader = accountManager.charactersDB[sessionData.leaderId]
+        var path = pathsManager.pathsDB[sessionData.pathId]
+        var instanceKey = `${leader.name}(${leader.id})`
+        var followers = []
+        var session = {
+            "key": instanceKey,
+            "type": sessionData.type,
+            "character": leader,
+            "path": path,
         }
-        else if (session.type == "fight") {
-            var followers = undefined
-            if (session.followersIds && session.followersIds.length > 0) {
-                followers = []
-                for (var i = 0; i < session.followersIds.length; i++) {
-                    var follower = accountManager.charactersDB[session.followersIds[i]]
-                    followers.push({"name": follower.name, "id": follower.id})
-                    instancesManager.runningInstances[key].childs.push(follower.id)
-                    await this.runFollowerSession(follower, leader)
-                }
+        if (sessionData.type == "farm") {
+            session = {
+                ...session,
+                "jobIds": sessionData.jobIds,
+                "resourceIds": sessionData.resourceIds
             }
-            var sessionStr = JSON.stringify({
-                "name": session.name,
-                "type": session.type,
-                "character": leader,
-                "path": path,
-                "monsterLvlCoefDiff": session.monsterLvlCoefDiff,
-                "followers": followers
-            })
         }
-        instance.runningSession = {"key": key, "creds": creds, sessionStr: sessionStr};
-        await client.runSession(creds.login, creds.password, creds.certId, creds.certHash, sessionStr);
+        else if (sessionData.type == "fight") {
+            for (var i = 0; i < sessionData.followersIds.length; i++) {
+                console.log(i)
+                var follower = accountManager.charactersDB[sessionData.followersIds[i]]
+                followers.push(follower)
+            }
+            session = {
+                ...session,
+                "monsterLvlCoefDiff": sessionData.monsterLvlCoefDiff,
+                "followers": followers
+            }
+        }
+        console.log("will run session : " + JSON.stringify(session))
+        var leaderInstance = await this.runSessionLow(session)
+        console.log("Done running session : " + instanceKey);
+        for (var i = 0; i < sessionData.followersIds.length; i++) {
+            var follower = accountManager.charactersDB[sessionData.followersIds[i]]
+            await this.runFollowerSession(follower, leader, leaderInstance)
+        }
+
     }
 
-    async restartSession(sessionArgs) {
-        var server = await instancesManager.spawnServer(sessionArgs.key);
-        var client = await instancesManager.spawnClient(sessionArgs.key);
-        console.log("restarting session : " + sessionArgs.key);
-        var instance = instancesManager.runningInstances[sessionArgs.key];
-        instance.runningSession = sessionArgs
+    async runSessionLow(session) {
+        if (!session.key) {
+            throw new Error("Session key is required")
+        }
+        var instance = await instancesManager.spawn(session.key);
+        instance.runningSession = session
         instance.serverClosed = false
-        client.runSession(sessionArgs.creds.login, sessionArgs.creds.password, sessionArgs.creds.certId, sessionArgs.creds.certHash, sessionArgs.sessionStr);
+        var creds = accountManager.getAccountCreds(session.character.accountId)
+        instance.client.runSession(
+            creds.login, 
+            creds.password, 
+            creds.certId, 
+            creds.certHash, 
+            JSON.stringify(session)
+        );
+        // console.debug("Session : " + JSON.stringify(creds) + " started  : " + JSON.stringify(session));
+        return instance
     }
 
     stopSession(key) {

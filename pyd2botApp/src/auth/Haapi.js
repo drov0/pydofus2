@@ -8,7 +8,7 @@ class RESTClient {
     async request(url, request) {
         request.timeout = 5e3;
         request.headers = {
-            "User-Agent": "Zaap",
+            "User-Agent": "Zaap 3.6.2",
             "content-type": "multipart/form-data",
         };
 
@@ -16,7 +16,6 @@ class RESTClient {
         process.env.DEBUG_NETWORK && console.log("[HTTP] answer", request.method, url);
         const res = await fetch(url, request);
         let textResponse = await res.text();
-        console.log(textResponse);
         if (process.env.DEBUG_NETWORK && console.log("[HTTP] result", request.method, url, res.status, res.statusText), res.status >= 400) {
             throw "application/json" === res.headers.get("content-type") && (res.body = textResponse = JSON.parse(textResponse)), new this.HttpError(textResponse);
         }
@@ -60,14 +59,12 @@ class RESTClient {
     }
 }
 
-import { RESTClient } from './restClient.js';
-import { AuthHelper } from './authHelper.js';
 
 class Haapi {
 
     constructor() {
         this.haapiUrl = "https://haapi.ankama.com/";
-        this.authHelper = new AuthHelper();
+        this.authHelper = require('./AuthHelper.js').instance;
         this.restClient = new RESTClient();
     }
 
@@ -130,8 +127,7 @@ class Haapi {
         }
     }
 
-    async getAPIKey(login, password) {
-
+    async getAPIKey(login, password, certId, certHash) {
         var cert = this.authHelper.getStoredCertificate(login).certificate;
         var certificate_hash = this.authHelper.generateHashFromCertif(cert);
         let url = this.getUrl("ANKAMA_API_CREATE_API_KEY");
@@ -166,4 +162,4 @@ class Haapi {
     }
 }
 
-module.exports = Haapi;
+Haapi.getAPIKey("tarik-maj@hotmail.fr", "rmrtxha1", 126304780, "f2a5726c0581d18c92b4a2278ff4c457240e62e8a64265cef8793781c641ba8c")

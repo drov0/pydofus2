@@ -59,8 +59,7 @@ def f(idx):
     print(f"Key for account melanco-lalco : " + res)
     return res
 
-f(2)
-f(4)
+f(5)
 # p2 = Process(target=f, args=(5, ))
 # p2.start()
 # p2.join()

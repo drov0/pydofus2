@@ -4,3 +4,4 @@ Py3AMF
 httpx[http2]
 xmltodict
 lxml
+cloudscraper

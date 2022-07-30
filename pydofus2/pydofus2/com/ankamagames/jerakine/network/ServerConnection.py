@@ -1,5 +1,4 @@
 import base64
-import traceback
 from time import perf_counter, sleep
 from types import FunctionType
 from pydofus2.com.ankamagames.dofus.kernel.net.DisconnectionReasonEnum import DisconnectionReasonEnum
@@ -37,7 +36,7 @@ class ServerConnection(IServerConnection):
 
     DEBUG_LOW_LEVEL_VERBOSE: bool = False
 
-    DEBUG_DATA: bool = False
+    DEBUG_DATA: bool = True
 
     LATENCY_AVG_BUFFER_SIZE: int = 50
 

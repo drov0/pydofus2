@@ -86,6 +86,8 @@ class Pyd2botServer:
         dofus2.registerGameStartFrame(BotPartyFrame)
         logger.debug("Frames registered")
         loginToken = Haapi().getLoginToken(login, password, certId, certHash)
+        if loginToken is None:
+            raise Exception("Unable to generate login token.")
         print(f"loginToken: {loginToken}")
         dofus2.login(loginToken, SessionManager().character["serverId"], SessionManager().character["id"])
         try:

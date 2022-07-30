@@ -86,15 +86,17 @@ class InstancesManager {
                     resolve(pyd2bot_process);
                 }
                 else if (stdout.toString().includes("Error while reading socket")) {
-                    console.log("Error in bot exec" + stdout.toString());
+                    console.log("Error in instance " + instanceId + " : " + stdout.toString());
+                    this.wantsToKillClient[instanceId] = true
                 }
                 else {
-                    console.log("stdout - " + stdout.toString());
+                    // console.log("stdout - " + stdout.toString());
                 }
             });
             pyd2bot_process.stderr.on('data', (stderr) => {
                 if (!stderr.toString().includes("DEBUG") && !stderr.toString().includes("INFO") && !stderr.toString().includes("WARNING")) {
                     console.log("stderr - " + stderr.toString());
+                    this.wantsToKillClient[instanceId] = true
                 }
             });
 
@@ -121,7 +123,7 @@ class InstancesManager {
                         console.log("Instance " + instanceId + " server crashed");
                         console.log("running session : " + JSON.stringify(instance.runningSession))
                         const sessionsManager = require("../sessions/SessionsManager.js").instance;
-                        sessionsManager.restartSession(instance.runningSession)
+                        sessionsManager.runSessionLow(instance.runningSession)
                     }
                     else {
                         console.log("Instance " + instanceId + " has no running session");
@@ -141,6 +143,12 @@ class InstancesManager {
         for (var instanceId in this.runningInstances) {
             this.killInstance(instanceId);
         }
+    }
+
+    async spawn(instanceId) {
+        await this.spawnServer(instanceId);
+        await this.spawnClient(instanceId);
+        return this.runningInstances[instanceId];
     }
 
     killInstance(instanceId) {

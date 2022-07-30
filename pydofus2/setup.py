@@ -33,6 +33,7 @@ setup(
         "Py3AMF",
         "httpx[http2]",
         "xmltodict",
-        "lxml"
+        "lxml",
+        "cloudscraper"
     ],
 )

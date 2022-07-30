@@ -186,8 +186,9 @@ class BotPartyFrame(Frame):
             self.canFarmMonitor.start()
             logger.debug(f"Send party invite to all followers {self.followers}")
             for follower in self.followers:
-                if follower["name"] == None or follower["id"] == None:
+                if follower["name"] is None or follower["id"] is None:
                     raise Exception("Follower name or id is None")
+                logger.debug(f"Will Send party invite to {follower['name']}")
                 self.sendPartyInvite(follower["name"])
         return True
 

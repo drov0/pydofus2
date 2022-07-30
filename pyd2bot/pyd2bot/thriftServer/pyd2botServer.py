@@ -2,6 +2,9 @@ from asyncio.log import logger
 import json
 import logging
 from time import perf_counter, sleep
+from build.lib.pydofus2.com.ankamagames.dofus.logic.game.common.managers.PlayedCharacterManager import PlayedCharacterManager
+from build.lib.pydofus2.com.ankamagames.dofus.modules.utils.pathFinding.world.Transition import Transition
+from pyd2bot.apis.MoveAPI import MoveAPI
 from pyd2bot.thriftServer.pyd2botService.ttypes import Character, Spell
 
 
@@ -96,6 +99,13 @@ class Pyd2botServer:
             logger.error(f"Error while running session: {e}")
             from pyd2bot.PyD2Bot import PyD2Bot
             PyD2Bot().stop()
+            
+    def recvMsgFromLeader(self, msgJsonStr):
+        msgJson = json.loads(msgJsonStr)
+        if msgJson.get("type") == "transit":
+            transition = Transition(**msgJson)
+            MoveAPI.followTransition(transition)
+        return json.dumps({"mapId": PlayedCharacterManager().currentMap.mapId, "zoneRp": PlayedCharacterManager().currentZoneRp, "cellid": PlayedCharacterManager().currentCellId})
 
     def fetchBreedSpells(self, breedId:int) -> list['Spell']:
         from pydofus2.com.ankamagames.dofus.datacenter.breeds.Breed import Breed

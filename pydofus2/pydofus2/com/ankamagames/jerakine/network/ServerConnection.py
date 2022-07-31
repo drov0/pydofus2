@@ -307,11 +307,9 @@ class ServerConnection(IServerConnection):
                         msg = self.lowReceive(input)
         except Exception as e:
             import pydofus2.com.ankamagames.dofus.kernel.net.ConnectionsHandler as connh
-
-            logger.error("[" + str(self._id) + "] Error while reading socket. \n", exc_info=True)
+            logger.error(f"[{self._id}] Error while reading socket. \n", exc_info=True)
             import sys
             import traceback
-
             exc_type, exc_value, exc_traceback = sys.exc_info()
             traceback_in_var = traceback.format_tb(exc_traceback)
             error_trace = '\n'.join(traceback_in_var)
@@ -399,14 +397,13 @@ class ServerConnection(IServerConnection):
             messageId = self.getMessageId(staticHeader)
             if messageId not in self._rawParser._messagesTypes:
                 raise Exception(f"Unknown message id {messageId}")
-            byteLenDynamicHeader = staticHeader & NetworkMessage.BIT_MASK
-
-            if src.remaining() >= byteLenDynamicHeader:
-                messageLength = self.readMessageLength(staticHeader, src)
-
+            try:
+                 messageLength = self.readMessageLength(staticHeader, src)
+            except IndexError as e:
+                messageLength = None
+            if messageLength is not None:
                 if src.remaining() >= messageLength:
                     self.updateLatency()
-
                     if self.getUnpackMode(messageId, messageLength) == UnpackMode.ASYNC:
                         self._input = src.read(messageLength)
                         msg = self._rawParser.parseAsync(self._input, messageId, messageLength, self.computeMessage)

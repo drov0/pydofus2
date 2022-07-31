@@ -2,11 +2,10 @@ from asyncio.log import logger
 import json
 import logging
 from time import perf_counter, sleep
-from build.lib.pydofus2.com.ankamagames.dofus.logic.game.common.managers.PlayedCharacterManager import PlayedCharacterManager
-from build.lib.pydofus2.com.ankamagames.dofus.modules.utils.pathFinding.world.Transition import Transition
-from pyd2bot.apis.MoveAPI import MoveAPI
 from pyd2bot.thriftServer.pyd2botService.ttypes import Character, Spell
+from pydofus2.com.ankamagames.haapi.Haapi import Haapi
 
+logger = None
 
 
 class Pyd2botServer:
@@ -74,38 +73,64 @@ class Pyd2botServer:
         from pydofus2.com.ankamagames.jerakine.logger.Logger import Logger
         print(f"runSession called with login {login}")
         session = json.loads(sessionJson)
-        logger = Logger(f"{session['character']['name']}({session['character']['id']})")
-        from pydofus2.com.ankamagames.haapi.Haapi import Haapi
-        from pydofus2.com.DofusClient import DofusClient
-        from pyd2bot.logic.common.frames.BotWorkflowFrame import BotWorkflowFrame
+        logger_name = f"{session['character']['name']}({session['character']['id']})"
+        Logger.prefix = logger_name
+        logger = Logger()
+        logger.debug(f"logger_name {logger_name}")
+        logger.debug("session: " + sessionJson)
         from pyd2bot.logic.managers.SessionManager import SessionManager
-        from pyd2bot.logic.common.frames.BotCharacterUpdatesFrame import BotCharacterUpdatesFrame
-        from pyd2bot.logic.roleplay.frames.BotPartyFrame import BotPartyFrame
         SessionManager().load(sessionJson)
         logger.debug("Session loaded")
+        from pydofus2.com.ankamagames.haapi.Haapi import Haapi
+        from pydofus2.com.DofusClient import DofusClient
         dofus2 = DofusClient()
+        logger.debug("importing frames")
+        from pyd2bot.logic.common.frames.BotCharacterUpdatesFrame import BotCharacterUpdatesFrame
+        from pyd2bot.logic.common.frames.BotWorkflowFrame import BotWorkflowFrame
+        from pyd2bot.logic.roleplay.frames.BotPartyFrame import BotPartyFrame
+        logger.debug("frames imported")
         dofus2.registerInitFrame(BotWorkflowFrame)
         dofus2.registerGameStartFrame(BotCharacterUpdatesFrame)
+        logger.debug("registerGameStartFrame BotCharacterUpdatesFrame")
         dofus2.registerGameStartFrame(BotPartyFrame)
+        logger.debug("registerGameStartFrame BotPartyFrame")
         logger.debug("Frames registered")
+        if session.get("APIKEY"):
+            Haapi().APIKEY = session["APIKEY"]
         loginToken = Haapi().getLoginToken(login, password, certId, certHash)
         if loginToken is None:
             raise Exception("Unable to generate login token.")
-        print(f"loginToken: {loginToken}")
+        logger.debug(f"loginToken: {loginToken}")
         dofus2.login(loginToken, SessionManager().character["serverId"], SessionManager().character["id"])
         try:
             dofus2.join()
         except Exception as e:
             logger.error(f"Error while running session: {e}")
             from pyd2bot.PyD2Bot import PyD2Bot
-            PyD2Bot().stop()
+            PyD2Bot().stopServer()
             
-    def recvMsgFromLeader(self, msgJsonStr):
+    def rcvLeaderMsg(self, msgJsonStr):
+        print(f"rcvLeaderMsg called with msgJsonStr {msgJsonStr}")
+        from pyd2bot.logic.roleplay.messages.LeaderPosMessage import LeaderPosMessage
+        from pyd2bot.logic.roleplay.messages.LeaderTransitionMessage import LeaderTransitionMessage
+        from pydofus2.com.ankamagames.dofus.kernel.Kernel import Kernel
+        from pydofus2.com.ankamagames.dofus.modules.utils.pathFinding.world.Vertex import Vertex
+        from pydofus2.com.ankamagames.dofus.modules.utils.pathFinding.world.Transition import Transition
+        from pydofus2.com.ankamagames.dofus.modules.utils.pathFinding.world.WorldPathFinder import WorldPathFinder
+        from pydofus2.com.ankamagames.dofus.logic.game.common.managers.PlayedCharacterManager import PlayedCharacterManager
         msgJson = json.loads(msgJsonStr)
         if msgJson.get("type") == "transit":
-            transition = Transition(**msgJson)
-            MoveAPI.followTransition(transition)
-        return json.dumps({"mapId": PlayedCharacterManager().currentMap.mapId, "zoneRp": PlayedCharacterManager().currentZoneRp, "cellid": PlayedCharacterManager().currentCellId})
+            tr = Transition(**msgJson["data"])
+            Kernel().getWorker().process(LeaderTransitionMessage(tr))
+            print("LeaderTransitionMessage processed")
+        elif msgJson.get("type") == "pos":
+            v = Vertex(**msgJson["data"])
+            Kernel().getWorker().process(LeaderPosMessage(v))
+            print("LeaderPosMessage processed")
+        cv = WorldPathFinder().currPlayerVertex
+        result = json.dumps({"vertex": cv.to_json(), "cellid": PlayedCharacterManager().currentCellId})
+        print(f"rcvLeaderMsg result: {result}")
+        return result
 
     def fetchBreedSpells(self, breedId:int) -> list['Spell']:
         from pydofus2.com.ankamagames.dofus.datacenter.breeds.Breed import Breed
@@ -135,3 +160,7 @@ class Pyd2botServer:
                 if gr not in res[skill.parentJobId]["gatheredRessources"]:
                     res[skill.parentJobId]["gatheredRessources"].append(gr)
         return json.dumps(res)
+    
+    def getApiKey(self, login:str, password:str, certId:str, certHash:str) -> str:
+        response = Haapi().createAPIKEY(login, password, certId, certHash, game_id=102)
+        return json.dumps(response)

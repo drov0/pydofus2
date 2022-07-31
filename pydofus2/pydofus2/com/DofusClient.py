@@ -33,11 +33,13 @@ class DofusClient(metaclass=Singleton):
     
     def __init__(self):
         krnl.Kernel().init()
+        logger.info("Kernel initialized ...")
         self._worker = krnl.Kernel().getWorker()
         self._registredInitFrames = []
         self._registredGameStartFrames = []
         I18nFileAccessor().init()
         DataMapProvider().init(AnimatedCharacter)
+        logger.info("DofusClient initialized")
 
     def relogin(self):
         self.login(self._loginToken, self._serverId, self._characterId)
@@ -72,6 +74,7 @@ class DofusClient(metaclass=Singleton):
                     snapshot = tracemalloc.take_snapshot()
                     MemoryProfiler.logMemoryUsage(snapshot)
             except KeyboardInterrupt:
+                logger.debug("Shutdown requested by user")
                 self.shutdown()
                 if self.LOG_MEMORY_USAGE:
                     MemoryProfiler.saveCollectedData()

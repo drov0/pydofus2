@@ -28,6 +28,8 @@ if len(sys.argv) <= 1 or sys.argv[1] == '--help':
     print('  void runSession(string login, string password, int certId, string certHash, string sessionJson)')
     print('   fetchBreedSpells(int breedId)')
     print('  string fetchJobsInfosJson()')
+    print('  string rcvLeaderMsg(string msg)')
+    print('  string getApiKey(string login, string password, int certId, string certHash)')
     print('')
     sys.exit(0)
 
@@ -130,6 +132,18 @@ elif cmd == 'fetchJobsInfosJson':
         print('fetchJobsInfosJson requires 0 args')
         sys.exit(1)
     pp.pprint(client.fetchJobsInfosJson())
+
+elif cmd == 'rcvLeaderMsg':
+    if len(args) != 1:
+        print('rcvLeaderMsg requires 1 args')
+        sys.exit(1)
+    pp.pprint(client.rcvLeaderMsg(args[0],))
+
+elif cmd == 'getApiKey':
+    if len(args) != 4:
+        print('getApiKey requires 4 args')
+        sys.exit(1)
+    pp.pprint(client.getApiKey(args[0], args[1], eval(args[2]), args[3],))
 
 else:
     print('Unrecognized method %s' % cmd)

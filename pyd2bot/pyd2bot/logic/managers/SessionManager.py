@@ -32,7 +32,7 @@ class SessionManager(metaclass=Singleton):
             self.resourceIds = sessionJson.get("resourceIds")
         elif self.type == "fight":
             self.followers : list[str] = sessionJson.get("followers")
-            if self.followers:
+            if self.followers is not None:
                 self.isLeader = True
                 self.path = sessionJson.get("path")
                 logger.info(f"Running path {self.path}")

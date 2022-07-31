@@ -1,10 +1,9 @@
 import json
+import ssl
 from time import sleep
 import httpx
 from pydofus2.com.ankamagames.jerakine.logger.Logger import Logger
 from pydofus2.com.ankamagames.jerakine.metaclasses.Singleton import Singleton
-from requests import request
-import requests
 import cloudscraper
 
 logger = Logger()
@@ -27,11 +26,12 @@ class Haapi(metaclass=Singleton):
     def clients(self):
         for client in [
             cloudscraper.create_scraper(),
-            cloudscraper.create_scraper(disableCloudflareV1=True),
-            cloudscraper.create_scraper(interpreter='nodejs'),
-            cloudscraper.create_scraper(allow_brotli=False),
-            httpx.Client(http2=True),
-            httpx.Client()]:
+            # cloudscraper.create_scraper(disableCloudflareV1=True, verify=False),
+            # cloudscraper.create_scraper(interpreter='nodejs', verify=False),
+            # cloudscraper.create_scraper(allow_brotli=False, verify=False),
+            # httpx.Client(http2=True, verify=False),
+            # httpx.Client(verify=False)
+            ]:
             yield client
     
     def createAPIKEY(self, login, password, certId, certHash, game_id=102) -> str:
@@ -62,7 +62,7 @@ class Haapi(metaclass=Singleton):
                 key = response.json().get("key")
                 if key:
                     self.APIKEY = key
-                    return key
+                    return response.json()
                 else:
                     logger.debug("Error while calling HAAPI to get Login Token : %s" % response.content)
                     sleep(5)
@@ -78,14 +78,16 @@ class Haapi(metaclass=Singleton):
     def getLoginToken(self, login, password, certId, certHash, game_id=1):
         logger.debug("Calling HAAPI to get Login Token")
         nbrtries = 0
-        while nbrtries < 5:
-            self.APIKEY = self.createAPIKEY(login, password, certId, certHash)
-            if not self.APIKEY:
-                logger.debug("Fail to create APIKEY, retrying in 30 seconds")
-                sleep(30)
-                nbrtries += 1
-            else:
-                break
+        if not self.APIKEY:
+            while nbrtries < 5:
+                response = self.createAPIKEY(login, password, certId, certHash)
+                self.APIKEY = response.get("key")
+                if not self.APIKEY:
+                    logger.debug("Failed to create APIKEY, retrying in 30 seconds")
+                    sleep(30)
+                    nbrtries += 1
+                else:
+                    break
         if not self.APIKEY:
             raise HaapiException("Failed to create APIKEY")
         nbrtries = 0
@@ -102,7 +104,7 @@ class Haapi(metaclass=Singleton):
                         "User-Agent": "Zaap1",
                         "Content-Type": "multipart/form-data",
                         "APIKEY": self.APIKEY,
-                    },
+                    }
                 )
                 logger.debug(response.content)
                 if response.headers["content-type"] == "application/json":

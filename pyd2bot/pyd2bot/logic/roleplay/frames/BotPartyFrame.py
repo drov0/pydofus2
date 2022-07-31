@@ -3,13 +3,18 @@ import threading
 from threading import Timer
 from time import sleep
 from typing import TYPE_CHECKING
-from pydofus2.com.DofusClient import DofusClient
-
+from pydofus2.com.ankamagames.berilia.managers.KernelEventsManager import KernelEventsManager
+from pydofus2.com.ankamagames.dofus.logic.game.roleplay.messages.CharacterMovementStoppedMessage import CharacterMovementStoppedMessage
+from pydofus2.com.ankamagames.dofus.modules.utils.pathFinding.world.Transition import Transition
+from pyd2bot.logic.roleplay.messages.LeaderPosMessage import LeaderPosMessage
+from pyd2bot.logic.roleplay.messages.LeaderTransitionMessage import LeaderTransitionMessage
 from pydofus2.com.ankamagames.atouin.managers.MapDisplayManager import MapDisplayManager
 from pydofus2.com.ankamagames.dofus.kernel.Kernel import Kernel
 from pydofus2.com.ankamagames.dofus.kernel.net.ConnectionsHandler import ConnectionsHandler
 from pydofus2.com.ankamagames.dofus.logic.game.common.managers.PlayedCharacterManager import PlayedCharacterManager
 from pydofus2.com.ankamagames.dofus.logic.game.fight.messages.MapMoveFailed import MapMoveFailed
+from pydofus2.com.ankamagames.dofus.modules.utils.pathFinding.world.Vertex import Vertex
+from pydofus2.com.ankamagames.dofus.modules.utils.pathFinding.world.WorldPathFinder import WorldPathFinder
 from pydofus2.com.ankamagames.dofus.network.messages.game.atlas.compass.CompassUpdatePartyMemberMessage import (
     CompassUpdatePartyMemberMessage,
 )
@@ -73,12 +78,15 @@ from pyd2bot.misc.BotEventsmanager import BotEventsManager
 if TYPE_CHECKING:
     from pydofus2.com.ankamagames.dofus.logic.game.roleplay.frames.RoleplayEntitiesFrame import RoleplayEntitiesFrame
     from pydofus2.com.ankamagames.dofus.logic.game.roleplay.frames.RoleplayMovementFrame import RoleplayMovementFrame
+    from pyd2bot.logic.common.frames.BotWorkflowFrame import BotWorkflowFrame
+
 
 logger = Logger()
 
 
 class AllOnSameMapMonitor(threading.Thread):
     _runningMonitors = list['AllOnSameMapMonitor']()
+    VERBOSE = False
     def __init__(self, bpframe: "BotPartyFrame"):
         super().__init__()
         while self._runningMonitors:
@@ -89,18 +97,19 @@ class AllOnSameMapMonitor(threading.Thread):
         self._runningMonitors.append(self)
         
     def run(self) -> None:
-        logger.debug("AllOnSameMapMonitor started")
+        logger.debug("[AllOnSameMapMonitor] started")
         while not self.stopSig.is_set():
             if PlayedCharacterManager().isInFight:
-                logger.debug("AllOnSameMapMonitor: isFighting")
+                if self.VERBOSE:
+                    logger.debug("[AllOnSameMapMonitor] bot isFighting")
             else:                
                 if not self.bpframe:
-                    logger.debug("AllOnSameMapMonitor: No BotPartyFrame found")
+                    if self.VERBOSE:
+                        logger.debug("[AllOnSameMapMonitor] BotPartyFrame not found")
                 elif self.bpframe.allMembersOnSameMap:
                     BotEventsManager().dispatch(BotEventsManager.ALLMEMBERS_ONSAME_MAP)
-                    logger.debug("AllOnSameMapMonitor: all members are on same map")
             sleep(1)
-        logger.debug("AllOnSameMapMonitor: died")
+        logger.debug("[AllOnSameMapMonitor] died")
         self._runningMonitors.remove(self)
         
 
@@ -110,8 +119,10 @@ class BotPartyFrame(Frame):
     CONFIRME_JOIN_TIMEOUT = 10
     name: str = None
     changingMap: bool = False
-    mapChangesQueue = []
-
+    leaderTransitionsQueue : list = []
+    followingLeaderTransition = None
+    wantsTransition = None
+    
     def __init__(self) -> None:
         super().__init__()
 
@@ -140,23 +151,29 @@ class BotPartyFrame(Frame):
         return Kernel().getWorker().getFrame("RoleplayEntitiesFrame")
 
     @property
+    def workflowFrame(self) -> "BotWorkflowFrame":
+        return Kernel().getWorker().getFrame("BotWorkflowFrame")
+    @property
+    def leader(self) -> dict:
+        return SessionManager().leader
+    
+    @property
     def allMembersOnSameMap(self):
         for follower in self.followers:
-            logger.debug(f"Checking follower if {follower['name']} is on same map")
+            # logger.debug(f"[BotPartyFrame] Checking follower if {follower['name']} is on same map")
             if self.entitiesFrame is None:
-                logger.debug("No RoleplayEntitiesFrame found")
+                # logger.debug("[BotPartyFrame] No RoleplayEntitiesFrame found")
                 return False
             entity = self.entitiesFrame.getEntityInfos(follower["id"])
             if not entity:
-                logger.debug("Member %s not found in the current map", follower)
+                # logger.debug(f"[BotPartyFrame] Member {follower['name']} not found in the current map")
                 return False
-        logger.debug("All members are on the same map")
+        # logger.debug("[BotPartyFrame] All members are on the same map")
         return True
 
     def pulled(self):
-        if self._inParty:
+        if self.currentPartyId:
             self.leaveParty()
-            self._inParty = False
         if self.isLeader:
             self.canFarmMonitor.stopSig.set()
             self.canFarmMonitor.join()
@@ -164,34 +181,41 @@ class BotPartyFrame(Frame):
         if self._partyInviteTimers:
             for timer in self._partyInviteTimers.values():
                 timer.cancel()
-        self._partyId = None
+        self.currentPartyId = None
         self._partyInviteTimers.clear()
-        self.mapChangesQueue.clear()
-        logger.debug("BotPartyFrame pulled")
+        self.leaderTransitionsQueue.clear()
+        logger.debug("[BotPartyFrame] BotPartyFrame pulled")
         return True
 
     def pushed(self):
-        logger.debug("BotPartyFrame pushed")
+        logger.debug("[BotPartyFrame] BotPartyFrame pushed")
         self._partyInviteTimers = dict[str, Timer]()
-        self._partyId = None
+        self.currentPartyId = None
         self._partyMembers = dict[int, PartyMemberInformations]()
-        self._isJoiningLeaderVertex = False
-        self._inParty = False
+        self._joiningLeaderVertex : Vertex = None
         self._allMemberOnSameMap = False
         self._allMembersJoined = False
         self._wantsToJoinFight = None
+        self.leaderTransitionsQueue : list = []
+        self.followingLeaderTransition = None
         if self.isLeader:
-            logger.debug("Bot is leader")
+            logger.debug("[BotPartyFrame] Bot is leader")
             self.canFarmMonitor = AllOnSameMapMonitor(self)
             self.canFarmMonitor.start()
-            logger.debug(f"Send party invite to all followers {self.followers}")
+            logger.debug(f"[BotPartyFrame] Send party invite to all followers {self.followers}")
             for follower in self.followers:
                 if follower["name"] is None or follower["id"] is None:
                     raise Exception("Follower name or id is None")
-                logger.debug(f"Will Send party invite to {follower['name']}")
+                logger.debug(f"[BotPartyFrame] Will Send party invite to {follower['name']}")
                 self.sendPartyInvite(follower["name"])
         return True
 
+    def getFollowerById(self, id: int) -> dict:
+        for idx, follower in enumerate(self.followers):
+            if follower["id"] == id:
+                return idx
+        return None 
+    
     def sendPrivateMessage(self, playerName, message):
         ccmsg = ChatClientPrivateMessage()
         pi = PlayerSearchCharacterNameInformation()
@@ -201,11 +225,12 @@ class BotPartyFrame(Frame):
 
     def cancelPartyInvite(self, playerName):
         cpimsg = PartyCancelInvitationMessage()
-        for follower in self.followers:
-            if follower["name"] == playerName:
-                cpimsg.init(follower["id"], self._partyId)
-                ConnectionsHandler.getConnection().send(cpimsg)
-                break
+        if self.currentPartyId is not None:
+            for follower in self.followers:
+                if follower["name"] == playerName:
+                    cpimsg.init(follower["id"], self.currentPartyId)
+                    ConnectionsHandler.getConnection().send(cpimsg)
+                    break
 
     def sendPartyInvite(self, playerName):
         for member in self._partyMembers.values():
@@ -225,17 +250,17 @@ class BotPartyFrame(Frame):
 
     def sendFollowMember(self, memberId):
         pfmrm = PartyFollowMemberRequestMessage()
-        pfmrm.init(memberId, self._partyId)
+        pfmrm.init(memberId, self.currentPartyId)
         ConnectionsHandler.getConnection().send(pfmrm)
 
     def joinFight(self, fightId: int):
         if self.movementFrame._isMoving:
             self.movementFrame._wantsToJoinFight = {
                 "fightId": fightId,
-                "fighterId": self.leaderId,
+                "fighterId": self.leader['id'],
             }
         else:
-            self.movementFrame.joinFight(self.leaderId, fightId)
+            self.movementFrame.joinFight(self.leader['id'], fightId)
 
     def checkIfTeamInFight(self):
         if not PlayedCharacterManager().isFighting and self.entitiesFrame:
@@ -243,23 +268,34 @@ class BotPartyFrame(Frame):
                 for team in fight.teams:
                     for member in team.teamInfos.teamMembers:
                         if member.id in self._partyMembers:
-                            logger.debug(f"Team is in a fight")
+                            logger.debug(f"[BotPartyFrame] Team is in a fight")
                             self.joinFight(fightId)
                             return
 
     def leaveParty(self):
+        if not self.currentPartyId:
+            logger.warning("[BotPartyFrame] No party to leave")
+            return
         plmsg = PartyLeaveRequestMessage()
-        plmsg.init(self._partyId)
+        plmsg.init(self.currentPartyId)
         ConnectionsHandler.getConnection().send(plmsg)
+        self.currentPartyId = None
 
     def process(self, msg: Message):
+        
+        if self.workflowFrame._inBankAutoUnload:
+            return False
+        
         if isinstance(msg, PartyNewGuestMessage):
             return True
 
-        elif isinstance(msg, MapMoveFailed):
-            mirmsg = MapInformationsRequestMessage()
-            mirmsg.init(mapId_=MapDisplayManager().currentMapPoint.mapId)
-            ConnectionsHandler.getConnection().send(mirmsg)
+        elif isinstance(msg, MapChangeFailedMessage):
+            if self.isLeader:
+                return False
+            if self.followingLeaderTransition:
+                self.leaderTransitionsQueue = [self.followingLeaderTransition] + self.leaderTransitionsQueue
+                self.followingLeaderTransition = None
+            self.requestMapData()
             return True
 
         elif isinstance(msg, PartyMemberRemoveMessage):
@@ -277,10 +313,10 @@ class BotPartyFrame(Frame):
             return True
 
         elif isinstance(msg, PartyInvitationMessage):
-            logger.debug(f"{msg.fromName} invited you to join his party")
+            logger.debug(f"[BotPartyFrame] {msg.fromName} invited you to join his party")
             if not self.isLeader and msg.fromName == self.leaderName:
-                self.leaderId = msg.fromId
-                self._partyId = msg.partyId
+                self.leader['id'] = msg.fromId
+                self.currentPartyId = msg.partyId
                 paimsg = PartyAcceptInvitationMessage()
                 paimsg.init(msg.partyId)
                 ConnectionsHandler.getConnection().send(paimsg)
@@ -291,114 +327,102 @@ class BotPartyFrame(Frame):
             return True
 
         elif isinstance(msg, PartyNewMemberMessage):
-            logger.info(f"{msg.memberInformations.name} joined your party")
-            self._inParty = True
-            self._partyId = msg.partyId
+            logger.info(f"[BotPartyFrame] {msg.memberInformations.name} joined your party")
+            self.currentPartyId = msg.partyId
             self._partyMembers[msg.memberInformations.id] = msg.memberInformations
-            if self.isLeader and msg.memberInformations.id != self.leaderId:
+            if self.isLeader and msg.memberInformations.id != PlayedCharacterManager().id:
                 self.sendFollowMember(msg.memberInformations.id)
+                fidx = self.getFollowerById(msg.memberInformations.id)
+                self.notifyFollowerWithPos(fidx)
                 if msg.memberInformations.name in self._partyInviteTimers:
                     self._partyInviteTimers[msg.memberInformations.name].cancel()
                     del self._partyInviteTimers[msg.memberInformations.name]
             elif msg.memberInformations.id == PlayedCharacterManager().id:
-                self.sendFollowMember(self.leaderId)
+                self.sendFollowMember(self.leader['id'])
             return True
-
+    
         elif isinstance(msg, PartyJoinMessage):
             self._partyMembers.clear()
-            logger.debug(f"Party {msg.partyId} of leader {msg.partyLeaderId}")
+            logger.debug(f"[BotPartyFrame] Party {msg.partyId} of leader {msg.partyLeaderId}")
             for member in msg.members:
                 if member.id not in self._partyMembers:
                     self._partyMembers[member.id] = member
                 if member.id == PlayedCharacterManager().id:
-                    if not self._inParty:
-                        self._inParty = True
-                        self._partyId = msg.partyId
-                        self.leaderId = msg.partyLeaderId
+                    if not self.currentPartyId:
+                        self.currentPartyId = msg.partyId
                         if not self.isLeader:
-                            self.sendFollowMember(self.leaderId)
-                    else:
-                        for member in msg.members:
-                            if member.id == msg.partyLeaderId:
-                                if member.name != self.leaderName:
-                                    self.leaveParty()
-                                    return
-            if not self.isLeader and not self._isJoiningLeaderVertex:
-                logger.debug(f"{self.leaderName} is in map {self._partyMembers[self.leaderId].mapId}")
-                self.setFollowLeader()
-                if (
-                    PlayedCharacterManager().currentMap
-                    and PlayedCharacterManager().currentMap.mapId != self._partyMembers[self.leaderId].mapId
-                ):
-                    self._isJoiningLeaderVertex = True
-                    af = BotAutoTripFrame(self._partyMembers[self.leaderId].mapId)
-                    Kernel().getWorker().pushFrame(af)
-                    return
+                            self.sendFollowMember(self.leader['id'])
+                    elif msg.partyLeaderId != self.leader["id"]:
+                        logger.warning(f"[BotPartyFrame] The party has the wrong leader {msg.partyLeaderId} instead of {self.leader['id']}")
+                        self.leaveParty()
+                        return
+            if not self.isLeader and self._joiningLeaderVertex is None:
+                logger.debug(f"[BotPartyFrame] {self.leaderName} is in map {self._partyMembers[self.leader['id']].mapId}")
             self.checkIfTeamInFight()
-            if not self.isLeader and self.leaderId not in self._partyMembers:
+            if not self.isLeader and self.leader['id'] not in self._partyMembers:
                 self.leaveParty()
             return True
 
         elif isinstance(msg, AutoTripEndedMessage):
-            if self._isJoiningLeaderVertex:
-                leaderInfos = self.entitiesFrame.getEntityInfos(self.leaderId)
+            if self._joiningLeaderVertex is not None:
+                leaderInfos = self.entitiesFrame.getEntityInfos(self.leader["id"])
                 if not leaderInfos:
-                    if self.leaderId not in self._partyMembers:
-                        logger.warning(f"Leader {self.leaderName} is not in party anymore")
+                    logger.warning(f"[BotPartyFrame] Autotrip ended, was following leader transition {self._joiningLeaderVertex} but the leader {self.leaderName} is not in the current Map!")
+                    if self.leader["id"] not in self._partyMembers:
+                        logger.warning(f"[BotPartyFrame] Leader {self.leaderName} is not in the party anymore!")
                         return False
-                    af = BotAutoTripFrame(self._partyMembers[self.leaderId].mapId)
-                    Kernel().getWorker().pushFrame(af)
-                    return True
-                leaderCellid = leaderInfos.disposition.cellId
-                leaderRpZone = MapDisplayManager().dataMap.cells[leaderCellid].linkedZoneRP
-                if leaderRpZone != PlayedCharacterManager().currentZoneRp:
-                    af = BotAutoTripFrame(self._partyMembers[self.leaderId].mapId, leaderRpZone)
-                    Kernel().getWorker().pushFrame(af)
-                    return True
-                self._isJoiningLeaderVertex = False
-            elif self._wantsToJoinFight:
+                    if PlayedCharacterManager().currentMap.mapId != self._joiningLeaderVertex.mapId:
+                        logger.warning(f"[BotPartyFrame] Leader {self.leaderName} is not in the correct map!")
+                        af = BotAutoTripFrame(self._joiningLeaderVertex.mapId, self._joiningLeaderVertex.zoneId)
+                        Kernel().getWorker().pushFrame(af)
+                        return True
+                else:
+                    self.leader["currentVertex"] = self._joiningLeaderVertex
+                    self._joiningLeaderVertex = None
+            if self._wantsToJoinFight:
                 self.joinFight(self._wantsToJoinFight)
 
+        elif isinstance(msg, LeaderTransitionMessage):
+            logger.debug(f"[BotPartyFrame] Leader {self.leader['name']} will transit following {msg.transition}")
+            if self.followingLeaderTransition is None:
+                self.wantsTransition = msg.transition
+                if self.movementFrame._isMoving:
+                    KernelEventsManager().add_listener(KernelEventsManager.MOVEMENT_STOPPED, self.onMovementStopped)
+                    logger.debug(f"[BotPartyFrame] Leader transited but the bot is still moving, waiting for the end of the movement")
+                else:
+                    self.onMovementStopped(None)
+            elif self.followingLeaderTransition != msg.transition:
+                logger.debug(f"[BotPartyFrame] Bot is already following {self.followingLeaderTransition}. Will queue this one!")
+                self.leaderTransitionsQueue.append(msg.transition)
+        
+        elif isinstance(msg, LeaderPosMessage):
+            self.leader["currentVertex"] = msg.vertex
+            if self._joiningLeaderVertex is not None:
+                if msg.vertex.UID == self._joiningLeaderVertex.UID:
+                    return True
+            elif WorldPathFinder().currPlayerVertex != msg.vertex:
+                self._joiningLeaderVertex = msg.vertex
+                af = BotAutoTripFrame(msg.vertex.mapId, msg.vertex.zoneId)
+                Kernel().getWorker().pushFrame(af)
+                return True 
+            
         elif isinstance(msg, CompassUpdatePartyMemberMessage):
             self._partyMembers[msg.memberId].worldX = msg.coords.worldX
             self._partyMembers[msg.memberId].worldY = msg.coords.worldY
-            logger.debug(f"Member {msg.memberId} moved to map {(msg.coords.worldX, msg.coords.worldY)}")
-            mapPos = PlayedCharacterManager().currMapPos
-            if not self.isLeader and not self._isJoiningLeaderVertex and msg.memberId == self.leaderId:
-                logger.debug(
-                    f"Leader moved to map {(msg.coords.worldX, msg.coords.worldY)}, my current pos {(mapPos.posX, mapPos.posY)} will follow him"
-                )
-                if mapPos.posX != msg.coords.worldX or mapPos.posY != msg.coords.worldY:
-                    if self.movementFrame._isMoving:
-                        self.movementFrame.cancelFollowingActor()
-                    if self.changingMap:
-                        logger.debug("Already changing map, queueing")
-                        self.mapChangesQueue.append((msg.coords.worldX, msg.coords.worldY))
-                    else:
-                        MoveAPI.changeMapToDstCoords(msg.coords.worldX, msg.coords.worldY)
-                        self.changingMap = True
-            else:
-                logger.debug("nothing to do")
+            logger.debug(f"[BotPartyFrame] Member {msg.memberId} moved to map {(msg.coords.worldX, msg.coords.worldY)}")
             return True
 
         elif isinstance(msg, MapComplementaryInformationsDataMessage):
-            self.changingMap = False
-            if self.mapChangesQueue:
-                cx, xy = self.mapChangesQueue.pop(0)
-                MoveAPI.changeMapToDstCoords(cx, xy)
-                self.changingMap = True
-            elif self._partyId is not None and not self.isLeader:
-                self.setFollowLeader()
+            if not self.isLeader:
+                self.followingLeaderTransition = None
+                if self.leaderTransitionsQueue:
+                    tr = self.leaderTransitionsQueue.pop(0)
+                    self.followingLeaderTransition = tr
+                    MoveAPI.followTransition(tr)
 
         elif isinstance(msg, PartyMemberInStandardFightMessage):
-            if float(msg.memberId) == float(self.leaderId):
-                logger.debug(f"member {msg.memberId} joined fight {msg.fightId}")
-                if (
-                    self.movementFrame._wantToChangeMap is not None
-                    and self.movementFrame._wantToChangeMap == msg.fightId
-                ):
-                    self.joinFight(msg.fightId)
-                    return
+            if float(msg.memberId) == float(self.leader['id']):
+                logger.debug(f"[BotPartyFrame] member {msg.memberId} started fight {msg.fightId}")
                 if float(msg.fightMap.mapId) != float(PlayedCharacterManager().currentMap.mapId):
                     af = BotAutoTripFrame(msg.fightMap.mapId)
                     Kernel().getWorker().pushFrame(af)
@@ -406,16 +430,66 @@ class BotPartyFrame(Frame):
                 else:
                     self.joinFight(msg.fightId)
             return True
-
-        elif isinstance(msg, MapChangeFailedMessage):
-            leaderPosX = self._partyMembers[self.leaderId].worldX
-            leaderPosY = self._partyMembers[self.leaderId].worldY
-            MoveAPI.changeMapToDstCoords(leaderPosX, leaderPosY)
-            self.changingMap = True
-
+        
     def setFollowLeader(self):
         if not self.isLeader:
             if not self.movementFrame:
                 Timer(1, self.setFollowLeader).start()
                 return
-            self.movementFrame.setFollowingActor(self.leaderId)
+            self.movementFrame.setFollowingActor(self.leader['id'])
+    
+    def sendMsgToFollower(self, msg: dict, followerIdx: int):
+        follower = self.followers[followerIdx]
+        port = follower["serverPort"]
+        logger.debug(f"[BotPartyFrame] Sending message {msg} to follower {port}")
+        from pyd2bot.PyD2Bot import PyD2Bot
+        transport, client = PyD2Bot().runClient('localhost', port)
+        recv = client.rcvLeaderMsg(json.dumps(msg))
+        logger.debug(f"[BotPartyFrame] Received message {recv} from follower {port}")
+        transport.close()
+        return recv
+    
+    def notifyFollowerWithPos(self, followerIdx):
+        cv = WorldPathFinder().currPlayerVertex
+        if cv is None:
+            Timer(1, self.notifyFollowerWithPos, [followerIdx]).start()
+            return
+        msg = {
+            "type": "pos",
+            "data": cv.to_json()
+        }
+        try:
+            rcv = self.sendMsgToFollower(msg, followerIdx)
+        except Exception as e:
+            logger.warning(f"[BotPartyFrame] Exception while sending pos to follower {followerIdx}")
+            logger.warning(e)
+            return False
+        followerPos = json.loads(rcv)
+        self.followers[followerIdx]["currentVertex"] = Vertex(**followerPos["vertex"])
+        self.followers[followerIdx]["currentCellId"] = followerPos["cellid"]
+            
+            
+    def notifyFollowersWithTransition(self, tr: Transition):
+        for followerIdx, follower in enumerate(self.followers):
+            msg = {
+                "type": "transit",
+                "data": tr.to_json()
+            }
+            rcv = self.sendMsgToFollower(msg, followerIdx)
+            followerPos = json.loads(rcv)
+            self.followers[followerIdx]["currentVertex"] = Vertex(**followerPos["vertex"])
+            self.followers[followerIdx]["currentCellId"] = followerPos["cellid"]
+    
+    def onMovementStopped(self, event):
+        KernelEventsManager().remove_listener(KernelEventsManager.MOVEMENT_STOPPED, self.onMovementStopped)
+        logger.debug(f"[BotPartyFrame] Movement stopped")
+        if self.wantsTransition is not None:
+            logger.debug(f"[BotPartyFrame] Wants to follow transition {self.wantsTransition}")
+            self.followingLeaderTransition = self.wantsTransition
+            self.wantsTransition = None
+            MoveAPI.followTransition(self.followingLeaderTransition)
+            
+    def requestMapData(self):
+        mirmsg = MapInformationsRequestMessage()
+        mirmsg.init(mapId_=MapDisplayManager().currentMapPoint.mapId)
+        ConnectionsHandler.getConnection().send(mirmsg)

@@ -75,6 +75,8 @@ class SessionsManager {
         var leader = accountManager.charactersDB[sessionData.leaderId]
         var path = pathsManager.pathsDB[sessionData.pathId]
         var instanceKey = `${leader.name}(${leader.id})`
+        var leaderPort = instancesManager.getFreePort()
+        leader.serverPort = leaderPort
         var followers = []
         var session = {
             "key": instanceKey,
@@ -93,6 +95,8 @@ class SessionsManager {
             for (var i = 0; i < sessionData.followersIds.length; i++) {
                 console.log(i)
                 var follower = accountManager.charactersDB[sessionData.followersIds[i]]
+                var followerPort = instancesManager.getFreePort()
+                follower.serverPort = followerPort
                 followers.push(follower)
             }
             session = {
@@ -111,11 +115,11 @@ class SessionsManager {
 
     }
 
-    async runSessionLow(session) {
+    async runSessionLow(session, port) {
         if (!session.key) {
             throw new Error("Session key is required")
         }
-        var instance = await instancesManager.spawn(session.key);
+        var instance = await instancesManager.spawn(session.key, port);
         instance.runningSession = session
         instance.serverClosed = false
         var creds = accountManager.getAccountCreds(session.character.accountId)
@@ -126,7 +130,7 @@ class SessionsManager {
             creds.certHash, 
             JSON.stringify(session)
         );
-        // console.debug("Session : " + JSON.stringify(creds) + " started  : " + JSON.stringify(session));
+        console.debug("Run Session :" + (creds.login, creds.password, creds.certId, creds.certHash, JSON.stringify(session)))
         return instance
     }
 

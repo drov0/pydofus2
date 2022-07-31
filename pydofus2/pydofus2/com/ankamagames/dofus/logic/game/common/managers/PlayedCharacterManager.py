@@ -268,7 +268,7 @@ class PlayedCharacterManager(IDestroyable, metaclass=Singleton):
     @property
     def currentCellId(self) -> int:
         if self.entity is None:
-            # logger.error("No player entity found")
+            logger.error("No player entity found")
             return None
         return self.entity.position.cellId
 
@@ -397,10 +397,14 @@ class PlayedCharacterManager(IDestroyable, metaclass=Singleton):
 
     @property
     def currentCell(self) -> "Cell":
+        if self.currentCellId is None:
+            return None
         return MapDisplayManager().dataMap.cells[self.currentCellId]
 
     @property
     def currentZoneRp(self) -> int:
+        if self.currentCell is None:
+            return None
         return self.currentCell.linkedZoneRP
 
     def addInfosAvailableCallback(self, pCallback: Callback) -> None:

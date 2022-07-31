@@ -25,3 +25,10 @@ class Vertex:
 
     def __str__(self) -> str:
         return f"Vertex(mapId={self._mapId}, zoneId={self._zoneId}, uid={self._uid})"
+
+    def to_json(self) -> dict:
+        return {
+            "mapId": self._mapId,
+            "zoneId": self._zoneId,
+            "vertexUid": self._uid,
+        }

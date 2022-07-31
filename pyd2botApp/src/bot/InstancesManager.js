@@ -73,9 +73,15 @@ class InstancesManager {
         throw "Could not connect client to instance " + instanceId;
     }
 
-    async spawnServer(instanceId) {
+    getFreePort() {
+        return this.freePorts.pop();
+    }
+
+    async spawnServer(instanceId, port) {
         var execFunc = (resolve, reject) => {
-            var port = this.freePorts.pop();
+            if (port == undefined) {
+                port = this.getFreePort();
+            }
             // var pyd2bot_process = child_process.spawn(`${this.pyd2botDevEnvPath} ${this.pyd2botDevPath} --port ${port} --host 0.0.0.0`, {"shell": true});
             var pyd2bot_process = child_process.execFile(this.pyd2botExePath, ['--port', port, '--host', '0.0.0.0'])
             this.runningInstances[instanceId] = {"port": port, "server" : pyd2bot_process, "client" : null, "connection" : null, "childs" : []};
@@ -145,8 +151,8 @@ class InstancesManager {
         }
     }
 
-    async spawn(instanceId) {
-        await this.spawnServer(instanceId);
+    async spawn(instanceId, port) {
+        await this.spawnServer(instanceId, port);
         await this.spawnClient(instanceId);
         return this.runningInstances[instanceId];
     }

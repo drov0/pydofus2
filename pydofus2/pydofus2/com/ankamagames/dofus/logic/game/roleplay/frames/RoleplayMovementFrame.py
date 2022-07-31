@@ -149,6 +149,8 @@ class RoleplayMovementFrame(Frame):
     _moveRequestTimer : Timer = None
     
     _joinFightTimer : Timer = None
+    
+    _walkToMapChangeCellFails = 0
 
     def __init__(self):
         self._wantToChangeMap = None
@@ -288,10 +290,10 @@ class RoleplayMovementFrame(Frame):
                     logger.info(
                         f"[MapMovement] Entity {movedEntity.id} moved from {movedEntity.position.cellId} to {clientMovePath.end.cellId}"
                     )
-                movedEntity.position.cellId = clientMovePath.end.cellId
+                movedEntity.position.cellId = clientMovePath.end.cellId # Updated moved entity current cellId
                 self.entitiesFrame.updateEntityCellId(gmmmsg.actorId, clientMovePath.end.cellId)
             else:
-                logger.error(f"[MapMovement] Entity {gmmmsg.actorId} not found")
+                logger.warning(f"[MapMovement] Entity {gmmmsg.actorId} not found")
 
             if float(gmmmsg.actorId) != float(PlayedCharacterManager().id):
                 self.applyGameMapMovement(float(gmmmsg.actorId), clientMovePath, msg)
@@ -313,8 +315,7 @@ class RoleplayMovementFrame(Frame):
                 if self._movementAnimTimer:
                     self._movementAnimTimer.cancel()
                 self._movementAnimTimer = Timer(pathDuration * 1.3, self.onMovementAnimEnd, [movedEntity])
-                self._isMoving = True
-                self._destinationPoint = clientMovePath.end.cellId
+                # self._destinationPoint = clientMovePath.end.cellId
                 self._movementAnimTimer.start()
                 logger.debug(f"Movement anim timer started")
             return True
@@ -324,7 +325,6 @@ class RoleplayMovementFrame(Frame):
             if self._movementAnimTimer:
                 self._movementAnimTimer.cancel()
             if emcmsg.entity.id == PlayedCharacterManager().id:
-
                 if self.VERBOSE:
                     logger.debug(
                         f"[RolePlayMovement] Mouvement complete, arrived at {emcmsg.entity.position.cellId} and the requested destination was {self._destinationPoint}"
@@ -339,8 +339,18 @@ class RoleplayMovementFrame(Frame):
                             logger.debug(
                                 f"[RolePlayMovement] Wants to change map but didn't reach the map change cell will retry to reach it"
                             )
+                        if self._walkToMapChangeCellFails > 3:
+                            self._walkToMapChangeCellFails = 0
+                            logger.warning(f"[RolePlayMovement] Change map to dest {self._wantToChangeMap} failed cause can't reach map change cell {self._destinationPoint} from cell {emcmsg.entity.position.cellId}!")
+                            cmfm: MapChangeFailedMessage = MapChangeFailedMessage()
+                            cmfm.init(self._wantToChangeMap)
+                            Kernel().getWorker().processImmediately(cmfm)
+                            self._wantToChangeMap = None
+                            return True
+                        self._walkToMapChangeCellFails += 1
                         self.askMoveTo(MapPoint.fromCellId(self._destinationPoint))
                     else:
+                        self._walkToMapChangeCellFails = 0
                         self.askMapChange()
 
                 elif self._followingIe:
@@ -378,7 +388,7 @@ class RoleplayMovementFrame(Frame):
                 elif self._wantsToJoinFight:
                     self.joinFight(self._wantsToJoinFight["fighterId"], self._wantsToJoinFight["fightId"])
 
-                Kernel().getWorker().processImmediately(CharacterMovementStoppedMessage())
+                Kernel().getWorker().process(CharacterMovementStoppedMessage())
             return True
 
         elif isinstance(msg, EntityMovementStoppedMessage):
@@ -488,6 +498,7 @@ class RoleplayMovementFrame(Frame):
         return True
 
     def onMovementAnimEnd(self, movedEntity: IEntity) -> None:
+        logger.debug("[RolePlayMovement] Movement animation ended")
         self._isMoving = False
         KernelEventsManager().dispatch(KernelEventsManager.MOVEMENT_STOPPED)
         Kernel().getWorker().processImmediately(EntityMovementCompleteMessage(movedEntity))
@@ -613,7 +624,7 @@ class RoleplayMovementFrame(Frame):
         ConnectionsHandler.getConnection().send(cmmsg)
         if self._changeMapTimeout:
             self._changeMapTimeout.cancel()
-        self._changeMapTimeout = BenchmarkTimer(self.CHANGEMAP_TIMEOUT, self.onMapChangeFailed)
+        self._changeMapTimeout = Timer(self.CHANGEMAP_TIMEOUT, self.onMapChangeFailed)
         self._changeMapTimeout.start()
         if self.VERBOSE:
             logger.debug("[RolePlayMovement] Change map timer started.")
@@ -638,23 +649,24 @@ class RoleplayMovementFrame(Frame):
             if PlayedCharacterManager().currentCellId != entityInfo.disposition.cellId:
                 self.askMoveTo(MapPoint.fromCellId(entityInfo.disposition.cellId))
         else:
-            logger.warning(f"Actor {actorId} is not on current map.")
+            logger.warning(f"[RolePlayMovement] Actor {actorId} is not on current map.")
 
     def onMapChangeFailed(self) -> None:
         logger.debug(f"[RolePlayMovement] Map change to {self._wantToChangeMap} failed!")
         if self._changeMapTimeout:
             self._changeMapTimeout.cancel()
         self._changeMapFails += 1
-        if self._changeMapFails > 1:
-            logger.debug(f"[RolePlayMovement] Change map to dest {self._wantToChangeMap} failed!")
+        if self._changeMapFails > 3:
+            self._changeMapFails = 0
+            logger.warning(f"[RolePlayMovement] Change map to dest {self._wantToChangeMap} failed!")
             cmfm: MapChangeFailedMessage = MapChangeFailedMessage()
             cmfm.init(self._wantToChangeMap)
             Kernel().getWorker().processImmediately(cmfm)
         elif self._wantToChangeMap is None:
-            logger.error(f"We want to change map to None, aborting")
+            logger.warning(f"[RolePlayMovement] Can't to change map to None, aborting")
         else:
             self.askMapChange()
-            self._changeMapTimeout = BenchmarkTimer(self.CHANGEMAP_TIMEOUT, self.onMapChangeFailed)
+            self._changeMapTimeout = Timer(self.CHANGEMAP_TIMEOUT, self.onMapChangeFailed)
             self._changeMapTimeout.start()
 
     def activateSkill(self, skillInstanceId: int, elementId: int, additionalParam: int = 0) -> None:
@@ -680,7 +692,7 @@ class RoleplayMovementFrame(Frame):
             self._canMove = False
 
     def requestMonsterFight(self, monsterGroupId: int) -> None:
-        if self._requestFighFails > 0:
+        if self._requestFighFails > 2:
             logger.error(
                 f"[RolePlayMovement]  Server rejected moster fight request for the {self._requestFighFails} time!"
             )
@@ -710,6 +722,9 @@ class RoleplayMovementFrame(Frame):
 
     def cancelFollowingActor(self):
         self._isRequestingMovement = False
+        if self._moveRequestTimer:
+            self._moveRequestTimer.cancel()
+            self._moveRequestFails = 0
         if self._movementAnimTimer:
             self._movementAnimTimer.cancel()
         self._canMove = True

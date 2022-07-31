@@ -16,11 +16,9 @@ from pydofus2.com.ankamagames.jerakine.logger.Logger import Logger
 from pydofus2.com.ankamagames.jerakine.messages.Message import Message
 from pydofus2.com.ankamagames.jerakine.types.enums.Priority import Priority
 from pyd2bot.apis.InventoryAPI import InventoryAPI
-from pyd2bot.logic.common.frames.BotCharacterUpdatesFrame import BotCharacterUpdatesFrame
 from pyd2bot.logic.fight.frames.BotFightFrame import BotFightFrame
 from pyd2bot.logic.managers.SessionManager import SessionManager
 from pyd2bot.logic.roleplay.frames.BotFarmPathFrame import BotFarmPathFrame
-from pyd2bot.logic.roleplay.frames.BotPartyFrame import BotPartyFrame
 from pyd2bot.logic.roleplay.frames.BotPhenixAutoRevive import BotPhenixAutoRevive
 from pyd2bot.logic.roleplay.frames.BotUnloadInBankFrame import BotUnloadInBankFrame
 from pyd2bot.logic.roleplay.messages.BankUnloadEndedMessage import BankUnloadEndedMessage
@@ -51,8 +49,6 @@ class BotWorkflowFrame(Frame):
         if SessionManager().isLeader:
             if Kernel().getWorker().getFrame("BotFarmPathFrame"):
                 Kernel().getWorker().removeFrameByName("BotFarmPathFrame")
-        if Kernel().getWorker().getFrame("BotPartyFrame"):
-            Kernel().getWorker().removeFrameByName("BotPartyFrame")
         self._inBankAutoUnload = True
         logger.warn(f"Inventory is almost full {InventoryAPI.getWeightPercent()}, will trigger auto bank unload...")
         Kernel().getWorker().addFrame(BotUnloadInBankFrame())
@@ -109,8 +105,6 @@ class BotWorkflowFrame(Frame):
                     Kernel().getWorker().addFrame(BotFarmPathFrame(True))
             if Kernel().getWorker().contains("BotUnloadInBankFrame"):
                 Kernel().getWorker().removeFrameByName("BotUnloadInBankFrame")
-            if not Kernel().getWorker().contains("BotPartyFrame"):
-                Kernel().getWorker().addFrame(BotPartyFrame())
 
         elif (
             isinstance(msg, GameRolePlayPlayerLifeStatusMessage)

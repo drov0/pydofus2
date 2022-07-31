@@ -502,6 +502,251 @@ Pyd2botService_fetchJobsInfosJson_result.prototype.write = function(output) {
   return;
 };
 
+var Pyd2botService_rcvLeaderMsg_args = function(args) {
+  this.msg = null;
+  if (args) {
+    if (args.msg !== undefined && args.msg !== null) {
+      this.msg = args.msg;
+    }
+  }
+};
+Pyd2botService_rcvLeaderMsg_args.prototype = {};
+Pyd2botService_rcvLeaderMsg_args.prototype.read = function(input) {
+  input.readStructBegin();
+  while (true) {
+    var ret = input.readFieldBegin();
+    var ftype = ret.ftype;
+    var fid = ret.fid;
+    if (ftype == Thrift.Type.STOP) {
+      break;
+    }
+    switch (fid) {
+      case 1:
+      if (ftype == Thrift.Type.STRING) {
+        this.msg = input.readString();
+      } else {
+        input.skip(ftype);
+      }
+      break;
+      case 0:
+        input.skip(ftype);
+        break;
+      default:
+        input.skip(ftype);
+    }
+    input.readFieldEnd();
+  }
+  input.readStructEnd();
+  return;
+};
+
+Pyd2botService_rcvLeaderMsg_args.prototype.write = function(output) {
+  output.writeStructBegin('Pyd2botService_rcvLeaderMsg_args');
+  if (this.msg !== null && this.msg !== undefined) {
+    output.writeFieldBegin('msg', Thrift.Type.STRING, 1);
+    output.writeString(this.msg);
+    output.writeFieldEnd();
+  }
+  output.writeFieldStop();
+  output.writeStructEnd();
+  return;
+};
+
+var Pyd2botService_rcvLeaderMsg_result = function(args) {
+  this.success = null;
+  if (args) {
+    if (args.success !== undefined && args.success !== null) {
+      this.success = args.success;
+    }
+  }
+};
+Pyd2botService_rcvLeaderMsg_result.prototype = {};
+Pyd2botService_rcvLeaderMsg_result.prototype.read = function(input) {
+  input.readStructBegin();
+  while (true) {
+    var ret = input.readFieldBegin();
+    var ftype = ret.ftype;
+    var fid = ret.fid;
+    if (ftype == Thrift.Type.STOP) {
+      break;
+    }
+    switch (fid) {
+      case 0:
+      if (ftype == Thrift.Type.STRING) {
+        this.success = input.readString();
+      } else {
+        input.skip(ftype);
+      }
+      break;
+      case 0:
+        input.skip(ftype);
+        break;
+      default:
+        input.skip(ftype);
+    }
+    input.readFieldEnd();
+  }
+  input.readStructEnd();
+  return;
+};
+
+Pyd2botService_rcvLeaderMsg_result.prototype.write = function(output) {
+  output.writeStructBegin('Pyd2botService_rcvLeaderMsg_result');
+  if (this.success !== null && this.success !== undefined) {
+    output.writeFieldBegin('success', Thrift.Type.STRING, 0);
+    output.writeString(this.success);
+    output.writeFieldEnd();
+  }
+  output.writeFieldStop();
+  output.writeStructEnd();
+  return;
+};
+
+var Pyd2botService_getApiKey_args = function(args) {
+  this.login = null;
+  this.password = null;
+  this.certId = null;
+  this.certHash = null;
+  if (args) {
+    if (args.login !== undefined && args.login !== null) {
+      this.login = args.login;
+    }
+    if (args.password !== undefined && args.password !== null) {
+      this.password = args.password;
+    }
+    if (args.certId !== undefined && args.certId !== null) {
+      this.certId = args.certId;
+    }
+    if (args.certHash !== undefined && args.certHash !== null) {
+      this.certHash = args.certHash;
+    }
+  }
+};
+Pyd2botService_getApiKey_args.prototype = {};
+Pyd2botService_getApiKey_args.prototype.read = function(input) {
+  input.readStructBegin();
+  while (true) {
+    var ret = input.readFieldBegin();
+    var ftype = ret.ftype;
+    var fid = ret.fid;
+    if (ftype == Thrift.Type.STOP) {
+      break;
+    }
+    switch (fid) {
+      case 1:
+      if (ftype == Thrift.Type.STRING) {
+        this.login = input.readString();
+      } else {
+        input.skip(ftype);
+      }
+      break;
+      case 2:
+      if (ftype == Thrift.Type.STRING) {
+        this.password = input.readString();
+      } else {
+        input.skip(ftype);
+      }
+      break;
+      case 3:
+      if (ftype == Thrift.Type.I32) {
+        this.certId = input.readI32();
+      } else {
+        input.skip(ftype);
+      }
+      break;
+      case 4:
+      if (ftype == Thrift.Type.STRING) {
+        this.certHash = input.readString();
+      } else {
+        input.skip(ftype);
+      }
+      break;
+      default:
+        input.skip(ftype);
+    }
+    input.readFieldEnd();
+  }
+  input.readStructEnd();
+  return;
+};
+
+Pyd2botService_getApiKey_args.prototype.write = function(output) {
+  output.writeStructBegin('Pyd2botService_getApiKey_args');
+  if (this.login !== null && this.login !== undefined) {
+    output.writeFieldBegin('login', Thrift.Type.STRING, 1);
+    output.writeString(this.login);
+    output.writeFieldEnd();
+  }
+  if (this.password !== null && this.password !== undefined) {
+    output.writeFieldBegin('password', Thrift.Type.STRING, 2);
+    output.writeString(this.password);
+    output.writeFieldEnd();
+  }
+  if (this.certId !== null && this.certId !== undefined) {
+    output.writeFieldBegin('certId', Thrift.Type.I32, 3);
+    output.writeI32(this.certId);
+    output.writeFieldEnd();
+  }
+  if (this.certHash !== null && this.certHash !== undefined) {
+    output.writeFieldBegin('certHash', Thrift.Type.STRING, 4);
+    output.writeString(this.certHash);
+    output.writeFieldEnd();
+  }
+  output.writeFieldStop();
+  output.writeStructEnd();
+  return;
+};
+
+var Pyd2botService_getApiKey_result = function(args) {
+  this.success = null;
+  if (args) {
+    if (args.success !== undefined && args.success !== null) {
+      this.success = args.success;
+    }
+  }
+};
+Pyd2botService_getApiKey_result.prototype = {};
+Pyd2botService_getApiKey_result.prototype.read = function(input) {
+  input.readStructBegin();
+  while (true) {
+    var ret = input.readFieldBegin();
+    var ftype = ret.ftype;
+    var fid = ret.fid;
+    if (ftype == Thrift.Type.STOP) {
+      break;
+    }
+    switch (fid) {
+      case 0:
+      if (ftype == Thrift.Type.STRING) {
+        this.success = input.readString();
+      } else {
+        input.skip(ftype);
+      }
+      break;
+      case 0:
+        input.skip(ftype);
+        break;
+      default:
+        input.skip(ftype);
+    }
+    input.readFieldEnd();
+  }
+  input.readStructEnd();
+  return;
+};
+
+Pyd2botService_getApiKey_result.prototype.write = function(output) {
+  output.writeStructBegin('Pyd2botService_getApiKey_result');
+  if (this.success !== null && this.success !== undefined) {
+    output.writeFieldBegin('success', Thrift.Type.STRING, 0);
+    output.writeString(this.success);
+    output.writeFieldEnd();
+  }
+  output.writeFieldStop();
+  output.writeStructEnd();
+  return;
+};
+
 var Pyd2botServiceClient = exports.Client = function(output, pClass) {
   this.output = output;
   this.pClass = pClass;
@@ -735,6 +980,127 @@ Pyd2botServiceClient.prototype.recv_fetchJobsInfosJson = function(input,mtype,rs
   }
   return callback('fetchJobsInfosJson failed: unknown result');
 };
+
+Pyd2botServiceClient.prototype.rcvLeaderMsg = function(msg, callback) {
+  this._seqid = this.new_seqid();
+  if (callback === undefined) {
+    var _defer = Q.defer();
+    this._reqs[this.seqid()] = function(error, result) {
+      if (error) {
+        _defer.reject(error);
+      } else {
+        _defer.resolve(result);
+      }
+    };
+    this.send_rcvLeaderMsg(msg);
+    return _defer.promise;
+  } else {
+    this._reqs[this.seqid()] = callback;
+    this.send_rcvLeaderMsg(msg);
+  }
+};
+
+Pyd2botServiceClient.prototype.send_rcvLeaderMsg = function(msg) {
+  var output = new this.pClass(this.output);
+  var params = {
+    msg: msg
+  };
+  var args = new Pyd2botService_rcvLeaderMsg_args(params);
+  try {
+    output.writeMessageBegin('rcvLeaderMsg', Thrift.MessageType.CALL, this.seqid());
+    args.write(output);
+    output.writeMessageEnd();
+    return this.output.flush();
+  }
+  catch (e) {
+    delete this._reqs[this.seqid()];
+    if (typeof output.reset === 'function') {
+      output.reset();
+    }
+    throw e;
+  }
+};
+
+Pyd2botServiceClient.prototype.recv_rcvLeaderMsg = function(input,mtype,rseqid) {
+  var callback = this._reqs[rseqid] || function() {};
+  delete this._reqs[rseqid];
+  if (mtype == Thrift.MessageType.EXCEPTION) {
+    var x = new Thrift.TApplicationException();
+    x.read(input);
+    input.readMessageEnd();
+    return callback(x);
+  }
+  var result = new Pyd2botService_rcvLeaderMsg_result();
+  result.read(input);
+  input.readMessageEnd();
+
+  if (null !== result.success) {
+    return callback(null, result.success);
+  }
+  return callback('rcvLeaderMsg failed: unknown result');
+};
+
+Pyd2botServiceClient.prototype.getApiKey = function(login, password, certId, certHash, callback) {
+  this._seqid = this.new_seqid();
+  if (callback === undefined) {
+    var _defer = Q.defer();
+    this._reqs[this.seqid()] = function(error, result) {
+      if (error) {
+        _defer.reject(error);
+      } else {
+        _defer.resolve(result);
+      }
+    };
+    this.send_getApiKey(login, password, certId, certHash);
+    return _defer.promise;
+  } else {
+    this._reqs[this.seqid()] = callback;
+    this.send_getApiKey(login, password, certId, certHash);
+  }
+};
+
+Pyd2botServiceClient.prototype.send_getApiKey = function(login, password, certId, certHash) {
+  var output = new this.pClass(this.output);
+  var params = {
+    login: login,
+    password: password,
+    certId: certId,
+    certHash: certHash
+  };
+  var args = new Pyd2botService_getApiKey_args(params);
+  try {
+    output.writeMessageBegin('getApiKey', Thrift.MessageType.CALL, this.seqid());
+    args.write(output);
+    output.writeMessageEnd();
+    return this.output.flush();
+  }
+  catch (e) {
+    delete this._reqs[this.seqid()];
+    if (typeof output.reset === 'function') {
+      output.reset();
+    }
+    throw e;
+  }
+};
+
+Pyd2botServiceClient.prototype.recv_getApiKey = function(input,mtype,rseqid) {
+  var callback = this._reqs[rseqid] || function() {};
+  delete this._reqs[rseqid];
+  if (mtype == Thrift.MessageType.EXCEPTION) {
+    var x = new Thrift.TApplicationException();
+    x.read(input);
+    input.readMessageEnd();
+    return callback(x);
+  }
+  var result = new Pyd2botService_getApiKey_result();
+  result.read(input);
+  input.readMessageEnd();
+
+  if (null !== result.success) {
+    return callback(null, result.success);
+  }
+  return callback('getApiKey failed: unknown result');
+};
 var Pyd2botServiceProcessor = exports.Processor = function(handler) {
   this._handler = handler;
 };
@@ -864,6 +1230,83 @@ Pyd2botServiceProcessor.prototype.process_fetchJobsInfosJson = function(seqid, i
       } else {
         result_obj = new Thrift.TApplicationException(Thrift.TApplicationExceptionType.UNKNOWN, err.message);
         output.writeMessageBegin("fetchJobsInfosJson", Thrift.MessageType.EXCEPTION, seqid);
+      }
+      result_obj.write(output);
+      output.writeMessageEnd();
+      output.flush();
+    });
+  }
+};
+Pyd2botServiceProcessor.prototype.process_rcvLeaderMsg = function(seqid, input, output) {
+  var args = new Pyd2botService_rcvLeaderMsg_args();
+  args.read(input);
+  input.readMessageEnd();
+  if (this._handler.rcvLeaderMsg.length === 1) {
+    Q.fcall(this._handler.rcvLeaderMsg.bind(this._handler),
+      args.msg
+    ).then(function(result) {
+      var result_obj = new Pyd2botService_rcvLeaderMsg_result({success: result});
+      output.writeMessageBegin("rcvLeaderMsg", Thrift.MessageType.REPLY, seqid);
+      result_obj.write(output);
+      output.writeMessageEnd();
+      output.flush();
+    }).catch(function (err) {
+      var result;
+      result = new Thrift.TApplicationException(Thrift.TApplicationExceptionType.UNKNOWN, err.message);
+      output.writeMessageBegin("rcvLeaderMsg", Thrift.MessageType.EXCEPTION, seqid);
+      result.write(output);
+      output.writeMessageEnd();
+      output.flush();
+    });
+  } else {
+    this._handler.rcvLeaderMsg(args.msg, function (err, result) {
+      var result_obj;
+      if ((err === null || typeof err === 'undefined')) {
+        result_obj = new Pyd2botService_rcvLeaderMsg_result((err !== null || typeof err === 'undefined') ? err : {success: result});
+        output.writeMessageBegin("rcvLeaderMsg", Thrift.MessageType.REPLY, seqid);
+      } else {
+        result_obj = new Thrift.TApplicationException(Thrift.TApplicationExceptionType.UNKNOWN, err.message);
+        output.writeMessageBegin("rcvLeaderMsg", Thrift.MessageType.EXCEPTION, seqid);
+      }
+      result_obj.write(output);
+      output.writeMessageEnd();
+      output.flush();
+    });
+  }
+};
+Pyd2botServiceProcessor.prototype.process_getApiKey = function(seqid, input, output) {
+  var args = new Pyd2botService_getApiKey_args();
+  args.read(input);
+  input.readMessageEnd();
+  if (this._handler.getApiKey.length === 4) {
+    Q.fcall(this._handler.getApiKey.bind(this._handler),
+      args.login,
+      args.password,
+      args.certId,
+      args.certHash
+    ).then(function(result) {
+      var result_obj = new Pyd2botService_getApiKey_result({success: result});
+      output.writeMessageBegin("getApiKey", Thrift.MessageType.REPLY, seqid);
+      result_obj.write(output);
+      output.writeMessageEnd();
+      output.flush();
+    }).catch(function (err) {
+      var result;
+      result = new Thrift.TApplicationException(Thrift.TApplicationExceptionType.UNKNOWN, err.message);
+      output.writeMessageBegin("getApiKey", Thrift.MessageType.EXCEPTION, seqid);
+      result.write(output);
+      output.writeMessageEnd();
+      output.flush();
+    });
+  } else {
+    this._handler.getApiKey(args.login, args.password, args.certId, args.certHash, function (err, result) {
+      var result_obj;
+      if ((err === null || typeof err === 'undefined')) {
+        result_obj = new Pyd2botService_getApiKey_result((err !== null || typeof err === 'undefined') ? err : {success: result});
+        output.writeMessageBegin("getApiKey", Thrift.MessageType.REPLY, seqid);
+      } else {
+        result_obj = new Thrift.TApplicationException(Thrift.TApplicationExceptionType.UNKNOWN, err.message);
+        output.writeMessageBegin("getApiKey", Thrift.MessageType.EXCEPTION, seqid);
       }
       result_obj.write(output);
       output.writeMessageEnd();

@@ -217,6 +217,8 @@ class BotFarmPathFrame(Frame):
             f"[BotFarmFrame] Current Map {PlayedCharacterManager().currentMap.mapId} Moving to {self._currTransition.transitionMapId}"
         )
         MoveAPI.followTransition(self._currTransition)
+        if self.partyFrame:
+            self.partyFrame.notifyFollowersWithTransition(self._currTransition)
 
     def attackMonsterGroup(self):
         availableMonsterFights = []

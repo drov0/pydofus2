@@ -8,31 +8,49 @@ from thrift.transport import TSocket
 from thrift.transport import TTransport
 from thrift.protocol import TBinaryProtocol
 from thrift.server import TServer
-import signal
-from thrift.protocol.THeaderProtocol import THeaderProtocolFactory
 logger = logging.getLogger(__name__)
-
 class PyD2Bot(metaclass=Singleton):
     _stop = threading.Event()
+    _server = None
     
-    def run(self, host, port):
+    def runServer(self, host, port):
         self._stop.clear()
         handler = Pyd2botServer()
         processor = Pyd2botService.Processor(handler)
         transport = TSocket.TServerSocket(host=host, port=port)
         tfactory = TTransport.TBufferedTransportFactory()
         pfactory = TBinaryProtocol.TBinaryProtocolFactory()
-        server = TServer.TSimpleServer(processor, transport, tfactory, pfactory)
-        def handler(signum, frame):
-            print('Signal handler called with signal', signum)
-            self._stop.set()
-            sys.exit(0)
-        signal.signal(signal.SIGINT, handler)
-        server.serverTransport.listen()
+        server = TServer.TThreadPoolServer(processor, transport, tfactory, pfactory)
+        self._server = server
         print("Server started on {}:{}".format(host, port), flush=True)
-        server.serve()
+        for i in range(server.threads):
+            try:
+                t = threading.Thread(target=server.serveThread)
+                t.setDaemon(server.daemon)
+                t.start()
+            except Exception as x:
+                logger.exception(x)
+
+        # Pump the socket for clients
+        server.serverTransport.listen()
+        while not self._stop.is_set():
+            try:
+                client = server.serverTransport.accept()
+                if not client:
+                    continue
+                server.clients.put(client)
+            except Exception as x:
+                logger.exception(x)
+    
+    def runClient(self, host, port):
+        transport = TSocket.TSocket(host, port)
+        transport = TTransport.TBufferedTransport(transport)
+        protocol = TBinaryProtocol.TBinaryProtocol(transport)
+        client = Pyd2botService.Client(protocol)
+        transport.open()
+        return transport, client
         
-    def stop(self):
+    def stopServer(self):
         self._stop.set()
         print("Server stopped")
         sys.exit(0)

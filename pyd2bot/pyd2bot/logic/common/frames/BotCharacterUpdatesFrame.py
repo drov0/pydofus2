@@ -21,7 +21,7 @@ from pydofus2.com.ankamagames.jerakine.types.enums.Priority import Priority
 from pydofus2.damageCalculation.tools import StatIds
 from pyd2bot.logic.managers.SessionManager import SessionManager
 
-logger = Logger("Dofus2")
+logger = Logger()
 
 
 class BotCharacterUpdatesFrame(Frame):

@@ -226,22 +226,25 @@ class RoleplayMovementFrame(Frame):
             logger.error("[RolePlayMovement] Trying to perform roleplay action while the player is fighting")
             connh.ConnectionsHandler.getConnection().close()
 
-        if isinstance(msg, GameMapNoMovementMessage):
-            logger.debug("[RolePlayMovement] Server rejected Movement!")
-            self._moveRequestFails += 1
-            if self._moveRequestFails > 3:
-                self._moveRequestFails = 0
-                Kernel().getWorker().process(MapMoveFailed())
-                return
+        if isinstance(msg, GameMapNoMovementMessage):            
+            gmnmm = msg
+            newPos = MapPoint.fromCoords(gmnmm.cellX, gmnmm.cellY)
+            self._moveRequestFails += 1        
+            if self._moveRequestTimer:
+                self._moveRequestTimer.cancel()    
             if self._changeMapTimeout:
                 self._changeMapTimeout.cancel()
             if self._movementAnimTimer:
-                self._movementAnimTimer.cancel()
+                self._movementAnimTimer.cancel()            
             self._isMoving = False
             self._canMove = True
             self._isRequestingMovement = False
-            gmnmm = msg
-            newPos = MapPoint.fromCoords(gmnmm.cellX, gmnmm.cellY)
+            logger.debug("[RolePlayMovement] Server rejected Movement!, landed on new position: %s", newPos)
+            if self._moveRequestFails > 3:
+                self._moveRequestFails = 0
+                logger.debug("[RolePlayMovement] Server rejected Movement too many times, sending moveFailed")
+                Kernel().getWorker().process(MapMoveFailed())
+                return True
             player: AnimatedCharacter = DofusEntities.getEntity(PlayedCharacterManager().id)
             if not player:
                 logger.error("[RolePlayMovement] Player not found!!")
@@ -249,7 +252,6 @@ class RoleplayMovementFrame(Frame):
             if player.isMoving:
                 player.stop = True
             player.position = newPos
-
             if self._wantsToJoinFight:
                 self.joinFight(self._wantsToJoinFight["fighterId"], self._wantsToJoinFight["fightId"])
 
@@ -283,6 +285,8 @@ class RoleplayMovementFrame(Frame):
         if isinstance(msg, GameMapMovementMessage):
             if self._moveRequestTimer:
                 self._moveRequestTimer.cancel()
+                if self._isRequestingMovement:
+                    logger.debug("[RolePlayMovement] Move request accepted")
             gmmmsg = msg
             movedEntity = DofusEntities.getEntity(gmmmsg.actorId)
             clientMovePath = MapMovementAdapter.getClientMovement(gmmmsg.keyMovements)
@@ -316,7 +320,6 @@ class RoleplayMovementFrame(Frame):
                 if self._movementAnimTimer:
                     self._movementAnimTimer.cancel()
                 self._movementAnimTimer = Timer(pathDuration * 1.3, self.onMovementAnimEnd, [movedEntity])
-                # self._destinationPoint = clientMovePath.end.cellId
                 self._movementAnimTimer.start()
                 logger.debug(f"Movement anim timer started")
             return True

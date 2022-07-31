@@ -139,3 +139,32 @@ class BotWorkflowFrame(Frame):
                 if not Kernel().getWorker().contains("BotFarmPathFrame"):
                     Kernel().getWorker().addFrame(BotFarmPathFrame(True))
             return True
+
+    @property
+    def status(self) -> str:
+        from pydofus2.com.ankamagames.dofus.logic.game.roleplay.frames.RoleplayInteractivesFrame import RoleplayInteractivesFrame
+        from pydofus2.com.ankamagames.dofus.logic.game.roleplay.frames.RoleplayMovementFrame import RoleplayMovementFrame
+        from pydofus2.com.ankamagames.atouin.managers.MapDisplayManager import MapDisplayManager
+        bpframe : BotPartyFrame = Kernel().getWorker().getFrame("BotPartyFrame")
+        mvframe : RoleplayMovementFrame = Kernel().getWorker().getFrame("RoleplayMovementFrame")
+        iframe  : RoleplayInteractivesFrame = Kernel().getWorker().getFrame("RoleplayInteractivesFrame")
+        if MapDisplayManager().currentDataMap is None:
+            return "loadingMap"
+        elif PlayedCharacterManager().isInFight:
+            return "fighting"
+        elif bpframe and bpframe.followingLeaderTransition:
+            return "inTransition"
+        elif bpframe and bpframe.joiningLeaderVertex:
+            return "joiningLeaderVertex"
+        elif Kernel().getWorker().getFrame("BotUnloadInBankFrame"):
+            return "inBankAutoUnload"
+        elif Kernel().getWorker().getFrame("BotPhenixAutoRevive"):
+            return "inPhenixAutoRevive"
+        elif Kernel().getWorker().getFrame("BotAutoTripFrame"):
+            return "inAutoTrip"
+        elif iframe and iframe._usingInteractive:
+            return "interacting"
+        elif mvframe and mvframe._isMoving:
+            return "moving"
+        else:
+            return "idle"

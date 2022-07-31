@@ -136,6 +136,10 @@ class BotFarmPathFrame(Frame):
             self.interactivesFrame.currentRequestedElementId = None
             self.interactivesFrame.usingInteractive = False
 
+    @property
+    def isInsideFarmPath(self) -> bool:
+        return WorldPathFinder().currPlayerVertex in self.farmPath
+    
     def process(self, msg: Message) -> bool:
 
         if isinstance(msg, AutoTripEndedMessage):
@@ -251,15 +255,8 @@ class BotFarmPathFrame(Frame):
         logger.debug("[BotFarmFrame] doFarm called")
         if SessionManager().type == "fight" and not SessionManager().isLeader:
             logger.warning("[BotFarmFrame] in fight mode only the leader can run a farm path")
+            Kernel().getWorker().removeFrame(self)
             return
-        if self.partyFrame:
-            logger.debug("[BotFarmFrame] Party found")
-            if not self.partyFrame.allMembersOnSameMap:
-                logger.warning("[BotFarmFrame] Party members are not on the same map")
-                BotEventsManager().add_listener(BotEventsManager.ALLMEMBERS_ONSAME_MAP, self.doFarm)
-                return
-        logger.debug("[BotFarmFrame] Party found and all members on the same map")
-        BotEventsManager().remove_listener(BotEventsManager.ALLMEMBERS_ONSAME_MAP, self.doFarm)
         if WorldPathFinder().currPlayerVertex not in self.farmPath:
             logger.debug(
                 f"[BotFarmFrame] Map {WorldPathFinder().currPlayerVertex.mapId} not in farm path will switch to autotrip"
@@ -267,6 +264,15 @@ class BotFarmPathFrame(Frame):
             self._inAutoTrip = True
             self._worker.addFrame(BotAutoTripFrame(self.farmPath.startVertex.mapId))
             return
+        if self.partyFrame:
+            logger.debug(f"[BotFarmFrame] Party found")
+            logger.debug(f"[BotFarmFrame] Party members on same map :  {self.partyFrame.allMembersOnSameMap}")
+            logger.debug(f"[BotFarmFrame] Party members idle :  {self.partyFrame.allMembersIdle}")
+            if not self.partyFrame.allMembersOnSameMap or not self.partyFrame.allMembersIdle:
+                BotEventsManager().add_listener(BotEventsManager.MEMBERS_READY, self.doFarm)
+                return
+        logger.info("[BotFarmFrame] Party found and all members on the same map and are idle.")
+        BotEventsManager().remove_listener(BotEventsManager.MEMBERS_READY, self.doFarm)
         self._followinMonsterGroup = None
         self._followingIe = None
         self._lastCellId = PlayedCharacterManager().currentCellId

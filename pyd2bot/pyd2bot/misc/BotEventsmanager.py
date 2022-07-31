@@ -4,7 +4,7 @@ from whistle import EventDispatcher
 
 class BotEventsManager(EventDispatcher, metaclass=Singleton):
 
-    ALLMEMBERS_ONSAME_MAP = 0
+    MEMBERS_READY = 0
 
     def __init__(self):
         super().__init__()

@@ -399,6 +399,8 @@ class PlayedCharacterManager(IDestroyable, metaclass=Singleton):
     def currentCell(self) -> "Cell":
         if self.currentCellId is None:
             return None
+        if MapDisplayManager().dataMap is None:
+            return None
         return MapDisplayManager().dataMap.cells[self.currentCellId]
 
     @property

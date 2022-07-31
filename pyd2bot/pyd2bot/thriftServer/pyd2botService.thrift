@@ -14,13 +14,14 @@ struct Character {
     7:string serverName
 }
 service Pyd2botService {
+    string getApiKey(1: string login, 2: string password, 3: int certId, 4: string certHash)
     list<Character> fetchAccountCharacters(1: string login, 2: string password, 3: int certId, 4: string certHash),
     oneway void runSession(1: string login, 2: string password, 3: int certId, 4: string certHash, 5:string sessionJson),
     list<Spell> fetchBreedSpells(1: int breedId),
     string fetchJobsInfosJson(),
     oneway void moveToVertex(1: string vertex)
     oneway void followTransition(1: string transition)
-    string getApiKey(1: string login, 2: string password, 3: int certId, 4: string certHash)
+    string getStatus()
 }
        
     

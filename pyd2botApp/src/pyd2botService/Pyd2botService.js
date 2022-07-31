@@ -14,6 +14,151 @@ var Int64 = require('node-int64');
 var ttypes = require('./pyd2botService_types');
 //HELPER FUNCTIONS AND STRUCTURES
 
+var Pyd2botService_getApiKey_args = function(args) {
+  this.login = null;
+  this.password = null;
+  this.certId = null;
+  this.certHash = null;
+  if (args) {
+    if (args.login !== undefined && args.login !== null) {
+      this.login = args.login;
+    }
+    if (args.password !== undefined && args.password !== null) {
+      this.password = args.password;
+    }
+    if (args.certId !== undefined && args.certId !== null) {
+      this.certId = args.certId;
+    }
+    if (args.certHash !== undefined && args.certHash !== null) {
+      this.certHash = args.certHash;
+    }
+  }
+};
+Pyd2botService_getApiKey_args.prototype = {};
+Pyd2botService_getApiKey_args.prototype.read = function(input) {
+  input.readStructBegin();
+  while (true) {
+    var ret = input.readFieldBegin();
+    var ftype = ret.ftype;
+    var fid = ret.fid;
+    if (ftype == Thrift.Type.STOP) {
+      break;
+    }
+    switch (fid) {
+      case 1:
+      if (ftype == Thrift.Type.STRING) {
+        this.login = input.readString();
+      } else {
+        input.skip(ftype);
+      }
+      break;
+      case 2:
+      if (ftype == Thrift.Type.STRING) {
+        this.password = input.readString();
+      } else {
+        input.skip(ftype);
+      }
+      break;
+      case 3:
+      if (ftype == Thrift.Type.I32) {
+        this.certId = input.readI32();
+      } else {
+        input.skip(ftype);
+      }
+      break;
+      case 4:
+      if (ftype == Thrift.Type.STRING) {
+        this.certHash = input.readString();
+      } else {
+        input.skip(ftype);
+      }
+      break;
+      default:
+        input.skip(ftype);
+    }
+    input.readFieldEnd();
+  }
+  input.readStructEnd();
+  return;
+};
+
+Pyd2botService_getApiKey_args.prototype.write = function(output) {
+  output.writeStructBegin('Pyd2botService_getApiKey_args');
+  if (this.login !== null && this.login !== undefined) {
+    output.writeFieldBegin('login', Thrift.Type.STRING, 1);
+    output.writeString(this.login);
+    output.writeFieldEnd();
+  }
+  if (this.password !== null && this.password !== undefined) {
+    output.writeFieldBegin('password', Thrift.Type.STRING, 2);
+    output.writeString(this.password);
+    output.writeFieldEnd();
+  }
+  if (this.certId !== null && this.certId !== undefined) {
+    output.writeFieldBegin('certId', Thrift.Type.I32, 3);
+    output.writeI32(this.certId);
+    output.writeFieldEnd();
+  }
+  if (this.certHash !== null && this.certHash !== undefined) {
+    output.writeFieldBegin('certHash', Thrift.Type.STRING, 4);
+    output.writeString(this.certHash);
+    output.writeFieldEnd();
+  }
+  output.writeFieldStop();
+  output.writeStructEnd();
+  return;
+};
+
+var Pyd2botService_getApiKey_result = function(args) {
+  this.success = null;
+  if (args) {
+    if (args.success !== undefined && args.success !== null) {
+      this.success = args.success;
+    }
+  }
+};
+Pyd2botService_getApiKey_result.prototype = {};
+Pyd2botService_getApiKey_result.prototype.read = function(input) {
+  input.readStructBegin();
+  while (true) {
+    var ret = input.readFieldBegin();
+    var ftype = ret.ftype;
+    var fid = ret.fid;
+    if (ftype == Thrift.Type.STOP) {
+      break;
+    }
+    switch (fid) {
+      case 0:
+      if (ftype == Thrift.Type.STRING) {
+        this.success = input.readString();
+      } else {
+        input.skip(ftype);
+      }
+      break;
+      case 0:
+        input.skip(ftype);
+        break;
+      default:
+        input.skip(ftype);
+    }
+    input.readFieldEnd();
+  }
+  input.readStructEnd();
+  return;
+};
+
+Pyd2botService_getApiKey_result.prototype.write = function(output) {
+  output.writeStructBegin('Pyd2botService_getApiKey_result');
+  if (this.success !== null && this.success !== undefined) {
+    output.writeFieldBegin('success', Thrift.Type.STRING, 0);
+    output.writeString(this.success);
+    output.writeFieldEnd();
+  }
+  output.writeFieldStop();
+  output.writeStructEnd();
+  return;
+};
+
 var Pyd2botService_fetchAccountCharacters_args = function(args) {
   this.login = null;
   this.password = null;
@@ -652,102 +797,32 @@ Pyd2botService_followTransition_result.prototype.write = function(output) {
   return;
 };
 
-var Pyd2botService_getApiKey_args = function(args) {
-  this.login = null;
-  this.password = null;
-  this.certId = null;
-  this.certHash = null;
-  if (args) {
-    if (args.login !== undefined && args.login !== null) {
-      this.login = args.login;
-    }
-    if (args.password !== undefined && args.password !== null) {
-      this.password = args.password;
-    }
-    if (args.certId !== undefined && args.certId !== null) {
-      this.certId = args.certId;
-    }
-    if (args.certHash !== undefined && args.certHash !== null) {
-      this.certHash = args.certHash;
-    }
-  }
+var Pyd2botService_getStatus_args = function(args) {
 };
-Pyd2botService_getApiKey_args.prototype = {};
-Pyd2botService_getApiKey_args.prototype.read = function(input) {
+Pyd2botService_getStatus_args.prototype = {};
+Pyd2botService_getStatus_args.prototype.read = function(input) {
   input.readStructBegin();
   while (true) {
     var ret = input.readFieldBegin();
     var ftype = ret.ftype;
-    var fid = ret.fid;
     if (ftype == Thrift.Type.STOP) {
       break;
     }
-    switch (fid) {
-      case 1:
-      if (ftype == Thrift.Type.STRING) {
-        this.login = input.readString();
-      } else {
-        input.skip(ftype);
-      }
-      break;
-      case 2:
-      if (ftype == Thrift.Type.STRING) {
-        this.password = input.readString();
-      } else {
-        input.skip(ftype);
-      }
-      break;
-      case 3:
-      if (ftype == Thrift.Type.I32) {
-        this.certId = input.readI32();
-      } else {
-        input.skip(ftype);
-      }
-      break;
-      case 4:
-      if (ftype == Thrift.Type.STRING) {
-        this.certHash = input.readString();
-      } else {
-        input.skip(ftype);
-      }
-      break;
-      default:
-        input.skip(ftype);
-    }
+    input.skip(ftype);
     input.readFieldEnd();
   }
   input.readStructEnd();
   return;
 };
 
-Pyd2botService_getApiKey_args.prototype.write = function(output) {
-  output.writeStructBegin('Pyd2botService_getApiKey_args');
-  if (this.login !== null && this.login !== undefined) {
-    output.writeFieldBegin('login', Thrift.Type.STRING, 1);
-    output.writeString(this.login);
-    output.writeFieldEnd();
-  }
-  if (this.password !== null && this.password !== undefined) {
-    output.writeFieldBegin('password', Thrift.Type.STRING, 2);
-    output.writeString(this.password);
-    output.writeFieldEnd();
-  }
-  if (this.certId !== null && this.certId !== undefined) {
-    output.writeFieldBegin('certId', Thrift.Type.I32, 3);
-    output.writeI32(this.certId);
-    output.writeFieldEnd();
-  }
-  if (this.certHash !== null && this.certHash !== undefined) {
-    output.writeFieldBegin('certHash', Thrift.Type.STRING, 4);
-    output.writeString(this.certHash);
-    output.writeFieldEnd();
-  }
+Pyd2botService_getStatus_args.prototype.write = function(output) {
+  output.writeStructBegin('Pyd2botService_getStatus_args');
   output.writeFieldStop();
   output.writeStructEnd();
   return;
 };
 
-var Pyd2botService_getApiKey_result = function(args) {
+var Pyd2botService_getStatus_result = function(args) {
   this.success = null;
   if (args) {
     if (args.success !== undefined && args.success !== null) {
@@ -755,8 +830,8 @@ var Pyd2botService_getApiKey_result = function(args) {
     }
   }
 };
-Pyd2botService_getApiKey_result.prototype = {};
-Pyd2botService_getApiKey_result.prototype.read = function(input) {
+Pyd2botService_getStatus_result.prototype = {};
+Pyd2botService_getStatus_result.prototype.read = function(input) {
   input.readStructBegin();
   while (true) {
     var ret = input.readFieldBegin();
@@ -785,8 +860,8 @@ Pyd2botService_getApiKey_result.prototype.read = function(input) {
   return;
 };
 
-Pyd2botService_getApiKey_result.prototype.write = function(output) {
-  output.writeStructBegin('Pyd2botService_getApiKey_result');
+Pyd2botService_getStatus_result.prototype.write = function(output) {
+  output.writeStructBegin('Pyd2botService_getStatus_result');
   if (this.success !== null && this.success !== undefined) {
     output.writeFieldBegin('success', Thrift.Type.STRING, 0);
     output.writeString(this.success);
@@ -806,6 +881,68 @@ var Pyd2botServiceClient = exports.Client = function(output, pClass) {
 Pyd2botServiceClient.prototype = {};
 Pyd2botServiceClient.prototype.seqid = function() { return this._seqid; };
 Pyd2botServiceClient.prototype.new_seqid = function() { return this._seqid += 1; };
+
+Pyd2botServiceClient.prototype.getApiKey = function(login, password, certId, certHash, callback) {
+  this._seqid = this.new_seqid();
+  if (callback === undefined) {
+    var _defer = Q.defer();
+    this._reqs[this.seqid()] = function(error, result) {
+      if (error) {
+        _defer.reject(error);
+      } else {
+        _defer.resolve(result);
+      }
+    };
+    this.send_getApiKey(login, password, certId, certHash);
+    return _defer.promise;
+  } else {
+    this._reqs[this.seqid()] = callback;
+    this.send_getApiKey(login, password, certId, certHash);
+  }
+};
+
+Pyd2botServiceClient.prototype.send_getApiKey = function(login, password, certId, certHash) {
+  var output = new this.pClass(this.output);
+  var params = {
+    login: login,
+    password: password,
+    certId: certId,
+    certHash: certHash
+  };
+  var args = new Pyd2botService_getApiKey_args(params);
+  try {
+    output.writeMessageBegin('getApiKey', Thrift.MessageType.CALL, this.seqid());
+    args.write(output);
+    output.writeMessageEnd();
+    return this.output.flush();
+  }
+  catch (e) {
+    delete this._reqs[this.seqid()];
+    if (typeof output.reset === 'function') {
+      output.reset();
+    }
+    throw e;
+  }
+};
+
+Pyd2botServiceClient.prototype.recv_getApiKey = function(input,mtype,rseqid) {
+  var callback = this._reqs[rseqid] || function() {};
+  delete this._reqs[rseqid];
+  if (mtype == Thrift.MessageType.EXCEPTION) {
+    var x = new Thrift.TApplicationException();
+    x.read(input);
+    input.readMessageEnd();
+    return callback(x);
+  }
+  var result = new Pyd2botService_getApiKey_result();
+  result.read(input);
+  input.readMessageEnd();
+
+  if (null !== result.success) {
+    return callback(null, result.success);
+  }
+  return callback('getApiKey failed: unknown result');
+};
 
 Pyd2botServiceClient.prototype.fetchAccountCharacters = function(login, password, certId, certHash, callback) {
   this._seqid = this.new_seqid();
@@ -1117,7 +1254,7 @@ Pyd2botServiceClient.prototype.send_followTransition = function(transition) {
   }
 };
 
-Pyd2botServiceClient.prototype.getApiKey = function(login, password, certId, certHash, callback) {
+Pyd2botServiceClient.prototype.getStatus = function(callback) {
   this._seqid = this.new_seqid();
   if (callback === undefined) {
     var _defer = Q.defer();
@@ -1128,25 +1265,19 @@ Pyd2botServiceClient.prototype.getApiKey = function(login, password, certId, cer
         _defer.resolve(result);
       }
     };
-    this.send_getApiKey(login, password, certId, certHash);
+    this.send_getStatus();
     return _defer.promise;
   } else {
     this._reqs[this.seqid()] = callback;
-    this.send_getApiKey(login, password, certId, certHash);
+    this.send_getStatus();
   }
 };
 
-Pyd2botServiceClient.prototype.send_getApiKey = function(login, password, certId, certHash) {
+Pyd2botServiceClient.prototype.send_getStatus = function() {
   var output = new this.pClass(this.output);
-  var params = {
-    login: login,
-    password: password,
-    certId: certId,
-    certHash: certHash
-  };
-  var args = new Pyd2botService_getApiKey_args(params);
+  var args = new Pyd2botService_getStatus_args();
   try {
-    output.writeMessageBegin('getApiKey', Thrift.MessageType.CALL, this.seqid());
+    output.writeMessageBegin('getStatus', Thrift.MessageType.CALL, this.seqid());
     args.write(output);
     output.writeMessageEnd();
     return this.output.flush();
@@ -1160,7 +1291,7 @@ Pyd2botServiceClient.prototype.send_getApiKey = function(login, password, certId
   }
 };
 
-Pyd2botServiceClient.prototype.recv_getApiKey = function(input,mtype,rseqid) {
+Pyd2botServiceClient.prototype.recv_getStatus = function(input,mtype,rseqid) {
   var callback = this._reqs[rseqid] || function() {};
   delete this._reqs[rseqid];
   if (mtype == Thrift.MessageType.EXCEPTION) {
@@ -1169,14 +1300,14 @@ Pyd2botServiceClient.prototype.recv_getApiKey = function(input,mtype,rseqid) {
     input.readMessageEnd();
     return callback(x);
   }
-  var result = new Pyd2botService_getApiKey_result();
+  var result = new Pyd2botService_getStatus_result();
   result.read(input);
   input.readMessageEnd();
 
   if (null !== result.success) {
     return callback(null, result.success);
   }
-  return callback('getApiKey failed: unknown result');
+  return callback('getStatus failed: unknown result');
 };
 var Pyd2botServiceProcessor = exports.Processor = function(handler) {
   this._handler = handler;
@@ -1193,6 +1324,46 @@ Pyd2botServiceProcessor.prototype.process = function(input, output) {
     x.write(output);
     output.writeMessageEnd();
     output.flush();
+  }
+};
+Pyd2botServiceProcessor.prototype.process_getApiKey = function(seqid, input, output) {
+  var args = new Pyd2botService_getApiKey_args();
+  args.read(input);
+  input.readMessageEnd();
+  if (this._handler.getApiKey.length === 4) {
+    Q.fcall(this._handler.getApiKey.bind(this._handler),
+      args.login,
+      args.password,
+      args.certId,
+      args.certHash
+    ).then(function(result) {
+      var result_obj = new Pyd2botService_getApiKey_result({success: result});
+      output.writeMessageBegin("getApiKey", Thrift.MessageType.REPLY, seqid);
+      result_obj.write(output);
+      output.writeMessageEnd();
+      output.flush();
+    }).catch(function (err) {
+      var result;
+      result = new Thrift.TApplicationException(Thrift.TApplicationExceptionType.UNKNOWN, err.message);
+      output.writeMessageBegin("getApiKey", Thrift.MessageType.EXCEPTION, seqid);
+      result.write(output);
+      output.writeMessageEnd();
+      output.flush();
+    });
+  } else {
+    this._handler.getApiKey(args.login, args.password, args.certId, args.certHash, function (err, result) {
+      var result_obj;
+      if ((err === null || typeof err === 'undefined')) {
+        result_obj = new Pyd2botService_getApiKey_result((err !== null || typeof err === 'undefined') ? err : {success: result});
+        output.writeMessageBegin("getApiKey", Thrift.MessageType.REPLY, seqid);
+      } else {
+        result_obj = new Thrift.TApplicationException(Thrift.TApplicationExceptionType.UNKNOWN, err.message);
+        output.writeMessageBegin("getApiKey", Thrift.MessageType.EXCEPTION, seqid);
+      }
+      result_obj.write(output);
+      output.writeMessageEnd();
+      output.flush();
+    });
   }
 };
 Pyd2botServiceProcessor.prototype.process_fetchAccountCharacters = function(seqid, input, output) {
@@ -1326,39 +1497,35 @@ Pyd2botServiceProcessor.prototype.process_followTransition = function(seqid, inp
   input.readMessageEnd();
   this._handler.followTransition(args.transition);
 };
-Pyd2botServiceProcessor.prototype.process_getApiKey = function(seqid, input, output) {
-  var args = new Pyd2botService_getApiKey_args();
+Pyd2botServiceProcessor.prototype.process_getStatus = function(seqid, input, output) {
+  var args = new Pyd2botService_getStatus_args();
   args.read(input);
   input.readMessageEnd();
-  if (this._handler.getApiKey.length === 4) {
-    Q.fcall(this._handler.getApiKey.bind(this._handler),
-      args.login,
-      args.password,
-      args.certId,
-      args.certHash
+  if (this._handler.getStatus.length === 0) {
+    Q.fcall(this._handler.getStatus.bind(this._handler)
     ).then(function(result) {
-      var result_obj = new Pyd2botService_getApiKey_result({success: result});
-      output.writeMessageBegin("getApiKey", Thrift.MessageType.REPLY, seqid);
+      var result_obj = new Pyd2botService_getStatus_result({success: result});
+      output.writeMessageBegin("getStatus", Thrift.MessageType.REPLY, seqid);
       result_obj.write(output);
       output.writeMessageEnd();
       output.flush();
     }).catch(function (err) {
       var result;
       result = new Thrift.TApplicationException(Thrift.TApplicationExceptionType.UNKNOWN, err.message);
-      output.writeMessageBegin("getApiKey", Thrift.MessageType.EXCEPTION, seqid);
+      output.writeMessageBegin("getStatus", Thrift.MessageType.EXCEPTION, seqid);
       result.write(output);
       output.writeMessageEnd();
       output.flush();
     });
   } else {
-    this._handler.getApiKey(args.login, args.password, args.certId, args.certHash, function (err, result) {
+    this._handler.getStatus(function (err, result) {
       var result_obj;
       if ((err === null || typeof err === 'undefined')) {
-        result_obj = new Pyd2botService_getApiKey_result((err !== null || typeof err === 'undefined') ? err : {success: result});
-        output.writeMessageBegin("getApiKey", Thrift.MessageType.REPLY, seqid);
+        result_obj = new Pyd2botService_getStatus_result((err !== null || typeof err === 'undefined') ? err : {success: result});
+        output.writeMessageBegin("getStatus", Thrift.MessageType.REPLY, seqid);
       } else {
         result_obj = new Thrift.TApplicationException(Thrift.TApplicationExceptionType.UNKNOWN, err.message);
-        output.writeMessageBegin("getApiKey", Thrift.MessageType.EXCEPTION, seqid);
+        output.writeMessageBegin("getStatus", Thrift.MessageType.EXCEPTION, seqid);
       }
       result_obj.write(output);
       output.writeMessageEnd();

@@ -1,17 +1,13 @@
-from asyncio.log import logger
 import json
 import logging
 from time import perf_counter, sleep
-
-
 from pyd2bot.thriftServer.pyd2botService.ttypes import Character, Spell
-
 logger = None
 
 
 class Pyd2botServer:
     def __init__(self):
-        pass
+        self.logger = None
     
     def fetchAccountCharacters(self, login:str, password:str, certId:str, certHash:str) -> list[Character]:
         from pydofus2.com.ankamagames.jerakine.logger.Logger import Logger
@@ -76,37 +72,37 @@ class Pyd2botServer:
         session = json.loads(sessionJson)
         logger_name = f"{session['character']['name']}({session['character']['id']})"
         Logger.prefix = logger_name
-        logger = Logger()
-        logger.debug(f"logger_name {logger_name}")
-        logger.debug("session: " + sessionJson)
+        self.logger = Logger()
+        self.logger.debug(f"logger_name {logger_name}")
+        self.logger.debug("session: " + sessionJson)
         from pyd2bot.logic.managers.SessionManager import SessionManager
         SessionManager().load(sessionJson)
-        logger.debug("Session loaded")
+        self.logger.debug("Session loaded")
         from pydofus2.com.ankamagames.haapi.Haapi import Haapi
         from pydofus2.com.DofusClient import DofusClient
         dofus2 = DofusClient()
-        logger.debug("importing frames")
+        self.logger.debug("importing frames")
         from pyd2bot.logic.common.frames.BotCharacterUpdatesFrame import BotCharacterUpdatesFrame
         from pyd2bot.logic.common.frames.BotWorkflowFrame import BotWorkflowFrame
         from pyd2bot.logic.roleplay.frames.BotPartyFrame import BotPartyFrame
-        logger.debug("frames imported")
+        self.logger.debug("frames imported")
         dofus2.registerInitFrame(BotWorkflowFrame)
         dofus2.registerGameStartFrame(BotCharacterUpdatesFrame)
-        logger.debug("registerGameStartFrame BotCharacterUpdatesFrame")
+        self.logger.debug("registerGameStartFrame BotCharacterUpdatesFrame")
         dofus2.registerGameStartFrame(BotPartyFrame)
-        logger.debug("registerGameStartFrame BotPartyFrame")
-        logger.debug("Frames registered")
+        self.logger.debug("registerGameStartFrame BotPartyFrame")
+        self.logger.debug("Frames registered")
         if session.get("APIKEY"):
             Haapi().APIKEY = session["APIKEY"]
         loginToken = Haapi().getLoginToken(login, password, certId, certHash)
         if loginToken is None:
             raise Exception("Unable to generate login token.")
-        logger.debug(f"loginToken: {loginToken}")
+        self.logger.debug(f"loginToken: {loginToken}")
         dofus2.login(loginToken, SessionManager().character["serverId"], SessionManager().character["id"])
         try:
             dofus2.join()
         except Exception as e:
-            logger.error(f"Error while running session: {e}")
+            self.logger.error(f"Error while running session: {e}")
             from pyd2bot.PyD2Bot import PyD2Bot
             PyD2Bot().stopServer()
         
@@ -149,8 +145,8 @@ class Pyd2botServer:
         from pydofus2.com.ankamagames.dofus.kernel.Kernel import Kernel
         from pydofus2.com.ankamagames.dofus.modules.utils.pathFinding.world.Vertex import Vertex
         v = Vertex(**json.loads(vertex))
+        print(f"Leader pos giver, leader is in vertex {v}")
         Kernel().getWorker().process(LeaderPosMessage(v))
-        print("LeaderPosMessage processed")
         
     def followTransition(self, transition: str):        
         from pyd2bot.logic.roleplay.messages.LeaderTransitionMessage import LeaderTransitionMessage
@@ -159,3 +155,11 @@ class Pyd2botServer:
         tr = Transition(**json.loads(transition))
         Kernel().getWorker().process(LeaderTransitionMessage(tr))
         print("LeaderTransitionMessage processed")
+        
+    def getStatus(self) -> str:
+        from pydofus2.com.ankamagames.dofus.kernel.Kernel import Kernel
+        from pyd2bot.logic.common.frames.BotWorkflowFrame import BotWorkflowFrame
+        wfframe : BotWorkflowFrame = Kernel().getWorker().getFrame("BotWorkflowFrame")
+        if wfframe:
+            return wfframe.status
+        return "connecting"

@@ -13,7 +13,7 @@ class Logger(logging.Logger, metaclass=Singleton):
     def __init__(self, log_prefix=""):
         super().__init__("logger")
         self.setLevel(logging.DEBUG)
-        formatter = logging.Formatter("%(asctime)s | %(levelname)s | %(filename)s:%(lineno)s | %(message)s")
+        formatter = logging.Formatter("%(asctime)s | %(levelname)s | %(filename)s:%(lineno)s | %(message)s", datefmt='%H:%M:%S')
         now = datetime.datetime.now()
         if not os.path.isdir(self.LOGS_PATH):
             os.mkdir(self.LOGS_PATH)

@@ -2,8 +2,9 @@ from asyncio.log import logger
 import json
 import logging
 from time import perf_counter, sleep
+
+
 from pyd2bot.thriftServer.pyd2botService.ttypes import Character, Spell
-from pydofus2.com.ankamagames.haapi.Haapi import Haapi
 
 logger = None
 
@@ -108,30 +109,7 @@ class Pyd2botServer:
             logger.error(f"Error while running session: {e}")
             from pyd2bot.PyD2Bot import PyD2Bot
             PyD2Bot().stopServer()
-            
-    def rcvLeaderMsg(self, msgJsonStr):
-        print(f"rcvLeaderMsg called with msgJsonStr {msgJsonStr}")
-        from pyd2bot.logic.roleplay.messages.LeaderPosMessage import LeaderPosMessage
-        from pyd2bot.logic.roleplay.messages.LeaderTransitionMessage import LeaderTransitionMessage
-        from pydofus2.com.ankamagames.dofus.kernel.Kernel import Kernel
-        from pydofus2.com.ankamagames.dofus.modules.utils.pathFinding.world.Vertex import Vertex
-        from pydofus2.com.ankamagames.dofus.modules.utils.pathFinding.world.Transition import Transition
-        from pydofus2.com.ankamagames.dofus.modules.utils.pathFinding.world.WorldPathFinder import WorldPathFinder
-        from pydofus2.com.ankamagames.dofus.logic.game.common.managers.PlayedCharacterManager import PlayedCharacterManager
-        msgJson = json.loads(msgJsonStr)
-        if msgJson.get("type") == "transit":
-            tr = Transition(**msgJson["data"])
-            Kernel().getWorker().process(LeaderTransitionMessage(tr))
-            print("LeaderTransitionMessage processed")
-        elif msgJson.get("type") == "pos":
-            v = Vertex(**msgJson["data"])
-            Kernel().getWorker().process(LeaderPosMessage(v))
-            print("LeaderPosMessage processed")
-        cv = WorldPathFinder().currPlayerVertex
-        result = json.dumps({"vertex": cv.to_json(), "cellid": PlayedCharacterManager().currentCellId})
-        print(f"rcvLeaderMsg result: {result}")
-        return result
-
+        
     def fetchBreedSpells(self, breedId:int) -> list['Spell']:
         from pydofus2.com.ankamagames.dofus.datacenter.breeds.Breed import Breed
         spells = []
@@ -162,5 +140,22 @@ class Pyd2botServer:
         return json.dumps(res)
     
     def getApiKey(self, login:str, password:str, certId:str, certHash:str) -> str:
+        from pydofus2.com.ankamagames.haapi.Haapi import Haapi
         response = Haapi().createAPIKEY(login, password, certId, certHash, game_id=102)
         return json.dumps(response)
+
+    def moveToVertex(self, vertex: str):
+        from pyd2bot.logic.roleplay.messages.LeaderPosMessage import LeaderPosMessage
+        from pydofus2.com.ankamagames.dofus.kernel.Kernel import Kernel
+        from pydofus2.com.ankamagames.dofus.modules.utils.pathFinding.world.Vertex import Vertex
+        v = Vertex(**json.loads(vertex))
+        Kernel().getWorker().process(LeaderPosMessage(v))
+        print("LeaderPosMessage processed")
+        
+    def followTransition(self, transition: str):        
+        from pyd2bot.logic.roleplay.messages.LeaderTransitionMessage import LeaderTransitionMessage
+        from pydofus2.com.ankamagames.dofus.kernel.Kernel import Kernel
+        from pydofus2.com.ankamagames.dofus.modules.utils.pathFinding.world.Transition import Transition
+        tr = Transition(**json.loads(transition))
+        Kernel().getWorker().process(LeaderTransitionMessage(tr))
+        print("LeaderTransitionMessage processed")

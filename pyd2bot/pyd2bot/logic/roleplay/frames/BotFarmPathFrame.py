@@ -1,4 +1,6 @@
+import asyncio
 from threading import Timer
+import threading
 from typing import TYPE_CHECKING
 from pydofus2.com.DofusClient import DofusClient
 
@@ -216,9 +218,8 @@ class BotFarmPathFrame(Frame):
         logger.debug(
             f"[BotFarmFrame] Current Map {PlayedCharacterManager().currentMap.mapId} Moving to {self._currTransition.transitionMapId}"
         )
-        MoveAPI.followTransition(self._currTransition)
-        if self.partyFrame:
-            self.partyFrame.notifyFollowersWithTransition(self._currTransition)
+        MoveAPI.followTransition(self._currTransition,)
+        self.partyFrame.notifyFollowersWithTransition(self._currTransition)
 
     def attackMonsterGroup(self):
         availableMonsterFights = []

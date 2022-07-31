@@ -502,16 +502,16 @@ Pyd2botService_fetchJobsInfosJson_result.prototype.write = function(output) {
   return;
 };
 
-var Pyd2botService_rcvLeaderMsg_args = function(args) {
-  this.msg = null;
+var Pyd2botService_moveToVertex_args = function(args) {
+  this.vertex = null;
   if (args) {
-    if (args.msg !== undefined && args.msg !== null) {
-      this.msg = args.msg;
+    if (args.vertex !== undefined && args.vertex !== null) {
+      this.vertex = args.vertex;
     }
   }
 };
-Pyd2botService_rcvLeaderMsg_args.prototype = {};
-Pyd2botService_rcvLeaderMsg_args.prototype.read = function(input) {
+Pyd2botService_moveToVertex_args.prototype = {};
+Pyd2botService_moveToVertex_args.prototype.read = function(input) {
   input.readStructBegin();
   while (true) {
     var ret = input.readFieldBegin();
@@ -523,7 +523,7 @@ Pyd2botService_rcvLeaderMsg_args.prototype.read = function(input) {
     switch (fid) {
       case 1:
       if (ftype == Thrift.Type.STRING) {
-        this.msg = input.readString();
+        this.vertex = input.readString();
       } else {
         input.skip(ftype);
       }
@@ -540,11 +540,11 @@ Pyd2botService_rcvLeaderMsg_args.prototype.read = function(input) {
   return;
 };
 
-Pyd2botService_rcvLeaderMsg_args.prototype.write = function(output) {
-  output.writeStructBegin('Pyd2botService_rcvLeaderMsg_args');
-  if (this.msg !== null && this.msg !== undefined) {
-    output.writeFieldBegin('msg', Thrift.Type.STRING, 1);
-    output.writeString(this.msg);
+Pyd2botService_moveToVertex_args.prototype.write = function(output) {
+  output.writeStructBegin('Pyd2botService_moveToVertex_args');
+  if (this.vertex !== null && this.vertex !== undefined) {
+    output.writeFieldBegin('vertex', Thrift.Type.STRING, 1);
+    output.writeString(this.vertex);
     output.writeFieldEnd();
   }
   output.writeFieldStop();
@@ -552,16 +552,41 @@ Pyd2botService_rcvLeaderMsg_args.prototype.write = function(output) {
   return;
 };
 
-var Pyd2botService_rcvLeaderMsg_result = function(args) {
-  this.success = null;
+var Pyd2botService_moveToVertex_result = function(args) {
+};
+Pyd2botService_moveToVertex_result.prototype = {};
+Pyd2botService_moveToVertex_result.prototype.read = function(input) {
+  input.readStructBegin();
+  while (true) {
+    var ret = input.readFieldBegin();
+    var ftype = ret.ftype;
+    if (ftype == Thrift.Type.STOP) {
+      break;
+    }
+    input.skip(ftype);
+    input.readFieldEnd();
+  }
+  input.readStructEnd();
+  return;
+};
+
+Pyd2botService_moveToVertex_result.prototype.write = function(output) {
+  output.writeStructBegin('Pyd2botService_moveToVertex_result');
+  output.writeFieldStop();
+  output.writeStructEnd();
+  return;
+};
+
+var Pyd2botService_followTransition_args = function(args) {
+  this.transition = null;
   if (args) {
-    if (args.success !== undefined && args.success !== null) {
-      this.success = args.success;
+    if (args.transition !== undefined && args.transition !== null) {
+      this.transition = args.transition;
     }
   }
 };
-Pyd2botService_rcvLeaderMsg_result.prototype = {};
-Pyd2botService_rcvLeaderMsg_result.prototype.read = function(input) {
+Pyd2botService_followTransition_args.prototype = {};
+Pyd2botService_followTransition_args.prototype.read = function(input) {
   input.readStructBegin();
   while (true) {
     var ret = input.readFieldBegin();
@@ -571,9 +596,9 @@ Pyd2botService_rcvLeaderMsg_result.prototype.read = function(input) {
       break;
     }
     switch (fid) {
-      case 0:
+      case 1:
       if (ftype == Thrift.Type.STRING) {
-        this.success = input.readString();
+        this.transition = input.readString();
       } else {
         input.skip(ftype);
       }
@@ -590,13 +615,38 @@ Pyd2botService_rcvLeaderMsg_result.prototype.read = function(input) {
   return;
 };
 
-Pyd2botService_rcvLeaderMsg_result.prototype.write = function(output) {
-  output.writeStructBegin('Pyd2botService_rcvLeaderMsg_result');
-  if (this.success !== null && this.success !== undefined) {
-    output.writeFieldBegin('success', Thrift.Type.STRING, 0);
-    output.writeString(this.success);
+Pyd2botService_followTransition_args.prototype.write = function(output) {
+  output.writeStructBegin('Pyd2botService_followTransition_args');
+  if (this.transition !== null && this.transition !== undefined) {
+    output.writeFieldBegin('transition', Thrift.Type.STRING, 1);
+    output.writeString(this.transition);
     output.writeFieldEnd();
   }
+  output.writeFieldStop();
+  output.writeStructEnd();
+  return;
+};
+
+var Pyd2botService_followTransition_result = function(args) {
+};
+Pyd2botService_followTransition_result.prototype = {};
+Pyd2botService_followTransition_result.prototype.read = function(input) {
+  input.readStructBegin();
+  while (true) {
+    var ret = input.readFieldBegin();
+    var ftype = ret.ftype;
+    if (ftype == Thrift.Type.STOP) {
+      break;
+    }
+    input.skip(ftype);
+    input.readFieldEnd();
+  }
+  input.readStructEnd();
+  return;
+};
+
+Pyd2botService_followTransition_result.prototype.write = function(output) {
+  output.writeStructBegin('Pyd2botService_followTransition_result');
   output.writeFieldStop();
   output.writeStructEnd();
   return;
@@ -981,7 +1031,7 @@ Pyd2botServiceClient.prototype.recv_fetchJobsInfosJson = function(input,mtype,rs
   return callback('fetchJobsInfosJson failed: unknown result');
 };
 
-Pyd2botServiceClient.prototype.rcvLeaderMsg = function(msg, callback) {
+Pyd2botServiceClient.prototype.moveToVertex = function(vertex, callback) {
   this._seqid = this.new_seqid();
   if (callback === undefined) {
     var _defer = Q.defer();
@@ -992,25 +1042,28 @@ Pyd2botServiceClient.prototype.rcvLeaderMsg = function(msg, callback) {
         _defer.resolve(result);
       }
     };
-    this.send_rcvLeaderMsg(msg);
+    this.send_moveToVertex(vertex);
     return _defer.promise;
   } else {
     this._reqs[this.seqid()] = callback;
-    this.send_rcvLeaderMsg(msg);
+    this.send_moveToVertex(vertex);
   }
 };
 
-Pyd2botServiceClient.prototype.send_rcvLeaderMsg = function(msg) {
+Pyd2botServiceClient.prototype.send_moveToVertex = function(vertex) {
   var output = new this.pClass(this.output);
   var params = {
-    msg: msg
+    vertex: vertex
   };
-  var args = new Pyd2botService_rcvLeaderMsg_args(params);
+  var args = new Pyd2botService_moveToVertex_args(params);
   try {
-    output.writeMessageBegin('rcvLeaderMsg', Thrift.MessageType.CALL, this.seqid());
+    output.writeMessageBegin('moveToVertex', Thrift.MessageType.ONEWAY, this.seqid());
     args.write(output);
     output.writeMessageEnd();
-    return this.output.flush();
+    this.output.flush();
+    var callback = this._reqs[this.seqid()] || function() {};
+    delete this._reqs[this.seqid()];
+    callback(null);
   }
   catch (e) {
     delete this._reqs[this.seqid()];
@@ -1021,23 +1074,47 @@ Pyd2botServiceClient.prototype.send_rcvLeaderMsg = function(msg) {
   }
 };
 
-Pyd2botServiceClient.prototype.recv_rcvLeaderMsg = function(input,mtype,rseqid) {
-  var callback = this._reqs[rseqid] || function() {};
-  delete this._reqs[rseqid];
-  if (mtype == Thrift.MessageType.EXCEPTION) {
-    var x = new Thrift.TApplicationException();
-    x.read(input);
-    input.readMessageEnd();
-    return callback(x);
+Pyd2botServiceClient.prototype.followTransition = function(transition, callback) {
+  this._seqid = this.new_seqid();
+  if (callback === undefined) {
+    var _defer = Q.defer();
+    this._reqs[this.seqid()] = function(error, result) {
+      if (error) {
+        _defer.reject(error);
+      } else {
+        _defer.resolve(result);
+      }
+    };
+    this.send_followTransition(transition);
+    return _defer.promise;
+  } else {
+    this._reqs[this.seqid()] = callback;
+    this.send_followTransition(transition);
   }
-  var result = new Pyd2botService_rcvLeaderMsg_result();
-  result.read(input);
-  input.readMessageEnd();
+};
 
-  if (null !== result.success) {
-    return callback(null, result.success);
+Pyd2botServiceClient.prototype.send_followTransition = function(transition) {
+  var output = new this.pClass(this.output);
+  var params = {
+    transition: transition
+  };
+  var args = new Pyd2botService_followTransition_args(params);
+  try {
+    output.writeMessageBegin('followTransition', Thrift.MessageType.ONEWAY, this.seqid());
+    args.write(output);
+    output.writeMessageEnd();
+    this.output.flush();
+    var callback = this._reqs[this.seqid()] || function() {};
+    delete this._reqs[this.seqid()];
+    callback(null);
   }
-  return callback('rcvLeaderMsg failed: unknown result');
+  catch (e) {
+    delete this._reqs[this.seqid()];
+    if (typeof output.reset === 'function') {
+      output.reset();
+    }
+    throw e;
+  }
 };
 
 Pyd2botServiceClient.prototype.getApiKey = function(login, password, certId, certHash, callback) {
@@ -1237,42 +1314,17 @@ Pyd2botServiceProcessor.prototype.process_fetchJobsInfosJson = function(seqid, i
     });
   }
 };
-Pyd2botServiceProcessor.prototype.process_rcvLeaderMsg = function(seqid, input, output) {
-  var args = new Pyd2botService_rcvLeaderMsg_args();
+Pyd2botServiceProcessor.prototype.process_moveToVertex = function(seqid, input, output) {
+  var args = new Pyd2botService_moveToVertex_args();
   args.read(input);
   input.readMessageEnd();
-  if (this._handler.rcvLeaderMsg.length === 1) {
-    Q.fcall(this._handler.rcvLeaderMsg.bind(this._handler),
-      args.msg
-    ).then(function(result) {
-      var result_obj = new Pyd2botService_rcvLeaderMsg_result({success: result});
-      output.writeMessageBegin("rcvLeaderMsg", Thrift.MessageType.REPLY, seqid);
-      result_obj.write(output);
-      output.writeMessageEnd();
-      output.flush();
-    }).catch(function (err) {
-      var result;
-      result = new Thrift.TApplicationException(Thrift.TApplicationExceptionType.UNKNOWN, err.message);
-      output.writeMessageBegin("rcvLeaderMsg", Thrift.MessageType.EXCEPTION, seqid);
-      result.write(output);
-      output.writeMessageEnd();
-      output.flush();
-    });
-  } else {
-    this._handler.rcvLeaderMsg(args.msg, function (err, result) {
-      var result_obj;
-      if ((err === null || typeof err === 'undefined')) {
-        result_obj = new Pyd2botService_rcvLeaderMsg_result((err !== null || typeof err === 'undefined') ? err : {success: result});
-        output.writeMessageBegin("rcvLeaderMsg", Thrift.MessageType.REPLY, seqid);
-      } else {
-        result_obj = new Thrift.TApplicationException(Thrift.TApplicationExceptionType.UNKNOWN, err.message);
-        output.writeMessageBegin("rcvLeaderMsg", Thrift.MessageType.EXCEPTION, seqid);
-      }
-      result_obj.write(output);
-      output.writeMessageEnd();
-      output.flush();
-    });
-  }
+  this._handler.moveToVertex(args.vertex);
+};
+Pyd2botServiceProcessor.prototype.process_followTransition = function(seqid, input, output) {
+  var args = new Pyd2botService_followTransition_args();
+  args.read(input);
+  input.readMessageEnd();
+  this._handler.followTransition(args.transition);
 };
 Pyd2botServiceProcessor.prototype.process_getApiKey = function(seqid, input, output) {
   var args = new Pyd2botService_getApiKey_args();

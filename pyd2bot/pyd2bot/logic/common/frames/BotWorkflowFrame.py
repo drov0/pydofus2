@@ -1,3 +1,4 @@
+from pyd2bot.logic.roleplay.frames.BotPartyFrame import BotPartyFrame
 from pydofus2.com.ankamagames.dofus.logic.game.common.managers.PlayedCharacterManager import PlayedCharacterManager
 from pydofus2.com.ankamagames.dofus.network.enums.GameContextEnum import GameContextEnum
 from pydofus2.com.ankamagames.dofus.network.enums.PlayerLifeStatusEnum import PlayerLifeStatusEnum
@@ -49,6 +50,8 @@ class BotWorkflowFrame(Frame):
         if SessionManager().isLeader:
             if Kernel().getWorker().getFrame("BotFarmPathFrame"):
                 Kernel().getWorker().removeFrameByName("BotFarmPathFrame")
+        if Kernel().getWorker().getFrame("BotPartyFrame"):
+            Kernel().getWorker().removeFrameByName("BotPartyFrame")
         self._inBankAutoUnload = True
         logger.warn(f"Inventory is almost full {InventoryAPI.getWeightPercent()}, will trigger auto bank unload...")
         Kernel().getWorker().addFrame(BotUnloadInBankFrame())
@@ -103,6 +106,9 @@ class BotWorkflowFrame(Frame):
             if SessionManager().path:
                 if not Kernel().getWorker().contains("BotFarmPathFrame"):
                     Kernel().getWorker().addFrame(BotFarmPathFrame(True))
+            if SessionManager().type == "fight":
+                if not Kernel().getWorker().contains("BotPartyFrame"):
+                    Kernel().getWorker().addFrame(BotPartyFrame())
             if Kernel().getWorker().contains("BotUnloadInBankFrame"):
                 Kernel().getWorker().removeFrameByName("BotUnloadInBankFrame")
 

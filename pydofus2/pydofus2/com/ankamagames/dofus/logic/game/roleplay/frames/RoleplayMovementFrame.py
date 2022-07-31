@@ -108,9 +108,9 @@ logger = Logger()
 class RoleplayMovementFrame(Frame):
     CONSECUTIVE_MOVEMENT_DELAY: int = 0.25
     VERBOSE = True
-    CHANGEMAP_TIMEOUT = 3
-    ATTACKMOSTERS_TIMEOUT = 3
-    JOINFIGHT_TIMEOUT = 3
+    CHANGEMAP_TIMEOUT = 10
+    ATTACKMOSTERS_TIMEOUT = 10
+    JOINFIGHT_TIMEOUT = 10
     MOVEMENT_REQUEST_TIMEOUT = 3
     MAX_MOVEMENT_REQUEST_FAILS = 3
     
@@ -228,10 +228,11 @@ class RoleplayMovementFrame(Frame):
 
         if isinstance(msg, GameMapNoMovementMessage):
             logger.debug("[RolePlayMovement] Server rejected Movement!")
-            if self._moveRequestFails > 0:
+            self._moveRequestFails += 1
+            if self._moveRequestFails > 3:
+                self._moveRequestFails = 0
                 Kernel().getWorker().process(MapMoveFailed())
                 return
-            self._moveRequestFails += 1
             if self._changeMapTimeout:
                 self._changeMapTimeout.cancel()
             if self._movementAnimTimer:
@@ -622,7 +623,7 @@ class RoleplayMovementFrame(Frame):
         cmmsg: ChangeMapMessage = ChangeMapMessage()
         cmmsg.init(int(self._wantToChangeMap), False)
         ConnectionsHandler.getConnection().send(cmmsg)
-        if self._changeMapTimeout:
+        if self._changeMapTimeout is not None:
             self._changeMapTimeout.cancel()
         self._changeMapTimeout = Timer(self.CHANGEMAP_TIMEOUT, self.onMapChangeFailed)
         self._changeMapTimeout.start()
@@ -653,7 +654,7 @@ class RoleplayMovementFrame(Frame):
 
     def onMapChangeFailed(self) -> None:
         logger.debug(f"[RolePlayMovement] Map change to {self._wantToChangeMap} failed!")
-        if self._changeMapTimeout:
+        if self._changeMapTimeout is not None:
             self._changeMapTimeout.cancel()
         self._changeMapFails += 1
         if self._changeMapFails > 3:
@@ -662,7 +663,7 @@ class RoleplayMovementFrame(Frame):
             cmfm: MapChangeFailedMessage = MapChangeFailedMessage()
             cmfm.init(self._wantToChangeMap)
             Kernel().getWorker().processImmediately(cmfm)
-        elif self._wantToChangeMap is None:
+        if self._wantToChangeMap is None:
             logger.warning(f"[RolePlayMovement] Can't to change map to None, aborting")
         else:
             self.askMapChange()

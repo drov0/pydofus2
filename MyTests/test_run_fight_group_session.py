@@ -31,8 +31,7 @@ plusbellelavieSession = {
         "subAreaId": 95,
         "startVertex": {"mapId": 191104002, "mapRpZone": 1},
         "fightOnly": True,
-        "monsterLvlCoefDiff": 3,
-        "jobIds": [],
+        "monsterLvlCoefDiff": 3
     },
     "monsterLvlCoefDiff": "3",
     "followers": [

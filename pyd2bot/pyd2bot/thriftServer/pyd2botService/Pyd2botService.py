@@ -53,10 +53,18 @@ class Iface(object):
     def fetchJobsInfosJson(self):
         pass
 
-    def rcvLeaderMsg(self, msg):
+    def moveToVertex(self, vertex):
         """
         Parameters:
-         - msg
+         - vertex
+
+        """
+        pass
+
+    def followTransition(self, transition):
+        """
+        Parameters:
+         - transition
 
         """
         pass
@@ -200,37 +208,37 @@ class Client(Iface):
             return result.success
         raise TApplicationException(TApplicationException.MISSING_RESULT, "fetchJobsInfosJson failed: unknown result")
 
-    def rcvLeaderMsg(self, msg):
+    def moveToVertex(self, vertex):
         """
         Parameters:
-         - msg
+         - vertex
 
         """
-        self.send_rcvLeaderMsg(msg)
-        return self.recv_rcvLeaderMsg()
+        self.send_moveToVertex(vertex)
 
-    def send_rcvLeaderMsg(self, msg):
-        self._oprot.writeMessageBegin('rcvLeaderMsg', TMessageType.CALL, self._seqid)
-        args = rcvLeaderMsg_args()
-        args.msg = msg
+    def send_moveToVertex(self, vertex):
+        self._oprot.writeMessageBegin('moveToVertex', TMessageType.ONEWAY, self._seqid)
+        args = moveToVertex_args()
+        args.vertex = vertex
         args.write(self._oprot)
         self._oprot.writeMessageEnd()
         self._oprot.trans.flush()
 
-    def recv_rcvLeaderMsg(self):
-        iprot = self._iprot
-        (fname, mtype, rseqid) = iprot.readMessageBegin()
-        if mtype == TMessageType.EXCEPTION:
-            x = TApplicationException()
-            x.read(iprot)
-            iprot.readMessageEnd()
-            raise x
-        result = rcvLeaderMsg_result()
-        result.read(iprot)
-        iprot.readMessageEnd()
-        if result.success is not None:
-            return result.success
-        raise TApplicationException(TApplicationException.MISSING_RESULT, "rcvLeaderMsg failed: unknown result")
+    def followTransition(self, transition):
+        """
+        Parameters:
+         - transition
+
+        """
+        self.send_followTransition(transition)
+
+    def send_followTransition(self, transition):
+        self._oprot.writeMessageBegin('followTransition', TMessageType.ONEWAY, self._seqid)
+        args = followTransition_args()
+        args.transition = transition
+        args.write(self._oprot)
+        self._oprot.writeMessageEnd()
+        self._oprot.trans.flush()
 
     def getApiKey(self, login, password, certId, certHash):
         """
@@ -279,7 +287,8 @@ class Processor(Iface, TProcessor):
         self._processMap["runSession"] = Processor.process_runSession
         self._processMap["fetchBreedSpells"] = Processor.process_fetchBreedSpells
         self._processMap["fetchJobsInfosJson"] = Processor.process_fetchJobsInfosJson
-        self._processMap["rcvLeaderMsg"] = Processor.process_rcvLeaderMsg
+        self._processMap["moveToVertex"] = Processor.process_moveToVertex
+        self._processMap["followTransition"] = Processor.process_followTransition
         self._processMap["getApiKey"] = Processor.process_getApiKey
         self._on_message_begin = None
 
@@ -383,28 +392,27 @@ class Processor(Iface, TProcessor):
         oprot.writeMessageEnd()
         oprot.trans.flush()
 
-    def process_rcvLeaderMsg(self, seqid, iprot, oprot):
-        args = rcvLeaderMsg_args()
+    def process_moveToVertex(self, seqid, iprot, oprot):
+        args = moveToVertex_args()
         args.read(iprot)
         iprot.readMessageEnd()
-        result = rcvLeaderMsg_result()
         try:
-            result.success = self._handler.rcvLeaderMsg(args.msg)
-            msg_type = TMessageType.REPLY
+            self._handler.moveToVertex(args.vertex)
         except TTransport.TTransportException:
             raise
-        except TApplicationException as ex:
-            logging.exception('TApplication exception in handler')
-            msg_type = TMessageType.EXCEPTION
-            result = ex
         except Exception:
-            logging.exception('Unexpected exception in handler')
-            msg_type = TMessageType.EXCEPTION
-            result = TApplicationException(TApplicationException.INTERNAL_ERROR, 'Internal error')
-        oprot.writeMessageBegin("rcvLeaderMsg", msg_type, seqid)
-        result.write(oprot)
-        oprot.writeMessageEnd()
-        oprot.trans.flush()
+            logging.exception('Exception in oneway handler')
+
+    def process_followTransition(self, seqid, iprot, oprot):
+        args = followTransition_args()
+        args.read(iprot)
+        iprot.readMessageEnd()
+        try:
+            self._handler.followTransition(args.transition)
+        except TTransport.TTransportException:
+            raise
+        except Exception:
+            logging.exception('Exception in oneway handler')
 
     def process_getApiKey(self, seqid, iprot, oprot):
         args = getApiKey_args()
@@ -946,16 +954,16 @@ fetchJobsInfosJson_result.thrift_spec = (
 )
 
 
-class rcvLeaderMsg_args(object):
+class moveToVertex_args(object):
     """
     Attributes:
-     - msg
+     - vertex
 
     """
 
 
-    def __init__(self, msg=None,):
-        self.msg = msg
+    def __init__(self, vertex=None,):
+        self.vertex = vertex
 
     def read(self, iprot):
         if iprot._fast_decode is not None and isinstance(iprot.trans, TTransport.CReadableTransport) and self.thrift_spec is not None:
@@ -968,7 +976,7 @@ class rcvLeaderMsg_args(object):
                 break
             if fid == 1:
                 if ftype == TType.STRING:
-                    self.msg = iprot.readString().decode('utf-8', errors='replace') if sys.version_info[0] == 2 else iprot.readString()
+                    self.vertex = iprot.readString().decode('utf-8', errors='replace') if sys.version_info[0] == 2 else iprot.readString()
                 else:
                     iprot.skip(ftype)
             else:
@@ -980,10 +988,10 @@ class rcvLeaderMsg_args(object):
         if oprot._fast_encode is not None and self.thrift_spec is not None:
             oprot.trans.write(oprot._fast_encode(self, [self.__class__, self.thrift_spec]))
             return
-        oprot.writeStructBegin('rcvLeaderMsg_args')
-        if self.msg is not None:
-            oprot.writeFieldBegin('msg', TType.STRING, 1)
-            oprot.writeString(self.msg.encode('utf-8') if sys.version_info[0] == 2 else self.msg)
+        oprot.writeStructBegin('moveToVertex_args')
+        if self.vertex is not None:
+            oprot.writeFieldBegin('vertex', TType.STRING, 1)
+            oprot.writeString(self.vertex.encode('utf-8') if sys.version_info[0] == 2 else self.vertex)
             oprot.writeFieldEnd()
         oprot.writeFieldStop()
         oprot.writeStructEnd()
@@ -1001,23 +1009,23 @@ class rcvLeaderMsg_args(object):
 
     def __ne__(self, other):
         return not (self == other)
-all_structs.append(rcvLeaderMsg_args)
-rcvLeaderMsg_args.thrift_spec = (
+all_structs.append(moveToVertex_args)
+moveToVertex_args.thrift_spec = (
     None,  # 0
-    (1, TType.STRING, 'msg', 'UTF8', None, ),  # 1
+    (1, TType.STRING, 'vertex', 'UTF8', None, ),  # 1
 )
 
 
-class rcvLeaderMsg_result(object):
+class followTransition_args(object):
     """
     Attributes:
-     - success
+     - transition
 
     """
 
 
-    def __init__(self, success=None,):
-        self.success = success
+    def __init__(self, transition=None,):
+        self.transition = transition
 
     def read(self, iprot):
         if iprot._fast_decode is not None and isinstance(iprot.trans, TTransport.CReadableTransport) and self.thrift_spec is not None:
@@ -1028,9 +1036,9 @@ class rcvLeaderMsg_result(object):
             (fname, ftype, fid) = iprot.readFieldBegin()
             if ftype == TType.STOP:
                 break
-            if fid == 0:
+            if fid == 1:
                 if ftype == TType.STRING:
-                    self.success = iprot.readString().decode('utf-8', errors='replace') if sys.version_info[0] == 2 else iprot.readString()
+                    self.transition = iprot.readString().decode('utf-8', errors='replace') if sys.version_info[0] == 2 else iprot.readString()
                 else:
                     iprot.skip(ftype)
             else:
@@ -1042,10 +1050,10 @@ class rcvLeaderMsg_result(object):
         if oprot._fast_encode is not None and self.thrift_spec is not None:
             oprot.trans.write(oprot._fast_encode(self, [self.__class__, self.thrift_spec]))
             return
-        oprot.writeStructBegin('rcvLeaderMsg_result')
-        if self.success is not None:
-            oprot.writeFieldBegin('success', TType.STRING, 0)
-            oprot.writeString(self.success.encode('utf-8') if sys.version_info[0] == 2 else self.success)
+        oprot.writeStructBegin('followTransition_args')
+        if self.transition is not None:
+            oprot.writeFieldBegin('transition', TType.STRING, 1)
+            oprot.writeString(self.transition.encode('utf-8') if sys.version_info[0] == 2 else self.transition)
             oprot.writeFieldEnd()
         oprot.writeFieldStop()
         oprot.writeStructEnd()
@@ -1063,9 +1071,10 @@ class rcvLeaderMsg_result(object):
 
     def __ne__(self, other):
         return not (self == other)
-all_structs.append(rcvLeaderMsg_result)
-rcvLeaderMsg_result.thrift_spec = (
-    (0, TType.STRING, 'success', 'UTF8', None, ),  # 0
+all_structs.append(followTransition_args)
+followTransition_args.thrift_spec = (
+    None,  # 0
+    (1, TType.STRING, 'transition', 'UTF8', None, ),  # 1
 )
 
 

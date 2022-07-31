@@ -28,7 +28,8 @@ if len(sys.argv) <= 1 or sys.argv[1] == '--help':
     print('  void runSession(string login, string password, int certId, string certHash, string sessionJson)')
     print('   fetchBreedSpells(int breedId)')
     print('  string fetchJobsInfosJson()')
-    print('  string rcvLeaderMsg(string msg)')
+    print('  void moveToVertex(string vertex)')
+    print('  void followTransition(string transition)')
     print('  string getApiKey(string login, string password, int certId, string certHash)')
     print('')
     sys.exit(0)
@@ -133,11 +134,17 @@ elif cmd == 'fetchJobsInfosJson':
         sys.exit(1)
     pp.pprint(client.fetchJobsInfosJson())
 
-elif cmd == 'rcvLeaderMsg':
+elif cmd == 'moveToVertex':
     if len(args) != 1:
-        print('rcvLeaderMsg requires 1 args')
+        print('moveToVertex requires 1 args')
         sys.exit(1)
-    pp.pprint(client.rcvLeaderMsg(args[0],))
+    pp.pprint(client.moveToVertex(args[0],))
+
+elif cmd == 'followTransition':
+    if len(args) != 1:
+        print('followTransition requires 1 args')
+        sys.exit(1)
+    pp.pprint(client.followTransition(args[0],))
 
 elif cmd == 'getApiKey':
     if len(args) != 4:

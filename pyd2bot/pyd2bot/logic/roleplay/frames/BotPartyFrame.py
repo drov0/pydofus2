@@ -2,9 +2,9 @@ import json
 import threading
 from threading import Timer
 from time import sleep
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Tuple
+from pyd2bot.PyD2Bot import PyD2Bot
 from pydofus2.com.ankamagames.berilia.managers.KernelEventsManager import KernelEventsManager
-from pydofus2.com.ankamagames.dofus.logic.game.roleplay.messages.CharacterMovementStoppedMessage import CharacterMovementStoppedMessage
 from pydofus2.com.ankamagames.dofus.modules.utils.pathFinding.world.Transition import Transition
 from pyd2bot.logic.roleplay.messages.LeaderPosMessage import LeaderPosMessage
 from pyd2bot.logic.roleplay.messages.LeaderTransitionMessage import LeaderTransitionMessage
@@ -12,7 +12,6 @@ from pydofus2.com.ankamagames.atouin.managers.MapDisplayManager import MapDispla
 from pydofus2.com.ankamagames.dofus.kernel.Kernel import Kernel
 from pydofus2.com.ankamagames.dofus.kernel.net.ConnectionsHandler import ConnectionsHandler
 from pydofus2.com.ankamagames.dofus.logic.game.common.managers.PlayedCharacterManager import PlayedCharacterManager
-from pydofus2.com.ankamagames.dofus.logic.game.fight.messages.MapMoveFailed import MapMoveFailed
 from pydofus2.com.ankamagames.dofus.modules.utils.pathFinding.world.Vertex import Vertex
 from pydofus2.com.ankamagames.dofus.modules.utils.pathFinding.world.WorldPathFinder import WorldPathFinder
 from pydofus2.com.ankamagames.dofus.network.messages.game.atlas.compass.CompassUpdatePartyMemberMessage import (
@@ -79,8 +78,9 @@ if TYPE_CHECKING:
     from pydofus2.com.ankamagames.dofus.logic.game.roleplay.frames.RoleplayEntitiesFrame import RoleplayEntitiesFrame
     from pydofus2.com.ankamagames.dofus.logic.game.roleplay.frames.RoleplayMovementFrame import RoleplayMovementFrame
     from pyd2bot.logic.common.frames.BotWorkflowFrame import BotWorkflowFrame
-
-
+    from thrift.transport.TTransport import TBufferedTransport
+    from pyd2bot.thriftServer.pyd2botService.Pyd2botService import Client as Pyd2botServiceClient
+lock = threading.Lock()
 logger = Logger()
 
 
@@ -113,15 +113,15 @@ class AllOnSameMapMonitor(threading.Thread):
         self._runningMonitors.remove(self)
         
 
-
 class BotPartyFrame(Frame):
     ASK_INVITE_TIMOUT = 10
-    CONFIRME_JOIN_TIMEOUT = 10
+    CONFIRME_JOIN_TIMEOUT = 5
     name: str = None
     changingMap: bool = False
     leaderTransitionsQueue : list = []
     followingLeaderTransition = None
     wantsTransition = None
+    followersClients : dict[int, Tuple['TBufferedTransport', 'Pyd2botServiceClient']] = {}
     
     def __init__(self) -> None:
         super().__init__()
@@ -160,15 +160,11 @@ class BotPartyFrame(Frame):
     @property
     def allMembersOnSameMap(self):
         for follower in self.followers:
-            # logger.debug(f"[BotPartyFrame] Checking follower if {follower['name']} is on same map")
             if self.entitiesFrame is None:
-                # logger.debug("[BotPartyFrame] No RoleplayEntitiesFrame found")
                 return False
             entity = self.entitiesFrame.getEntityInfos(follower["id"])
             if not entity:
-                # logger.debug(f"[BotPartyFrame] Member {follower['name']} not found in the current map")
                 return False
-        # logger.debug("[BotPartyFrame] All members are on the same map")
         return True
 
     def pulled(self):
@@ -184,6 +180,8 @@ class BotPartyFrame(Frame):
         self.currentPartyId = None
         self._partyInviteTimers.clear()
         self.leaderTransitionsQueue.clear()
+        for transport, client in self.followersClients.values():
+            transport.close()
         logger.debug("[BotPartyFrame] BotPartyFrame pulled")
         return True
 
@@ -204,8 +202,7 @@ class BotPartyFrame(Frame):
             self.canFarmMonitor.start()
             logger.debug(f"[BotPartyFrame] Send party invite to all followers {self.followers}")
             for follower in self.followers:
-                if follower["name"] is None or follower["id"] is None:
-                    raise Exception("Follower name or id is None")
+                self.connectFollowerClient(follower)
                 logger.debug(f"[BotPartyFrame] Will Send party invite to {follower['name']}")
                 self.sendPartyInvite(follower["name"])
         return True
@@ -213,7 +210,7 @@ class BotPartyFrame(Frame):
     def getFollowerById(self, id: int) -> dict:
         for idx, follower in enumerate(self.followers):
             if follower["id"] == id:
-                return idx
+                return follower
         return None 
     
     def sendPrivateMessage(self, playerName, message):
@@ -283,9 +280,6 @@ class BotPartyFrame(Frame):
 
     def process(self, msg: Message):
         
-        if self.workflowFrame._inBankAutoUnload:
-            return False
-        
         if isinstance(msg, PartyNewGuestMessage):
             return True
 
@@ -332,8 +326,8 @@ class BotPartyFrame(Frame):
             self._partyMembers[msg.memberInformations.id] = msg.memberInformations
             if self.isLeader and msg.memberInformations.id != PlayedCharacterManager().id:
                 self.sendFollowMember(msg.memberInformations.id)
-                fidx = self.getFollowerById(msg.memberInformations.id)
-                self.notifyFollowerWithPos(fidx)
+                follower = self.getFollowerById(msg.memberInformations.id)
+                self.notifyFollowerWithPos(follower)
                 if msg.memberInformations.name in self._partyInviteTimers:
                     self._partyInviteTimers[msg.memberInformations.name].cancel()
                     del self._partyInviteTimers[msg.memberInformations.name]
@@ -393,7 +387,8 @@ class BotPartyFrame(Frame):
                     self.onMovementStopped(None)
             elif self.followingLeaderTransition != msg.transition:
                 logger.debug(f"[BotPartyFrame] Bot is already following {self.followingLeaderTransition}. Will queue this one!")
-                self.leaderTransitionsQueue.append(msg.transition)
+                with lock:
+                    self.leaderTransitionsQueue.append(msg.transition)
         
         elif isinstance(msg, LeaderPosMessage):
             self.leader["currentVertex"] = msg.vertex
@@ -414,11 +409,16 @@ class BotPartyFrame(Frame):
 
         elif isinstance(msg, MapComplementaryInformationsDataMessage):
             if not self.isLeader:
+                logger.debug(f"*********************** new map **************************")
                 self.followingLeaderTransition = None
-                if self.leaderTransitionsQueue:
-                    tr = self.leaderTransitionsQueue.pop(0)
-                    self.followingLeaderTransition = tr
-                    MoveAPI.followTransition(tr)
+                with lock:
+                    if self.leaderTransitionsQueue:
+                        logger.debug(f"[BotPartyFrame] LeaderTransitionQueue: {self.leaderTransitionsQueue}")
+                        tr = self.leaderTransitionsQueue.pop(0)
+                        self.followingLeaderTransition = tr
+                        MoveAPI.followTransition(tr)
+                    else:
+                        logger.debug(f"[BotPartyFrame] No queued leader transition to follow: {self.leaderTransitionsQueue}")
 
         elif isinstance(msg, PartyMemberInStandardFightMessage):
             if float(msg.memberId) == float(self.leader['id']):
@@ -437,49 +437,40 @@ class BotPartyFrame(Frame):
                 Timer(1, self.setFollowLeader).start()
                 return
             self.movementFrame.setFollowingActor(self.leader['id'])
-    
-    def sendMsgToFollower(self, msg: dict, followerIdx: int):
-        follower = self.followers[followerIdx]
-        port = follower["serverPort"]
-        logger.debug(f"[BotPartyFrame] Sending message {msg} to follower {port}")
+
+    def connectFollowerClient(self, follower: dict):
         from pyd2bot.PyD2Bot import PyD2Bot
-        transport, client = PyD2Bot().runClient('localhost', port)
-        recv = client.rcvLeaderMsg(json.dumps(msg))
-        logger.debug(f"[BotPartyFrame] Received message {recv} from follower {port}")
-        transport.close()
-        return recv
+        transport, client = PyD2Bot().runClient('localhost', follower["serverPort"])
+        self.followersClients[follower["id"]] = (transport, client)
+        return transport, client
     
-    def notifyFollowerWithPos(self, followerIdx):
+    def notifyFollowerWithPos(self, follower):
         cv = WorldPathFinder().currPlayerVertex
         if cv is None:
-            Timer(1, self.notifyFollowerWithPos, [followerIdx]).start()
+            Timer(1, self.notifyFollowerWithPos, [follower]).start()
             return
-        msg = {
-            "type": "pos",
-            "data": cv.to_json()
-        }
         try:
-            rcv = self.sendMsgToFollower(msg, followerIdx)
+            transport, client = self.followersClients[follower["id"]]
+            client.moveToVertex(json.dumps(cv.to_json()))
         except Exception as e:
-            logger.warning(f"[BotPartyFrame] Exception while sending pos to follower {followerIdx}")
+            logger.warning(f"[BotPartyFrame] Exception while sending pos to follower {follower['name']}")
             logger.warning(e)
             return False
-        followerPos = json.loads(rcv)
-        self.followers[followerIdx]["currentVertex"] = Vertex(**followerPos["vertex"])
-        self.followers[followerIdx]["currentCellId"] = followerPos["cellid"]
             
             
     def notifyFollowersWithTransition(self, tr: Transition):
-        for followerIdx, follower in enumerate(self.followers):
-            msg = {
-                "type": "transit",
-                "data": tr.to_json()
-            }
-            rcv = self.sendMsgToFollower(msg, followerIdx)
-            followerPos = json.loads(rcv)
-            self.followers[followerIdx]["currentVertex"] = Vertex(**followerPos["vertex"])
-            self.followers[followerIdx]["currentCellId"] = followerPos["cellid"]
+        for follower in self.followers:
+            self.notifyFollowerWithTransition(follower, tr)
     
+    def notifyFollowerWithTransition(self, follower: int, tr: Transition):
+        try:
+            transport, client = self.followersClients[follower["id"]]
+            client.followTransition(json.dumps(tr.to_json()))
+        except Exception as e:
+            logger.warning(f"[BotPartyFrame] Exception while asking follower {follower['name']} to follow {tr}")
+            logger.warning(e)
+            return False
+            
     def onMovementStopped(self, event):
         KernelEventsManager().remove_listener(KernelEventsManager.MOVEMENT_STOPPED, self.onMovementStopped)
         logger.debug(f"[BotPartyFrame] Movement stopped")

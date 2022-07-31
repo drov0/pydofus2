@@ -18,7 +18,8 @@ service Pyd2botService {
     oneway void runSession(1: string login, 2: string password, 3: int certId, 4: string certHash, 5:string sessionJson),
     list<Spell> fetchBreedSpells(1: int breedId),
     string fetchJobsInfosJson(),
-    string rcvLeaderMsg(1: string msg)
+    oneway void moveToVertex(1: string vertex)
+    oneway void followTransition(1: string transition)
     string getApiKey(1: string login, 2: string password, 3: int certId, 4: string certHash)
 }
        

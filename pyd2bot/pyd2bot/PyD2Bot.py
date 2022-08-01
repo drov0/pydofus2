@@ -10,9 +10,11 @@ from thrift.transport import TTransport
 from thrift.protocol import TBinaryProtocol
 from thrift.server import TServer
 logger = logging.getLogger(__name__)
+
 class PyD2Bot(metaclass=Singleton):
     _stop = threading.Event()
     _server = None
+    _runingClients = {}
     
     def runServer(self, host, port):
         self._stop.clear()
@@ -51,12 +53,13 @@ class PyD2Bot(metaclass=Singleton):
         for k in range(5):
             try:
                 transport.open()
-                break
+                return transport, client
             except Exception as x:
                 logger.exception(x)
                 time.sleep(5)
                 continue
-        return transport, client
+        raise Exception("Can't connect to server")
+        
         
     def stopServer(self):
         self._stop.set()

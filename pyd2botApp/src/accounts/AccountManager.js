@@ -206,7 +206,7 @@ class AccountManager {
             this.saveApiKeys()
         }
         else {
-            expiredate = Date.parse(apiKeyData.expiration_date)
+            var expiredate = Date.parse(apiKeyData.expiration_date)
             if (expiredate < Date.now()) {
                 console.log("API key expired, generating new one")
                 var apiKeyData = await instance.client.getApiKey()

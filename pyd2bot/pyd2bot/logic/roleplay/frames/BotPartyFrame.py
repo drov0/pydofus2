@@ -71,6 +71,8 @@ from pyd2bot.logic.managers.SessionManager import SessionManager
 from pyd2bot.logic.roleplay.frames.BotAutoTripFrame import BotAutoTripFrame
 from pyd2bot.logic.roleplay.messages.AutoTripEndedMessage import AutoTripEndedMessage
 from pyd2bot.misc.BotEventsmanager import BotEventsManager
+from thrift.transport.TTransport import TTransportException
+from pyd2bot.PyD2Bot import PyD2Bot
 
 if TYPE_CHECKING:
     from pydofus2.com.ankamagames.dofus.logic.game.roleplay.frames.RoleplayEntitiesFrame import RoleplayEntitiesFrame
@@ -194,7 +196,7 @@ class BotPartyFrame(Frame):
         if self.isLeader:
             self.canFarmMonitor.stopSig.set()
             self.canFarmMonitor.join()
-        self._partyMembers.clear()
+        self.partyMembers.clear()
         if self._partyInviteTimers:
             for timer in self._partyInviteTimers.values():
                 timer.cancel()
@@ -210,7 +212,7 @@ class BotPartyFrame(Frame):
         logger.debug("[BotPartyFrame] BotPartyFrame pushed")
         self._partyInviteTimers = dict[str, Timer]()
         self.currentPartyId = None
-        self._partyMembers = dict[int, PartyMemberInformations]()
+        self.partyMembers = dict[int, PartyMemberInformations]()
         self.joiningLeaderVertex : Vertex = None
         self._allMemberOnSameMap = False
         self._allMembersJoined = False
@@ -252,7 +254,7 @@ class BotPartyFrame(Frame):
                     break
 
     def sendPartyInvite(self, playerName):
-        for member in self._partyMembers.values():
+        for member in self.partyMembers.values():
             if member.name == playerName:
                 return
         if self._partyInviteTimers.get(playerName):
@@ -286,7 +288,7 @@ class BotPartyFrame(Frame):
             for fightId, fight in self.entitiesFrame._fights.items():
                 for team in fight.teams:
                     for member in team.teamInfos.teamMembers:
-                        if member.id in self._partyMembers:
+                        if member.id in self.partyMembers:
                             logger.debug(f"[BotPartyFrame] Team is in a fight")
                             self.joinFight(fightId)
                             return
@@ -308,17 +310,14 @@ class BotPartyFrame(Frame):
         elif isinstance(msg, MapChangeFailedMessage):
             if self.isLeader:
                 return False
-            if self.followingLeaderTransition:
-                self.leaderTransitionsQueue = [self.followingLeaderTransition] + self.leaderTransitionsQueue
-                self.followingLeaderTransition = None
             self.requestMapData()
             return True
 
         elif isinstance(msg, PartyMemberRemoveMessage):
             logger.debug(f"[BotPartyFrame] {msg.leavingPlayerId} left the party")
-            player = self._partyMembers.get(msg.leavingPlayerId)
+            player = self.partyMembers.get(msg.leavingPlayerId)
             if player:
-                del self._partyMembers[msg.leavingPlayerId]
+                del self.partyMembers[msg.leavingPlayerId]
             if self.isLeader:
                 follower = self.getFollowerById(msg.leavingPlayerId)
                 self.sendPartyInvite(follower["name"])
@@ -347,7 +346,7 @@ class BotPartyFrame(Frame):
         elif isinstance(msg, PartyNewMemberMessage):
             logger.info(f"[BotPartyFrame] {msg.memberInformations.name} joined your party")
             self.currentPartyId = msg.partyId
-            self._partyMembers[msg.memberInformations.id] = msg.memberInformations
+            self.partyMembers[msg.memberInformations.id] = msg.memberInformations
             if self.isLeader and msg.memberInformations.id != PlayedCharacterManager().id:
                 self.sendFollowMember(msg.memberInformations.id)
                 follower = self.getFollowerById(msg.memberInformations.id)
@@ -360,13 +359,13 @@ class BotPartyFrame(Frame):
             return True
     
         elif isinstance(msg, PartyJoinMessage):
-            self._partyMembers.clear()
+            self.partyMembers.clear()
             logger.debug(f"[BotPartyFrame] Party {msg.partyName} - {msg.partyId} of leader {msg.partyLeaderId}")
             for member in msg.members:
-                if member.id not in self._partyMembers:
-                    self._partyMembers[member.id] = member
+                if member.id not in self.partyMembers:
+                    self.partyMembers[member.id] = member
                 if member.id == PlayedCharacterManager().id:
-                    if not self.currentPartyId:
+                    if self.currentPartyId is None:
                         self.currentPartyId = msg.partyId
                         if not self.isLeader:
                             self.sendFollowMember(self.leader['id'])
@@ -375,14 +374,14 @@ class BotPartyFrame(Frame):
                         self.leaveParty()
                         return
             if not self.isLeader and self.joiningLeaderVertex is None:
-                logger.debug(f"[BotPartyFrame] {self.leaderName} is in map {self._partyMembers[self.leader['id']].mapId}")
+                logger.debug(f"[BotPartyFrame] {self.leaderName} is in map {self.partyMembers[self.leader['id']].mapId}")
             self.checkIfTeamInFight()
-            if not self.isLeader and self.leader['id'] not in self._partyMembers:
+            if not self.isLeader and self.leader['id'] not in self.partyMembers:
                 self.leaveParty()
             return True
 
         elif isinstance(msg, AutoTripEndedMessage):
-            if not self.isLeader and self.leader["id"] not in self._partyMembers:
+            if not self.isLeader and self.leader["id"] not in self.partyMembers:
                 logger.warning(f"[BotPartyFrame] Leader {self.leaderName} is not in the party anymore!")
                 return False
             if self.joiningLeaderVertex is not None:
@@ -418,14 +417,14 @@ class BotPartyFrame(Frame):
                 logger.debug(f"[BotPartyFrame] Player is already in leader vertex {msg.vertex}")
             
         elif isinstance(msg, CompassUpdatePartyMemberMessage):
-            self._partyMembers[msg.memberId].worldX = msg.coords.worldX
-            self._partyMembers[msg.memberId].worldY = msg.coords.worldY
+            self.partyMembers[msg.memberId].worldX = msg.coords.worldX
+            self.partyMembers[msg.memberId].worldY = msg.coords.worldY
             logger.debug(f"[BotPartyFrame] Member {msg.memberId} moved to map {(msg.coords.worldX, msg.coords.worldY)}")
             return True
 
         elif isinstance(msg, MapComplementaryInformationsDataMessage):
             if not self.isLeader:
-                logger.debug(f"*********************** new map **************************")
+                logger.debug(f"*********************************** New map {msg.mapId}**********************************************")
                 self.followingLeaderTransition = None
 
         elif isinstance(msg, PartyMemberInStandardFightMessage):
@@ -445,27 +444,17 @@ class BotPartyFrame(Frame):
                 Timer(1, self.setFollowLeader).start()
                 return
             self.movementFrame.setFollowingActor(self.leader['id'])
-
-    def connectFollowerClient(self, follower: dict):
-        from pyd2bot.PyD2Bot import PyD2Bot
-        transport, client = PyD2Bot().runClient('localhost', follower["serverPort"])
-        self.followersClients[follower["id"]] = (transport, client)
-        return transport, client
     
     def notifyFollowerWithPos(self, follower):
         cv = WorldPathFinder().currPlayerVertex
         if cv is None:
             Timer(1, self.notifyFollowerWithPos, [follower]).start()
             return
-        try:
-            transport, client = self.followersClients[follower["id"]]
-            if not transport.isOpen():
-                transport.open()
-            client.moveToVertex(json.dumps(cv.to_json()))
-        except Exception as e:
-            logger.warning(f"[BotPartyFrame] Exception while sending pos to follower {follower['name']}")
-            logger.exception(e, exc_info=True)
-            return False
+        transport, client = self.getFollowerClient(follower)
+        if client is None:
+            logger.warning(f"[BotPartyFrame] follower {follower['name']} thrift server is not connected.")
+            raise Exception(f"follower {follower['name']} thrift server is not connected.")
+        client.moveToVertex(json.dumps(cv.to_json()))
             
             
     def notifyFollowersWithTransition(self, tr: Transition):
@@ -473,32 +462,23 @@ class BotPartyFrame(Frame):
             self.notifyFollowerWithTransition(follower, tr)
     
     def notifyFollowerWithTransition(self, follower: dict, tr: Transition):
-        try:
-            transport, client = self.followersClients[follower["id"]]
-            if not transport.isOpen():
-                transport.open()
-            client.followTransition(json.dumps(tr.to_json()))
-        except Exception as e:
-            logger.warning(f"[BotPartyFrame] Exception while asking follower {follower['name']} to follow {tr}")
-            logger.exception(e, exc_info=True)
-            return False
-    
+        transport, client = self.getFollowerClient(follower)
+        if client is None:
+            logger.warning(f"[BotPartyFrame] follower {follower['name']} thrift server is not connected.")
+            raise Exception(f"follower {follower['name']} thrift server is not connected.") 
+        client.followTransition(json.dumps(tr.to_json()))
+        
     def notifyFollowesrWithPos(self):
         for follower in self.followers:
             self.notifyFollowerWithPos(follower)
             
     def fetchFollowerStatus(self, follower: dict):
-        try:
-            transport, client = self.followersClients[follower["id"]]
-            if not transport.isOpen():
-                transport.open()
-            status = client.getStatus()
-            return status
-        except Exception as e:
-            logger.warning(f"[BotPartyFrame] Exception while asking follower {follower['name']} status")
-            logger.exception(e, exc_info=True)
-            return "unknown"
-     
+        transport, client = self.getFollowerClient(follower)
+        if client is None:
+            logger.warning(f"[BotPartyFrame] follower {follower['name']} thrift server is not connected.")
+            return "disconnected"
+        return client.getStatus()
+
     def requestMapData(self):
         mirmsg = MapInformationsRequestMessage()
         mirmsg.init(mapId_=MapDisplayManager().currentMapPoint.mapId)
@@ -509,4 +489,22 @@ class BotPartyFrame(Frame):
         self.joiningLeaderVertex = vertex
         af = BotAutoTripFrame(vertex.mapId, vertex.zoneId)
         Kernel().getWorker().pushFrame(af)
-        return True 
+        return True
+    
+    def getFollowerClient(self, follower: dict):
+        try:
+            transport, client = self.followersClients[follower["id"]]
+        except KeyError as e:
+            return None, None
+        try:
+            if not transport.isOpen():
+                transport.open()
+        except TTransportException as e:
+            if e.type == TTransportException.ALREADY_OPEN:
+                pass
+        return transport, client
+    
+
+    def connectFollowerClient(self, follower: dict):
+        transport, client = PyD2Bot().runClient('localhost', follower["serverPort"])
+        self.followersClients[follower["id"]] = (transport, client)

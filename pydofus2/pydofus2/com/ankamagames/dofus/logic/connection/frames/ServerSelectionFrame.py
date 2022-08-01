@@ -115,7 +115,7 @@ class ServerSelectionFrame(Frame):
                 self._serversList.sort(key=lambda x: x.date)
             logger.info(f"Server {ssumsg.server.id} status changed to {ServerStatusEnum(ssumsg.server.status).name}.")
             logger.info(f"My server id {AuthentificationManager()._lva.serverId}.")
-            if ssumsg.server.id == AuthentificationManager()._lva.serverId:
+            if int(ssumsg.server.id) == int(AuthentificationManager()._lva.serverId):
                 if ServerStatusEnum(ssumsg.server.status) != ServerStatusEnum.ONLINE:
                     logger.debug(
                         f"Waiting for my server {ssumsg.server.id} to be online current status {ServerStatusEnum(ssumsg.server.status)}."
@@ -126,6 +126,9 @@ class ServerSelectionFrame(Frame):
                     ssmsg = ServerSelectionMessage()
                     ssmsg.init(AuthentificationManager()._lva.serverId)
                     krnl.Kernel().getWorker().processImmediately(ssmsg)
+                    logger.debug(f"Sending ServerSelectionMessage to server {AuthentificationManager()._lva.serverId}.")
+            else:
+                logger.debug(f"Not my server {int(ssumsg.server.id)} != {int(AuthentificationManager()._lva.serverId)}")
             self.broadcastServersListUpdate()
             return True
 

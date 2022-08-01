@@ -181,6 +181,8 @@ class RoleplayEntitiesFrame(AbstractEntitiesFrame, Frame):
         # self._aggressions = list[Aggression]()
 
         self._aggroTimeoutIdsMonsterAssoc = dict()
+        
+        self.mcidm_processessed : bool = False
 
         super().__init__()
 
@@ -201,6 +203,7 @@ class RoleplayEntitiesFrame(AbstractEntitiesFrame, Frame):
         self._merchantsList = list()
         self._monstersIds = list[float]()
         self._entitiesVisibleNumber = 0
+        self.mcidm_processessed = False
         if MapDisplayManager()._currentMapRendered:
             ccFrame = Kernel().getWorker().getFrame("ContextChangeFrame")
             connexion = ""
@@ -231,6 +234,7 @@ class RoleplayEntitiesFrame(AbstractEntitiesFrame, Frame):
                 connexion = ""
                 if ccFrame:
                     connexion = ccFrame.mapChangeConnexion
+                self.mcidm_processessed = False
                 mirmsg = MapInformationsRequestMessage()
                 mirmsg.init(mapId_=MapDisplayManager().currentMapPoint.mapId)
                 ConnectionsHandler.getConnection().send(mirmsg, connexion)
@@ -445,6 +449,7 @@ class RoleplayEntitiesFrame(AbstractEntitiesFrame, Frame):
             #         partyManagementFrame.playerShouldReceiveRewards = False
             #         partyManagementFrame.playerRewards = None
             logger.debug("MapComplementaryInformationsDataMessage processed")
+            self.mcidm_processessed = True
             return False
 
         if isinstance(msg, CharacterMovementStoppedMessage):

@@ -145,11 +145,16 @@ class BotWorkflowFrame(Frame):
         from pydofus2.com.ankamagames.dofus.logic.game.roleplay.frames.RoleplayInteractivesFrame import RoleplayInteractivesFrame
         from pydofus2.com.ankamagames.dofus.logic.game.roleplay.frames.RoleplayMovementFrame import RoleplayMovementFrame
         from pydofus2.com.ankamagames.atouin.managers.MapDisplayManager import MapDisplayManager
+        from pydofus2.com.ankamagames.dofus.logic.game.roleplay.frames.RoleplayEntitiesFrame import RoleplayEntitiesFrame
+
         bpframe : BotPartyFrame = Kernel().getWorker().getFrame("BotPartyFrame")
         mvframe : RoleplayMovementFrame = Kernel().getWorker().getFrame("RoleplayMovementFrame")
         iframe  : RoleplayInteractivesFrame = Kernel().getWorker().getFrame("RoleplayInteractivesFrame")
+        rpeframe : RoleplayEntitiesFrame = Kernel().getWorker().getFrame("RoleplayEntitiesFrame")
         if MapDisplayManager().currentDataMap is None:
             return "loadingMap"
+        elif rpeframe and not rpeframe.mcidm_processessed:
+            return "processingMapComplementaryData"
         elif PlayedCharacterManager().isInFight:
             return "fighting"
         elif bpframe and bpframe.followingLeaderTransition:

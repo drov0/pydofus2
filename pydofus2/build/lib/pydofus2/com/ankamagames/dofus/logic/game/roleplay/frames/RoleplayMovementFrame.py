@@ -38,6 +38,7 @@ from pydofus2.com.ankamagames.dofus.network.messages.game.context.fight.GameFigh
     GameFightJoinRequestMessage,
 )
 from pydofus2.com.ankamagames.dofus.network.messages.game.context.roleplay.ChangeMapMessage import ChangeMapMessage
+from pydofus2.com.ankamagames.dofus.network.messages.game.context.roleplay.MapComplementaryInformationsDataMessage import MapComplementaryInformationsDataMessage
 from pydofus2.com.ankamagames.dofus.network.messages.game.context.roleplay.delay.GameRolePlayDelayedActionFinishedMessage import (
     GameRolePlayDelayedActionFinishedMessage,
 )
@@ -51,9 +52,6 @@ from pydofus2.com.ankamagames.dofus.network.messages.game.context.roleplay.haven
     EditHavenBagFinishedMessage,
 )
 from pydofus2.com.ankamagames.dofus.network.messages.game.context.roleplay.MapChangeFailedMessage import MapChangeFailedMessage
-from pydofus2.com.ankamagames.dofus.network.messages.game.context.roleplay.MapComplementaryInformationsDataMessage import (
-    MapComplementaryInformationsDataMessage,
-)
 from pydofus2.com.ankamagames.dofus.network.messages.game.context.roleplay.TeleportOnSameMapMessage import (
     TeleportOnSameMapMessage,
 )

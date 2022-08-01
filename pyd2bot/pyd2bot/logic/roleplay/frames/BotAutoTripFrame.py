@@ -128,13 +128,13 @@ class BotAutoTripFrame(Frame):
             if isinstance(arg, list):
                 path = arg
                 break
-        if len(path) == 0:
-            Kernel().getWorker().removeFrame(self)
-            Kernel().getWorker().process(AutoTripEndedMessage(self.dstMapId))
-            return True
         if path is None:
             Kernel().getWorker().removeFrame(self)
             Kernel().getWorker().process(AutoTripEndedMessage(None))
+            return True
+        if len(path) == 0:
+            Kernel().getWorker().removeFrame(self)
+            Kernel().getWorker().process(AutoTripEndedMessage(self.dstMapId))
             return True
         logger.debug(f"\nPath found: ")
         for e in path:

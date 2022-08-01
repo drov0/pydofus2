@@ -396,7 +396,7 @@ class BotFightFrame(Frame):
             self._myTurn = False
             if self.partyFrame and self.partyFrame.isLeader:
                 # if bot is in fight and in a prrty and is the leader, check if all party members are in fight
-                for memberId in self.partyFrame._partyMembers:
+                for memberId in self.partyFrame.partyMembers:
                     if not self.entitiesFrame.getEntityInfos(memberId):
                         return True
             startFightMsg = GameFightReadyMessage()
@@ -472,7 +472,7 @@ class BotFightFrame(Frame):
 
     def getTargetableEntities(self, spellw: SpellWrapper, targetSum=False) -> list[_Target]:
         result = list[_Target]()
-        if not FightEntitiesFrame.getCurrentInstance():
+        if not FightEntitiesFrame.getCurrentInstance() or not self.battleFrame:
             return []
         if self.VERBOSE:
             logger.debug(f"Deads list : {self.battleFrame._deadTurnsList}")

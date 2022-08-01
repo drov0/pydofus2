@@ -126,7 +126,7 @@ class InstancesManager {
                         console.log("Instance " + instanceId + " server crashed");
                         console.log("running session : " + JSON.stringify(instance.runningSession))
                         const sessionsManager = require("../sessions/SessionsManager.js").instance;
-                        sessionsManager.runSessionLow(instance.runningSession)
+                        sessionsManager.runSessionLow(instance.runningSession, instance.port)
                     }
                     else {
                         console.log("Instance " + instanceId + " has no running session");

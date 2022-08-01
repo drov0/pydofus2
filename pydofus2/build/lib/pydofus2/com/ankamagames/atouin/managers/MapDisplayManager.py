@@ -22,6 +22,7 @@ class MapDisplayManager(metaclass=Singleton):
     _nMapLoadEnd: int
     _identifiedElementPosition: dict[int, MapPoint]
     _currentMapRendered = True
+    currentDataMap = None
 
     def __init__(self) -> None:
         from pydofus2.com.ankamagames.jerakine.resources.loaders.MapLoader import MapLoader
@@ -78,8 +79,7 @@ class MapDisplayManager(metaclass=Singleton):
 
     def loadMap(self, mapId: int, forceReloadWithoutCache: bool = False, decryptionKey=None) -> None:
         from pydofus2.com.ankamagames.dofus.kernel.Kernel import Kernel
-
-        del self.currentDataMap
+        self.currentDataMap = None
         self._forceReloadWithoutCache = forceReloadWithoutCache
         self._currentMapRendered = False
         self._nMapLoadStart = perf_counter()

@@ -70,5 +70,29 @@
     "accountId": "twistedFater",
     "primarySpellId": 13516,
     "primaryStatId": 10
+  },
+  "336140370130": {
+    "name": "Maniaco-lalcolic",
+    "id": 336140370130,
+    "level": 62,
+    "breedId": 10,
+    "breedName": "Sadida",
+    "serverId": 210,
+    "serverName": "Merkator",
+    "accountId": "slicer-the-dicer",
+    "primarySpellId": 13516,
+    "primaryStatId": 10
+  },
+  "335911059666": {
+    "name": "Skilled-champ",
+    "id": 335911059666,
+    "level": 26,
+    "breedId": 10,
+    "breedName": "Sadida",
+    "serverId": 210,
+    "serverName": "Merkator",
+    "accountId": "slicer-the-dicer",
+    "primarySpellId": 13516,
+    "primaryStatId": 10
   }
 }

@@ -115,7 +115,7 @@ class ServerSelectionFrame(Frame):
                 self._serversList.sort(key=lambda x: x.date)
             logger.info(f"Server {ssumsg.server.id} status changed to {ServerStatusEnum(ssumsg.server.status).name}.")
             logger.info(f"My server id {AuthentificationManager()._lva.serverId}.")
-            if float(ssumsg.server.id) == float(AuthentificationManager()._lva.serverId):
+            if ssumsg.server.id == AuthentificationManager()._lva.serverId:
                 if ServerStatusEnum(ssumsg.server.status) != ServerStatusEnum.ONLINE:
                     logger.debug(
                         f"Waiting for my server {ssumsg.server.id} to be online current status {ServerStatusEnum(ssumsg.server.status)}."

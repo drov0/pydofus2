@@ -36,7 +36,7 @@ class ServerConnection(IServerConnection):
 
     DEBUG_LOW_LEVEL_VERBOSE: bool = False
 
-    DEBUG_DATA: bool = True
+    DEBUG_DATA: bool = False
 
     LATENCY_AVG_BUFFER_SIZE: int = 50
 
@@ -401,6 +401,7 @@ class ServerConnection(IServerConnection):
                  messageLength = self.readMessageLength(staticHeader, src)
             except IndexError as e:
                 messageLength = None
+                
             if messageLength is not None:
                 if src.remaining() >= messageLength:
                     self.updateLatency()
@@ -443,7 +444,10 @@ class ServerConnection(IServerConnection):
             return None
 
         if self._staticHeader != -1:
-            self._splittedPacketLength = self.readMessageLength(self._staticHeader, src)
+            try:
+                self._splittedPacketLength = self.readMessageLength(self._staticHeader, src)
+            except IndexError as e:
+                return None
             self._staticHeader = -1
 
         if src.remaining() + len(self._inputBuffer) >= self._splittedPacketLength:

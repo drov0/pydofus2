@@ -9,7 +9,7 @@ class Pyd2botServer:
     def __init__(self):
         self.logger = None
     
-    def fetchAccountCharacters(self, login:str, password:str, certId:str, certHash:str) -> list[Character]:
+    def fetchAccountCharacters(self, login:str, password:str, certId:str, certHash:str, apiKey:str) -> list[Character]:
         from pydofus2.com.ankamagames.jerakine.logger.Logger import Logger
         Logger.prefix = login
         from pydofus2.com.ankamagames.haapi.Haapi import Haapi
@@ -21,6 +21,7 @@ class Pyd2botServer:
         logging.info("fetchAccountCharacters called")
         rate = 2.
         timeout = 10.
+        Haapi().APIKEY = apiKey
         loginToken = Haapi().getLoginToken(login, password, certId, certHash)
         result = list()
         dofus2 = DofusClient()
@@ -66,7 +67,7 @@ class Pyd2botServer:
         dofus2.shutdown()
         return result
         
-    def runSession(self, login:str, password:str, certId:str, certHash:str, sessionJson:str) -> None:
+    def runSession(self, login:str, password:str, certId:str, certHash:str, apiKey: str, sessionJson:str) -> None:
         from pydofus2.com.ankamagames.jerakine.logger.Logger import Logger
         print(f"runSession called with login {login}")
         session = json.loads(sessionJson)
@@ -92,8 +93,7 @@ class Pyd2botServer:
         dofus2.registerGameStartFrame(BotPartyFrame)
         self.logger.debug("registerGameStartFrame BotPartyFrame")
         self.logger.debug("Frames registered")
-        if session.get("APIKEY"):
-            Haapi().APIKEY = session["APIKEY"]
+        Haapi().APIKEY = apiKey
         loginToken = Haapi().getLoginToken(login, password, certId, certHash)
         if loginToken is None:
             raise Exception("Unable to generate login token.")

@@ -459,10 +459,12 @@ class BotPartyFrame(Frame):
             return
         try:
             transport, client = self.followersClients[follower["id"]]
+            if not transport.isOpen():
+                transport.open()
             client.moveToVertex(json.dumps(cv.to_json()))
         except Exception as e:
             logger.warning(f"[BotPartyFrame] Exception while sending pos to follower {follower['name']}")
-            logger.warning(e)
+            logger.exception(e, exc_info=True)
             return False
             
             
@@ -473,10 +475,12 @@ class BotPartyFrame(Frame):
     def notifyFollowerWithTransition(self, follower: dict, tr: Transition):
         try:
             transport, client = self.followersClients[follower["id"]]
+            if not transport.isOpen():
+                transport.open()
             client.followTransition(json.dumps(tr.to_json()))
         except Exception as e:
             logger.warning(f"[BotPartyFrame] Exception while asking follower {follower['name']} to follow {tr}")
-            logger.warning(e)
+            logger.exception(e, exc_info=True)
             return False
     
     def notifyFollowesrWithPos(self):
@@ -486,12 +490,13 @@ class BotPartyFrame(Frame):
     def fetchFollowerStatus(self, follower: dict):
         try:
             transport, client = self.followersClients[follower["id"]]
+            if not transport.isOpen():
+                transport.open()
             status = client.getStatus()
-            # logger.debug(f"[BotPartyFrame] Follower {follower['name']} status: {status}")
             return status
         except Exception as e:
             logger.warning(f"[BotPartyFrame] Exception while asking follower {follower['name']} status")
-            logger.warning(e)
+            logger.exception(e, exc_info=True)
             return "unknown"
      
     def requestMapData(self):

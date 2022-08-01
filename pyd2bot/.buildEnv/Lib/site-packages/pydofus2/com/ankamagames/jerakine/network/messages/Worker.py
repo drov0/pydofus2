@@ -288,7 +288,8 @@ class Worker(EventDispatcher, MessageHandler):
         if frame.pulled():
             if frame in self._framesList:
                 self._framesList.remove(frame)
-                del self._currentFrameTypesCache[str(frame)]
+                if str(frame) in self._currentFrameTypesCache:
+                    del self._currentFrameTypesCache[str(frame)]
                 if frame in self._framesBeingDeleted:
                     del self._framesBeingDeleted[frame]
                 if self.DEBUG_FRAMES:

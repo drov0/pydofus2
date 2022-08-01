@@ -24,8 +24,10 @@ class AccountManager {
     constructor() {
         this.accountsDbFile = path.join(ejse.data('persistenceDir'), 'accounts.json')
         this.charactersDbFile = path.join(ejse.data('persistenceDir'), 'characters.json')
+        this.apiKeysDbFile = path.join(ejse.data('persistenceDir'), 'apiKeys.json')
         this.accountsDB = require(this.accountsDbFile)
         this.charactersDB = require(this.charactersDbFile)
+        this.apiKeysDB = require(this.apiKeysDbFile)
         this.accountsPasswords = {}
         this.authHelper = new AuthHelper();
         this.currentEditedAccount = null
@@ -187,13 +189,40 @@ class AccountManager {
         }
     }
 
+    saveApiKeys() {
+        var saveJson = JSON.stringify(this.apiKeysDb, null, 2);
+        fs.writeFile(path.join(ejse.data('persistenceDir'), 'apiKeys.json'), saveJson, 'utf8', (err) => {
+            if (err) {
+                console.log(err)
+            }
+        })
+    }
+
+    async getAccountApiKey(key) {
+        var apiKeyData = this.apiKeysDB[key]
+        if (!apiKeyData) {
+            var apiKeyData = await instance.client.getApiKey()
+            this.apiKeysDB[key] = apiKeyData
+            this.saveApiKeys()
+        }
+        else {
+            expiredate = Date.parse(apiKeyData.expiration_date)
+            if (expiredate < Date.now()) {
+                console.log("API key expired, generating new one")
+                var apiKeyData = await instance.client.getApiKey()
+                this.apiKeysDB[key] = apiKeyData
+                this.saveApiKeys()
+            }
+        }
+        return apiKeyData.key
+    }
+
     async fetchCharacters(key) {
-        var server = await instancesManager.spawnServer(key)
-        console.log("fetchCharacters " + key)
-        var client = await instancesManager.spawnClient(key)
+        var instance = await instancesManager.spawn(key)
+        var apiKey = this.getAccountApiKey(key)
         var creds = this.getAccountCreds(key)
         console.log(creds)
-        var response = await client.fetchAccountCharacters(creds.login, creds.password, creds.certId, creds.certHash)
+        var response = await instance.client.fetchAccountCharacters(creds.login, creds.password, creds.certId, creds.certHash, apiKey)
         console.log("fetcheCharacters result: " + JSON.stringify(response))
         for (let ck in response) {
             var character = response[ck]
@@ -201,7 +230,7 @@ class AccountManager {
             if (!ejse.data('dofus2Data').breedSpells[character.breedId])
             {
                 var spells = {}
-                var breedSpellsResponse = await client.fetchBreedSpells(character.breedId)
+                var breedSpellsResponse = await instance.client.fetchBreedSpells(character.breedId)
                 Object.values(breedSpellsResponse).forEach(spell => {
                     spells[spell.id] = spell
                 })
@@ -209,8 +238,11 @@ class AccountManager {
                 this.saveBreedSpells()
             }  
             character.accountId = key
-            character.primarySpellId = defaultBreedConfig[character.breedId].primarySpellId
-            character.primaryStatId = defaultBreedConfig[character.breedId].primaryStat
+            var defaultConfig = defaultBreedConfig[character.breedId]
+            if (defaultConfig) {
+                character.primarySpellId = defaultBreedConfig[character.breedId].primarySpellId
+                character.primaryStatId = defaultBreedConfig[character.breedId].primaryStat
+            }
             this.charactersDB[character.id] = character
         }
         console.log("fetch characters ended")

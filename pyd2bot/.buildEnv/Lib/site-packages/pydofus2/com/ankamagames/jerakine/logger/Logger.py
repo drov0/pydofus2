@@ -12,9 +12,8 @@ class Logger(logging.Logger, metaclass=Singleton):
     LOGS_PATH = Path(os.getenv("APPDATA")) / "pydofus2" / "logs"
     def __init__(self, log_prefix=""):
         super().__init__("logger")
-        self.prefix = log_prefix
         self.setLevel(logging.DEBUG)
-        formatter = logging.Formatter("%(asctime)s | %(levelname)s | %(filename)s:%(lineno)s | %(message)s")
+        formatter = logging.Formatter("%(asctime)s | %(levelname)s | %(filename)s:%(lineno)s | %(message)s", datefmt='%H:%M:%S')
         now = datetime.datetime.now()
         if not os.path.isdir(self.LOGS_PATH):
             os.mkdir(self.LOGS_PATH)

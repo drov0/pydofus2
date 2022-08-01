@@ -1,6 +1,7 @@
 import logging
 import sys
 import threading
+import time
 from pyd2bot.thriftServer.pyd2botServer import Pyd2botServer
 import pyd2bot.thriftServer.pyd2botService.Pyd2botService as Pyd2botService
 from pydofus2.com.ankamagames.jerakine.metaclasses.Singleton import Singleton
@@ -47,7 +48,14 @@ class PyD2Bot(metaclass=Singleton):
         transport = TTransport.TBufferedTransport(transport)
         protocol = TBinaryProtocol.TBinaryProtocol(transport)
         client = Pyd2botService.Client(protocol)
-        transport.open()
+        for k in range(5):
+            try:
+                transport.open()
+                break
+            except Exception as x:
+                logger.exception(x)
+                time.sleep(5)
+                continue
         return transport, client
         
     def stopServer(self):

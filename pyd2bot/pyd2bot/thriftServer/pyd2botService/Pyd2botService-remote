@@ -25,8 +25,8 @@ if len(sys.argv) <= 1 or sys.argv[1] == '--help':
     print('')
     print('Functions:')
     print('  string getApiKey(string login, string password, int certId, string certHash)')
-    print('   fetchAccountCharacters(string login, string password, int certId, string certHash)')
-    print('  void runSession(string login, string password, int certId, string certHash, string sessionJson)')
+    print('   fetchAccountCharacters(string login, string password, int certId, string certHash, string apiKey)')
+    print('  void runSession(string login, string password, int certId, string certHash, string apiKey, string sessionJson)')
     print('   fetchBreedSpells(int breedId)')
     print('  string fetchJobsInfosJson()')
     print('  void moveToVertex(string vertex)')
@@ -118,16 +118,16 @@ if cmd == 'getApiKey':
     pp.pprint(client.getApiKey(args[0], args[1], eval(args[2]), args[3],))
 
 elif cmd == 'fetchAccountCharacters':
-    if len(args) != 4:
-        print('fetchAccountCharacters requires 4 args')
+    if len(args) != 5:
+        print('fetchAccountCharacters requires 5 args')
         sys.exit(1)
-    pp.pprint(client.fetchAccountCharacters(args[0], args[1], eval(args[2]), args[3],))
+    pp.pprint(client.fetchAccountCharacters(args[0], args[1], eval(args[2]), args[3], args[4],))
 
 elif cmd == 'runSession':
-    if len(args) != 5:
-        print('runSession requires 5 args')
+    if len(args) != 6:
+        print('runSession requires 6 args')
         sys.exit(1)
-    pp.pprint(client.runSession(args[0], args[1], eval(args[2]), args[3], args[4],))
+    pp.pprint(client.runSession(args[0], args[1], eval(args[2]), args[3], args[4], args[5],))
 
 elif cmd == 'fetchBreedSpells':
     if len(args) != 1:

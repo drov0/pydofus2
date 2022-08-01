@@ -60,7 +60,7 @@ class SessionsManager {
             "character": character,
             "leader": leader
         }
-        await this.runSessionLow(session)
+        await this.runSessionLow(session, character.serverPort)
         console.log("Done running session : " + instanceKey)
         leaderInstance.childs.push(character.id)
     }
@@ -106,7 +106,7 @@ class SessionsManager {
             }
         }
         console.log("will run session : " + JSON.stringify(session))
-        var leaderInstance = await this.runSessionLow(session)
+        var leaderInstance = await this.runSessionLow(session, leaderPort)
         console.log("Done running session : " + instanceKey);
         for (var i = 0; i < sessionData.followersIds.length; i++) {
             var follower = accountManager.charactersDB[sessionData.followersIds[i]]
@@ -123,14 +123,16 @@ class SessionsManager {
         instance.runningSession = session
         instance.serverClosed = false
         var creds = accountManager.getAccountCreds(session.character.accountId)
+        var apiKey = await accountManager.getAccountApiKey(session.character.accountId)
         instance.client.runSession(
             creds.login, 
             creds.password, 
             creds.certId, 
             creds.certHash, 
+            apiKey,
             JSON.stringify(session)
         );
-        console.debug("Run Session :" + (creds.login, creds.password, creds.certId, creds.certHash, JSON.stringify(session)))
+        console.debug("Run Session :" + (creds.login, creds.password, creds.certId, creds.certHash, apiKey, JSON.stringify(session)))
         return instance
     }
 

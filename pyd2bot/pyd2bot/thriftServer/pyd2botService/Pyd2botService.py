@@ -30,24 +30,26 @@ class Iface(object):
         """
         pass
 
-    def fetchAccountCharacters(self, login, password, certId, certHash):
+    def fetchAccountCharacters(self, login, password, certId, certHash, apiKey):
         """
         Parameters:
          - login
          - password
          - certId
          - certHash
+         - apiKey
 
         """
         pass
 
-    def runSession(self, login, password, certId, certHash, sessionJson):
+    def runSession(self, login, password, certId, certHash, apiKey, sessionJson):
         """
         Parameters:
          - login
          - password
          - certId
          - certHash
+         - apiKey
          - sessionJson
 
         """
@@ -129,25 +131,27 @@ class Client(Iface):
             return result.success
         raise TApplicationException(TApplicationException.MISSING_RESULT, "getApiKey failed: unknown result")
 
-    def fetchAccountCharacters(self, login, password, certId, certHash):
+    def fetchAccountCharacters(self, login, password, certId, certHash, apiKey):
         """
         Parameters:
          - login
          - password
          - certId
          - certHash
+         - apiKey
 
         """
-        self.send_fetchAccountCharacters(login, password, certId, certHash)
+        self.send_fetchAccountCharacters(login, password, certId, certHash, apiKey)
         return self.recv_fetchAccountCharacters()
 
-    def send_fetchAccountCharacters(self, login, password, certId, certHash):
+    def send_fetchAccountCharacters(self, login, password, certId, certHash, apiKey):
         self._oprot.writeMessageBegin('fetchAccountCharacters', TMessageType.CALL, self._seqid)
         args = fetchAccountCharacters_args()
         args.login = login
         args.password = password
         args.certId = certId
         args.certHash = certHash
+        args.apiKey = apiKey
         args.write(self._oprot)
         self._oprot.writeMessageEnd()
         self._oprot.trans.flush()
@@ -167,25 +171,27 @@ class Client(Iface):
             return result.success
         raise TApplicationException(TApplicationException.MISSING_RESULT, "fetchAccountCharacters failed: unknown result")
 
-    def runSession(self, login, password, certId, certHash, sessionJson):
+    def runSession(self, login, password, certId, certHash, apiKey, sessionJson):
         """
         Parameters:
          - login
          - password
          - certId
          - certHash
+         - apiKey
          - sessionJson
 
         """
-        self.send_runSession(login, password, certId, certHash, sessionJson)
+        self.send_runSession(login, password, certId, certHash, apiKey, sessionJson)
 
-    def send_runSession(self, login, password, certId, certHash, sessionJson):
+    def send_runSession(self, login, password, certId, certHash, apiKey, sessionJson):
         self._oprot.writeMessageBegin('runSession', TMessageType.ONEWAY, self._seqid)
         args = runSession_args()
         args.login = login
         args.password = password
         args.certId = certId
         args.certHash = certHash
+        args.apiKey = apiKey
         args.sessionJson = sessionJson
         args.write(self._oprot)
         self._oprot.writeMessageEnd()
@@ -371,7 +377,7 @@ class Processor(Iface, TProcessor):
         iprot.readMessageEnd()
         result = fetchAccountCharacters_result()
         try:
-            result.success = self._handler.fetchAccountCharacters(args.login, args.password, args.certId, args.certHash)
+            result.success = self._handler.fetchAccountCharacters(args.login, args.password, args.certId, args.certHash, args.apiKey)
             msg_type = TMessageType.REPLY
         except TTransport.TTransportException:
             raise
@@ -393,7 +399,7 @@ class Processor(Iface, TProcessor):
         args.read(iprot)
         iprot.readMessageEnd()
         try:
-            self._handler.runSession(args.login, args.password, args.certId, args.certHash, args.sessionJson)
+            self._handler.runSession(args.login, args.password, args.certId, args.certHash, args.apiKey, args.sessionJson)
         except TTransport.TTransportException:
             raise
         except Exception:
@@ -659,15 +665,17 @@ class fetchAccountCharacters_args(object):
      - password
      - certId
      - certHash
+     - apiKey
 
     """
 
 
-    def __init__(self, login=None, password=None, certId=None, certHash=None,):
+    def __init__(self, login=None, password=None, certId=None, certHash=None, apiKey=None,):
         self.login = login
         self.password = password
         self.certId = certId
         self.certHash = certHash
+        self.apiKey = apiKey
 
     def read(self, iprot):
         if iprot._fast_decode is not None and isinstance(iprot.trans, TTransport.CReadableTransport) and self.thrift_spec is not None:
@@ -698,6 +706,11 @@ class fetchAccountCharacters_args(object):
                     self.certHash = iprot.readString().decode('utf-8', errors='replace') if sys.version_info[0] == 2 else iprot.readString()
                 else:
                     iprot.skip(ftype)
+            elif fid == 5:
+                if ftype == TType.STRING:
+                    self.apiKey = iprot.readString().decode('utf-8', errors='replace') if sys.version_info[0] == 2 else iprot.readString()
+                else:
+                    iprot.skip(ftype)
             else:
                 iprot.skip(ftype)
             iprot.readFieldEnd()
@@ -724,6 +737,10 @@ class fetchAccountCharacters_args(object):
             oprot.writeFieldBegin('certHash', TType.STRING, 4)
             oprot.writeString(self.certHash.encode('utf-8') if sys.version_info[0] == 2 else self.certHash)
             oprot.writeFieldEnd()
+        if self.apiKey is not None:
+            oprot.writeFieldBegin('apiKey', TType.STRING, 5)
+            oprot.writeString(self.apiKey.encode('utf-8') if sys.version_info[0] == 2 else self.apiKey)
+            oprot.writeFieldEnd()
         oprot.writeFieldStop()
         oprot.writeStructEnd()
 
@@ -747,6 +764,7 @@ fetchAccountCharacters_args.thrift_spec = (
     (2, TType.STRING, 'password', 'UTF8', None, ),  # 2
     (3, TType.I32, 'certId', None, None, ),  # 3
     (4, TType.STRING, 'certHash', 'UTF8', None, ),  # 4
+    (5, TType.STRING, 'apiKey', 'UTF8', None, ),  # 5
 )
 
 
@@ -827,16 +845,18 @@ class runSession_args(object):
      - password
      - certId
      - certHash
+     - apiKey
      - sessionJson
 
     """
 
 
-    def __init__(self, login=None, password=None, certId=None, certHash=None, sessionJson=None,):
+    def __init__(self, login=None, password=None, certId=None, certHash=None, apiKey=None, sessionJson=None,):
         self.login = login
         self.password = password
         self.certId = certId
         self.certHash = certHash
+        self.apiKey = apiKey
         self.sessionJson = sessionJson
 
     def read(self, iprot):
@@ -870,6 +890,11 @@ class runSession_args(object):
                     iprot.skip(ftype)
             elif fid == 5:
                 if ftype == TType.STRING:
+                    self.apiKey = iprot.readString().decode('utf-8', errors='replace') if sys.version_info[0] == 2 else iprot.readString()
+                else:
+                    iprot.skip(ftype)
+            elif fid == 6:
+                if ftype == TType.STRING:
                     self.sessionJson = iprot.readString().decode('utf-8', errors='replace') if sys.version_info[0] == 2 else iprot.readString()
                 else:
                     iprot.skip(ftype)
@@ -899,8 +924,12 @@ class runSession_args(object):
             oprot.writeFieldBegin('certHash', TType.STRING, 4)
             oprot.writeString(self.certHash.encode('utf-8') if sys.version_info[0] == 2 else self.certHash)
             oprot.writeFieldEnd()
+        if self.apiKey is not None:
+            oprot.writeFieldBegin('apiKey', TType.STRING, 5)
+            oprot.writeString(self.apiKey.encode('utf-8') if sys.version_info[0] == 2 else self.apiKey)
+            oprot.writeFieldEnd()
         if self.sessionJson is not None:
-            oprot.writeFieldBegin('sessionJson', TType.STRING, 5)
+            oprot.writeFieldBegin('sessionJson', TType.STRING, 6)
             oprot.writeString(self.sessionJson.encode('utf-8') if sys.version_info[0] == 2 else self.sessionJson)
             oprot.writeFieldEnd()
         oprot.writeFieldStop()
@@ -926,7 +955,8 @@ runSession_args.thrift_spec = (
     (2, TType.STRING, 'password', 'UTF8', None, ),  # 2
     (3, TType.I32, 'certId', None, None, ),  # 3
     (4, TType.STRING, 'certHash', 'UTF8', None, ),  # 4
-    (5, TType.STRING, 'sessionJson', 'UTF8', None, ),  # 5
+    (5, TType.STRING, 'apiKey', 'UTF8', None, ),  # 5
+    (6, TType.STRING, 'sessionJson', 'UTF8', None, ),  # 6
 )
 
 

@@ -54,6 +54,8 @@ class WorldPathFinder(metaclass=Singleton):
 
     @property
     def currPlayerVertex(self) -> Vertex:
+        if PlayedCharacterManager().currentZoneRp is None:
+            return None
         vertex = self.worldGraph.getVertex(
             PlayedCharacterManager().currentMap.mapId, PlayedCharacterManager().currentZoneRp
         )

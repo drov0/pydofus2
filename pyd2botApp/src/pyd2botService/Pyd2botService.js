@@ -164,6 +164,7 @@ var Pyd2botService_fetchAccountCharacters_args = function(args) {
   this.password = null;
   this.certId = null;
   this.certHash = null;
+  this.apiKey = null;
   if (args) {
     if (args.login !== undefined && args.login !== null) {
       this.login = args.login;
@@ -176,6 +177,9 @@ var Pyd2botService_fetchAccountCharacters_args = function(args) {
     }
     if (args.certHash !== undefined && args.certHash !== null) {
       this.certHash = args.certHash;
+    }
+    if (args.apiKey !== undefined && args.apiKey !== null) {
+      this.apiKey = args.apiKey;
     }
   }
 };
@@ -218,6 +222,13 @@ Pyd2botService_fetchAccountCharacters_args.prototype.read = function(input) {
         input.skip(ftype);
       }
       break;
+      case 5:
+      if (ftype == Thrift.Type.STRING) {
+        this.apiKey = input.readString();
+      } else {
+        input.skip(ftype);
+      }
+      break;
       default:
         input.skip(ftype);
     }
@@ -247,6 +258,11 @@ Pyd2botService_fetchAccountCharacters_args.prototype.write = function(output) {
   if (this.certHash !== null && this.certHash !== undefined) {
     output.writeFieldBegin('certHash', Thrift.Type.STRING, 4);
     output.writeString(this.certHash);
+    output.writeFieldEnd();
+  }
+  if (this.apiKey !== null && this.apiKey !== undefined) {
+    output.writeFieldBegin('apiKey', Thrift.Type.STRING, 5);
+    output.writeString(this.apiKey);
     output.writeFieldEnd();
   }
   output.writeFieldStop();
@@ -325,6 +341,7 @@ var Pyd2botService_runSession_args = function(args) {
   this.password = null;
   this.certId = null;
   this.certHash = null;
+  this.apiKey = null;
   this.sessionJson = null;
   if (args) {
     if (args.login !== undefined && args.login !== null) {
@@ -338,6 +355,9 @@ var Pyd2botService_runSession_args = function(args) {
     }
     if (args.certHash !== undefined && args.certHash !== null) {
       this.certHash = args.certHash;
+    }
+    if (args.apiKey !== undefined && args.apiKey !== null) {
+      this.apiKey = args.apiKey;
     }
     if (args.sessionJson !== undefined && args.sessionJson !== null) {
       this.sessionJson = args.sessionJson;
@@ -385,6 +405,13 @@ Pyd2botService_runSession_args.prototype.read = function(input) {
       break;
       case 5:
       if (ftype == Thrift.Type.STRING) {
+        this.apiKey = input.readString();
+      } else {
+        input.skip(ftype);
+      }
+      break;
+      case 6:
+      if (ftype == Thrift.Type.STRING) {
         this.sessionJson = input.readString();
       } else {
         input.skip(ftype);
@@ -421,8 +448,13 @@ Pyd2botService_runSession_args.prototype.write = function(output) {
     output.writeString(this.certHash);
     output.writeFieldEnd();
   }
+  if (this.apiKey !== null && this.apiKey !== undefined) {
+    output.writeFieldBegin('apiKey', Thrift.Type.STRING, 5);
+    output.writeString(this.apiKey);
+    output.writeFieldEnd();
+  }
   if (this.sessionJson !== null && this.sessionJson !== undefined) {
-    output.writeFieldBegin('sessionJson', Thrift.Type.STRING, 5);
+    output.writeFieldBegin('sessionJson', Thrift.Type.STRING, 6);
     output.writeString(this.sessionJson);
     output.writeFieldEnd();
   }
@@ -944,7 +976,7 @@ Pyd2botServiceClient.prototype.recv_getApiKey = function(input,mtype,rseqid) {
   return callback('getApiKey failed: unknown result');
 };
 
-Pyd2botServiceClient.prototype.fetchAccountCharacters = function(login, password, certId, certHash, callback) {
+Pyd2botServiceClient.prototype.fetchAccountCharacters = function(login, password, certId, certHash, apiKey, callback) {
   this._seqid = this.new_seqid();
   if (callback === undefined) {
     var _defer = Q.defer();
@@ -955,21 +987,22 @@ Pyd2botServiceClient.prototype.fetchAccountCharacters = function(login, password
         _defer.resolve(result);
       }
     };
-    this.send_fetchAccountCharacters(login, password, certId, certHash);
+    this.send_fetchAccountCharacters(login, password, certId, certHash, apiKey);
     return _defer.promise;
   } else {
     this._reqs[this.seqid()] = callback;
-    this.send_fetchAccountCharacters(login, password, certId, certHash);
+    this.send_fetchAccountCharacters(login, password, certId, certHash, apiKey);
   }
 };
 
-Pyd2botServiceClient.prototype.send_fetchAccountCharacters = function(login, password, certId, certHash) {
+Pyd2botServiceClient.prototype.send_fetchAccountCharacters = function(login, password, certId, certHash, apiKey) {
   var output = new this.pClass(this.output);
   var params = {
     login: login,
     password: password,
     certId: certId,
-    certHash: certHash
+    certHash: certHash,
+    apiKey: apiKey
   };
   var args = new Pyd2botService_fetchAccountCharacters_args(params);
   try {
@@ -1006,7 +1039,7 @@ Pyd2botServiceClient.prototype.recv_fetchAccountCharacters = function(input,mtyp
   return callback('fetchAccountCharacters failed: unknown result');
 };
 
-Pyd2botServiceClient.prototype.runSession = function(login, password, certId, certHash, sessionJson, callback) {
+Pyd2botServiceClient.prototype.runSession = function(login, password, certId, certHash, apiKey, sessionJson, callback) {
   this._seqid = this.new_seqid();
   if (callback === undefined) {
     var _defer = Q.defer();
@@ -1017,21 +1050,22 @@ Pyd2botServiceClient.prototype.runSession = function(login, password, certId, ce
         _defer.resolve(result);
       }
     };
-    this.send_runSession(login, password, certId, certHash, sessionJson);
+    this.send_runSession(login, password, certId, certHash, apiKey, sessionJson);
     return _defer.promise;
   } else {
     this._reqs[this.seqid()] = callback;
-    this.send_runSession(login, password, certId, certHash, sessionJson);
+    this.send_runSession(login, password, certId, certHash, apiKey, sessionJson);
   }
 };
 
-Pyd2botServiceClient.prototype.send_runSession = function(login, password, certId, certHash, sessionJson) {
+Pyd2botServiceClient.prototype.send_runSession = function(login, password, certId, certHash, apiKey, sessionJson) {
   var output = new this.pClass(this.output);
   var params = {
     login: login,
     password: password,
     certId: certId,
     certHash: certHash,
+    apiKey: apiKey,
     sessionJson: sessionJson
   };
   var args = new Pyd2botService_runSession_args(params);
@@ -1370,12 +1404,13 @@ Pyd2botServiceProcessor.prototype.process_fetchAccountCharacters = function(seqi
   var args = new Pyd2botService_fetchAccountCharacters_args();
   args.read(input);
   input.readMessageEnd();
-  if (this._handler.fetchAccountCharacters.length === 4) {
+  if (this._handler.fetchAccountCharacters.length === 5) {
     Q.fcall(this._handler.fetchAccountCharacters.bind(this._handler),
       args.login,
       args.password,
       args.certId,
-      args.certHash
+      args.certHash,
+      args.apiKey
     ).then(function(result) {
       var result_obj = new Pyd2botService_fetchAccountCharacters_result({success: result});
       output.writeMessageBegin("fetchAccountCharacters", Thrift.MessageType.REPLY, seqid);
@@ -1391,7 +1426,7 @@ Pyd2botServiceProcessor.prototype.process_fetchAccountCharacters = function(seqi
       output.flush();
     });
   } else {
-    this._handler.fetchAccountCharacters(args.login, args.password, args.certId, args.certHash, function (err, result) {
+    this._handler.fetchAccountCharacters(args.login, args.password, args.certId, args.certHash, args.apiKey, function (err, result) {
       var result_obj;
       if ((err === null || typeof err === 'undefined')) {
         result_obj = new Pyd2botService_fetchAccountCharacters_result((err !== null || typeof err === 'undefined') ? err : {success: result});
@@ -1410,7 +1445,7 @@ Pyd2botServiceProcessor.prototype.process_runSession = function(seqid, input, ou
   var args = new Pyd2botService_runSession_args();
   args.read(input);
   input.readMessageEnd();
-  this._handler.runSession(args.login, args.password, args.certId, args.certHash, args.sessionJson);
+  this._handler.runSession(args.login, args.password, args.certId, args.certHash, args.apiKey, args.sessionJson);
 };
 Pyd2botServiceProcessor.prototype.process_fetchBreedSpells = function(seqid, input, output) {
   var args = new Pyd2botService_fetchBreedSpells_args();

@@ -74,7 +74,7 @@ class BotUnloadInSellerFrame(Frame):
     def entitiesFrame(self) -> "RoleplayEntitiesFrame":
         return Kernel().getWorker().getFrame("RoleplayEntitiesFrame")
     
-    def waitForSeller(self):
+    def waitForSellerToComme(self):
         while not self.stopWaitingForSeller.is_set():
             if self.entitiesFrame and self.entitiesFrame.getEntityInfos(self.sellerInfos["id"]):
                 logger.debug("Seller found in the bank map")
@@ -82,21 +82,31 @@ class BotUnloadInSellerFrame(Frame):
                 self.state = UnloadInSellerStatesEnum.IN_EXCHANGE_WITH_SELLER
                 return True        
             sleep(0.5)
-            
+    
+    def waitForSellerIdleStatus(self):
+        transport, client = self.connectToSellerServer()
+        currentMapId = PlayedCharacterManager().currentMap.mapId
+        while not self.stopWaitingForSeller.is_set():
+            sellerStatus = client.getStatus()
+            logger.debug("Seller status: %s", sellerStatus)
+            if sellerStatus == "idle":
+                client.comeToBankToCollectResources(json.dumps(self.bankInfos.to_json()), json.dumps(SessionManager().character))
+                if currentMapId != self.bankInfos.npcMapId:
+                    Kernel().getWorker().addFrame(BotAutoTripFrame(self.bankInfos.npcMapId))
+                    self.state = UnloadInSellerStatesEnum.WALKING_TO_BANK
+                else:
+                    threading.Thread(target=self.waitForSellerToComme).start()
+                    self.state = UnloadInSellerStatesEnum.WAITING_FOR_SELLER
+                return True
+            sleep(2)
+    
     def start(self):
         self.bankInfos = Localizer.getBankInfos()
         logger.debug("Bank infos: %s", self.bankInfos.__dict__)
         currentMapId = PlayedCharacterManager().currentMap.mapId
         self._startMapId = currentMapId
         self._startRpZone = PlayedCharacterManager().currentZoneRp
-        transport, client = self.connectToSellerServer()
-        client.comeToBankToCollectResources(json.dumps(self.bankInfos.to_json()), json.dumps(SessionManager().character))
-        if currentMapId != self.bankInfos.npcMapId:
-            Kernel().getWorker().addFrame(BotAutoTripFrame(self.bankInfos.npcMapId))
-            self.state = UnloadInSellerStatesEnum.WALKING_TO_BANK
-        else:
-            threading.Thread(target=self.waitForSeller).start()
-            self.state = UnloadInSellerStatesEnum.WAITING_FOR_SELLER
+        threading.Thread(target=self.waitForSellerIdleStatus).start()
 
     def process(self, msg: Message) -> bool:
 
@@ -106,7 +116,7 @@ class BotUnloadInSellerFrame(Frame):
                 Kernel().getWorker().removeFrame(self)
                 Kernel().getWorker().processImmediately(SellerCollectedGuestItemsMessage())
             elif self.state == UnloadInSellerStatesEnum.WALKING_TO_BANK:
-                threading.Thread(target=self.waitForSeller).start()
+                threading.Thread(target=self.waitForSellerToComme).start()
                 self.state = UnloadInSellerStatesEnum.WAITING_FOR_SELLER
             return True
 

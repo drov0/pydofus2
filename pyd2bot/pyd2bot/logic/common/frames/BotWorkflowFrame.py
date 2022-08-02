@@ -141,8 +141,8 @@ class BotWorkflowFrame(Frame):
                     Kernel().getWorker().addFrame(BotFarmPathFrame(True))
             return True
 
-    @property
-    def status(self) -> str:
+    @staticmethod
+    def status() -> str:
         from pydofus2.com.ankamagames.dofus.logic.game.roleplay.frames.RoleplayInteractivesFrame import RoleplayInteractivesFrame
         from pydofus2.com.ankamagames.dofus.logic.game.roleplay.frames.RoleplayMovementFrame import RoleplayMovementFrame
         from pydofus2.com.ankamagames.atouin.managers.MapDisplayManager import MapDisplayManager

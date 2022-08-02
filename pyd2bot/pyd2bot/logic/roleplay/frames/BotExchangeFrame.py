@@ -77,6 +77,8 @@ class BotExchangeFrame(Frame):
 
     def pulled(self) -> bool:
         logger.debug("BotExchangeFrame pulled")
+        if self.acceptExchangeTimer is not None:
+            self.acceptExchangeTimer.cancel()
         return True
 
     @property

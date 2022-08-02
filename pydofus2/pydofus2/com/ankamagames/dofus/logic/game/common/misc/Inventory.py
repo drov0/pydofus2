@@ -11,12 +11,12 @@ from pydofus2.com.ankamagames.dofus.network.enums.CharacterInventoryPositionEnum
 from pydofus2.com.ankamagames.dofus.network.types.game.data.items.ObjectItem import ObjectItem
 from pydofus2.com.ankamagames.jerakine.logger.Logger import Logger
 
-logger = Logger("Dofus2")
+logger = Logger()
 
 
 class Inventory:
 
-    _itemsDict: dict
+    _itemsDict: dict[int, 'ItemSet']
 
     _views: dict[str, IInventoryView]
 
@@ -48,16 +48,15 @@ class Inventory:
             del self._views[name]
 
     def getItem(self, uid: int) -> ItemWrapper:
-        if self._itemsDict[uid]:
+        if self._itemsDict.get(uid):
             return self._itemsDict[uid].item
         return None
 
     def getItemMaskCount(self, uid: int, mask: str) -> int:
         itemSet: ItemSet = self._itemsDict[uid]
         if not itemSet:
-            logger.warning("Suppression d'un item qui n'existe pas")
             return 0
-        if itemSet.masks.hasOwnProperty(mask):
+        if itemSet.masks.get(mask):
             return itemSet.masks[mask]
         return 0
 
@@ -80,6 +79,7 @@ class Inventory:
                 item.effects,
             )
             self._itemsDict[item.objectUID] = ItemSet(iw)
+            logger.debug(f"Added item {item.objectUID} to inventory")
             iteml.append(iw)
         self.initializeViews(iteml)
 
@@ -104,13 +104,15 @@ class Inventory:
         else:
             itemSet = ItemSet(item)
             self._itemsDict[item.objectUID] = itemSet
+            logger.debug(f"Added item {item.objectUID} to inventory")
             self.addItemToViews(itemSet)
 
     def removeItem(self, itemUID: int, quantity: int = -1) -> None:
         oldItem: ItemWrapper = None
         itemSet: ItemSet = self._itemsDict.get(itemUID)
-        if not itemSet:
-            logger.warning("Suppression d'un item qui n'existe pas")
+        if itemSet is None:
+            logger.warning(f"Item {itemUID} not found in inventory. Can't delete it")
+            logger.debug(f"itemUID: {itemUID}, inventory: {list(self._itemsDict.keys())}")
             return
         if quantity == -1 or quantity == itemSet.item.quantity:
             del self._itemsDict[itemUID]

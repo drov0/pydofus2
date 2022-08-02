@@ -115,7 +115,7 @@ class MembersMonitor(threading.Thread):
                 elif self.bpframe.allMembersIdle:
                     if self.bpframe.allMembersOnSameMap:
                         BotEventsManager().dispatch(BotEventsManager.MEMBERS_READY)
-                    elif self.bpframe.farmFrame and self.bpframe.farmFrame.isInsideFarmPath and self.wfframe and self.wfframe.status == "idle":
+                    elif self.bpframe.farmFrame and self.bpframe.farmFrame.isInsideFarmPath and self.wfframe and self.wfframe.status() == "idle":
                         self.bpframe.notifyFollowesrWithPos()
             sleep(1)
         logger.debug("[MembersMonitor] died")

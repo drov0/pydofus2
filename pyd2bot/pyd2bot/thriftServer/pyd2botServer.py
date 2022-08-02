@@ -154,10 +154,7 @@ class Pyd2botServer:
         print("LeaderTransitionMessage processed")
         
     def getStatus(self) -> str:
-        wfframe : BotWorkflowFrame = Kernel().getWorker().getFrame("BotWorkflowFrame")
-        if wfframe:
-            return wfframe.status
-        return "connecting"
+        return BotWorkflowFrame.status()
 
     def comeToBankToCollectResources(self, bankInfos: str, guestInfos: str):
         bankInfos = json.loads(bankInfos)

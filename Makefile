@@ -18,7 +18,7 @@ setup:
 	echo "$(PYD2BOT_DIR)" >> .venv/pyd2bot.pth
 	pip install -r requirements.txt
 
-update: gen-protocol gen-msgClasses gen-msgShuffle extract-keys unpack-maps bdist
+update: decompile gen-protocol gen-msgClasses gen-msgShuffle extract-keys unpack-maps bdist
 
 decompile:
 	@$(FFDEC) -config parallelSpeedUp=true -selectclass $(SELECTCLASS) -export script $(DOFUS_SRC) $(DOFUSINVOKER)

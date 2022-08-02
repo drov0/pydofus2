@@ -4575,26 +4575,6 @@
             "parent": null, 
             "protocolId": 1591
         }, 
-        "1602": {
-            "boolfields": [], 
-            "fields": [
-                {
-                    "dynamicType": false, 
-                    "length": null, 
-                    "lengthTypeId": null, 
-                    "name": "speedMultiplier", 
-                    "optional": false, 
-                    "type": "Int", 
-                    "typeId": 1, 
-                    "typename": "int"
-                }
-            ], 
-            "hash_function": false, 
-            "name": "GameMapSpeedMovementMessage", 
-            "package": "pydofus2.com.ankamagames.dofus.network.messages.game.context.GameMapSpeedMovementMessage", 
-            "parent": null, 
-            "protocolId": 1602
-        }, 
         "1605": {
             "boolfields": [], 
             "fields": [
@@ -9018,46 +8998,6 @@
             "package": "pydofus2.com.ankamagames.dofus.network.messages.game.context.roleplay.party.PartyFollowThisMemberRequestMessage", 
             "parent": "PartyFollowMemberRequestMessage", 
             "protocolId": 3084
-        }, 
-        "3091": {
-            "boolfields": [], 
-            "fields": [
-                {
-                    "dynamicType": false, 
-                    "length": null, 
-                    "lengthTypeId": null, 
-                    "name": "mapRate", 
-                    "optional": false, 
-                    "type": "VarShort", 
-                    "typeId": 14, 
-                    "typename": "int"
-                }, 
-                {
-                    "dynamicType": false, 
-                    "length": null, 
-                    "lengthTypeId": null, 
-                    "name": "subAreaRate", 
-                    "optional": false, 
-                    "type": "VarShort", 
-                    "typeId": 14, 
-                    "typename": "int"
-                }, 
-                {
-                    "dynamicType": false, 
-                    "length": null, 
-                    "lengthTypeId": null, 
-                    "name": "totalRate", 
-                    "optional": false, 
-                    "type": "VarShort", 
-                    "typeId": 14, 
-                    "typename": "int"
-                }
-            ], 
-            "hash_function": false, 
-            "name": "MapRewardRateMessage", 
-            "package": "pydofus2.com.ankamagames.dofus.network.messages.game.context.roleplay.MapRewardRateMessage", 
-            "parent": null, 
-            "protocolId": 3091
         }, 
         "3100": {
             "boolfields": [], 
@@ -29072,23 +29012,23 @@
         }
     }, 
     "primitives": [
-        "UnsignedShort", 
-        "VarInt", 
-        "VarUhInt", 
-        "VarLong", 
-        "Boolean", 
-        "UTF", 
+        "VarShort", 
         "VarUhShort", 
-        "UnsignedInt", 
+        "UTF", 
+        "VarUhLong", 
+        "VarLong", 
         "Int", 
         "ByteArray", 
-        "VarUhLong", 
-        "Byte", 
-        "UnsignedByte", 
-        "Float", 
         "Short", 
-        "VarShort", 
-        "Double"
+        "UnsignedInt", 
+        "Float", 
+        "Byte", 
+        "VarInt", 
+        "Boolean", 
+        "UnsignedByte", 
+        "Double", 
+        "UnsignedShort", 
+        "VarUhInt"
     ], 
     "type": {
         "AbstractCharacterInformation": {
@@ -47323,26 +47263,6 @@
             "parent": null, 
             "protocolId": 9811
         }, 
-        "GameMapSpeedMovementMessage": {
-            "boolfields": [], 
-            "fields": [
-                {
-                    "dynamicType": false, 
-                    "length": null, 
-                    "lengthTypeId": null, 
-                    "name": "speedMultiplier", 
-                    "optional": false, 
-                    "type": "Int", 
-                    "typeId": 1, 
-                    "typename": "int"
-                }
-            ], 
-            "hash_function": false, 
-            "name": "GameMapSpeedMovementMessage", 
-            "package": "pydofus2.com.ankamagames.dofus.network.messages.game.context.GameMapSpeedMovementMessage", 
-            "parent": null, 
-            "protocolId": 1602
-        }, 
         "GameRefreshMonsterBoostsMessage": {
             "boolfields": [], 
             "fields": [
@@ -58516,46 +58436,6 @@
             "package": "pydofus2.com.ankamagames.dofus.network.messages.game.context.roleplay.MapObstacleUpdateMessage", 
             "parent": null, 
             "protocolId": 8327
-        }, 
-        "MapRewardRateMessage": {
-            "boolfields": [], 
-            "fields": [
-                {
-                    "dynamicType": false, 
-                    "length": null, 
-                    "lengthTypeId": null, 
-                    "name": "mapRate", 
-                    "optional": false, 
-                    "type": "VarShort", 
-                    "typeId": 14, 
-                    "typename": "int"
-                }, 
-                {
-                    "dynamicType": false, 
-                    "length": null, 
-                    "lengthTypeId": null, 
-                    "name": "subAreaRate", 
-                    "optional": false, 
-                    "type": "VarShort", 
-                    "typeId": 14, 
-                    "typename": "int"
-                }, 
-                {
-                    "dynamicType": false, 
-                    "length": null, 
-                    "lengthTypeId": null, 
-                    "name": "totalRate", 
-                    "optional": false, 
-                    "type": "VarShort", 
-                    "typeId": 14, 
-                    "typename": "int"
-                }
-            ], 
-            "hash_function": false, 
-            "name": "MapRewardRateMessage", 
-            "package": "pydofus2.com.ankamagames.dofus.network.messages.game.context.roleplay.MapRewardRateMessage", 
-            "parent": null, 
-            "protocolId": 3091
         }, 
         "MapRunningFightDetailsExtendedMessage": {
             "boolfields": [], 

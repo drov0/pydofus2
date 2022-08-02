@@ -1,4 +1,7 @@
+from re import S
 from pyd2bot.logic.roleplay.frames.BotPartyFrame import BotPartyFrame
+from pyd2bot.logic.roleplay.frames.BotUnloadInSellerFrame import BotUnloadInSellerFrame
+from pyd2bot.logic.roleplay.messages.SellerCollectedGuestItemsMessage import SellerCollectedGuestItemsMessage
 from pydofus2.com.ankamagames.dofus.logic.game.common.managers.PlayedCharacterManager import PlayedCharacterManager
 from pydofus2.com.ankamagames.dofus.network.enums.GameContextEnum import GameContextEnum
 from pydofus2.com.ankamagames.dofus.network.enums.PlayerLifeStatusEnum import PlayerLifeStatusEnum
@@ -33,9 +36,9 @@ class BotWorkflowFrame(Frame):
         super().__init__()
 
     def pushed(self) -> bool:
-        self._inBankAutoUnload = False
+        self._inAutoUnload = False
         self._inPhenixAutoRevive = False
-        self._delayedAutoBankUnlaod = False
+        self._delayedAutoUnlaod = False
         return True
 
     def pulled(self) -> bool:
@@ -46,26 +49,28 @@ class BotWorkflowFrame(Frame):
     def priority(self) -> int:
         return Priority.VERY_LOW
 
-    def triggerBankUnload(self):
-        if SessionManager().isLeader:
-            if Kernel().getWorker().getFrame("BotFarmPathFrame"):
-                Kernel().getWorker().removeFrameByName("BotFarmPathFrame")
-        if Kernel().getWorker().getFrame("BotPartyFrame"):
+    def triggerUnload(self):
+        if SessionManager().path and Kernel().getWorker().getFrame("BotFarmPathFrame"):
+            Kernel().getWorker().removeFrameByName("BotFarmPathFrame")
+        if SessionManager().party and Kernel().getWorker().getFrame("BotPartyFrame"):
             Kernel().getWorker().removeFrameByName("BotPartyFrame")
-        self._inBankAutoUnload = True
+        self._inAutoUnload = True
         logger.warn(f"Inventory is almost full {InventoryAPI.getWeightPercent()}, will trigger auto bank unload...")
-        Kernel().getWorker().addFrame(BotUnloadInBankFrame())
+        if SessionManager().unloadType == "bank":
+            Kernel().getWorker().addFrame(BotUnloadInBankFrame(True))
+        elif SessionManager().unloadType == "seller":
+            Kernel().getWorker().addFrame(BotUnloadInSellerFrame(SessionManager().seller, True))
 
     def process(self, msg: Message) -> bool:
 
         if isinstance(msg, GameContextCreateMessage):
             logger.debug("*************************************** GameContext Changed ************************************************")
             self.currentContext = msg.context
-            if self._delayedAutoBankUnlaod:
-                self._delayedAutoBankUnlaod = False
-                self.triggerBankUnload()
+            if self._delayedAutoUnlaod:
+                self._delayedAutoUnlaod = False
+                self.triggerUnload()
                 return True
-            if not self._inBankAutoUnload and not self._inPhenixAutoRevive:
+            if not self._inAutoUnload and not self._inPhenixAutoRevive:
                 if self.currentContext == GameContextEnum.ROLE_PLAY:
                     if SessionManager().path:
                         Kernel().getWorker().addFrame(BotFarmPathFrame())
@@ -75,9 +80,9 @@ class BotWorkflowFrame(Frame):
 
         elif isinstance(msg, GameContextDestroyMessage):
             logger.debug("*************************************** GameContext Destroyed ************************************************")
-            if self._delayedAutoBankUnlaod:
-                self._delayedAutoBankUnlaod = False
-                self.triggerBankUnload()
+            if self._delayedAutoUnlaod:
+                self._delayedAutoUnlaod = False
+                self.triggerUnload()
                 return False
             if self.currentContext == GameContextEnum.FIGHT:
                 if Kernel().getWorker().getFrame("BotFightFrame"):
@@ -89,28 +94,24 @@ class BotWorkflowFrame(Frame):
             return True
 
         elif isinstance(msg, InventoryWeightMessage):
-            if not self._inBankAutoUnload:
+            if not self._inAutoUnload:
                 WeightPercent = round((msg.inventoryWeight / msg.weightMax) * 100, 2)
                 if WeightPercent > 95:
                     if self.currentContext is None:
-                        self._delayedAutoBankUnlaod = True
+                        self._delayedAutoUnlaod = True
                         logger.debug("Inventory full but context is not created yet so will delay bank unload..")
                         return False
-                    self.triggerBankUnload()
+                    self.triggerUnload()
                 return True
             else:
                 return False
 
-        elif isinstance(msg, BankUnloadEndedMessage):
-            self._inBankAutoUnload = False
-            if SessionManager().path:
-                if not Kernel().getWorker().contains("BotFarmPathFrame"):
-                    Kernel().getWorker().addFrame(BotFarmPathFrame(True))
-            if SessionManager().type == "fight":
-                if not Kernel().getWorker().contains("BotPartyFrame"):
-                    Kernel().getWorker().addFrame(BotPartyFrame())
-            if Kernel().getWorker().contains("BotUnloadInBankFrame"):
-                Kernel().getWorker().removeFrameByName("BotUnloadInBankFrame")
+        elif isinstance(msg, (BankUnloadEndedMessage, SellerCollectedGuestItemsMessage)):
+            self._inAutoUnload = False
+            if SessionManager().path and not Kernel().getWorker().contains("BotFarmPathFrame"):
+                Kernel().getWorker().addFrame(BotFarmPathFrame(True))
+            if SessionManager().party and not Kernel().getWorker().contains("BotPartyFrame"):
+                Kernel().getWorker().addFrame(BotPartyFrame())
 
         elif (
             isinstance(msg, GameRolePlayPlayerLifeStatusMessage)
@@ -162,7 +163,11 @@ class BotWorkflowFrame(Frame):
         elif bpframe and bpframe.joiningLeaderVertex:
             return "joiningLeaderVertex"
         elif Kernel().getWorker().getFrame("BotUnloadInBankFrame"):
-            return "inBankAutoUnload"
+            f : "BotUnloadInBankFrame" = Kernel().getWorker().getFrame("BotUnloadInBankFrame")
+            return "inBankAutoUnload" + ":" + f.state.name
+        elif Kernel().getWorker().getFrame("BotUnloadInSellerFrame"):
+            f : "BotUnloadInSellerFrame" = Kernel().getWorker().getFrame("BotUnloadInSellerFrame")
+            return "inSellerAutoUnload" + ":" + f.state.name
         elif Kernel().getWorker().getFrame("BotPhenixAutoRevive"):
             return "inPhenixAutoRevive"
         elif Kernel().getWorker().getFrame("BotAutoTripFrame"):

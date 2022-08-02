@@ -88,21 +88,23 @@ class Pyd2botServer:
         return result
         
     def runSession(self, login:str, password:str, certId:str, certHash:str, apiKey: str, sessionJson:str) -> None:
-        print(f"runSession called with login {login}")
+        self.logger.debug(f"runSession called with login {login}")
         self.logger.debug("session: " + sessionJson)
         SessionManager().load(sessionJson)
         self.logger.debug("Session loaded")
         dofus2 = DofusClient()
-        self.logger.debug("importing frames")
-        dofus2.registerInitFrame(BotWorkflowFrame)
-        dofus2.registerGameStartFrame(BotCharacterUpdatesFrame)
-        dofus2.registerGameStartFrame(BotPartyFrame)
+        if SessionManager().type == "fight":
+            dofus2.registerInitFrame(BotWorkflowFrame)
+            dofus2.registerGameStartFrame(BotCharacterUpdatesFrame)
+            dofus2.registerGameStartFrame(BotPartyFrame)
+        elif SessionManager().type == "selling":
+            pass
         self.logger.debug("Frames registered")
         Haapi().APIKEY = apiKey
         loginToken = Haapi().getLoginToken(login, password, certId, certHash)
         if loginToken is None:
             raise Exception("Unable to generate login token.")
-        self.logger.debug(f"Generated LoginToken: {loginToken}")
+        self.logger.debug(f"Generated LoginToken : {loginToken}")
         dofus2.login(loginToken, SessionManager().character["serverId"], SessionManager().character["id"])
         try:
             dofus2.join()

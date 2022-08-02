@@ -16,6 +16,14 @@ class BankInfos:
         self.npcMapId = npcMapId
         self.openBankReplyId = openBankReplyId
 
+    def to_json(self):
+        return {
+            "npcActionId": self.npcActionId,
+            "npcId": self.npcId,
+            "npcMapId": self.npcMapId,
+            "openBankReplyId": self.openBankReplyId
+        }
+
 
 class Localizer:
     _phenixesByAreaId = dict[int, list]()

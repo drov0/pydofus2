@@ -26,12 +26,15 @@ class SessionManager(metaclass=Singleton):
         sessionJson = json.loads(sessionstr)
         self.type = sessionJson.get("type")
         self.character = sessionJson.get("character")
+        self.unloadType = sessionJson.get("unloadType")
+        self.seller = sessionJson.get("seller")
         if self.type == "farm":
             self.path = sessionJson.get("path")
             self.jobIds = sessionJson.get("jobIds")
             self.resourceIds = sessionJson.get("resourceIds")
         elif self.type == "fight":
             self.followers : list[str] = sessionJson.get("followers")
+            self.party = True
             if self.followers is not None:
                 self.isLeader = True
                 self.path = sessionJson.get("path")

@@ -13,10 +13,10 @@ from pyd2bot.logic.roleplay.frames.BotAutoTripFrame import BotAutoTripFrame
 from pyd2bot.logic.roleplay.messages.AutoTripEndedMessage import AutoTripEndedMessage
 from pyd2bot.logic.roleplay.messages.BankUnloadEndedMessage import BankUnloadEndedMessage
 from pyd2bot.misc.Localizer import Localizer
-
+from enum import Enum
 logger = Logger()
 
-class BankUnloadStates:
+class BankUnloadStates(Enum):
     WAITING_FOR_MAP = -1
     IDLE = 0
     WALKING_TO_BANK = 1
@@ -27,7 +27,7 @@ class BankUnloadStates:
 class BotUnloadInBankFrame(Frame):
     PHENIX_MAPID = None
 
-    def __init__(self, return_to_start=False):
+    def __init__(self, return_to_start=True):
         super().__init__()
         self.return_to_start = return_to_start
 

@@ -12,6 +12,7 @@ with open(os.path.join(currdir, "testData", "apiKeys.json"), "r") as fp:
 plusbellelavieSession = {
     "key": "Plusbellelavie(336986964178)",
     "type": "fight",
+    "unloadType": "seller",
     "character": {
         "name": "Plusbellelavie",
         "id": 336986964178,
@@ -34,6 +35,19 @@ plusbellelavieSession = {
         "monsterLvlCoefDiff": 3
     },
     "monsterLvlCoefDiff": "3",
+    "seller": {
+        "name": "Maniaco-lalcolic",
+        "id": 336140370130,
+        "level": 62,
+        "breedId": 10,
+        "breedName": "Sadida",
+        "serverId": 210,
+        "serverName": "Merkator",
+        "accountId": "slicer-the-dicer",
+        "primarySpellId": 13516,
+        "primaryStatId": 10,
+        "serverPort": 10095,
+    },
     "followers": [
         {
             "name": "Moneydicer",
@@ -66,6 +80,7 @@ plusbellelavieSession = {
 moneydicerSession = {
     "key": "Moneydicer(336815325394)",
     "type": "fight",
+    "unloadType": "seller",
     "character": {
         "name": "Moneydicer",
         "id": 336815325394,
@@ -92,10 +107,24 @@ moneydicerSession = {
         "primaryStatId": 10,
         "serverPort": 10098,
     },
+    "seller": {
+        "name": "Maniaco-lalcolic",
+        "id": 336140370130,
+        "level": 62,
+        "breedId": 10,
+        "breedName": "Sadida",
+        "serverId": 210,
+        "serverName": "Merkator",
+        "accountId": "slicer-the-dicer",
+        "primarySpellId": 13516,
+        "primaryStatId": 10,
+        "serverPort": 10095
+    },
 }
 moneylifeSession = {
     "key": "Moneylife(336919920850)",
     "type": "fight",
+    "unloadType": "seller",
     "character": {
         "name": "Moneylife",
         "id": 336919920850,
@@ -122,14 +151,43 @@ moneylifeSession = {
         "primaryStatId": 10,
         "serverPort": 10098,
     },
+    "seller": {
+        "name": "Maniaco-lalcolic",
+        "id": 336140370130,
+        "level": 62,
+        "breedId": 10,
+        "breedName": "Sadida",
+        "serverId": 210,
+        "serverName": "Merkator",
+        "accountId": "slicer-the-dicer",
+        "primarySpellId": 13516,
+        "primaryStatId": 10,
+        "serverPort": 10095
+    },
 }
-
-sessions = [plusbellelavieSession, moneydicerSession, moneylifeSession]
+sellerSession = {
+    "key": "Maniaco-lalcolic(336140370130)",
+    "type": "selling",
+    "unloadType": None,
+    "character": {
+        "name": "Maniaco-lalcolic",
+        "id": 336140370130,
+        "level": 62,
+        "breedId": 10,
+        "breedName": "Sadida",
+        "serverId": 210,
+        "serverName": "Merkator",
+        "accountId": "slicer-the-dicer",
+        "primarySpellId": 13516,
+        "primaryStatId": 10,
+        "serverPort": 10095
+    },
+}
+sessions = [plusbellelavieSession, moneydicerSession, moneylifeSession, sellerSession]
 
 for session in sessions:
     accountId = session["character"]["accountId"]
     creds = accounts[accountId]
     transport, client = PyD2Bot().runClient('localhost', session["character"]["serverPort"])
-    session["APIKEY"] = _apiKeys[accountId]["key"]
-    client.runSession(creds["login"], creds["password"], creds["certId"], creds["certHash"], json.dumps(session))
+    client.runSession(creds["login"], creds["password"], creds["certId"], creds["certHash"], _apiKeys[accountId]["key"], json.dumps(session))
     

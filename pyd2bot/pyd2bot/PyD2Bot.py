@@ -20,7 +20,7 @@ class PyD2Bot(metaclass=Singleton):
     def runServer(self, id:str, host: str, port: int):
         self.id = id
         self._stop.clear()
-        handler = Pyd2botServer()
+        handler = Pyd2botServer(id)
         processor = Pyd2botService.Processor(handler)
         transport = TSocket.TServerSocket(host=host, port=port)
         tfactory = TTransport.TBufferedTransportFactory()

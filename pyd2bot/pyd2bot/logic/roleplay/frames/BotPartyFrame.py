@@ -72,7 +72,6 @@ from pyd2bot.logic.roleplay.frames.BotAutoTripFrame import BotAutoTripFrame
 from pyd2bot.logic.roleplay.messages.AutoTripEndedMessage import AutoTripEndedMessage
 from pyd2bot.misc.BotEventsmanager import BotEventsManager
 from thrift.transport.TTransport import TTransportException
-from pyd2bot.PyD2Bot import PyD2Bot
 
 if TYPE_CHECKING:
     from pydofus2.com.ankamagames.dofus.logic.game.roleplay.frames.RoleplayEntitiesFrame import RoleplayEntitiesFrame
@@ -120,7 +119,8 @@ class MembersMonitor(threading.Thread):
                         self.bpframe.notifyFollowesrWithPos()
             sleep(1)
         logger.debug("[MembersMonitor] died")
-        self._runningMonitors.remove(self)
+        if self in self._runningMonitors:
+            self._runningMonitors.remove(self)
 
 class BotPartyFrame(Frame):
     ASK_INVITE_TIMOUT = 10
@@ -499,6 +499,7 @@ class BotPartyFrame(Frame):
                 self.connectFollowerClient(follower)
                 transport, client = self.getFollowerClient(follower)
                 return client.getStatus()
+            
     def requestMapData(self):
         mirmsg = MapInformationsRequestMessage()
         mirmsg.init(mapId_=MapDisplayManager().currentMapPoint.mapId)
@@ -526,5 +527,7 @@ class BotPartyFrame(Frame):
     
 
     def connectFollowerClient(self, follower: dict):
+        from pyd2bot.PyD2Bot import PyD2Bot
+
         transport, client = PyD2Bot().runClient('localhost', follower["serverPort"])
         self.followersClients[follower["id"]] = (transport, client)

@@ -1,5 +1,11 @@
-from pyd2bot.logic.roleplay.frames.BotBankInteractionFrame import BotBankInteractionFrame
-from pyd2bot.logic.roleplay.messages.BankInteractionEndedMessage import BankInteractionEndedMessage
+from enum import Enum
+import json
+import threading
+from time import sleep
+from pyd2bot.logic.managers.SessionManager import SessionManager
+from pyd2bot.logic.roleplay.frames.BotExchangeFrame import BotExchangeFrame
+from pyd2bot.logic.roleplay.messages.ExchangeConcludedMessage import ExchangeConcludedMessage
+from pyd2bot.logic.roleplay.messages.SellerCollectedGuestItemsMessage import SellerCollectedGuestItemsMessage
 from pydofus2.com.ankamagames.dofus.logic.game.common.managers.PlayedCharacterManager import PlayedCharacterManager
 from pydofus2.com.ankamagames.dofus.network.messages.game.context.roleplay.MapComplementaryInformationsDataMessage import (
     MapComplementaryInformationsDataMessage,
@@ -11,84 +17,110 @@ from pydofus2.com.ankamagames.jerakine.messages.Message import Message
 from pydofus2.com.ankamagames.jerakine.types.enums.Priority import Priority
 from pyd2bot.logic.roleplay.frames.BotAutoTripFrame import BotAutoTripFrame
 from pyd2bot.logic.roleplay.messages.AutoTripEndedMessage import AutoTripEndedMessage
-from pyd2bot.logic.roleplay.messages.BankUnloadEndedMessage import BankUnloadEndedMessage
 from pyd2bot.misc.Localizer import Localizer
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from pydofus2.com.ankamagames.dofus.logic.game.roleplay.frames.RoleplayEntitiesFrame import RoleplayEntitiesFrame
 
 logger = Logger()
 
-class BankUnloadStates:
+class UnloadInSellerStatesEnum(Enum):
     WAITING_FOR_MAP = -1
     IDLE = 0
     WALKING_TO_BANK = 1
     ISIDE_BANK = 2
-    INTERACTING_WITH_BANK_MAN = 3
     RETURNING_TO_START_POINT = 4
+    WAITING_FOR_SELLER = 5
+    IN_EXCHANGE_WITH_SELLER = 6
 
-class BotUnloadInBankFrame(Frame):
+
+class BotUnloadInSellerFrame(Frame):
     PHENIX_MAPID = None
 
-    def __init__(self, return_to_start=True):
+    def __init__(self, sellerInfos: dict, return_to_start=True):
         super().__init__()
+        self.sellerInfos = sellerInfos
         self.return_to_start = return_to_start
+        self.stopWaitingForSeller = threading.Event()
 
     def pushed(self) -> bool:
-        logger.debug("BotUnloadInBankFrame pushed")
-        self.state = BankUnloadStates.IDLE
+        logger.debug("BotUnloadInSellerFrame pushed")
+        self.state = UnloadInSellerStatesEnum.IDLE
         if PlayedCharacterManager().currentMap is not None:
             self.start()
         else:
-            self.state = BankUnloadStates.WAITING_FOR_MAP
+            self.state = UnloadInSellerStatesEnum.WAITING_FOR_MAP
         return True
 
     def pulled(self) -> bool:
-        logger.debug("BotUnloadInBankFrame pulled")
+        logger.debug("BotUnloadInSellerFrame pulled")
+        transport, client = self.sellerInfos["client"]
+        transport.close()
+        self.stopWaitingForSeller.set()
         return True
 
     @property
     def priority(self) -> int:
         return Priority.VERY_LOW
 
+    def connectToSellerServer(self):
+        from pyd2bot.PyD2Bot import PyD2Bot
+
+        transport, client = PyD2Bot().runClient('localhost', self.sellerInfos["serverPort"])
+        self.sellerInfos["client"] = (transport, client)
+        return transport, client
+    
+    @property
+    def entitiesFrame(self) -> "RoleplayEntitiesFrame":
+        return Kernel().getWorker().getFrame("RoleplayEntitiesFrame")
+    
+    def waitForSeller(self):
+        while not self.stopWaitingForSeller.is_set():
+            if self.entitiesFrame and self.entitiesFrame.getEntityInfos(self.sellerInfos["id"]):
+                logger.debug("Seller found in the bank map")
+                Kernel().getWorker().addFrame(BotExchangeFrame("give", target=self.sellerInfos))
+                self.state = UnloadInSellerStatesEnum.IN_EXCHANGE_WITH_SELLER
+                return True        
+            sleep(0.5)
+            
     def start(self):
-        self.infos = Localizer.getBankInfos()
-        logger.debug("Bank infos: %s", self.infos.__dict__)
+        self.bankInfos = Localizer.getBankInfos()
+        logger.debug("Bank infos: %s", self.bankInfos.__dict__)
         currentMapId = PlayedCharacterManager().currentMap.mapId
         self._startMapId = currentMapId
         self._startRpZone = PlayedCharacterManager().currentZoneRp
-        self._startedInBankMap = False
-        if currentMapId != self.infos.npcMapId:
-            Kernel().getWorker().addFrame(BotAutoTripFrame(self.infos.npcMapId))
-            self.state = BankUnloadStates.WALKING_TO_BANK
+        transport, client = self.connectToSellerServer()
+        client.comeToBankToCollectResources(json.dumps(self.bankInfos.to_json()), json.dumps(SessionManager().character))
+        if currentMapId != self.bankInfos.npcMapId:
+            Kernel().getWorker().addFrame(BotAutoTripFrame(self.bankInfos.npcMapId))
+            self.state = UnloadInSellerStatesEnum.WALKING_TO_BANK
         else:
-            self._startedInBankMap = True
-            Kernel().getWorker().addFrame(BotBankInteractionFrame(self.infos))
-            self.state = BankUnloadStates.INTERACTING_WITH_BANK_MAN
+            threading.Thread(target=self.waitForSeller).start()
+            self.state = UnloadInSellerStatesEnum.WAITING_FOR_SELLER
 
     def process(self, msg: Message) -> bool:
 
         if isinstance(msg, AutoTripEndedMessage):
             logger.debug("AutoTripEndedMessage received")
-            if self.state == BankUnloadStates.RETURNING_TO_START_POINT:
-                self.state = BankUnloadStates.IDLE
+            if self.state == UnloadInSellerStatesEnum.RETURNING_TO_START_POINT:
                 Kernel().getWorker().removeFrame(self)
-                Kernel().getWorker().processImmediately(BankUnloadEndedMessage())
-            elif self.state == BankUnloadStates.WALKING_TO_BANK:
-                self.state = BankUnloadStates.ISIDE_BANK
-                Kernel().getWorker().addFrame(BotBankInteractionFrame(self.infos))
-                self.state = BankUnloadStates.INTERACTING_WITH_BANK_MAN
+                Kernel().getWorker().processImmediately(SellerCollectedGuestItemsMessage())
+            elif self.state == UnloadInSellerStatesEnum.WALKING_TO_BANK:
+                threading.Thread(target=self.waitForSeller).start()
+                self.state = UnloadInSellerStatesEnum.WAITING_FOR_SELLER
             return True
 
         elif isinstance(msg, MapComplementaryInformationsDataMessage):
-            if self.state == BankUnloadStates.WAITING_FOR_MAP:
-                self.state = BankUnloadStates.IDLE
+            if self.state == UnloadInSellerStatesEnum.WAITING_FOR_MAP:
+                self.state = UnloadInSellerStatesEnum.IDLE
                 self.start()
 
-        elif isinstance(msg, BankInteractionEndedMessage):
+        elif isinstance(msg, ExchangeConcludedMessage):
             if not self.return_to_start:
-                self.state = BankUnloadStates.IDLE
                 Kernel().getWorker().removeFrame(self)
-                Kernel().getWorker().processImmediately(BankUnloadEndedMessage())
+                Kernel().getWorker().processImmediately(SellerCollectedGuestItemsMessage())
             else:
-                self.state = BankUnloadStates.RETURNING_TO_START_POINT
+                self.state = UnloadInSellerStatesEnum.RETURNING_TO_START_POINT
                 Kernel().getWorker().addFrame(BotAutoTripFrame(self._startMapId, self._startRpZone))
                 
     

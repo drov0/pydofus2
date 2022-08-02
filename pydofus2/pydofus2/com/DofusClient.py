@@ -13,6 +13,7 @@ import pydofus2.com.ankamagames.dofus.logic.connection.managers.Authentification
 import pydofus2.com.ankamagames.dofus.kernel.net.ConnectionsHandler as connh
 from pydofus2.com.ankamagames.dofus.logic.game.common.managers.PlayedCharacterManager import PlayedCharacterManager
 from pydofus2.com.ankamagames.dofus.types.entities.AnimatedCharacter import AnimatedCharacter
+from pydofus2.com.ankamagames.haapi.Haapi import Haapi
 from pydofus2.com.ankamagames.jerakine.data.I18nFileAccessor import I18nFileAccessor
 from pydofus2.com.ankamagames.jerakine.logger.Logger import Logger
 from typing import TYPE_CHECKING
@@ -42,6 +43,7 @@ class DofusClient(metaclass=Singleton):
         logger.info("DofusClient initialized")
 
     def relogin(self):
+        self._loginToken = Haapi().regenLoginToken()
         self.login(self._loginToken, self._serverId, self._characterId)
 
     def login(self, loginToken, serverId=0, characterId=None):

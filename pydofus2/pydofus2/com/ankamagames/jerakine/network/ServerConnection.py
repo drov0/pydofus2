@@ -193,7 +193,14 @@ class ServerConnection(IServerConnection):
                     self._outputBuffer = []
                 self._outputBuffer.append(msg)
             return
-        self.lowSend(msg)
+        try:
+            self.lowSend(msg)
+        except ConnectionResetError as e:            
+            import pydofus2.com.ankamagames.dofus.kernel.net.ConnectionsHandler as connh
+            logger.debug(str(e))
+            if '[WinError 10054]' in str(e):
+                connh.ConnectionsHandler.connectionGonnaBeClosed(DisconnectionReasonEnum.CONNECTION_LOST, str(e))
+                connh.ConnectionsHandler.getConnection().close()
 
     def __str__(self) -> str:
         status = "Server connection status:\n"
@@ -305,7 +312,7 @@ class ServerConnection(IServerConnection):
                                 f"[{self._id}] Processed one parsed message from buffer, will low receive the remaining {input.remaining()} bytes"
                             )
                         msg = self.lowReceive(input)
-        except Exception as e:
+        except Exception as e:                
             import pydofus2.com.ankamagames.dofus.kernel.net.ConnectionsHandler as connh
             logger.error(f"[{self._id}] Error while reading socket. \n", exc_info=True)
             import sys
@@ -575,7 +582,7 @@ class ServerConnection(IServerConnection):
     def onSocketError(self, e: IOErrorEvent) -> None:
         if self._lagometer:
             self._lagometer.stop()
-        logger.error(f"[{self._id}] Failure while opening socket.")
+        logger.debug(f"[{self._id}] Failure while opening socket.")
         self._connecting = False
         self._handler.process(ServerConnectionFailedMessage(self, e.text))
 
@@ -584,9 +591,9 @@ class ServerConnection(IServerConnection):
             self._lagometer.stop()
         self._connecting = False
         if self._firstConnectionTry:
-            logger.error(f"[{self._id}] Failure while opening socket, timeout, but WWJD ? Give a second chance !")
+            logger.debug(f"[{self._id}] Failure while opening socket, timeout, but WWJD ? Give a second chance !")
             self.connect(self._remoteSrvHost, self._remoteSrvPort)
             self._firstConnectionTry = False
         else:
-            logger.error(f"[{self._id}] Failure while opening socket, timeout.")
+            logger.debug(f"[{self._id}] Failure while opening socket, timeout.")
             self._handler.process(ServerConnectionFailedMessage(self, "timeout"))

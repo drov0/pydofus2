@@ -85,6 +85,18 @@ class Iface(object):
     def getStatus(self):
         pass
 
+    def comeToBankToCollectResources(self, bankInfos, guestInfos):
+        """
+        Parameters:
+         - bankInfos
+         - guestInfos
+
+        """
+        pass
+
+    def getCurrentVertex(self):
+        pass
+
 
 class Client(Iface):
     def __init__(self, iprot, oprot=None):
@@ -313,6 +325,50 @@ class Client(Iface):
             return result.success
         raise TApplicationException(TApplicationException.MISSING_RESULT, "getStatus failed: unknown result")
 
+    def comeToBankToCollectResources(self, bankInfos, guestInfos):
+        """
+        Parameters:
+         - bankInfos
+         - guestInfos
+
+        """
+        self.send_comeToBankToCollectResources(bankInfos, guestInfos)
+
+    def send_comeToBankToCollectResources(self, bankInfos, guestInfos):
+        self._oprot.writeMessageBegin('comeToBankToCollectResources', TMessageType.ONEWAY, self._seqid)
+        args = comeToBankToCollectResources_args()
+        args.bankInfos = bankInfos
+        args.guestInfos = guestInfos
+        args.write(self._oprot)
+        self._oprot.writeMessageEnd()
+        self._oprot.trans.flush()
+
+    def getCurrentVertex(self):
+        self.send_getCurrentVertex()
+        return self.recv_getCurrentVertex()
+
+    def send_getCurrentVertex(self):
+        self._oprot.writeMessageBegin('getCurrentVertex', TMessageType.CALL, self._seqid)
+        args = getCurrentVertex_args()
+        args.write(self._oprot)
+        self._oprot.writeMessageEnd()
+        self._oprot.trans.flush()
+
+    def recv_getCurrentVertex(self):
+        iprot = self._iprot
+        (fname, mtype, rseqid) = iprot.readMessageBegin()
+        if mtype == TMessageType.EXCEPTION:
+            x = TApplicationException()
+            x.read(iprot)
+            iprot.readMessageEnd()
+            raise x
+        result = getCurrentVertex_result()
+        result.read(iprot)
+        iprot.readMessageEnd()
+        if result.success is not None:
+            return result.success
+        raise TApplicationException(TApplicationException.MISSING_RESULT, "getCurrentVertex failed: unknown result")
+
 
 class Processor(Iface, TProcessor):
     def __init__(self, handler):
@@ -326,6 +382,8 @@ class Processor(Iface, TProcessor):
         self._processMap["moveToVertex"] = Processor.process_moveToVertex
         self._processMap["followTransition"] = Processor.process_followTransition
         self._processMap["getStatus"] = Processor.process_getStatus
+        self._processMap["comeToBankToCollectResources"] = Processor.process_comeToBankToCollectResources
+        self._processMap["getCurrentVertex"] = Processor.process_getCurrentVertex
         self._on_message_begin = None
 
     def on_message_begin(self, func):
@@ -492,6 +550,40 @@ class Processor(Iface, TProcessor):
             msg_type = TMessageType.EXCEPTION
             result = TApplicationException(TApplicationException.INTERNAL_ERROR, 'Internal error')
         oprot.writeMessageBegin("getStatus", msg_type, seqid)
+        result.write(oprot)
+        oprot.writeMessageEnd()
+        oprot.trans.flush()
+
+    def process_comeToBankToCollectResources(self, seqid, iprot, oprot):
+        args = comeToBankToCollectResources_args()
+        args.read(iprot)
+        iprot.readMessageEnd()
+        try:
+            self._handler.comeToBankToCollectResources(args.bankInfos, args.guestInfos)
+        except TTransport.TTransportException:
+            raise
+        except Exception:
+            logging.exception('Exception in oneway handler')
+
+    def process_getCurrentVertex(self, seqid, iprot, oprot):
+        args = getCurrentVertex_args()
+        args.read(iprot)
+        iprot.readMessageEnd()
+        result = getCurrentVertex_result()
+        try:
+            result.success = self._handler.getCurrentVertex()
+            msg_type = TMessageType.REPLY
+        except TTransport.TTransportException:
+            raise
+        except TApplicationException as ex:
+            logging.exception('TApplication exception in handler')
+            msg_type = TMessageType.EXCEPTION
+            result = ex
+        except Exception:
+            logging.exception('Unexpected exception in handler')
+            msg_type = TMessageType.EXCEPTION
+            result = TApplicationException(TApplicationException.INTERNAL_ERROR, 'Internal error')
+        oprot.writeMessageBegin("getCurrentVertex", msg_type, seqid)
         result.write(oprot)
         oprot.writeMessageEnd()
         oprot.trans.flush()
@@ -1420,6 +1512,185 @@ class getStatus_result(object):
         return not (self == other)
 all_structs.append(getStatus_result)
 getStatus_result.thrift_spec = (
+    (0, TType.STRING, 'success', 'UTF8', None, ),  # 0
+)
+
+
+class comeToBankToCollectResources_args(object):
+    """
+    Attributes:
+     - bankInfos
+     - guestInfos
+
+    """
+
+
+    def __init__(self, bankInfos=None, guestInfos=None,):
+        self.bankInfos = bankInfos
+        self.guestInfos = guestInfos
+
+    def read(self, iprot):
+        if iprot._fast_decode is not None and isinstance(iprot.trans, TTransport.CReadableTransport) and self.thrift_spec is not None:
+            iprot._fast_decode(self, iprot, [self.__class__, self.thrift_spec])
+            return
+        iprot.readStructBegin()
+        while True:
+            (fname, ftype, fid) = iprot.readFieldBegin()
+            if ftype == TType.STOP:
+                break
+            if fid == 1:
+                if ftype == TType.STRING:
+                    self.bankInfos = iprot.readString().decode('utf-8', errors='replace') if sys.version_info[0] == 2 else iprot.readString()
+                else:
+                    iprot.skip(ftype)
+            elif fid == 3:
+                if ftype == TType.STRING:
+                    self.guestInfos = iprot.readString().decode('utf-8', errors='replace') if sys.version_info[0] == 2 else iprot.readString()
+                else:
+                    iprot.skip(ftype)
+            else:
+                iprot.skip(ftype)
+            iprot.readFieldEnd()
+        iprot.readStructEnd()
+
+    def write(self, oprot):
+        if oprot._fast_encode is not None and self.thrift_spec is not None:
+            oprot.trans.write(oprot._fast_encode(self, [self.__class__, self.thrift_spec]))
+            return
+        oprot.writeStructBegin('comeToBankToCollectResources_args')
+        if self.bankInfos is not None:
+            oprot.writeFieldBegin('bankInfos', TType.STRING, 1)
+            oprot.writeString(self.bankInfos.encode('utf-8') if sys.version_info[0] == 2 else self.bankInfos)
+            oprot.writeFieldEnd()
+        if self.guestInfos is not None:
+            oprot.writeFieldBegin('guestInfos', TType.STRING, 3)
+            oprot.writeString(self.guestInfos.encode('utf-8') if sys.version_info[0] == 2 else self.guestInfos)
+            oprot.writeFieldEnd()
+        oprot.writeFieldStop()
+        oprot.writeStructEnd()
+
+    def validate(self):
+        return
+
+    def __repr__(self):
+        L = ['%s=%r' % (key, value)
+             for key, value in self.__dict__.items()]
+        return '%s(%s)' % (self.__class__.__name__, ', '.join(L))
+
+    def __eq__(self, other):
+        return isinstance(other, self.__class__) and self.__dict__ == other.__dict__
+
+    def __ne__(self, other):
+        return not (self == other)
+all_structs.append(comeToBankToCollectResources_args)
+comeToBankToCollectResources_args.thrift_spec = (
+    None,  # 0
+    (1, TType.STRING, 'bankInfos', 'UTF8', None, ),  # 1
+    None,  # 2
+    (3, TType.STRING, 'guestInfos', 'UTF8', None, ),  # 3
+)
+
+
+class getCurrentVertex_args(object):
+
+
+    def read(self, iprot):
+        if iprot._fast_decode is not None and isinstance(iprot.trans, TTransport.CReadableTransport) and self.thrift_spec is not None:
+            iprot._fast_decode(self, iprot, [self.__class__, self.thrift_spec])
+            return
+        iprot.readStructBegin()
+        while True:
+            (fname, ftype, fid) = iprot.readFieldBegin()
+            if ftype == TType.STOP:
+                break
+            else:
+                iprot.skip(ftype)
+            iprot.readFieldEnd()
+        iprot.readStructEnd()
+
+    def write(self, oprot):
+        if oprot._fast_encode is not None and self.thrift_spec is not None:
+            oprot.trans.write(oprot._fast_encode(self, [self.__class__, self.thrift_spec]))
+            return
+        oprot.writeStructBegin('getCurrentVertex_args')
+        oprot.writeFieldStop()
+        oprot.writeStructEnd()
+
+    def validate(self):
+        return
+
+    def __repr__(self):
+        L = ['%s=%r' % (key, value)
+             for key, value in self.__dict__.items()]
+        return '%s(%s)' % (self.__class__.__name__, ', '.join(L))
+
+    def __eq__(self, other):
+        return isinstance(other, self.__class__) and self.__dict__ == other.__dict__
+
+    def __ne__(self, other):
+        return not (self == other)
+all_structs.append(getCurrentVertex_args)
+getCurrentVertex_args.thrift_spec = (
+)
+
+
+class getCurrentVertex_result(object):
+    """
+    Attributes:
+     - success
+
+    """
+
+
+    def __init__(self, success=None,):
+        self.success = success
+
+    def read(self, iprot):
+        if iprot._fast_decode is not None and isinstance(iprot.trans, TTransport.CReadableTransport) and self.thrift_spec is not None:
+            iprot._fast_decode(self, iprot, [self.__class__, self.thrift_spec])
+            return
+        iprot.readStructBegin()
+        while True:
+            (fname, ftype, fid) = iprot.readFieldBegin()
+            if ftype == TType.STOP:
+                break
+            if fid == 0:
+                if ftype == TType.STRING:
+                    self.success = iprot.readString().decode('utf-8', errors='replace') if sys.version_info[0] == 2 else iprot.readString()
+                else:
+                    iprot.skip(ftype)
+            else:
+                iprot.skip(ftype)
+            iprot.readFieldEnd()
+        iprot.readStructEnd()
+
+    def write(self, oprot):
+        if oprot._fast_encode is not None and self.thrift_spec is not None:
+            oprot.trans.write(oprot._fast_encode(self, [self.__class__, self.thrift_spec]))
+            return
+        oprot.writeStructBegin('getCurrentVertex_result')
+        if self.success is not None:
+            oprot.writeFieldBegin('success', TType.STRING, 0)
+            oprot.writeString(self.success.encode('utf-8') if sys.version_info[0] == 2 else self.success)
+            oprot.writeFieldEnd()
+        oprot.writeFieldStop()
+        oprot.writeStructEnd()
+
+    def validate(self):
+        return
+
+    def __repr__(self):
+        L = ['%s=%r' % (key, value)
+             for key, value in self.__dict__.items()]
+        return '%s(%s)' % (self.__class__.__name__, ', '.join(L))
+
+    def __eq__(self, other):
+        return isinstance(other, self.__class__) and self.__dict__ == other.__dict__
+
+    def __ne__(self, other):
+        return not (self == other)
+all_structs.append(getCurrentVertex_result)
+getCurrentVertex_result.thrift_spec = (
     (0, TType.STRING, 'success', 'UTF8', None, ),  # 0
 )
 fix_spec(all_structs)

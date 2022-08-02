@@ -27,7 +27,7 @@ class BankUnloadStates:
 class BotUnloadInBankFrame(Frame):
     PHENIX_MAPID = None
 
-    def __init__(self, return_to_start=False):
+    def __init__(self, return_to_start=True):
         super().__init__()
         self.return_to_start = return_to_start
 

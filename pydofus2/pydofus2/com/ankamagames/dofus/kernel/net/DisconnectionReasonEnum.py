@@ -21,3 +21,5 @@ class DisconnectionReasonEnum(Enum):
     WANTED_SHUTDOWN = 7
     
     EXCEPTION_THROWN = 8
+    
+    CONNECTION_LOST = 9

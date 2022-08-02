@@ -245,7 +245,7 @@ class RoleplayMovementFrame(Frame):
                 return True
             player: AnimatedCharacter = DofusEntities.getEntity(PlayedCharacterManager().id)
             if not player:
-                logger.error("[RolePlayMovement] Player not found!!")
+                logger.warning("[RolePlayMovement] Player not found!!")
                 return True
             if player.isMoving:
                 player.stop = True
@@ -695,8 +695,8 @@ class RoleplayMovementFrame(Frame):
 
     def requestMonsterFight(self, monsterGroupId: int) -> None:
         if self._requestFighFails > 2:
-            logger.error(
-                f"[RolePlayMovement]  Server rejected moster fight request for the {self._requestFighFails} time!"
+            logger.warning(
+                f"[RolePlayMovement]  Server rejected monster fight request for the {self._requestFighFails} time!"
             )
             self._requestFighFails = 0
             nopmsg = FightRequestFailed(monsterGroupId)

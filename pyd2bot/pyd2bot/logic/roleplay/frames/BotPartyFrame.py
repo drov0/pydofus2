@@ -361,6 +361,10 @@ class BotPartyFrame(Frame):
         elif isinstance(msg, PartyJoinMessage):
             self.partyMembers.clear()
             logger.debug(f"[BotPartyFrame] Party {msg.partyName} - {msg.partyId} of leader {msg.partyLeaderId}")
+            if not self.isLeader and msg.partyLeaderId != self.leader["id"]:
+                logger.warning(f"[BotPartyFrame] The party has the wrong leader {msg.partyLeaderId} instead of {self.leader['id']}")
+                self.leaveParty()
+                return
             for member in msg.members:
                 if member.id not in self.partyMembers:
                     self.partyMembers[member.id] = member
@@ -369,10 +373,6 @@ class BotPartyFrame(Frame):
                         self.currentPartyId = msg.partyId
                         if not self.isLeader:
                             self.sendFollowMember(self.leader['id'])
-                    elif msg.partyLeaderId != self.leader["id"]:
-                        logger.warning(f"[BotPartyFrame] The party has the wrong leader {msg.partyLeaderId} instead of {self.leader['id']}")
-                        self.leaveParty()
-                        return
             if not self.isLeader and self.joiningLeaderVertex is None:
                 logger.debug(f"[BotPartyFrame] {self.leaderName} is in map {self.partyMembers[self.leader['id']].mapId}")
             self.checkIfTeamInFight()
@@ -450,12 +450,19 @@ class BotPartyFrame(Frame):
         if cv is None:
             Timer(1, self.notifyFollowerWithPos, [follower]).start()
             return
+        
         transport, client = self.getFollowerClient(follower)
         if client is None:
             logger.warning(f"[BotPartyFrame] follower {follower['name']} thrift server is not connected.")
             raise Exception(f"follower {follower['name']} thrift server is not connected.")
-        client.moveToVertex(json.dumps(cv.to_json()))
-            
+        try:
+            client.moveToVertex(json.dumps(cv.to_json()))
+        except TTransportException as e:
+            if e.message == "unexpected exception":
+                logger.debug(f"[BotPartyFrame] follower {follower['name']} thrift server disconnected.")
+                self.connectFollowerClient(follower)
+                transport, client = self.getFollowerClient(follower)
+                client.moveToVertex(json.dumps(cv.to_json()))     
             
     def notifyFollowersWithTransition(self, tr: Transition):
         for follower in self.followers:
@@ -465,9 +472,16 @@ class BotPartyFrame(Frame):
         transport, client = self.getFollowerClient(follower)
         if client is None:
             logger.warning(f"[BotPartyFrame] follower {follower['name']} thrift server is not connected.")
-            raise Exception(f"follower {follower['name']} thrift server is not connected.") 
-        client.followTransition(json.dumps(tr.to_json()))
-        
+            raise Exception(f"follower {follower['name']} thrift server is not connected.")
+        try:
+            client.followTransition(json.dumps(tr.to_json()))
+        except TTransportException as e:
+            if e.message == "unexpected exception":
+                logger.debug(f"[BotPartyFrame] follower {follower['name']} thrift server disconnected.")
+                self.connectFollowerClient(follower)
+                transport, client = self.getFollowerClient(follower)
+                client.followTransition(json.dumps(tr.to_json()))
+                
     def notifyFollowesrWithPos(self):
         for follower in self.followers:
             self.notifyFollowerWithPos(follower)
@@ -477,8 +491,14 @@ class BotPartyFrame(Frame):
         if client is None:
             logger.warning(f"[BotPartyFrame] follower {follower['name']} thrift server is not connected.")
             return "disconnected"
-        return client.getStatus()
-
+        try:
+            return client.getStatus()
+        except TTransportException as e:
+            if e.message == "unexpected exception":
+                logger.debug(f"[BotPartyFrame] follower {follower['name']} thrift server disconnected.")
+                self.connectFollowerClient(follower)
+                transport, client = self.getFollowerClient(follower)
+                return client.getStatus()
     def requestMapData(self):
         mirmsg = MapInformationsRequestMessage()
         mirmsg.init(mapId_=MapDisplayManager().currentMapPoint.mapId)

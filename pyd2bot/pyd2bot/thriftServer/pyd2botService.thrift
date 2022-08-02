@@ -22,6 +22,8 @@ service Pyd2botService {
     oneway void moveToVertex(1: string vertex)
     oneway void followTransition(1: string transition)
     string getStatus()
+    oneway void comeToBankToCollectResources(1: string bankInfos, 3: string guestInfos)
+    string getCurrentVertex()
 }
        
     

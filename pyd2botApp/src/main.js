@@ -168,9 +168,9 @@ ipcMain.on("deleteSession", (event, key) => {
 ipcMain.on("editSession", (event, key) => {
     var session = sessionsManager.sessionsDB[key];
     sessionsManager.currentEditedSession = session;
-    if (session.type == "fight") 
+    if (session.type == "farm") 
         mainWindow.loadURL(sessionsManager.urls.farmSessionFormUrl);
-    else if (session.type == "farm") 
+    else if (session.type == "fight") 
         mainWindow.loadURL(sessionsManager.urls.fightSessionFormUrl);
 });
 

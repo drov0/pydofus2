@@ -904,6 +904,169 @@ Pyd2botService_getStatus_result.prototype.write = function(output) {
   return;
 };
 
+var Pyd2botService_comeToBankToCollectResources_args = function(args) {
+  this.bankInfos = null;
+  this.guestInfos = null;
+  if (args) {
+    if (args.bankInfos !== undefined && args.bankInfos !== null) {
+      this.bankInfos = args.bankInfos;
+    }
+    if (args.guestInfos !== undefined && args.guestInfos !== null) {
+      this.guestInfos = args.guestInfos;
+    }
+  }
+};
+Pyd2botService_comeToBankToCollectResources_args.prototype = {};
+Pyd2botService_comeToBankToCollectResources_args.prototype.read = function(input) {
+  input.readStructBegin();
+  while (true) {
+    var ret = input.readFieldBegin();
+    var ftype = ret.ftype;
+    var fid = ret.fid;
+    if (ftype == Thrift.Type.STOP) {
+      break;
+    }
+    switch (fid) {
+      case 1:
+      if (ftype == Thrift.Type.STRING) {
+        this.bankInfos = input.readString();
+      } else {
+        input.skip(ftype);
+      }
+      break;
+      case 3:
+      if (ftype == Thrift.Type.STRING) {
+        this.guestInfos = input.readString();
+      } else {
+        input.skip(ftype);
+      }
+      break;
+      default:
+        input.skip(ftype);
+    }
+    input.readFieldEnd();
+  }
+  input.readStructEnd();
+  return;
+};
+
+Pyd2botService_comeToBankToCollectResources_args.prototype.write = function(output) {
+  output.writeStructBegin('Pyd2botService_comeToBankToCollectResources_args');
+  if (this.bankInfos !== null && this.bankInfos !== undefined) {
+    output.writeFieldBegin('bankInfos', Thrift.Type.STRING, 1);
+    output.writeString(this.bankInfos);
+    output.writeFieldEnd();
+  }
+  if (this.guestInfos !== null && this.guestInfos !== undefined) {
+    output.writeFieldBegin('guestInfos', Thrift.Type.STRING, 3);
+    output.writeString(this.guestInfos);
+    output.writeFieldEnd();
+  }
+  output.writeFieldStop();
+  output.writeStructEnd();
+  return;
+};
+
+var Pyd2botService_comeToBankToCollectResources_result = function(args) {
+};
+Pyd2botService_comeToBankToCollectResources_result.prototype = {};
+Pyd2botService_comeToBankToCollectResources_result.prototype.read = function(input) {
+  input.readStructBegin();
+  while (true) {
+    var ret = input.readFieldBegin();
+    var ftype = ret.ftype;
+    if (ftype == Thrift.Type.STOP) {
+      break;
+    }
+    input.skip(ftype);
+    input.readFieldEnd();
+  }
+  input.readStructEnd();
+  return;
+};
+
+Pyd2botService_comeToBankToCollectResources_result.prototype.write = function(output) {
+  output.writeStructBegin('Pyd2botService_comeToBankToCollectResources_result');
+  output.writeFieldStop();
+  output.writeStructEnd();
+  return;
+};
+
+var Pyd2botService_getCurrentVertex_args = function(args) {
+};
+Pyd2botService_getCurrentVertex_args.prototype = {};
+Pyd2botService_getCurrentVertex_args.prototype.read = function(input) {
+  input.readStructBegin();
+  while (true) {
+    var ret = input.readFieldBegin();
+    var ftype = ret.ftype;
+    if (ftype == Thrift.Type.STOP) {
+      break;
+    }
+    input.skip(ftype);
+    input.readFieldEnd();
+  }
+  input.readStructEnd();
+  return;
+};
+
+Pyd2botService_getCurrentVertex_args.prototype.write = function(output) {
+  output.writeStructBegin('Pyd2botService_getCurrentVertex_args');
+  output.writeFieldStop();
+  output.writeStructEnd();
+  return;
+};
+
+var Pyd2botService_getCurrentVertex_result = function(args) {
+  this.success = null;
+  if (args) {
+    if (args.success !== undefined && args.success !== null) {
+      this.success = args.success;
+    }
+  }
+};
+Pyd2botService_getCurrentVertex_result.prototype = {};
+Pyd2botService_getCurrentVertex_result.prototype.read = function(input) {
+  input.readStructBegin();
+  while (true) {
+    var ret = input.readFieldBegin();
+    var ftype = ret.ftype;
+    var fid = ret.fid;
+    if (ftype == Thrift.Type.STOP) {
+      break;
+    }
+    switch (fid) {
+      case 0:
+      if (ftype == Thrift.Type.STRING) {
+        this.success = input.readString();
+      } else {
+        input.skip(ftype);
+      }
+      break;
+      case 0:
+        input.skip(ftype);
+        break;
+      default:
+        input.skip(ftype);
+    }
+    input.readFieldEnd();
+  }
+  input.readStructEnd();
+  return;
+};
+
+Pyd2botService_getCurrentVertex_result.prototype.write = function(output) {
+  output.writeStructBegin('Pyd2botService_getCurrentVertex_result');
+  if (this.success !== null && this.success !== undefined) {
+    output.writeFieldBegin('success', Thrift.Type.STRING, 0);
+    output.writeString(this.success);
+    output.writeFieldEnd();
+  }
+  output.writeFieldStop();
+  output.writeStructEnd();
+  return;
+};
+
 var Pyd2botServiceClient = exports.Client = function(output, pClass) {
   this.output = output;
   this.pClass = pClass;
@@ -1343,6 +1506,106 @@ Pyd2botServiceClient.prototype.recv_getStatus = function(input,mtype,rseqid) {
   }
   return callback('getStatus failed: unknown result');
 };
+
+Pyd2botServiceClient.prototype.comeToBankToCollectResources = function(bankInfos, guestInfos, callback) {
+  this._seqid = this.new_seqid();
+  if (callback === undefined) {
+    var _defer = Q.defer();
+    this._reqs[this.seqid()] = function(error, result) {
+      if (error) {
+        _defer.reject(error);
+      } else {
+        _defer.resolve(result);
+      }
+    };
+    this.send_comeToBankToCollectResources(bankInfos, guestInfos);
+    return _defer.promise;
+  } else {
+    this._reqs[this.seqid()] = callback;
+    this.send_comeToBankToCollectResources(bankInfos, guestInfos);
+  }
+};
+
+Pyd2botServiceClient.prototype.send_comeToBankToCollectResources = function(bankInfos, guestInfos) {
+  var output = new this.pClass(this.output);
+  var params = {
+    bankInfos: bankInfos,
+    guestInfos: guestInfos
+  };
+  var args = new Pyd2botService_comeToBankToCollectResources_args(params);
+  try {
+    output.writeMessageBegin('comeToBankToCollectResources', Thrift.MessageType.ONEWAY, this.seqid());
+    args.write(output);
+    output.writeMessageEnd();
+    this.output.flush();
+    var callback = this._reqs[this.seqid()] || function() {};
+    delete this._reqs[this.seqid()];
+    callback(null);
+  }
+  catch (e) {
+    delete this._reqs[this.seqid()];
+    if (typeof output.reset === 'function') {
+      output.reset();
+    }
+    throw e;
+  }
+};
+
+Pyd2botServiceClient.prototype.getCurrentVertex = function(callback) {
+  this._seqid = this.new_seqid();
+  if (callback === undefined) {
+    var _defer = Q.defer();
+    this._reqs[this.seqid()] = function(error, result) {
+      if (error) {
+        _defer.reject(error);
+      } else {
+        _defer.resolve(result);
+      }
+    };
+    this.send_getCurrentVertex();
+    return _defer.promise;
+  } else {
+    this._reqs[this.seqid()] = callback;
+    this.send_getCurrentVertex();
+  }
+};
+
+Pyd2botServiceClient.prototype.send_getCurrentVertex = function() {
+  var output = new this.pClass(this.output);
+  var args = new Pyd2botService_getCurrentVertex_args();
+  try {
+    output.writeMessageBegin('getCurrentVertex', Thrift.MessageType.CALL, this.seqid());
+    args.write(output);
+    output.writeMessageEnd();
+    return this.output.flush();
+  }
+  catch (e) {
+    delete this._reqs[this.seqid()];
+    if (typeof output.reset === 'function') {
+      output.reset();
+    }
+    throw e;
+  }
+};
+
+Pyd2botServiceClient.prototype.recv_getCurrentVertex = function(input,mtype,rseqid) {
+  var callback = this._reqs[rseqid] || function() {};
+  delete this._reqs[rseqid];
+  if (mtype == Thrift.MessageType.EXCEPTION) {
+    var x = new Thrift.TApplicationException();
+    x.read(input);
+    input.readMessageEnd();
+    return callback(x);
+  }
+  var result = new Pyd2botService_getCurrentVertex_result();
+  result.read(input);
+  input.readMessageEnd();
+
+  if (null !== result.success) {
+    return callback(null, result.success);
+  }
+  return callback('getCurrentVertex failed: unknown result');
+};
 var Pyd2botServiceProcessor = exports.Processor = function(handler) {
   this._handler = handler;
 };
@@ -1561,6 +1824,48 @@ Pyd2botServiceProcessor.prototype.process_getStatus = function(seqid, input, out
       } else {
         result_obj = new Thrift.TApplicationException(Thrift.TApplicationExceptionType.UNKNOWN, err.message);
         output.writeMessageBegin("getStatus", Thrift.MessageType.EXCEPTION, seqid);
+      }
+      result_obj.write(output);
+      output.writeMessageEnd();
+      output.flush();
+    });
+  }
+};
+Pyd2botServiceProcessor.prototype.process_comeToBankToCollectResources = function(seqid, input, output) {
+  var args = new Pyd2botService_comeToBankToCollectResources_args();
+  args.read(input);
+  input.readMessageEnd();
+  this._handler.comeToBankToCollectResources(args.bankInfos, args.guestInfos);
+};
+Pyd2botServiceProcessor.prototype.process_getCurrentVertex = function(seqid, input, output) {
+  var args = new Pyd2botService_getCurrentVertex_args();
+  args.read(input);
+  input.readMessageEnd();
+  if (this._handler.getCurrentVertex.length === 0) {
+    Q.fcall(this._handler.getCurrentVertex.bind(this._handler)
+    ).then(function(result) {
+      var result_obj = new Pyd2botService_getCurrentVertex_result({success: result});
+      output.writeMessageBegin("getCurrentVertex", Thrift.MessageType.REPLY, seqid);
+      result_obj.write(output);
+      output.writeMessageEnd();
+      output.flush();
+    }).catch(function (err) {
+      var result;
+      result = new Thrift.TApplicationException(Thrift.TApplicationExceptionType.UNKNOWN, err.message);
+      output.writeMessageBegin("getCurrentVertex", Thrift.MessageType.EXCEPTION, seqid);
+      result.write(output);
+      output.writeMessageEnd();
+      output.flush();
+    });
+  } else {
+    this._handler.getCurrentVertex(function (err, result) {
+      var result_obj;
+      if ((err === null || typeof err === 'undefined')) {
+        result_obj = new Pyd2botService_getCurrentVertex_result((err !== null || typeof err === 'undefined') ? err : {success: result});
+        output.writeMessageBegin("getCurrentVertex", Thrift.MessageType.REPLY, seqid);
+      } else {
+        result_obj = new Thrift.TApplicationException(Thrift.TApplicationExceptionType.UNKNOWN, err.message);
+        output.writeMessageBegin("getCurrentVertex", Thrift.MessageType.EXCEPTION, seqid);
       }
       result_obj.write(output);
       output.writeMessageEnd();

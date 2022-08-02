@@ -1,23 +1,43 @@
 import json
 import logging
 from time import perf_counter, sleep
-from pyd2bot.thriftServer.pyd2botService.ttypes import Character, Spell
-logger = None
 
+from pyd2bot.logic.common.frames.BotCharacterUpdatesFrame import \
+    BotCharacterUpdatesFrame
+from pyd2bot.logic.common.frames.BotWorkflowFrame import BotWorkflowFrame
+from pyd2bot.logic.managers.SessionManager import SessionManager
+from pyd2bot.logic.roleplay.frames.BotPartyFrame import BotPartyFrame
+from pyd2bot.logic.roleplay.frames.BotSellerCollectFrame import \
+    BotSellerCollectFrame
+from pyd2bot.logic.roleplay.messages.LeaderPosMessage import LeaderPosMessage
+from pyd2bot.logic.roleplay.messages.LeaderTransitionMessage import \
+    LeaderTransitionMessage
+from pyd2bot.misc.Localizer import BankInfos
+from pyd2bot.thriftServer.pyd2botService.ttypes import Character, Spell
+from pydofus2.com.ankamagames.dofus.datacenter.breeds.Breed import Breed
+from pydofus2.com.ankamagames.dofus.datacenter.jobs.Skill import Skill
+from pydofus2.com.ankamagames.dofus.kernel.Kernel import Kernel
+from pydofus2.com.ankamagames.dofus.logic.common.managers.PlayerManager import \
+    PlayerManager
+from pydofus2.com.ankamagames.dofus.logic.connection.frames.ServerSelectionFrame import \
+    ServerSelectionFrame
+from pydofus2.com.ankamagames.dofus.modules.utils.pathFinding.world.Transition import \
+    Transition
+from pydofus2.com.ankamagames.dofus.modules.utils.pathFinding.world.Vertex import \
+    Vertex
+from pydofus2.com.ankamagames.dofus.modules.utils.pathFinding.world.WorldPathFinder import WorldPathFinder
+from pydofus2.com.ankamagames.dofus.network.enums.ServerStatusEnum import \
+    ServerStatusEnum
+from pydofus2.com.ankamagames.haapi.Haapi import Haapi
+from pydofus2.com.ankamagames.jerakine.logger.Logger import Logger
+from pydofus2.com.DofusClient import DofusClient
 
 class Pyd2botServer:
-    def __init__(self):
-        self.logger = None
+    def __init__(self, id: str):
+        self.id = id
+        self.logger = Logger()
     
     def fetchAccountCharacters(self, login:str, password:str, certId:str, certHash:str, apiKey:str) -> list[Character]:
-        from pydofus2.com.ankamagames.jerakine.logger.Logger import Logger
-        Logger.prefix = login
-        from pydofus2.com.ankamagames.haapi.Haapi import Haapi
-        from pydofus2.com.DofusClient import DofusClient
-        from pydofus2.com.ankamagames.dofus.kernel.Kernel import Kernel
-        from pydofus2.com.ankamagames.dofus.logic.common.managers.PlayerManager import PlayerManager
-        from pydofus2.com.ankamagames.dofus.logic.connection.frames.ServerSelectionFrame import ServerSelectionFrame
-        from pydofus2.com.ankamagames.dofus.network.enums.ServerStatusEnum import ServerStatusEnum
         logging.info("fetchAccountCharacters called")
         rate = 2.
         timeout = 10.
@@ -68,36 +88,21 @@ class Pyd2botServer:
         return result
         
     def runSession(self, login:str, password:str, certId:str, certHash:str, apiKey: str, sessionJson:str) -> None:
-        from pydofus2.com.ankamagames.jerakine.logger.Logger import Logger
         print(f"runSession called with login {login}")
-        session = json.loads(sessionJson)
-        logger_name = f"{session['character']['name']}({session['character']['id']})"
-        Logger.prefix = logger_name
-        self.logger = Logger()
-        self.logger.debug(f"logger_name {logger_name}")
         self.logger.debug("session: " + sessionJson)
-        from pyd2bot.logic.managers.SessionManager import SessionManager
         SessionManager().load(sessionJson)
         self.logger.debug("Session loaded")
-        from pydofus2.com.ankamagames.haapi.Haapi import Haapi
-        from pydofus2.com.DofusClient import DofusClient
         dofus2 = DofusClient()
         self.logger.debug("importing frames")
-        from pyd2bot.logic.common.frames.BotCharacterUpdatesFrame import BotCharacterUpdatesFrame
-        from pyd2bot.logic.common.frames.BotWorkflowFrame import BotWorkflowFrame
-        from pyd2bot.logic.roleplay.frames.BotPartyFrame import BotPartyFrame
-        self.logger.debug("frames imported")
         dofus2.registerInitFrame(BotWorkflowFrame)
         dofus2.registerGameStartFrame(BotCharacterUpdatesFrame)
-        self.logger.debug("registerGameStartFrame BotCharacterUpdatesFrame")
         dofus2.registerGameStartFrame(BotPartyFrame)
-        self.logger.debug("registerGameStartFrame BotPartyFrame")
         self.logger.debug("Frames registered")
         Haapi().APIKEY = apiKey
         loginToken = Haapi().getLoginToken(login, password, certId, certHash)
         if loginToken is None:
             raise Exception("Unable to generate login token.")
-        self.logger.debug(f"loginToken: {loginToken}")
+        self.logger.debug(f"Generated LoginToken: {loginToken}")
         dofus2.login(loginToken, SessionManager().character["serverId"], SessionManager().character["id"])
         try:
             dofus2.join()
@@ -107,7 +112,6 @@ class Pyd2botServer:
             PyD2Bot().stopServer()
         
     def fetchBreedSpells(self, breedId:int) -> list['Spell']:
-        from pydofus2.com.ankamagames.dofus.datacenter.breeds.Breed import Breed
         spells = []
         breed = Breed.getBreedById(breedId)
         if not breed:
@@ -118,8 +122,6 @@ class Pyd2botServer:
         return spells
     
     def fetchJobsInfosJson(self) -> str:
-        import json
-        from pydofus2.com.ankamagames.dofus.datacenter.jobs.Skill import Skill
         res = {}
         skills = Skill.getSkills()
         for skill in skills:
@@ -136,30 +138,32 @@ class Pyd2botServer:
         return json.dumps(res)
     
     def getApiKey(self, login:str, password:str, certId:str, certHash:str) -> str:
-        from pydofus2.com.ankamagames.haapi.Haapi import Haapi
         response = Haapi().createAPIKEY(login, password, certId, certHash, game_id=102)
         return json.dumps(response)
 
     def moveToVertex(self, vertex: str):
-        from pyd2bot.logic.roleplay.messages.LeaderPosMessage import LeaderPosMessage
-        from pydofus2.com.ankamagames.dofus.kernel.Kernel import Kernel
-        from pydofus2.com.ankamagames.dofus.modules.utils.pathFinding.world.Vertex import Vertex
         v = Vertex(**json.loads(vertex))
         print(f"Leader pos giver, leader is in vertex {v}")
         Kernel().getWorker().process(LeaderPosMessage(v))
         
     def followTransition(self, transition: str):        
-        from pyd2bot.logic.roleplay.messages.LeaderTransitionMessage import LeaderTransitionMessage
-        from pydofus2.com.ankamagames.dofus.kernel.Kernel import Kernel
-        from pydofus2.com.ankamagames.dofus.modules.utils.pathFinding.world.Transition import Transition
         tr = Transition(**json.loads(transition))
         Kernel().getWorker().process(LeaderTransitionMessage(tr))
         print("LeaderTransitionMessage processed")
         
     def getStatus(self) -> str:
-        from pydofus2.com.ankamagames.dofus.kernel.Kernel import Kernel
-        from pyd2bot.logic.common.frames.BotWorkflowFrame import BotWorkflowFrame
         wfframe : BotWorkflowFrame = Kernel().getWorker().getFrame("BotWorkflowFrame")
         if wfframe:
             return wfframe.status
         return "connecting"
+
+    def comeToBankToCollectResources(self, bankInfos: str, guestInfos: str):
+        bankInfos = json.loads(bankInfos)
+        bankInfos = BankInfos(**bankInfos)
+        # bankInfos = Localizer.getBankInfos()
+        # logger.debug("Bank infos: %s", self.bankInfos.__dict__)
+        guestInfos = json.loads(guestInfos)
+        Kernel().getWorker().addFrame(BotSellerCollectFrame(bankInfos, guestInfos))
+    
+    def getCurrentVertex(self) -> str:
+        return json.dumps(WorldPathFinder().currPlayerVertex.to_json())

@@ -55,7 +55,7 @@ class Inventory:
     def getItemMaskCount(self, uid: int, mask: str) -> int:
         itemSet: ItemSet = self._itemsDict[uid]
         if not itemSet:
-            logger.error("Suppression d'un item qui n'existe pas")
+            logger.warning("Suppression d'un item qui n'existe pas")
             return 0
         if itemSet.masks.hasOwnProperty(mask):
             return itemSet.masks[mask]
@@ -110,14 +110,14 @@ class Inventory:
         oldItem: ItemWrapper = None
         itemSet: ItemSet = self._itemsDict.get(itemUID)
         if not itemSet:
-            logger.error("Suppression d'un item qui n'existe pas")
+            logger.warning("Suppression d'un item qui n'existe pas")
             return
         if quantity == -1 or quantity == itemSet.item.quantity:
             del self._itemsDict[itemUID]
             self.removeItemFromViews(itemSet)
         else:
             if itemSet.item.quantity < quantity:
-                logger.error("On essaye de supprimer de l'inventaire plus d'objet qu'il n'en existe")
+                logger.warning("On essaye de supprimer de l'inventaire plus d'objet qu'il n'en existe")
                 return
             oldItem = itemSet.item.clone()
             itemSet.item.quantity -= quantity
@@ -135,7 +135,7 @@ class Inventory:
     def modifyItemPosition(self, itemUID: int, position: int) -> None:
         itemSet: ItemSet = self._itemsDict.get(itemUID)
         if not itemSet:
-            logger.error("On essaye de modifier la position d'un objet qui n'existe pas")
+            logger.warning("On essaye de modifier la position d'un objet qui n'existe pas")
             return
         iw: ItemWrapper = itemSet.item.clone()
         iw.position = position

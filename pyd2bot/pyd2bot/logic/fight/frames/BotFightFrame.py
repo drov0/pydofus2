@@ -1,4 +1,5 @@
 import collections
+from threading import Timer
 from time import perf_counter
 from types import FunctionType
 from typing import TYPE_CHECKING, Tuple
@@ -112,6 +113,8 @@ class BotFightFrame(Frame):
     _lastTarget: int = None
 
     _spellw: SpellWrapper = None
+    
+    _fightOptionsSent = False
 
     def __init__(self):
         self._turnAction = []
@@ -133,6 +136,7 @@ class BotFightFrame(Frame):
         self._spellw = None
         self._repeatActionTimeout = None
         self._spellCastFails = 0
+        self._fightOptionsSent = False
         Kernel().getWorker().addFrame(self._botTurnFrame)
         return True
 
@@ -322,11 +326,12 @@ class BotFightFrame(Frame):
 
     def nextTurnAction(self) -> None:
         if not self.battleFrame:
+            logger.warning("[FightAlgo] No battle frame found")
             return
         if self.battleFrame._executingSequence:
             if self.VERBOSE:
                 logger.warn(f"[FightBot] Battle is busy processing sequences")
-            BenchmarkTimer(0.1, self.nextTurnAction).start()
+            Timer(0.5, self.nextTurnAction).start()
             return
         else:
             if self.VERBOSE:
@@ -357,13 +362,14 @@ class BotFightFrame(Frame):
             SessionManager().lastFightTime = perf_counter()
             self._fightCount += 1
             self._inFight = True
-            if SessionManager().isLeader:
+            if SessionManager().isLeader and not self._fightOptionsSent:
                 gfotmsg = GameFightOptionToggleMessage()
                 gfotmsg.init(FightOptionsEnum.FIGHT_OPTION_SET_SECRET)
                 ConnectionsHandler.getConnection().send(gfotmsg)
                 gfotmsg = GameFightOptionToggleMessage()
                 gfotmsg.init(FightOptionsEnum.FIGHT_OPTION_SET_TO_PARTY_ONLY)
                 ConnectionsHandler.getConnection().send(gfotmsg)
+                self._fightOptionsSent = True
             return False
 
         elif isinstance(msg, GameFightEndMessage):

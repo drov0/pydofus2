@@ -1,3 +1,4 @@
+from threading import Timer
 from pydofus2.com.ankamagames.jerakine.benchmark.BenchmarkTimer import BenchmarkTimer
 from time import perf_counter
 from pydofus2.com.DofusClient import DofusClient
@@ -130,6 +131,10 @@ class DisconnectionHandlerFrame(Frame):
                             DofusClient().interrupt(reason)
                         elif reason.reason == DisconnectionReasonEnum.RESTARTING:
                             self.reconnect()
+                        elif reason.reason == DisconnectionReasonEnum.CONNECTION_LOST:
+                            logger.debug(f"The connection was lost. Restarting in 10seconds.")
+                            krnl.Kernel().reset(reloadData=True, autoRetry=True)
+                            Timer(10, DofusClient().relogin).start()
                         else:
                             krnl.Kernel().getWorker().process(ExpectedSocketClosureMessage(reason.reason))
             else:

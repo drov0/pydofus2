@@ -65,6 +65,8 @@ bdist:
 	@python -m venv .buildEnv
 	@source .buildEnv/Scripts/activate
 	@cd $(PYDOFUS_DIR)
+	@python -m pip install --upgrade pip
+	@pip install wheel
 	@pip install .
 	@cd $(PYD2BOT_DIR)
 	@pip install -r requirements.txt

@@ -1,7 +1,7 @@
 import logging
-import sys
 import threading
 import time
+from pydofus2.com.ankamagames.jerakine.logger.Logger import Logger
 from pyd2bot.thriftServer.pyd2botServer import Pyd2botServer
 import pyd2bot.thriftServer.pyd2botService.Pyd2botService as Pyd2botService
 from pydofus2.com.ankamagames.jerakine.metaclasses.Singleton import Singleton
@@ -9,14 +9,16 @@ from thrift.transport import TSocket
 from thrift.transport import TTransport
 from thrift.protocol import TBinaryProtocol
 from thrift.server import TServer
-logger = logging.getLogger(__name__)
+logger = Logger()
 
 class PyD2Bot(metaclass=Singleton):
     _stop = threading.Event()
     _server = None
     _runingClients = {}
+    id = None
     
-    def runServer(self, host, port):
+    def runServer(self, id:str, host: str, port: int):
+        self.id = id
         self._stop.clear()
         handler = Pyd2botServer()
         processor = Pyd2botService.Processor(handler)
@@ -44,7 +46,10 @@ class PyD2Bot(metaclass=Singleton):
                 server.clients.put(client)
             except Exception as x:
                 logger.exception(x)
-    
+            
+        logger.info("Server {self.id} stopped.")
+
+        
     def runClient(self, host, port):
         transport = TSocket.TSocket(host, port)
         transport = TTransport.TBufferedTransport(transport)
@@ -62,6 +67,6 @@ class PyD2Bot(metaclass=Singleton):
         
         
     def stopServer(self):
+        print("Server stop called")
         self._stop.set()
-        print("Server stopped")
-        sys.exit(0)
+        

@@ -15,6 +15,10 @@ class Haapi(metaclass=Singleton):
     def __init__(self) -> None:
         self.url = "https://haapi.ankama.com"
         self.APIKEY = None
+        self.login = None
+        self.password = None
+        self.certId = None
+        self.certHash = None
 
     def getUrl(self, request):
         return self.url + {
@@ -75,7 +79,14 @@ class Haapi(metaclass=Singleton):
                 sleep(5)
         return None
     
+    def regenLoginToken(self):
+        return self.getLoginToken(self.login, self.password, self.certId, self.certHash)
+    
     def getLoginToken(self, login, password, certId, certHash, game_id=1):
+        self.login = login
+        self.password = password
+        self.certId = certId
+        self.certHash = certHash
         logger.debug("Calling HAAPI to get Login Token")
         nbrtries = 0
         if not self.APIKEY:

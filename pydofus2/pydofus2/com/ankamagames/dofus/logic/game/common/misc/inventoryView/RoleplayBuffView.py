@@ -32,7 +32,7 @@ class RoleplayBuffView(IInventoryView):
         return self._content
 
     def addItem(self, item: ItemWrapper, invisible: int, needUpdateView: bool = True) -> None:
-        self._content.unshift(item)
+        self._content = [item] + self._content
         if needUpdateView:
             self.updateView()
 

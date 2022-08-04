@@ -3,6 +3,8 @@ from pydofus2.com.ankamagames.jerakine.logger.Logger import Logger
 from pydofus2.com.ankamagames.jerakine.metaclasses.Singleton import Singleton
 from pyd2bot.logic.managers.PathManager import PathManager
 from pydofus2.com.ankamagames.haapi.Haapi import Haapi
+
+    
 logger = Logger()
 
 
@@ -44,3 +46,4 @@ class SessionManager(metaclass=Singleton):
                 self.leader : int = sessionJson.get("leader")
         if self.path:
             self.path = PathManager.from_json(sessionJson["path"])
+

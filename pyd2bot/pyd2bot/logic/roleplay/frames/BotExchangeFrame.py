@@ -1,6 +1,13 @@
 from threading import Timer
+from time import sleep
+from pyd2bot.apis.InventoryAPI import InventoryAPI
 from pyd2bot.logic.roleplay.messages.ExchangeConcludedMessage import ExchangeConcludedMessage
+from pydofus2.com.ankamagames.dofus.datacenter.communication.InfoMessage import InfoMessage
 from pydofus2.com.ankamagames.dofus.kernel.net.ConnectionsHandler import ConnectionsHandler
+from pydofus2.com.ankamagames.dofus.logic.game.common.managers.InventoryManager import InventoryManager
+from pydofus2.com.ankamagames.dofus.logic.game.common.managers.PlayedCharacterManager import PlayedCharacterManager
+from pydofus2.com.ankamagames.dofus.logic.game.roleplay.actions.DeleteObjectAction import DeleteObjectAction
+from pydofus2.com.ankamagames.dofus.network.messages.game.basic.TextInformationMessage import TextInformationMessage
 from pydofus2.com.ankamagames.dofus.network.messages.game.inventory.exchanges.ExchangeAcceptMessage import (
     ExchangeAcceptMessage,
 )
@@ -37,24 +44,28 @@ from pydofus2.com.ankamagames.dofus.kernel.Kernel import Kernel
 from pydofus2.com.ankamagames.jerakine.logger.Logger import Logger
 from pydofus2.com.ankamagames.jerakine.messages.Message import Message
 from pydofus2.com.ankamagames.jerakine.types.enums.Priority import Priority
+from enum import Enum
 logger = Logger()
 
 
-class SellerStateEnum:
-    IDLE = 4
-    GOING_TO_BANK = 1
-    INSIDE_BANK = 8
-    TREATING_BOT_UNLOAD = 2
-    UNLOADING_IN_BANK = 3
-    WAITING_FOR_BOT_TO_ARRIVE = 5
-    EXCHANGING_WITH_GUEST = 6
-    EXCHANGE_REQUEST_SENT = 7
-    EXCHANGE_REQUEST_ACCEPTED = 9
-    EXCHANGE_ACCEPT_SENT = 10
+class ExchangeDirectionEnum(Enum):
+    GIVE = 0
+    RECEIVE = 1
+class ExchangeStateEnum(Enum):
+    NOT_STARTED = -1
+    IDLE = 0
+    EXCHANGE_REQUEST_SENT = 1
+    EXCHANGE_REQUEST_RECEIVED = 2
+    EXCHANGE_REQUEST_ACCEPTED = 3
+    EXCHANGE_OPEN = 4
+    EXCHANGE_OBJECTS_ADDED = 5
+    EXCHANGE_READY_SENT = 6
+    TERMINATED = 7
 
 class BotExchangeFrame(Frame):
     PHENIX_MAPID = None
-
+    state = ExchangeStateEnum.NOT_STARTED
+    
     def __init__(self, direction: str, target: dict, items: list = None):
         self.direction = direction
         self.target = target
@@ -67,11 +78,13 @@ class BotExchangeFrame(Frame):
             self.step = len(items)
         self.wantsToMoveItemToExchange = set()
         self.acceptExchangeTimer : Timer = None
+        self.openExchangeTimer : Timer = None
         super().__init__()
 
     def pushed(self) -> bool:
         logger.debug("BotExchangeFrame pushed")
-        if self.direction == "give":
+        self.state = ExchangeStateEnum.IDLE
+        if self.direction == ExchangeDirectionEnum.GIVE:
             self.sendExchangeRequest()
         return True
 
@@ -79,6 +92,8 @@ class BotExchangeFrame(Frame):
         logger.debug("BotExchangeFrame pulled")
         if self.acceptExchangeTimer is not None:
             self.acceptExchangeTimer.cancel()
+        if self.openExchangeTimer:
+            self.openExchangeTimer.cancel()
         return True
 
     @property
@@ -86,16 +101,34 @@ class BotExchangeFrame(Frame):
         return Priority.VERY_LOW
 
     def process(self, msg: Message) -> bool:
-
+        
         if isinstance(msg, ExchangeRequestedTradeMessage):
+            logger.debug(f"Exchange request received from {msg.source} to {msg.target}")
             if msg.source == self.target["id"]:
-                self.state = SellerStateEnum.EXCHANGE_REQUEST_SENT
+                self.state = ExchangeStateEnum.EXCHANGE_REQUEST_RECEIVED
                 ConnectionsHandler.getConnection().send(ExchangeAcceptMessage())
+                self.state = ExchangeStateEnum.EXCHANGE_REQUEST_ACCEPTED
+            elif int(msg.source) == int(PlayedCharacterManager().id):
+                if self.openExchangeTimer:
+                    self.openExchangeTimer.cancel()
+                self.state = ExchangeStateEnum.EXCHANGE_REQUEST_SENT
 
+        elif isinstance(msg, TextInformationMessage):
+            if InfoMessage.getInfoMessageById(msg.msgType * 10000 + msg.msgId):
+                infoMsg = InfoMessage.getInfoMessageById(msg.msgType * 10000 + msg.msgId)
+                logger.debug(f"info: {infoMsg.text}")
+                if msg.msgId == 12:
+                    for iw in InventoryManager().realInventory:
+                        if not iw.isEquipment and iw.isDestructible:
+                            logger.debug(f"delete {iw.name} x 1")
+                            doa = DeleteObjectAction.create(iw.objectUID, 1)
+                            Kernel().getWorker().process(doa)
+                            return
+                
         elif isinstance(msg, ExchangeStartedWithPodsMessage):
             logger.debug("Exchange started.")
-            self.state = SellerStateEnum.EXCHANGE_REQUEST_ACCEPTED
-            if self.direction == "give":
+            self.state = ExchangeStateEnum.EXCHANGE_OPEN
+            if self.direction == ExchangeDirectionEnum.GIVE:
                 if self.giveAll:
                     ConnectionsHandler.getConnection().send(ExchangeObjectTransfertAllFromInvMessage())
                 else:
@@ -109,26 +142,30 @@ class BotExchangeFrame(Frame):
 
         elif isinstance(msg, ExchangeObjectsAddedMessage):
             logger.debug("All items moved to exchange.")
-            Timer(1, self.sendExchangeReady).start()
+            self.state = ExchangeStateEnum.EXCHANGE_OBJECTS_ADDED
+            if self.direction == ExchangeDirectionEnum.GIVE:
+                Timer(3, self.sendExchangeReady).start()
                 
         elif isinstance(msg, ExchangeObjectAddedMessage):
             logger.debug("Item added to exchange.")
-            if self.direction == "give":
+            if self.direction == ExchangeDirectionEnum.GIVE:
                 self.wantsToMoveItemToExchange.remove(msg.object.objectUID)
                 if len(self.wantsToMoveItemToExchange) == 0:
                     logger.debug("All items moved to exchange.")
-                    self.sendExchangeReady()
+                    self.state = ExchangeStateEnum.EXCHANGE_OBJECTS_ADDED
+                    Timer(3, self.sendExchangeReady).start()
                     
         elif isinstance(msg, ExchangeIsReadyMessage):
-            self.acceptExchangeTimer.cancel()
-            logger.debug(f"Exchange is ready received from {msg.id}.")
-            if int(msg.id) == int(self.target["id"]):
-                self.sendExchangeReady()
-                self.state = SellerStateEnum.EXCHANGE_ACCEPT_SENT
+            if self.acceptExchangeTimer is not None:
+                self.acceptExchangeTimer.cancel()
+            if self.direction == ExchangeDirectionEnum.RECEIVE and int(msg.id) == int(self.target["id"]):
+                logger.debug("Exchange is ready received from target.")
+                Timer(3, self.sendExchangeReady).start()
                 return True
 
         elif isinstance(msg, ExchangeLeaveMessage):
             logger.debug("ExchangeLeaveMessage received")
+            self.state = ExchangeStateEnum.TERMINATED
             Kernel().getWorker().processImmediately(ExchangeConcludedMessage())
             Kernel().getWorker().removeFrame(self)
 
@@ -136,15 +173,16 @@ class BotExchangeFrame(Frame):
         msg = ExchangePlayerRequestMessage()
         msg.init(exchangeType_=1, target_=self.target["id"])
         ConnectionsHandler.getConnection().send(msg)
-        self.state = SellerStateEnum.EXCHANGE_REQUEST_SENT
+        self.openExchangeTimer = Timer(3, self.sendExchangeRequest)
+        self.openExchangeTimer.start()
         logger.debug("Exchange open request sent")
 
     def sendExchangeReady(self):
+        if self.state == ExchangeStateEnum.TERMINATED:
+            return
         readymsg = ExchangeReadyMessage()
-        logger.debug(f"Step {self.step}")
         readymsg.init(ready_=True, step_=self.step)
         ConnectionsHandler.getConnection().send(readymsg)
         self.acceptExchangeTimer = Timer(5, self.sendExchangeReady)
         self.acceptExchangeTimer.start()
-        self.state = SellerStateEnum.EXCHANGE_ACCEPT_SENT
         logger.debug("Exchange is ready sent.")

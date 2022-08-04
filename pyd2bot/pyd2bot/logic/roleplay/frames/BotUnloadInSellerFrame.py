@@ -3,7 +3,7 @@ import json
 import threading
 from time import sleep
 from pyd2bot.logic.managers.SessionManager import SessionManager
-from pyd2bot.logic.roleplay.frames.BotExchangeFrame import BotExchangeFrame
+from pyd2bot.logic.roleplay.frames.BotExchangeFrame import BotExchangeFrame, ExchangeDirectionEnum
 from pyd2bot.logic.roleplay.messages.ExchangeConcludedMessage import ExchangeConcludedMessage
 from pyd2bot.logic.roleplay.messages.SellerCollectedGuestItemsMessage import SellerCollectedGuestItemsMessage
 from pydofus2.com.ankamagames.dofus.logic.game.common.managers.PlayedCharacterManager import PlayedCharacterManager
@@ -78,7 +78,7 @@ class BotUnloadInSellerFrame(Frame):
         while not self.stopWaitingForSeller.is_set():
             if self.entitiesFrame and self.entitiesFrame.getEntityInfos(self.sellerInfos["id"]):
                 logger.debug("Seller found in the bank map")
-                Kernel().getWorker().addFrame(BotExchangeFrame("give", target=self.sellerInfos))
+                Kernel().getWorker().addFrame(BotExchangeFrame(ExchangeDirectionEnum.GIVE, target=self.sellerInfos))
                 self.state = UnloadInSellerStatesEnum.IN_EXCHANGE_WITH_SELLER
                 return True        
             sleep(0.5)

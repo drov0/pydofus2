@@ -75,6 +75,7 @@ pydofus2/com/ankamagames/dofus/datacenter/breeds/BreedRoleByBreed.py
 pydofus2/com/ankamagames/dofus/datacenter/breeds/__init__.py
 pydofus2/com/ankamagames/dofus/datacenter/characteristics/Characteristic.py
 pydofus2/com/ankamagames/dofus/datacenter/characteristics/__init__.py
+pydofus2/com/ankamagames/dofus/datacenter/communication/InfoMessage.py
 pydofus2/com/ankamagames/dofus/datacenter/communication/NamingRule.py
 pydofus2/com/ankamagames/dofus/datacenter/communication/SmileyPack.py
 pydofus2/com/ankamagames/dofus/datacenter/communication/__init__.py

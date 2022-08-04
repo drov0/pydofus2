@@ -27,6 +27,8 @@ from whistle import Event
 
 logger = Logger()
 
+class UnknowMessageId(Exception):
+    pass
 
 class ServerConnection(IServerConnection):
 
@@ -36,7 +38,7 @@ class ServerConnection(IServerConnection):
 
     DEBUG_LOW_LEVEL_VERBOSE: bool = False
 
-    DEBUG_DATA: bool = True
+    DEBUG_DATA: bool = False
 
     LATENCY_AVG_BUFFER_SIZE: int = 50
 
@@ -74,6 +76,7 @@ class ServerConnection(IServerConnection):
         self._maxUnpackTime: int = float("inf")
         self._firstConnectionTry: bool = True
         self._timeoutTimer = None
+        self._processingSocketData = False
         super().__init__()
 
     def close(self) -> None:
@@ -281,7 +284,7 @@ class ServerConnection(IServerConnection):
 
     def receive(self, input: ByteArray, fromEnterFrame: bool = False) -> None:
         try:
-            if input.remaining() > 0:
+            if input.remaining() >= 2:
                 if self.DEBUG_LOW_LEVEL_VERBOSE:
                     if fromEnterFrame:
                         logger.info(
@@ -312,6 +315,13 @@ class ServerConnection(IServerConnection):
                                 f"[{self._id}] Processed one parsed message from buffer, will low receive the remaining {input.remaining()} bytes"
                             )
                         msg = self.lowReceive(input)
+                        
+        except UnknowMessageId as e:
+            import pydofus2.com.ankamagames.dofus.kernel.net.ConnectionsHandler as connh
+            logger.debug(str(e))
+            connh.ConnectionsHandler.connectionGonnaBeClosed(DisconnectionReasonEnum.RESTARTING)
+            connh.ConnectionsHandler.getConnection().close()
+            
         except Exception as e:                
             import pydofus2.com.ankamagames.dofus.kernel.net.ConnectionsHandler as connh
             logger.error(f"[{self._id}] Error while reading socket. \n", exc_info=True)
@@ -322,6 +332,7 @@ class ServerConnection(IServerConnection):
             error_trace = '\n'.join(traceback_in_var)
             connh.ConnectionsHandler.connectionGonnaBeClosed(DisconnectionReasonEnum.EXCEPTION_THROWN, error_trace)
             connh.ConnectionsHandler.getConnection().close()
+        self._processingSocketData = False
 
     def checkClosed(self) -> bool:
         if self._willClose:
@@ -403,13 +414,10 @@ class ServerConnection(IServerConnection):
             staticHeader = src.readUnsignedShort()
             messageId = self.getMessageId(staticHeader)
             if messageId not in self._rawParser._messagesTypes:
-                raise Exception(f"Unknown message id {messageId}")
-            try:
-                 messageLength = self.readMessageLength(staticHeader, src)
-            except IndexError as e:
-                messageLength = None
-                
-            if messageLength is not None:
+                raise UnknowMessageId(f"Unknown message id {messageId}")
+            byteLenDynamicHeader: int = staticHeader & NetworkMessage.BIT_MASK
+            if src.remaining() >= byteLenDynamicHeader:
+                messageLength = self.readMessageLength(staticHeader, src)
                 if src.remaining() >= messageLength:
                     self.updateLatency()
                     if self.getUnpackMode(messageId, messageLength) == UnpackMode.ASYNC:
@@ -575,9 +583,12 @@ class ServerConnection(IServerConnection):
         self._staticHeader = -1
 
     def onSocketData(self, pe: ProgressEvent) -> None:
-        if self.DEBUG_LOW_LEVEL_VERBOSE:
-            logger.info(f"[{self._id}] Receive Event, byte available : {self._socket.bytesAvailable}")
-        self.receive(self._socket._buff)
+        if not self._processingSocketData:
+            self._processingSocketData = True
+            if self.DEBUG_LOW_LEVEL_VERBOSE:
+                logger.info(f"[{self._id}] Receive Event, byte available : {self._socket.bytesAvailable}")
+            self.receive(self._socket._buff)
+            self._processingSocketData = False
 
     def onSocketError(self, e: IOErrorEvent) -> None:
         if self._lagometer:

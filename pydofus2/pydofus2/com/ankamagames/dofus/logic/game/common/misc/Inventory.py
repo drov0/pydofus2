@@ -79,7 +79,7 @@ class Inventory:
                 item.effects,
             )
             self._itemsDict[item.objectUID] = ItemSet(iw)
-            logger.debug(f"Added item {item.objectUID} to inventory")
+            # logger.debug(f"Added item {item.objectUID} to inventory")
             iteml.append(iw)
         self.initializeViews(iteml)
 
@@ -104,15 +104,13 @@ class Inventory:
         else:
             itemSet = ItemSet(item)
             self._itemsDict[item.objectUID] = itemSet
-            logger.debug(f"Added item {item.objectUID} to inventory")
+            # logger.debug(f"Added item {item.objectUID} to inventory")
             self.addItemToViews(itemSet)
 
     def removeItem(self, itemUID: int, quantity: int = -1) -> None:
-        oldItem: ItemWrapper = None
-        itemSet: ItemSet = self._itemsDict.get(itemUID)
+        itemSet: ItemSet = self._itemsDict.get(int(itemUID))
         if itemSet is None:
-            logger.warning(f"Item {itemUID} not found in inventory. Can't delete it")
-            logger.debug(f"itemUID: {itemUID}, inventory: {list(self._itemsDict.keys())}")
+            # logger.warning(f"Item {itemUID} not found in inventory. Can't delete it")
             return
         if quantity == -1 or quantity == itemSet.item.quantity:
             del self._itemsDict[itemUID]

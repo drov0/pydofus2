@@ -94,5 +94,29 @@
     "accountId": "slicer-the-dicer",
     "primarySpellId": 13516,
     "primaryStatId": 10
+  },
+  "337022615762": {
+    "name": "Hardlett",
+    "id": 337022615762,
+    "level": 48,
+    "breedId": 10,
+    "breedName": "Sadida",
+    "serverId": 210,
+    "serverName": "Merkator",
+    "accountId": "Money",
+    "primarySpellId": 13516,
+    "primaryStatId": 10
+  },
+  "336919855314": {
+    "name": "Moneycreator",
+    "id": 336919855314,
+    "level": 61,
+    "breedId": 10,
+    "breedName": "Sadida",
+    "serverId": 210,
+    "serverName": "Merkator",
+    "accountId": "Exodios-panda",
+    "primarySpellId": 13516,
+    "primaryStatId": 10
   }
 }

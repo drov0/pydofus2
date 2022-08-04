@@ -5,6 +5,7 @@ globalThis.window = {};
 const JSEncrypt = require('jsencrypt')
 const AuthHelper = require("../auth/AuthHelper.js");
 const InstancesManager = require("../bot/InstancesManager.js");
+const { instance } = require('../paths/PathManager.js');
 const instancesManager = InstancesManager.instance;
 const defaultBreedConfig = {
     10: { // sadida
@@ -190,8 +191,8 @@ class AccountManager {
     }
 
     saveApiKeys() {
-        var saveJson = JSON.stringify(this.apiKeysDb, null, 2);
-        fs.writeFile(path.join(ejse.data('persistenceDir'), 'apiKeys.json'), saveJson, 'utf8', (err) => {
+        var saveJson = JSON.stringify(this.apiKeysDB, null, 2);
+        fs.writeFile(this.apiKeysDbFile, saveJson, 'utf8', (err) => {
             if (err) {
                 console.log(err)
             }
@@ -201,7 +202,13 @@ class AccountManager {
     async getAccountApiKey(key) {
         var apiKeyData = this.apiKeysDB[key]
         if (!apiKeyData) {
-            var apiKeyData = await instance.client.getApiKey()
+            var creds = this.getAccountCreds(key)
+            console.log("will call getApiKey for " + creds.login)
+            var instance = instancesManager.runningInstances[key]
+            var apiKeyData = await instance.client.getApiKey(creds.login, creds.password, creds.certId, creds.certHash)
+            console.log("got api key " + apiKeyData)
+            apiKeyData = JSON.parse(apiKeyData)
+            console.log("got api key for " + creds.login + ": " + apiKeyData.key)
             this.apiKeysDB[key] = apiKeyData
             this.saveApiKeys()
         }
@@ -209,7 +216,8 @@ class AccountManager {
             var expiredate = Date.parse(apiKeyData.expiration_date)
             if (expiredate < Date.now()) {
                 console.log("API key expired, generating new one")
-                var apiKeyData = await instance.client.getApiKey()
+                var creds = this.getAccountCreds(key)
+                var apiKeyData = await instance.client.getApiKey(creds.login, creds.password, creds.certId, creds.certHash)
                 this.apiKeysDB[key] = apiKeyData
                 this.saveApiKeys()
             }
@@ -218,10 +226,10 @@ class AccountManager {
     }
 
     async fetchCharacters(key) {
-        var instance = await instancesManager.spawn(key)
-        var apiKey = this.getAccountApiKey(key)
+        var port = instancesManager.getFreePort()
+        var instance = await instancesManager.spawn(key, port)
+        var apiKey = await this.getAccountApiKey(key)
         var creds = this.getAccountCreds(key)
-        console.log(creds)
         var response = await instance.client.fetchAccountCharacters(creds.login, creds.password, creds.certId, creds.certHash, apiKey)
         console.log("fetcheCharacters result: " + JSON.stringify(response))
         for (let ck in response) {

@@ -1,12 +1,13 @@
 import json
 import logging
+import threading
 from time import perf_counter, sleep
+from pyd2bot.apis.PlayerAPI import PlayerAPI
 
 from pyd2bot.logic.common.frames.BotCharacterUpdatesFrame import \
     BotCharacterUpdatesFrame
 from pyd2bot.logic.common.frames.BotWorkflowFrame import BotWorkflowFrame
 from pyd2bot.logic.managers.SessionManager import SessionManager
-from pyd2bot.logic.roleplay.frames.BotPartyFrame import BotPartyFrame
 from pyd2bot.logic.roleplay.frames.BotSellerCollectFrame import \
     BotSellerCollectFrame
 from pyd2bot.logic.roleplay.messages.LeaderPosMessage import LeaderPosMessage
@@ -31,7 +32,7 @@ from pydofus2.com.ankamagames.dofus.network.enums.ServerStatusEnum import \
 from pydofus2.com.ankamagames.haapi.Haapi import Haapi
 from pydofus2.com.ankamagames.jerakine.logger.Logger import Logger
 from pydofus2.com.DofusClient import DofusClient
-
+lock = threading.Lock()
 class Pyd2botServer:
     def __init__(self, id: str):
         self.id = id
@@ -96,7 +97,6 @@ class Pyd2botServer:
         if SessionManager().type == "fight":
             dofus2.registerInitFrame(BotWorkflowFrame)
             dofus2.registerGameStartFrame(BotCharacterUpdatesFrame)
-            dofus2.registerGameStartFrame(BotPartyFrame)
         elif SessionManager().type == "selling":
             pass
         self.logger.debug("Frames registered")
@@ -154,15 +154,13 @@ class Pyd2botServer:
         print("LeaderTransitionMessage processed")
         
     def getStatus(self) -> str:
-        return BotWorkflowFrame.status()
+        return PlayerAPI.status()
 
     def comeToBankToCollectResources(self, bankInfos: str, guestInfos: str):
-        bankInfos = json.loads(bankInfos)
-        bankInfos = BankInfos(**bankInfos)
-        # bankInfos = Localizer.getBankInfos()
-        # logger.debug("Bank infos: %s", self.bankInfos.__dict__)
-        guestInfos = json.loads(guestInfos)
-        Kernel().getWorker().addFrame(BotSellerCollectFrame(bankInfos, guestInfos))
+        with lock:
+            bankInfos = BankInfos(**json.loads(bankInfos))
+            guestInfos = json.loads(guestInfos)
+            Kernel().getWorker().addFrame(BotSellerCollectFrame(bankInfos, guestInfos))
     
     def getCurrentVertex(self) -> str:
         return json.dumps(WorldPathFinder().currPlayerVertex.to_json())

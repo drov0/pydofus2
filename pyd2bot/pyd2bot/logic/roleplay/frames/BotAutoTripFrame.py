@@ -29,7 +29,7 @@ if TYPE_CHECKING:
     from pydofus2.com.ankamagames.dofus.logic.game.roleplay.frames.RoleplayInteractivesFrame import RoleplayInteractivesFrame
 from pyd2bot.logic.roleplay.messages.AutoTripEndedMessage import AutoTripEndedMessage
 
-logger = Logger("Dofus2")
+logger = Logger()
 
 
 class BotAutoTripFrame(Frame):

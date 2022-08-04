@@ -3,7 +3,6 @@ from time import perf_counter, sleep
 from typing import TYPE_CHECKING
 from pydofus2.com.DofusClient import DofusClient
 from pydofus2.com.ankamagames.berilia.managers.KernelEventsManager import KernelEventsManager
-
 import pydofus2.com.ankamagames.dofus.kernel.net.ConnectionsHandler as connh
 from pydofus2.com.ankamagames.atouin.managers.MapDisplayManager import MapDisplayManager
 from pydofus2.com.ankamagames.atouin.messages.EntityMovementCompleteMessage import EntityMovementCompleteMessage
@@ -20,7 +19,6 @@ from pydofus2.com.ankamagames.dofus.logic.game.roleplay.actions.PlayerFightReque
 from pydofus2.com.ankamagames.dofus.logic.game.roleplay.messages.CharacterMovementStoppedMessage import (
     CharacterMovementStoppedMessage,
 )
-from pydofus2.com.ankamagames.dofus.logic.game.roleplay.messages.FollowActorFailedMessage import FollowActorFailedMessage
 from pydofus2.com.ankamagames.dofus.logic.game.roleplay.messages.MovementRequestTimeoutMessage import MovementRequestTimeoutMessage
 from pydofus2.com.ankamagames.dofus.network.enums.PlayerLifeStatusEnum import PlayerLifeStatusEnum
 from pydofus2.com.ankamagames.dofus.network.messages.game.context.GameMapMovementCancelMessage import (
@@ -76,11 +74,9 @@ from pydofus2.com.ankamagames.dofus.network.messages.game.inventory.exchanges.Ex
 from pydofus2.com.ankamagames.dofus.network.messages.game.prism.PrismFightDefenderLeaveMessage import (
     PrismFightDefenderLeaveMessage,
 )
-from pydofus2.com.ankamagames.dofus.network.types.game.context.GameContextActorInformations import GameContextActorInformations
 from pydofus2.com.ankamagames.dofus.network.types.game.context.roleplay.GameRolePlayGroupMonsterInformations import (
     GameRolePlayGroupMonsterInformations,
 )
-from pydofus2.com.ankamagames.dofus.network.types.game.interactive.InteractiveElement import InteractiveElement
 from pydofus2.com.ankamagames.dofus.types.entities.AnimatedCharacter import AnimatedCharacter
 from pydofus2.com.ankamagames.jerakine.benchmark.BenchmarkTimer import BenchmarkTimer
 from pydofus2.com.ankamagames.jerakine.entities.interfaces.IEntity import IEntity
@@ -311,7 +307,7 @@ class RoleplayMovementFrame(Frame):
             else:
                 self._isRequestingMovement = False
                 self._isMoving = True
-                if (PlayedCharacterManager().inventoryWeight / PlayedCharacterManager().inventoryWeightMax) == 1:
+                if (1.0 * PlayedCharacterManager().inventoryWeight / PlayedCharacterManager().inventoryWeightMax) > 1.0:
                     pathDuration = max(1, 1 * clientMovePath.getCrossingDuration(False))
                 else:
                     pathDuration = max(1, 1 * clientMovePath.getCrossingDuration(True))
@@ -556,6 +552,16 @@ class RoleplayMovementFrame(Frame):
             logger.debug("[RolePlayMovement] Player is already moving, waiting for him to stop")
             return False
         movePath = Pathfinding.findPath(DataMapProvider(), playerEntity.position, cell)
+        if self._wantToChangeMap and movePath.end.cellId != cell.cellId:
+            logger.debug(
+                f"[RolePlayMovement] Player is trying to move to a cell {cell.cellId} but he is on {playerEntity.position.cellId} and the path is {movePath.end.cellId} -> {movePath.start.cellId}"
+            )
+            self._isRequestingMovement = False
+            cmfm: MapChangeFailedMessage = MapChangeFailedMessage()
+            cmfm.init(self._wantToChangeMap)
+            Kernel().getWorker().processImmediately(cmfm)
+            self._wantToChangeMap = None
+            return False
         self.sendPath(movePath)
         return True
 

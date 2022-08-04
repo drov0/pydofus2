@@ -1,5 +1,5 @@
 from pyd2bot.logic.roleplay.frames.BotBankInteractionFrame import BotBankInteractionFrame
-from pyd2bot.logic.roleplay.frames.BotExchangeFrame import BotExchangeFrame
+from pyd2bot.logic.roleplay.frames.BotExchangeFrame import BotExchangeFrame, ExchangeDirectionEnum
 from pyd2bot.logic.roleplay.messages.BankInteractionEndedMessage import BankInteractionEndedMessage
 from pyd2bot.logic.roleplay.messages.ExchangeConcludedMessage import ExchangeConcludedMessage
 from pyd2bot.logic.roleplay.messages.SellerCollectedGuestItemsMessage import SellerCollectedGuestItemsMessage
@@ -63,7 +63,7 @@ class BotSellerCollectFrame(Frame):
             Kernel().getWorker().addFrame(BotAutoTripFrame(self.bankInfos.npcMapId))
         else:
             self.state = SellerCollecteStateEnum.INSIDE_BANK
-            Kernel().getWorker().addFrame(BotExchangeFrame("receive", self.guest, self.items))
+            Kernel().getWorker().addFrame(BotExchangeFrame(ExchangeDirectionEnum.RECEIVE, self.guest, self.items))
             self.state = SellerCollecteStateEnum.EXCHANGING_WITH_GUEST
             
     def process(self, msg: Message) -> bool:
@@ -72,7 +72,7 @@ class BotSellerCollectFrame(Frame):
             logger.debug("AutoTripEndedMessage received")
             if self.state == SellerCollecteStateEnum.GOING_TO_BANK:
                 self.state = SellerCollecteStateEnum.INSIDE_BANK
-                Kernel().getWorker().addFrame(BotExchangeFrame("receive", self.guest, self.items))
+                Kernel().getWorker().addFrame(BotExchangeFrame(ExchangeDirectionEnum.RECEIVE, self.guest, self.items))
                 self.state = SellerCollecteStateEnum.EXCHANGING_WITH_GUEST
             return True
 

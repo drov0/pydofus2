@@ -51,34 +51,40 @@ class Haapi(metaclass=Singleton):
             "payment_mode": "OK",
             "lang" : "fr"
         }
-        for client in self.clients:
-            response = client.post(
-                self.getUrl("CREATE_API_KEY"),
-                data=data,
-                headers={
-                    "User-Agent": "Zaap 3.6.2",
-                    "Content-Type": "multipart/form-data",
-                    "cache-control": "no-cache",
-                },
-            )
-            if response.headers["content-type"] == "application/json":
-                logger.debug("APIKEY created")
-                key = response.json().get("key")
-                if key:
-                    self.APIKEY = key
-                    return response.json()
-                else:
-                    logger.debug("Error while calling HAAPI to get Login Token : %s" % response.content)
-                    sleep(5)
-            else:
-                from lxml import html
-                root = html.fromstring(response.content.decode('UTF-8'))
-                error = root.xpath('//span[@class="error-description"]')[0].text
-                errorCode = root.xpath('//span[@class="code-label"]//span')[0].text
-                logger.debug(f"[Haapi error {errorCode}] : Login Token creation for login {login} failed for reason: {error}")
-                sleep(5)
+        
+        nbrtries = 0
+        while nbrtries < 5:
+            for client in self.clients:
+                    response = client.post(
+                        self.getUrl("CREATE_API_KEY"),
+                        data=data,
+                        headers={
+                            "User-Agent": "Zaap 3.6.2",
+                            "Content-Type": "multipart/form-data",
+                            "cache-control": "no-cache",
+                        },
+                    )
+                    if response.headers["content-type"] == "application/json":
+                        logger.debug("APIKEY created")
+                        key = response.json().get("key")
+                        if key:
+                            self.APIKEY = key
+                            return response.json()
+                        else:
+                            logger.debug("Error while calling HAAPI to get Login Token : %s" % response.content)
+                            sleep(5)
+                    else:
+                        from lxml import html
+                        root = html.fromstring(response.content.decode('UTF-8'))
+                        error = root.xpath('//span[@class="error-description"]')[0].text
+                        errorCode = root.xpath('//span[@class="code-label"]//span')[0].text
+                        logger.debug(f"[Haapi error {errorCode}] : Login Token creation for login {login} failed for reason: {error}")
+                        sleep(5)
+            logger.debug("Failed to create APIKEY, retrying in 30 seconds")
+            sleep(30)
+            nbrtries += 1
         return None
-    
+            
     def regenLoginToken(self):
         return self.getLoginToken(self.login, self.password, self.certId, self.certHash)
     
@@ -88,19 +94,8 @@ class Haapi(metaclass=Singleton):
         self.certId = certId
         self.certHash = certHash
         logger.debug("Calling HAAPI to get Login Token")
-        nbrtries = 0
         if not self.APIKEY:
-            while nbrtries < 5:
-                response = self.createAPIKEY(login, password, certId, certHash)
-                self.APIKEY = response.get("key")
-                if not self.APIKEY:
-                    logger.debug("Failed to create APIKEY, retrying in 30 seconds")
-                    sleep(30)
-                    nbrtries += 1
-                else:
-                    break
-        if not self.APIKEY:
-            raise HaapiException("Failed to create APIKEY")
+            raise HaapiException("No haapi key found")
         nbrtries = 0
         while nbrtries < 5:
             for client in self.clients:

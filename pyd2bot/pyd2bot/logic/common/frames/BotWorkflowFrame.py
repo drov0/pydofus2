@@ -1,4 +1,3 @@
-from re import S
 from pyd2bot.logic.roleplay.frames.BotPartyFrame import BotPartyFrame
 from pyd2bot.logic.roleplay.frames.BotUnloadInSellerFrame import BotUnloadInSellerFrame
 from pyd2bot.logic.roleplay.messages.SellerCollectedGuestItemsMessage import SellerCollectedGuestItemsMessage
@@ -39,6 +38,7 @@ class BotWorkflowFrame(Frame):
         self._inAutoUnload = False
         self._inPhenixAutoRevive = False
         self._delayedAutoUnlaod = False
+        Kernel().getWorker().addFrame(BotPartyFrame())
         return True
 
     def pulled(self) -> bool:
@@ -64,7 +64,7 @@ class BotWorkflowFrame(Frame):
     def process(self, msg: Message) -> bool:
 
         if isinstance(msg, GameContextCreateMessage):
-            logger.debug("*************************************** GameContext Changed ************************************************")
+            logger.debug("*************************************** GameContext Created ************************************************")
             self.currentContext = msg.context
             if self._delayedAutoUnlaod:
                 self._delayedAutoUnlaod = False
@@ -72,25 +72,24 @@ class BotWorkflowFrame(Frame):
                 return True
             if not self._inAutoUnload and not self._inPhenixAutoRevive:
                 if self.currentContext == GameContextEnum.ROLE_PLAY:
-                    if SessionManager().path:
-                        Kernel().getWorker().addFrame(BotFarmPathFrame())
+                    if SessionManager().party and not Kernel().getWorker().contains("BotPartyFrame"):
+                        Kernel().getWorker().addFrame(BotPartyFrame())
+                    if SessionManager().path and not Kernel().getWorker().contains("BotFarmPathFrame"):
+                        Kernel().getWorker().addFrame(BotFarmPathFrame(True))
                 elif self.currentContext == GameContextEnum.FIGHT:
+                    if SessionManager().party and not Kernel().getWorker().contains("BotPartyFrame"):
+                        Kernel().getWorker().addFrame(BotPartyFrame())
                     Kernel().getWorker().addFrame(BotFightFrame())
             return True
 
         elif isinstance(msg, GameContextDestroyMessage):
             logger.debug("*************************************** GameContext Destroyed ************************************************")
-            if self._delayedAutoUnlaod:
-                self._delayedAutoUnlaod = False
-                self.triggerUnload()
-                return False
             if self.currentContext == GameContextEnum.FIGHT:
-                if Kernel().getWorker().getFrame("BotFightFrame"):
+                if Kernel().getWorker().contains("BotFightFrame"):
                     Kernel().getWorker().removeFrameByName("BotFightFrame")
             elif self.currentContext == GameContextEnum.ROLE_PLAY:
-                if Kernel().getWorker().getFrame("BotFarmPathFrame"):
+                if Kernel().getWorker().contains("BotFarmPathFrame"):
                     Kernel().getWorker().removeFrameByName("BotFarmPathFrame")
-
             return True
 
         elif isinstance(msg, InventoryWeightMessage):
@@ -99,7 +98,7 @@ class BotWorkflowFrame(Frame):
                 if WeightPercent > 95:
                     if self.currentContext is None:
                         self._delayedAutoUnlaod = True
-                        logger.debug("Inventory full but context is not created yet so will delay bank unload..")
+                        logger.debug("Inventory full but the context is not created yet, so we will delay the unload.")
                         return False
                     self.triggerUnload()
                 return True
@@ -141,40 +140,3 @@ class BotWorkflowFrame(Frame):
                     Kernel().getWorker().addFrame(BotFarmPathFrame(True))
             return True
 
-    @staticmethod
-    def status() -> str:
-        from pydofus2.com.ankamagames.dofus.logic.game.roleplay.frames.RoleplayInteractivesFrame import RoleplayInteractivesFrame
-        from pydofus2.com.ankamagames.dofus.logic.game.roleplay.frames.RoleplayMovementFrame import RoleplayMovementFrame
-        from pydofus2.com.ankamagames.atouin.managers.MapDisplayManager import MapDisplayManager
-        from pydofus2.com.ankamagames.dofus.logic.game.roleplay.frames.RoleplayEntitiesFrame import RoleplayEntitiesFrame
-
-        bpframe : BotPartyFrame = Kernel().getWorker().getFrame("BotPartyFrame")
-        mvframe : RoleplayMovementFrame = Kernel().getWorker().getFrame("RoleplayMovementFrame")
-        iframe  : RoleplayInteractivesFrame = Kernel().getWorker().getFrame("RoleplayInteractivesFrame")
-        rpeframe : RoleplayEntitiesFrame = Kernel().getWorker().getFrame("RoleplayEntitiesFrame")
-        if MapDisplayManager().currentDataMap is None:
-            return "loadingMap"
-        elif rpeframe and not rpeframe.mcidm_processessed:
-            return "processingMapComplementaryData"
-        elif PlayedCharacterManager().isInFight:
-            return "fighting"
-        elif bpframe and bpframe.followingLeaderTransition:
-            return "inTransition"
-        elif bpframe and bpframe.joiningLeaderVertex:
-            return "joiningLeaderVertex"
-        elif Kernel().getWorker().getFrame("BotUnloadInBankFrame"):
-            f : "BotUnloadInBankFrame" = Kernel().getWorker().getFrame("BotUnloadInBankFrame")
-            return "inBankAutoUnload" + ":" + f.state.name
-        elif Kernel().getWorker().getFrame("BotUnloadInSellerFrame"):
-            f : "BotUnloadInSellerFrame" = Kernel().getWorker().getFrame("BotUnloadInSellerFrame")
-            return "inSellerAutoUnload" + ":" + f.state.name
-        elif Kernel().getWorker().getFrame("BotPhenixAutoRevive"):
-            return "inPhenixAutoRevive"
-        elif Kernel().getWorker().getFrame("BotAutoTripFrame"):
-            return "inAutoTrip"
-        elif iframe and iframe._usingInteractive:
-            return "interacting"
-        elif mvframe and mvframe._isMoving:
-            return "moving"
-        else:
-            return "idle"

@@ -3,7 +3,7 @@ import threading
 import tracemalloc
 from pydofus2.com.ankamagames.dofus.kernel.net.DisconnectionReason import DisconnectionReason
 from pydofus2.com.ankamagames.dofus.logic.common.managers.PlayerManager import PlayerManager
-from time import sleep
+from time import perf_counter, sleep
 import pydofus2.com.ankamagames.dofus.kernel.Kernel as krnl
 from pydofus2.com.ankamagames.dofus.kernel.net.DisconnectionReasonEnum import DisconnectionReasonEnum
 from pydofus2.com.ankamagames.dofus.logic.connection.actions.LoginValidationWithTokenAction import (
@@ -31,6 +31,8 @@ class DofusClient(metaclass=Singleton):
     LOG_MEMORY_USAGE : bool= False
     _stop = threading.Event()
     _stopReason : DisconnectionReason = None
+    _lastLoginTime = None
+    _minLoginInterval = 60 
     
     def __init__(self):
         krnl.Kernel().init()
@@ -47,6 +49,11 @@ class DofusClient(metaclass=Singleton):
         self.login(self._loginToken, self._serverId, self._characterId)
 
     def login(self, loginToken, serverId=0, characterId=None):
+        if self._lastLoginTime is not None and perf_counter() - self._lastLoginTime < self._minLoginInterval:
+            logger.info("Login request ignored, too soon")
+            threading.Timer(self._minLoginInterval - (perf_counter() - self._lastLoginTime) + 10, self.login, args=(loginToken, serverId, characterId)).start()
+            return
+        self._lastLoginTime = perf_counter()
         if self.LOG_MEMORY_USAGE:
             tracemalloc.start(10)
         self._serverId = serverId

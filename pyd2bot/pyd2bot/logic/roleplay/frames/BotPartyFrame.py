@@ -104,7 +104,6 @@ class MembersMonitor(threading.Thread):
                 if self.VERBOSE:
                     logger.debug("[MembersMonitor] bot isFighting")
             
-
             elif PlayerAPI.status() != "idle":
                 pass
             
@@ -195,7 +194,10 @@ class BotPartyFrame(Frame):
             self.leaveParty()
         if self.isLeader:
             self.canFarmMonitor.stopSig.set()
-            self.canFarmMonitor.join()
+            try:
+                self.canFarmMonitor.join()
+            except:
+                pass
         self.partyMembers.clear()
         if self.partyInviteTimers:
             for timer in self.partyInviteTimers.values():
@@ -506,6 +508,8 @@ class BotPartyFrame(Frame):
                 self.connectFollowerClient(follower)
                 transport, client = self.getFollowerClient(follower)
                 return client.getStatus()
+            else:
+                raise e
             
     def requestMapData(self):
         mirmsg = MapInformationsRequestMessage()

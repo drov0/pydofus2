@@ -56,8 +56,8 @@ class TriggeredBuff(BasicBuff):
         return self._effect.parameter2
 
     @param3.setter
-    def param3(self) -> None:
-        self._effect.parameter2 = self.param3
+    def param3(self, value) -> None:
+        self._effect.parameter2 = value
 
     def initParam(self, param1: int, param2: int, param3: int) -> None:
         min: int = 0

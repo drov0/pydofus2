@@ -893,7 +893,9 @@ class FightSequenceFrame(Frame, ISpellCastProvider):
 
         if isinstance(msg, GameActionFightTriggerGlyphTrapMessage):
             if self._castingSpell:
-                self._fightBattleFrame.process(SequenceEndMessage())
+                semsg = SequenceEndMessage()
+                semsg.init(0, 0, 0)
+                self._fightBattleFrame.process(semsg)
                 self._fightBattleFrame.process(SequenceStartMessage())
                 self._fightBattleFrame.currentSequenceFrame.process(msg)
                 return True
@@ -998,10 +1000,12 @@ class FightSequenceFrame(Frame, ISpellCastProvider):
         playerId = PlayedCharacterManager().id
         sourceInfos = self.fightEntitiesFrame.getEntityInfos(gafdmsg.sourceId)
         targetInfos = self.fightEntitiesFrame.getEntityInfos(gafdmsg.targetId)
+        
         playerInfos = self.fightEntitiesFrame.getEntityInfos(playerId)
         summonDestroyedWithSummoner = False
         summonerIsMe = True
         if (
+            targetInfos and 
             targetInfos.stats.summoned
             and not isinstance(targetInfos, GameFightFighterNamedInformations)
             and not isinstance(targetInfos, GameFightEntityInformation)
@@ -1085,7 +1089,7 @@ class FightSequenceFrame(Frame, ISpellCastProvider):
                     or effect.effectId == ActionIds.ACTION_FIGHT_ADD_GLYPH_CASTING_SPELL_ENDTURN
                 ):
                     spellId = effect.parameter0
-                    spellGrade = Spell.getSpellById(spellId).getSpellLevel(effect.parameter1.grade)
+                    spellGrade = Spell.getSpellById(spellId).getSpellLevel(effect.parameter1).grade
         self.pushStep(
             FightMarkCellsStep(
                 gafmcmsg.mark.markId,
@@ -1240,6 +1244,8 @@ class FightSequenceFrame(Frame, ISpellCastProvider):
         movementPathCells: list[int] = movementPath.getCells()
         logger.debug(f"Fighter {gmmmsg.actorId} has moved following the path {movementPathCells}")
         fightContextFrame: "FightContextFrame" = Kernel().getWorker().getFrame("FightContextFrame")
+        if not fightContextFrame:
+            return
         movingEntity: IMovable = DofusEntities.getEntity(gmmmsg.actorId)
         movingEntity.position.cellId = movementPath.end.cellId
         nbCells = len(movementPathCells)

@@ -99,32 +99,41 @@ class Haapi(metaclass=Singleton):
         nbrtries = 0
         while nbrtries < 5:
             for client in self.clients:
-                response = client.get(
-                    self.getUrl("GET_LOGIN_TOKEN"),
-                    params={
-                        "game": game_id,
-                        "certificate_id": certId,
-                        "certificate_hash": certHash,
-                    },
-                    headers={
-                        "User-Agent": "Zaap1",
-                        "Content-Type": "multipart/form-data",
-                        "APIKEY": self.APIKEY,
-                    }
-                )
-                logger.debug(response.content)
-                if response.headers["content-type"] == "application/json":
-                    token = response.json().get("token")
-                    if token:
-                        logger.debug("Login Token created")
-                        return token
+                try:
+                    response = client.get(
+                        self.getUrl("GET_LOGIN_TOKEN"),
+                        params={
+                            "game": game_id,
+                            "certificate_id": certId,
+                            "certificate_hash": certHash,
+                        },
+                        headers={
+                            "User-Agent": "Zaap1",
+                            "Content-Type": "multipart/form-data",
+                            "APIKEY": self.APIKEY,
+                        }
+                    )
+                    logger.debug(response.content)
+                    if response.headers["content-type"] == "application/json":
+                        token = response.json().get("token")
+                        if token:
+                            logger.debug("Login Token created")
+                            return token
+                        else:
+                            logger.error("Error while calling HAAPI to get Login Token : %s" % response.json()["message"])
+                            sleep(5)
                     else:
-                        logger.error("Error while calling HAAPI to get Login Token : %s" % response.json()["message"])
-                        sleep(5)
-                else:
-                    from lxml import html
-                    root = html.fromstring(response.content.decode('UTF-8'))
-                    error = root.xpath('//div[@id="what-happened-section"]//p/@text')[0]
-                    logger.debug("Login Token creation failed, reason: %s" % error)
-                    sleep(5)
+                        from lxml import html
+                        root = html.fromstring(response.content.decode('UTF-8'))
+                        error = root.xpath('//div[@id="what-happened-section"]//p/@text')
+                        if error:
+                            logger.debug("Login Token creation failed, reason: %s" % error)
+                        elif "Access denied | haapi.ankama.com used Cloudflare to restrict access" in response.text:
+                            logger.debug("Login Token creation failed, reason: Access denied | haapi.ankama.com used Cloudflare to restrict access")
+                        logger.info("Login Token creation failed, retrying in 5 minutes")
+                        sleep(60 * 5)
+                except ssl.SSLError:
+                    logger.debug("SSL error while calling HAAPI to get Login Token")
+                    sleep(10)
+                    
         return None

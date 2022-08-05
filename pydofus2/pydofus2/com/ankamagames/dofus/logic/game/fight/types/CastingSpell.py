@@ -13,7 +13,7 @@ class CastingSpell:
 
     targetedCell: MapPoint
 
-    spell: Spell
+    spell: Spell = None
 
     spellRank: SpellLevel
 

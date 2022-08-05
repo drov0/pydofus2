@@ -1,6 +1,7 @@
 from threading import Timer
 from typing import TYPE_CHECKING
 from pyd2bot.apis.PlayerAPI import PlayerAPI
+from pydofus2.com.DofusClient import DofusClient
 from pydofus2.com.ankamagames.atouin.managers.MapDisplayManager import MapDisplayManager
 from pydofus2.com.ankamagames.dofus.datacenter.notifications.Notification import Notification
 from pydofus2.com.ankamagames.dofus.kernel.Kernel import Kernel
@@ -177,11 +178,14 @@ class BotFarmPathFrame(Frame):
                 self.doFarm()
             return True
 
-        elif isinstance(msg, (FightRequestFailed, MapMoveFailed, MapChangeFailedMessage, MovementRequestTimeoutMessage)):
-            if self._inAutoTrip:
-                return False
-            self.requestMapData()
+        elif isinstance(msg, (MapMoveFailed, MapChangeFailedMessage, MovementRequestTimeoutMessage)):
+            DofusClient().restart()
 
+        elif isinstance(msg, FightRequestFailed):
+            self._followinMonsterGroup = None
+            self._discardedMonstersIds.append(int(msg.actorId))
+            self.doFarm()
+                
         elif isinstance(msg, InteractiveUsedMessage):
             if self._inAutoTrip:
                 return False
@@ -233,8 +237,9 @@ class BotFarmPathFrame(Frame):
         availableMonsterFights = []
         currPlayerPos = PlayedCharacterManager().entity.position
         for entityId in self.entitiesFrame._monstersIds:
-            if entityId in self._discardedMonstersIds:
+            if int(entityId) in self._discardedMonstersIds:
                 continue
+            logger.debug(f"[BotFarmFrame] Discarded monsters {self._discardedMonstersIds}")
             infos: GameRolePlayGroupMonsterInformations = self.entitiesFrame.getEntityInfos(entityId)
             if self.insideCurrentPlayerZoneRp(infos.disposition.cellId):
                 totalGrpLvl = infos.staticInfos.mainCreatureLightInfos.level + sum(
@@ -253,6 +258,7 @@ class BotFarmPathFrame(Frame):
 
     def insideCurrentPlayerZoneRp(self, cellId):
         tgtRpZone = MapDisplayManager().dataMap.cells[cellId].linkedZoneRP
+        logger.debug(f"[BotFarmFrame] Current player zone {PlayedCharacterManager().currentZoneRp}, target zone {tgtRpZone}")
         return tgtRpZone == PlayedCharacterManager().currentZoneRp
 
     def doFarm(self, event=None):

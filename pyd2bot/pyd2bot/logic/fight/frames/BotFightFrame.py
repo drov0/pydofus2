@@ -3,6 +3,7 @@ from threading import Timer
 from time import perf_counter
 from types import FunctionType
 from typing import TYPE_CHECKING, Tuple
+from pydofus2.com.DofusClient import DofusClient
 from pydofus2.com.ankamagames.atouin.AtouinConstants import AtouinConstants
 from pydofus2.com.ankamagames.atouin.messages.MapLoadedMessage import MapLoadedMessage
 from pydofus2.com.ankamagames.atouin.utils.DataMapProvider import DataMapProvider
@@ -198,10 +199,6 @@ class BotFightFrame(Frame):
                 logger.debug("[FightAlgo] Not hittable target found")
             return None, None
         for target in targets:
-            # logger.debug(f"[FightAlgo] distance to {target} is {target.pos.distanceToCell(self.fighterPos)}")
-            # line = MapTools.getCellsCoordBetween(self.fighterPos.cellId, target.pos.cellId)
-            # logger.debug(f"Line to target {[l.cellId for l in line]}")
-            # logger.debug(f"Los to target {LosDetector.losBetween(DataMapProvider(), self.fighterPos, target.pos)}")
             if target.pos.distanceTo(self.fighterPos) == 1.0:
                 return target, []
         spellZone = self.getSpellZone(spellw)
@@ -380,7 +377,7 @@ class BotFightFrame(Frame):
             if self.VERBOSE:
                 logger.debug(f"[FightBot] Failed to cast spell")
             if self._spellCastFails > 2:
-                self.turnEnd()
+                DofusClient().restart()
                 return
             self._spellCastFails += 1
             # self._tryWithLessRangeOf += 2
@@ -482,6 +479,8 @@ class BotFightFrame(Frame):
             return []
         if self.VERBOSE:
             logger.debug(f"Deads list : {self.battleFrame._deadTurnsList}")
+        if self.fighterInfos is None:
+            return []
         for entity in FightEntitiesFrame.getCurrentInstance().entities.values():
             if entity.contextualId < 0 and isinstance(entity, GameFightMonsterInformations):
                 monster = entity

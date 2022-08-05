@@ -7,7 +7,7 @@ from pyd2bot.apis.PlayerAPI import PlayerAPI
 from pyd2bot.logic.common.frames.BotCharacterUpdatesFrame import \
     BotCharacterUpdatesFrame
 from pyd2bot.logic.common.frames.BotWorkflowFrame import BotWorkflowFrame
-from pyd2bot.logic.managers.SessionManager import SessionManager
+from pyd2bot.logic.managers.SessionManager import SessionManager, InactivityMonitor
 from pyd2bot.logic.roleplay.frames.BotSellerCollectFrame import \
     BotSellerCollectFrame
 from pyd2bot.logic.roleplay.messages.LeaderPosMessage import LeaderPosMessage
@@ -106,9 +106,12 @@ class Pyd2botServer:
             raise Exception("Unable to generate login token.")
         self.logger.debug(f"Generated LoginToken : {loginToken}")
         dofus2.login(loginToken, SessionManager().character["serverId"], SessionManager().character["id"])
+        iam = InactivityMonitor()
+        iam.start()
         try:
             dofus2.join()
         except Exception as e:
+            iam.stop.set()
             self.logger.error(f"Error while running session: {e}")
             from pyd2bot.PyD2Bot import PyD2Bot
             PyD2Bot().stopServer()
@@ -154,7 +157,9 @@ class Pyd2botServer:
         print("LeaderTransitionMessage processed")
         
     def getStatus(self) -> str:
-        return PlayerAPI.status()
+        status = PlayerAPI.status()
+        print(f"get staus called -> Status: {status}")
+        return status
 
     def comeToBankToCollectResources(self, bankInfos: str, guestInfos: str):
         with lock:

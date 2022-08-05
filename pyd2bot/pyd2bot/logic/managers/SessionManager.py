@@ -1,4 +1,9 @@
+from calendar import c
 import json
+import threading
+from time import perf_counter, sleep
+from pyd2bot.apis.PlayerAPI import PlayerAPI
+from pydofus2.com.DofusClient import DofusClient
 from pydofus2.com.ankamagames.jerakine.logger.Logger import Logger
 from pydofus2.com.ankamagames.jerakine.metaclasses.Singleton import Singleton
 from pyd2bot.logic.managers.PathManager import PathManager
@@ -7,8 +12,31 @@ from pydofus2.com.ankamagames.haapi.Haapi import Haapi
     
 logger = Logger()
 
-
-
+class SessionTypeEnum:
+    FIGHT = "fight"
+    FARM = "farm"
+    SELL = "selling"
+class InactivityMonitor(threading.Thread):
+    
+    def __init__(self):
+        super().__init__()
+        self.lastActivity = perf_counter()
+        self.maxInactivityInterval = 60 * 60 * 2 if SessionManager().type == "selling" else 60 * 5
+        self.lastStatus = "disconnected"
+        self.stop = threading.Event()
+    
+    def run(self):
+        while not self.stop.is_set():
+            status = PlayerAPI.status()
+            if status != self.lastStatus:
+                self.lastStatus = status
+                self.lastActivity = perf_counter()
+            elif perf_counter() - self.lastActivity > self.maxInactivityInterval:
+                logger.info("Inactivity detected, disconnecting ...")
+                DofusClient().restart()
+                self.lastActivity = perf_counter()
+            sleep(3)
+            
 class SessionManager(metaclass=Singleton):
     character = None
     path = None

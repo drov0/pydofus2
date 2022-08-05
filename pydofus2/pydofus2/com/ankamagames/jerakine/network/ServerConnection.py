@@ -81,7 +81,7 @@ class ServerConnection(IServerConnection):
 
     def close(self) -> None:
         if self._socket.connected:
-            logger.debug(f"[{self._id}] Closing socket for connection! ")
+            logger.debug(f"[{self._id}] Closing socket for connection!")
             EnterFrameDispatcher().removeEventListener(self.onEnterFrame)
             self._socket.close()
         elif not self.checkClosed():

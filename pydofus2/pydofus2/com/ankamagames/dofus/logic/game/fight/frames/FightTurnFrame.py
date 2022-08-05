@@ -530,6 +530,7 @@ class FightTurnFrame(Frame):
             currMapId = PlayedCharacterManager().currentMap.mapId
             gmmrmsg.init(keyMovements, currMapId)
             ConnectionsHandler.getConnection().send(gmmrmsg)
+            logger.debug(f"Sent movement request {keyMovements}")
         else:
             logger.debug("Fight is not paused, and battle frame is running can't move")
             self._isRequestingMovement = False

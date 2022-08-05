@@ -9,6 +9,8 @@ from pydofus2.com.ankamagames.dofus.logic.game.common.managers.PlayedCharacterMa
     PlayedCharacterManager,
 )
 from pydofus2.com.ankamagames.dofus.logic.game.fight.fightEvents.FightEvent import FightEvent
+from pydofus2.com.ankamagames.dofus.logic.game.fight.types.StatBuff import StatBuff
+
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
@@ -16,7 +18,6 @@ if TYPE_CHECKING:
         FightEntitiesFrame,
     )
     from pydofus2.com.ankamagames.dofus.logic.game.fight.types.BasicBuff import BasicBuff
-    from pydofus2.com.ankamagames.dofus.logic.game.fight.types.StatBuff import StatBuff
 from pydofus2.com.ankamagames.dofus.misc.utils.GameDebugManager import GameDebugManager
 from pydofus2.com.ankamagames.dofus.network.enums.FightEventEnum import FightEventEnum
 from pydofus2.com.ankamagames.dofus.network.types.game.context.fight.GameFightFighterInformations import (
@@ -29,7 +30,7 @@ from pydofus2.com.ankamagames.jerakine.utils.display.EnterFrameDispatcher import
     EnterFrameDispatcher,
 )
 
-logger = Logger("Dofus2")
+logger = Logger()
 
 
 class FightEventsHelper(metaclass=Singleton):
@@ -89,7 +90,7 @@ class FightEventsHelper(metaclass=Singleton):
             if self._joinedEvents and len(self._joinedEvents) > 0:
                 if self._joinedEvents[0].name == FightEventEnum.FIGHTER_GOT_TACKLED:
                     if name == FightEventEnum.FIGHTER_MP_LOST or name == FightEventEnum.FIGHTER_AP_LOST:
-                        self._joinedEvents[0] = fightEvent
+                        self._joinedEvents.insert(0, fightEvent)
                         return
                     if name != FightEventEnum.FIGHTER_VISIBILITY_CHANGED:
                         feTackle = self._joinedEvents.pop(0)
@@ -130,6 +131,7 @@ class FightEventsHelper(metaclass=Singleton):
                     and event.targetId == fightEvent.targetId
                 ):
                     groupByType = False
+                    break
         if groupByType:
             for i in range(num):
                 eventList = self._events[i]
@@ -171,9 +173,9 @@ class FightEventsHelper(metaclass=Singleton):
         lastDamageMap: dict = deadTargetsDescr["lastDamageMap"]
         eventsGroupedByTarget: dict = dict()
         groupedByElementsEventList = None
-        while self._events:
+        while len(self._events) > 0:
             eventList = self._events[0]
-            if eventList == None or len(eventList) == 0:
+            if eventList is None or len(eventList) == 0:
                 self._events.pop(0)
             else:
                 eventBase = eventList[0]
@@ -200,7 +202,7 @@ class FightEventsHelper(metaclass=Singleton):
                         ):
                             typeEvent = -1
                         if eventBase.name == FightEventEnum.FIGHTER_LIFE_GAIN:
-                            pass
+                            typeEvent = 1
                         else:
                             typeEvent = 1
                         fightEvent = self.groupByElements(
@@ -322,7 +324,7 @@ class FightEventsHelper(metaclass=Singleton):
         if len(pEventList) == 0:
             return False
         tmpEventList: list[FightEvent] = pEventList
-        while tmpEventList:
+        while len(tmpEventList) > 1:
             listToConcat = self.getGroupedListEvent(tmpEventList)
             if len(listToConcat) <= 1:
                 continue
@@ -332,31 +334,31 @@ class FightEventsHelper(metaclass=Singleton):
                 if (
                     event != listToConcat[0]
                     and event.targetId == listToConcat[0].targetId
-                    and isinstance(listToConcat[0], "StatBuff")
+                    and isinstance(listToConcat[0], StatBuff)
                 ):
                     listToConcat[0].params[1] += event.params[1]
             evt = listToConcat[0]
-            if isinstance(evt.buff, "StatBuff"):
+            if isinstance(evt.buff, StatBuff):
                 tmpEffect = evt.buff.effect.clone()
                 if isinstance(tmpEffect, EffectInstanceDice):
                     buffStackCount = 1
-                    tmpparam1 = int(evt.buff.rawParam1)
+                    tmpDiceNum = int(evt.buff.rawParam1)
                     for event in listToConcat:
-                        if event.targetId == evt.targetId and event.buff.id is not evt.buff.id:
+                        if event.targetId == evt.targetId and event.buff.id != evt.buff.id:
                             if (
                                 evt.buff.castingSpell.spellRank.maxStack
                                 and buffStackCount >= evt.buff.castingSpell.spellRank.maxStack
                             ):
                                 break
                             buffStackCount += 1
-                            tmpparam1 += int(event.buff.rawParam1)
-                    EffectInstanceDice(tmpEffect).diceNum = tmpparam1
+                            tmpDiceNum += int(event.buff.rawParam1)
+                    EffectInstanceDice(tmpEffect).diceNum = tmpDiceNum
                 evt.params[1] = tmpEffect.description
             team = self.groupEntitiesByTeam(
                 playerTeamId,
                 elist,
                 pEntitiesList,
-                pEventList[0].name not in self.SKIP_ENTITY_ALIVE_CHECK_EVENTS,
+                (pEventList[0].name not in self.SKIP_ENTITY_ALIVE_CHECK_EVENTS) if pEventList else False,
             )
             if team in ["all", "allies", "enemies"]:
                 self.removeEventFromEventsList(pEventList, listToConcat)
@@ -367,18 +369,19 @@ class FightEventsHelper(metaclass=Singleton):
             if team == "none":
                 logger.warn("Failed to group FightEvents for the team 'none'")
             else:
-                for t in pEntitiesList:
+                for t in pEntitiesList.values():
                     if isinstance(t, GameFightFighterInformations):
                         teamId = t.spawnInfo.teamId
                     else:
                         teamId = t.teamId
                     if (
-                        "allies" not in team
+                        "allies" in team
                         and teamId == playerTeamId
-                        or "enemies" not in team
+                        or "enemies" in team
                         and teamId != playerTeamId
                     ):
-                        list.remove(t.contextualId)
+                        if t.contextualId in elist:
+                            elist.remove(t.contextualId)
                 self.removeEventFromEventsList(pEventList, listToConcat)
                 if evt.name == "fighterLifeLoss" and deadTargets[listToConcat[0].targetId]:
                     pass
@@ -401,7 +404,8 @@ class FightEventsHelper(metaclass=Singleton):
     def removeEventFromEventsList(self, pEventList: list[FightEvent], pListToRemove: list[FightEvent]) -> None:
         event: FightEvent = None
         for event in pListToRemove:
-            pEventList.remove(event)
+            if event in pEventList:
+                pEventList.remove(event)
 
     def groupEntitiesByTeam(
         self,
@@ -416,7 +420,7 @@ class FightEventsHelper(metaclass=Singleton):
         enemiesCount: int = 0
         nbTotalAllies: int = 0
         nbTotalEnemies: int = 0
-        for fighterInfos in entitiesList:
+        for fighterInfos in entitiesList.values():
             if fighterInfos != None:
                 if fighterInfos.spawnInfo.teamId == playerTeamId:
                     nbTotalAllies += 1
@@ -424,7 +428,7 @@ class FightEventsHelper(metaclass=Singleton):
                     nbTotalEnemies += 1
                 if (
                     not checkAlive or checkAlive and fighterInfos.spawnInfo.alive
-                ) and fighterInfos.contextualId not in targetList:
+                ) and fighterInfos.contextualId in targetList:
                     if fighterInfos.spawnInfo.teamId == playerTeamId:
                         alliesCount += 1
                     else:
@@ -433,7 +437,7 @@ class FightEventsHelper(metaclass=Singleton):
         if nbTotalAllies == alliesCount and nbTotalEnemies == enemiesCount:
             return "all"
         if alliesCount > 1 and alliesCount == nbTotalAllies:
-            returnData += (returnData if returnData != "" else "") + "allies"
+            returnData += ("," if returnData != "" else "") + "allies"
             if enemiesCount > 0 and enemiesCount < nbTotalEnemies:
                 returnData += ",other"
         if enemiesCount > 1 and enemiesCount == nbTotalEnemies:
@@ -455,7 +459,7 @@ class FightEventsHelper(metaclass=Singleton):
             pFightEvent.castingSpellId != pBaseEvent.castingSpellId
             or GameDebugManager().detailedFightLog_unGroupEffects
             or pFightEvent.buff
-            and pFightEvent.buff.disabled is not pBaseEvent.buff.disabled
+            and pFightEvent.buff.disabled != pBaseEvent.buff.disabled
         ):
             return False
         for paramId in range(pFightEvent.firstParamToCheck, pNbParams):
@@ -463,12 +467,7 @@ class FightEventsHelper(metaclass=Singleton):
                 return False
         return True
 
-    def sendAllFightEvents(self, now: bool = False) -> None:
-        if now:
-            self.sendEvents()
-            for fightEvent in reversed(self._fightEvents):
-                if fightEvent:
-                    pass
+    def sendAllFightEvents(self) -> None:
         self.clearData()
 
     def clearData(self) -> None:

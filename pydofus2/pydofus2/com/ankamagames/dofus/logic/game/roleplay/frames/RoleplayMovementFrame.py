@@ -552,16 +552,26 @@ class RoleplayMovementFrame(Frame):
             logger.debug("[RolePlayMovement] Player is already moving, waiting for him to stop")
             return False
         movePath = Pathfinding.findPath(DataMapProvider(), playerEntity.position, cell)
-        if self._wantToChangeMap and movePath.end.cellId != cell.cellId:
-            logger.debug(
-                f"[RolePlayMovement] Player is trying to move to a cell {cell.cellId} but he is on {playerEntity.position.cellId} and the path is {movePath.end.cellId} -> {movePath.start.cellId}"
-            )
-            self._isRequestingMovement = False
-            cmfm: MapChangeFailedMessage = MapChangeFailedMessage()
-            cmfm.init(self._wantToChangeMap)
-            Kernel().getWorker().processImmediately(cmfm)
-            self._wantToChangeMap = None
-            return False
+        if movePath.end.cellId != cell.cellId:
+            if self._wantToChangeMap:
+                logger.debug(
+                    f"[RolePlayMovement] Player is trying to move to a cell {cell.cellId} but he is on {playerEntity.position.cellId} and the path is {movePath.end.cellId} -> {movePath.start.cellId}"
+                )
+                self._isRequestingMovement = False
+                cmfm: MapChangeFailedMessage = MapChangeFailedMessage()
+                cmfm.init(self._wantToChangeMap)
+                Kernel().getWorker().processImmediately(cmfm)
+                self._wantToChangeMap = None
+                return False
+            elif self._followingMonsterGroup:
+                logger.debug(
+                    f"[RolePlayMovement] Player is trying to attack monsters in cell {cell.cellId} but that cell is unreachable"
+                )
+                cmfm: FightRequestFailed = FightRequestFailed(self._followingMonsterGroup.contextualId)
+                self._isRequestingMovement = False
+                self._followingMonsterGroup = None
+                Kernel().getWorker().processImmediately(cmfm)
+                return False
         self.sendPath(movePath)
         return True
 
@@ -712,7 +722,7 @@ class RoleplayMovementFrame(Frame):
         grpamrmsg: GameRolePlayAttackMonsterRequestMessage = GameRolePlayAttackMonsterRequestMessage()
         grpamrmsg.init(monsterGroupId)
         ConnectionsHandler.getConnection().send(grpamrmsg)
-        self._requestFightTimeout = BenchmarkTimer(1, lambda: self.attackMonsters(monsterGroupId))
+        self._requestFightTimeout = Timer(5, self.attackMonsters, (monsterGroupId,))
         self._requestFightTimeout.start()
         self._requestFighFails += 1
 

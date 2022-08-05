@@ -46,6 +46,7 @@ class BotUnloadInSellerFrame(Frame):
     def pushed(self) -> bool:
         logger.debug("BotUnloadInSellerFrame pushed")
         self.state = UnloadInSellerStatesEnum.IDLE
+        self.stopWaitingForSeller.clear()
         if PlayedCharacterManager().currentMap is not None:
             self.start()
         else:
@@ -75,13 +76,19 @@ class BotUnloadInSellerFrame(Frame):
         return Kernel().getWorker().getFrame("RoleplayEntitiesFrame")
     
     def waitForSellerToComme(self):
+        self.stopWaitingForSeller.clear()
         while not self.stopWaitingForSeller.is_set():
-            if self.entitiesFrame and self.entitiesFrame.getEntityInfos(self.sellerInfos["id"]):
-                logger.debug("Seller found in the bank map")
-                Kernel().getWorker().addFrame(BotExchangeFrame(ExchangeDirectionEnum.GIVE, target=self.sellerInfos))
-                self.state = UnloadInSellerStatesEnum.IN_EXCHANGE_WITH_SELLER
-                return True        
-            sleep(0.5)
+            if self.entitiesFrame:
+                if self.entitiesFrame.getEntityInfos(self.sellerInfos["id"]):
+                    logger.debug("Seller found in the bank map")
+                    Kernel().getWorker().addFrame(BotExchangeFrame(ExchangeDirectionEnum.GIVE, target=self.sellerInfos))
+                    self.state = UnloadInSellerStatesEnum.IN_EXCHANGE_WITH_SELLER
+                    return True        
+                else:
+                    logger.debug("Seller not found in the bank map")
+            else:
+                logger.debug("No entitiesFrame found")
+            sleep(2)
     
     def waitForSellerIdleStatus(self):
         transport, client = self.connectToSellerServer()

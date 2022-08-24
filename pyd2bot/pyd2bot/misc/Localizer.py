@@ -10,7 +10,8 @@ from pyd2bot.BotConstants import BotConstants
 
 
 class BankInfos:
-    def __init__(self, npcActionId: int, npcId: float, npcMapId: float, openBankReplyId: int):
+    def __init__(self, npcActionId: int, npcId: float, npcMapId: float, openBankReplyId: int, name: str = "undefined"):
+        self.name = name
         self.npcActionId = npcActionId
         self.npcId = npcId
         self.npcMapId = npcMapId
@@ -36,48 +37,29 @@ class Localizer:
         subarea = SubArea.getSubAreaById(subareaId)
         areaId = subarea._area.id
         playerPos = PlayedCharacterManager().currMapPos
-        if str(areaId) in cls.AREAINFOS:
-            closestBank = cls.AREAINFOS[str(areaId)]["bank"]
-        else:
-            minDist = float("inf")
-            srcV = WorldPathFinder().currPlayerVertex
-            closestBank = None
-            for areaId, jsonbank in cls.AREAINFOS.items():
-                if "bank" in jsonbank:
-                    rpZ = 1
-                    bankMapId = jsonbank["bank"]["npcMapId"]
-                    while True:
-                        dstV = WorldPathFinder().worldGraph.getVertex(bankMapId, rpZ)
-                        if not dstV:
-                            break
-                        path = AStar.search(WorldPathFinder().worldGraph, srcV, dstV, lambda x: (), False)
-                        if path is not None:
-                            bankMapPos = MapPosition.getMapPositionById(bankMapId)
-                            dist = abs(bankMapPos.posX - playerPos.posX) + abs(bankMapPos.posY - playerPos.posY)
-                            if dist < minDist:
-                                dist = len(path)
-                                closestBank = jsonbank["bank"]
-                            break
-                        rpZ += 1
+        minDist = float("inf")
+        srcV = WorldPathFinder().currPlayerVertex
+        closestBank = None
+        rpZ = 1
+        for bank in cls.AREAINFOS[str(areaId)]["bank"]:
+            bankMapId = bank["npcMapId"]
+            while True:
+                dstV = WorldPathFinder().worldGraph.getVertex(bankMapId, rpZ)
+                if not dstV:
+                    break
+                path = AStar.search(WorldPathFinder().worldGraph, srcV, dstV, lambda x: (), False)
+                if path is not None:
+                    dist = len(path)
+                    if dist < minDist:
+                        minDist = dist
+                        closestBank = bank
+                    break
+                rpZ += 1
         return BankInfos(**closestBank)
 
     @classmethod
     def getPhenixMapId(cls) -> float:
         subareaId = MapDisplayManager().currentDataMap.subareaId
         subarea = SubArea.getSubAreaById(subareaId)
-        if not cls._phenixesByAreaId:
-            for phenix in Phoenix.getAllPhoenixes():
-                phenixSubArea = SubArea.getSubAreaByMapId(phenix.mapId)
-                if phenixSubArea._area.id not in cls._phenixesByAreaId:
-                    cls._phenixesByAreaId[phenixSubArea._area.id] = []
-                cls._phenixesByAreaId[phenixSubArea._area.id].append(phenix.mapId)
-        minDist = float("inf")
-        closestPhenixMapId = None
-        playerMp = MapPosition.getMapPositionById(MapDisplayManager().currentMapPoint.mapId)
-        for phenixMapId in cls._phenixesByAreaId[subarea._area.id]:
-            phenixMp = MapPosition.getMapPositionById(phenixMapId)
-            dist = abs(phenixMp.posX - playerMp.posX) + abs(phenixMp.posY - playerMp.posY)
-            if dist < minDist:
-                minDist = dist
-                closestPhenixMapId = phenixMapId
-        return closestPhenixMapId
+        areaId = subarea._area.id
+        return cls.AREAINFOS[str(areaId)]["phoenix"]["mapId"]

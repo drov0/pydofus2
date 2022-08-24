@@ -61,7 +61,7 @@ class FightChangeVisibilityStep(AbstractSequencable, IFightStep):
 
             if isinstance(invisibleEntity, AnimatedCharacter):
                 invisibleEntityPos = invisibleEntity.position
-                entitiesFrame: FightEntitiesFrame = Kernel().getWorker().getFrame(FightEntitiesFrame)
+                entitiesFrame: FightEntitiesFrame = Kernel().getWorker().getFrame('FightEntitiesFrame')
                 fightEntities = entitiesFrame.entities
                 for entityId in fightEntities:
                     entityInfos = entitiesFrame.getEntityInfos(entityId)

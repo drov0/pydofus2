@@ -25,16 +25,20 @@ if TYPE_CHECKING:
     from pydofus2.com.ankamagames.dofus.logic.game.roleplay.frames.RoleplayInteractivesFrame import RoleplayInteractivesFrame
 
 logger = Logger("Dofus2")
-
+class AutoReviveStateEnum:
+    PHANTOME = 0
+    SAOUL_RELEASED = 1
+    WALING_TO_PHOENIX = 2
+    REVIVED = 3
 
 class BotPhenixAutoRevive(Frame):
     def __init__(self):
-        self.phenixMapId = Localizer.getPhenixMapId()
         super().__init__()
 
     def pushed(self) -> bool:
         self._waitingForMapData = False
         if PlayerLifeStatusEnum(PlayedCharacterManager().state) == PlayerLifeStatusEnum.STATUS_PHANTOM:
+            self.phenixMapId = Localizer.getPhenixMapId()
             Kernel().getWorker().addFrame(BotAutoTripFrame(self.phenixMapId))
         elif PlayedCharacterManager().state == PlayerLifeStatusEnum.STATUS_TOMBSTONE:
             self.releaseSoul()
@@ -55,6 +59,7 @@ class BotPhenixAutoRevive(Frame):
 
         elif isinstance(msg, GameRolePlayPlayerLifeStatusMessage):
             if PlayedCharacterManager().state == PlayerLifeStatusEnum.STATUS_PHANTOM:
+                # state changed from tomb to phantome
                 self._waitingForMapData = True
             else:
                 logger.info("Player is not in phantom state will renmove the phenix frame")
@@ -63,6 +68,7 @@ class BotPhenixAutoRevive(Frame):
 
         elif isinstance(msg, MapComplementaryInformationsDataMessage):
             if self._waitingForMapData:
+                self.phenixMapId = Localizer.getPhenixMapId()
                 Kernel().getWorker().addFrame(BotAutoTripFrame(self.phenixMapId))
                 self._waitingForMapData = False
             return False

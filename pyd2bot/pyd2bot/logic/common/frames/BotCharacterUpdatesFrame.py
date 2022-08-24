@@ -58,7 +58,7 @@ class BotCharacterUpdatesFrame(Frame):
         logger.debug(f"Have {points} unused stat points")
         logger.debug(f"Stat {statId} has base {base} and additional {additional} so totoal = {base + additional}")
         currentStatPoints = base + additional
-        for i in range(len(statFloors)):
+        for i in range(len(statFloors) + 1):
             if i + 1 == len(statFloors):
                 nextFloor = float("inf")
             else:
@@ -77,7 +77,7 @@ class BotCharacterUpdatesFrame(Frame):
                 break
             boost += additionalBoost
             currPoints -= additionalBoost * currentFloorCost
-            currentFloorCost = statFloors[i + 1][1]
+            currentFloorCost = statFloors[i + 1][1] if i + 1 < len(statFloors) else 4
             i += 1
         canUse = points - currPoints
         if boost > 0:

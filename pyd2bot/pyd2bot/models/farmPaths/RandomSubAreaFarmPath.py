@@ -13,14 +13,15 @@ class RandomSubAreaFarmPath(AbstractFarmPath):
     def __init__(
         self,
         name: str,
-        subAreaId: int,
         startVertex: Vertex,
+        onlyDirections: bool = True,
     ) -> None:
         self.name = name
         self.startVertex = startVertex
-        self.subArea = SubArea.getSubAreaById(subAreaId)
+        self.subArea = SubArea.getSubAreaByMapId(startVertex.mapId)
         self._currentVertex = None
         self._verticies = list[Vertex]()
+        self.onlyDirections = onlyDirections
 
     def __next__(self) -> Transition:
         outgoingEdges = WorldPathFinder().worldGraph.getOutgoingEdgesFromVertex(self.currentVertex)
@@ -29,7 +30,7 @@ class RandomSubAreaFarmPath(AbstractFarmPath):
             if edge.dst.mapId in self.subArea.mapIds:
                 if AStar.hasValidTransition(edge):
                     for tr in edge.transitions:
-                        if tr.direction != -1:
+                        if not self.onlyDirections or tr.direction != -1:
                             transitions.append(tr)
         return random.choice(transitions)
 
@@ -85,6 +86,5 @@ class RandomSubAreaFarmPath(AbstractFarmPath):
         startVertex = WorldPathFinder().worldGraph.getVertex(**pathJson["startVertex"])
         return cls(
             pathJson["name"],
-            pathJson["subAreaId"],
             startVertex,
         )

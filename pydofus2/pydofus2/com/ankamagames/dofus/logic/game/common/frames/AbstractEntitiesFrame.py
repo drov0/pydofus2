@@ -103,7 +103,7 @@ class AbstractEntitiesFrame(Frame):
         entityId = float(entityId)
         if not self._entities or not self._entitiesTotal:
             return None
-        if not self._entities.get(entityId):
+        if self._entities.get(entityId) is None:
             # logger.error(f"Entity {entityId} is unknown. Available actor Ids are {list(self._entities.keys())}")
             if entityId <= EntitiesManager.RANDOM_ENTITIES_ID_START:
                 return None

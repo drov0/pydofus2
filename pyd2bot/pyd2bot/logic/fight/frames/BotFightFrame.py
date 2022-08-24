@@ -123,6 +123,7 @@ class BotFightFrame(Frame):
         self._botTurnFrame = BotFightTurnFrame()
         self.spellId = SessionManager().character["primarySpellId"]
         self._spellCastFails = 0
+        self._inFight = False
         super().__init__()
 
     def pushed(self) -> bool:
@@ -358,6 +359,7 @@ class BotFightFrame(Frame):
             logger.debug(f"****************** Joined fight ******************************************")
             SessionManager().lastFightTime = perf_counter()
             self._fightCount += 1
+            self._spellCastFails = 0
             self._inFight = True
             if SessionManager().isLeader and not self._fightOptionsSent:
                 gfotmsg = GameFightOptionToggleMessage()
@@ -377,8 +379,8 @@ class BotFightFrame(Frame):
             if self.VERBOSE:
                 logger.debug(f"[FightBot] Failed to cast spell")
             if self._spellCastFails > 2:
-                DofusClient().restart()
-                return
+                self.turnEnd()
+                return True
             self._spellCastFails += 1
             # self._tryWithLessRangeOf += 2
             self.playTurn()
@@ -448,6 +450,7 @@ class BotFightFrame(Frame):
         return stats.getStatTotalValue(StatIds.MOVEMENT_POINTS)
 
     def turnEnd(self) -> None:
+        self._spellCastFails = 0
         self._myTurn = False
         self._seqQueue.clear()
         self._turnAction.clear()
@@ -489,6 +492,7 @@ class BotFightFrame(Frame):
                     and float(entity.contextualId) not in self.battleFrame._deadTurnsList
                     and (targetSum or not monster.stats.summoned)
                     and self.canCastSpell(spellw, entity.contextualId)
+                    and entity.disposition.cellId != -1
                 ):
                     result.append(_Target(entity.contextualId, MapPoint.fromCellId(entity.disposition.cellId)))
         if self.VERBOSE:

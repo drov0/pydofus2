@@ -71,6 +71,8 @@ class WorldPathFinder(metaclass=Singleton):
         if self.src is None:
             callback(None)
             return
+        if linkedZone is None:
+            linkedZone = 1
         self.linkedZone = linkedZone
         WorldPathFinder.callback = callback
         self.dst = destinationMapId

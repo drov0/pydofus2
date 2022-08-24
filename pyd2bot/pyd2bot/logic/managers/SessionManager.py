@@ -21,7 +21,7 @@ class InactivityMonitor(threading.Thread):
     def __init__(self):
         super().__init__()
         self.lastActivity = perf_counter()
-        self.maxInactivityInterval = 60 * 60 * 2 if SessionManager().type == "selling" else 60 * 5
+        self.maxInactivityInterval = 60 * 60 * 2 if SessionManager().type == "selling" else 60 * 15
         self.lastStatus = "disconnected"
         self.stop = threading.Event()
     
@@ -29,13 +29,13 @@ class InactivityMonitor(threading.Thread):
         while not self.stop.is_set():
             status = PlayerAPI.status()
             if status != self.lastStatus:
-                self.lastStatus = status
                 self.lastActivity = perf_counter()
             elif perf_counter() - self.lastActivity > self.maxInactivityInterval:
                 logger.info("Inactivity detected, disconnecting ...")
                 DofusClient().restart()
                 self.lastActivity = perf_counter()
-            sleep(3)
+            self.lastStatus = status
+            sleep(1)
             
 class SessionManager(metaclass=Singleton):
     character = None
@@ -66,6 +66,7 @@ class SessionManager(metaclass=Singleton):
             self.followers : list[str] = sessionJson.get("followers")
             self.party = True
             if self.followers is not None:
+                self.monsterLvlCoefDiff = sessionJson.get("monsterLvlCoefDiff")
                 self.isLeader = True
                 self.path = sessionJson.get("path")
                 logger.info(f"Running path {self.path}")

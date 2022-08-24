@@ -395,17 +395,18 @@ class BuffManager(metaclass=Singleton):
             )
         newBuffs: list = []
         currentFighterId: float = CurrentPlayedFighterManager().currentFighterId
-        for buff in self._buffs[targetId]:
-            if spellId == buff.castingSpell.spell.id and buff.canBeDispell(
-                forceUndispellable, -sys.maxsize + 1, dying
-            ):
-                if GameDebugManager().buffsDebugActivated:
-                    logger.debug(f"[BUFFS DEBUG]      Buff {buff.uid} doit �tre retir�")
-                buff.onRemoved()
-            else:
-                if GameDebugManager().buffsDebugActivated:
-                    logger.debug(f"[BUFFS DEBUG]      Buff {buff.uid} reste")
-                newBuffs.append(buff)
+        if targetId in self._buffs:
+            for buff in self._buffs[targetId]:
+                if spellId == buff.castingSpell.spell.id and buff.canBeDispell(
+                    forceUndispellable, -sys.maxsize + 1, dying
+                ):
+                    if GameDebugManager().buffsDebugActivated:
+                        logger.debug(f"[BUFFS DEBUG]      Buff {buff.uid} doit �tre retir�")
+                    buff.onRemoved()
+                else:
+                    if GameDebugManager().buffsDebugActivated:
+                        logger.debug(f"[BUFFS DEBUG]      Buff {buff.uid} reste")
+                    newBuffs.append(buff)
         self._buffs[targetId] = newBuffs
 
     def dispellUniqueBuff(

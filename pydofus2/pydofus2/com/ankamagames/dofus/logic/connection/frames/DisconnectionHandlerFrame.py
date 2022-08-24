@@ -120,21 +120,17 @@ class DisconnectionHandlerFrame(Frame):
                         logger.debug(
                             f"The connection closure was expected (reason: {reason.reason})."
                         )
-                        if (
-                            reason.reason == DisconnectionReasonEnum.DISCONNECTED_BY_POPUP
-                            or reason.reason == DisconnectionReasonEnum.SWITCHING_TO_HUMAN_VENDOR
+                        if (reason.reason == DisconnectionReasonEnum.SWITCHING_TO_HUMAN_VENDOR
                             or reason.reason == DisconnectionReasonEnum.WANTED_SHUTDOWN
-                            or reason.reason == DisconnectionReasonEnum.EXCEPTION_THROWN
                         ):
                             logger.debug(reason.message)
                             krnl.Kernel().reset()
                             DofusClient().interrupt(reason)
-                        elif reason.reason == DisconnectionReasonEnum.RESTARTING:
-                            self.reconnect()
+                        elif reason.reason == DisconnectionReasonEnum.RESTARTING or reason.reason == DisconnectionReasonEnum.EXCEPTION_THROWN or reason.reason == DisconnectionReasonEnum.DISCONNECTED_BY_POPUP:
+                            Timer(10, self.reconnect).start()
                         elif reason.reason == DisconnectionReasonEnum.CONNECTION_LOST:
                             logger.debug(f"The connection was lost. Restarting in 10seconds.")
-                            krnl.Kernel().reset(reloadData=True, autoRetry=True)
-                            Timer(10, DofusClient().relogin).start()
+                            Timer(10, self.reconnect).start()
                         else:
                             krnl.Kernel().getWorker().process(ExpectedSocketClosureMessage(reason.reason))
             else:

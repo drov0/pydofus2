@@ -4,28 +4,79 @@ from time import sleep
 from pyd2bot.PyD2Bot import PyD2Bot
 
 currdir = os.path.dirname(os.path.abspath(__file__))
+
 with open(os.path.join(currdir, "testData", "accounts.json"), "r") as fp:
     accounts = json.load(fp)
+    
 with open(os.path.join(currdir, "testData", "apiKeys.json"), "r") as fp:
     apiKeys = json.load(fp)
 
 path_pioute_astrub = {
     "type": "RandomSubAreaFarmPath",
     "name": "pioute_astrub_village",
-    "subAreaId": 95,
     "startVertex": {"mapId": 191104002, "mapRpZone": 1},
 }
 path_criniere_astrub = {
     "type": "RandomSubAreaFarmPath",
     "name": "pioute_astrub_village",
-    "subAreaId": 96,
     "startVertex": {"mapId": 193332228, "mapRpZone": 1},
 }
 path_taniela = {
     "type": "RandomSubAreaFarmPath",
     "name": "pioute_astrub_village",
-    "subAreaId": 30,
     "startVertex": {"mapId": 120062979, "mapRpZone": 1}
+}
+path_astrub_forest = {
+    "type": "RandomSubAreaFarmPath",
+    "name": "path_astrub_forest",
+    "startVertex": {"mapId": 189531139, "mapRpZone": 1}
+}
+path_astrub_egouts = {    
+    "type": "RandomSubAreaFarmPath",
+    "name": "path_astrub_egouts",
+    "onlyDirections": False,
+    "startVertex": {"mapId": 101715461, "mapRpZone": 1}
+}
+path_abraknyde_forest = {    
+    "type": "RandomSubAreaFarmPath",
+    "name": "path_abraknyde_forest",
+    "startVertex": {"mapId": 147854595, "mapRpZone": 1}
+}
+path_champs_inglasse = {
+    "type": "RandomSubAreaFarmPath",
+    "name": "path_champs_inglasse",
+    "startVertex": {"mapId": 88083732, "mapRpZone": 1}
+}
+path_bonta_chaffer = {
+    "type": "RandomSubAreaFarmPath",
+    "name": "path_bonta_chaffer",
+    "startVertex": {"mapId": 158991365, "mapRpZone": 1}
+
+}
+path_blop_cania = {
+    "type": "RandomSubAreaFarmPath",
+    "name": "path_blop_cania",
+    "startVertex": {"mapId": 156240386, "mapRpZone": 1}
+}
+path_champs_astrub = {
+    "type": "RandomSubAreaFarmPath",
+    "name": "path_champs_astrub",
+    "startVertex": {"mapId": 189792777, "mapRpZone": 1}
+}
+path_campement_bworks = {
+    "type": "RandomSubAreaFarmPath",
+    "name": "path_campement_bworks",
+    "startVertex": {"mapId": 104073218, "mapRpZone": 1}
+}
+path_peninsule_gelees = {
+    "type": "RandomSubAreaFarmPath",
+    "name": "path_peninsule_gelees",
+    "startVertex": {"mapId": 88082952, "mapRpZone": 1}
+}
+path_dark_forest = {
+    "type": "RandomSubAreaFarmPath",
+    "name": "path_dark_forest",
+    "startVertex": {"mapId": 147851779, "mapRpZone": 1}
 }
 seller = {
     "name": "Maniaco-lalcolic",
@@ -123,8 +174,8 @@ plusbellelavieSession = {
     "type": "fight",
     "unloadType": "seller",
     "character": leader,
-    "path": path_taniela,
-    "monsterLvlCoefDiff": "3",
+    "path": path_peninsule_gelees,
+    "monsterLvlCoefDiff": 10,
     "seller": seller,
     "followers": [
         moneydicer,

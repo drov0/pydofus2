@@ -140,12 +140,6 @@ class AccountManager {
     }
 
     saveAccounts() {
-        for (var [key, account] of Object.entries(this.accountsDB)) {
-            this.accountsDB[key] = {
-                "login": account.login,
-                "password": this.encrypt.encrypt(account.password)
-            }
-        }
         var saveJson = JSON.stringify(this.accountsDB, null, 2);
         fs.writeFile(this.accountsDbFile, saveJson, 'utf8', (err) => {
             if (err) {

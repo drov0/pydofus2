@@ -245,7 +245,7 @@ class BotFarmPathFrame(Frame):
                 totalGrpLvl = infos.staticInfos.mainCreatureLightInfos.level + sum(
                     [ul.level for ul in infos.staticInfos.underlings]
                 )
-                if totalGrpLvl < self.farmPath.monsterLvlCoefDiff * PlayedCharacterManager().limitedLevel:
+                if totalGrpLvl < SessionManager().monsterLvlCoefDiff * PlayedCharacterManager().limitedLevel:
                     monsterGroupPos = MapPoint.fromCellId(infos.disposition.cellId)
                     availableMonsterFights.append(
                         {"info": infos, "distance": currPlayerPos.distanceToCell(monsterGroupPos)}

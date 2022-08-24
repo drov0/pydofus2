@@ -2,12 +2,11 @@ from pydofus2.com.ankamagames.dofus.logic.game.common.misc.DofusEntities import 
 from pydofus2.com.ankamagames.dofus.logic.game.common.misc.IEntityLocalizer import (
     IEntityLocalizer,
 )
-from pydofus2.com.ankamagames.jerakine.entities.interfaces.IDisplayable import IDisplayable
 from pydofus2.com.ankamagames.jerakine.entities.interfaces.IEntity import IEntity
 from pydofus2.com.ankamagames.jerakine.logger.Logger import Logger
 from pydofus2.com.ankamagames.jerakine.metaclasses.Singleton import Singleton
 
-logger = Logger("Dofus2")
+logger = Logger()
 
 
 class FightEntitiesHolder(IEntityLocalizer, metaclass=Singleton):
@@ -37,9 +36,4 @@ class FightEntitiesHolder(IEntityLocalizer, metaclass=Singleton):
         return self._holdedEntities
 
     def unregistered(self) -> None:
-        for entity in self._holdedEntities:
-            if isinstance(entity, IDisplayable):
-                entity = None
-            if isinstance(entity, TiphonSprite):
-                entity = None
         self._holdedEntities.clear()

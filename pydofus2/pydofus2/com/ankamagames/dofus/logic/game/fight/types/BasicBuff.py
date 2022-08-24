@@ -130,7 +130,12 @@ class BasicBuff:
         if isinstance(self._effect, EffectInstanceDice):
             return self._effect.diceNum
         return None
-
+    
+    @param1.setter
+    def param1(self, value: Any) -> None:
+        if isinstance(self._effect, EffectInstanceDice):
+            self._effect.diceNum = value
+            
     @property
     def param2(self) -> Any:
         if isinstance(self._effect, EffectInstanceDice):

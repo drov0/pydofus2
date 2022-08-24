@@ -174,5 +174,49 @@
     "access": [],
     "refresh_token": "7318843c-bfa8-42a2-b16d-9e6097852ae1",
     "expiration_date": "2022-09-02T01:44:38+02:00"
+  },
+  "grinder97": {
+    "key": "b604df5c-3987-4da9-a1a5-6a8e82c9cfaf",
+    "account_id": 148961241,
+    "ip": "37.65.14.204",
+    "added_date": "2022-08-24T17:15:01+02:00",
+    "meta": [],
+    "data": {
+      "shop": "ZAAP",
+      "lang": "fr",
+      "payment_mode": "OK",
+      "country": "FR",
+      "currency": "EUR",
+      "security_state": "SECURED",
+      "security_detail": "CERTIFICATE_OK"
+    },
+    "game_id": 102,
+    "certificate_id": 128442020,
+    "external_auth_id": null,
+    "access": [],
+    "refresh_token": "44de38d6-f2c2-40af-9838-6b195174c21a",
+    "expiration_date": "2022-09-23T17:15:01+02:00"
+  },
+  "grinder98": {
+    "key": "0f6270ae-aa21-473b-ba2d-8af61cf26043",
+    "account_id": 148963127,
+    "ip": "37.65.14.204",
+    "added_date": "2022-08-24T17:16:54+02:00",
+    "meta": [],
+    "data": {
+      "shop": "ZAAP",
+      "lang": "fr",
+      "payment_mode": "OK",
+      "country": "FR",
+      "currency": "EUR",
+      "security_state": "SECURED",
+      "security_detail": "CERTIFICATE_OK"
+    },
+    "game_id": 102,
+    "certificate_id": 128442102,
+    "external_auth_id": null,
+    "access": [],
+    "refresh_token": "65238381-cee0-441d-92ee-7e815940578c",
+    "expiration_date": "2022-09-23T17:16:54+02:00"
   }
 }

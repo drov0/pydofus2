@@ -100,26 +100,29 @@ class MembersMonitor(threading.Thread):
     def run(self) -> None:
         logger.debug("[MembersMonitor] started")
         while not self.stopSig.is_set():
-            if PlayedCharacterManager().isInFight:
-                if self.VERBOSE:
-                    logger.debug("[MembersMonitor] bot isFighting")
-            
-            elif PlayerAPI.status() != "idle":
-                pass
-            
-            else:                
-                if not self.bpframe:
+            try:
+                if PlayedCharacterManager().isInFight:
                     if self.VERBOSE:
-                        logger.debug("[MembersMonitor] BotPartyFrame not found")
-                        
-                elif not self.bpframe.farmFrame:
+                        logger.debug("[MembersMonitor] bot isFighting")
+                
+                elif PlayerAPI.status() != "idle":
                     pass
                 
-                elif self.bpframe.allMembersIdle:
-                    if self.bpframe.allMembersOnSameMap:
-                        BotEventsManager().dispatch(BotEventsManager.MEMBERS_READY)
-                    elif self.bpframe.farmFrame and self.bpframe.farmFrame.isInsideFarmPath:
-                        self.bpframe.notifyFollowesrWithPos()
+                else:                
+                    if not self.bpframe:
+                        if self.VERBOSE:
+                            logger.debug("[MembersMonitor] BotPartyFrame not found")
+                            
+                    elif not self.bpframe.farmFrame:
+                        pass
+                    
+                    elif self.bpframe.allMembersIdle:
+                        if self.bpframe.allMembersOnSameMap:
+                            BotEventsManager().dispatch(BotEventsManager.MEMBERS_READY)
+                        elif self.bpframe.farmFrame and self.bpframe.farmFrame.isInsideFarmPath:
+                            self.bpframe.notifyFollowesrWithPos()
+            except Exception as e:
+                logger.error(e)
             sleep(1)
         logger.debug("[MembersMonitor] died")
         if self in self._runningMonitors:
@@ -194,10 +197,6 @@ class BotPartyFrame(Frame):
             self.leaveParty()
         if self.isLeader:
             self.canFarmMonitor.stopSig.set()
-            try:
-                self.canFarmMonitor.join()
-            except:
-                pass
         self.partyMembers.clear()
         if self.partyInviteTimers:
             for timer in self.partyInviteTimers.values():

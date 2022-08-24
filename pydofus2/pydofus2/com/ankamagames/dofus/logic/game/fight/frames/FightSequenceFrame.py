@@ -389,10 +389,8 @@ class FightSequenceFrame(Frame, ISpellCastProvider):
 
     @property
     def fightEntitiesFrame(self) -> "FightEntitiesFrame":
-        if not self._fightEntitiesFrame:
-            self._fightEntitiesFrame = Kernel().getWorker().getFrame("FightEntitiesFrame")
-        return self._fightEntitiesFrame
-
+        return Kernel().getWorker().getFrame("FightEntitiesFrame")
+    
     def addSubSequence(self, sequence: ISequencer) -> None:
         self._subSequenceWaitingCount += 1
         # logger.debug(f"Adding ParallelStartSequenceStep to sequence #{self._instanceId}")
@@ -766,8 +764,9 @@ class FightSequenceFrame(Frame, ISpellCastProvider):
         if isinstance(msg, GameActionFightInvisibilityMessage):
             gafimsg = msg
             self.keepInMindToUpdateMovementArea()
-            fightEntitiesFrame = FightEntitiesFrame.getCurrentInstance()
-            inviInfo = fightEntitiesFrame.getEntityInfos(gafimsg.targetId)
+            inviInfo = self.fightEntitiesFrame.getEntityInfos(gafimsg.targetId)
+            if not inviInfo:
+                return True
             if GameDebugManager().buffsDebugActivated:
                 logger.debug(
                     "[BUFFS DEBUG] Changement de l'invisibilit� de "
@@ -778,8 +777,9 @@ class FightSequenceFrame(Frame, ISpellCastProvider):
                     + " nouvel �tat "
                     + str(gafimsg.state)
                 )
-            fightEntitiesFrame.setLastKnownEntityPosition(gafimsg.targetId, inviInfo.disposition.cellId)
-            fightEntitiesFrame.setLastKnownEntityMovementPoint(gafimsg.targetId, 0, True)
+            
+            self.fightEntitiesFrame.setLastKnownEntityPosition(gafimsg.targetId, inviInfo.disposition.cellId)
+            self.fightEntitiesFrame.setLastKnownEntityMovementPoint(gafimsg.targetId, 0, True)
             self.pushStep(FightChangeVisibilityStep(gafimsg.targetId, gafimsg.state))
             return True
 

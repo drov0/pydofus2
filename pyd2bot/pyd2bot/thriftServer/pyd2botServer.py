@@ -41,7 +41,7 @@ class Pyd2botServer:
     def fetchAccountCharacters(self, login:str, password:str, certId:str, certHash:str, apiKey:str) -> list[Character]:
         logging.info("fetchAccountCharacters called")
         rate = 2.
-        timeout = 10.
+        timeout = 20.
         Haapi().APIKEY = apiKey
         loginToken = Haapi().getLoginToken(login, password, certId, certHash)
         result = list()
@@ -64,6 +64,7 @@ class Pyd2botServer:
         usedServers = ssf._serversUsedList.copy()
         for server in usedServers:
             if ServerStatusEnum(server.status) == ServerStatusEnum.ONLINE or ServerStatusEnum(server.status) == ServerStatusEnum.NOJOIN:
+                dofus2._lastLoginTime = None
                 dofus2._loginToken = Haapi().getLoginToken(login, password, certId, certHash)
                 dofus2._serverId = server.id
                 dofus2.restart()

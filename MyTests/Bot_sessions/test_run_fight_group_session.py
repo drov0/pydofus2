@@ -1,6 +1,5 @@
 import json
 import os
-from time import sleep
 from pyd2bot.PyD2Bot import PyD2Bot
 
 currdir = os.path.dirname(os.path.abspath(__file__))
@@ -77,6 +76,31 @@ path_dark_forest = {
     "type": "RandomSubAreaFarmPath",
     "name": "path_dark_forest",
     "startVertex": {"mapId": 147851779, "mapRpZone": 1}
+}
+path_dragon_cochon = {
+    "type": "RandomSubAreaFarmPath",
+    "name": "path_dragon_cochon",
+    "startVertex": {"mapId": 72619522, "mapRpZone": 1}
+}
+path_mine_doeupole = {
+    "type": "RandomSubAreaFarmPath",
+    "name": "path_mine_doeupole",
+    "startVertex": {"mapId": 123470337, "mapRpZone": 1}
+}
+path_bord_foret_malefique = {
+    "type": "RandomSubAreaFarmPath",
+    "name": "path_bord_foret_malefique",
+    "startVertex": {"mapId": 88080650, "mapRpZone": 1}
+}
+path_egouts_astrubien = {
+    "type": "RandomSubAreaFarmPath",
+    "name": "path_egouts_astrubien",
+    "startVertex": {"mapId": 101715467, "mapRpZone": 1}
+}
+path_pic_cania = {
+    "type": "RandomSubAreaFarmPath",
+    "name": "path_pic_cania",
+    "startVertex": {"mapId": 139462657, "mapRpZone": 1}
 }
 seller = {
     "name": "Maniaco-lalcolic",
@@ -169,13 +193,14 @@ moneslicer = {
     "primaryStatId": 10,
     "serverPort": 10092,
 }
+
 plusbellelavieSession = {
     "key": "Plusbellelavie(336986964178)",
     "type": "fight",
     "unloadType": "seller",
     "character": leader,
     "path": path_peninsule_gelees,
-    "monsterLvlCoefDiff": 10,
+    "monsterLvlCoefDiff": 5,
     "seller": seller,
     "followers": [
         moneydicer,

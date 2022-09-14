@@ -45,7 +45,7 @@ class FightActionPointsVariationStep(AbstractStatContextualStep, IFightStep):
         updateFighterInfos = False
         super().__init__(
             self.COLOR,
-            "+" + value if value > 0 else str(value),
+            "+" + str(value) if value > 0 else "-" + str(abs(value)),
             entityId,
             GameContextEnum.FIGHT,
             self.BLOCKING,

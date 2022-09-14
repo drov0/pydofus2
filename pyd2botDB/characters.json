@@ -118,5 +118,29 @@
     "accountId": "Exodios-panda",
     "primarySpellId": 13516,
     "primaryStatId": 10
+  },
+  "345554485458": {
+    "name": "Saitama-com",
+    "id": 345554485458,
+    "level": 2,
+    "breedId": 10,
+    "breedName": "Sadida",
+    "serverId": 210,
+    "serverName": "Merkator",
+    "accountId": "grinder97",
+    "primarySpellId": 13516,
+    "primaryStatId": 10
+  },
+  "345554878674": {
+    "name": "Lakinator",
+    "id": 345554878674,
+    "level": 2,
+    "breedId": 10,
+    "breedName": "Sadida",
+    "serverId": 210,
+    "serverName": "Merkator",
+    "accountId": "grinder98",
+    "primarySpellId": 13516,
+    "primaryStatId": 10
   }
 }

@@ -224,6 +224,7 @@ class AccountManager {
         var instance = await instancesManager.spawn(key, port)
         var apiKey = await this.getAccountApiKey(key)
         var creds = this.getAccountCreds(key)
+        console.log(creds)
         var response = await instance.client.fetchAccountCharacters(creds.login, creds.password, creds.certId, creds.certHash, apiKey)
         console.log("fetcheCharacters result: " + JSON.stringify(response))
         for (let ck in response) {

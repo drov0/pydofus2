@@ -71,6 +71,10 @@ class Haapi(metaclass=Singleton):
                             self.APIKEY = key
                             return response.json()
                         else:
+                            if "reason" in response.json():
+                                if response.json()["reason"] == "BAN":
+                                    logger.debug("This account is banned definitively")
+                                    return None
                             logger.debug("Error while calling HAAPI to get Login Token : %s" % response.content)
                             sleep(5)
                     else:
@@ -80,8 +84,8 @@ class Haapi(metaclass=Singleton):
                         errorCode = root.xpath('//span[@class="code-label"]//span')[0].text
                         logger.debug(f"[Haapi error {errorCode}] : Login Token creation for login {login} failed for reason: {error}")
                         sleep(5)
-            logger.debug("Failed to create APIKEY, retrying in 30 seconds")
-            sleep(30)
+            logger.debug("Failed to create APIKEY, retrying in 10 seconds")
+            sleep(10)
             nbrtries += 1
         return None
             

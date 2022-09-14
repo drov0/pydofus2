@@ -237,6 +237,7 @@ class PlayedCharacterUpdatesFrame(Frame):
 
         if isinstance(msg, CharacterLevelUpMessage):
             clumsg = msg
+            entityInfos = None
             previousLevel = pcm.PlayedCharacterManager().infos.level
             pcm.PlayedCharacterManager().infos.level = clumsg.newLevel
             if clumsg.newLevel == 10 and PlayerManager().server.gameTypeId != GameServerTypeEnum.SERVER_TYPE_TEMPORIS:

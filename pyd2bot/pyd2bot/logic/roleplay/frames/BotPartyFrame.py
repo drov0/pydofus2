@@ -221,17 +221,24 @@ class BotPartyFrame(Frame):
         self.leaderTransitionsQueue : list = []
         self.followingLeaderTransition = None
         if self.isLeader:
-            logger.debug("[BotPartyFrame] Bot is leader.")
-            self.canFarmMonitor = MembersMonitor(self)
-            self.canFarmMonitor.start()
-            logger.debug(f"[BotPartyFrame] Send party invite to all followers.")
-            for follower in self.followers:
-                follower["status"] = "unknown"
-                self.connectFollowerClient(follower)
-                logger.debug(f"[BotPartyFrame] Will Send party invite to {follower['name']}")
-                self.sendPartyInvite(follower["name"])
+            self.init()
         return True
 
+    def init(self):
+        if WorldPathFinder().currPlayerVertex is None:
+            logger.debug("[BotPartyFrame] Cant invite members before am in game")
+            Timer(5, self.init).start()
+            return
+        logger.debug("[BotPartyFrame] Bot is leader.")
+        self.canFarmMonitor = MembersMonitor(self)
+        self.canFarmMonitor.start()
+        logger.debug(f"[BotPartyFrame] Send party invite to all followers.")
+        for follower in self.followers:
+            follower["status"] = "unknown"
+            self.connectFollowerClient(follower)
+            logger.debug(f"[BotPartyFrame] Will Send party invite to {follower['name']}")
+            self.sendPartyInvite(follower["name"])
+            
     def getFollowerById(self, id: int) -> dict:
         for follower in self.followers:
             if follower["id"] == id:

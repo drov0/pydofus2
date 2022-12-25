@@ -104,11 +104,11 @@ path_pic_cania = {
 }
 seller = {
     "name": "Maniaco-lalcolic",
-    "id": 336140370130,
+    "id": 5820449062,
     "level": 62,
     "breedId": 10,
     "breedName": "Sadida",
-    "serverId": 210,
+    "serverId": 294,
     "serverName": "Merkator",
     "accountId": "slicer-the-dicer",
     "primarySpellId": 13516,
@@ -117,11 +117,11 @@ seller = {
 }
 leader = {
     "name": "Plusbellelavie",
-    "id": 336986964178,
+    "id": 369475322150,
     "level": 65,
     "breedId": 10,
     "breedName": "Sadida",
-    "serverId": 210,
+    "serverId": 294,
     "serverName": "Merkator",
     "accountId": "melanco-lalco",
     "primarySpellId": 13516,
@@ -130,11 +130,11 @@ leader = {
 }
 moneydicer = {
     "name": "Moneydicer",
-    "id": 336815325394,
+    "id": 92638609702,
     "level": 70,
     "breedId": 10,
     "breedName": "Sadida",
-    "serverId": 210,
+    "serverId": 294,
     "serverName": "Merkator",
     "accountId": "Exodios-cra",
     "primarySpellId": 13516,
@@ -143,11 +143,11 @@ moneydicer = {
 }
 moneylife = {
     "name": "Moneylife",
-    "id": 336919920850,
+    "id": 790823206,
     "level": 54,
     "breedId": 10,
     "breedName": "Sadida",
-    "serverId": 210,
+    "serverId": 294,
     "serverName": "Merkator",
     "accountId": "twistedFater",
     "primarySpellId": 13516,
@@ -156,11 +156,11 @@ moneylife = {
 }
 hardlett = {
     "name": "Hardlett",
-    "id": 337022615762,
+    "id": 76302254374,
     "level": 48,
     "breedId": 10,
     "breedName": "Sadida",
-    "serverId": 210,
+    "serverId": 294,
     "serverName": "Merkator",
     "accountId": "Money",
     "primarySpellId": 13516,
@@ -169,11 +169,11 @@ hardlett = {
 }
 moneycreator = {
     "name": "Moneycreator",
-    "id": 336919855314,
+    "id": 171988287782,
     "level": 61,
     "breedId": 10,
     "breedName": "Sadida",
-    "serverId": 210,
+    "serverId": 294,
     "serverName": "Merkator",
     "accountId": "Exodios-panda",
     "primarySpellId": 13516,
@@ -182,11 +182,11 @@ moneycreator = {
 }
 moneslicer = {
     "name": "Moneslicer",
-    "id": 336919789778,
+    "id": 258718695718,
     "level": 49,
     "breedId": 10,
     "breedName": "Sadida",
-    "serverId": 210,
+    "serverId": 294,
     "serverName": "Merkator",
     "accountId": "Exodios-arc",
     "primarySpellId": 13516,
@@ -195,7 +195,7 @@ moneslicer = {
 }
 
 plusbellelavieSession = {
-    "key": "Plusbellelavie(336986964178)",
+    "key": "Plusbellelavie(369475322150)",
     "type": "fight",
     "unloadType": "seller",
     "character": leader,
@@ -211,7 +211,7 @@ plusbellelavieSession = {
     ],
 }
 moneydicerSession = {
-    "key": "Moneydicer(336815325394)",
+    "key": "Moneydicer(92638609702)",
     "type": "fight",
     "unloadType": "seller",
     "character": moneydicer,
@@ -219,7 +219,7 @@ moneydicerSession = {
     "seller": seller,
 }
 moneylifeSession = {
-    "key": "Moneylife(336919920850)",
+    "key": "Moneylife(790823206)",
     "type": "fight",
     "unloadType": "seller",
     "character": moneylife,
@@ -227,7 +227,7 @@ moneylifeSession = {
     "seller": seller,
 }
 hardlettSession = {
-    "key": "Hardlett(337022615762)",
+    "key": "Hardlett(76302254374)",
     "type": "fight",
     "unloadType": "seller",
     "character": hardlett,
@@ -235,7 +235,7 @@ hardlettSession = {
     "seller": seller,
 }
 moneycreatorSession = {
-    "key": "Moneycreator(336919855314)",
+    "key": "Moneycreator(171988287782)",
     "type": "fight",
     "unloadType": "seller",
     "character": moneycreator,
@@ -243,7 +243,7 @@ moneycreatorSession = {
     "seller": seller,
 }
 moneslicerSession = {
-    "key": "Moneslicer(336919789778)",
+    "key": "Moneslicer(258718695718)",
     "type": "fight",
     "unloadType": "seller",
     "character": moneslicer,
@@ -251,7 +251,7 @@ moneslicerSession = {
     "seller": seller,
 }
 sellerSession = {
-    "key": "Maniaco-lalcolic(336140370130)",
+    "key": "Maniaco-lalcolic(5820449062)",
     "type": "selling",
     "unloadType": None,
     "character": seller

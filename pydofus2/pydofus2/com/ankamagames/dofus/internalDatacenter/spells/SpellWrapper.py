@@ -16,7 +16,7 @@ from pydofus2.com.ankamagames.dofus.datacenter.spells.SpellLevel import SpellLev
 from pydofus2.com.ankamagames.dofus.internalDatacenter.DataEnum import DataEnum
 from pydofus2.com.ankamagames.dofus.internalDatacenter.items.ItemWrapper import ItemWrapper
 from pydofus2.com.ankamagames.dofus.internalDatacenter.items.WeaponWrapper import WeaponWrapper
-from pydofus2.com.ankamagames.dofus.internalDatacenter.spells.EffectZone import EffectZone
+from pydofus2.com.ankamagames.dofus.datacenter.spells.EffectZone import EffectZone
 from pydofus2.com.ankamagames.dofus.internalDatacenter.stats.EntityStats import EntityStats
 from pydofus2.com.ankamagames.dofus.logic.common.managers.StatsManager import StatsManager
 from pydofus2.com.ankamagames.dofus.logic.game.common.managers.PlayedCharacterManager import (
@@ -683,9 +683,9 @@ class SpellWrapper(ISlotData, ICellZoneProvider, IDataCenter):
                 if damageBaseSpellModifier and isinstance(effectInstance, EffectInstanceDice):
                     effectInstanceDice = effectInstance
                     modif = damageBaseSpellModifier.totalValue - damageBaseSpellModifier.additionalValue
-                    effectInstanceDice.param1 += modif
-                    if effectInstanceDice.param2 > 0:
-                        effectInstanceDice.param2 += modif
+                    effectInstanceDice.diceNum += modif
+                    if effectInstanceDice.diceSide > 0:
+                        effectInstanceDice.diceSide += modif
                 damageSpellModifier = spellmm.SpellModifiersManager().getSpellModifier(
                     entityId, self.id, CharacterSpellModificationTypeEnum.DAMAGE
                 )
@@ -697,13 +697,13 @@ class SpellWrapper(ISlotData, ICellZoneProvider, IDataCenter):
                 elif healSpellModifier:
                     effectInstance.modificator = damageSpellModifier.totalValue - damageSpellModifier.additionalValue
             self.criticalEffect.append(effectInstance)
-        llen = len(self._spellLevel.additionalEffectsZones)
-        if llen > 0:
-            self.additionalEffectsZones = list[EffectZone]()
-        for j in range(0, llen, 2):
-            self.additionalEffectsZones.append(
-                EffectZone(
-                    self._spellLevel.additionalEffectsZones[j],
-                    self._spellLevel.additionalEffectsZones[j + 1],
-                )
-            )
+        # llen = len(self._spellLevel.additionalEffectsZones)
+        # if llen > 0:
+        #     self.additionalEffectsZones = list[EffectZone]()
+        # for j in range(0, llen, 2):
+        #     self.additionalEffectsZones.append(
+        #         EffectZone(
+        #             self._spellLevel.additionalEffectsZones[j],
+        #             self._spellLevel.additionalEffectsZones[j + 1],
+        #         )
+        #     )

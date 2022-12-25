@@ -337,5 +337,5 @@ ROOTDIR = pathlib.Path(os.path.dirname(__file__))
 # )
 
 t = perf_counter()
-parseFile(ROOTDIR / "target.as", ROOTDIR / "InfoMessage.py")
+parseFile(ROOTDIR / "target.as", ROOTDIR / "EffectZone.py")
 print("parsing took:", perf_counter() - t)

@@ -34,7 +34,7 @@ class EffectInstance(IDataCenter):
 
     UNDEFINED_SHOW: int = -1
 
-    UNDEFINED_DESCRIPTION: str = "None"
+    UNDEFINED_DESCRIPTION: str = "undefined"
 
     effectUid: int
 
@@ -156,7 +156,7 @@ class EffectInstance(IDataCenter):
         if self._category == self.UNDEFINED_CATEGORY:
             if not self._effectData:
                 self._effectData = Effect.getEffectById(self.effectId)
-            self._category = int(self._effectData.category) if not not self._effectData else -1
+            self._category = int(self._effectData.category) if self._effectData else -1
         return self._category
 
     @property
@@ -164,7 +164,7 @@ class EffectInstance(IDataCenter):
         if self._bonusType == -2:
             if not self._effectData:
                 self._effectData = Effect.getEffectById(self.effectId)
-            self._bonusType = int(self._effectData.bonusType) if not not self._effectData else -2
+            self._bonusType = int(self._effectData.bonusType) if self._effectData else -2
         return self._bonusType
 
     @property
@@ -178,7 +178,7 @@ class EffectInstance(IDataCenter):
         if self._oppositeId == -1:
             if not self._effectData:
                 self._effectData = Effect.getEffectById(self.effectId)
-            self._oppositeId = int(self._effectData.oppositeId) if not not self._effectData else -1
+            self._oppositeId = int(self._effectData.oppositeId) if self._effectData else -1
         return self._oppositeId
 
     @property
@@ -186,7 +186,7 @@ class EffectInstance(IDataCenter):
         if self._priority == 0:
             if not self._effectData:
                 self._effectData = Effect.getEffectById(self.effectId)
-            self._priority = int(self._effectData.effectPriority) if not not self._effectData else int(0)
+            self._priority = int(self._effectData.effectPriority) if self._effectData else int(0)
         return self._priority
 
     def clone(self, o: "EffectInstance" = None) -> "EffectInstance":
@@ -299,13 +299,13 @@ class EffectInstance(IDataCenter):
                         self.zoneSize = int(params[0])
 
                 elif len(params) == 2:
-                    if SpellZone.hasMinSize(self.rawZone.substr(0, 1)):
+                    if SpellZone.hasMinSize(self.rawZone[:1]):
                         self.zoneMinSize = int(params[1])
                     else:
                         self.zoneEfficiencyPercent = int(params[1])
 
                 elif len(params) == 3:
-                    if SpellZone.hasMinSize(self.rawZone.substr(0, 1)):
+                    if SpellZone.hasMinSize(self.rawZone[:1]):
                         self.zoneMinSize = int(params[1])
                         self.zoneEfficiencyPercent = int(params[2])
                     else:
@@ -322,7 +322,7 @@ class EffectInstance(IDataCenter):
                     self.zoneEfficiencyPercent = None
                     self.zoneMaxEfficiency = None
         else:
-            logger.error("Zone incorrect (" + self.rawZone + ")")
+            logger.error(f"Zone incorrect ({self.rawZone})")
 
     @property
     def parameter0(self):

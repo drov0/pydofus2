@@ -137,8 +137,6 @@ class AuthentificationFrame(Frame):
             PlayerManager().nickname = ismsg.accountTag.nickname
             PlayerManager().tag = ismsg.accountTag.tagNumber
             PlayerManager().subscriptionEndDate = ismsg.subscriptionEndDate
-            PlayerManager().subscriptionDurationElapsed = ismsg.subscriptionElapsedDuration
-            PlayerManager().secretQuestion = ismsg.secretQuestion
             PlayerManager().accountCreation = ismsg.accountCreation
             PlayerManager().wasAlreadyConnected = ismsg.wasAlreadyConnected
             DataStoreType.ACCOUNT_ID = str(ismsg.accountId)

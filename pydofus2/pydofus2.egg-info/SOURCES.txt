@@ -843,6 +843,8 @@ pydofus2/com/ankamagames/dofus/network/messages/game/character/debt/DebtsDeleteM
 pydofus2/com/ankamagames/dofus/network/messages/game/character/debt/DebtsUpdateMessage.py
 pydofus2/com/ankamagames/dofus/network/messages/game/character/debt/__init__.py
 pydofus2/com/ankamagames/dofus/network/messages/game/character/deletion/CharacterDeletionErrorMessage.py
+pydofus2/com/ankamagames/dofus/network/messages/game/character/deletion/CharacterDeletionPrepareMessage.py
+pydofus2/com/ankamagames/dofus/network/messages/game/character/deletion/CharacterDeletionPrepareRequestMessage.py
 pydofus2/com/ankamagames/dofus/network/messages/game/character/deletion/CharacterDeletionRequestMessage.py
 pydofus2/com/ankamagames/dofus/network/messages/game/character/deletion/__init__.py
 pydofus2/com/ankamagames/dofus/network/messages/game/character/replay/CharacterReplayRequestMessage.py
@@ -860,6 +862,7 @@ pydofus2/com/ankamagames/dofus/network/messages/game/character/stats/CharacterSt
 pydofus2/com/ankamagames/dofus/network/messages/game/character/stats/FighterStatsListMessage.py
 pydofus2/com/ankamagames/dofus/network/messages/game/character/stats/LifePointsRegenBeginMessage.py
 pydofus2/com/ankamagames/dofus/network/messages/game/character/stats/LifePointsRegenEndMessage.py
+pydofus2/com/ankamagames/dofus/network/messages/game/character/stats/RemoveSpellModifierMessage.py
 pydofus2/com/ankamagames/dofus/network/messages/game/character/stats/ResetCharacterStatsRequestMessage.py
 pydofus2/com/ankamagames/dofus/network/messages/game/character/stats/UpdateLifePointsMessage.py
 pydofus2/com/ankamagames/dofus/network/messages/game/character/stats/UpdateSpellModifierMessage.py
@@ -1869,6 +1872,7 @@ pydofus2/com/ankamagames/dofus/network/messages/server/__init__.py
 pydofus2/com/ankamagames/dofus/network/messages/server/basic/SystemMessageDisplayMessage.py
 pydofus2/com/ankamagames/dofus/network/messages/server/basic/__init__.py
 pydofus2/com/ankamagames/dofus/network/messages/subscription/AccountInformationsUpdateMessage.py
+pydofus2/com/ankamagames/dofus/network/messages/subscription/AccountSubscriptionElapsedDurationMessage.py
 pydofus2/com/ankamagames/dofus/network/messages/subscription/__init__.py
 pydofus2/com/ankamagames/dofus/network/messages/web/__init__.py
 pydofus2/com/ankamagames/dofus/network/messages/web/haapi/HaapiApiKeyMessage.py

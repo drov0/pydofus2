@@ -3,12 +3,12 @@ from pydofus2.com.ankamagames.jerakine.network.NetworkMessage import NetworkMess
 
 class ReloginTokenStatusMessage(NetworkMessage):
     validToken:bool
-    ticket:list[int]
+    token:str
     
 
-    def init(self, validToken_:bool, ticket_:list[int]):
+    def init(self, validToken_:bool, token_:str):
         self.validToken = validToken_
-        self.ticket = ticket_
+        self.token = token_
         
         super().__init__()
     

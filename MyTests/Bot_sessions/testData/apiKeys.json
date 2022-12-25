@@ -1,16 +1,14 @@
 {
     "slicer-the-dicer": {
-        "key": "71c84443-4f39-4ac7-8438-8189b6bbb199",
+        "key": "c2d0bf08-ee8d-4aeb-903f-c73859dcc72e",
         "account_id": 166307043,
-        "ip": "37.65.14.204",
-        "added_date": "2022-08-31T10:29:48+02:00",
+        "ip": "37.65.14.3",
+        "added_date": "2022-12-24T22:19:57+01:00",
         "meta": [],
         "data": {
             "shop": "ZAAP",
             "lang": "fr",
             "payment_mode": "OK",
-            "country": "FR",
-            "currency": "EUR",
             "security_state": "SECURED",
             "security_detail": "CERTIFICATE_OK"
         },
@@ -18,21 +16,19 @@
         "certificate_id": 125970667,
         "external_auth_id": null,
         "access": [],
-        "refresh_token": "67eeae56-88e5-4312-98d4-e124c79a3ef4",
-        "expiration_date": "2022-09-30T10:29:48+02:00"
+        "refresh_token": "39ac5b26-7dc0-47e5-aa60-e21e3ec4ef93",
+        "expiration_date": "2023-01-23T22:19:57+01:00"
     },
     "twistedFater": {
-        "key": "fc9c93f1-070a-42c5-bfb1-366d9f334f1f",
+        "key": "e5be41a2-4a5d-4fef-a363-98eb7f6846f9",
         "account_id": 112348096,
-        "ip": "37.65.14.204",
-        "added_date": "2022-08-31T10:30:59+02:00",
+        "ip": "37.65.14.3",
+        "added_date": "2022-12-24T22:19:57+01:00",
         "meta": [],
         "data": {
             "shop": "ZAAP",
             "lang": "fr",
             "payment_mode": "OK",
-            "country": "",
-            "currency": "EUR",
             "security_state": "SECURED",
             "security_detail": "CERTIFICATE_OK"
         },
@@ -40,21 +36,19 @@
         "certificate_id": 126305096,
         "external_auth_id": null,
         "access": [],
-        "refresh_token": "2c08e28e-cfd5-4a2a-9b1f-19b6c4fb43cc",
-        "expiration_date": "2022-09-30T10:30:59+02:00"
+        "refresh_token": "fd760cb3-2522-49d4-96b5-75a945e5bd13",
+        "expiration_date": "2023-01-23T22:19:57+01:00"
     },
     "Money": {
-        "key": "b8a8389c-0a5b-42a6-93ab-a8ea5a45bc37",
+        "key": "bfc69650-5067-4b38-88cc-a8f2e4fa14d6",
         "account_id": 166607292,
-        "ip": "37.65.14.204",
-        "added_date": "2022-08-31T10:31:34+02:00",
+        "ip": "37.65.14.3",
+        "added_date": "2022-12-24T22:20:28+01:00",
         "meta": [],
         "data": {
             "shop": "ZAAP",
             "lang": "fr",
             "payment_mode": "OK",
-            "country": "",
-            "currency": "EUR",
             "security_state": "SECURED",
             "security_detail": "CERTIFICATE_OK"
         },
@@ -62,21 +56,19 @@
         "certificate_id": 126304780,
         "external_auth_id": null,
         "access": [],
-        "refresh_token": "da97e260-9a45-4e78-bf0e-421cf302ad3d",
-        "expiration_date": "2022-09-30T10:31:34+02:00"
+        "refresh_token": "fc5c2d7b-0540-4999-9876-4dcc8fdb0e43",
+        "expiration_date": "2023-01-23T22:20:28+01:00"
     },
     "Exodios-panda": {
-        "key": "dfcb96d8-8c3a-4102-ab8b-0c19a372629b",
+        "key": "3c822c7c-45e1-426a-b90e-280417b955b9",
         "account_id": 139765036,
-        "ip": "37.65.14.204",
-        "added_date": "2022-08-31T10:33:19+02:00",
+        "ip": "37.65.14.3",
+        "added_date": "2022-12-24T22:20:58+01:00",
         "meta": [],
         "data": {
             "shop": "ZAAP",
             "lang": "fr",
             "payment_mode": "OK",
-            "country": "MA",
-            "currency": "MAD",
             "security_state": "SECURED",
             "security_detail": "CERTIFICATE_OK"
         },
@@ -84,21 +76,19 @@
         "certificate_id": 126304696,
         "external_auth_id": null,
         "access": [],
-        "refresh_token": "682eb004-8ae1-45ab-9b62-2990ce5cc394",
-        "expiration_date": "2022-09-30T10:33:19+02:00"
+        "refresh_token": "b3551950-8917-4d2b-9b2b-1bc4408f34db",
+        "expiration_date": "2023-01-23T22:20:58+01:00"
     },
     "Exodios-cra": {
-        "key": "a876bcbd-623b-4f88-b9ca-f9290576bd3b",
+        "key": "9c9962ba-d7bc-41ac-8056-48689cb35535",
         "account_id": 139764821,
-        "ip": "37.65.14.204",
-        "added_date": "2022-08-31T10:33:19+02:00",
+        "ip": "37.65.14.3",
+        "added_date": "2022-12-24T22:20:58+01:00",
         "meta": [],
         "data": {
             "shop": "ZAAP",
             "lang": "fr",
             "payment_mode": "OK",
-            "country": "MA",
-            "currency": "MAD",
             "security_state": "SECURED",
             "security_detail": "CERTIFICATE_OK"
         },
@@ -106,21 +96,19 @@
         "certificate_id": 126200687,
         "external_auth_id": null,
         "access": [],
-        "refresh_token": "5f3421c7-58aa-4346-9863-cf4b985c30bf",
-        "expiration_date": "2022-09-30T10:33:19+02:00"
+        "refresh_token": "8e1c0796-cb6e-4c10-981d-5e2b06e94503",
+        "expiration_date": "2023-01-23T22:20:58+01:00"
     },
     "TheGrinder": {
-        "key": "97ea9e48-cc96-496c-9717-2b869ab311c9",
+        "key": "b5b37220-c563-407d-a278-8d0b134f09e5",
         "account_id": 113057520,
-        "ip": "37.65.14.204",
-        "added_date": "2022-08-31T10:33:55+02:00",
+        "ip": "37.65.14.3",
+        "added_date": "2022-12-24T22:20:58+01:00",
         "meta": [],
         "data": {
             "shop": "ZAAP",
             "lang": "fr",
             "payment_mode": "OK",
-            "country": "MA",
-            "currency": "MAD",
             "security_state": "SECURED",
             "security_detail": "CERTIFICATE_OK"
         },
@@ -128,21 +116,19 @@
         "certificate_id": 126194254,
         "external_auth_id": null,
         "access": [],
-        "refresh_token": "7d0d46e6-b3c0-49c1-a1b6-e29c8688d643",
-        "expiration_date": "2022-09-30T10:33:55+02:00"
+        "refresh_token": "d0eec9e3-6179-49d8-aed2-73b61e7d6d67",
+        "expiration_date": "2023-01-23T22:20:58+01:00"
     },
     "Exodios-arc": {
-        "key": "8488d5df-b191-4d57-9caa-ecf5598c3ff2",
+        "key": "e0f46443-f39c-489c-8a85-6d69ce90c05f",
         "account_id": 139764951,
-        "ip": "37.65.14.204",
-        "added_date": "2022-08-31T10:34:30+02:00",
+        "ip": "37.65.14.3",
+        "added_date": "2022-12-24T22:21:59+01:00",
         "meta": [],
         "data": {
             "shop": "ZAAP",
             "lang": "fr",
             "payment_mode": "OK",
-            "country": "MA",
-            "currency": "MAD",
             "security_state": "SECURED",
             "security_detail": "CERTIFICATE_OK"
         },
@@ -150,21 +136,19 @@
         "certificate_id": 126304681,
         "external_auth_id": null,
         "access": [],
-        "refresh_token": "c1f40dc1-dfa5-40df-93a6-627c0314cad1",
-        "expiration_date": "2022-09-30T10:34:30+02:00"
+        "refresh_token": "4c3161b0-2166-480e-bba3-6ec6b73232c5",
+        "expiration_date": "2023-01-23T22:21:59+01:00"
     },
     "melanco-lalco": {
-        "key": "28b4a95d-8910-4f56-91d6-cff2c926ba90",
+        "key": "9949d5c0-f5cc-4ebc-90ad-00b0273574ab",
         "account_id": 166500291,
-        "ip": "37.65.14.204",
-        "added_date": "2022-08-31T10:34:30+02:00",
+        "ip": "37.65.14.3",
+        "added_date": "2022-12-24T22:21:59+01:00",
         "meta": [],
         "data": {
             "shop": "ZAAP",
             "lang": "fr",
             "payment_mode": "OK",
-            "country": "FR",
-            "currency": "EUR",
             "security_state": "SECURED",
             "security_detail": "CERTIFICATE_OK"
         },
@@ -172,9 +156,7 @@
         "certificate_id": 126142784,
         "external_auth_id": null,
         "access": [],
-        "refresh_token": "791e6302-4de5-47de-9701-f92c0a291eda",
-        "expiration_date": "2022-09-30T10:34:30+02:00"
-    },
-    "grinder97": null,
-    "grinder98": null
+        "refresh_token": "544239d2-d83a-4caa-8f2c-3f99cea266ba",
+        "expiration_date": "2023-01-23T22:21:59+01:00"
+    }
 }

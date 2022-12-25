@@ -3,13 +3,13 @@ from pydofus2.com.ankamagames.jerakine.network.NetworkMessage import NetworkMess
 
 class GameRolePlayArenaSwitchToGameServerMessage(NetworkMessage):
     validToken:bool
-    ticket:list[int]
+    token:str
     homeServerId:int
     
 
-    def init(self, validToken_:bool, ticket_:list[int], homeServerId_:int):
+    def init(self, validToken_:bool, token_:str, homeServerId_:int):
         self.validToken = validToken_
-        self.ticket = ticket_
+        self.token = token_
         self.homeServerId = homeServerId_
         
         super().__init__()

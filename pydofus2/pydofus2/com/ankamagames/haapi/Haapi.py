@@ -11,6 +11,7 @@ class HaapiException(Exception):
     pass
 
 class Haapi(metaclass=Singleton):
+    MAX_CREATE_API_KAY_RETRIES = 5
     
     def __init__(self) -> None:
         self.url = "https://haapi.ankama.com"
@@ -53,7 +54,7 @@ class Haapi(metaclass=Singleton):
         }
         
         nbrtries = 0
-        while nbrtries < 5:
+        while nbrtries < self.MAX_CREATE_API_KAY_RETRIES:
             for client in self.clients:
                     response = client.post(
                         self.getUrl("CREATE_API_KEY"),
@@ -80,9 +81,13 @@ class Haapi(metaclass=Singleton):
                     else:
                         from lxml import html
                         root = html.fromstring(response.content.decode('UTF-8'))
-                        error = root.xpath('//span[@class="error-description"]')[0].text
-                        errorCode = root.xpath('//span[@class="code-label"]//span')[0].text
-                        logger.debug(f"[Haapi error {errorCode}] : Login Token creation for login {login} failed for reason: {error}")
+                        try:
+                            error = root.xpath('//div[@class="cf-error-description"]')[0].text
+                            errorCode = root.xpath('//span[@class="cf-code-label"]//span')[0].text
+                            logger.debug(f"[Haapi error {errorCode}] : Login Token creation for login {login} failed for reason: {error}")
+                        except IndexError:
+                            logger.debug(response.content.decode('UTF-8'))
+                        
                         sleep(5)
             logger.debug("Failed to create APIKEY, retrying in 10 seconds")
             sleep(10)

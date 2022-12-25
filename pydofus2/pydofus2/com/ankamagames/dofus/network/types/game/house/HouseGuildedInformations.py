@@ -10,8 +10,8 @@ class HouseGuildedInformations(HouseInstanceInformations):
     guildInfo:'GuildInformations'
     
 
-    def init(self, guildInfo_:'GuildInformations', instanceId_:int, ownerTag_:'AccountTagInformation', price_:int, secondHand_:bool, isLocked_:bool, hasOwner_:bool, isSaleLocked_:bool):
+    def init(self, guildInfo_:'GuildInformations', instanceId_:int, ownerTag_:'AccountTagInformation', price_:int, secondHand_:bool, isLocked_:bool, hasOwner_:bool, isSaleLocked_:bool, isAdminLocked_:bool):
         self.guildInfo = guildInfo_
         
-        super().init(instanceId_, ownerTag_, price_, secondHand_, isLocked_, hasOwner_, isSaleLocked_)
+        super().init(instanceId_, ownerTag_, price_, secondHand_, isLocked_, hasOwner_, isSaleLocked_, isAdminLocked_)
     

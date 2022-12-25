@@ -4,13 +4,13 @@ from pydofus2.com.ankamagames.jerakine.network.NetworkMessage import NetworkMess
 class GameRolePlayArenaSwitchToFightServerMessage(NetworkMessage):
     address:str
     ports:list[int]
-    ticket:list[int]
+    token:str
     
 
-    def init(self, address_:str, ports_:list[int], ticket_:list[int]):
+    def init(self, address_:str, ports_:list[int], token_:str):
         self.address = address_
         self.ports = ports_
-        self.ticket = ticket_
+        self.token = token_
         
         super().__init__()
     

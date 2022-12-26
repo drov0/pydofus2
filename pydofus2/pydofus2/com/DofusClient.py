@@ -105,11 +105,8 @@ class DofusClient(metaclass=Singleton):
 
     def restart(self):
         conn = connh.ConnectionsHandler.getConnection()
-        if not conn.checkClosed():
-            self.relogin()
-        else:
-            connh.ConnectionsHandler.connectionGonnaBeClosed(DisconnectionReasonEnum.RESTARTING)
-            conn.close()
+        connh.ConnectionsHandler.connectionGonnaBeClosed(DisconnectionReasonEnum.RESTARTING)
+        conn.close()
             
 
     def interrupt(self, reason: DisconnectionReason):

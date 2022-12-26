@@ -29,6 +29,17 @@ class AccountManager {
         this.accountsDB = require(this.accountsDbFile)
         this.charactersDB = require(this.charactersDbFile)
         this.apiKeysDB = require(this.apiKeysDbFile)
+        for (var [key, apiKeyData] of Object.entries(this.apiKeysDB)) {
+            var expiredate = Date.parse(apiKeyData.expiration_date)
+            if (expiredate < Date.now()) {
+                console.log("API key expired")
+                this.apiKeysDB[key].expired = true
+            }
+            else {
+                console.log("API key is valid")
+                this.apiKeysDB[key].expired = false
+            }
+        }
         this.accountsPasswords = {}
         this.authHelper = new AuthHelper();
         this.currentEditedAccount = null
@@ -193,36 +204,35 @@ class AccountManager {
         })
     }
 
-    async getAccountApiKey(key) {
+    async fetchAccountApiKey(key) {
         var apiKeyData = this.apiKeysDB[key]
-        if (!apiKeyData) {
+        if (apiKeyData == undefined || apiKeyData.expired) {
             var creds = this.getAccountCreds(key)
             console.log("will call getApiKey for " + creds.login)
-            var instance = instancesManager.runningInstances[key]
-            var apiKeyData = await instance.client.getApiKey(creds.login, creds.password, creds.certId, creds.certHash)
-            console.log("got api key " + apiKeyData)
-            apiKeyData = JSON.parse(apiKeyData)
-            console.log("got api key for " + creds.login + ": " + apiKeyData.key)
-            this.apiKeysDB[key] = apiKeyData
-            this.saveApiKeys()
-        }
-        else {
-            var expiredate = Date.parse(apiKeyData.expiration_date)
-            if (expiredate < Date.now()) {
-                console.log("API key expired, generating new one")
-                var creds = this.getAccountCreds(key)
-                var apiKeyData = await instance.client.getApiKey(creds.login, creds.password, creds.certId, creds.certHash)
-                this.apiKeysDB[key] = apiKeyData
+            var port = instancesManager.getFreePort()
+            var instance = await instancesManager.spawn(key, port)
+            var apiKeyDataRemote = await instance.client.getApiKey(creds.login, creds.password, creds.certId, creds.certHash)
+            instancesManager.killInstance(key)
+            apiKeyDataRemote = JSON.parse(apiKeyDataRemote)
+            console.log("got api key " + apiKeyDataRemote)
+            if (apiKeyDataRemote != null) {
+                console.log("got api key for " + creds.login + ": " + apiKeyDataRemote.key)
+                this.apiKeysDB[key] = apiKeyDataRemote
+                this.apiKeysDB[key].expired = false
                 this.saveApiKeys()
             }
+            else {
+                console.log("Couldn't fetch apiKey for this account")
+                return null
+            }
         }
-        return apiKeyData.key
+        return this.apiKeysDB[key].key
     }
 
     async fetchCharacters(key) {
         var port = instancesManager.getFreePort()
         var instance = await instancesManager.spawn(key, port)
-        var apiKey = await this.getAccountApiKey(key)
+        var apiKey = await this.fetchAccountApiKey(key)
         var creds = this.getAccountCreds(key)
         console.log(creds)
         var response = await instance.client.fetchAccountCharacters(creds.login, creds.password, creds.certId, creds.certHash, apiKey)

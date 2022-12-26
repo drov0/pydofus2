@@ -243,6 +243,7 @@ pydofus2/com/ankamagames/dofus/datacenter/servers/ServerCommunity.py
 pydofus2/com/ankamagames/dofus/datacenter/servers/ServerGameType.py
 pydofus2/com/ankamagames/dofus/datacenter/servers/ServerPopulation.py
 pydofus2/com/ankamagames/dofus/datacenter/servers/__init__.py
+pydofus2/com/ankamagames/dofus/datacenter/spells/EffectZone.py
 pydofus2/com/ankamagames/dofus/datacenter/spells/FinishMove.py
 pydofus2/com/ankamagames/dofus/datacenter/spells/Spell.py
 pydofus2/com/ankamagames/dofus/datacenter/spells/SpellLevel.py
@@ -282,7 +283,6 @@ pydofus2/com/ankamagames/dofus/internalDatacenter/mount/MountData.py
 pydofus2/com/ankamagames/dofus/internalDatacenter/mount/__init__.py
 pydofus2/com/ankamagames/dofus/internalDatacenter/people/PartyMemberWrapper.py
 pydofus2/com/ankamagames/dofus/internalDatacenter/people/__init__.py
-pydofus2/com/ankamagames/dofus/internalDatacenter/spells/EffectZone.py
 pydofus2/com/ankamagames/dofus/internalDatacenter/spells/SpellWrapper.py
 pydofus2/com/ankamagames/dofus/internalDatacenter/spells/__init__.py
 pydofus2/com/ankamagames/dofus/internalDatacenter/stats/DetailedStats.py

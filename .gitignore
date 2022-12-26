@@ -8,7 +8,6 @@ account.json
 *.dlm
 *.d2p
 unpacked_raw_msg
-*.as
 /.venv/
 /.vscode/
 creds.json
@@ -19,4 +18,4 @@ test.sh
 /pyd2bot/build/
 /pyd2bot/.buildEnv/
 /pydofus2/build/
-/protocolBuilder/sources/
+sources

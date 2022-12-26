@@ -33,6 +33,10 @@ function hideUnhidePassword(key) {
     document.getElementById(`${key}-togglePwd`).classList.toggle("fa-eye-slash")
 }
 
+// Haapi key
+function fetchAPIKey(key) {
+    ipc.send('fetchAPIKey', key)
+}
 // characters
 function saveCharacters() {
     ipc.send('saveCharacters')

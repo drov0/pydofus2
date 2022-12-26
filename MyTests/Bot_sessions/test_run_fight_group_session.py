@@ -102,6 +102,9 @@ path_pic_cania = {
     "name": "path_pic_cania",
     "startVertex": {"mapId": 139462657, "mapRpZone": 1}
 }
+
+main_path = path_astrub_egouts
+
 seller = {
     "name": "Maniaco-lalcolic",
     "id": 5820449062,
@@ -199,8 +202,8 @@ plusbellelavieSession = {
     "type": "fight",
     "unloadType": "seller",
     "character": leader,
-    "path": path_peninsule_gelees,
-    "monsterLvlCoefDiff": 5,
+    "path": main_path,
+    "monsterLvlCoefDiff": 100,
     "seller": seller,
     "followers": [
         moneydicer,

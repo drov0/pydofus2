@@ -67,3 +67,6 @@ class IServerConnection(EventDispatcher):
 
     def stopConnectionTimeout(self) -> None:
         raise NotImplementedError()
+
+    def checkClosed(self) -> None:
+        raise NotImplementedError()

@@ -38,7 +38,7 @@ class ServerConnection(IServerConnection):
 
     DEBUG_LOW_LEVEL_VERBOSE: bool = False
 
-    DEBUG_DATA: bool = True
+    DEBUG_DATA: bool = False
 
     LATENCY_AVG_BUFFER_SIZE: int = 50
 
@@ -288,10 +288,10 @@ class ServerConnection(IServerConnection):
                 if self.DEBUG_LOW_LEVEL_VERBOSE:
                     if fromEnterFrame:
                         logger.info(
-                            f"[{self._id}] Handling data, byte available : {input.remaining()}  trigger by a timer"
+                            f"[{self._id}] Handling data, bytes available : {input.remaining()}  triggered by a timer"
                         )
                     else:
-                        logger.info(f"[{self._id}] Handling data, byte available : {input.remaining()}")
+                        logger.info(f"[{self._id}] Handling data, bytes available : {input.remaining()}")
                 msg: NetworkMessage = self.lowReceive(input)
                 while msg is not None:
                     input.trim()
@@ -608,3 +608,11 @@ class ServerConnection(IServerConnection):
         else:
             logger.debug(f"[{self._id}] Failure while opening socket, timeout.")
             self._handler.process(ServerConnectionFailedMessage(self, "timeout"))
+
+    def checkClosed(self) -> bool:
+        if self._willClose:
+            if len(self._asyncTrees) == 0:
+                self._willClose = False
+                self.dispatchEvent(SocketEvent.CLOSE)
+            return True
+        return False

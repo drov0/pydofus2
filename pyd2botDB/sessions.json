@@ -1,13 +1,2 @@
 {
-  "astrub_pioute": {
-    "name": "astrub_pioute",
-    "pathId": "pioute_astrub_village",
-    "type": "fight",
-    "monsterLvlCoefDiff": "3",
-    "leaderId": 336986964178,
-    "followersIds": [
-      336815325394,
-      336919920850
-    ]
-  }
 }

@@ -29,6 +29,7 @@
                 <thead>
                     <th scope="col">entryId</th>
                     <th scope="col">login</th>
+                    <th scope="col">API Key status</th>
                     <th scope="col">password</th>
                     <th scope="col">action</th>
                 </thead>
@@ -37,6 +38,7 @@
                     <tr id=<%= `account-${key}` %>>
                         <td scope="row"><%= key%></td>
                         <td><%= account.login %></td>
+                        <td><% if (accounts.apiKeysDB[key].expired) { %><span style="color: red;">expired</span><%} else { %><span style="color: green;">valid</span><% } %></td>
                         <td><text id=<%= `${key}-password` %>><%= accounts.accountsPasswords[key] %></text><i class="far fa-eye" id=<%=`${key}-togglePwd`%> style="margin-left: 10px; cursor: pointer;" onclick="hideUnhidePassword('<%= key%>')"></i></td>
                         <td>
                             <div class="dropdown">
@@ -45,11 +47,12 @@
                                   <li><a class="dropdown-item" style="cursor: pointer;" onclick="editAccount('<%= key %>')"><i class="fas fa-edit" style="margin-left: -5px;"></i>  edit</a></li>
                                   <li><a class="dropdown-item" style="cursor: pointer;" onclick="deleteAccount('<%= key %>')"><i class="fas fa-trash-alt" style="margin-left: -5px;"></i>  delete</a></li>
                                   <li><a class="dropdown-item" style="cursor: pointer;" onclick="fetchCharacters('<%= key %>')"><i class="fas fa-sync-alt" style="margin-left: -5px;"></i>  import characters</a></li>
+                                  <li><a class="dropdown-item" style="cursor: pointer;" onclick="fetchAPIKey('<%= key %>')"><i class="fas fa-key" style="margin-left: -5px;"></i>  fetch API Key</a></li>
                                 </ul>
                             </div>
                         </td>
                     </tr>
-                    <% }) %>
+                    <% }) %>c:\Users\majdoub\AppData\Local\Programs\Microsoft VS Code\resources\app\out\vs\code\electron-sandbox\workbench\workbench.html
                 </tbody>
             </table>
             <div class="managerBottomButtonsBar">

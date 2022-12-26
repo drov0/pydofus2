@@ -20,18 +20,22 @@ ejse.data('dofus2Data', {
     'breedSpells': require(path.join(ejse.data('persistenceDir'), 'breedSpells.json')),
 })
 const mainUrl = "file://" + path.join(__dirname, 'ejs', 'main.ejs')
+const loadingPageUrl = "file://" + path.join(__dirname, 'ejs', 'loading.ejs')
 const pathsManager = require('./paths/PathManager.js').instance;
 const accountManager = require("./accounts/AccountManager.js").instance;
 const sessionsManager = require("./sessions/SessionsManager.js").instance;
 let mainWindow;
-
+let loadingWindow;
 // Handle creating/removing shortcuts on Windows when installing/uninstalling.
 if (require('electron-squirrel-startup')) {
     // eslint-disable-line global-require
     app.quit();
 }
 
+app.disableHardwareAcceleration()
+
 const createWindow = () => {
+
     // Create the browser window.
     mainWindow = new BrowserWindow({
         webPreferences: {
@@ -40,6 +44,22 @@ const createWindow = () => {
         },
         show: false,
     });
+
+    loadingWindow = new BrowserWindow({
+        parent: mainWindow, 
+        show: false, 
+        frame: false, 
+        transparent: true, 
+        hasShadow: false, 
+        resizable: false,
+        modal: true,
+        webPreferences: {
+            nodeIntegration: true,
+            contextIsolation: false,
+            enableRemoteModule: true,
+        },
+    });
+    loadingWindow.loadURL(loadingPageUrl);
 
     // and load the index.html of the app.
     mainWindow.loadURL(sessionsManager.urls.manageSessionsUrl);
@@ -51,7 +71,7 @@ const createWindow = () => {
     const mainMenu = Menu.buildFromTemplate(mainMenuTemplate);
     Menu.setApplicationMenu(mainMenu);
     // Open the DevTools.
-    mainWindow.webContents.openDevTools();
+    // mainWindow.webContents.openDevTools();
 };
 
 
@@ -85,7 +105,17 @@ ipcMain.on("hideUnhidePassword", (event, key) => {
 });
 
 ipcMain.on("fetchCharacters", async (event, key) => {
-    await accountManager.fetchCharacters(key)
+    loadingWindow.show();
+    await accountManager.fetchCharacters(key);
+    mainWindow.loadURL(accountManager.urls.manageAccountsUrl);
+    loadingWindow.hide();
+});
+
+// Haapi api key
+ipcMain.on("fetchAPIKey", async (event, key) => {
+    loadingWindow.show()
+    await accountManager.fetchAccountApiKey(key);
+    loadingWindow.hide()
     mainWindow.loadURL(accountManager.urls.manageAccountsUrl);
 });
 
@@ -106,8 +136,6 @@ ipcMain.on("goToCharacterProfile", (event, key) => {
     accountManager.selectedCharacterKey = key;
     mainWindow.loadURL(accountManager.urls.characterProfileUrl);
 });
-
-
 
 ipcMain.on("cancelCharacterProfileEdit", (event, args) => {
     accountManager.selectedCharacterKey = null;

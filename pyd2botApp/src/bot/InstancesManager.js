@@ -79,7 +79,6 @@ class InstancesManager {
 
     async spawnServer(instanceId, port) {
         var execFunc = (resolve, reject) => {
-            // var pyd2bot_process = child_process.spawn(`${this.pyd2botDevEnvPath} ${this.pyd2botDevPath} --port ${port} --host 0.0.0.0`, {"shell": true});
             var pyd2bot_process = child_process.execFile(this.pyd2botExePath, ['--port', port, '--host', '0.0.0.0', '--id', instanceId])
             this.runningInstances[instanceId] = {"port": port, "server" : pyd2bot_process, "client" : null, "connection" : null, "childs" : []};
             
@@ -96,15 +95,16 @@ class InstancesManager {
                     // console.log("stdout - " + stdout.toString());
                 }
             });
+
             pyd2bot_process.stderr.on('data', (stderr) => {
                 if (!stderr.toString().includes("DEBUG") && !stderr.toString().includes("INFO") && !stderr.toString().includes("WARNING")) {
                     console.log("stderr - " + stderr.toString());
-                    this.wantsToKillClient[instanceId] = true
+                    // this.wantsToKillClient[instanceId] = true
                 }
             });
 
             pyd2bot_process.on('exit', function(code) {
-                console.log("Detected Crash " + code);
+                console.log(`Server ${instanceId} exited with code ${code}`);
             });
 
             pyd2bot_process.on('close', async (code) => {
@@ -168,12 +168,6 @@ class InstancesManager {
                     this.wantsToKillServer[instanceId] = true;
                     instance.server.kill('SIGINT')
                 }
-            }
-            if (instance.childs) {
-                console.log("Killing childs for instance " + instanceId);
-                instance.childs.forEach(child => {
-                    this.killInstance(child);
-                })
             }
             this.freePorts.push(instance.port);
             delete this.runningInstances[instanceId];

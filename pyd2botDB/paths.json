@@ -1,80 +1,10 @@
 {
-  "pioute_astrub_village": {
-    "type": "RandomSubAreaFarmPath",
-    "name": "pioute_astrub_village",
-    "subAreaId": 95,
+  "path_astrub_egouts": {
+    "name": "path_astrub_egouts",
+    "type": "SubAreaRandomPath",
     "startVertex": {
-      "mapId": 191104002,
-      "mapRpZone": 1
-    },
-    "fightOnly": true,
-    "monsterLvlCoefDiff": 3,
-    "jobIds": []
-  },
-  "lumberjack_astrub_forest": {
-    "type": "RandomSubAreaFarmPath",
-    "name": "lumberjack_astrub_forest",
-    "subAreaId": 97,
-    "startVertex": {
-      "mapId": 189532167,
-      "mapRpZone": 1
-    },
-    "fightOnly": false,
-    "monsterLvlCoefDiff": 1.5,
-    "jobIds": [
-      2
-    ]
-  },
-  "fisher_incarnam_lake": {
-    "type": "RandomSubAreaFarmPath",
-    "name": "fisher_astrub_lake",
-    "subAreaId": 442,
-    "startVertex": {
-      "mapId": 153878786,
-      "mapRpZone": 1
-    },
-    "fightOnly": false,
-    "monsterLvlCoefDiff": 1.5,
-    "jobIds": [
-      36
-    ]
-  },
-  "incarnam_lac_monster": {
-    "type": "RandomSubAreaFarmPath",
-    "name": "incarnam_lac_monster",
-    "subAreaId": 442,
-    "startVertex": {
-      "mapId": 153878786,
-      "mapRpZone": 1
-    },
-    "fightOnly": true,
-    "monsterLvlCoefDiff": 10,
-    "jobIds": []
-  },
-  "tainela_bouftou": {
-    "type": "RandomSubAreaFarmPath",
-    "name": "tainela_bouftou",
-    "subAreaId": 30,
-    "startVertex": {
-      "mapId": 120062979,
-      "mapRpZone": 1
-    },
-    "fightOnly": true,
-    "monsterLvlCoefDiff": 1.5,
-    "jobIds": []
-  },
-  "lumberjack_cania": {
-    "type": "RandomSubAreaFarmPath",
-    "name": "lumberjack_cania",
-    "subAreaId": 69,
-    "startVertex": {
-      "mapId": 155975692,
-      "mapRpZone": 1
-    },
-    "fightOnly": false,
-    "monsterLvlCoefDiff": 1.5,
-    "jobIds": [
-      2
-    ]
+      "mapId": "101715461",
+      "mapRpZone": "1"
+    }
   }
 }

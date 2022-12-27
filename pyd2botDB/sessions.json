@@ -1,2 +1,14 @@
 {
+  "test": {
+    "name": "test",
+    "path": "path_astrub_egouts",
+    "type": "fight",
+    "monsterLvlCoefDiff": "5",
+    "leaderId": 369475322150,
+    "followersIds": [
+      790823206
+    ],
+    "unloadType": "seller",
+    "sellerId": 5820449062
+  }
 }

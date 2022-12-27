@@ -19,13 +19,14 @@ function createPath() {
     let newPath = {
         "name": document.getElementById("pathName").value,
         "type": document.getElementById("pathType").value,
-        "fightOnly": document.getElementById("fightOnly").checked ? true : false,
-        "monsterLvlCoefDiff": document.getElementById("monsterLvlCoefDiff").value,
         "startVertex" : {
             "mapId": document.getElementById("startMapId").value,
             "mapRpZone": document.getElementById("startMapRpZone").value,
         },
-        "subAreaId": document.getElementById("subAreaId").value,
+    }
+    if (!newPath.name || !newPath.startVertex.mapId) {
+        alert("Invalid input")
+        return
     }
     ipc.send('createPath', newPath)
 }

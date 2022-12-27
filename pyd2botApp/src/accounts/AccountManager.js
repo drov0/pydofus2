@@ -204,6 +204,10 @@ class AccountManager {
         })
     }
 
+    getCharLabel(ch) {
+        return `${ch.name} (${ch.serverName}, ${ch.breedName}, ${ch.level})`
+    }
+
     async fetchAccountApiKey(key) {
         var apiKeyData = this.apiKeysDB[key]
         if (apiKeyData == undefined || apiKeyData.expired) {

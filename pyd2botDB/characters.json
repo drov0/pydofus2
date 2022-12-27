@@ -70,5 +70,63 @@
     "accountId": "melanco-lalco",
     "primarySpellId": 12902,
     "primaryStatId": 10
+  },
+  "258718695718": {
+    "name": "Moneslicer",
+    "id": 258718695718,
+    "level": 184,
+    "breedId": 10,
+    "breedName": "Sadida",
+    "serverId": 294,
+    "serverName": "Hell Mina",
+    "accountId": "Exodios-arc",
+    "primarySpellId": 13516,
+    "primaryStatId": 10
+  },
+  "30179787043": {
+    "name": "Pipo-ar",
+    "id": 30179787043,
+    "level": 1,
+    "breedId": 17,
+    "breedName": "Huppermage",
+    "serverId": 294,
+    "serverName": "Imagiro",
+    "accountId": "TheGrinder"
+  },
+  "92638609702": {
+    "name": "Moneydicer",
+    "id": 92638609702,
+    "level": 185,
+    "breedId": 10,
+    "breedName": "Sadida",
+    "serverId": 294,
+    "serverName": "Hell Mina",
+    "accountId": "Exodios-cra",
+    "primarySpellId": 13516,
+    "primaryStatId": 10
+  },
+  "184588173606": {
+    "name": "Moneydicer-[Ush]",
+    "id": 184588173606,
+    "level": 2,
+    "breedId": 10,
+    "breedName": "Sadida",
+    "serverId": 294,
+    "serverName": "Hell Mina",
+    "accountId": "Exodios-cra",
+    "primarySpellId": 13516,
+    "primaryStatId": 10
+  },
+  "171988287782": {
+    "name": "Moneycreator",
+    "id": 171988287782,
+    "level": 183,
+    "breedId": 10,
+    "breedName": "Sadida",
+    "serverId": 294,
+    "serverName": "Hell Mina",
+    "accountId": "Exodios-panda",
+    "primarySpellId": 13516,
+    "primaryStatId": 10
   }
 }

@@ -145,8 +145,10 @@ ipcMain.on("cancelCharacterProfileEdit", (event, args) => {
 
 // paths ipc handling
 ipcMain.on("createPath", (event, newPath) => {
+    loadingWindow.show()
     pathsManager.createPath(newPath);
     mainWindow.loadURL(pathsManager.urls.managePathsUrl);
+    loadingWindow.hide()
 });
 
 ipcMain.on("savePaths", (event, args) => {

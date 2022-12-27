@@ -4,6 +4,9 @@ var followersIds = Array();
 var followersAccountIds = Array();
 var jobsIds = Array();
 var resourcesIds = Array();
+var sellerId = null;
+var unloadType = null;
+
 function editSession(key) {
     ipc.send('editSession', key)
 }
@@ -60,7 +63,13 @@ function createSession() {
             "monsterLvlCoefDiff" : document.getElementById("monsterLvlCoefDiff").value,
             "leaderId": leader.id,
             "followersIds": followersIds,
+            "unloadType": unloadType,
+            "sellerId": sellerId
         }
+    }
+    if (unloadType == "seller" && !sellerId) {
+        alert("Please choose a seller");
+        return;
     }
     if (!newSession.name) {
         alert("Please enter a name");
@@ -70,12 +79,31 @@ function createSession() {
     ipc.send('createSession', newSession)
 }
 
-function addFollower() { 
+// leader section
+function onLeaderChange() {
+    let leaderPhNode = document.getElementById("leader_ph")
+    if (leaderPhNode) leaderPhNode.remove()
+    followersIds.length = 0;
+    followersAccountIds.length = 0;
     var followersListNode = document.getElementById("followers");
-    if (!document.getElementById("follower").value)
+    followersListNode.innerHTML = "";
+    populateFollowersSelectNode()
+    sellerId = null
+    populateSellerSelectNode()
+}
+
+// follower section
+function addFollower() {
+    var followerNode = document.getElementById("follower");
+    var leaderNode = document.getElementById("leader");
+    if (!leaderNode) {
+        alert("You must select a leader first");
         return;
-    var follower = JSON.parse(document.getElementById("follower").value);
-    var leader = JSON.parse(document.getElementById("leader").value);
+    }
+    if (!followerNode.value)
+        return;
+    var follower = JSON.parse(followerNode.value);
+    var leader = JSON.parse(leaderNode.value);
     if (follower.accountId == leader.accountId) {
         alert("A follower must be in a different account than the leader");
         return;
@@ -88,6 +116,11 @@ function addFollower() {
         alert("Followers must belong to different accounts");
         return;
     }
+    addFollowerByValue(follower)
+}
+
+function addFollowerByValue(follower) { 
+    var followersListNode = document.getElementById("followers");
     try {
         followersListNode.childNodes.forEach(function(li) {
             if (li.character) {
@@ -108,41 +141,120 @@ function addFollower() {
     }
     followersIds.push(follower.id);
     followersAccountIds.push(follower.accountId);
-    var [liNode, button] = makeLiNode()
+    var [liNode, removeButton] = makeLiNode()
     liNode.textContent = `${follower.name} (${follower.serverName})`;
     liNode.character = JSON.stringify(follower);
-    liNode.appendChild(button);
-    button.addEventListener('click', (event) => {
+    liNode.appendChild(removeButton);
+    removeButton.addEventListener('click', (event) => {
         liNode.remove();
         followersIds.splice(followersIds.indexOf(follower.id), 1);
         followersAccountIds.splice(followersAccountIds.indexOf(follower.accountId), 1);
-        populateFollowersSelect()
+        addFollowerOption(follower);
+        addSellerOption(follower);
     });
+    document.getElementById(`sellerSelectOption-${follower.id}`).remove()
+    document.getElementById(`followerSelectOption-${follower.id}`).remove()
     followersListNode.appendChild(liNode);
-    populateFollowersSelect()
 }
 
-function populateFollowersSelect() { 
-    var leader = JSON.parse(document.getElementById("leader").value);
+function addFollowerOption(ch) {
     var fNode = document.getElementById("follower");
-    fNode.innerHTML = "";
-    var accounts = ipc.sendSync('getData', 'accounts');
-    var characters = accounts.charactersDB;
-    Object.entries(characters).forEach(([key, ch]) => {
-        if (ch.accountId != leader.accountId && ch.serverId == leader.serverId && !followersAccountIds.includes(ch.accountId)) {
-            optionNode = document.createElement("option");
-            optionNode.value = JSON.stringify(ch);
-            optionNode.textContent = `${ch.name} (${ch.serverName}, ${ch.breedName})`;
-            fNode.appendChild(optionNode);
-        }
-    })
- }
+    optionNode = document.createElement("option");
+    optionNode.value = JSON.stringify(ch);
+    optionNode.id = `followerSelectOption-${ch.id}`
+    optionNode.textContent = `${ch.name} (${ch.serverName}, ${ch.breedName}, ${ch.level})`;
+    fNode.appendChild(optionNode);
+}
 
+function populateFollowersSelectNode() {
+    var leaderNode = document.getElementById("leader");
+    if (leaderNode.value) {
+        var leader = JSON.parse(leaderNode.value)
+        var fNode = document.getElementById("follower");
+        fNode.innerHTML = "<option selected disabled>Choose a follower</option>";
+        var accounts = ipc.sendSync('getData', 'accounts');
+        var characters = accounts.charactersDB;
+        Object.entries(characters).forEach(([key, ch]) => {
+            if (ch.accountId != leader.accountId && ch.serverId == leader.serverId && !followersAccountIds.includes(ch.accountId) && ch.id != sellerId) {
+                addFollowerOption(ch)
+            }
+        })
+    }
+}
+
+function populateFollowersListNode () {
+    var sessions = ipc.sendSync('getData', 'sessions');
+    var accounts = ipc.sendSync('getData', 'accounts');
+    var curr = sessions.currentEditedSession;
+    if (curr) {
+        curr.followersIds.forEach(key => {
+            follower = accounts.charactersDB[key];
+            addFollowerByValue(follower)
+        });
+    }
+}
+
+// seller section
+function onUnloadTypeChange() {    
+    var sellerDivNode = document.getElementById("sellerDiv");
+    unloadType = document.getElementById("unloadType").value;
+    if (unloadType == "seller") {
+        sellerDivNode.style.display = "flex";
+        populateSellerSelectNode();
+    } else {
+        sellerDivNode.style.display = "none";
+        if (sellerId != null) {
+            var accounts = ipc.sendSync('getData', 'accounts');
+            ch = accounts.charactersDB[sellerId];
+            addFollowerOption(ch);
+        }
+    }
+}
+
+function onSellerChange() {
+    let sellerPhNode = document.getElementById("seller_ph");
+    if (sellerPhNode) 
+        sellerPhNode.remove();
+    let seller = JSON.parse(document.getElementById("seller").value);
+    var accounts = ipc.sendSync('getData', 'accounts');
+    if (sellerId != null) {
+        ch = accounts.charactersDB[sellerId];
+        addFollowerOption(ch);
+    }
+    sellerId = seller.id;
+    document.getElementById(`followerSelectOption-${sellerId}`).remove();
+}
+
+function addSellerOption(ch) {
+    var sNode = document.getElementById("seller");
+    optionNode = document.createElement("option");
+    optionNode.value = JSON.stringify(ch);
+    optionNode.textContent = `${ch.name} (${ch.serverName}, ${ch.breedName}, ${ch.level})`;
+    optionNode.id = `sellerSelectOption-${ch.id}`;
+    sNode.appendChild(optionNode);
+}
+
+function populateSellerSelectNode() {
+    var leaderNode = document.getElementById("leader");
+    var sNode = document.getElementById("seller");
+    if (leaderNode.value) {
+        var leader = JSON.parse(leaderNode.value)
+        sNode.innerHTML = "<option selected disabled>Choose a seller</option>";;
+        var accounts = ipc.sendSync('getData', 'accounts');
+        var characters = accounts.charactersDB;
+        Object.entries(characters).forEach(([key, ch]) => {
+            if (ch.accountId != leader.accountId && ch.serverId == leader.serverId && !followersAccountIds.includes(ch.accountId)) {
+                addSellerOption(ch);
+            }
+        })
+    }
+}
+
+// resource section
  function populateResourcesSelect() { 
     const dofusData = ipc.sendSync('getData', 'dofus2Data');
     const skills = dofusData.skills;
     var jobsNode = document.getElementById("jobs");
-    console.log(jobsNode.innerHTML);
     var resourceSelectNode = document.getElementById("resourceSelect");
     resourceSelectNode.innerHTML = "";
     jobsNode.childNodes.forEach( (li) => {
@@ -158,9 +270,9 @@ function populateFollowersSelect() {
             })
         }
     })
- }
+}
 
- function addJob() {
+function addJob() {
     const dofusData = ipc.sendSync('getData', 'dofus2Data');
     const skills = dofusData.skills;
     var jobsListNode = document.getElementById("jobs");
@@ -198,9 +310,9 @@ function populateFollowersSelect() {
     jobsListNode.appendChild(liNode);
     document.getElementById(`jobSelectOption-${jobId}`).remove();
     populateResourcesSelect()
- }
+}
 
- function populateJobsSelect() {
+function populateJobsSelect() {
     const dofusData = ipc.sendSync('getData', 'dofus2Data');
     const skills = dofusData.skills;
     var jobSelectNode = document.getElementById("jobSelect");
@@ -224,28 +336,9 @@ function populateFollowersSelect() {
         alert(err);
         return;
     }
- }
+}
     
- function makeLiNode() {
-    var liNode = document.createElement("Li");
-    liNode.className = "list-group-item";
-    liNode.addEventListener('mouseover', (event) => {
-        liNode.className = "list-group-item active";
-    })
-    liNode.addEventListener('mouseout', (event) => {
-        liNode.className = "list-group-item";
-    })
-    liNode.style.display = "flex";
-    liNode.style.flexDirection = "row";
-    liNode.style.justifyContent = "space-between";
-    var button = document.createElement("input");
-    button.type = "button";
-    button.value = "x";
-    liNode.appendChild(button);
-    return [liNode, button];
- }
-
- function addResource() {
+function addResource() {
     var resourceSelectNode = document.getElementById("resourceSelect");
     var resourcesListNode = document.getElementById("resources");
     var resource = JSON.parse(resourceSelectNode.value);
@@ -271,4 +364,24 @@ function populateFollowersSelect() {
     liNode.appendChild(button);
     document.getElementById(`resourceSelectOption-${resource.id}`).remove();
     resourcesListNode.appendChild(liNode);
- }
+}
+
+// misc
+function makeLiNode() {
+    var liNode = document.createElement("Li");
+    liNode.className = "list-group-item";
+    liNode.addEventListener('mouseover', (event) => {
+        liNode.className = "list-group-item active";
+    })
+    liNode.addEventListener('mouseout', (event) => {
+        liNode.className = "list-group-item";
+    })
+    liNode.style.display = "flex";
+    liNode.style.flexDirection = "row";
+    liNode.style.justifyContent = "space-between";
+    var button = document.createElement("input");
+    button.type = "button";
+    button.value = "x";
+    liNode.appendChild(button);
+    return [liNode, button];
+}

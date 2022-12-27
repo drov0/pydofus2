@@ -33,17 +33,16 @@
                     <% Object.entries(sessions.sessionsDB).forEach(([key, session])=> {%>
                     <tr id=<%= `session-${key}` %>>
                         <td scope="row"><%=session.name%></td>
-                        <td><%= session.pathId %></td>
+                        <td><%= session.path %></td>
                         <td><%= session.type %></td>
-                        <td><%= sessions.isRunning(key) ? 'running' : 'idle' %></td>
-                        
+                        <td><%= session.isRunning ? 'running' : 'idle' %></td>
                         <td>
                             <div class="dropdown">
                                 <a class="btn btn-secondary dropdown-toggle" href="#" role="button" id="dropdownMenuLink" data-bs-toggle="dropdown" aria-expanded="false"></a>
                                 <ul class="dropdown-menu" aria-labelledby="dropdownMenuLink">
                                     <li><a class="dropdown-item" href="#" onclick="editSession('<%= key %>')">edit</a></li>
                                     <li><a class="dropdown-item" href="#" onclick="deleteSession('<%= key %>')">delete</a></li>
-                                    <% if (runningInstances[key]) {%>
+                                    <% if (session.isRunning) {%>
                                         <li><a class="dropdown-item" href="#" onclick="stopSession('<%= key %>')">stop</a></li>
                                     <% } else {%>
                                         <li><a class="dropdown-item" href="#" onclick="runSession('<%= key %>')">run</a></li>

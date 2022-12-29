@@ -3,7 +3,7 @@
 
 <head>
     <meta charset="UTF-8" />
-    <title>Grider</title>
+    <title>Grinder</title>
     <!-- Bootstrap CSS -->
     <link rel="stylesheet" href="<%= nodeModulesUrl + '/bootstrap/dist/css/bootstrap.min.css'%>" />
     <link rel="stylesheet" href="<%= nodeModulesUrl + '/fontawesome-free/css/all.min.css'%>" />
@@ -81,9 +81,7 @@
                 </div>
                 <div class="myform-group" id="sellerDiv">
                     <label for="seller">seller : </label>
-                    <select id="seller" onchange="onSellerChange()" class="myfg-input form-select" value="<%= JSON.stringify(currSeller) %>">
-                        <% if (currSeller) { %><option value="<%= JSON.stringify(currSeller) %>" selected><%= accounts.getCharLabel(currSeller) %></option><% } else { %> <option selected id="seller_ph" disabled>Select a seller for the group</option><% } %> 
-                    </select>
+                    <select id="seller" onchange="onSellerChange()" class="myfg-input form-select" value="<%= JSON.stringify(currSeller) %>"></select>
                 </div>
                 <div class="managerBottomButtonsBar">
                     <button class="btn btn-primary" onclick="createSession()">confirm</button>
@@ -93,9 +91,7 @@
         </div>
     </div>
     <script>
-        onUnloadTypeChange()
-        populateFollowersSelectNode()
-        populateFollowersListNode()
+        initFightSessionForm();
     </script>
 </body>
 </html>

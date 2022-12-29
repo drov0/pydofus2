@@ -99,4 +99,4 @@ class MapDisplayManager(metaclass=Singleton):
         elif Kernel().getWorker().contains("FightContextFrame"):
             Kernel().getWorker().getFrame("FightContextFrame").process(msg)
         else:
-            logger.error("No context frame found!")
+            logger.warning("No context frame found!")

@@ -1,14 +1,35 @@
 {
-  "test": {
-    "name": "test",
+  "astrub_egouts": {
+    "name": "astrub_egouts",
     "path": "path_astrub_egouts",
     "type": "fight",
     "monsterLvlCoefDiff": "5",
-    "leaderId": 369475322150,
+    "leaderId": 92638609702,
     "followersIds": [
-      790823206
+      790823206,
+      76302254374,
+      369475322150,
+      258718695718,
+      171988287782
+    ],
+    "unloadType": "seller",
+    "sellerId": 5820449062
+  },
+  "criniere_astrub": {
+    "name": "criniere_astrub",
+    "path": "path_criniere_astrub",
+    "type": "fight",
+    "monsterLvlCoefDiff": "5",
+    "leaderId": 92638609702,
+    "followersIds": [
+      790823206,
+      76302254374,
+      369475322150,
+      258718695718,
+      171988287782
     ],
     "unloadType": "seller",
     "sellerId": 5820449062
   }
+  
 }

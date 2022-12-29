@@ -1,10 +1,18 @@
 {
   "path_astrub_egouts": {
     "name": "path_astrub_egouts",
-    "type": "SubAreaRandomPath",
+    "type": "RandomSubAreaFarmPath",
     "startVertex": {
       "mapId": "101715461",
       "mapRpZone": "1"
+    }
+  },
+  "path_criniere_astrub" : {
+    "type": "RandomSubAreaFarmPath",
+    "name": "pioute_astrub_village",
+    "startVertex": {
+        "mapId": 193332228, 
+        "mapRpZone": 1
     }
   }
 }

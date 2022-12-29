@@ -1,57 +1,61 @@
-import logging
+import queue
 import threading
 import time
 from pydofus2.com.ankamagames.jerakine.logger.Logger import Logger
 from pyd2bot.thriftServer.pyd2botServer import Pyd2botServer
+from thrift.protocol.THeaderProtocol import THeaderProtocolFactory
 import pyd2bot.thriftServer.pyd2botService.Pyd2botService as Pyd2botService
 from pydofus2.com.ankamagames.jerakine.metaclasses.Singleton import Singleton
-from thrift.transport import TSocket
 from thrift.transport import TTransport
+from thrift.transport.TSocket import TSocket, TServerSocket
 from thrift.protocol import TBinaryProtocol
-from thrift.server import TServer
-logger = Logger()
 
 class PyD2Bot(metaclass=Singleton):
     _stop = threading.Event()
-    _server = None
-    _runingClients = {}
-    id = None
+    id: str
+    logger = None
+    _running_threads = list[threading.Thread]()
+    _daemon: int
+    processor = None
+    serverTransport = None
+    inputTransportFactory = None
+    inputProtocolFactory = None
     
-    def runServer(self, id:str, host: str, port: int):
+    def __init__(self, id:str, host: str, port: int, deamon=False) -> None:
         self.id = id
+        self.host = host
+        self.port = port
+        self._daemon = deamon
+        Logger.prefix = id
+        self.logger = Logger()
+        self.handler = Pyd2botServer(self.id)       
+        self.processor = Pyd2botService.Processor(self.handler)
+        self.inputTransportFactory = self.outputTransportFactory = TTransport.TBufferedTransportFactory()
+        self.inputProtocolFactory = self.outputProtocolFactory = TBinaryProtocol.TBinaryProtocolFactory()
+    
+    def runServer(self):
         self._stop.clear()
-        handler = Pyd2botServer(id)
-        processor = Pyd2botService.Processor(handler)
-        transport = TSocket.TServerSocket(host=host, port=port)
-        tfactory = TTransport.TBufferedTransportFactory()
-        pfactory = TBinaryProtocol.TBinaryProtocolFactory()
-        server = TServer.TThreadPoolServer(processor, transport, tfactory, pfactory)
-        self._server = server
-        print("Server started on {}:{}".format(host, port), flush=True)
-        for i in range(server.threads):
-            try:
-                t = threading.Thread(target=server.serveThread)
-                t.setDaemon(server.daemon)
-                t.start()
-            except Exception as x:
-                logger.exception(x)
-
+        self.serverTransport = TServerSocket(host=self.host, port=self.port)
+        self.logger.info(f"[Server - {self.id}] Threads started")
         # Pump the socket for clients
-        server.serverTransport.listen()
+        self.serverTransport.listen()
+        self.logger.info(f"[Server - {self.id}] Started listening on {self.host}:{self.port}")
         while not self._stop.is_set():
             try:
-                client = server.serverTransport.accept()
+                client: TSocket = self.serverTransport.accept()
                 if not client:
                     continue
-                server.clients.put(client)
+                t = threading.Thread(target=self.serveClient, args=(client,))
+                t.setDaemon(self._daemon)
+                t.start()
+                self._running_threads.append(t)
+                self.logger.info(f"[Server - {self.id}] Accepted client: {client}")
             except Exception as x:
-                logger.exception(x)
-            
-        logger.info("Server {self.id} stopped.")
+                self.logger.exception(x)
+        self.logger.info(f"[Server - {self.id}] Goodbye crual world!")
 
-        
-    def runClient(self, host, port):
-        transport = TSocket.TSocket(host, port)
+    def runClient(self, host: str, port: int):
+        transport = TSocket(host, port)
         transport = TTransport.TBufferedTransport(transport)
         protocol = TBinaryProtocol.TBinaryProtocol(transport)
         client = Pyd2botService.Client(protocol)
@@ -60,13 +64,39 @@ class PyD2Bot(metaclass=Singleton):
                 transport.open()
                 return transport, client
             except Exception as x:
-                logger.exception(x)
+                self.logger.exception(x)
                 time.sleep(5)
                 continue
         raise Exception("Can't connect to server")
         
-        
+    def serveClient(self, client: TSocket):
+        """Process input/output from a client for as long as possible"""
+        itrans = self.inputTransportFactory.getTransport(client)
+        iprot = self.inputProtocolFactory.getProtocol(itrans)
+
+        # for THeaderProtocol, we must use the same protocol instance for input
+        # and output so that the response is in the same dialect that the
+        # server detected the request was in.
+        if isinstance(self.inputProtocolFactory, THeaderProtocolFactory):
+            otrans = None
+            oprot = iprot
+        else:
+            otrans = self.outputTransportFactory.getTransport(client)
+            oprot = self.outputProtocolFactory.getProtocol(otrans)
+
+        try:
+            while not self._stop.is_set():
+                self.processor.process(iprot, oprot)
+        except TTransport.TTransportException:
+            pass
+        except Exception as x:
+            self.logger.exception(x)
+
+        itrans.close()
+        if otrans:
+            otrans.close()
+        client.close()
+            
     def stopServer(self):
-        print("Server stop called")
+        self.logger.info(f"[Server - {self.id}] Stop called")
         self._stop.set()
-        

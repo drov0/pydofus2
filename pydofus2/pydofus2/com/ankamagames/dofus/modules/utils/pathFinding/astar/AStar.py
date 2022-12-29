@@ -44,11 +44,12 @@ class AStar:
 
     MAX_ITERATION: int = 10000
 
+    
     def __init__(self):
         super().__init__()
 
     @classmethod
-    def search(cls, worldGraph: WorldGraph, src: Vertex, dst: Vertex, callback: FunctionType, onFrame=True) -> None:
+    def search(cls, worldGraph: WorldGraph, src: Vertex, dst: Vertex, callback: FunctionType, onFrame=True) -> list["Edge"]:
         logger.info(f"Searching path from {src} to {dst} ...")
         if cls.callback != None:
             raise Exception("Pathfinding already in progress")

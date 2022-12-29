@@ -20,7 +20,7 @@ class NetworkMessage(INetworkMessage):
     _name = None
 
     def __init__(self):
-        NetworkMessage.GLOBAL_INSTANCE_ID = (NetworkMessage.GLOBAL_INSTANCE_ID + 1) % 100000
+        NetworkMessage.GLOBAL_INSTANCE_ID = (NetworkMessage.GLOBAL_INSTANCE_ID + 1) % 1000
         self._instance_id = NetworkMessage.GLOBAL_INSTANCE_ID
         self.receptionTime: int = None
         self.sourceConnection: str = None

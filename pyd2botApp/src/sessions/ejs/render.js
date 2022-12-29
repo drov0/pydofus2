@@ -1,5 +1,7 @@
 const ipc = window.require('electron').ipcRenderer;
-
+window.onerror = function(error, url, line) {
+    ipc.send('errorInWindow', {"error": error, "url": url, "line": line});
+};
 var followersIds = Array();
 var followersAccountIds = Array();
 var jobsIds = Array();
@@ -8,11 +10,11 @@ var sellerId = null;
 var unloadType = null;
 
 function editSession(key) {
-    ipc.send('editSession', key)
+    ipc.send('editSession', key);
 }
 
 function saveSessions() {
-    ipc.send('saveSessions')
+    ipc.send('saveSessions');
 }
 
 function deleteSession(key) {
@@ -21,15 +23,31 @@ function deleteSession(key) {
 }
 
 function cancelCreateSession() {
-    ipc.send('cancelCreateSession')
+    ipc.send('cancelCreateSession');
 }
 
 function runSession(key) {
-    ipc.send('runSession', key)
+    var elem1 = document.getElementById("session-status-" + key);
+    elem1.innerHTML = "running";
+    ipc.once(`sessionStarted-${key}`, function(event){    
+        var elem = document.getElementById(`runstop_session-${key}`);
+        elem.innerHTML = '<i class="fas fa-stop" style="margin-left: -5px;"></i>  stop';
+        elem.onclick = () => stopSession(key);
+        elem1.innerHTML = "started"
+    });
+    ipc.once(`sessionStoped-${key}`, function(event){
+        let elem = document.getElementById(`runstop_session-${key}`);
+        elem.innerHTML = '<i class="fas fa-play" style="margin-left: -5px;"></i>  run';
+        elem.onclick = () => runSession(key);
+        elem1.innerHTML = "idle";
+    });
+    ipc.send('runSession', key);
 }
 
-function stopSession(key) {
-    ipc.send('stopSession', key)
+function stopSession(key) {    
+    var elem1 = document.getElementById("session-status-" + key);
+    elem1.innerHTML = "stopping";
+    ipc.send('stopSession', key);
 }
 
 function createSession() {
@@ -171,7 +189,7 @@ function populateFollowersSelectNode() {
     if (leaderNode.value) {
         var leader = JSON.parse(leaderNode.value)
         var fNode = document.getElementById("follower");
-        fNode.innerHTML = "<option selected disabled>Choose a follower</option>";
+        fNode.innerHTML = "<option selected disabled>Choose a follower to add</option>";
         var accounts = ipc.sendSync('getData', 'accounts');
         var characters = accounts.charactersDB;
         Object.entries(characters).forEach(([key, ch]) => {
@@ -235,18 +253,27 @@ function addSellerOption(ch) {
 }
 
 function populateSellerSelectNode() {
+    var sessions = ipc.sendSync('getData', 'sessions');
+    var accounts = ipc.sendSync('getData', 'accounts');
+    var curr = sessions.currentEditedSession;
+    var currSeller = curr ? accounts.charactersDB[curr.sellerId] : null;
+    sellerId = curr ? curr.sellerId : null;
     var leaderNode = document.getElementById("leader");
     var sNode = document.getElementById("seller");
     if (leaderNode.value) {
         var leader = JSON.parse(leaderNode.value)
-        sNode.innerHTML = "<option selected disabled>Choose a seller</option>";;
+        if (!currSeller) {
+            sNode.innerHTML = "<option id='seller_ph' selected disabled>Choose a seller</option>";
+        } else {
+            sNode.innerHTML = `<option value='${JSON.stringify(currSeller)}' selected disabled>${currSeller.name} (${currSeller.serverName}, ${currSeller.breedName}, ${currSeller.level})</option>`;
+        }
         var accounts = ipc.sendSync('getData', 'accounts');
         var characters = accounts.charactersDB;
         Object.entries(characters).forEach(([key, ch]) => {
-            if (ch.accountId != leader.accountId && ch.serverId == leader.serverId && !followersAccountIds.includes(ch.accountId)) {
+            if (ch.accountId != leader.accountId && ch.serverId == leader.serverId && !followersAccountIds.includes(ch.accountId) && ch.id != sellerId) {
                 addSellerOption(ch);
             }
-        })
+        });
     }
 }
 
@@ -267,7 +294,7 @@ function populateSellerSelectNode() {
                 optionNode.textContent = resource.name;
                 optionNode.id = `resourceSelectOption-${resource.id}`;
                 resourceSelectNode.appendChild(optionNode);
-            })
+            });
         }
     })
 }
@@ -384,4 +411,10 @@ function makeLiNode() {
     button.value = "x";
     liNode.appendChild(button);
     return [liNode, button];
+}
+
+function initFightSessionForm() {
+    onUnloadTypeChange()
+    populateFollowersSelectNode()
+    populateFollowersListNode()
 }

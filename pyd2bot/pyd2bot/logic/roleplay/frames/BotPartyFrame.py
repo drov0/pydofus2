@@ -321,6 +321,8 @@ class BotPartyFrame(Frame):
             return True
 
         elif isinstance(msg, MapChangeFailedMessage):
+            logger.debug(f"Autotrip received map change failed for reason: {msg.reason}")
+            raise Exception(f"Autotrip received map change failed for reason: {msg.reason}")
             if self.isLeader:
                 return False
             self.requestMapData()
@@ -417,10 +419,10 @@ class BotPartyFrame(Frame):
                 if msg.vertex.UID == self.joiningLeaderVertex.UID:
                     return True
                 else:
-                    logger.warning(f"[BotPartyFrame] Received another leader pos {msg.vertex} while still following leader pos {self.joiningLeaderVertex}")
+                    logger.warning(f"[BotPartyFrame] Received another leader pos {msg.vertex} while still following leader pos {self.joiningLeaderVertex}.")
                     return True
             elif WorldPathFinder().currPlayerVertex is not None and  WorldPathFinder().currPlayerVertex.UID != msg.vertex.UID:
-                logger.debug(f"[BotPartyFrame] Leader {self.leaderName} is in vertex {msg.vertex}, will follow it")
+                logger.debug(f"[BotPartyFrame] Leader {self.leaderName} is in vertex {msg.vertex}, will follow it.")
                 self.joiningLeaderVertex = msg.vertex
                 af = BotAutoTripFrame(msg.vertex.mapId, msg.vertex.zoneId)
                 Kernel().getWorker().pushFrame(af)

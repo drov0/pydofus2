@@ -3,7 +3,9 @@ from pydofus2.com.ankamagames.jerakine.network.NetworkMessage import NetworkMess
 
 class MapChangeFailedMessage(NetworkMessage):
     mapId: int
+    reason: str
 
-    def init(self, mapId):
+    def init(self, mapId, reason=""):
         self.mapId = mapId
+        self.reason = reason
         super().__init__()

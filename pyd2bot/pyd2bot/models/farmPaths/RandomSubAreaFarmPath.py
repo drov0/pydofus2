@@ -84,6 +84,8 @@ class RandomSubAreaFarmPath(AbstractFarmPath):
     @classmethod
     def from_json(cls, pathJson: dict) -> "RandomSubAreaFarmPath":
         startVertex = WorldPathFinder().worldGraph.getVertex(**pathJson["startVertex"])
+        if startVertex is None:
+            raise ValueError("Could not find start vertex from json startVertex : " + str(pathJson["startVertex"]))
         return cls(
             pathJson["name"],
             startVertex,

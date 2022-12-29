@@ -37,28 +37,28 @@ class Cell:
             return
 
         if self.map.version >= 9:
-            tmp_bytes = raw.readShort()
-            self.mov = (tmp_bytes & 1) == 0
-            self.nonWalkableDuringFight = (tmp_bytes & 2) != 0
-            self.nonWalkableDuringRP = (tmp_bytes & 4) != 0
-            self.los = (tmp_bytes & 8) == 0
-            self.blue = (tmp_bytes & 16) != 0
-            self.red = (tmp_bytes & 32) != 0
-            self.visible = (tmp_bytes & 64) != 0
-            self.farmCell = (tmp_bytes & 128) != 0
+            tmpbytesv9 = raw.readShort()
+            self.mov = (tmpbytesv9 & 1) == 0
+            self.nonWalkableDuringFight = (tmpbytesv9 & 2) != 0
+            self.nonWalkableDuringRP = (tmpbytesv9 & 4) != 0
+            self.los = (tmpbytesv9 & 8) == 0
+            self.blue = (tmpbytesv9 & 16) != 0
+            self.red = (tmpbytesv9 & 32) != 0
+            self.visible = (tmpbytesv9 & 64) != 0
+            self.farmCell = (tmpbytesv9 & 128) != 0
 
             if self.map.version == 9:
-                self.top_arrow = (tmp_bytes & 256) != 0
-                self.bottom_arrow = (tmp_bytes & 512) != 0
-                self.right_arrow = (tmp_bytes & 1024) != 0
-                self.left_arrow = (tmp_bytes & 2048) != 0
+                self.top_arrow = (tmpbytesv9 & 256) != 0
+                self.bottom_arrow = (tmpbytesv9 & 512) != 0
+                self.right_arrow = (tmpbytesv9 & 1024) != 0
+                self.left_arrow = (tmpbytesv9 & 2048) != 0
 
             else:
-                self.havenbagCell = (tmp_bytes & 256) != 0
-                self.top_arrow = (tmp_bytes & 512) != 0
-                self.bottom_arrow = (tmp_bytes & 1024) != 0
-                self.right_arrow = (tmp_bytes & 2048) != 0
-                self.left_arrow = (tmp_bytes & 4096) != 0
+                self.havenbagCell = (tmpbytesv9 & 256) != 0
+                self.top_arrow = (tmpbytesv9 & 512) != 0
+                self.bottom_arrow = (tmpbytesv9 & 1024) != 0
+                self.right_arrow = (tmpbytesv9 & 2048) != 0
+                self.left_arrow = (tmpbytesv9 & 4096) != 0
 
         else:
             self.losmov = raw.readUnsignedByte()
@@ -154,27 +154,29 @@ class Cell:
     def __str__(self) -> str:
         return (
             "map : "
-            + self.map.id
-            + " CellId : "
-            + self.id
-            + " mov : "
-            + self.mov
-            + " los : "
-            + self.los
-            + " nonWalkableDuringFight : "
-            + self.nonWalkableDuringFight
-            + " nonWalkableDuringRp : "
-            + self.nonWalkableDuringRP
-            + " farmCell : "
-            + self.farmCell
-            + " havenbagCell: "
-            + self.havenbagCell
-            + " visbile : "
-            + self.visible
-            + " speed: "
-            + self.speed
-            + " moveZone: "
-            + self.moveZone
-            + " linkedZoneId: "
-            + self.linkedZone
+            + str(self.map.id)
+            + ", CellId : "
+            + str(self.id)
+            + ", mov : "
+            + str(self.mov)
+            + ", los : "
+            + str(self.los)
+            + ", nonWalkableDuringFight : "
+            + str(self.nonWalkableDuringFight)
+            + ", nonWalkableDuringRp : "
+            + str(self.nonWalkableDuringRP)
+            + ", farmCell : "
+            + str(self.farmCell)
+            + ", havenbagCell: "
+            + str(self.havenbagCell)
+            + ", visbile : "
+            + str(self.visible)
+            + ", speed: "
+            + str(self.speed)
+            + ", moveZone: "
+            + str(self.moveZone)
+            + ", linkedZoneId: "
+            + str(self.linkedZoneRP)
+            + ", floor: "
+            + str(self.floor)
         )

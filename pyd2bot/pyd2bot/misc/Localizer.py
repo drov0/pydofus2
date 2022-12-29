@@ -36,15 +36,16 @@ class Localizer:
         subareaId = MapDisplayManager().currentDataMap.subareaId
         subarea = SubArea.getSubAreaById(subareaId)
         areaId = subarea._area.id
-        playerPos = PlayedCharacterManager().currMapPos
         minDist = float("inf")
         srcV = WorldPathFinder().currPlayerVertex
-        closestBank = None
+        closestBank = cls.AREAINFOS[str(areaId)]["bank"][0]
         rpZ = 1
-        for bank in cls.AREAINFOS[str(areaId)]["bank"]:
-            bankMapId = bank["npcMapId"]
+        for bank in cls.AREAINFOS[str(areaId)]["bank"][1:]:
+            if bank["npcMapId"] == PlayedCharacterManager().currentMap.mapId:
+                closestBank = bank["npcMapId"]
+                break
             while True:
-                dstV = WorldPathFinder().worldGraph.getVertex(bankMapId, rpZ)
+                dstV = WorldPathFinder().worldGraph.getVertex(bank["npcMapId"], rpZ)
                 if not dstV:
                     break
                 path = AStar.search(WorldPathFinder().worldGraph, srcV, dstV, lambda x: (), False)
@@ -55,6 +56,8 @@ class Localizer:
                         closestBank = bank
                     break
                 rpZ += 1
+        if closestBank is None:
+            raise Exception(f"Could not find closest bank to areaId {areaId}")
         return BankInfos(**closestBank)
 
     @classmethod

@@ -100,6 +100,8 @@ class Pyd2botServer:
             dofus2.registerGameStartFrame(BotCharacterUpdatesFrame)
         elif SessionManager().type == "selling":
             pass
+        else:
+            raise Exception("Unsupported session type: %s" % SessionManager().type)
         self.logger.debug("Frames registered")
         Haapi().APIKEY = apiKey
         loginToken = Haapi().getLoginToken(login, password, certId, certHash)
@@ -113,7 +115,7 @@ class Pyd2botServer:
             dofus2.join()
         except Exception as e:
             iam.stop.set()
-            self.logger.error(f"Error while running session: {e}")
+            self.logger.error(f"[Server - {SessionManager().key}] Error while running session:\n{e}")
             from pyd2bot.PyD2Bot import PyD2Bot
             PyD2Bot().stopServer()
         
@@ -149,7 +151,7 @@ class Pyd2botServer:
 
     def moveToVertex(self, vertex: str):
         v = Vertex(**json.loads(vertex))
-        print(f"Leader pos giver, leader is in vertex {v}")
+        self.logger.debug(f"Leader pos given, leader in vertex {v}.")
         Kernel().getWorker().process(LeaderPosMessage(v))
         
     def followTransition(self, transition: str):        

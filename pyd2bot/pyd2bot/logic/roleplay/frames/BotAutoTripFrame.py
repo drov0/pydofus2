@@ -77,6 +77,8 @@ class BotAutoTripFrame(Frame):
             return True
 
         if isinstance(msg, MapChangeFailedMessage):
+            logger.debug(f"Autotrip received map change failed for reason: {msg.reason}")
+            raise Exception(f"Autotrip received map change failed for reason: {msg.reason}")
             v = WorldPathFinder().currPlayerVertex
             if self.changeMapFails.get(v.UID, 0) > 3:
                 DofusClient().restart()
@@ -101,22 +103,23 @@ class BotAutoTripFrame(Frame):
 
     def walkToNextStep(self):
         if not PlayedCharacterManager().currentMap:
-            Timer(0.1, self.walkToNextStep).start()
+            Timer(0.5, self.walkToNextStep).start()
             return
         elif self._computed:
-            if WorldPathFinder().currPlayerVertex.mapId == self.path[-1].dst.mapId:
-                logger.debug("Trip reached destination Map")
+            currMapId = WorldPathFinder().currPlayerVertex.mapId
+            dstMapId = self.path[-1].dst.mapId
+            logger.debug(f"Player current mapId {currMapId} and dst mapId {dstMapId}")
+            if currMapId == dstMapId:
+                logger.debug(f"Trip reached destination Map : {dstMapId}")
                 Kernel().getWorker().removeFrame(self)
                 Kernel().getWorker().processImmediately(AutoTripEndedMessage(self.dstMapId))
                 return True
-            logger.debug(f"Current step index: {self.currentEdgeIndex}/{len(self.path)}")
-            if self.currentEdgeIndex == len(self.path):
-                DofusClient().restart()
+            logger.debug(f"Current step index: {self.currentEdgeIndex + 1}/{len(self.path)}")
             e = self.path[self.currentEdgeIndex]
-            logger.debug(f"Moving using next edge")
-            print(f"\t|- src {e.src.mapId} -> dst {e.dst.mapId}")
+            logger.debug(f"Moving using next edge :")
+            logger.debug(f"\t|- src {e.src.mapId} -> dst {e.dst.mapId}")
             for tr in e.transitions:
-                print(f"\t\t|- direction : {tr.direction}, skill : {tr.skillId}, cell : {tr.cell}")
+                logger.debug(f"\t\t|- direction : {tr.direction}, skill : {tr.skillId}, cell : {tr.cell}")
             MoveAPI.followEdge(e)
         else:
             WorldPathFinder().findPath(self.dstMapId, self.onComputeOver, self.dstRpZone)

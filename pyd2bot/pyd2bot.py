@@ -8,7 +8,4 @@ if __name__ == "__main__":
     args = parser.parse_args()
     Logger.prefix = args.id
     from pyd2bot.PyD2Bot import PyD2Bot
-    PyD2Bot().runServer(args.id, args.host, args.port)
-        
-    
-        
+    PyD2Bot(args.id, args.host, args.port).runServer()

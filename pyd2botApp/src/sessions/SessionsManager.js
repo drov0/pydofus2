@@ -2,7 +2,6 @@ const path = require('path')
 const fs = require('fs')
 const ejse = require('ejs-electron')
 const instancesManager = require("../bot/InstancesManager.js").instance;
-const { session } = require('electron');
 const accountManager = require("../accounts/AccountManager.js").instance;
 const pathsManager = require("../paths/PathManager.js").instance;
 class SessionsManager {
@@ -51,7 +50,7 @@ class SessionsManager {
         })
     }
 
-    async runSession(sessionKey) {
+    async runSession(sessionKey, event) {
         console.log("running session : " + sessionKey);
         var sessionData = this.sessionsDB[sessionKey];
         if (!sessionData) {
@@ -59,13 +58,14 @@ class SessionsManager {
             return;
         }
         var leader = accountManager.charactersDB[sessionData.leaderId];
-        var path = pathsManager.pathsDB[sessionData.pathId];
+        var path = pathsManager.pathsDB[sessionData.path];
         var instanceKey = `${leader.name}(${leader.id})`;
         var leaderPort = instancesManager.getFreePort();
         leader.serverPort = leaderPort;
         var followers = [];
         var seller = null;
         this.sessionsDB[sessionKey].runningBots = Array();
+        this.sessionsDB[sessionKey].event = event;
         var leaderSession = {
             "key": instanceKey,
             "type": sessionData.type,
@@ -101,6 +101,7 @@ class SessionsManager {
         }
         // console.log("will run session : " + JSON.stringify(session))
         var leaderBot = await this.runPyd2Bot(leaderSession);
+        leaderBot.originSessionKey = sessionKey;
         this.sessionsDB[sessionKey].runningBots.push(leaderBot);
         console.log("Done running session : " + instanceKey);
         for (var i = 0; i < sessionData.followersIds.length; i++) {
@@ -118,6 +119,7 @@ class SessionsManager {
                 followerSession.seller = seller;
             } 
             var followerBot = await this.runPyd2Bot(followerSession);
+            followerBot.originSessionKey = sessionKey;
             console.log("Done running session : " + instanceKey);
             this.sessionsDB[sessionKey].runningBots.push(followerBot)
         }
@@ -131,19 +133,10 @@ class SessionsManager {
             }
             var sellerBot = await this.runPyd2Bot(sellerSession);
             console.log("Done running session : " + instanceKey);
+            sellerBot.originSessionKey = sessionKey;
             this.sessionsDB[sessionKey].runningBots.push(sellerBot);
         }
         this.sessionsDB[sessionKey].isRunning = true;
-    }
-
-    isRunning(key) {
-        var sessionData = this.sessionsDB[key];
-        var character = accountManager.charactersDB[sessionData.leaderId]
-        var inst = instancesManager.runningInstances[`${character.name}(${character.id})`]
-        if (inst) {
-            return true
-        }
-        return false
     }
 
     async runPyd2Bot(session) {
@@ -163,14 +156,20 @@ class SessionsManager {
             apiKey,
             JSON.stringify(session)
         );
-        console.debug("Run Session :" + (creds.login, creds.password, creds.certId, creds.certHash, apiKey, JSON.stringify(session)));
+        // console.debug("Run Session :" + (creds.login, creds.password, creds.certId, creds.certHash, apiKey, JSON.stringify(session)));
         return instance;
     }
 
-    stopSession(key) {
-        if (instancesManager.runningInstances[key]) {
-            instancesManager.killInstance(key);
+    async stopSession(key) {
+        console.log("Stop Session : " + key)
+        if (!key) {
+            console.log("Can't stop session of undefined key");
         }
+        var bots = this.sessionsDB[key].runningBots;
+        for (let i = 0; i < bots.length; i += 1) {
+            await instancesManager.killInstance(bots[i].key);
+        }
+        this.sessionsDB[key].isRunning = false;
     }
 
 }

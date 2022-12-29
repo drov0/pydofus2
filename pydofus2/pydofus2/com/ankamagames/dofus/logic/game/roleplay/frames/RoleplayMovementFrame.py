@@ -524,6 +524,12 @@ class RoleplayMovementFrame(Frame):
 
     def askMoveTo(self, cell: MapPoint) -> bool:
         playerEntity: AnimatedCharacter = DofusEntities.getEntity(PlayedCharacterManager().id)
+        playerRpZone = PlayedCharacterManager().currentZoneRp
+        dstCellRpZone = MapDisplayManager().dataMap.cells[cell.cellId].linkedZoneRP
+        logger.debug(f"[RolePlayMovement] Dst cellRpZone is {dstCellRpZone} and playerRpZone is {playerRpZone}")
+        if playerRpZone != dstCellRpZone:
+            logger.debug("[RolePlayMovement] Dst cell and curent player cell are not in the same rp zone")
+            return False
         if playerEntity.position.cellId == cell.cellId:
             logger.debug("[RolePlayMovement] Already on the cell")
         logger.debug(
@@ -555,11 +561,11 @@ class RoleplayMovementFrame(Frame):
         if movePath.end.cellId != cell.cellId:
             if self._wantToChangeMap:
                 logger.debug(
-                    f"[RolePlayMovement] Player is trying to move to a cell {cell.cellId} but he is on {playerEntity.position.cellId} and the path is {movePath.end.cellId} -> {movePath.start.cellId}"
+                    f"[RolePlayMovement] Player is trying to move to a cell {cell.cellId} but he is on {playerEntity.position.cellId} and the path is {movePath.start.cellId} -> {movePath.end.cellId}"
                 )
                 self._isRequestingMovement = False
                 cmfm: MapChangeFailedMessage = MapChangeFailedMessage()
-                cmfm.init(self._wantToChangeMap)
+                cmfm.init(self._wantToChangeMap, "No path to change map cell found!")
                 Kernel().getWorker().processImmediately(cmfm)
                 self._wantToChangeMap = None
                 return False

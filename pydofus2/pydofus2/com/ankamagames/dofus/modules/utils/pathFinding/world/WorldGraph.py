@@ -48,6 +48,8 @@ class WorldGraph:
         return vertex
 
     def getVertex(self, mapId: float, mapRpZone: int) -> Vertex:
+        mapId = float(mapId)
+        mapRpZone = int(mapRpZone)
         if self._vertices.get(mapId) is None:
             return None
         return self._vertices[mapId].get(mapRpZone)

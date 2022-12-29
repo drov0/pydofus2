@@ -67,7 +67,7 @@ class WorldPathFinder(metaclass=Singleton):
             return
         TimeDebug.reset()
         self.src = self.currPlayerVertex
-        logger.info(f"Start searching path from {self.currPlayerVertex} to destMapId {destinationMapId}")
+        logger.info(f"[WoldPathFinder] Start searching path from {self.currPlayerVertex} to destMapId {destinationMapId}")
         if self.src is None:
             callback(None)
             return
@@ -88,14 +88,14 @@ class WorldPathFinder(metaclass=Singleton):
         if path is None:
             self.next()
         else:
-            logger.info("path to map " + str(self.dst) + " found in " + str(TimeDebug.getElapsedTime()) + "s")
+            logger.debug(f"[WoldPathFinder] Path to map {str(self.dst)} found in {str(TimeDebug.getElapsedTime())}s")
             self.callback(path)
 
     def next(self) -> None:
         dstV: Vertex = self.worldGraph.getVertex(self.dst, self.linkedZone)
         self.linkedZone += 1
         if dstV is None:
-            logger.info("no path found to map " + str(self.dst))
+            logger.debug(f"[WoldPathFinder] No path found to map {str(self.dst)}")
             cb = self.callback
             self.callback = None
             cb(None)

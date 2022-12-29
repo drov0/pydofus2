@@ -1,6 +1,4 @@
 from threading import Timer
-from time import sleep
-from pyd2bot.apis.InventoryAPI import InventoryAPI
 from pyd2bot.logic.roleplay.messages.ExchangeConcludedMessage import ExchangeConcludedMessage
 from pydofus2.com.ankamagames.dofus.datacenter.communication.InfoMessage import InfoMessage
 from pydofus2.com.ankamagames.dofus.kernel.net.ConnectionsHandler import ConnectionsHandler
@@ -20,6 +18,7 @@ from pydofus2.com.ankamagames.dofus.network.messages.game.inventory.exchanges.Ex
 from pydofus2.com.ankamagames.dofus.network.messages.game.inventory.exchanges.ExchangeObjectAddedMessage import (
     ExchangeObjectAddedMessage,
 )
+from pydofus2.com.ankamagames.dofus.network.messages.game.inventory.exchanges.ExchangeObjectMoveKamaMessage import ExchangeObjectMoveKamaMessage
 from pydofus2.com.ankamagames.dofus.network.messages.game.inventory.exchanges.ExchangeObjectMoveMessage import (
     ExchangeObjectMoveMessage,
 )
@@ -39,6 +38,7 @@ from pydofus2.com.ankamagames.dofus.network.messages.game.inventory.exchanges.Ex
 from pydofus2.com.ankamagames.dofus.network.messages.game.inventory.exchanges.ExchangeStartedWithPodsMessage import (
     ExchangeStartedWithPodsMessage,
 )
+from pydofus2.com.ankamagames.dofus.network.messages.game.inventory.items.ExchangeKamaModifiedMessage import ExchangeKamaModifiedMessage
 from pydofus2.com.ankamagames.jerakine.messages.Frame import Frame
 from pydofus2.com.ankamagames.dofus.kernel.Kernel import Kernel
 from pydofus2.com.ankamagames.jerakine.logger.Logger import Logger
@@ -59,8 +59,9 @@ class ExchangeStateEnum(Enum):
     EXCHANGE_REQUEST_ACCEPTED = 3
     EXCHANGE_OPEN = 4
     EXCHANGE_OBJECTS_ADDED = 5
-    EXCHANGE_READY_SENT = 6
-    TERMINATED = 7
+    EXCHANGE_KAMAS_ADDED = 6
+    EXCHANGE_READY_SENT = 7
+    TERMINATED = 8
 
 class BotExchangeFrame(Frame):
     PHENIX_MAPID = None
@@ -117,13 +118,13 @@ class BotExchangeFrame(Frame):
             if InfoMessage.getInfoMessageById(msg.msgType * 10000 + msg.msgId):
                 infoMsg = InfoMessage.getInfoMessageById(msg.msgType * 10000 + msg.msgId)
                 logger.debug(f"info: {infoMsg.text}")
-                if msg.msgId == 12:
+                if msg.msgId == 12: # inventory plein
                     for iw in InventoryManager().realInventory:
                         if not iw.isEquipment and iw.isDestructible:
                             logger.debug(f"delete {iw.name} x 1")
                             doa = DeleteObjectAction.create(iw.objectUID, 1)
                             Kernel().getWorker().process(doa)
-                            return
+                            return True
                 
         elif isinstance(msg, ExchangeStartedWithPodsMessage):
             logger.debug("Exchange started.")
@@ -144,7 +145,19 @@ class BotExchangeFrame(Frame):
             logger.debug("All items moved to exchange.")
             self.state = ExchangeStateEnum.EXCHANGE_OBJECTS_ADDED
             if self.direction == ExchangeDirectionEnum.GIVE:
+                if self.giveAll:
+                    Timer(3, self.sendAllKamas).start()
+                else:
+                    Timer(3, self.sendExchangeReady).start()
+            return True
+        
+        elif isinstance(msg, ExchangeKamaModifiedMessage):
+            logger.debug(f"{msg.quantity} kamas added to exchange")
+            self.state = ExchangeStateEnum.EXCHANGE_KAMAS_ADDED
+            self.step += 1
+            if self.direction == ExchangeDirectionEnum.GIVE:
                 Timer(3, self.sendExchangeReady).start()
+            return True
                 
         elif isinstance(msg, ExchangeObjectAddedMessage):
             logger.debug("Item added to exchange.")
@@ -156,18 +169,22 @@ class BotExchangeFrame(Frame):
                     Timer(3, self.sendExchangeReady).start()
                     
         elif isinstance(msg, ExchangeIsReadyMessage):
+            logger.debug(f"Exchange is ready received from target {int(msg.id)}")
             if self.acceptExchangeTimer is not None:
                 self.acceptExchangeTimer.cancel()
-            if self.direction == ExchangeDirectionEnum.RECEIVE and int(msg.id) == int(self.target["id"]):
-                logger.debug("Exchange is ready received from target.")
+            if self.direction == ExchangeDirectionEnum.RECEIVE and int(msg.id) == int(self.target["id"]) and msg.ready:
                 Timer(3, self.sendExchangeReady).start()
                 return True
 
         elif isinstance(msg, ExchangeLeaveMessage):
             logger.debug("ExchangeLeaveMessage received")
-            self.state = ExchangeStateEnum.TERMINATED
-            Kernel().getWorker().processImmediately(ExchangeConcludedMessage())
-            Kernel().getWorker().removeFrame(self)
+            if msg.success == True:
+                logger.debug("Exchange ended successfully")
+                self.state = ExchangeStateEnum.TERMINATED
+                Kernel().getWorker().processImmediately(ExchangeConcludedMessage())
+                Kernel().getWorker().removeFrame(self)
+            else:
+                raise Exception("Exchange failed")
 
     def sendExchangeRequest(self):
         msg = ExchangePlayerRequestMessage()
@@ -186,3 +203,10 @@ class BotExchangeFrame(Frame):
         self.acceptExchangeTimer = Timer(5, self.sendExchangeReady)
         self.acceptExchangeTimer.start()
         logger.debug("Exchange is ready sent.")
+    
+    def sendAllKamas(self):
+        eomkm = ExchangeObjectMoveKamaMessage()
+        kamas_quantity = InventoryManager().inventory.kamas
+        logger.debug(f"There is {kamas_quantity} in bots inventory.") 
+        eomkm.init(kamas_quantity)
+        ConnectionsHandler.getConnection().send(eomkm)

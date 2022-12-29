@@ -14,7 +14,7 @@ class PathManager {
             'managePathsUrl': "file://" + path.join(__dirname, 'ejs', 'pathsManager.ejs'),
             'newPathUrl': "file://" + path.join(__dirname, 'ejs', 'newPathForm.ejs'),
         }
-        this.types = ['SubAreaRandomPath']
+        this.types = ['RandomSubAreaFarmPath']
         this.currentEditedPath = null
         ejse.data('paths', this);
     }

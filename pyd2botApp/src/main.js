@@ -171,15 +171,14 @@ ipcMain.on("cancelCreatePath", (event, args) => {
 });
 
 // sessions ipc handling
-ipcMain.on("runSession", (event, sessionkey) => {
-    sessionsManager.runSession(sessionkey);
-    mainWindow.loadURL(sessionsManager.urls.manageSessionsUrl);
+ipcMain.on("runSession", async (event, key) => {
+    await sessionsManager.runSession(key, event);
+    event.sender.send('sessionStarted-'+key);
 });
 
-ipcMain.on("stopSession", (event, sessionkey) => {
-    sessionsManager.stopSession(sessionkey);
-    mainWindow.loadURL(sessionsManager.urls.manageSessionsUrl);
-
+ipcMain.on("stopSession", async (event, key) => {
+    await sessionsManager.stopSession(key);
+    event.sender.send('sessionStoped-'+key);
 });
 
 ipcMain.on("createSession", (event, newSession) => {
@@ -209,8 +208,14 @@ ipcMain.on("cancelCreateSession", (event, args) => {
     mainWindow.loadURL(sessionsManager.urls.manageSessionsUrl);
 });
 
+
+// misc and error handling
 ipcMain.on("getData", (event, key) => {
     event.returnValue = ejse.data(key);
+});
+
+ipcMain.on('errorInWindow', function(event, data){
+    console.log(`error : ${data.error}'\n'url: ${data.url}:${data.line}`)
 });
 // This method will be called when Electron has finished
 // initialization and is ready to create browser windows.

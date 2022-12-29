@@ -45,6 +45,7 @@ class SessionManager(metaclass=Singleton):
     followers: list[str] = None
     jobIds = None
     resourceIds = None
+    id = None
 
     def __init__(self) -> None:
         pass
@@ -54,6 +55,7 @@ class SessionManager(metaclass=Singleton):
         
     def load(self, sessionstr: str):
         sessionJson = json.loads(sessionstr)
+        self.key = sessionJson.get("key")
         self.type = sessionJson.get("type")
         self.character = sessionJson.get("character")
         self.unloadType = sessionJson.get("unloadType")
@@ -66,7 +68,7 @@ class SessionManager(metaclass=Singleton):
             self.followers : list[str] = sessionJson.get("followers")
             self.party = True
             if self.followers is not None:
-                self.monsterLvlCoefDiff = sessionJson.get("monsterLvlCoefDiff")
+                self.monsterLvlCoefDiff = float(sessionJson.get("monsterLvlCoefDiff"))
                 self.isLeader = True
                 self.path = sessionJson.get("path")
                 logger.info(f"Running path {self.path}")

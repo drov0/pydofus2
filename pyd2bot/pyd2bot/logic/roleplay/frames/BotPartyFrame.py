@@ -375,7 +375,7 @@ class BotPartyFrame(Frame):
     
         elif isinstance(msg, PartyJoinMessage):
             self.partyMembers.clear()
-            logger.debug(f"[BotPartyFrame] Party {msg.partyName} - {msg.partyId} of leader {msg.partyLeaderId}")
+            logger.debug(f"[BotPartyFrame] Joined Party {msg.partyId} of leader {msg.partyLeaderId}")
             if not self.isLeader and msg.partyLeaderId != self.leader["id"]:
                 logger.warning(f"[BotPartyFrame] The party has the wrong leader {msg.partyLeaderId} instead of {self.leader['id']}")
                 self.leaveParty()

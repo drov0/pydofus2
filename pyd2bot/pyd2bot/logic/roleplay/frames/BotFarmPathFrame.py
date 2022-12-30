@@ -267,7 +267,7 @@ class BotFarmPathFrame(Frame):
         if BotEventsManager().has_listeners(BotEventsManager.MEMBERS_READY):
             BotEventsManager().remove_listener(BotEventsManager.MEMBERS_READY, self.doFarm)
         if PlayerAPI.status() != "idle":
-            logger.debug(f"[BotFarmFrame] Can't farm is bot is not idle but {PlayerAPI.status()}")
+            logger.debug(f"[BotFarmFrame] Can't farm coz bot is not idle but {PlayerAPI.status()}")
             BotEventsManager().add_listener(BotEventsManager.MEMBERS_READY, self.doFarm)
             return
         logger.debug("[BotFarmFrame] doFarm called")

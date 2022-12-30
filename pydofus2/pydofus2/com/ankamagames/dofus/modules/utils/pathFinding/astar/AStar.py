@@ -1,5 +1,10 @@
 from time import perf_counter
 from types import FunctionType
+from pydofus2.com.ankamagames.atouin.utils.DataMapProvider import DataMapProvider
+from pydofus2.com.ankamagames.dofus.logic.game.common.managers.PlayedCharacterManager import PlayedCharacterManager
+from pydofus2.com.ankamagames.dofus.modules.utils.pathFinding.world.TransitionTypeEnum import TransitionTypeEnum
+from pydofus2.com.ankamagames.jerakine.pathfinding.Pathfinding import Pathfinding
+from pydofus2.com.ankamagames.jerakine.types.positions.MapPoint import MapPoint
 from whistle import Event
 from pydofus2.com.ankamagames.dofus.datacenter.world.MapPosition import MapPosition
 from pydofus2.com.ankamagames.dofus.datacenter.world.SubArea import SubArea
@@ -147,7 +152,15 @@ class AStar:
             "Sv",
         ]
         valid: bool = False
+        canUseTr = True
         for transition in edge.transitions:
+            canUseTr = True               
+            if edge.src.mapId == PlayedCharacterManager().currentMap.mapId and transition.type == TransitionTypeEnum.SCROLL.value:
+                srcCell = PlayedCharacterManager().entity.position
+                dstCell = MapPoint.fromCellId(transition.cell)
+                movePath = Pathfinding.findPath(DataMapProvider(), srcCell, dstCell)
+                if movePath.end.cellId != dstCell.cellId:
+                    canUseTr = False
             if len(transition.criterion) != 0:
                 if (
                     "&" not in transition.criterion
@@ -156,8 +169,11 @@ class AStar:
                 ):
                     return False
                 criterion = GroupItemCriterion(transition.criterion)
-                return criterion.isRespected
-            valid = True
+                if not criterion.isRespected:
+                    return False
+                elif canUseTr:
+                    return True
+            valid = canUseTr
         return valid
 
     @classmethod

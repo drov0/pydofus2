@@ -7,7 +7,7 @@ from pydofus2.com.ankamagames.dofus.modules.utils.pathFinding.world.WorldPathFin
 dstmapId = 193331718
 dstMapRpz = 1
 
-srcMapId = 193331717
+srcMapId = 193331717.0
 srcMapRpz = 3
 
 MapDisplayManager().loadMap(srcMapId)
@@ -23,7 +23,7 @@ oev = WorldPathFinder().worldGraph.getOutgoingEdgesFromVertex(srcV)
 for e in oev:
     print(f"|- src {e.src} -> dst ({e.dst})")
     for tr in e.transitions:
-        print(f"\t|- direction : {tr.direction}, skill : {tr.skillId}, cell : {tr.cell}")
+        print(f"\t|- direction : {tr.direction}, skill : {tr.skillId}, cell : {tr.cell}, type : {tr.type}")
 path = AStar.search(WorldPathFinder().worldGraph, srcV, dstV, lambda x: (), False)
 if path is None:
     print("No path found")
@@ -31,4 +31,4 @@ else:
     for e in path:
         print(f"|- src {e.src} -> dst ({e.dst})")
         for tr in e.transitions:
-            print(f"\t|- direction : {tr.direction}, skill : {tr.skillId}, cell : {tr.cell}")
+            print(f"\t|- direction : {tr.direction}, skill : {tr.skillId}, cell : {tr.cell}, type : {tr.type}")

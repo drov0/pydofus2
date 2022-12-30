@@ -791,7 +791,7 @@ class FightSequenceFrame(Frame, ISpellCastProvider):
         if isinstance(msg, GameActionFightDeathMessage):
             gafdmsg = msg
             fightEntitiesFrame = FightEntitiesFrame.getCurrentInstance()
-            logger.info(f"{msg.targetId} died")
+            logger.info(f"[FightSequence] Fighter {msg.targetId} died")
             fbf: "FightBattleFrame" = Kernel().getWorker().getFrame("FightBattleFrame")
             self.fighterHasBeenKilled(gafdmsg)
             return True

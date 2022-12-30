@@ -329,7 +329,7 @@ class ServerConnection(IServerConnection):
             import traceback
             exc_type, exc_value, exc_traceback = sys.exc_info()
             traceback_in_var = traceback.format_tb(exc_traceback)
-            error_trace = '\n'.join(traceback_in_var)
+            error_trace = '\n'.join([exc_type, exc_value, traceback_in_var])
             connh.ConnectionsHandler.connectionGonnaBeClosed(DisconnectionReasonEnum.EXCEPTION_THROWN, error_trace)
             connh.ConnectionsHandler.getConnection().close()
         self._processingSocketData = False

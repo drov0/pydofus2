@@ -1,6 +1,7 @@
 from threading import Timer
 from time import perf_counter, sleep
 from typing import TYPE_CHECKING
+import uuid
 from pydofus2.com.DofusClient import DofusClient
 from pydofus2.com.ankamagames.berilia.managers.KernelEventsManager import KernelEventsManager
 import pydofus2.com.ankamagames.dofus.kernel.net.ConnectionsHandler as connh
@@ -648,10 +649,11 @@ class RoleplayMovementFrame(Frame):
         ConnectionsHandler.getConnection().send(cmmsg)
         if self._changeMapTimeout is not None:
             self._changeMapTimeout.cancel()
-        self._changeMapTimeout = Timer(self.CHANGEMAP_TIMEOUT, self.onMapChangeFailed)
+        timer_uuid = uuid.uuid4().hex
+        self._changeMapTimeout = Timer(self.CHANGEMAP_TIMEOUT, self.onMapChangeFailed, [timer_uuid])
         self._changeMapTimeout.start()
         if self.VERBOSE:
-            logger.debug("[RolePlayMovement] Change map timer started.")
+            logger.debug(f"[RolePlayMovement] timer '{timer_uuid}' - Change map timer started.")
 
     def attackMonsters(self, contextualId: int) -> None:
         if self._followingMonsterGroup:
@@ -675,8 +677,8 @@ class RoleplayMovementFrame(Frame):
         else:
             logger.warning(f"[RolePlayMovement] Actor {actorId} is not on current map.")
 
-    def onMapChangeFailed(self) -> None:
-        logger.debug(f"[RolePlayMovement] Map change to {self._wantToChangeMap} failed!")
+    def onMapChangeFailed(self, timer_uuid) -> None:
+        logger.debug(f"[RolePlayMovement] timer '{timer_uuid}' - Map change to {self._wantToChangeMap} failed!")
         if self._changeMapTimeout is not None:
             self._changeMapTimeout.cancel()
         self._changeMapFails += 1
@@ -687,11 +689,9 @@ class RoleplayMovementFrame(Frame):
             cmfm.init(self._wantToChangeMap)
             Kernel().getWorker().processImmediately(cmfm)
         if self._wantToChangeMap is None:
-            logger.warning(f"[RolePlayMovement] Can't to change map to None, aborting")
+            logger.warning(f"[RolePlayMovement] Can't change map to None, aborting")
         else:
             self.askMapChange()
-            self._changeMapTimeout = Timer(self.CHANGEMAP_TIMEOUT, self.onMapChangeFailed)
-            self._changeMapTimeout.start()
 
     def activateSkill(self, skillInstanceId: int, elementId: int, additionalParam: int = 0) -> None:
         rpInteractivesFrame: "RoleplayInteractivesFrame" = Kernel().getWorker().getFrame("RoleplayInteractivesFrame")

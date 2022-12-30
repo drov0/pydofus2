@@ -53,6 +53,8 @@ class PlayerAPI:
             status = "interacting"
         elif mvframe and mvframe._isMoving:
             status = "moving"
+        elif mvframe and mvframe._wantToChangeMap:
+            status = "changingMap"
         else:
             status = "idle"
         return status

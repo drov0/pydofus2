@@ -1,6 +1,6 @@
 {
-  "astrub_egouts": {
-    "name": "astrub_egouts",
+  "session_astrub_egouts": {
+    "name": "session_astrub_egouts",
     "path": "path_astrub_egouts",
     "type": "fight",
     "monsterLvlCoefDiff": "5",
@@ -15,9 +15,25 @@
     "unloadType": "seller",
     "sellerId": 5820449062
   },
-  "criniere_astrub": {
-    "name": "criniere_astrub",
+  "session_criniere_astrub": {
+    "name": "session_criniere_astrub",
     "path": "path_criniere_astrub",
+    "type": "fight",
+    "monsterLvlCoefDiff": "5",
+    "leaderId": 92638609702,
+    "followersIds": [
+      790823206,
+      76302254374,
+      369475322150,
+      258718695718,
+      171988287782
+    ],
+    "unloadType": "seller",
+    "sellerId": 5820449062
+  },
+  "session_souterrain_astrub": {
+    "name": "session_souterrain_astrub",
+    "path": "path_souterrain_astrub",
     "type": "fight",
     "monsterLvlCoefDiff": "5",
     "leaderId": 92638609702,

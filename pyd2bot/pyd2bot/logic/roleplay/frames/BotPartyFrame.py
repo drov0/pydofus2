@@ -123,7 +123,7 @@ class MembersMonitor(threading.Thread):
                             self.bpframe.notifyFollowesrWithPos()
             except Exception as e:
                 logger.error(e)
-            sleep(1)
+            sleep(3)
         logger.debug("[MembersMonitor] died")
         if self in self._runningMonitors:
             self._runningMonitors.remove(self)
@@ -196,7 +196,8 @@ class BotPartyFrame(Frame):
         if self.currentPartyId:
             self.leaveParty()
         if self.isLeader:
-            self.canFarmMonitor.stopSig.set()
+            if hasattr(self, "canFarmMonitor"):
+                self.canFarmMonitor.stopSig.set()
         self.partyMembers.clear()
         if self.partyInviteTimers:
             for timer in self.partyInviteTimers.values():

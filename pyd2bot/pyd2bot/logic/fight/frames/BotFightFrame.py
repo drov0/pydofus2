@@ -329,7 +329,7 @@ class BotFightFrame(Frame):
         if self.battleFrame._executingSequence:
             if self.VERBOSE:
                 logger.warn(f"[FightBot] Battle is busy processing sequences")
-            Timer(0.5, self.nextTurnAction).start()
+            Timer(1, self.nextTurnAction).start()
             return
         else:
             if self.VERBOSE:
@@ -458,14 +458,6 @@ class BotFightFrame(Frame):
             self._repeatActionTimeout.cancel()
         if self.turnFrame:
             self.turnFrame.finishTurn()
-
-    def fakeActivity(self) -> None:
-        if not self._enabled:
-            return
-        BenchmarkTimer(60 * 5, self.fakeActivity).start()
-        bpmgs: BasicPingMessage = BasicPingMessage()
-        bpmgs.init(False)
-        ConnectionsHandler.getConnection().send(bpmgs, ConnectionType.TO_ALL_SERVERS)
 
     @property
     def fighterInfos(self) -> "GameContextActorInformations":

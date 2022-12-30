@@ -10,12 +10,8 @@ account.json
 unpacked_raw_msg
 /.venv/
 /.vscode/
-creds.json
-botCharactersDB.json
 content\maps
 test.sh
 /my_tests/
-/pyd2bot/build/
 /pyd2bot/.buildEnv/
-/pydofus2/build/
 sources

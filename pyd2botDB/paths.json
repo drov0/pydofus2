@@ -7,12 +7,20 @@
       "mapRpZone": "1"
     }
   },
-  "path_criniere_astrub" : {
+  "path_criniere_astrub": {
     "type": "RandomSubAreaFarmPath",
     "name": "pioute_astrub_village",
     "startVertex": {
-        "mapId": 193332228, 
-        "mapRpZone": 1
+      "mapId": 193332228,
+      "mapRpZone": 1
+    }
+  },
+  "path_souterrain_astrub": {
+    "name": "path_souterrain_astrub",
+    "type": "RandomSubAreaFarmPath",
+    "startVertex": {
+      "mapId": "188482052",
+      "mapRpZone": "1"
     }
   }
 }

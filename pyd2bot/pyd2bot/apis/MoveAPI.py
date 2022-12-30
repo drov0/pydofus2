@@ -153,7 +153,7 @@ class MoveAPI:
     def neighborMapIdFromcoords(cls, x: int, y: int) -> int:
         v = WorldPathFinder().currPlayerVertex
         if not v:
-            Timer(0.1, cls.neighborMapIdFromcoords, [x, y]).start()
+            Timer(1, cls.neighborMapIdFromcoords, [x, y]).start()
             return
         outgoingEdges = WorldPathFinder().worldGraph.getOutgoingEdgesFromVertex(v)
         for edge in outgoingEdges:
@@ -167,7 +167,7 @@ class MoveAPI:
     def changeMapToDstCoords(cls, x: int, y: int) -> None:
         v = WorldPathFinder().currPlayerVertex
         if not v:
-            Timer(0.2, cls.changeMapToDstCoords, [x, y]).start()
+            Timer(1, cls.changeMapToDstCoords, [x, y]).start()
             return
         outgoingEdges = WorldPathFinder().worldGraph.getOutgoingEdgesFromVertex(v)
         for edge in outgoingEdges:

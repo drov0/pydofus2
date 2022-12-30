@@ -1,5 +1,6 @@
 import random
 from threading import Timer
+from time import perf_counter, sleep
 from typing import TYPE_CHECKING
 from pydofus2.com.ankamagames.dofus.datacenter.items.criterion.CriterionUtils import CriterionUtils
 from pydofus2.com.ankamagames.dofus.datacenter.world.MapPosition import MapPosition
@@ -128,10 +129,26 @@ class MoveAPI:
     @classmethod
     def followTransition(cls, tr: Transition):
         if not tr.isValid:
-            raise Exception("Trying to follow a NON valid transition")
+            raise Exception("[RolePlayMovement] Trying to follow a NON valid transition")
+        if tr.transitionMapId == PlayedCharacterManager().currentMap.mapId:
+            logger.warning(f"[RolePlayMovement] transition is heading to my current map '{tr.transitionMapId}', nothing to do.")
+            return True
         if TransitionTypeEnum(tr.type) == TransitionTypeEnum.INTERACTIVE:
-            logger.debug(f"Activating skill {tr.skillId} to change map towards '{tr.transitionMapId}'")
+            logger.debug(f"[RolePlayMovement] Wants to activate skillId '{tr.skillId}' to change map to '{tr.transitionMapId}'")
             ie = cls.getTransitionIe(tr)
+            if ie is not None:
+                logger.debug(f"[RolePlayMovement] InteractiveElement found: '{ie.element.elementId}'")
+            else:
+                logger.warning(f"[RolePlayMovement] InteractiveElement not found: '{tr.skillId}' - retrying...")
+                s = perf_counter()
+                while True:
+                    if perf_counter() - s > 10:
+                        raise Exception(f"[RolePlayMovement] InteractiveElement not found: '{tr.skillId}'")
+                    ie = cls.getTransitionIe(tr)
+                    if ie is not None:
+                        break
+                    sleep(0.2)
+                logger.debug(f"[RolePlayMovement] InteractiveElement found: '{ie.element.elementId}' after retry")
             rpmframe: "RoleplayMovementFrame" = Kernel().getWorker().getFrame("RoleplayMovementFrame")
             if tr.cell != PlayedCharacterManager().entity.position.cellId:
                 rpmframe.setFollowingInteraction(
@@ -142,11 +159,11 @@ class MoveAPI:
                     }
                 )
                 rpmframe.resetNextMoveMapChange()
-                rpmframe.askMoveTo(ie.position)
+                rpmframe.askMoveTo(ie.position, TransitionTypeEnum.INTERACTIVE)
             else:
                 rpmframe.activateSkill(ie.skillUID, tr.id, 0)
         else:
-            logger.debug(f"Classic map change map towards '{tr.transitionMapId}'")
+            logger.debug(f"[RolePlayMovement] Scroll MAP change towards '{tr.transitionMapId}'")
             cls.sendClickAdjacentMsg(tr.transitionMapId, tr.cell)
 
     @classmethod

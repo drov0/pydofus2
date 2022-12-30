@@ -493,20 +493,20 @@ class BotFightFrame(Frame):
 
     def castSpell(self, spellId: int, cellId: bool) -> None:
         if self.VERBOSE:
-            logger.debug(f"[FightBot] Casting spell {spellId} on cell {cellId}")
+            logger.debug(f"[FightBot] Casting spell {spellId} on cell {cellId}.")
         gafcrmsg: GameActionFightCastRequestMessage = GameActionFightCastRequestMessage()
         gafcrmsg.init(spellId, cellId)
         ConnectionsHandler.getConnection().send(gafcrmsg)
 
     def askMove(self, cells: list[int], cellsTackled: list[int] = []) -> None:
         if self.VERBOSE:
-            logger.debug(f"[FightBot] Ask move follwing path {cells}")
+            logger.debug(f"[FightBot] Ask move follwing path {cells}.")
         if not self._myTurn:
-            logger.warn("[FightBot] Wants to move when it's not its turn yet")
+            logger.warn("[FightBot] Wants to move when it's not its turn yet.")
             return False
         fightTurnFrame: "FightTurnFrame" = Kernel().getWorker().getFrame("FightTurnFrame")
         if not fightTurnFrame:
-            logger.warn("[FightBot] Wants to move inside fight but 'FightTurnFrame' not found in kernel")
+            logger.warn("[FightBot] Wants to move inside fight but 'FightTurnFrame' not found in kernel.")
             return False
         fightTurnFrame.askMoveTo(cells, cellsTackled)
         return True

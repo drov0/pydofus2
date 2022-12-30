@@ -157,7 +157,7 @@ class BotFarmPathFrame(Frame):
             if self._inAutoTrip:
                 return False
             logger.error(
-                f"[BotFarmFrame] Error unable to use interactive element {msg.elemId} with the skill {msg.skillInstanceUid}"
+                f"[BotFarmFrame] Error unable to use interactive element '{msg.elemId}' with the skill '{msg.skillInstanceUid}'"
             )
             logger.debug("*" * 80)
             if msg.elemId == self._followingIe.element.elementId:
@@ -235,11 +235,11 @@ class BotFarmPathFrame(Frame):
 
     def attackMonsterGroup(self):
         availableMonsterFights = []
+        # logger.debug(f"[BotFarmFrame] Discarded monsters {self._discardedMonstersIds}")
         currPlayerPos = PlayedCharacterManager().entity.position
         for entityId in self.entitiesFrame._monstersIds:
             if int(entityId) in self._discardedMonstersIds:
                 continue
-            logger.debug(f"[BotFarmFrame] Discarded monsters {self._discardedMonstersIds}")
             infos: GameRolePlayGroupMonsterInformations = self.entitiesFrame.getEntityInfos(entityId)
             if self.insideCurrentPlayerZoneRp(infos.disposition.cellId):
                 totalGrpLvl = infos.staticInfos.mainCreatureLightInfos.level + sum(
@@ -258,7 +258,7 @@ class BotFarmPathFrame(Frame):
 
     def insideCurrentPlayerZoneRp(self, cellId):
         tgtRpZone = MapDisplayManager().dataMap.cells[cellId].linkedZoneRP
-        logger.debug(f"[BotFarmFrame] Current player zone {PlayedCharacterManager().currentZoneRp}, target zone {tgtRpZone}")
+        # logger.debug(f"[BotFarmFrame] Current player zone {PlayedCharacterManager().currentZoneRp}, target zone {tgtRpZone}")
         return tgtRpZone == PlayedCharacterManager().currentZoneRp
 
     def doFarm(self, event=None):
@@ -267,12 +267,12 @@ class BotFarmPathFrame(Frame):
         if BotEventsManager().has_listeners(BotEventsManager.MEMBERS_READY):
             BotEventsManager().remove_listener(BotEventsManager.MEMBERS_READY, self.doFarm)
         if PlayerAPI.status() != "idle":
-            logger.debug(f"[BotFarmFrame] Can't farm coz bot is not idle but {PlayerAPI.status()}")
+            logger.debug(f"[BotFarmFrame] Can't farm coz bot is not idle but '{PlayerAPI.status()}'")
             BotEventsManager().add_listener(BotEventsManager.MEMBERS_READY, self.doFarm)
             return
         logger.debug("[BotFarmFrame] doFarm called")
         if SessionManager().type == "fight" and not SessionManager().isLeader:
-            logger.warning("[BotFarmFrame] in fight mode only the leader can run a farm path")
+            logger.warning("[BotFarmFrame] In fight mode only the leader can run a farm path")
             Kernel().getWorker().removeFrame(self)
             return
         if WorldPathFinder().currPlayerVertex is None:
@@ -286,9 +286,8 @@ class BotFarmPathFrame(Frame):
             self._worker.addFrame(BotAutoTripFrame(self.farmPath.startVertex.mapId))
             return
         if self.partyFrame:
-            logger.debug(f"[BotFarmFrame] Party found")
-            logger.debug(f"[BotFarmFrame] Party members on same map :  {self.partyFrame.allMembersOnSameMap}")
-            logger.debug(f"[BotFarmFrame] Party members idle :  {self.partyFrame.allMembersIdle}")
+            logger.debug(f"[BotFarmFrame] Party members on same map : '{self.partyFrame.allMembersOnSameMap}'")
+            logger.debug(f"[BotFarmFrame] Party members idle : '{self.partyFrame.allMembersIdle}'")
             if not self.partyFrame.allMembersOnSameMap or not self.partyFrame.allMembersIdle:
                 BotEventsManager().add_listener(BotEventsManager.MEMBERS_READY, self.doFarm)
                 return

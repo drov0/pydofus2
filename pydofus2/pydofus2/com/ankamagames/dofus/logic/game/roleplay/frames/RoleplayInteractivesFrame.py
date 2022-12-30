@@ -4,16 +4,12 @@ from pydofus2.com.ankamagames.atouin.managers.MapDisplayManager import MapDispla
 from pydofus2.com.ankamagames.dofus.datacenter.interactives.Interactive import Interactive
 from pydofus2.com.ankamagames.dofus.datacenter.jobs.Skill import Skill
 from pydofus2.com.ankamagames.dofus.kernel.Kernel import Kernel
-from pydofus2.com.ankamagames.dofus.kernel.net.ConnectionsHandler import ConnectionsHandler
 from pydofus2.com.ankamagames.dofus.logic.game.common.managers.PlayedCharacterManager import PlayedCharacterManager
 from pydofus2.com.ankamagames.dofus.logic.game.roleplay.messages.InteractiveElementActivationMessage import (
     InteractiveElementActivationMessage,
 )
 from pydofus2.com.ankamagames.dofus.network.enums.MapObstacleStateEnum import MapObstacleStateEnum
 from pydofus2.com.ankamagames.dofus.network.messages.game.context.GameContextDestroyMessage import GameContextDestroyMessage
-from pydofus2.com.ankamagames.dofus.network.messages.game.context.GameMapMovementCancelMessage import (
-    GameMapMovementCancelMessage,
-)
 from pydofus2.com.ankamagames.dofus.network.messages.game.context.roleplay.MapObstacleUpdateMessage import (
     MapObstacleUpdateMessage,
 )

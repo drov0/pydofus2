@@ -188,7 +188,7 @@ class BotPartyFrame(Frame):
         for follower in self.followers:
             follower["status"] = self.fetchFollowerStatus(follower)
             if follower["status"] != "idle":
-                logger.debug(f"[BotPartyFrame] follower {follower['name']} is not idle but {follower['status']}")
+                logger.debug(f"[BotPartyFrame] follower '{follower['name']}' is not idle but '{follower['status']}'")
                 return False
         return True
     
@@ -322,12 +322,11 @@ class BotPartyFrame(Frame):
             return True
 
         elif isinstance(msg, MapChangeFailedMessage):
-            logger.debug(f"Autotrip received map change failed for reason: {msg.reason}")
-            raise Exception(f"Autotrip received map change failed for reason: {msg.reason}")
-            if self.isLeader:
-                return False
-            self.requestMapData()
-            return True
+            logger.error(f"[BotPartyFrame] received map change failed for reason: {msg.reason}")
+            # if self.isLeader:
+            #     return False
+            # self.requestMapData()
+            # return True
 
         elif isinstance(msg, PartyMemberRemoveMessage):
             logger.debug(f"[BotPartyFrame] {msg.leavingPlayerId} left the party")
@@ -410,9 +409,13 @@ class BotPartyFrame(Frame):
                 self.joinFight(self._wantsToJoinFight)
 
         elif isinstance(msg, LeaderTransitionMessage):
-            logger.debug(f"[BotPartyFrame] Will follow {self.leader['name']} transit {msg.transition}")
-            self.followingLeaderTransition = msg.transition
-            MoveAPI.followTransition(msg.transition)
+            if msg.transition.transitionMapId == PlayedCharacterManager().currentMap.mapId:
+                logger.warning(f"[BotPartyFrame] Leader '{self.leader['name']}' is heading to my current map '{msg.transition.transitionMapId}', nothing to do.")
+            else:
+                logger.debug(f"[BotPartyFrame] Will follow '{self.leader['name']}' transit '{msg.transition}'")
+                self.followingLeaderTransition = msg.transition
+                MoveAPI.followTransition(msg.transition)
+            return True
         
         elif isinstance(msg, LeaderPosMessage):
             self.leader["currentVertex"] = msg.vertex
@@ -430,6 +433,7 @@ class BotPartyFrame(Frame):
                 return True 
             else:
                 logger.debug(f"[BotPartyFrame] Player is already in leader vertex {msg.vertex}")
+                return True
             
         elif isinstance(msg, CompassUpdatePartyMemberMessage):
             if msg.memberId in self.partyMembers:
@@ -489,13 +493,13 @@ class BotPartyFrame(Frame):
     def notifyFollowerWithTransition(self, follower: dict, tr: Transition):
         transport, client = self.getFollowerClient(follower)
         if client is None:
-            logger.warning(f"[BotPartyFrame] follower {follower['name']} thrift server is not connected.")
-            raise Exception(f"follower {follower['name']} thrift server is not connected.")
+            logger.warning(f"[BotPartyFrame] follower '{follower['name']}' thrift server is not connected.")
+            raise Exception(f"follower '{follower['name']}' thrift server is not connected.")
         try:
             client.followTransition(json.dumps(tr.to_json()))
         except TTransportException as e:
             if e.message == "unexpected exception":
-                logger.debug(f"[BotPartyFrame] follower {follower['name']} thrift server disconnected.")
+                logger.debug(f"[BotPartyFrame] follower '{follower['name']}' thrift server disconnected.")
                 self.connectFollowerClient(follower)
                 transport, client = self.getFollowerClient(follower)
                 client.followTransition(json.dumps(tr.to_json()))

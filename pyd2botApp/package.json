@@ -57,6 +57,8 @@
         "bootstrap": "^5.2.3",
         "ejs-electron": "^2.1.1",
         "electron": "22.0.0",
+        "electron-reload": "^2.0.0-alpha.1",
+        "electron-reloader": "^1.2.3",
         "electron-squirrel-startup": "^1.0.0",
         "fontawesome-free": "^1.0.4",
         "jquery": "^3.6.3",

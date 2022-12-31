@@ -191,3 +191,13 @@ ul ul a {
     display: flex;
     flex-direction: row;
 }
+table {
+    border-collapse:collapse;  
+}
+table tr td, th{
+	border:1px solid rgb(206, 199, 199);
+  	padding:5px;
+}
+table tr:hover{  
+    background: #f1f1f1;
+}

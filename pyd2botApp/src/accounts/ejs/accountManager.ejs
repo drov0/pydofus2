@@ -34,10 +34,22 @@
                 </thead>
                 <tbody>
                     <% Object.entries(accounts.accountsDB).forEach(([key, account]) => {%>
+                    <% var expiration_date = new Date(accounts.apiKeysDB[key].expiration_date) %>
+                    <% var expired = expiration_date < Date.now() %>
+                    <% makeShortDate=(date)=>{
+                        yy=date.getFullYear()
+                        mm=date.getMonth()
+                        dd=date.getDate()
+                        hh=date.getHours()
+                        min=date.getMinutes()
+                        shortDate=`${yy}/${(mm<10)?0:''}${mm+1}/${(dd<10)?0:''}${dd} ${hh}:${min}`;
+                        return shortDate;
+                        }
+                    %>
                     <tr id=<%= `account-${key}` %>>
                         <td scope="row"><%= key%></td>
                         <td><%= account.login %></td>
-                        <td><% if (accounts.apiKeysDB[key].expired) { %><span style="color: red;">expired</span><%} else { %><span style="color: green;">valid</span><% } %></td>
+                        <td><% if (expired) { %><span style="color: red;">expired <%= makeShortDate(expiration_date) %></span><%} else { %><span style="color: green;">valid until <%= makeShortDate(expiration_date) %></span><% } %></td>
                         <td><text id=<%= `${key}-password` %>><%= accounts.accountsPasswords[key] %></text><i class="far fa-eye" id=<%=`${key}-togglePwd`%> style="margin-left: 10px; cursor: pointer;" onclick="hideUnhidePassword('<%= key%>')"></i></td>
                         <td>
                             <div class="dropdown">

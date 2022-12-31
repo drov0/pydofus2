@@ -12,6 +12,10 @@ class SessionsManager {
     constructor() {
         this.sessionsDbFile = path.join(ejse.data('persistenceDir'), 'sessions.json');
         this.sessionsDB = require(this.sessionsDbFile);
+        this.sessionsOper = {}
+        for (var key in this.sessionsDB) {
+            this.sessionsOper[key] = this.newEmptyOperSession()
+        }
         this.urls = {
             'manageSessionsUrl': "file://" + path.join(__dirname, 'ejs', 'sessionsManager.ejs'),
             'farmSessionFormUrl': "file://" + path.join(__dirname, 'ejs', 'newFarmSessionForm.ejs'),
@@ -29,12 +33,29 @@ class SessionsManager {
         }
         this.currentEditedSession = null;
         this.sessionsDB[session.name] = session;
-        console.log(session);
+        this.sessionsOper[session.name] = this.newEmptyOperSession();
+        console.log(`Created new session : ${session}`);
+    }
+
+    newEmptyOperSession() {
+        return {
+            "status": "idle",
+            "startTime": null,
+            "elapsedTime": 0,
+            "kamasEarned": 0,
+            "runningBots": [],
+            "event": null,
+        }
     }
 
     deleteSession(key) {
         if (this.sessionsDB[key]) {
+            if (this.sessionsOper[key].status != "idle") {
+                console.log("Session is running, stop it first");
+                return;
+            }
             delete this.sessionsDB[key];
+            delete this.sessionsOper[key];
         }
         else {
             console.log('Session not found');
@@ -64,14 +85,13 @@ class SessionsManager {
         leader.serverPort = leaderPort;
         var followers = [];
         var seller = null;
-        this.sessionsDB[sessionKey].runningBots = Array();
-        this.sessionsDB[sessionKey].event = event;
+        this.sessionsOper[sessionKey].event = event;
         var leaderSession = {
             "key": instanceKey,
             "type": sessionData.type,
             "character": leader,
             "path": path,
-            "unloadType": sessionData.unloadType
+            "unloadType": sessionData.unloadType,
         }
         if (sessionData.type == "farm") {
             leaderSession = {
@@ -99,15 +119,10 @@ class SessionsManager {
             seller.serverPort = instancesManager.getFreePort();
             leaderSession.seller = seller;
         }
-        // console.log("will run session : " + JSON.stringify(session))
-        var leaderBot = await this.runPyd2Bot(leaderSession);
-        leaderBot.originSessionKey = sessionKey;
-        this.sessionsDB[sessionKey].runningBots.push(leaderBot);
-        console.log("Done running session : " + instanceKey);
+        this.runPyd2Bot(sessionKey, leaderSession);
         for (var i = 0; i < sessionData.followersIds.length; i++) {
             var follower = accountManager.charactersDB[sessionData.followersIds[i]];
             var instanceKey = `${follower.name}(${follower.id})`;
-            console.log("running follower session : " + instanceKey);
             var followerSession = {
                 "key": instanceKey,
                 "type": "fight",
@@ -118,10 +133,7 @@ class SessionsManager {
             if (followerSession.unloadType == "seller") {
                 followerSession.seller = seller;
             } 
-            var followerBot = await this.runPyd2Bot(followerSession);
-            followerBot.originSessionKey = sessionKey;
-            console.log("Done running session : " + instanceKey);
-            this.sessionsDB[sessionKey].runningBots.push(followerBot)
+            this.runPyd2Bot(sessionKey, followerSession);
         }
         if (followerSession.unloadType == "seller") {
             var instanceKey = `${seller.name}(${seller.id})`;
@@ -131,33 +143,40 @@ class SessionsManager {
                 "unloadType": null,
                 "character": seller
             }
-            var sellerBot = await this.runPyd2Bot(sellerSession);
-            console.log("Done running session : " + instanceKey);
-            sellerBot.originSessionKey = sessionKey;
-            this.sessionsDB[sessionKey].runningBots.push(sellerBot);
+            this.runPyd2Bot(sessionKey, sellerSession);
         }
-        this.sessionsDB[sessionKey].isRunning = true;
+        this.sessionsOper[sessionKey].status = "started";
+        await Promise.all(this.sessionsOper[sessionKey].runningBots)
+        event.sender.send(`sessionStarted-${sessionKey}`);
     }
 
-    async runPyd2Bot(session) {
+    runPyd2Bot(parentKey, session) {
         if (!session.key) {
             throw new Error("Session key is required");
         }
-        var instance = await instancesManager.spawn(session.key, session.character.serverPort);
-        instance.runningSession = session;
-        instance.serverClosed = false;
-        var creds = accountManager.getAccountCreds(session.character.accountId);
-        var apiKey = await accountManager.fetchAccountApiKey(session.character.accountId);
-        instance.client.runSession(
-            creds.login, 
-            creds.password, 
-            creds.certId, 
-            creds.certHash, 
-            apiKey,
-            JSON.stringify(session)
+        console.log(`[SessionManager] running session : '${session.key}'`);
+        instancesManager.spawn(session.key, session.character.serverPort).then(
+            (instance) => {        
+                instance.runningSession = session;
+                instance.serverClosed = false;
+                var creds = accountManager.getAccountCreds(session.character.accountId);
+                accountManager.fetchAccountApiKey(session.character.accountId).then(
+                    (apiKey) => {
+                        console.log(`[SessionManager] session '${session.key}' run called`);
+                        instance.originSessionKey = parentKey;
+                        this.sessionsOper[parentKey].runningBots.push(instance)
+                        return instance.client.runSession(
+                            creds.login, 
+                            creds.password, 
+                            creds.certId, 
+                            creds.certHash, 
+                            apiKey,
+                            JSON.stringify(session)
+                        )
+                    }
+                );
+            }
         );
-        // console.debug("Run Session :" + (creds.login, creds.password, creds.certId, creds.certHash, apiKey, JSON.stringify(session)));
-        return instance;
     }
 
     async stopSession(key) {
@@ -165,11 +184,12 @@ class SessionsManager {
         if (!key) {
             console.log("Can't stop session of undefined key");
         }
-        var bots = this.sessionsDB[key].runningBots;
+        var bots = this.sessionsOper[key].runningBots;
         for (let i = 0; i < bots.length; i += 1) {
             await instancesManager.killInstance(bots[i].key);
         }
-        this.sessionsDB[key].isRunning = false;
+        this.sessionsOper[key].status = "idle";
+        this.sessionsOper[key].event.sender.send(`sessionStoped-${key}`);
     }
 
 }

@@ -145,7 +145,6 @@ class InstancesManager {
                 }
                 if (stdout_str.includes(`[Server - ${instanceId}] Goodbye crual world!`)) {
                     await ejse.data('sessions').stopSession(instance.originSessionKey);
-                    ejse.data('sessions').sessionsDB[instance.originSessionKey].event.sender.send(`sessionStoped-${instance.originSessionKey}`);
                 }
             });
 
@@ -171,7 +170,7 @@ class InstancesManager {
                         instance.wantsToKillClient = true;
                         instance.connection.end();
                     }
-                    ejse.data('sessions').runPyd2Bot(instance.runningSession);
+                    ejse.data('sessions').runPyd2Bot(instance.originSessionKey, instance.runningSession);
                 }
             });
 

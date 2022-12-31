@@ -26,27 +26,45 @@ function cancelCreateSession() {
     ipc.send('cancelCreateSession');
 }
 
+function convertMS(ms) {
+    var d, h, m, s;
+    s = Math.floor(ms / 1000);
+    m = Math.floor(s / 60);
+    s = s % 60;
+    h = Math.floor(m / 60);
+    m = m % 60;
+    d = Math.floor(h / 24);
+    h = h % 24;
+    return d + " days, " + h + " hours, " + m + " minutes, " + s + " seconds.";
+  };
+
 function runSession(key) {
-    var elem1 = document.getElementById("session-status-" + key);
-    elem1.innerHTML = "running";
+    var sessionStatusTd = document.getElementById(`session-status-${key}`);
+    let sessionElapsedTimeTd = document.getElementById(`session-elapsedTime-${key}`);
+    sessionStatusTd.innerHTML = "running";
+    var runStopButton = document.getElementById(`runstop_session-${key}`);
+    let sessionsManager = ipc.sendSync('getData', 'sessions');
     ipc.once(`sessionStarted-${key}`, function(event){    
-        var elem = document.getElementById(`runstop_session-${key}`);
-        elem.innerHTML = '<i class="fas fa-stop" style="margin-left: -5px;"></i>  stop';
-        elem.onclick = () => stopSession(key);
-        elem1.innerHTML = "started"
+        runStopButton.innerHTML = '<i class="fas fa-stop" style="margin-left: -5px;"></i>  stop';
+        runStopButton.onclick = () => stopSession(key);
+        sessionStatusTd.innerHTML = "started";
+        sessionsManager.sessionsOper[key].startTime = new Date();
+        setInterval(function () {
+            sessionsManager.sessionsOper[key].elapsedTime = Date.now() - sessionsManager.sessionsOper[key].startTime;
+            sessionElapsedTimeTd.innerHTML = convertMS(sessionsManager.sessionsOper[key].elapsedTime);
+        }, 5000);
     });
     ipc.once(`sessionStoped-${key}`, function(event){
-        let elem = document.getElementById(`runstop_session-${key}`);
-        elem.innerHTML = '<i class="fas fa-play" style="margin-left: -5px;"></i>  run';
-        elem.onclick = () => runSession(key);
-        elem1.innerHTML = "idle";
+        runStopButton.innerHTML = '<i class="fas fa-play" style="margin-left: -5px;"></i>  run';
+        runStopButton.onclick = () => runSession(key);
+        sessionStatusTd.innerHTML = "idle";
     });
     ipc.send('runSession', key);
 }
 
 function stopSession(key) {    
-    var elem1 = document.getElementById("session-status-" + key);
-    elem1.innerHTML = "stopping";
+    var sessionStatusTd = document.getElementById(`session-status-${key}`);
+    sessionStatusTd.innerHTML = "stopping";
     ipc.send('stopSession', key);
 }
 
@@ -63,11 +81,11 @@ function createSession() {
             "jobIds": jobsIds,
             "resourcesIds": resourcesIds,
         }
-        if (!newSession.jobs.length) {
+        if (!newSession.jobIds.length) {
             alert("Please select at least one job");
             return;
         }
-        if (!newSession.resources.length) {
+        if (!newSession.resourcesIds.length) {
             alert("Please select at least one resource");
             return;
         }

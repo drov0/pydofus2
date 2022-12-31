@@ -28,6 +28,18 @@ const sessionsManager = require("./sessions/SessionsManager.js").instance;
 
 let mainWindow;
 let loadingWindow;
+
+const env = process.env.NODE_ENV || 'development';
+  
+// If development environment
+if (env === 'development') {
+    try {
+        require('electron-reloader')(module, {
+            debug: true,
+            watchRenderer: true
+        });
+    } catch (_) { console.log('Error'); }    
+}
 // Handle creating/removing shortcuts on Windows when installing/uninstalling.
 if (require('electron-squirrel-startup')) {
     // eslint-disable-line global-require
@@ -176,12 +188,10 @@ ipcMain.on("cancelCreatePath", (event, args) => {
 // sessions ipc handling
 ipcMain.on("runSession", async (event, key) => {
     await sessionsManager.runSession(key, event);
-    event.sender.send('sessionStarted-'+key);
 });
 
 ipcMain.on("stopSession", async (event, key) => {
     await sessionsManager.stopSession(key);
-    event.sender.send('sessionStoped-'+key);
 });
 
 ipcMain.on("createSession", (event, newSession) => {

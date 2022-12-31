@@ -1,6 +1,6 @@
-const { app, BrowserWindow, Menu, ipcMain } = require('electron');
-const path = require('path')
-const ejse = require('ejs-electron')
+const { app, BrowserWindow, Menu, ipcMain } = require("electron");
+const path = require("path");
+const ejse = require("ejs-electron");
 ejse.data('nodeModulesUrl', "file://" + path.join(__dirname, '..', 'node_modules'));
 ejse.data('sidebarUrl', path.join(__dirname, 'ejs', 'sidebar.ejs'));
 ejse.data('cssUrl', "file://" + path.join(__dirname, 'assets', 'css'));
@@ -21,9 +21,11 @@ ejse.data('dofus2Data', {
 })
 const mainUrl = "file://" + path.join(__dirname, 'ejs', 'main.ejs')
 const loadingPageUrl = "file://" + path.join(__dirname, 'ejs', 'loading.ejs')
-const pathsManager = require('./paths/PathManager.js').instance;
+
+const pathsManager = require("./paths/PathManager.js").instance;
 const accountManager = require("./accounts/AccountManager.js").instance;
 const sessionsManager = require("./sessions/SessionsManager.js").instance;
+
 let mainWindow;
 let loadingWindow;
 // Handle creating/removing shortcuts on Windows when installing/uninstalling.
@@ -70,6 +72,7 @@ const createWindow = () => {
 
     const mainMenu = Menu.buildFromTemplate(mainMenuTemplate);
     Menu.setApplicationMenu(mainMenu);
+    
     // Open the DevTools.
     // mainWindow.webContents.openDevTools();
 };

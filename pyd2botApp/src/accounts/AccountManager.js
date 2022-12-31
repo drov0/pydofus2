@@ -1,11 +1,12 @@
+
 const path = require('path')
 const fs = require('fs')
 const ejse = require('ejs-electron')
 globalThis.window = {};
-const JSEncrypt = require('jsencrypt')
 const AuthHelper = require("../auth/AuthHelper.js");
 const InstancesManager = require("../bot/InstancesManager.js");
 const { instance } = require('../paths/PathManager.js');
+const JSEncrypt = require('node-jsencrypt');
 const instancesManager = InstancesManager.instance;
 const defaultBreedConfig = {
     10: { // sadida
@@ -51,10 +52,7 @@ class AccountManager {
             this.accountsPasswords[key] = "********"
         }
         var keysDir = path.join(process.env.AppData, 'pyd2bot', 'RSA-KEYS', 'password-crypting')
-
         if (!fs.existsSync(path.join(keysDir, 'public.pem')) || !fs.existsSync(path.join(keysDir, 'public.pem'))) {
-            var encrypt = new JSEncrypt();
-
             // Generate a RSA key pair using the `JSEncrypt` library.
             var crypt = new JSEncrypt({ default_key_size: 2048 });
             var PublicPrivateKey = {

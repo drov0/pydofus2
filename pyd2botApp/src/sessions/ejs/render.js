@@ -35,31 +35,47 @@ function convertMS(ms) {
     m = m % 60;
     d = Math.floor(h / 24);
     h = h % 24;
-    return d + " days, " + h + " hours, " + m + " minutes, " + s + " seconds.";
+    dd = d > 0 ? d + " days, " : "";
+    hh = h > 0 || d > 0 ? h + " hours, " : ""; 
+    mm = m > 0 || h > 0 || d > 0 ? m + " minutes, " : "";
+    return dd + hh + mm + s + " seconds.";
   };
 
 function runSession(key) {
-    var sessionStatusTd = document.getElementById(`session-status-${key}`);
+    let sessionStatusTd = document.getElementById(`session-status-${key}`);
     let sessionElapsedTimeTd = document.getElementById(`session-elapsedTime-${key}`);
+    let sessionEarnedKamasTd = document.getElementById(`session-earnedKamas-${key}`);
     sessionStatusTd.innerHTML = "running";
-    var runStopButton = document.getElementById(`runstop_session-${key}`);
+    let runStopButton = document.getElementById(`runstop_session-${key}`);
     let sessionsManager = ipc.sendSync('getData', 'sessions');
+    let sessionOper = sessionsManager.sessionsOper[key];
+    let intervalId;
+    ipc.send('runSession', key);
+
     ipc.once(`sessionStarted-${key}`, function(event){    
         runStopButton.innerHTML = '<i class="fas fa-stop" style="margin-left: -5px;"></i>  stop';
         runStopButton.onclick = () => stopSession(key);
         sessionStatusTd.innerHTML = "started";
         sessionsManager.sessionsOper[key].startTime = new Date();
-        setInterval(function () {
-            sessionsManager.sessionsOper[key].elapsedTime = Date.now() - sessionsManager.sessionsOper[key].startTime;
-            sessionElapsedTimeTd.innerHTML = convertMS(sessionsManager.sessionsOper[key].elapsedTime);
+        intervalId = setInterval(function () {
+            sessionOper = sessionsManager.sessionsOper[key];
+            sessionOper.elapsedTime = Date.now() - sessionOper.startTime;
+            sessionElapsedTimeTd.innerHTML = convertMS(sessionOper.elapsedTime);
+            ipc.send('fetchBotsKamas', key);
         }, 5000);
     });
-    ipc.once(`sessionStoped-${key}`, function(event){
+
+    ipc.on(`sessionKamasFetched-${key}`, function(event, data) {
+        // ipc.send('log', `sessionKamasFetched-${key} : ${data}`);
+        sessionEarnedKamasTd.innerHTML = data;
+    });
+
+    ipc.once(`sessionStoped-${key}`, function(event) {
+        clearInterval(intervalId);
         runStopButton.innerHTML = '<i class="fas fa-play" style="margin-left: -5px;"></i>  run';
         runStopButton.onclick = () => runSession(key);
         sessionStatusTd.innerHTML = "idle";
     });
-    ipc.send('runSession', key);
 }
 
 function stopSession(key) {    
@@ -69,10 +85,10 @@ function stopSession(key) {
 }
 
 function createSession() {
-    var sessionType = document.getElementById("sessionType").textContent
+    let sessionType = document.getElementById("sessionType").textContent
     let newSession;
     if (sessionType == "farm") {
-        var farmer = JSON.parse(document.getElementById("farmer").value);
+        let farmer = JSON.parse(document.getElementById("farmer").value);
         newSession = {
             "name": document.getElementById("name").value,
             "path": document.getElementById("path").value,

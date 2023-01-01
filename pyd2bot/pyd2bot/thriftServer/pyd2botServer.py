@@ -22,6 +22,7 @@ from pydofus2.com.ankamagames.dofus.logic.common.managers.PlayerManager import \
     PlayerManager
 from pydofus2.com.ankamagames.dofus.logic.connection.frames.ServerSelectionFrame import \
     ServerSelectionFrame
+from pydofus2.com.ankamagames.dofus.logic.game.common.managers.InventoryManager import InventoryManager
 from pydofus2.com.ankamagames.dofus.modules.utils.pathFinding.world.Transition import \
     Transition
 from pydofus2.com.ankamagames.dofus.modules.utils.pathFinding.world.Vertex import \
@@ -111,13 +112,13 @@ class Pyd2botServer:
         dofus2.login(loginToken, SessionManager().character["serverId"], SessionManager().character["id"])
         iam = InactivityMonitor()
         iam.start()
-        try:
-            dofus2.join()
-        except Exception as e:
-            iam.stop.set()
-            self.logger.error(f"[Server - {SessionManager().key}] Error while running session:\n{e}")
-            from pyd2bot.PyD2Bot import PyD2Bot
-            PyD2Bot().stopServer()
+        # try:
+        #     dofus2.join()
+        # except Exception as e:
+        #     iam.stop.set()
+        #     self.logger.error(f"[Server - {SessionManager().key}] Error while running session:\n{e}")
+        #     from pyd2bot.PyD2Bot import PyD2Bot
+        #     PyD2Bot().stopServer()
         
     def fetchBreedSpells(self, breedId:int) -> list['Spell']:
         spells = []
@@ -172,3 +173,8 @@ class Pyd2botServer:
     
     def getCurrentVertex(self) -> str:
         return json.dumps(WorldPathFinder().currPlayerVertex.to_json())
+    
+    def getInventoryKamas(self) -> int:
+        kamas = int(InventoryManager().inventory.kamas)
+        self.logger.info(f"getInventoryKamas called will respond with {kamas}")
+        return int(kamas)

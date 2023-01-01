@@ -24,12 +24,12 @@ class InstancesManager {
 
     async spawnClient(instanceId) {
         const max_attempts = 5;
-        var attempt = 0;
-        const retry_connect_timeout = 1000;                
+        let attempt = 0;
+        const retry_connect_timeout = 1000; 
+        let instance = this.runningInstances[instanceId];               
         var clientConnectionPromise = new Promise((resolve, reject) => {
-            var instance = this.runningInstances[instanceId];
             if (!instance) {
-                console.log("Instance " + instanceId + " not found");
+                console.log(`Instance '${instanceId}' not found!`);
                 return
             }
             var transport = thrift.TBufferedTransport;
@@ -54,7 +54,7 @@ class InstancesManager {
                 }
             });
             connection.on('timeout', (err) => {
-                console.log("Connecting client of instance '" + instanceId + "' timed out") 
+                console.log(`[Client - ${instanceId}] Connection timed out!`) 
             });
             connection.on('close', (err) => {
                 if (!instance.wantsToKillClient && instance.serverStatus !== "down") {
@@ -70,7 +70,7 @@ class InstancesManager {
             });
             connection.on('connect', (err) => {
                 instance.clientStatus = "connected";
-                console.log(`[Client - ${instanceId}] connected to server on port ${instance.port}`); 
+                console.log(`[Client - ${instanceId}] Connected to server on port ${instance.port}`); 
                 var client = thrift.createClient(Pyd2botService, connection);
                 if (instance.connection) {
                     instance.wantsToKillClient = true;
@@ -104,27 +104,16 @@ class InstancesManager {
             this.freePorts.push(port);
     }
 
-    async spawnServer(instanceId, port, originSessionKey=null) {
-        var execFunc = (resolve, reject) => {
-            var instance = {
-                "key": instanceId, 
-                "port": port, 
-                "server" : null, 
-                "client" : null, 
-                "connection" : null, 
-                "childs" : [], 
-                "wantsToKillServer" : false,
-                "wantsToKillClient" : false,
-                "serverStatus": "connecting",
-                "clientStatus": "down",
-                "originSessionKey": originSessionKey,
-            };
+    async spawnServer(instanceId) {
+        let instance = this.runningInstances[instanceId];
+        let port = instance.port;
+        let execFunc = (resolve, reject) => {
             let timeoutId = setTimeout(() => {
                 this.freePorts.push(port);
                 reject("Timeout : Could not start thrift server for instance '" + instanceId + "' on port " + port);
             }, 20000)
+            instance.serverStatus = "connecting";
             var pyd2bot_process = child_process.execFile(this.pyd2botExePath, ['--port', port, '--host', '0.0.0.0', '--id', instanceId])
-            this.runningInstances[instanceId] = instance;
             instance.server = pyd2bot_process;
 
             pyd2bot_process.stdout.on('data', async (stdout) => {
@@ -191,9 +180,22 @@ class InstancesManager {
     }
 
     async spawn(instanceId, port, originSessionKey=undefined) {
-        await this.spawnServer(instanceId, port, originSessionKey);
+        var instance = {
+            "key": instanceId, 
+            "port": port, 
+            "server" : null, 
+            "client" : null, 
+            "connection" : null, 
+            "wantsToKillServer" : false,
+            "wantsToKillClient" : false,
+            "serverStatus": "down",
+            "clientStatus": "down",
+            "originSessionKey": originSessionKey,
+        };
+        this.runningInstances[instanceId] = instance;
+        await this.spawnServer(instanceId);
         await this.spawnClient(instanceId);
-        return this.runningInstances[instanceId];
+        return instance;
     }
     
     async killInstance(instanceId) {

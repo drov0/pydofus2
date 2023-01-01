@@ -25,6 +25,7 @@ const loadingPageUrl = "file://" + path.join(__dirname, 'ejs', 'loading.ejs')
 const pathsManager = require("./paths/PathManager.js").instance;
 const accountManager = require("./accounts/AccountManager.js").instance;
 const sessionsManager = require("./sessions/SessionsManager.js").instance;
+const instancesManager = require("./bot/InstancesManager.js").instance;
 
 let mainWindow;
 let loadingWindow;
@@ -32,14 +33,14 @@ let loadingWindow;
 const env = process.env.NODE_ENV || 'development';
   
 // If development environment
-if (env === 'development') {
-    try {
-        require('electron-reloader')(module, {
-            debug: true,
-            watchRenderer: true
-        });
-    } catch (_) { console.log('Error'); }    
-}
+// if (env === 'development') {
+//     try {
+//         require('electron-reloader')(module, {
+//             debug: true,
+//             watchRenderer: true
+//         });
+//     } catch (_) { console.log('Error'); }    
+// }
 // Handle creating/removing shortcuts on Windows when installing/uninstalling.
 if (require('electron-squirrel-startup')) {
     // eslint-disable-line global-require
@@ -210,6 +211,7 @@ ipcMain.on("deleteSession", (event, key) => {
 ipcMain.on("editSession", (event, key) => {
     var session = sessionsManager.sessionsDB[key];
     sessionsManager.currentEditedSession = session;
+    console.log(`editing ${session}`);
     if (session.type == "farm") 
         mainWindow.loadURL(sessionsManager.urls.farmSessionFormUrl);
     else if (session.type == "fight") 
@@ -221,7 +223,13 @@ ipcMain.on("cancelCreateSession", (event, args) => {
     mainWindow.loadURL(sessionsManager.urls.manageSessionsUrl);
 });
 
+ipcMain.on('fetchBotsKamas', function(event, sessionKey) {
+    sessionsManager.fetchBotsKamas(event, sessionKey);
+});
 
+ipcMain.on('getRunningBots', function(event, sessionKey) {
+    event.returnValue = sessionsManager.sessionsOper[sessionKey].runningBots;
+});
 // misc and error handling
 ipcMain.on("getData", (event, key) => {
     event.returnValue = ejse.data(key);
@@ -229,6 +237,10 @@ ipcMain.on("getData", (event, key) => {
 
 ipcMain.on('errorInWindow', function(event, data){
     console.log(`error : ${data.error}'\n'url: ${data.url}:${data.line}`)
+});
+
+ipcMain.on('log', function(event, data){
+    console.log(data)
 });
 // This method will be called when Electron has finished
 // initialization and is ready to create browser windows.

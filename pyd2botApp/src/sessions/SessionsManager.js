@@ -42,7 +42,7 @@ class SessionsManager {
             "status": "idle",
             "startTime": null,
             "elapsedTime": 0,
-            "kamasEarned": 0,
+            "earnedKamas": 0,
             "runningBots": [],
             "event": null,
         }
@@ -74,6 +74,7 @@ class SessionsManager {
     async runSession(sessionKey, event) {
         console.log("running session : " + sessionKey);
         var sessionData = this.sessionsDB[sessionKey];
+        let runningBots = Array();
         if (!sessionData) {
             console.log("Session " + sessionKey + " not found");
             return;
@@ -119,7 +120,7 @@ class SessionsManager {
             seller.serverPort = instancesManager.getFreePort();
             leaderSession.seller = seller;
         }
-        this.runPyd2Bot(sessionKey, leaderSession);
+        runningBots.push(this.runPyd2Bot(sessionKey, leaderSession));
         for (var i = 0; i < sessionData.followersIds.length; i++) {
             var follower = accountManager.charactersDB[sessionData.followersIds[i]];
             var instanceKey = `${follower.name}(${follower.id})`;
@@ -133,7 +134,7 @@ class SessionsManager {
             if (followerSession.unloadType == "seller") {
                 followerSession.seller = seller;
             } 
-            this.runPyd2Bot(sessionKey, followerSession);
+            runningBots.push(this.runPyd2Bot(sessionKey, followerSession));
         }
         if (followerSession.unloadType == "seller") {
             var instanceKey = `${seller.name}(${seller.id})`;
@@ -143,36 +144,37 @@ class SessionsManager {
                 "unloadType": null,
                 "character": seller
             }
-            this.runPyd2Bot(sessionKey, sellerSession);
+            runningBots.push(this.runPyd2Bot(sessionKey, sellerSession));
         }
         this.sessionsOper[sessionKey].status = "started";
-        await Promise.all(this.sessionsOper[sessionKey].runningBots)
+        await Promise.all(runningBots);
         event.sender.send(`sessionStarted-${sessionKey}`);
     }
 
-    runPyd2Bot(parentKey, session) {
+    async runPyd2Bot(parentKey, session) {
         if (!session.key) {
             throw new Error("Session key is required");
         }
         console.log(`[SessionManager] running session : '${session.key}'`);
-        instancesManager.spawn(session.key, session.character.serverPort).then(
+        return instancesManager.spawn(session.key, session.character.serverPort).then(
             (instance) => {        
                 instance.runningSession = session;
                 instance.serverClosed = false;
+                instance.isSeller = session.unloadType === null;
+                this.sessionsOper[parentKey].runningBots.push(instance);
                 var creds = accountManager.getAccountCreds(session.character.accountId);
                 accountManager.fetchAccountApiKey(session.character.accountId).then(
                     (apiKey) => {
                         console.log(`[SessionManager] session '${session.key}' run called`);
                         instance.originSessionKey = parentKey;
-                        this.sessionsOper[parentKey].runningBots.push(instance)
-                        return instance.client.runSession(
+                        instance.client.runSession(
                             creds.login, 
                             creds.password, 
                             creds.certId, 
                             creds.certHash, 
                             apiKey,
                             JSON.stringify(session)
-                        )
+                        ).then(() => {return instance})
                     }
                 );
             }
@@ -192,5 +194,23 @@ class SessionsManager {
         this.sessionsOper[key].event.sender.send(`sessionStoped-${key}`);
     }
 
+    fetchBotsKamas(event, sessionKey) {
+        let runningBots = this.sessionsOper[sessionKey].runningBots;
+        runningBots.forEach((instance) => {
+            // console.log(`Getting kamas for instance ${instance.key}`);
+            instance.client.getInventoryKamas().then((kamas) => {
+                if (!instance.isSeller) {
+                    // console.log(`Got kamas: ${kamas} for instance ${instance.key}`);
+                    let oldKamas = instance.kamas;
+                    instance.kamas = kamas; 
+                    if (!oldKamas || kamas < oldKamas) // if oldKamas is undefined or delta is negative (because of a trade for example) 
+                        oldKamas = kamas; // we set oldKamas to kamas to avoid negative delta
+                    this.sessionsOper[sessionKey].earnedKamas += kamas - oldKamas; // we add the delta to the total earned kamas
+                    event.data = this.sessionsOper[sessionKey].earnedKamas; // we set the data to the total earned kamas
+                    event.sender.send(`sessionKamasFetched-${sessionKey}`, this.sessionsOper[sessionKey].earnedKamas);  // we send the event to the renderer
+                }
+            });
+        });
+    }
 }
 module.exports = SessionsManager;

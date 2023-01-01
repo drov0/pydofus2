@@ -24,6 +24,7 @@ service Pyd2botService {
     string getStatus()
     oneway void comeToBankToCollectResources(1: string bankInfos, 3: string guestInfos)
     string getCurrentVertex()
+    int getInventoryKamas()
 }
        
     

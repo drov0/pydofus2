@@ -30,5 +30,13 @@
         "mapId": 189531139, 
         "mapRpZone": 1
     }
-  }
+  },
+  "path_champs_astrub" : {
+    "type": "RandomSubAreaFarmPath",
+    "name": "path_champs_astrub",
+    "startVertex": {
+        "mapId": 189792777, 
+        "mapRpZone": 1
+    }
+}
 }

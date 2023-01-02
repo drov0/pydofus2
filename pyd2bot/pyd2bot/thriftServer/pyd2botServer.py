@@ -40,7 +40,6 @@ class Pyd2botServer:
         self.logger = Logger()
     
     def fetchAccountCharacters(self, login:str, password:str, certId:str, certHash:str, apiKey:str) -> list[Character]:
-        logging.info("fetchAccountCharacters called")
         rate = 2.
         timeout = 20.
         Haapi().APIKEY = apiKey
@@ -112,13 +111,6 @@ class Pyd2botServer:
         dofus2.login(loginToken, SessionManager().character["serverId"], SessionManager().character["id"])
         iam = InactivityMonitor()
         iam.start()
-        # try:
-        #     dofus2.join()
-        # except Exception as e:
-        #     iam.stop.set()
-        #     self.logger.error(f"[Server - {SessionManager().key}] Error while running session:\n{e}")
-        #     from pyd2bot.PyD2Bot import PyD2Bot
-        #     PyD2Bot().stopServer()
         
     def fetchBreedSpells(self, breedId:int) -> list['Spell']:
         spells = []
@@ -141,7 +133,11 @@ class Pyd2botServer:
                         "name": skill.parentJob.name,
                         "gatheredRessources": [] 
                     }
-                gr = {"name": skill.gatheredRessource.name, "id": skill.gatheredRessource.id, "levelMin": skill.levelMin}
+                gr = {
+                    "name": skill.gatheredRessource.name, 
+                    "id": skill.gatheredRessource.id, 
+                    "levelMin": skill.levelMin
+                }
                 if gr not in res[skill.parentJobId]["gatheredRessources"]:
                     res[skill.parentJobId]["gatheredRessources"].append(gr)
         return json.dumps(res)
@@ -176,5 +172,4 @@ class Pyd2botServer:
     
     def getInventoryKamas(self) -> int:
         kamas = int(InventoryManager().inventory.kamas)
-        self.logger.info(f"getInventoryKamas called will respond with {kamas}")
         return int(kamas)

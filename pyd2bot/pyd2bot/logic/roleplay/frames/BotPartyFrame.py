@@ -102,16 +102,14 @@ class MembersMonitor(threading.Thread):
         while not self.stopSig.is_set():
             try:
                 if PlayedCharacterManager().isInFight:
-                    if self.VERBOSE:
-                        logger.debug("[MembersMonitor] bot isFighting")
+                    pass
                 
                 elif PlayerAPI.status() != "idle":
                     pass
                 
                 else:                
                     if not self.bpframe:
-                        if self.VERBOSE:
-                            logger.debug("[MembersMonitor] BotPartyFrame not found")
+                        pass
                             
                     elif not self.bpframe.farmFrame:
                         pass
@@ -133,7 +131,6 @@ class BotPartyFrame(Frame):
     CONFIRME_JOIN_TIMEOUT = 5
     name: str = None
     changingMap: bool = False
-    leaderTransitionsQueue : list = []
     followingLeaderTransition = None
     wantsTransition = None
     followersClients : dict[int, Tuple['TBufferedTransport', 'Pyd2botServiceClient']] = {}
@@ -204,22 +201,16 @@ class BotPartyFrame(Frame):
                 timer.cancel()
         self.currentPartyId = None
         self.partyInviteTimers.clear()
-        self.leaderTransitionsQueue.clear()
         for transport, client in self.followersClients.values():
             transport.close()
-        logger.debug("[BotPartyFrame] BotPartyFrame pulled")
         return True
 
     def pushed(self):
-        logger.debug("[BotPartyFrame] BotPartyFrame pushed")
         self.partyInviteTimers = dict[str, Timer]()
         self.currentPartyId = None
         self.partyMembers = dict[int, PartyMemberInformations]()
         self.joiningLeaderVertex : Vertex = None
-        self._allMemberOnSameMap = False
-        self._allMembersJoined = False
         self._wantsToJoinFight = None
-        self.leaderTransitionsQueue : list = []
         self.followingLeaderTransition = None
         if self.isLeader:
             self.init()
@@ -230,7 +221,6 @@ class BotPartyFrame(Frame):
             logger.debug("[BotPartyFrame] Cant invite members before am in game")
             Timer(5, self.init).start()
             return
-        logger.debug("[BotPartyFrame] Bot is leader.")
         self.canFarmMonitor = MembersMonitor(self)
         self.canFarmMonitor.start()
         logger.debug(f"[BotPartyFrame] Send party invite to all followers.")

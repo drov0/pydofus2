@@ -1,5 +1,7 @@
 const ipc = window.require('electron').ipcRenderer;
-
+window.onerror = function(error, url, line) {
+    ipc.send('errorInWindow', {"error": error, "url": url, "line": line});
+};
 function editPath(key) {
     ipc.send('editPath', key)
 }

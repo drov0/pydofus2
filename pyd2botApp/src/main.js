@@ -223,6 +223,14 @@ ipcMain.on("cancelCreateSession", (event, args) => {
     mainWindow.loadURL(sessionsManager.urls.manageSessionsUrl);
 });
 
+
+ipcMain.on("getSessionsData", (event, args) => {
+    event.returnValue = {
+        "sessionsDB" : sessionsManager.sessionsDB,
+        "currentEditedSession" : sessionsManager.currentEditedSession,
+    }
+});
+// misc and error handling
 ipcMain.on('fetchBotsKamas', function(event, sessionKey) {
     sessionsManager.fetchBotsKamas(event, sessionKey);
 });
@@ -230,7 +238,7 @@ ipcMain.on('fetchBotsKamas', function(event, sessionKey) {
 ipcMain.on('getRunningBots', function(event, sessionKey) {
     event.returnValue = sessionsManager.sessionsOper[sessionKey].runningBots;
 });
-// misc and error handling
+
 ipcMain.on("getData", (event, key) => {
     event.returnValue = ejse.data(key);
 });

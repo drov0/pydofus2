@@ -1,4 +1,3 @@
-from calendar import c
 import json
 import threading
 from time import perf_counter, sleep
@@ -60,11 +59,11 @@ class SessionManager(metaclass=Singleton):
         self.character = sessionJson.get("character")
         self.unloadType = sessionJson.get("unloadType")
         self.seller = sessionJson.get("seller")
-        if self.type == "farm":
+        if self.type == SessionTypeEnum.FARM:
             self.path = sessionJson.get("path")
             self.jobIds = sessionJson.get("jobIds")
             self.resourceIds = sessionJson.get("resourceIds")
-        elif self.type == "fight":
+        elif self.type == SessionTypeEnum.FIGHT:
             self.followers : list[str] = sessionJson.get("followers")
             self.party = True
             if self.followers is not None:

@@ -1,7 +1,9 @@
 const ipc = window.require('electron').ipcRenderer;
+
 window.onerror = function(error, url, line) {
     ipc.send('errorInWindow', {"error": error, "url": url, "line": line});
 };
+
 var followersIds = Array();
 var followersAccountIds = Array();
 var jobsIds = Array();
@@ -41,14 +43,14 @@ function convertMS(ms) {
     return dd + hh + mm + s + " seconds.";
   };
 
+var elapsedTime = {};
+var startTime = {};
 function runSession(key) {
     let sessionStatusTd = document.getElementById(`session-status-${key}`);
     let sessionElapsedTimeTd = document.getElementById(`session-elapsedTime-${key}`);
     let sessionEarnedKamasTd = document.getElementById(`session-earnedKamas-${key}`);
     sessionStatusTd.innerHTML = "running";
     let runStopButton = document.getElementById(`runstop_session-${key}`);
-    let sessionsManager = ipc.sendSync('getData', 'sessions');
-    let sessionOper = sessionsManager.sessionsOper[key];
     let intervalId;
     ipc.send('runSession', key);
 
@@ -56,11 +58,9 @@ function runSession(key) {
         runStopButton.innerHTML = '<i class="fas fa-stop" style="margin-left: -5px;"></i>  stop';
         runStopButton.onclick = () => stopSession(key);
         sessionStatusTd.innerHTML = "started";
-        sessionsManager.sessionsOper[key].startTime = new Date();
+        startTime[key] = new Date();
         intervalId = setInterval(function () {
-            sessionOper = sessionsManager.sessionsOper[key];
-            sessionOper.elapsedTime = Date.now() - sessionOper.startTime;
-            sessionElapsedTimeTd.innerHTML = convertMS(sessionOper.elapsedTime);
+            sessionElapsedTimeTd.innerHTML = convertMS(Date.now() - startTime[key]);
             ipc.send('fetchBotsKamas', key);
         }, 5000);
     });
@@ -235,9 +235,9 @@ function populateFollowersSelectNode() {
 }
 
 function populateFollowersListNode () {
-    var sessions = ipc.sendSync('getData', 'sessions');
+    var sessionsData = ipc.sendSync('getSessionsData');
     var accounts = ipc.sendSync('getData', 'accounts');
-    var curr = sessions.currentEditedSession;
+    var curr = sessionsData.currentEditedSession;
     if (curr) {
         curr.followersIds.forEach(key => {
             follower = accounts.charactersDB[key];
@@ -287,9 +287,9 @@ function addSellerOption(ch) {
 }
 
 function populateSellerSelectNode() {
-    var sessions = ipc.sendSync('getData', 'sessions');
+    var sessionsData = ipc.sendSync('getSessionsData');
     var accounts = ipc.sendSync('getData', 'accounts');
-    var curr = sessions.currentEditedSession;
+    var curr = sessionsData.currentEditedSession;
     var currSeller = curr ? accounts.charactersDB[curr.sellerId] : null;
     sellerId = curr ? curr.sellerId : null;
     var leaderNode = document.getElementById("leader");

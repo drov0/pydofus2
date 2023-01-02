@@ -57,6 +57,7 @@
         "bootstrap": "^5.2.3",
         "ejs-electron": "^2.1.1",
         "electron": "22.0.0",
+        "electron-builder": "^23.6.0",
         "electron-reload": "^2.0.0-alpha.1",
         "electron-reloader": "^1.2.3",
         "electron-squirrel-startup": "^1.0.0",
@@ -65,5 +66,45 @@
         "node-jsencrypt": "^1.0.0",
         "popper": "^1.0.1",
         "thrift": "^0.17.0"
+    },
+    "build": {
+        "appId": "com.majdoubBotDev.bot.grinder",
+        "productName": "Grinder",
+        "copyright": "Copyright © 2022 majdoub BotDev",
+        "win": {
+            "publisherName": "majdoub BotDev",
+            "publish": [
+                "github"
+            ],
+            "target": [
+                "nsis"
+            ]
+        },
+        "dmg": {
+            "background": "assets/background.png",
+            "icon": "src/assets/icons/logo.png",
+            "title": "Grinder Installer"
+        },
+        "nsis": {
+            "oneClick": false,
+            "perMachine": false,
+            "allowToChangeInstallationDirectory": true,
+            "installerIcon": "assets/icon.ico",
+            "installerSidebar": "assets/sidebar.bmp",
+            "uninstallerSidebar": "assets/sidebar.bmp",
+            "license": "assets/agreement.html",
+            "createDesktopShortcut": true,
+            "createStartMenuShortcut": true
+        },
+        "publish": [
+            {
+                "provider": "github",
+                "owner": "vkiranmaniya",
+                "repo": "accurate",
+                "vPrefixedTagName": true,
+                "private": true,
+                "releaseType": "draft"
+            }
+        ]
     }
 }

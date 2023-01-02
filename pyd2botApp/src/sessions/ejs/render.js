@@ -66,7 +66,6 @@ function runSession(key) {
     });
 
     ipc.on(`sessionKamasFetched-${key}`, function(event, data) {
-        // ipc.send('log', `sessionKamasFetched-${key} : ${data}`);
         sessionEarnedKamasTd.innerHTML = data;
     });
 

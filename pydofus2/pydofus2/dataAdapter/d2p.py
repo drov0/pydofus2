@@ -5,7 +5,6 @@
 
 
 from collections import OrderedDict
-from fileinput import nextfile
 from pydofus2.com.ankamagames.jerakine.data.BinaryStream import BinaryStream
 from pathlib import Path
 

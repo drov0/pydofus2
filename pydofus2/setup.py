@@ -5,7 +5,7 @@ setup(
     name="pydofus2",
     
     # Version number (initial):
-    version="1.0.0",
+    version=open("./VERSION").read(),
     
     # Application author details:
     author="majdoub khalid",
@@ -16,24 +16,17 @@ setup(
     
     # Include additional files into the package
     include_package_data=True,
-
+    data_files=[('pydofus2', ['pydofus2/*.json', 'pydofus2/binaryData/*.bin'])],
+    
     # Details
     url="http://pypi.python.org/pypi/pydofus2_v100/",
     
     #
     # license="LICENSE.txt",
-    description="Useful towel-related stuff.",
+    description="Light python client for dofus2 offi.",
     
     # long_description=open("README.txt").read(),
     
     # Dependent packages (distributions)
-    install_requires=[
-        "pycryptodomex",
-        "whistle",
-        "Py3AMF",
-        "httpx[http2]",
-        "xmltodict",
-        "lxml",
-        "cloudscraper"
-    ],
+    install_requires= open("./requirements.txt").readlines()
 )

@@ -1,7 +1,5 @@
-import json
 import ssl
 from time import sleep
-import httpx
 from pydofus2.com.ankamagames.jerakine.logger.Logger import Logger
 from pydofus2.com.ankamagames.jerakine.metaclasses.Singleton import Singleton
 import cloudscraper
@@ -31,16 +29,14 @@ class Haapi(metaclass=Singleton):
     def clients(self):
         for client in [
             cloudscraper.create_scraper(),
-            # cloudscraper.create_scraper(disableCloudflareV1=True, verify=False),
-            # cloudscraper.create_scraper(interpreter='nodejs', verify=False),
-            # cloudscraper.create_scraper(allow_brotli=False, verify=False),
-            # httpx.Client(http2=True, verify=False),
-            # httpx.Client(verify=False)
+            cloudscraper.create_scraper(disableCloudflareV1=True, verify=False),
+            cloudscraper.create_scraper(interpreter='nodejs', verify=False),
+            cloudscraper.create_scraper(allow_brotli=False, verify=False),
             ]:
             yield client
     
     def createAPIKEY(self, login, password, certId, certHash, game_id=102) -> str:
-        logger.debug("Calling HAAPI to Create APIKEY")
+        logger.debug("[HAAPI] Sending http call to Create APIKEY")
         data = {
             "login": login,
             "password": password,
@@ -56,40 +52,38 @@ class Haapi(metaclass=Singleton):
         nbrtries = 0
         while nbrtries < self.MAX_CREATE_API_KAY_RETRIES:
             for client in self.clients:
-                    response = client.post(
-                        self.getUrl("CREATE_API_KEY"),
-                        data=data,
-                        headers={
-                            "User-Agent": "Zaap 3.6.2",
-                            "Content-Type": "multipart/form-data",
-                            "cache-control": "no-cache",
-                        },
-                    )
-                    if response.headers["content-type"] == "application/json":
-                        logger.debug("APIKEY created")
-                        key = response.json().get("key")
-                        if key:
-                            self.APIKEY = key
-                            return response.json()
-                        else:
-                            if "reason" in response.json():
-                                if response.json()["reason"] == "BAN":
-                                    logger.debug("This account is banned definitively")
-                                    return None
-                            logger.debug("Error while calling HAAPI to get Login Token : %s" % response.content)
-                            sleep(5)
+                response = client.post(
+                    self.getUrl("CREATE_API_KEY"),
+                    data=data,
+                    headers={
+                        "User-Agent": "Zaap 3.6.2",
+                        "Content-Type": "multipart/form-data",
+                        "cache-control": "no-cache",
+                    },
+                )
+                if response.headers["content-type"] == "application/json":
+                    logger.debug("[HAAPI] APIKEY created")
+                    key = response.json().get("key")
+                    if key:
+                        self.APIKEY = key
+                        return response.json()
                     else:
-                        from lxml import html
-                        root = html.fromstring(response.content.decode('UTF-8'))
-                        try:
-                            error = root.xpath('//div[@class="cf-error-description"]')[0].text
-                            errorCode = root.xpath('//span[@class="cf-code-label"]//span')[0].text
-                            logger.debug(f"[Haapi error {errorCode}] : Login Token creation for login {login} failed for reason: {error}")
-                        except IndexError:
-                            logger.debug(response.content.decode('UTF-8'))
-                        
+                        if "reason" in response.json():
+                            if response.json()["reason"] == "BAN":
+                                raise HaapiException("[HAAPI] This account is banned definitively")
+                        logger.debug("[HAAPI] Error while calling HAAPI to get Login Token : %s" % response.content)
                         sleep(5)
-            logger.debug("Failed to create APIKEY, retrying in 10 seconds")
+                else:
+                    from lxml import html
+                    root = html.fromstring(response.content.decode('UTF-8'))
+                    try:
+                        error = root.xpath('//div[@class="cf-error-description"]')[0].text
+                        errorCode = root.xpath('//span[@class="cf-code-label"]//span')[0].text
+                        logger.debug(f"[HAAPI] error - {errorCode} : Login Token creation for login {login} failed for reason: {error}")
+                    except IndexError:
+                        logger.debug(response.content.decode('UTF-8'))
+                    sleep(5)
+            logger.debug("[HAAPI] Failed to create APIKEY, retrying in 10 seconds")
             sleep(10)
             nbrtries += 1
         return None
@@ -102,9 +96,9 @@ class Haapi(metaclass=Singleton):
         self.password = password
         self.certId = certId
         self.certHash = certHash
-        logger.debug("Calling HAAPI to get Login Token")
+        logger.debug("[HAAPI] Sending http call to get Login Token")
         if not self.APIKEY:
-            raise HaapiException("No haapi key found")
+            raise HaapiException("[HAAPI] No haapi key found")
         nbrtries = 0
         while nbrtries < 5:
             for client in self.clients:
@@ -125,7 +119,7 @@ class Haapi(metaclass=Singleton):
                     if response.headers["content-type"] == "application/json":
                         token = response.json().get("token")
                         if token:
-                            logger.debug("Login Token created")
+                            logger.debug("[HAAPI] Login Token created")
                             return token
                         else:
                             logger.error("Error while calling HAAPI to get Login Token : %s" % response.json()["message"])
@@ -143,7 +137,7 @@ class Haapi(metaclass=Singleton):
                         logger.info("Login Token creation failed, retrying in 10 minutes")
                         sleep(60 * 10 + 3)
                 except ssl.SSLError:
-                    logger.debug("SSL error while calling HAAPI to get Login Token")
+                    logger.debug("[HAAPI] SSL error while calling HAAPI to get Login Token")
                     sleep(10)
                     
         return None

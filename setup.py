@@ -16,7 +16,7 @@ setup(
     
     # Include additional files into the package
     include_package_data=True,
-    data_files=[('pydofus2', ['pydofus2/*.json', 'pydofus2/binaryData/*.bin'])],
+    # data_files=[('pydofus2', ['pydofus2/**/*.json', 'pydofus2/binaryData/*.bin'])],
     
     # Details
     url="http://pypi.python.org/pypi/pydofus2_v100/",

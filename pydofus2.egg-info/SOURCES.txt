@@ -2502,6 +2502,7 @@ pydofus2/com/ankamagames/jerakine/sequencer/ISubSequenceSequencable.py
 pydofus2/com/ankamagames/jerakine/sequencer/ParallelStartSequenceStep.py
 pydofus2/com/ankamagames/jerakine/sequencer/SerialSequencer.py
 pydofus2/com/ankamagames/jerakine/sequencer/__init__.py
+pydofus2/com/ankamagames/jerakine/types/BinaryDofusData.py
 pydofus2/com/ankamagames/jerakine/types/Callback.py
 pydofus2/com/ankamagames/jerakine/types/ColorMultiplicator.py
 pydofus2/com/ankamagames/jerakine/types/CustomSharedObject.py

@@ -67,7 +67,7 @@ PROTOCOL_MSG_SHUFFLE_PATH = ROOTDIR / "network" / "MsgShuffle.json"
 
 GAME_VERSION_PATH = DOFUS_ROOTDIR / "VERSION"
 
-BINARY_DATA_DIR = ROOTDIR / ".." / ".." / ".." / "binaryData"
+BINARY_DATA_DIR = ROOTDIR.parent.parent.parent / "binaryData"
 
 with open(
     BINARY_DATA_DIR

@@ -18,14 +18,20 @@ setup(
     include_package_data=True,
     
     # Details
-    url="http://pypi.python.org/pypi/pydofus2_v100/",
+    url="https://github.com/kmajdoub/pydofus2",
     
     #
     # license="LICENSE.txt",
     description="Light python client for dofus2 offi.",
     
-    # long_description=open("README.txt").read(),
+    long_description=open("README.md").read(),
     
     # Dependent packages (distributions)
-    install_requires=open("./requirements.txt").readlines()
+    install_requires=open("./requirements.txt").readlines(),
+    classifiers=[
+        "Programming Language :: Python :: 3.9",
+        "License :: OSI Approved :: MIT License",
+        "Operating System :: Windows",
+    ],
+    python_requires='>=3.9,<3.10',
 )

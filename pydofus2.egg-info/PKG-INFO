@@ -2,6 +2,15 @@ Metadata-Version: 2.1
 Name: pydofus2
 Version: 1.0.0
 Summary: Light python client for dofus2 offi.
-Home-page: http://pypi.python.org/pypi/pydofus2_v100/
+Home-page: https://github.com/kmajdoub/pydofus2
 Author: majdoub khalid
 Author-email: majdoub.khalid@gmail.com
+Classifier: Programming Language :: Python :: 3.9
+Classifier: License :: OSI Approved :: MIT License
+Classifier: Operating System :: Windows
+Requires-Python: >=3.9,<3.10
+
+# pydofus2
+
+This is a 100% python lightweight client of dofus. In its structure its very close to the original source code of the game.
+Its used by the pyd2bot module, that adds extra frames to the worker process, these extra frames implement the bot logic.

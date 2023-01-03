@@ -1,14 +1,9 @@
-from pydofus2.com.ankamagames.jerakine.metaclasses.Singleton import Singleton
 from Cryptodome.PublicKey import RSA
-import pydofus2.com.ankamagames.dofus.Constants as Constants
+from pydofus2.com.ankamagames.jerakine.types.BinaryDofusData import BinaryResource
 
+class AuthentificationManager__verifyKey(BinaryResource):
+    ID = "115"
 
-class AuthentificationManager__verifyKey:
-    VERIFY_KEY_PATH = (
-        Constants.BINARY_DATA_DIR
-        / "115_com.ankamagames.dofus.logic.connection.managers.AuthentificationManager__verifyKey_com.ankamagames.dofus.logic.connection.managers.AuthentificationManager__verifyKey.bin"
-    )
-
-    def create() -> RSA.RsaKey:
-        with open(AuthentificationManager__verifyKey.VERIFY_KEY_PATH, "rb") as fp:
-            return RSA.import_key(fp.read())
+    @classmethod
+    def create(cls) -> RSA.RsaKey:
+        return RSA.import_key(cls.getBinaries())

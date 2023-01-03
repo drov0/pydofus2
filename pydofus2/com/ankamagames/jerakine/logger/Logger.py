@@ -1,9 +1,8 @@
 import logging
 import datetime
 import os
+from pathlib import Path
 import sys
-
-from anyio import Path
 from pydofus2.com.ankamagames.jerakine.metaclasses.Singleton import Singleton
 
 class Logger(logging.Logger, metaclass=Singleton):
@@ -16,7 +15,7 @@ class Logger(logging.Logger, metaclass=Singleton):
         formatter = logging.Formatter("%(asctime)s | %(levelname)s | %(filename)s:%(lineno)s | %(message)s", datefmt='%H:%M:%S')
         now = datetime.datetime.now()
         if not os.path.isdir(self.LOGS_PATH):
-            os.mkdir(self.LOGS_PATH)
+            os.makedirs(self.LOGS_PATH)
         fileHandler = logging.FileHandler(
             self.LOGS_PATH / f"{self.prefix}_{now.strftime('%Y-%m-%d')}.log"
         )

@@ -3,6 +3,7 @@ from time import sleep
 from pydofus2.com.ankamagames.jerakine.logger.Logger import Logger
 from pydofus2.com.ankamagames.jerakine.metaclasses.Singleton import Singleton
 import cloudscraper
+import httpx
 
 logger = Logger()
 class HaapiException(Exception):
@@ -10,7 +11,7 @@ class HaapiException(Exception):
 
 class Haapi(metaclass=Singleton):
     MAX_CREATE_API_KAY_RETRIES = 5
-    
+    CLOUDFLARE_ACCESS_DENIED_MSG = "<p>You do not have access to haapi.ankama.com.</p><p>The site owner may have set restrictions that prevent you from accessing the site.</p>"
     def __init__(self) -> None:
         self.url = "https://haapi.ankama.com"
         self.APIKEY = None
@@ -28,15 +29,17 @@ class Haapi(metaclass=Singleton):
     @property
     def clients(self):
         for client in [
+            # httpx.Client(http2=True),
             cloudscraper.create_scraper(),
-            cloudscraper.create_scraper(disableCloudflareV1=True, verify=False),
-            cloudscraper.create_scraper(interpreter='nodejs', verify=False),
-            cloudscraper.create_scraper(allow_brotli=False, verify=False),
+            cloudscraper.create_scraper(disableCloudflareV1=True),
+            cloudscraper.create_scraper(interpreter='nodejs'),
+            # cloudscraper.create_scraper(allow_brotli=False)
             ]:
             yield client
     
     def createAPIKEY(self, login, password, certId, certHash, game_id=102) -> str:
         logger.debug("[HAAPI] Sending http call to Create APIKEY")
+        logger.debug("[HAAPI] Login: %s, password %s, certId %s, certHash %s" % (login, password, certId, certHash))
         data = {
             "login": login,
             "password": password,
@@ -61,6 +64,7 @@ class Haapi(metaclass=Singleton):
                         "cache-control": "no-cache",
                     },
                 )
+                logger.debug(response.content.decode('UTF-8'))
                 if response.headers["content-type"] == "application/json":
                     logger.debug("[HAAPI] APIKEY created")
                     key = response.json().get("key")
@@ -74,14 +78,18 @@ class Haapi(metaclass=Singleton):
                         logger.debug("[HAAPI] Error while calling HAAPI to get Login Token : %s" % response.content)
                         sleep(5)
                 else:
-                    from lxml import html
-                    root = html.fromstring(response.content.decode('UTF-8'))
-                    try:
-                        error = root.xpath('//div[@class="cf-error-description"]')[0].text
-                        errorCode = root.xpath('//span[@class="cf-code-label"]//span')[0].text
-                        logger.debug(f"[HAAPI] error - {errorCode} : Login Token creation for login {login} failed for reason: {error}")
-                    except IndexError:
-                        logger.debug(response.content.decode('UTF-8'))
+                    responseUtf = response.content.decode('UTF-8')
+                    if self.CLOUDFLARE_ACCESS_DENIED_MSG in responseUtf:
+                        logger.debug("[HAAPI] " + self.CLOUDFLARE_ACCESS_DENIED_MSG)
+                    else:
+                        from lxml import html
+                        root = html.fromstring(responseUtf)
+                        try:
+                            error = root.xpath('//div[@class="cf-error-description"]')[0].text
+                            errorCode = root.xpath('//span[@class="cf-code-label"]//span')[0].text
+                            logger.debug(f"[HAAPI] error - {errorCode} : Login Token creation for login '{login}' failed for reason: {error}")
+                        except IndexError:
+                            logger.debug(response.content.decode('UTF-8'))
                     sleep(5)
             logger.debug("[HAAPI] Failed to create APIKEY, retrying in 10 seconds")
             sleep(10)

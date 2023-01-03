@@ -1,4 +1,3 @@
-from asyncio.log import logger
 from pydofus2.com.ankamagames.dofus.datacenter.jobs.Job import Job
 from pydofus2.com.ankamagames.dofus.datacenter.jobs.Skill import Skill
 from pydofus2.com.ankamagames.dofus.internalDatacenter.DataEnum import DataEnum

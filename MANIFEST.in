@@ -1,1 +1,2 @@
-recursive-include pydofus2 *.json *.bin
+recursive-include pydofus2 *.json
+recursive-include pydofus2 *.bin

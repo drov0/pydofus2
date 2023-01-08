@@ -26,7 +26,7 @@ class ProtocolSpec:
 
     @staticmethod
     def getClassSpecByName(name):
-        if name not in D2PROTOCOL["msg"]:
+        if name not in D2PROTOCOL["type"]:
             raise AttributeError(f"msg name {name} not found in known msg types")
         return D2PROTOCOL["type"][name]
 

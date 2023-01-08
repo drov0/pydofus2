@@ -18,15 +18,23 @@ with open(Constants.PROTOCOL_MSG_SHUFFLE_PATH, "r") as fp:
 
 class MessageReceiver(RawDataParser):
     logger = Logger("Dofus2")
-    _messagesTypes: dict = dict()
+    _messagesTypes = dict[int, type[NetworkMessage]]()
     _unpackModes: dict = dict()
-    _messages_to_discard: list = [
+    _messages_to_discard: set = {
         "SetCharacterRestrictionsMessage", 
         "GameContextRefreshEntityLookMessage", 
         "ChatServerMessage", 
         "ChatServerWithObjectMessage",
-        "UpdateMapPlayersAgressableStatusMessage"
-    ]
+        "UpdateMapPlayersAgressableStatusMessage",
+        "GameContextRemoveElementMessage",
+        "BasicAckMessage",
+        "BasicNoOperationMessage",
+        "ListMapNpcsQuestStatusUpdateMessage",
+        "GameMapChangeOrientationMessage",
+        "HousePropertiesMessage",
+        "KnownZaapListMessage"
+        "GuildGetInformationsMessage",
+    }
     for cls_name, cls_infos in msgShuffle.items():
         modulePath = cls_infos["module"]
         try:
@@ -45,10 +53,14 @@ class MessageReceiver(RawDataParser):
             StoreDataManager().registerClass(cls(), True, True)
 
     def parse(self, input: ByteArray, messageId: int, messageLength: int) -> INetworkMessage:
-        messageType: NetworkMessage = self._messagesTypes.get(messageId)
+        messageType = self._messagesTypes.get(messageId)
         if not messageType:
-            logger.warn(f"Unknown packet received (ID {messageId}, length {messageLength}")
+            logger.warn(f"Unknown packet ID {messageId}")
             return None
+        if messageType.__name__ in self._messages_to_discard:
+            message = messageType()
+            message.unpacked = False
+            return message
         message = messageType.unpack(input, messageLength)
         message.unpacked = True
         return message
@@ -76,6 +88,5 @@ class MessageReceiver(RawDataParser):
     def getMsgNameById(cls, messageId: int) -> str:
         messageType = cls._messagesTypes.get(messageId)
         if not messageType:
-            logger.warn("Unknown packet ID " + messageId)
-            return None
+            raise Exception(f"Unknown packet ID {messageId}")
         return messageType.__name__

@@ -20,6 +20,13 @@ class MessageReceiver(RawDataParser):
     logger = Logger("Dofus2")
     _messagesTypes: dict = dict()
     _unpackModes: dict = dict()
+    _messages_to_discard: list = [
+        "SetCharacterRestrictionsMessage", 
+        "GameContextRefreshEntityLookMessage", 
+        "ChatServerMessage", 
+        "ChatServerWithObjectMessage",
+        "UpdateMapPlayersAgressableStatusMessage"
+    ]
     for cls_name, cls_infos in msgShuffle.items():
         modulePath = cls_infos["module"]
         try:
@@ -38,9 +45,9 @@ class MessageReceiver(RawDataParser):
             StoreDataManager().registerClass(cls(), True, True)
 
     def parse(self, input: ByteArray, messageId: int, messageLength: int) -> INetworkMessage:
-        messageType: NetworkMessage = self._messagesTypes[messageId]
+        messageType: NetworkMessage = self._messagesTypes.get(messageId)
         if not messageType:
-            logger.warn(f"Unknown packet received (ID {messageId}  , length {messageLength}")
+            logger.warn(f"Unknown packet received (ID {messageId}, length {messageLength}")
             return None
         message = messageType.unpack(input, messageLength)
         message.unpacked = True
@@ -53,7 +60,7 @@ class MessageReceiver(RawDataParser):
         messageLength: int,
         callback: FunctionType,
     ) -> INetworkMessage:
-        messageType = self._messagesTypes[messageId]
+        messageType = self._messagesTypes.get(messageId)
         if not messageType:
             logger.warn("Unknown packet received (ID " + messageId + ", length " + messageLength + ")")
             return None
@@ -64,3 +71,11 @@ class MessageReceiver(RawDataParser):
 
     def getUnpackMode(self, messageId: int) -> int:
         return self._unpackModes[messageId] if messageId in self._unpackModes else UnpackMode.DEFAULT
+
+    @classmethod
+    def getMsgNameById(cls, messageId: int) -> str:
+        messageType = cls._messagesTypes.get(messageId)
+        if not messageType:
+            logger.warn("Unknown packet ID " + messageId)
+            return None
+        return messageType.__name__

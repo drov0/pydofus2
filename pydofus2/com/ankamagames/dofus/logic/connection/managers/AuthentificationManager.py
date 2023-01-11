@@ -1,5 +1,4 @@
 from argparse import ArgumentError
-import os
 from pydofus2.com.ankamagames.dofus.BuildInfos import BuildInfos
 from pydofus2.com.ankamagames.dofus.logic.connection.actions.LoginValidationAction import (
     LoginValidationAction,
@@ -10,7 +9,6 @@ from pydofus2.com.ankamagames.dofus.logic.connection.managers.AuthentificationMa
 from pydofus2.com.ankamagames.dofus.network.messages.connection.IdentificationMessage import (
     IdentificationMessage,
 )
-from pydofus2.com.ankamagames.dofus.network.types.version.Version import Version
 from pydofus2.com.ankamagames.jerakine.data.XmlConfig import XmlConfig
 from pydofus2.com.ankamagames.jerakine.logger.Logger import Logger
 from pydofus2.com.ankamagames.jerakine.metaclasses.Singleton import Singleton
@@ -25,8 +23,6 @@ from pydofus2.com.hurlan.crypto.symmetric.SimpleIVMode import SimpleIVMode
 from Cryptodome.PublicKey import RSA
 
 logger = Logger("Dofus2")
-ROOTDIR = os.path.dirname(__file__)
-
 
 class AuthentificationManager(metaclass=Singleton):
     _verifyKey = AuthentificationManager__verifyKey.create()

@@ -448,6 +448,7 @@ class RoleplayEntitiesFrame(AbstractEntitiesFrame, Frame):
             #     if partyManagementFrame.playerShouldReceiveRewards:
             #         partyManagementFrame.playerShouldReceiveRewards = False
             #         partyManagementFrame.playerRewards = None
+            
             logger.debug("MapComplementaryInformationsDataMessage processed")
             self.mcidm_processessed = True
             return False
@@ -457,7 +458,7 @@ class RoleplayEntitiesFrame(AbstractEntitiesFrame, Frame):
             return True
 
         if isinstance(msg, GameRolePlayShowActorMessage):
-            if Kernel().getWorker().avoidFlood(msg.__class__.__name__):
+            if Kernel().getWorker().avoidFlood(msg):
                 return True
             grpsamsg = msg
             if int(grpsamsg.informations.contextualId) == int(PlayedCharacterManager().id):

@@ -331,17 +331,12 @@ class Worker(EventDispatcher, MessageHandler):
             if treatment.process():
                 self._treatmentsQueue.remove(treatment)
 
-    def avoidFlood(self, messageName: str) -> bool:
+    def avoidFlood(self, omsg: Message) -> bool:
         if len(self._messagesQueue) > self.LONG_MESSAGE_QUEUE:
-            count = 0
-            toClean = []
-            for msg in self._messagesQueue:
-                if msg.__class__.__name__ == messageName:
-                    count += 1
-                    toClean.append(msg)
-            if count > 10:
-                for msg in toClean:
-                    self._messagesQueue.remove(msg)
+            toClean = [i for i, msg in enumerate(self._messagesQueue) if msg.__class__.__name__ == omsg.__class__.__name__]
+            if len(toClean) > 10:
+                for i in toClean:
+                    del self._messagesQueue[i]
                 return True
         return False
 
@@ -371,20 +366,6 @@ class Worker(EventDispatcher, MessageHandler):
             for frameToAdd in self._framesToAdd:
                 self.pushFrame(frameToAdd)
             self._framesToAdd.clear()
-
-    def avoidFlood(self, messageName: str) -> bool:
-        if len(self._messagesQueue) > self.LONG_MESSAGE_QUEUE:
-            count = 0
-            toClean = []
-            for i in range(len(self._messagesQueue)):
-                if self._messagesQueue[i].__class__.__name__ == messageName:
-                    count += 1
-                    toClean.append(self._messagesQueue[i])
-            if count > 10:
-                for i in range(len(toClean)):
-                    self._messagesQueue.remove(toClean[i])
-                return True
-        return False
 
     def clearUnstoppableMsgClassList(self) -> None:
         self._unstoppableMsgClassList.clear()

@@ -1,10 +1,10 @@
 import base64
 from threading import Timer
+import threading
 from time import perf_counter, sleep
 from types import FunctionType
 from pydofus2.com.ankamagames.dofus.kernel.net.DisconnectionReasonEnum import DisconnectionReasonEnum
 from pydofus2.com.ankamagames.dofus.network.messages.common.NetworkDataContainerMessage import NetworkDataContainerMessage
-from pydofus2.com.ankamagames.jerakine.benchmark.BenchmarkTimer import BenchmarkTimer
 from pydofus2.com.ankamagames.jerakine.events.IOErrorEvent import IOErrorEvent
 from pydofus2.com.ankamagames.jerakine.events.ProgressEvent import ProgressEvent
 from pydofus2.com.ankamagames.jerakine.events.SocketEvent import SocketEvent
@@ -25,6 +25,7 @@ from pydofus2.com.ankamagames.jerakine.utils.display.EnterFrameConst import Ente
 from pydofus2.com.ankamagames.jerakine.utils.display.EnterFrameDispatcher import EnterFrameDispatcher
 from pydofus2.mx.CustomSocket.Socket import Socket
 from whistle import Event
+lock = threading.Lock()
 
 logger = Logger()
 
@@ -301,28 +302,15 @@ class ServerConnection(IServerConnection):
                     msg.receptionTime = perf_counter()
                     msg.sourceConnection = self._id
                     self.process(msg)
-                    if (
-                        self._asyncNetworkDataContainerMessage != None
-                        and self._asyncNetworkDataContainerMessage.content.remaining()
-                    ):
-                        msg = self.lowReceive(self._asyncNetworkDataContainerMessage.content)
-                    else:
-                        if self.checkClosed() and not self._socket.connected:
-                            break
-                        if input.remaining() < 2:
-                            break
-                        if self.DEBUG_LOW_LEVEL_VERBOSE:
-                            logger.debug(
-                                f"[{self._id}] Processed one parsed message from buffer, will low receive the remaining {input.remaining()} bytes"
-                            )
-                        msg = self.lowReceive(input)
-                        
-        except UnknowMessageId as e:
-            import pydofus2.com.ankamagames.dofus.kernel.net.ConnectionsHandler as connh
-            logger.debug(str(e))
-            connh.ConnectionsHandler.connectionGonnaBeClosed(DisconnectionReasonEnum.RESTARTING)
-            connh.ConnectionsHandler.getConnection().close()
-            
+                    if self.checkClosed() and not self._socket.connected:
+                        break
+                    if input.remaining() < 2:
+                        break
+                    if self.DEBUG_LOW_LEVEL_VERBOSE:
+                        logger.debug(
+                            f"[{self._id}] Processed one parsed message from buffer, will low receive the remaining {input.remaining()} bytes"
+                        )
+                    msg = self.lowReceive(input)
         except Exception as e:                
             import pydofus2.com.ankamagames.dofus.kernel.net.ConnectionsHandler as connh
             logger.error(f"[{self._id}] Error while reading socket. \n", exc_info=True)
@@ -402,16 +390,13 @@ class ServerConnection(IServerConnection):
                 f"already received {len(self._inputBuffer)}, remaining {self._splittedPacketLength - len(self._inputBuffer)}. I just received {src.remaining()}"
             )
         messageLength = 0
-
         if not self._splittedPacket:
-
             if src.remaining() < 2:
                 if self.DEBUG_LOW_LEVEL_VERBOSE:
                     logger.info(
                         f"[{self._id}] Not enough data to read the header, byte available : {src.remaining()} (needed : 2)"
                     )
                 return None
-
             staticHeader = src.readUnsignedShort()
             messageId = self.getMessageId(staticHeader)
             if messageId not in self._rawParser._messagesTypes:
@@ -421,31 +406,19 @@ class ServerConnection(IServerConnection):
                 messageLength = self.readMessageLength(staticHeader, src)
                 if src.remaining() >= messageLength:
                     self.updateLatency()
-                    if self.getUnpackMode(messageId, messageLength) == UnpackMode.ASYNC:
-                        self._input = src.read(messageLength)
-                        msg = self._rawParser.parseAsync(self._input, messageId, messageLength, self.computeMessage)
-                        if self.DEBUG_LOW_LEVEL_VERBOSE and msg != None:
-                            logger.info(
-                                f"[{self._id}] Async {self.getType(msg)} parsing, message length : {messageLength})"
-                            )
-
-                    else:
-                        msg = self._rawParser.parse(src, messageId, messageLength)
-                        if self.DEBUG_LOW_LEVEL_VERBOSE:
-                            logger.info(f"[{self._id}] Full parsing done, remaining : {src.remaining()}")
+                    msg = self._rawParser.parse(src, messageId, messageLength)
+                    if self.DEBUG_LOW_LEVEL_VERBOSE:
+                        logger.info(f"[{self._id}] Full parsing done, remaining : {src.remaining()}")
                     return msg
-
                 if self.DEBUG_LOW_LEVEL_VERBOSE:
                     logger.info(
                         f"[{self._id}] Not enough data to read msg content, byte available : {src.remaining()} (needed : {messageLength} bytes)"
                     )
-
                 self._staticHeader = -1
                 self._splittedPacketLength = messageLength
                 self._splittedPacketId = messageId
                 self._splittedPacket = True
                 self._inputBuffer = src.read(src.remaining())
-
                 return None
 
             if self.DEBUG_LOW_LEVEL_VERBOSE:
@@ -470,27 +443,13 @@ class ServerConnection(IServerConnection):
             self._inputBuffer = self._inputBuffer + src.read(self._splittedPacketLength - len(self._inputBuffer))
             self._inputBuffer.position = 0
             self.updateLatency()
-
-            if self.getUnpackMode(self._splittedPacketId, self._splittedPacketLength) == UnpackMode.ASYNC:
-                msg = self._rawParser.parseAsync(
-                    self._inputBuffer,
-                    self._splittedPacketId,
-                    self._splittedPacketLength,
-                    self.computeMessage,
-                )
-                if self.DEBUG_LOW_LEVEL_VERBOSE and msg != None:
-                    logger.info(
-                        f"[{self._id}] Async splitted {self.getType(msg)} parsing, message length : {self._splittedPacketLength})"
-                    )
-            else:
-                msg = self._rawParser.parse(
-                    self._inputBuffer,
-                    self._splittedPacketId,
-                    self._splittedPacketLength,
-                )
-                if self.DEBUG_LOW_LEVEL_VERBOSE:
-                    logger.info(f"[{self._id}] Full parsing done, remaining : {src.remaining()}")
-
+            msg = self._rawParser.parse(
+                self._inputBuffer,
+                self._splittedPacketId,
+                self._splittedPacketLength,
+            )
+            if self.DEBUG_LOW_LEVEL_VERBOSE:
+                logger.info(f"[{self._id}] Full parsing done, remaining : {src.remaining()}")
             self._splittedPacket = False
             self._inputBuffer.clear()
             return msg
@@ -584,12 +543,10 @@ class ServerConnection(IServerConnection):
         self._staticHeader = -1
 
     def onSocketData(self, pe: ProgressEvent) -> None:
-        if not self._processingSocketData:
-            self._processingSocketData = True
-            if self.DEBUG_LOW_LEVEL_VERBOSE:
-                logger.info(f"[{self._id}] Receive Event, byte available : {self._socket.bytesAvailable}")
+        if self.DEBUG_LOW_LEVEL_VERBOSE:
+            logger.info(f"[{self._id}] Receive Event, byte available : {self._socket.bytesAvailable}")
+        with lock:
             self.receive(self._socket._buff)
-            self._processingSocketData = False
 
     def onSocketError(self, e: IOErrorEvent) -> None:
         if self._lagometer:
@@ -612,8 +569,5 @@ class ServerConnection(IServerConnection):
 
     def checkClosed(self) -> bool:
         if self._willClose:
-            if len(self._asyncTrees) == 0:
-                self._willClose = False
-                self.dispatchEvent(SocketEvent.CLOSE)
             return True
         return False

@@ -15,16 +15,25 @@ class ProtocolSpec:
     @staticmethod
     def getTypeSpecById(id):
         if str(id) not in D2PROTOCOL["type_by_id"]:
-            raise Exception(f"Type id {id} not found in known types ids")
+            raise AttributeError(f"Type id {id} not found in known types ids")
         return D2PROTOCOL["type_by_id"][str(id)]
 
-    staticmethod
-
+    @staticmethod
     def getClassSpecById(id):
         if str(id) not in D2PROTOCOL["msg_by_id"]:
-            raise Exception(f"msg id {id} not found in known msg ids")
+            raise AttributeError(f"msg id {id} not found in known msg ids")
         return D2PROTOCOL["msg_by_id"][str(id)]
 
     @staticmethod
     def getClassSpecByName(name):
+        if name not in D2PROTOCOL["type"]:
+            raise AttributeError(f"msg name {name} not found in known msg types")
         return D2PROTOCOL["type"][name]
+
+    @classmethod
+    def getMsgNameById(cls, id):
+        return cls.getClassSpecById(id)["name"]
+    
+    @classmethod
+    def getProtocolIdByName(cls, name):
+        return cls.getClassSpecByName(name)["protocolId"]

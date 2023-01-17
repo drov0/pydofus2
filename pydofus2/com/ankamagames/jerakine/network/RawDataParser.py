@@ -7,10 +7,10 @@ class RawDataParser:
     _messagesTypes = dict()
 
     def parse(self, data: ByteArray, msgId: int, msgLen: int) -> INetworkMessage:
-        pass
+        raise NotImplementedError()
 
     def parseAsync(self, data: ByteArray, messageId: int, msgLen: int, compute: FunctionType) -> INetworkMessage:
-        pass
+        raise NotImplementedError()
 
     def getUnpackMode(self, param1: int) -> int:
-        pass
+        raise NotImplementedError()

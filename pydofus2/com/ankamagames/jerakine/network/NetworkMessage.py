@@ -18,6 +18,8 @@ class NetworkMessage(INetworkMessage):
     HASH_FUNCTION: FunctionType
 
     _name = None
+    
+    _unpacked: bool = False
 
     def __init__(self):
         NetworkMessage.GLOBAL_INSTANCE_ID = (NetworkMessage.GLOBAL_INSTANCE_ID + 1) % 1000
@@ -68,12 +70,10 @@ class NetworkMessage(INetworkMessage):
         output.writeByteArray(data, 0, len(data))
 
     def getMessageId(self) -> int:
-        spec = ProtocolSpec.getClassSpecByName(self.__class__.__name__)
-        return spec["protocolId"]
+        return ProtocolSpec.getProtocolIdByName(self.__class__.__name__)
 
     def getSpec(self) -> dict:
-        spec = ProtocolSpec.getClassSpecByName(self.__class__.__name__)
-        return spec
+        return ProtocolSpec.getClassSpecByName(self.__class__.__name__)
 
     def reset(self) -> None:
         raise Exception("Not implemented")

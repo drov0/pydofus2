@@ -103,7 +103,6 @@ class AuthentificationFrame(Frame):
             AuthentificationManager().initAESKey()
             iMsg = AuthentificationManager().getIdentificationMessage()
             self._currentLogIsForced = isinstance(iMsg, IdentificationAccountForceMessage)
-            # Plogger.info(f"Current version : {iMsg.version.major}.{iMsg.version.minor}.{iMsg.version.code}.{iMsg.version.build}")
             dhf = krnl.Kernel().getWorker().getFrame("DisconnectionHandlerFrame")
             time = perf_counter()
             failureTimes = StoreDataManager().getData(Constants.DATASTORE_MODULE_DEBUG, "connection_fail_times")
@@ -116,7 +115,6 @@ class AuthentificationFrame(Frame):
                     if elapsedSeconds <= 3.6:
                         elapsedTimesSinceConnectionFail[i] = int(elapsedSeconds)
                 dhf.resetConnectionAttempts()
-            # iMsg.failedAttempts = elapsedTimesSinceConnectionFail
             connh.ConnectionsHandler.getConnection().send(iMsg)
             if InterClientManager().flashKey:
                 flashKeyMsg = ClientKeyMessage()

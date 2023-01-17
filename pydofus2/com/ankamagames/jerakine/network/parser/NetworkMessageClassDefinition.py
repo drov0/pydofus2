@@ -1,5 +1,6 @@
 from functools import reduce
 import importlib
+import os
 import sys
 from pydofus2.com.ankamagames.jerakine.logger.Logger import Logger
 from pydofus2.com.ankamagames.jerakine.network.CustomDataWrapper import ByteArray
@@ -13,7 +14,7 @@ logger = Logger("Dofus2")
 
 class NetworkMessageClassDefinition:
 
-    TRACE = False
+    TRACE = os.getenv("TRACE_MSG_PARSING", False)
 
     def __init__(self, className: str, raw: ByteArray) -> None:
         if self.TRACE:

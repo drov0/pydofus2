@@ -1,5 +1,3 @@
-import platform
-import locale
 
 
 class Capabilities:

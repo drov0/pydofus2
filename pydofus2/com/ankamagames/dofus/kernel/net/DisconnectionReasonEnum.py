@@ -1,6 +1,4 @@
 from enum import Enum
-from tkinter import EXCEPTION
-
 
 class DisconnectionReasonEnum(Enum):
 

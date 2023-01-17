@@ -11,7 +11,7 @@ from pydofus2.com.ankamagames.dofus.datacenter.items.criterion.ItemCriterionOper
 from pydofus2.com.ankamagames.dofus.internalDatacenter.stats.EntityStats import EntityStats
 from pydofus2.com.ankamagames.dofus.logic.common.managers.StatsManager import StatsManager
 from pydofus2.com.ankamagames.jerakine.data import I18n
-from pydofus2.damageCalculation.tools import StatIds
+from pydofus2.damageCalculation.tools.StatIds import StatIds
 
 logger = Logger("Dofus2")
 
@@ -139,7 +139,7 @@ class ItemCriterion(IItemCriterion):
                 "cw",
                 "Pl",
             ]
-            index = knownCriteriaList.index(self._criterionRef)
+            knownCriteriaList.index(self._criterionRef)
 
         return readableCriterionRef + " " + self._operator.text + " " + self._criterionValue
 

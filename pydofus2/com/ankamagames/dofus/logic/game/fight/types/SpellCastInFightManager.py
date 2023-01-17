@@ -1,7 +1,6 @@
 from pydofus2.com.ankamagames.dofus.internalDatacenter.spells.SpellWrapper import SpellWrapper
 from pydofus2.com.ankamagames.dofus.kernel.Kernel import Kernel
 
-from pydofus2.com.ankamagames.dofus.logic.game.common.spell.SpellModifiers import SpellModifiers
 from pydofus2.com.ankamagames.dofus.logic.game.fight.managers.CurrentPlayedFighterManager import (
     CurrentPlayedFighterManager,
 )

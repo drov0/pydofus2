@@ -65,10 +65,6 @@ from pydofus2.com.ankamagames.dofus.network.enums.FightTypeEnum import FightType
 from pydofus2.com.ankamagames.dofus.network.enums.MapObstacleStateEnum import (
     MapObstacleStateEnum,
 )
-from pydofus2.com.ankamagames.dofus.network.enums.TeamEnum import TeamEnum
-from pydofus2.com.ankamagames.dofus.network.messages.game.actions.fight.GameActionFightCarryCharacterMessage import (
-    GameActionFightCarryCharacterMessage,
-)
 from pydofus2.com.ankamagames.dofus.network.messages.game.actions.fight.GameActionFightNoSpellCastMessage import (
     GameActionFightNoSpellCastMessage,
 )
@@ -140,9 +136,6 @@ from pydofus2.com.ankamagames.dofus.network.messages.game.context.roleplay.Curre
 )
 from pydofus2.com.ankamagames.dofus.network.messages.game.context.roleplay.MapObstacleUpdateMessage import (
     MapObstacleUpdateMessage,
-)
-from pydofus2.com.ankamagames.dofus.network.messages.game.guild.tax.TaxCollectorListMessage import (
-    TaxCollectorListMessage,
 )
 from pydofus2.com.ankamagames.dofus.network.types.game.context.fight.FightResultFighterListEntry import (
     FightResultFighterListEntry,
@@ -556,7 +549,6 @@ class FightContextFrame(Frame):
             return False
 
         elif isinstance(msg, GameFightLeaveMessage):
-            gflmsg = msg
             return False
 
         # if isinstance(msg, TimelineEntityOverAction):
@@ -709,11 +701,9 @@ class FightContextFrame(Frame):
             return True
 
         elif isinstance(msg, ChallengeTargetsListMessage):
-            ctlmsg = msg
             return True
 
         elif isinstance(msg, ChallengeInfoMessage):
-            cimsg = msg
             return True
 
         elif isinstance(msg, ChallengeTargetUpdateMessage):

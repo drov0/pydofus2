@@ -19,7 +19,6 @@ if TYPE_CHECKING:
         FightBattleFrame,
     )
     from pydofus2.com.ankamagames.dofus.logic.game.fight.types.StateBuff import StateBuff
-import pydofus2.com.ankamagames.dofus.logic.game.fight.frames.FightEntitiesFrame as fightBattleFrame
 from pydofus2.com.ankamagames.dofus.logic.game.fight.types.CastingSpell import CastingSpell
 from pydofus2.com.ankamagames.dofus.misc.utils.GameDebugManager import GameDebugManager
 from pydofus2.com.ankamagames.dofus.network.enums.FightDispellableEnum import (

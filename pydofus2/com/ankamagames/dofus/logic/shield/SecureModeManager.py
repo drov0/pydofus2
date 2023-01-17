@@ -1,7 +1,6 @@
 from hashlib import md5
 import os
 from pathlib import Path
-import platform
 from types import FunctionType
 from pydofus2.com.ankamagames.dofus import Constants
 from pydofus2.com.ankamagames.dofus.logic.connection.managers.AuthentificationManager import (

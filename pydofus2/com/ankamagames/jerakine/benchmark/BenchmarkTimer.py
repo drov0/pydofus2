@@ -1,6 +1,5 @@
 from threading import Timer
 from types import FunctionType
-from pydofus2.com.ankamagames.jerakine.benchmark.FileLoggerEnum import FileLoggerEnum
 from pydofus2.com.ankamagames.jerakine.logger.Logger import Logger
 
 logger = Logger("Dofus2")

@@ -1,6 +1,4 @@
-from datetime import datetime
 import math
-from time import sleep
 from pydofus2.com.ankamagames.atouin.messages.CellClickMessage import CellClickMessage
 from pydofus2.com.ankamagames.atouin.messages.EntityMovementCompleteMessage import (
     EntityMovementCompleteMessage,
@@ -11,10 +9,8 @@ from pydofus2.com.ankamagames.atouin.messages.MapContainerRollOutMessage import 
 from pydofus2.com.ankamagames.atouin.types.Selection import Selection
 from pydofus2.com.ankamagames.atouin.utils.DataMapProvider import DataMapProvider
 from pydofus2.com.ankamagames.dofus.internalDatacenter.stats.EntityStats import EntityStats
-from pydofus2.com.ankamagames.dofus.internalDatacenter.stats.Stat import Stat
 from pydofus2.com.ankamagames.dofus.kernel.Kernel import Kernel
 from pydofus2.com.ankamagames.dofus.kernel.net.ConnectionsHandler import ConnectionsHandler
-from pydofus2.com.ankamagames.dofus.logic.common.managers.StatsManager import StatsManager
 from pydofus2.com.ankamagames.dofus.logic.game.common.managers.MapMovementAdapter import (
     MapMovementAdapter,
 )
@@ -31,14 +27,10 @@ from pydofus2.com.ankamagames.dofus.logic.game.fight.actions.GameFightTurnFinish
 from typing import TYPE_CHECKING
 from pydofus2.com.ankamagames.dofus.network.messages.game.context.GameMapMovementMessage import GameMapMovementMessage
 
-from pydofus2.com.ankamagames.dofus.types.entities.AnimatedCharacter import AnimatedCharacter
 
 if TYPE_CHECKING:
     from pydofus2.com.ankamagames.dofus.logic.game.fight.frames.FightContextFrame import (
         FightContextFrame,
-    )
-    from pydofus2.com.ankamagames.dofus.logic.game.fight.frames.FightSpellCastFrame import (
-        FightSpellCastFrame,
     )
 from pydofus2.com.ankamagames.dofus.logic.game.fight.managers.CurrentPlayedFighterManager import (
     CurrentPlayedFighterManager,
@@ -67,9 +59,6 @@ from pydofus2.com.ankamagames.dofus.network.messages.game.context.fight.GameFigh
 )
 from pydofus2.com.ankamagames.dofus.network.messages.game.context.fight.GameFightTurnReadyRequestMessage import (
     GameFightTurnReadyRequestMessage,
-)
-from pydofus2.com.ankamagames.dofus.network.types.game.character.characteristic.CharacterCharacteristicsInformations import (
-    CharacterCharacteristicsInformations,
 )
 from pydofus2.com.ankamagames.dofus.network.types.game.context.fight.GameFightFighterInformations import (
     GameFightFighterInformations,

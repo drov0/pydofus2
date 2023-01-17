@@ -1,4 +1,3 @@
-from whistle import Event
 from pydofus2.com.ankamagames.dofus.logic.game.common.misc.DofusEntities import DofusEntities
 from pydofus2.com.ankamagames.jerakine.entities.interfaces.IEntity import IEntity
 from pydofus2.com.ankamagames.jerakine.logger.Logger import Logger

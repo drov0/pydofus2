@@ -77,7 +77,7 @@ class ObjectEffectAdapter:
             while True:
                 incLevel = IncarnationLevel.getIncarnationLevelByIdAndLevel(oe.diceNum, level)
                 if incLevel:
-                    floor = incLevel.requiredXp
+                    incLevel.requiredXp
                 level += 1
                 incLevelPlusOne = IncarnationLevel.getIncarnationLevelByIdAndLevel(oe.diceNum, level)
                 if incLevelPlusOne:

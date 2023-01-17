@@ -1,5 +1,4 @@
 from pydofus2.com.ankamagames.dofus.enums.ActionIds import ActionIds
-from pydofus2.com.ankamagames.dofus.datacenter.effects.EffectInstance import EffectInstance
 from pydofus2.com.ankamagames.dofus.internalDatacenter.items.ItemWrapper import ItemWrapper
 from pydofus2.com.ankamagames.dofus.logic.game.common.managers.StorageOptionManager import (
     StorageOptionManager,

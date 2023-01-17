@@ -1,19 +1,12 @@
 from pydofus2.com.ankamagames.dofus.logic.game.fight.fightEvents.FightEventsHelper import (
     FightEventsHelper,
 )
-from pydofus2.com.ankamagames.dofus.logic.game.fight.frames.FightEntitiesFrame import (
-    FightEntitiesFrame,
-)
 from pydofus2.com.ankamagames.dofus.logic.game.fight.steps.IFightStep import IFightStep
 from pydofus2.com.ankamagames.dofus.logic.game.fight.types.FightEventEnum import FightEventEnum
 from pydofus2.com.ankamagames.dofus.network.enums.FightSpellCastCriticalEnum import (
     FightSpellCastCriticalEnum,
 )
-from pydofus2.com.ankamagames.dofus.network.types.game.context.fight.GameFightFighterInformations import (
-    GameFightFighterInformations,
-)
 from pydofus2.com.ankamagames.jerakine.sequencer.AbstractSequencable import AbstractSequencable
-from pydofus2.com.ankamagames.jerakine.sequencer.SerialSequencer import SerialSequencer
 
 
 class FightCloseCombatStep(AbstractSequencable, IFightStep):

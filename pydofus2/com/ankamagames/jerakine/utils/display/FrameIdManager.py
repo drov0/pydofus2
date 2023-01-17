@@ -1,4 +1,3 @@
-from threading import Event
 from pydofus2.com.ankamagames.jerakine.metaclasses.Singleton import Singleton
 from pydofus2.com.ankamagames.jerakine.utils.display.EnterFrameConst import EnterFrameConst
 import pydofus2.com.ankamagames.jerakine.utils.display.EnterFrameDispatcher as efd

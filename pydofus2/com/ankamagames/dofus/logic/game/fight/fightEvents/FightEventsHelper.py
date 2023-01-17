@@ -1,6 +1,5 @@
 from pydofus2.com.ankamagames.jerakine.metaclasses.Singleton import Singleton
 from whistle import Event
-from pydofus2.com.ankamagames.dofus.datacenter.effects.EffectInstance import EffectInstance
 from pydofus2.com.ankamagames.dofus.datacenter.effects.instances.EffectInstanceDice import (
     EffectInstanceDice,
 )
@@ -292,9 +291,9 @@ class FightEventsHelper(metaclass=Singleton):
         for fe in pvgroup:
             if not (pCastingSpellId != -1 and pCastingSpellId != fe.castingSpellId):
                 if previousElement and fe.params[2] != previousElement:
-                    isSameElement = False
-                previousElement = fe.params[2]
-                ttpts += fe.params[1]
+                    pass
+                fe.params[2]
+                fe.params[1]
         fightEventName = "fightLifeLossAndDeath" if pAddDeathInTheSameMsg else pvgroup[0].name
         newparams: list = list()
         newparams[0] = pvgroup[0].params[0]

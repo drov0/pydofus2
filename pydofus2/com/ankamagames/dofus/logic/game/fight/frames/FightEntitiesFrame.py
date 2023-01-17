@@ -3,7 +3,6 @@ from typing import TYPE_CHECKING
 import pydofus2.com.ankamagames.dofus.kernel.Kernel as krnl
 import pydofus2.com.ankamagames.dofus.logic.game.common.managers.PlayedCharacterManager as pcm
 from pydofus2.com.ankamagames.atouin.managers.MapDisplayManager import MapDisplayManager
-from pydofus2.com.ankamagames.dofus.datacenter.world.SubArea import SubArea
 from pydofus2.com.ankamagames.dofus.internalDatacenter.world.WorldPointWrapper import WorldPointWrapper
 from pydofus2.com.ankamagames.dofus.logic.common.managers.PlayerManager import PlayerManager
 from pydofus2.com.ankamagames.dofus.logic.common.managers.StatsManager import StatsManager
@@ -12,9 +11,7 @@ from pydofus2.com.ankamagames.dofus.logic.game.common.misc.DofusEntities import 
 from pydofus2.com.ankamagames.dofus.logic.game.fight.actions.RemoveEntityAction import RemoveEntityAction
 
 if TYPE_CHECKING:
-    from pydofus2.com.ankamagames.dofus.logic.game.fight.frames.FightContextFrame import (
-        FightContextFrame,
-    )
+    pass
 
 from pydofus2.com.ankamagames.dofus.logic.game.fight.managers.CurrentPlayedFighterManager import CurrentPlayedFighterManager
 from pydofus2.com.ankamagames.dofus.logic.game.fight.miscs.FightEntitiesHolder import FightEntitiesHolder
@@ -243,7 +240,7 @@ class FightEntitiesFrame(AbstractEntitiesFrame, Frame):
             fighterInfoToBeReady = self.getEntityInfos(gfhrsmsg.characterId)
             if not fighterInfoToBeReady or fighterInfoToBeReady.disposition.cellId == -1:
                 return True
-            ac2 = self.addOrUpdateActor(fighterInfoToBeReady)
+            self.addOrUpdateActor(fighterInfoToBeReady)
             if gfhrsmsg.isReady:
                 pass
             else:
@@ -325,11 +322,9 @@ class FightEntitiesFrame(AbstractEntitiesFrame, Frame):
                 return True
 
         if isinstance(msg, AnomalyStateMessage):
-            taimsg = msg
             return True
 
         if isinstance(msg, MapRewardRateMessage):
-            mrrmsg = msg
             return True
 
         if isinstance(msg, GameActionFightCarryCharacterMessage):
@@ -508,7 +503,7 @@ class FightEntitiesFrame(AbstractEntitiesFrame, Frame):
             lastFighterInfo: GameFightFighterInformations = self._entities.get(fighterId)
             if lastFighterInfo:
                 lastInvisibilityStat = lastFighterInfo.stats.invisibilityState
-            ac = self.addOrUpdateActor(fighterInfos)
+            self.addOrUpdateActor(fighterInfos)
             if (
                 lastInvisibilityStat == GameActionFightInvisibilityStateEnum.INVISIBLE
                 and fighterInfos.stats.invisibilityState == lastInvisibilityStat

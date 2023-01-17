@@ -1,22 +1,17 @@
 from typing import TYPE_CHECKING
 from pydofus2.com.ankamagames.atouin.managers.MapDisplayManager import MapDisplayManager
 from pydofus2.com.ankamagames.dofus.datacenter.world.MapPosition import MapPosition
-import pydofus2.com.ankamagames.dofus.kernel.Kernel as krnl
 from pydofus2.com.ankamagames.dofus.logic.game.common.misc.DofusEntities import DofusEntities
 from pydofus2.com.ankamagames.jerakine.entities.interfaces.IEntity import IEntity
 
 
 if TYPE_CHECKING:
-    from pydofus2.com.ankamagames.dofus.internalDatacenter.items.ItemWrapper import ItemWrapper
     from pydofus2.com.ankamagames.dofus.network.types.game.character.choice.CharacterBaseInformations import (
         CharacterBaseInformations,
     )
     from pydofus2.com.ankamagames.dofus.internalDatacenter.stats.EntityStats import EntityStats
     from pydofus2.com.ankamagames.dofus.datacenter.world.SubArea import SubArea
     from pydofus2.com.ankamagames.dofus.datacenter.world.WorldMap import WorldMap
-    from pydofus2.com.ankamagames.dofus.internalDatacenter.spells.SpellWrapper import (
-        SpellWrapper,
-    )
     from pydofus2.com.ankamagames.dofus.internalDatacenter.jobs.KnownJobWrapper import (
         KnownJobWrapper,
     )
@@ -49,7 +44,7 @@ from pydofus2.com.ankamagames.jerakine.interfaces.IDestroyable import IDestroyab
 from pydofus2.com.ankamagames.jerakine.metaclasses.Singleton import Singleton
 from pydofus2.com.ankamagames.jerakine.types.Callback import Callback
 from pydofus2.flash.geom.Point import Point
-from pydofus2.damageCalculation.tools import StatIds
+from pydofus2.damageCalculation.tools.StatIds import StatIds
 
 logger = Logger("Dofus2")
 

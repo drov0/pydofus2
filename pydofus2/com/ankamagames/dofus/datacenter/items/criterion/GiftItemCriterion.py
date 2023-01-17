@@ -43,7 +43,7 @@ class GiftItemCriterion(ItemCriterion, IDataCenter):
     def text(self) -> str:
         criterionInfo: list = None
         if self._operator.text == ">":
-            criterionInfo = self._criterionValueText.split(",")
+            self._criterionValueText.split(",")
             return I18n.getUiText(
                 "ui.pvp.giftRequired",
                 [AlignmentGift.getAlignmentGiftById(self._aliGiftId).name + " > " + self._aliGiftLevel],

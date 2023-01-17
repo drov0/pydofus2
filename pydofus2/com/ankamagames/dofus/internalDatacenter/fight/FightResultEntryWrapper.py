@@ -11,9 +11,6 @@ from pydofus2.com.ankamagames.dofus.kernel.Kernel import Kernel
 from pydofus2.com.ankamagames.dofus.logic.game.common.managers.PlayedCharacterManager import (
     PlayedCharacterManager,
 )
-from pydofus2.com.ankamagames.dofus.network.types.game.context.fight.FightResultAdditionalData import (
-    FightResultAdditionalData,
-)
 from pydofus2.com.ankamagames.dofus.network.types.game.context.fight.FightResultExperienceData import (
     FightResultExperienceData,
 )
@@ -43,9 +40,6 @@ from pydofus2.com.ankamagames.dofus.network.types.game.context.fight.GameFightEn
 )
 from pydofus2.com.ankamagames.dofus.network.types.game.context.fight.GameFightFighterInformations import (
     GameFightFighterInformations,
-)
-from pydofus2.com.ankamagames.dofus.network.types.game.context.fight.GameFightFighterNamedInformations import (
-    GameFightFighterNamedInformations,
 )
 from pydofus2.com.ankamagames.dofus.network.types.game.context.fight.GameFightMonsterInformations import (
     GameFightMonsterInformations,

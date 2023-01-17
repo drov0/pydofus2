@@ -1,6 +1,4 @@
-from pydofus2.com.ankamagames.dofus.logic.game.common.misc.DofusEntities import DofusEntities
 from pydofus2.com.ankamagames.dofus.logic.game.fight.steps.IFightStep import IFightStep
-from pydofus2.com.ankamagames.jerakine.entities.interfaces.IEntity import IEntity
 from pydofus2.com.ankamagames.jerakine.logger.Logger import Logger
 from pydofus2.com.ankamagames.jerakine.sequencer.AbstractSequencable import AbstractSequencable
 

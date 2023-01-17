@@ -80,7 +80,6 @@ from pydofus2.com.ankamagames.dofus.network.types.game.context.roleplay.GameRole
     GameRolePlayGroupMonsterInformations,
 )
 from pydofus2.com.ankamagames.dofus.types.entities.AnimatedCharacter import AnimatedCharacter
-from pydofus2.com.ankamagames.jerakine.benchmark.BenchmarkTimer import BenchmarkTimer
 from pydofus2.com.ankamagames.jerakine.entities.interfaces.IEntity import IEntity
 from pydofus2.com.ankamagames.jerakine.entities.interfaces.IMovable import IMovable
 from pydofus2.com.ankamagames.jerakine.handlers.messages.Action import Action

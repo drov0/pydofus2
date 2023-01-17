@@ -97,28 +97,28 @@ class Line(IZone):
         for r in range(self._minRadius, length + 1):
             if self._nDirection == DirectionsEnum.LEFT:
                 if MapPoint.isInMap(x - r, y - r):
-                    added = self.addCell(x - r, y - r, aCells)
+                    self.addCell(x - r, y - r, aCells)
             elif self._nDirection == DirectionsEnum.UP:
                 if MapPoint.isInMap(x - r, y + r):
-                    added = self.addCell(x - r, y + r, aCells)
+                    self.addCell(x - r, y + r, aCells)
             elif self._nDirection == DirectionsEnum.RIGHT:
                 if MapPoint.isInMap(x + r, y + r):
-                    added = self.addCell(x + r, y + r, aCells)
+                    self.addCell(x + r, y + r, aCells)
             elif self._nDirection == DirectionsEnum.DOWN:
                 if MapPoint.isInMap(x + r, y - r):
-                    added = self.addCell(x + r, y - r, aCells)
+                    self.addCell(x + r, y - r, aCells)
             elif self._nDirection == DirectionsEnum.UP_LEFT:
                 if MapPoint.isInMap(x - r, y):
-                    added = self.addCell(x - r, y, aCells)
+                    self.addCell(x - r, y, aCells)
             elif self._nDirection == DirectionsEnum.DOWN_LEFT:
                 if MapPoint.isInMap(x, y - r):
-                    added = self.addCell(x, y - r, aCells)
+                    self.addCell(x, y - r, aCells)
             elif self._nDirection == DirectionsEnum.DOWN_RIGHT:
                 if MapPoint.isInMap(x + r, y):
-                    added = self.addCell(x + r, y, aCells)
+                    self.addCell(x + r, y, aCells)
             elif self._nDirection == DirectionsEnum.UP_RIGHT:
                 if MapPoint.isInMap(x, y + r):
-                    added = self.addCell(x, y + r, aCells)
+                    self.addCell(x, y + r, aCells)
         return aCells
 
     def addCell(self, x: int, y: int, cellMap: list[int]) -> bool:

@@ -98,7 +98,6 @@ from pydofus2.com.ankamagames.dofus.logic.game.common.misc.DofusEntities import 
 from pydofus2.com.ankamagames.dofus.logic.game.fight.frames.FightEntitiesFrame import FightEntitiesFrame
 from pydofus2.com.ankamagames.dofus.logic.game.fight.managers.BuffManager import BuffManager
 from pydofus2.com.ankamagames.dofus.logic.game.fight.managers.CurrentPlayedFighterManager import CurrentPlayedFighterManager
-from pydofus2.com.ankamagames.dofus.logic.game.fight.miscs.TackleUtil import TackleUtil
 from pydofus2.com.ankamagames.dofus.logic.game.fight.types.BasicBuff import BasicBuff
 from pydofus2.com.ankamagames.dofus.logic.game.fight.types.CastingSpell import CastingSpell
 from pydofus2.com.ankamagames.dofus.misc.utils.GameDebugManager import GameDebugManager
@@ -752,7 +751,7 @@ class FightSequenceFrame(Frame, ISpellCastProvider):
             return True
 
         if isinstance(msg, GameActionFightChangeLookMessage):
-            gafclmsg = msg
+            pass
             # self.pushStep(
             #     FightChangeLookStep(
             #         gafclmsg.targetId,
@@ -998,7 +997,7 @@ class FightSequenceFrame(Frame, ISpellCastProvider):
                 if actorInfo.spawnInfo.alive and actorInfo.stats.summoner == gafdmsg.targetId:
                     self.pushStep(FightDeathStep(actorInfo.contextualId))
         playerId = PlayedCharacterManager().id
-        sourceInfos = self.fightEntitiesFrame.getEntityInfos(gafdmsg.sourceId)
+        self.fightEntitiesFrame.getEntityInfos(gafdmsg.sourceId)
         targetInfos = self.fightEntitiesFrame.getEntityInfos(gafdmsg.targetId)
         
         playerInfos = self.fightEntitiesFrame.getEntityInfos(playerId)

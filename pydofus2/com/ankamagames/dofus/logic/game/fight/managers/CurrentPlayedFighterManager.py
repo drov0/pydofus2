@@ -33,7 +33,7 @@ from pydofus2.com.ankamagames.dofus.logic.game.fight.managers.FightersStateManag
 )
 import pydofus2.com.ankamagames.dofus.logic.game.common.managers.PlayedCharacterManager as pcm
 from pydofus2.com.ankamagames.jerakine.metaclasses.Singleton import Singleton
-from pydofus2.damageCalculation.tools import StatIds
+from pydofus2.damageCalculation.tools.StatIds import StatIds
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:

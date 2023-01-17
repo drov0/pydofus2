@@ -18,7 +18,6 @@ from pydofus2.com.ankamagames.dofus.network.messages.game.modificator.AreaFightM
 from pydofus2.com.ankamagames.dofus.network.types.game.context.roleplay.MonsterBoosts import (
     MonsterBoosts,
 )
-from pydofus2.com.ankamagames.jerakine.data.I18n import I18n
 from pydofus2.com.ankamagames.jerakine.logger.Logger import Logger
 from pydofus2.com.ankamagames.jerakine.messages.Frame import Frame
 from pydofus2.com.ankamagames.jerakine.messages.Message import Message

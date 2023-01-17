@@ -8,7 +8,6 @@ import pydofus2.com.ankamagames.dofus.kernel.net.ConnectionsHandler as connh
 from pydofus2.com.ankamagames.dofus.kernel.net.DisconnectionReasonEnum import (
     DisconnectionReasonEnum,
 )
-from pydofus2.com.ankamagames.dofus.logic.connection.managers.AuthentificationManager import AuthentificationManager
 from pydofus2.com.ankamagames.jerakine.logger.Logger import Logger
 from pydofus2.com.ankamagames.jerakine.managers.StoreDataManager import StoreDataManager
 from pydofus2.com.ankamagames.jerakine.messages.Frame import Frame
@@ -81,7 +80,6 @@ class DisconnectionHandlerFrame(Frame):
 
         if isinstance(msg, ServerConnectionClosedMessage):
             logger.debug("Server Connection Closed.")
-            sccmsg = msg
             if (
                 connh.ConnectionsHandler.getConnection()
                 and connh.ConnectionsHandler.getConnection().mainConnection

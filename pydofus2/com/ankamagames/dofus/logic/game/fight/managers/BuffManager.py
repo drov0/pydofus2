@@ -356,7 +356,6 @@ class BuffManager(metaclass=Singleton):
         if not oldBuff:
             return False
         oldBuff.onApplied()
-        pass
         return True
 
     def dispell(
@@ -373,7 +372,6 @@ class BuffManager(metaclass=Singleton):
             if buff.canBeDispell(forceUndispellable, -sys.maxsize + 1, dying):
                 if GameDebugManager().buffsDebugActivated:
                     logger.debug("[BUFFS DEBUG]      Buff " + str(buff.uid) + " doit �tre retir�")
-                pass
                 buff.onRemoved()
             else:
                 if GameDebugManager().buffsDebugActivated:
@@ -449,9 +447,7 @@ class BuffManager(metaclass=Singleton):
                 buff.refreshDescription()
                 if not isState:
                     buff.onApplied()
-                pass
             else:
-                pass
                 if GameDebugManager().buffsDebugActivated:
                     logger.debug("[BUFFS DEBUG] Desenvoutement du buff " + str(boostUID) + " de " + str(targetId))
                 self._buffs[targetId].remove(buff)

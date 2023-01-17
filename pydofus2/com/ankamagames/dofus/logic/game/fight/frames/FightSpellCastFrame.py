@@ -14,7 +14,6 @@ from pydofus2.com.ankamagames.atouin.messages.CellClickMessage import CellClickM
 from pydofus2.com.ankamagames.atouin.utils.DataMapProvider import DataMapProvider
 from pydofus2.com.ankamagames.dofus.datacenter.effects.EffectInstance import EffectInstance
 from pydofus2.com.ankamagames.dofus.datacenter.spells.SpellLevel import SpellLevel
-from pydofus2.com.ankamagames.dofus.internalDatacenter.items.WeaponWrapper import WeaponWrapper
 from pydofus2.com.ankamagames.dofus.internalDatacenter.spells.SpellWrapper import SpellWrapper
 from pydofus2.com.ankamagames.dofus.internalDatacenter.stats.EntityStats import EntityStats
 from pydofus2.com.ankamagames.dofus.kernel.Kernel import Kernel
@@ -27,9 +26,6 @@ from pydofus2.com.ankamagames.dofus.logic.game.fight.frames.FightTurnFrame impor
 from pydofus2.com.ankamagames.dofus.logic.game.fight.managers.CurrentPlayedFighterManager import (
     CurrentPlayedFighterManager,
 )
-from pydofus2.com.ankamagames.dofus.network.enums.ChatActivableChannelsEnum import (
-    ChatActivableChannelsEnum,
-)
 from pydofus2.com.ankamagames.dofus.network.enums.GameActionFightInvisibilityStateEnum import (
     GameActionFightInvisibilityStateEnum,
 )
@@ -40,16 +36,12 @@ from pydofus2.com.ankamagames.dofus.network.messages.game.actions.fight.GameActi
 from pydofus2.com.ankamagames.dofus.network.messages.game.actions.fight.GameActionFightCastRequestMessage import (
     GameActionFightCastRequestMessage,
 )
-from pydofus2.com.ankamagames.dofus.network.messages.game.chat.ChatClientMultiMessage import (
-    ChatClientMultiMessage,
-)
 from pydofus2.com.ankamagames.dofus.network.types.game.context.fight.GameFightFighterInformations import (
     GameFightFighterInformations,
 )
 from pydofus2.com.ankamagames.dofus.types.entities.AnimatedCharacter import AnimatedCharacter
 from pydofus2.com.ankamagames.dofus.types.entities.Glyph import Glyph
 from pydofus2.com.ankamagames.jerakine.benchmark.BenchmarkTimer import BenchmarkTimer
-from pydofus2.com.ankamagames.jerakine.data.I18n import I18n
 from pydofus2.com.ankamagames.jerakine.entities.interfaces.IEntity import IEntity
 from pydofus2.com.ankamagames.jerakine.entities.messages.EntityClickMessage import (
     EntityClickMessage,
@@ -219,7 +211,7 @@ class FightSpellCastFrame(Frame):
 
         elif isinstance(msg, CellOutMessage):
             comsg = msg
-            cellEntity = EntitiesManager().getEntityOnCell(comsg.cellId, AnimatedCharacter)
+            EntitiesManager().getEntityOnCell(comsg.cellId, AnimatedCharacter)
             self.removeTeleportationPreview()
             self.removeSummoningPreview()
             self.clearTarget()
@@ -241,7 +233,7 @@ class FightSpellCastFrame(Frame):
 
         if isinstance(msg, TimelineEntityOutAction):
             teouta = msg
-            outEntity = DofusEntities.getEntity(teouta.targetId)
+            DofusEntities.getEntity(teouta.targetId)
             self.removeTeleportationPreview()
             self.removeSummoningPreview()
             return False

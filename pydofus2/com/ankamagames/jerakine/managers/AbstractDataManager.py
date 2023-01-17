@@ -29,7 +29,7 @@ class AbstractDataManager(object):
         )
         soName: str = self._soPrefix + str(math.floor(key / chunkLength))
         if self._cacheSO.contains(soName):
-            foo = self._cacheSO.peek(soName)
+            self._cacheSO.peek(soName)
             so: CustomSharedObject = self._cacheSO.peek(soName)
             v = so.data[self.DATA_KEY][key]
             self._cacheKey.store(realKey, v)

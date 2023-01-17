@@ -25,7 +25,6 @@ class StorageCraftFilterView(StorageGenericView):
         recipies: list = Recipe.getAllRecipesForSkillId(skillId, jobLevel)
         self._ingredients = dict()
         for recipe in recipies:
-            selected = False
             for id in recipe.ingredientIds:
                 self._ingredients[id] = True
         self._ingredients[DataEnum.ITEM_GID_SIGNATURE_RUNE] = True

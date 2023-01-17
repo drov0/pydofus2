@@ -1,5 +1,3 @@
-from pydofus2.com.ankamagames.dofus.kernel.Kernel import Kernel
-from pydofus2.com.ankamagames.dofus.kernel.net.ConnectionsHandler import ConnectionsHandler
 from pydofus2.com.ankamagames.dofus.logic.common.managers.PlayerManager import PlayerManager
 from pydofus2.com.ankamagames.dofus.network.messages.game.approach.ServerSessionConstantsMessage import (
     ServerSessionConstantsMessage,
@@ -9,12 +7,9 @@ from pydofus2.com.ankamagames.dofus.network.messages.game.basic.CurrentServerSta
     CurrentServerStatusUpdateMessage,
 )
 from pydofus2.com.ankamagames.dofus.network.messages.game.context.roleplay.houses.AccountHouseMessage import AccountHouseMessage
-from pydofus2.com.ankamagames.dofus.network.messages.security.CheckFileMessage import CheckFileMessage
-from pydofus2.com.ankamagames.dofus.network.messages.security.CheckFileRequestMessage import CheckFileRequestMessage
 from pydofus2.com.ankamagames.dofus.network.messages.web.haapi.HaapiApiKeyMessage import HaapiApiKeyMessage
 from pydofus2.com.ankamagames.dofus.network.messages.web.haapi.HaapiAuthErrorMessage import HaapiAuthErrorMessage
 from pydofus2.com.ankamagames.dofus.network.messages.web.haapi.HaapiSessionMessage import HaapiSessionMessage
-from pydofus2.com.ankamagames.dofus.network.types.game.approach.ServerSessionConstant import ServerSessionConstant
 from pydofus2.com.ankamagames.dofus.network.types.game.approach.ServerSessionConstantInteger import ServerSessionConstantInteger
 from pydofus2.com.ankamagames.dofus.network.types.game.approach.ServerSessionConstantLong import ServerSessionConstantLong
 from pydofus2.com.ankamagames.dofus.network.types.game.approach.ServerSessionConstantString import ServerSessionConstantString
@@ -93,7 +88,7 @@ class MiscFrame(Frame, metaclass=Singleton):
             return True
 
         if isinstance(msg, AccountHouseMessage):
-            ahm = msg
+            pass
             # if not Kernel().getWorker().getFrame('HouseFrame'):
             #     Kernel.getWorker().addFrame(HouseFrame())
             # houseFrame = Kernel().getWorker().getFrame('HouseFrame')
@@ -102,7 +97,7 @@ class MiscFrame(Frame, metaclass=Singleton):
             return True
 
         if isinstance(msg, HaapiSessionMessage):
-            hsm = msg
+            pass
             # if hsm.type == HaapiSessionTypeEnum.HAAPI_ACCOUNT_SESSION:
             #     HaapiKeyManager().saveAccountSessionId(hsm.key)
             # else:
@@ -112,7 +107,7 @@ class MiscFrame(Frame, metaclass=Singleton):
             return True
 
         if isinstance(msg, HaapiApiKeyMessage):
-            hakmsg = msg
+            pass
             # logStr = "RECEIVED API KEY : "
             # if hakmsg != null and hakmsg.token != null and len(hakmsg.token) >= 5:
             #     logStr += hakmsg.token.substr(0, 5)
@@ -121,7 +116,7 @@ class MiscFrame(Frame, metaclass=Singleton):
             return True
 
         if isinstance(msg, HaapiAuthErrorMessage):
-            haem = msg
+            pass
             # logger.debug("ERROR ON ASKING API KEY type=" + haem.type + ", id=" + haem.getMessageId())
             # if haem.type == HaapiAuthTypeEnum.HAAPI_API_KEY:
             #     logger.error("Error during ApiKey request.")

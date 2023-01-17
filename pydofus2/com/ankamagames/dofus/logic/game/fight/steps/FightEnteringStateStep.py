@@ -1,10 +1,6 @@
 from pydofus2.com.ankamagames.dofus.datacenter.spells.SpellState import SpellState
-from pydofus2.com.ankamagames.dofus.logic.game.fight.fightEvents.FightEventsHelper import (
-    FightEventsHelper,
-)
 from pydofus2.com.ankamagames.dofus.logic.game.fight.steps.IFightStep import IFightStep
 from pydofus2.com.ankamagames.dofus.logic.game.fight.types.BasicBuff import BasicBuff
-from pydofus2.com.ankamagames.dofus.logic.game.fight.types.FightEventEnum import FightEventEnum
 from pydofus2.com.ankamagames.dofus.logic.game.fight.types.StateBuff import StateBuff
 from pydofus2.com.ankamagames.jerakine.sequencer.AbstractSequencable import AbstractSequencable
 

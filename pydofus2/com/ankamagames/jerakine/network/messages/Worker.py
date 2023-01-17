@@ -297,7 +297,6 @@ class Worker(EventDispatcher, MessageHandler):
             else:
                 if self.DEBUG_FRAMES:
                     logger.warn(f"[DEBUG WORKER] Frame {frame} not in worker frames lsit")
-                pass
             if self.has_listeners(FramePulledEvent.EVENT_FRAME_PULLED):
                 self.dispatch(FramePulledEvent.EVENT_FRAME_PULLED, FramePulledEvent(frame))
         else:

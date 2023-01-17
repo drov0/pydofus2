@@ -2,7 +2,6 @@ from pydofus2.com.ankamagames.dofus.datacenter.effects.EffectInstance import Eff
 from pydofus2.com.ankamagames.dofus.datacenter.effects.instances.EffectInstanceInteger import (
     EffectInstanceInteger,
 )
-from pydofus2.com.ankamagames.jerakine.interfaces.IDataCenter import IDataCenter
 
 
 class EffectInstanceMount(EffectInstance):

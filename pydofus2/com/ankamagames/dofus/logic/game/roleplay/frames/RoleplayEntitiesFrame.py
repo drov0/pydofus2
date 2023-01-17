@@ -7,22 +7,7 @@ from pydofus2.com.ankamagames.dofus.network.messages.game.context.roleplay.fight
 from pydofus2.com.ankamagames.dofus.network.messages.game.context.roleplay.fight.GameRolePlayShowChallengeMessage import (
     GameRolePlayShowChallengeMessage,
 )
-from pydofus2.com.ankamagames.dofus.network.messages.game.context.roleplay.npc.ListMapNpcsQuestStatusUpdateMessage import (
-    ListMapNpcsQuestStatusUpdateMessage,
-)
 from pydofus2.com.ankamagames.dofus.network.types.game.context.fight.FightTeamInformations import FightTeamInformations
-from pydofus2.com.ankamagames.dofus.network.types.game.context.fight.FightTeamMemberInformations import (
-    FightTeamMemberInformations,
-)
-from pydofus2.com.ankamagames.dofus.network.types.game.context.roleplay.GameRolePlayNpcWithQuestInformations import (
-    GameRolePlayNpcWithQuestInformations,
-)
-from pydofus2.com.ankamagames.dofus.network.types.game.context.roleplay.GroupMonsterStaticInformations import (
-    GroupMonsterStaticInformations,
-)
-from pydofus2.com.ankamagames.dofus.network.types.game.context.roleplay.GroupMonsterStaticInformationsWithAlternatives import (
-    GroupMonsterStaticInformationsWithAlternatives,
-)
 from pydofus2.com.ankamagames.jerakine.benchmark.BenchmarkTimer import BenchmarkTimer
 from pydofus2.com.ankamagames.atouin.managers.EntitiesManager import EntitiesManager
 from pydofus2.com.ankamagames.atouin.managers.MapDisplayManager import MapDisplayManager
@@ -56,9 +41,6 @@ from pydofus2.com.ankamagames.dofus.network.messages.game.context.roleplay.GameR
 from pydofus2.com.ankamagames.dofus.network.messages.game.context.roleplay.GameRolePlayShowMultipleActorsMessage import (
     GameRolePlayShowMultipleActorsMessage,
 )
-from pydofus2.com.ankamagames.dofus.network.messages.game.context.roleplay.MapComplementaryInformationsDataInHavenBagMessage import (
-    MapComplementaryInformationsDataInHavenBagMessage,
-)
 from pydofus2.com.ankamagames.dofus.network.messages.game.context.roleplay.MapComplementaryInformationsWithCoordsMessage import (
     MapComplementaryInformationsWithCoordsMessage,
 )
@@ -87,7 +69,6 @@ from pydofus2.com.ankamagames.dofus.network.types.game.context.roleplay.GameRole
 from pydofus2.com.ankamagames.dofus.logic.game.common.frames.AbstractEntitiesFrame import (
     AbstractEntitiesFrame,
 )
-import pydofus2.com.ankamagames.dofus.logic.game.common.frames.ContextChangeFrame as ctxcf
 from pydofus2.com.ankamagames.dofus.logic.game.common.managers.PlayedCharacterManager import (
     PlayedCharacterManager,
 )
@@ -436,7 +417,6 @@ class RoleplayEntitiesFrame(AbstractEntitiesFrame, Frame):
                 pass
 
             if isinstance(msg, MapComplementaryInformationsAnomalyMessage):
-                mciamsg = msg
                 PlayedCharacterManager().isInAnomaly = True
 
             elif PlayedCharacterManager().isInAnomaly:

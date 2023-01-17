@@ -9,12 +9,8 @@ import pydofus2.com.ankamagames.dofus.logic.game.fight.fightEvents.FightEventsHe
 import pydofus2.com.ankamagames.dofus.logic.game.fight.frames.FightEntitiesFrame as fenf
 import pydofus2.com.ankamagames.dofus.logic.game.fight.frames.FightSequenceFrame as fseqf
 import pydofus2.com.ankamagames.dofus.logic.game.fight.managers.BuffManager as bffm
-from pydofus2.com.ankamagames.atouin.managers.EntitiesManager import EntitiesManager
 from pydofus2.com.ankamagames.atouin.utils.DataMapProvider import DataMapProvider
-from pydofus2.com.ankamagames.dofus.internalDatacenter.stats.EntityStats import EntityStats
 from pydofus2.com.ankamagames.dofus.kernel.net.ConnectionsHandler import ConnectionsHandler
-from pydofus2.com.ankamagames.dofus.logic.common.managers.PlayerManager import PlayerManager
-from pydofus2.com.ankamagames.dofus.logic.common.managers.StatsManager import StatsManager
 from pydofus2.com.ankamagames.dofus.logic.game.common.frames.SpellInventoryManagementFrame import SpellInventoryManagementFrame
 from pydofus2.com.ankamagames.dofus.logic.game.common.managers.PlayedCharacterManager import PlayedCharacterManager
 from pydofus2.com.ankamagames.dofus.logic.game.common.misc.DofusEntities import DofusEntities
@@ -28,7 +24,6 @@ from pydofus2.com.ankamagames.dofus.logic.game.fight.managers.SpellModifiersMana
 from pydofus2.com.ankamagames.dofus.logic.game.fight.miscs.FightEntitiesHolder import FightEntitiesHolder
 from pydofus2.com.ankamagames.dofus.logic.game.fight.types.StatBuff import StatBuff
 from pydofus2.com.ankamagames.dofus.logic.game.fight.types.TriggeredBuff import TriggeredBuff
-from pydofus2.com.ankamagames.dofus.misc.utils.GameDebugManager import GameDebugManager
 from pydofus2.com.ankamagames.dofus.network.messages.game.actions.fight.GameActionFightDeathMessage import (
     GameActionFightDeathMessage,
 )
@@ -67,9 +62,6 @@ from pydofus2.com.ankamagames.dofus.network.messages.game.context.fight.GameFigh
 )
 from pydofus2.com.ankamagames.dofus.network.messages.game.context.fight.GameFightTurnStartMessage import (
     GameFightTurnStartMessage,
-)
-from pydofus2.com.ankamagames.dofus.network.messages.game.context.fight.GameFightTurnStartPlayingMessage import (
-    GameFightTurnStartPlayingMessage,
 )
 from pydofus2.com.ankamagames.dofus.network.messages.game.context.fight.SlaveNoLongerControledMessage import (
     SlaveNoLongerControledMessage,
@@ -395,7 +387,6 @@ class FightBattleFrame(Frame):
             entityInfos = fenf.FightEntitiesFrame.getCurrentInstance().getEntityInfos(gftemsg.id)
             if isinstance(entityInfos, GameFightFighterInformations) and not entityInfos:
                 bffm.BuffManager().markFinishingBuffs(gftemsg.id)
-                pass
                 if gftemsg.id == CurrentPlayedFighterManager().currentFighterId:
                     CurrentPlayedFighterManager().getSpellCastManager().nextTurn()
                     spellwrapper.SpellWrapper.refreshAllPlayerSpellHolder(gftemsg.id)
@@ -784,7 +775,6 @@ class FightBattleFrame(Frame):
             self._newWave = False
             self._newWaveId = -1
         if self._neverSynchronizedBefore:
-            pass
             self._neverSynchronizedBefore = False
 
     def removeSavedPosition(self, pEntityId: float) -> None:

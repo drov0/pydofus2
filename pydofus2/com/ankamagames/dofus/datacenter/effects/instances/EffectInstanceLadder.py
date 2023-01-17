@@ -36,6 +36,6 @@ class EffectInstanceLadder(EffectInstanceCreature, IDataCenter):
 
     def setParameter(self, paramIndex: int, value) -> None:
         if paramIndex == 0:
-            monsterFamilyId = int(value)
+            int(value)
         elif paramIndex == 2:
             self.monsterCount = int(value)

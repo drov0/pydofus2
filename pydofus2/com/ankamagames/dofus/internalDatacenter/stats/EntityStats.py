@@ -2,7 +2,7 @@ from pydofus2.com.ankamagames.jerakine.logger.Logger import Logger
 from pydofus2.com.ankamagames.dofus.internalDatacenter.stats.DetailedStats import DetailedStat
 from pydofus2.com.ankamagames.dofus.internalDatacenter.stats.Stat import Stat
 from pydofus2.com.ankamagames.dofus.internalDatacenter.stats.UsableStat import UsableStat
-from pydofus2.damageCalculation.tools import StatIds
+from pydofus2.damageCalculation.tools.StatIds import StatIds
 
 logger = Logger("Dofus2")
 

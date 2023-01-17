@@ -1,6 +1,3 @@
-from pydofus2.com.ankamagames.dofus.logic.game.fight.steps.FightDestroyEntityStep import (
-    FightDestroyEntityStep,
-)
 from pydofus2.com.ankamagames.dofus.logic.game.fight.steps.IFightStep import IFightStep
 from pydofus2.com.ankamagames.jerakine.logger.Logger import Logger
 from whistle import Event
@@ -28,7 +25,6 @@ from pydofus2.com.ankamagames.dofus.network.types.game.context.fight.GameFightFi
 )
 from pydofus2.com.ankamagames.jerakine.entities.interfaces.IEntity import IEntity
 from pydofus2.com.ankamagames.jerakine.sequencer.AbstractSequencable import AbstractSequencable
-from pydofus2.com.ankamagames.jerakine.sequencer.SerialSequencer import SerialSequencer
 from pydofus2.com.ankamagames.jerakine.types.positions.MapPoint import MapPoint
 
 logger = Logger("Dofus2")

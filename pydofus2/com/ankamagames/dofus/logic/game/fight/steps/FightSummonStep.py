@@ -19,7 +19,6 @@ from pydofus2.com.ankamagames.dofus.logic.game.fight.managers.CurrentPlayedFight
     CurrentPlayedFighterManager,
 )
 from pydofus2.com.ankamagames.dofus.logic.game.fight.steps.IFightStep import IFightStep
-from pydofus2.com.ankamagames.dofus.logic.game.fight.types.BasicBuff import BasicBuff
 from pydofus2.com.ankamagames.dofus.logic.game.fight.types.FightEventEnum import FightEventEnum
 from pydofus2.com.ankamagames.dofus.logic.game.fight.types.StateBuff import StateBuff
 from pydofus2.com.ankamagames.dofus.network.messages.game.context.fight.character.GameFightShowFighterMessage import (

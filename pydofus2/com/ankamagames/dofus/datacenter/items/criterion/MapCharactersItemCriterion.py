@@ -1,4 +1,3 @@
-import imp
 from pydofus2.com.ankamagames.dofus.datacenter.items.criterion.IItemCriterion import IItemCriterion
 from pydofus2.com.ankamagames.dofus.datacenter.items.criterion.ItemCriterion import ItemCriterion
 from pydofus2.com.ankamagames.dofus.kernel.Kernel import Kernel

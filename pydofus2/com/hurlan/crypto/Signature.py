@@ -50,7 +50,7 @@ class Signature:
             sigHeader = sigData.readUTF()
             if sigHeader != self.SIGNATURE_HEADER:
                 return None
-            sigVersion = sigData.readByte()
+            sigData.readByte()
             sigData.readInt()
             sigData.readInt()
             sigFileLenght = sigData.readInt()

@@ -156,9 +156,8 @@ class StoreDataManager(metaclass=Singleton):
         return oValue
 
     def startStoreSequence(self) -> None:
-        _bStoreSequence = True
         if not self._nCurrentSequenceNum:
-            _aStoreSequence = []
+            pass
         self._nCurrentSequenceNum += 1
 
     def stopStoreSequence(self) -> None:

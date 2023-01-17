@@ -18,7 +18,6 @@ from pydofus2.com.ankamagames.dofus.internalDatacenter.items.ItemWrapper import 
 # from pydofus2.com.ankamagames.dofus.internalDatacenter.items.ItemWrapper import ItemWrapper
 import pydofus2.com.ankamagames.dofus.kernel.Kernel as krnl
 import pydofus2.com.ankamagames.dofus.kernel.net.ConnectionsHandler as connh
-import pydofus2.com.ankamagames.dofus.logic.connection.frames.ServerSelectionFrame as ssfrm
 from pydofus2.com.ankamagames.dofus.logic.connection.managers.AuthentificationManager import (
     AuthentificationManager,
 )
@@ -87,9 +86,6 @@ from pydofus2.com.ankamagames.dofus.network.messages.game.character.choice.Chara
 )
 from pydofus2.com.ankamagames.dofus.network.messages.game.context.GameContextCreateRequestMessage import (
     GameContextCreateRequestMessage,
-)
-from pydofus2.com.ankamagames.dofus.network.messages.game.initialization.CharacterLoadingCompleteMessage import (
-    CharacterLoadingCompleteMessage,
 )
 from pydofus2.com.ankamagames.dofus.network.messages.game.moderation.PopupWarningCloseRequestMessage import (
     PopupWarningCloseRequestMessage,

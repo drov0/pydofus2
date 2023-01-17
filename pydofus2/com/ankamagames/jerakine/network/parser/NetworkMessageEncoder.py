@@ -1,6 +1,5 @@
 from functools import reduce
 import importlib
-import json
 import random
 import sys
 from pydofus2.com.ankamagames.jerakine.logger.Logger import Logger

@@ -1,4 +1,3 @@
-from time import sleep
 from pydofus2.com.ankamagames.dofus.logic.common.frames.LatencyFrame import LatencyFrame
 from pydofus2.com.ankamagames.dofus.logic.common.managers.PlayerManager import PlayerManager
 from pydofus2.com.ankamagames.dofus.logic.common.managers.StatsManager import StatsManager

@@ -1,10 +1,7 @@
 from pydofus2.com.ankamagames.jerakine.logger.Logger import Logger
-from types import FunctionType
 from whistle import Event, EventDispatcher
 from pydofus2.com.ankamagames.jerakine.network.IServerConnection import IServerConnection
 from pydofus2.com.ankamagames.jerakine.network.INetworkMessage import INetworkMessage
-from pydofus2.com.ankamagames.jerakine.messages.Message import Message
-from pydofus2.com.ankamagames.jerakine.messages.MessageHandler import MessageHandler
 from pydofus2.com.ankamagames.jerakine.network.NetworkSentEvent import NetworkSentEvent
 from pydofus2.com.ankamagames.jerakine.events.SocketEvent import SocketEvent
 from pydofus2.com.ankamagames.jerakine.events.IOErrorEvent import IOErrorEvent

@@ -4,7 +4,6 @@ from pydofus2.com.ankamagames.dofus.kernel.net.ConnectionsHandler import Connect
 from pydofus2.com.ankamagames.dofus.logic.game.common.actions.GameContextQuitAction import (
     GameContextQuitAction,
 )
-from pydofus2.com.ankamagames.dofus.logic.game.roleplay.frames.RoleplayMovementFrame import RoleplayMovementFrame
 from pydofus2.com.ankamagames.dofus.network.enums.GameContextEnum import GameContextEnum
 from pydofus2.com.ankamagames.dofus.network.messages.game.context.GameContextCreateMessage import (
     GameContextCreateMessage,

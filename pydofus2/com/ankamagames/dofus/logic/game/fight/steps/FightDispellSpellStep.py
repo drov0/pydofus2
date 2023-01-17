@@ -1,10 +1,8 @@
 from pydofus2.com.ankamagames.dofus.enums.ActionIds import ActionIds
 from pydofus2.com.ankamagames.dofus.kernel.Kernel import Kernel
-from pydofus2.com.ankamagames.dofus.logic.game.fight.fightEvents.FightEventsHelper import FightEventsHelper
 from pydofus2.com.ankamagames.dofus.logic.game.fight.frames.FightEntitiesFrame import FightEntitiesFrame
 from pydofus2.com.ankamagames.dofus.logic.game.fight.managers.BuffManager import BuffManager
 from pydofus2.com.ankamagames.dofus.logic.game.fight.steps.IFightStep import IFightStep
-from pydofus2.com.ankamagames.dofus.logic.game.fight.types.FightEventEnum import FightEventEnum
 from pydofus2.com.ankamagames.dofus.network.messages.game.context.GameContextRefreshEntityLookMessage import (
     GameContextRefreshEntityLookMessage,
 )

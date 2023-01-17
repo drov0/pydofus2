@@ -1,9 +1,3 @@
-from pydofus2.com.ankamagames.dofus.internalDatacenter.stats.EntityStats import EntityStats
-from pydofus2.com.ankamagames.dofus.internalDatacenter.stats.Stat import Stat
-from pydofus2.com.ankamagames.dofus.logic.common.managers.StatsManager import StatsManager
-from pydofus2.com.ankamagames.dofus.logic.game.fight.fightEvents.FightEventsHelper import (
-    FightEventsHelper,
-)
 from pydofus2.com.ankamagames.dofus.logic.game.fight.frames.FightEntitiesFrame import (
     FightEntitiesFrame,
 )
@@ -11,13 +5,8 @@ from pydofus2.com.ankamagames.dofus.logic.game.fight.steps.IFightStep import IFi
 from pydofus2.com.ankamagames.dofus.logic.game.fight.steps.abstract.AbstractStatContextualStep import (
     AbstractStatContextualStep,
 )
-from pydofus2.com.ankamagames.dofus.logic.game.fight.types.FightEventEnum import FightEventEnum
 from pydofus2.com.ankamagames.dofus.network.enums.GameContextEnum import GameContextEnum
 from pydofus2.com.ankamagames.jerakine.logger.Logger import Logger
-from pydofus2.com.ankamagames.jerakine.utils.display.EnterFrameDispatcher import (
-    EnterFrameDispatcher,
-)
-from pydofus2.damageCalculation.tools.StatIds import StatIds
 
 logger = Logger("Dofus2")
 

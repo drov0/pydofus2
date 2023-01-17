@@ -1,11 +1,7 @@
-from pydofus2.com.ankamagames.atouin.AtouinConstants import AtouinConstants
 from pydofus2.com.ankamagames.dofus.kernel.Kernel import Kernel
 from pydofus2.com.ankamagames.dofus.logic.game.common.misc.DofusEntities import DofusEntities
 from pydofus2.com.ankamagames.dofus.logic.game.fight.actions.RemoveEntityAction import (
     RemoveEntityAction,
-)
-from pydofus2.com.ankamagames.dofus.logic.game.fight.fightEvents.FightEventsHelper import (
-    FightEventsHelper,
 )
 
 from pydofus2.com.ankamagames.dofus.logic.game.fight.frames.FightEntitiesFrame import (
@@ -15,7 +11,6 @@ from pydofus2.com.ankamagames.dofus.logic.game.fight.miscs.FightEntitiesHolder i
     FightEntitiesHolder,
 )
 from pydofus2.com.ankamagames.dofus.logic.game.fight.steps.IFightStep import IFightStep
-from pydofus2.com.ankamagames.dofus.logic.game.fight.types.FightEventEnum import FightEventEnum
 from pydofus2.com.ankamagames.dofus.network.enums.GameActionFightInvisibilityStateEnum import (
     GameActionFightInvisibilityStateEnum,
 )
@@ -26,7 +21,6 @@ from pydofus2.com.ankamagames.dofus.types.entities.AnimatedCharacter import Anim
 from pydofus2.com.ankamagames.jerakine.entities.interfaces.IDisplayable import IDisplayable
 from pydofus2.com.ankamagames.jerakine.entities.interfaces.IEntity import IEntity
 from pydofus2.com.ankamagames.jerakine.sequencer.AbstractSequencable import AbstractSequencable
-from pydofus2.com.ankamagames.jerakine.types.positions.MapPoint import MapPoint
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:

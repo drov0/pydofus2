@@ -1,4 +1,3 @@
-from time import perf_counter
 from types import FunctionType
 from pydofus2.com.ankamagames.atouin.utils.DataMapProvider import DataMapProvider
 from pydofus2.com.ankamagames.dofus.logic.game.common.managers.PlayedCharacterManager import PlayedCharacterManager

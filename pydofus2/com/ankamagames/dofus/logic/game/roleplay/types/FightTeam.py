@@ -19,7 +19,6 @@ from pydofus2.com.ankamagames.dofus.network.types.game.context.fight.FightTeamMe
 from pydofus2.com.ankamagames.dofus.network.types.game.context.fight.FightTeamMemberInformations import (
     FightTeamMemberInformations,
 )
-from pydofus2.com.ankamagames.dofus.types.entities.AnimatedCharacter import AnimatedCharacter
 from pydofus2.com.ankamagames.jerakine.entities.interfaces.IEntity import IEntity
 from pydofus2.com.ankamagames.jerakine.logger.Logger import Logger
 

@@ -15,7 +15,6 @@ from pydofus2.com.ankamagames.dofus.logic.game.roleplay.messages.InteractiveElem
     InteractiveElementActivationMessage,
 )
 from pydofus2.com.ankamagames.dofus.network.types.game.interactive.InteractiveElement import InteractiveElement
-from pydofus2.com.ankamagames.jerakine.types.enums.DirectionsEnum import DirectionsEnum
 
 if TYPE_CHECKING:
     from pydofus2.com.ankamagames.dofus.logic.game.roleplay.frames.RoleplayContextFrame import (
@@ -97,7 +96,7 @@ class RoleplayWorldFrame(Frame):
 
     @property
     def roleplayContextFrame(self) -> "RoleplayContextFrame":
-        from pydofus2.com.ankamagames.dofus.logic.game.roleplay.frames.RoleplayContextFrame import RoleplayContextFrame
+        pass
 
         return Kernel().getWorker().getFrame("RoleplayContextFrame")
 

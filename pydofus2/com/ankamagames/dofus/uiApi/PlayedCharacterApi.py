@@ -54,9 +54,6 @@ from pydofus2.com.ankamagames.dofus.logic.game.fight.types.castSpellManager.Spel
 from pydofus2.com.ankamagames.dofus.logic.game.roleplay.frames.RoleplayContextFrame import (
     RoleplayContextFrame,
 )
-from pydofus2.com.ankamagames.dofus.logic.game.roleplay.frames.RoleplayEntitiesFrame import (
-    RoleplayEntitiesFrame,
-)
 from pydofus2.com.ankamagames.dofus.network.enums.CharacterInventoryPositionEnum import (
     CharacterInventoryPositionEnum,
 )
@@ -83,9 +80,6 @@ from pydofus2.com.ankamagames.dofus.network.types.game.context.roleplay.GameRole
 )
 from pydofus2.com.ankamagames.dofus.network.types.game.context.roleplay.GuildInformations import (
     GuildInformations,
-)
-from pydofus2.com.ankamagames.dofus.network.types.game.context.roleplay.HumanOptionTitle import (
-    HumanOptionTitle,
 )
 from pydofus2.com.ankamagames.dofus.network.types.game.data.items.ForgettableSpellItem import (
     ForgettableSpellItem,
@@ -238,7 +232,7 @@ class PlayedCharacterApi(IApi, metaclass=Singleton):
         return Kernel().getWorker().getFrame("TinselFrame").titlesOrnamentsAskedBefore
 
     def getEntityInfos(self) -> GameRolePlayCharacterInformations:
-        import pydofus2.com.ankamagames.dofus.logic.game.fight.frames.FightEntitiesFrame as fenf
+        pass
 
         entitiesFrame: AbstractEntitiesFrame = None
         if self.isInFight():
@@ -287,9 +281,7 @@ class PlayedCharacterApi(IApi, metaclass=Singleton):
         return PlayedCharacterManager().isInExchange
 
     def isInFight(self) -> bool:
-        from pydofus2.com.ankamagames.dofus.logic.game.fight.frames.FightContextFrame import (
-            FightContextFrame,
-        )
+        pass
 
         return Kernel().getWorker().contains("FightContextFrame")
 

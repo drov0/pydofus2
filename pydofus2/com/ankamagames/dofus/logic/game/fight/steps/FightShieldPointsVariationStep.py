@@ -1,4 +1,3 @@
-from pydofus2.com.ankamagames.berilia.types.LocationEnum import LocationEnum
 from pydofus2.com.ankamagames.dofus.internalDatacenter.stats.EntityStats import EntityStats
 from pydofus2.com.ankamagames.dofus.internalDatacenter.stats.Stat import Stat
 from pydofus2.com.ankamagames.dofus.logic.common.managers.StatsManager import StatsManager
@@ -15,9 +14,6 @@ from pydofus2.com.ankamagames.dofus.logic.game.fight.steps.abstract.AbstractStat
 )
 from pydofus2.com.ankamagames.dofus.logic.game.fight.types.FightEventEnum import FightEventEnum
 from pydofus2.com.ankamagames.dofus.network.enums.GameContextEnum import GameContextEnum
-from pydofus2.com.ankamagames.dofus.network.types.game.context.fight.GameFightCharacterInformations import (
-    GameFightCharacterInformations,
-)
 from pydofus2.com.ankamagames.dofus.network.types.game.context.fight.GameFightFighterInformations import (
     GameFightFighterInformations,
 )

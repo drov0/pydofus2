@@ -2,7 +2,7 @@ from pydofus2.com.ankamagames.dofus.datacenter.characteristics.Characteristic im
     Characteristic,
 )
 from pydofus2.com.ankamagames.jerakine.logger.Logger import Logger
-from pydofus2.damageCalculation.tools import StatIds
+from pydofus2.damageCalculation.tools.StatIds import StatIds
 
 logger = Logger("Dofus2")
 

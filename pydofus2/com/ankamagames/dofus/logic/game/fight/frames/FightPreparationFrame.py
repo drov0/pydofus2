@@ -290,7 +290,7 @@ class FightPreparationFrame(Frame):
                     and gfpspcdmsg.cancellerId != PlayedCharacterManager().id
                 ):
                     entitiesFrame = Kernel().getWorker().getFrame("FightEntitiesFrame")
-                    cancellerInfo = entitiesFrame.getEntityInfos(gfpspcdmsg.cancellerId)
+                    entitiesFrame.getEntityInfos(gfpspcdmsg.cancellerId)
             return True
 
         if isinstance(msg, GameEntityDispositionErrorMessage):

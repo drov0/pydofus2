@@ -3,7 +3,6 @@ from pydofus2.com.ankamagames.dofus.logic.game.fight.steps.IFightStep import IFi
 from pydofus2.com.ankamagames.dofus.types.entities.AnimatedCharacter import AnimatedCharacter
 from pydofus2.com.ankamagames.jerakine.benchmark.BenchmarkTimer import BenchmarkTimer
 from pydofus2.com.ankamagames.jerakine.sequencer.AbstractSequencable import AbstractSequencable
-from pydofus2.com.ankamagames.jerakine.types.positions.MapPoint import MapPoint
 
 
 class FightInvisibleTemporarilyDetectedStep(AbstractSequencable, IFightStep):

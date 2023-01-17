@@ -55,7 +55,6 @@ class SpellModifiersManager(metaclass=Singleton):
         logger.info("Verbose mode has been " + verboseAction)
 
     def reset(self) -> None:
-        _singleton = None
         logger.info("Singleton instance has been destroyed")
 
     def setSpellModifiers(self, spellModifiers: SpellModifiers) -> bool:

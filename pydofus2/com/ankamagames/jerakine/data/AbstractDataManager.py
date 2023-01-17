@@ -27,7 +27,7 @@ class AbstractDataManager:
         )
         soName: str = cls._soPrefix + str(math.floor(key / chunkLength))
         if cls._cacheSO.contains(soName):
-            foo = cls._cacheSO.peek(soName)
+            cls._cacheSO.peek(soName)
             v = CustomSharedObject(cls._cacheSO.peek(soName)).data[cls.DATA_KEY][key]
             cls._cacheKey.store(realKey, v)
             return v

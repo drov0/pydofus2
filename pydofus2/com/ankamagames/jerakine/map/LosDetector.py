@@ -1,4 +1,3 @@
-import math
 from pydofus2.com.ankamagames.jerakine.logger.Logger import Logger
 from pydofus2.com.ankamagames.jerakine.map.IDataMapProvider import IDataMapProvider
 from pydofus2.com.ankamagames.jerakine.map.ILosDetector import ILosDetector

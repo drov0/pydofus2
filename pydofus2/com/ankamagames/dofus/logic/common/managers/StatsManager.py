@@ -20,7 +20,6 @@ from pydofus2.com.ankamagames.jerakine.managers.StoreDataManager import StoreDat
 from pydofus2.com.ankamagames.jerakine.metaclasses.Singleton import Singleton
 from pydofus2.com.ankamagames.jerakine.types.DataStoreType import DataStoreType
 from pydofus2.com.ankamagames.jerakine.types.enums.DataStoreEnum import DataStoreEnum
-from pydofus2.damageCalculation.tools.StatIds import StatIds
 
 logger = Logger()
 

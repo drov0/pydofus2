@@ -1,4 +1,3 @@
-from pydofus2.com.ankamagames.dofus.logic.game.common.misc.DofusEntities import DofusEntities
 from pydofus2.com.ankamagames.dofus.logic.game.fight.steps.FightRemoveSubEntityStep import (
     FightRemoveSubEntityStep,
 )

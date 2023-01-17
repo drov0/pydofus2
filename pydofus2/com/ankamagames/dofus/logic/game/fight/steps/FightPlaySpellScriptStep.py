@@ -1,4 +1,3 @@
-from time import perf_counter
 from pydofus2.com.ankamagames.dofus.datacenter.spells.Spell import Spell
 from pydofus2.com.ankamagames.dofus.datacenter.spells.SpellLevel import SpellLevel
 from pydofus2.com.ankamagames.dofus.logic.game.common.misc.ISpellCastProvider import (
@@ -7,7 +6,6 @@ from pydofus2.com.ankamagames.dofus.logic.game.common.misc.ISpellCastProvider im
 from pydofus2.com.ankamagames.dofus.logic.game.fight.steps.IFightStep import IFightStep
 from pydofus2.com.ankamagames.jerakine.logger.Logger import Logger
 from pydofus2.com.ankamagames.jerakine.sequencer.AbstractSequencable import AbstractSequencable
-from pydofus2.com.ankamagames.jerakine.types.Callback import Callback
 
 logger = Logger("Dofus2")
 

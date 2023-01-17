@@ -1,5 +1,4 @@
 from pydofus2.com.ankamagames.dofus.datacenter.effects.EffectInstance import EffectInstance
-from pydofus2.com.ankamagames.jerakine.interfaces.IDataCenter import IDataCenter
 
 
 class EffectInstanceCreature(EffectInstance):

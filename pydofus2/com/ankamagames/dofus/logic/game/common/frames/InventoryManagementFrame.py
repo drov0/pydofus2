@@ -12,9 +12,6 @@ from pydofus2.com.ankamagames.dofus.logic.game.roleplay.actions.DeleteObjectActi
 from pydofus2.com.ankamagames.dofus.network.enums.CharacterInventoryPositionEnum import (
     CharacterInventoryPositionEnum,
 )
-from pydofus2.com.ankamagames.dofus.network.enums.ChatActivableChannelsEnum import (
-    ChatActivableChannelsEnum,
-)
 from pydofus2.com.ankamagames.dofus.network.messages.game.inventory.KamasUpdateMessage import (
     KamasUpdateMessage,
 )
@@ -45,12 +42,6 @@ from pydofus2.com.ankamagames.dofus.network.messages.game.inventory.items.Object
 from pydofus2.com.ankamagames.dofus.network.messages.game.inventory.items.ObjectQuantityMessage import (
     ObjectQuantityMessage,
 )
-from pydofus2.com.ankamagames.dofus.network.messages.game.inventory.items.ObjectUseOnCellMessage import (
-    ObjectUseOnCellMessage,
-)
-from pydofus2.com.ankamagames.dofus.network.messages.game.inventory.items.ObjectUseOnCharacterMessage import (
-    ObjectUseOnCharacterMessage,
-)
 from pydofus2.com.ankamagames.dofus.network.messages.game.inventory.items.ObjectsAddedMessage import (
     ObjectsAddedMessage,
 )
@@ -64,7 +55,6 @@ from pydofus2.com.ankamagames.dofus.network.messages.game.inventory.items.WatchI
     WatchInventoryContentMessage,
 )
 from pydofus2.com.ankamagames.jerakine.benchmark.BenchmarkTimer import BenchmarkTimer
-from pydofus2.com.ankamagames.jerakine.data.I18n import I18n
 from pydofus2.com.ankamagames.jerakine.logger.Logger import Logger
 from pydofus2.com.ankamagames.jerakine.messages.Frame import Frame
 from pydofus2.com.ankamagames.jerakine.messages.Message import Message

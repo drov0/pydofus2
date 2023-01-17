@@ -1,4 +1,3 @@
-import json
 from pydofus2.com.ankamagames.dofus.logic.common.managers.StatsManager import StatsManager
 from pydofus2.com.ankamagames.dofus.logic.game.fight.steps.IFightStep import IFightStep
 from pydofus2.com.ankamagames.dofus.network.types.game.character.characteristic.CharacterCharacteristic import (

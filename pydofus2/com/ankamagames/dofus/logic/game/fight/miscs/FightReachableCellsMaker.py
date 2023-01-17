@@ -4,7 +4,6 @@ from pydofus2.com.ankamagames.dofus.network.types.game.context.FightEntityDispos
     FightEntityDispositionInformations,
 )
 from pydofus2.com.ankamagames.jerakine.logger.Logger import Logger
-from pydofus2.com.ankamagames.atouin.data.map.Map import Map
 from pydofus2.com.ankamagames.dofus.internalDatacenter.stats.Stat import Stat
 from pydofus2.com.ankamagames.dofus.kernel.Kernel import Kernel
 from pydofus2.com.ankamagames.dofus.logic.common.managers.StatsManager import StatsManager

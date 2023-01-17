@@ -1,18 +1,13 @@
 from types import FunctionType
-from pydofus2.com.ankamagames.atouin.managers.EntitiesManager import EntitiesManager
 from pydofus2.com.ankamagames.dofus import Constants
 from pydofus2.com.ankamagames.dofus.modules.utils.pathFinding.astar.AStar import AStar
 from pydofus2.com.ankamagames.dofus.modules.utils.pathFinding.world.Edge import Edge
 from pydofus2.com.ankamagames.dofus.modules.utils.pathFinding.world.Vertex import Vertex
 from pydofus2.com.ankamagames.dofus.modules.utils.pathFinding.world.WorldGraph import WorldGraph
-from pydofus2.com.ankamagames.atouin.data.map.Cell import Cell
-from pydofus2.com.ankamagames.atouin.managers.MapDisplayManager import MapDisplayManager
 from pydofus2.com.ankamagames.dofus.logic.game.common.managers.PlayedCharacterManager import (
     PlayedCharacterManager,
 )
-from pydofus2.com.ankamagames.dofus.logic.game.common.misc.DofusEntities import DofusEntities
 from pydofus2.com.ankamagames.dofus.modules.utils.pathFinding.tools.TimeDebug import TimeDebug
-from pydofus2.com.ankamagames.jerakine.entities.interfaces.IEntity import IEntity
 from pydofus2.com.ankamagames.jerakine.logger.Logger import Logger
 from pydofus2.com.ankamagames.jerakine.metaclasses.Singleton import Singleton
 from pydofus2.com.ankamagames.jerakine.network.CustomDataWrapper import ByteArray

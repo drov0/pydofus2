@@ -1,4 +1,3 @@
-import os
 import pydofus2.com.ankamagames.dofus.Constants as Constants
 
 class BinaryResource:

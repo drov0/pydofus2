@@ -1,6 +1,5 @@
 import linecache
 import os
-import sys
 from time import perf_counter
 import tracemalloc
 

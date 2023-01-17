@@ -94,7 +94,7 @@ class AveragePricesFrame(Frame):
             return False
         if self.dataAvailable:
             now = datetime.now()
-            lastUpdateHour = self._pricesData.lastUpdate.hour
+            self._pricesData.lastUpdate.hour
             if (
                 now.getFullYear() == self._pricesData.lastUpdate.getFullYear()
                 and now.getMonth() == self._pricesData.lastUpdate.getMonth()

@@ -19,7 +19,6 @@ from pydofus2.com.ankamagames.dofus.logic.game.common.misc.DofusEntities import 
 from pydofus2.com.ankamagames.dofus.logic.game.fight.managers.CurrentPlayedFighterManager import CurrentPlayedFighterManager
 from pydofus2.com.ankamagames.dofus.logic.game.fight.managers.SpellModifiersManager import SpellModifiersManager
 from pydofus2.com.ankamagames.dofus.network.enums.AggressableStatusEnum import AggressableStatusEnum
-from pydofus2.com.ankamagames.dofus.network.enums.CompassTypeEnum import CompassTypeEnum
 from pydofus2.com.ankamagames.dofus.network.enums.GameServerTypeEnum import GameServerTypeEnum
 from pydofus2.com.ankamagames.dofus.network.enums.PlayerLifeStatusEnum import PlayerLifeStatusEnum
 from pydofus2.com.ankamagames.dofus.network.enums.StatsUpgradeResultEnum import StatsUpgradeResultEnum
@@ -27,7 +26,6 @@ from pydofus2.com.ankamagames.dofus.network.messages.game.almanach.AlmanachCalen
     AlmanachCalendarDateMessage,
 )
 from pydofus2.com.ankamagames.dofus.network.messages.game.atlas.compass.CompassResetMessage import CompassResetMessage
-from pydofus2.com.ankamagames.dofus.network.messages.game.atlas.compass.CompassUpdateMessage import CompassUpdateMessage
 from pydofus2.com.ankamagames.dofus.network.messages.game.atlas.compass.CompassUpdatePartyMemberMessage import (
     CompassUpdatePartyMemberMessage,
 )
@@ -48,9 +46,6 @@ from pydofus2.com.ankamagames.dofus.network.messages.game.character.spell.forget
 )
 from pydofus2.com.ankamagames.dofus.network.messages.game.character.stats.CharacterExperienceGainMessage import (
     CharacterExperienceGainMessage,
-)
-from pydofus2.com.ankamagames.dofus.network.messages.game.character.stats.CharacterLevelUpInformationMessage import (
-    CharacterLevelUpInformationMessage,
 )
 from pydofus2.com.ankamagames.dofus.network.messages.game.character.stats.CharacterLevelUpMessage import CharacterLevelUpMessage
 from pydofus2.com.ankamagames.dofus.network.messages.game.character.stats.CharacterStatsListMessage import (
@@ -94,11 +89,10 @@ from pydofus2.com.ankamagames.dofus.network.types.game.character.characteristic.
 from pydofus2.com.ankamagames.dofus.network.types.game.context.roleplay.HumanOptionAlliance import HumanOptionAlliance
 from pydofus2.com.ankamagames.dofus.network.types.game.context.roleplay.HumanOptionOrnament import HumanOptionOrnament
 from pydofus2.com.ankamagames.dofus.types.data.PlayerSetInfo import PlayerSetInfo
-from pydofus2.com.ankamagames.jerakine.data.I18n import I18n
 from pydofus2.com.ankamagames.jerakine.messages.Frame import Frame
 from pydofus2.com.ankamagames.jerakine.messages.Message import Message
 from pydofus2.com.ankamagames.jerakine.types.enums.Priority import Priority
-from pydofus2.damageCalculation.tools import StatIds
+from pydofus2.damageCalculation.tools.StatIds import StatIds
 
 if TYPE_CHECKING:
     from pydofus2.com.ankamagames.dofus.logic.game.fight.frames.FightBattleFrame import FightBattleFrame
@@ -199,7 +193,7 @@ class PlayedCharacterUpdatesFrame(Frame):
             ):
                 return False
 
-            newSubArea = SubArea.getSubAreaByMapId(mcidmsg.mapId)
+            SubArea.getSubAreaByMapId(mcidmsg.mapId)
 
             # if pcm.PlayedCharacterManager().currentSubArea and newSubArea:
             #    if PrismSubAreaWrapper.prismList[newSubArea.id]:
@@ -269,7 +263,6 @@ class PlayedCharacterUpdatesFrame(Frame):
             return False
 
         if isinstance(msg, CharacterExperienceGainMessage):
-            cegmsg = msg
             return True
 
         if isinstance(msg, GameRolePlayPlayerLifeStatusMessage):
@@ -280,7 +273,6 @@ class PlayedCharacterUpdatesFrame(Frame):
             return False
 
         if isinstance(msg, GameRolePlayGameOverMessage):
-            grpgomsg = msg
             pcm.PlayedCharacterManager().state = PlayerLifeStatusEnum.STATUS_TOMBSTONE
             return True
 
@@ -394,12 +386,12 @@ class PlayedCharacterUpdatesFrame(Frame):
             return True
 
         if isinstance(msg, DebtsUpdateMessage):
-            dum = msg
+            pass
             # DebtManager().updateDebts(dum.debts)
             return True
 
         if isinstance(msg, DebtsDeleteMessage):
-            ddm = msg
+            pass
             # DebtManager().removeDebts(ddm.debts)
             return True
 
@@ -467,7 +459,7 @@ class PlayedCharacterUpdatesFrame(Frame):
         statsManager: StatsManager = StatsManager()
         playerStats: EntityStats = statsManager.getStats(playerId)
         if playerStats is not None:
-            oldEnergyPoints = playerStats.getStatTotalValue(StatIds.ENERGY_POINTS)
+            playerStats.getStatTotalValue(StatIds.ENERGY_POINTS)
         statsManager.addRawStats(playerId, stats.characteristics)
         SpellModifiersManager().setRawSpellsModifiers(playerId, stats.spellModifications)
         if stats.kamas != InventoryManager().inventory.kamas:

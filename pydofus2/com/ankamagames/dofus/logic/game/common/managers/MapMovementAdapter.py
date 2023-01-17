@@ -48,7 +48,6 @@ class MapMovementAdapter:
                 mp.end = destination
                 break
             mp.addPoint(pe)
-            previousElement = pe
             moveCount += 1
         mp.fill()
         if cls.DEBUG_ADAPTER:

@@ -161,7 +161,6 @@ class JobsFrame(Frame):
             ConnectionsHandler.getConnection().send(jcddsmsg)
             return True
         if isinstance(msg, JobExperienceOtherPlayerUpdateMessage):
-            jeopumsg = msg
             return True
         if isinstance(msg, JobExperienceUpdateMessage):
             jeumsg = msg

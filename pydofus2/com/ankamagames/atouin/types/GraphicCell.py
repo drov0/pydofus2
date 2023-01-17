@@ -27,11 +27,8 @@ class GraphicCell(ICustomUnicNameGetter):
         self._processDrop = self.returnTrueFunctionType
         super().__init__()
         self.cellId = cellId
-        name = str(cellId)
+        str(cellId)
         self._name = "cell::" + cellId
-        buttonMode = True
-        mouseChildren = False
-        cacheAsBitmap = True
 
     @property
     def dropValidator(self) -> FunctionType:

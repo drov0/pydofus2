@@ -1,4 +1,3 @@
-from functools import reduce
 import importlib
 import os
 import sys

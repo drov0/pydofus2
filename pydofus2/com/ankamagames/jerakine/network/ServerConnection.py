@@ -1,7 +1,7 @@
 import base64
 from threading import Timer
 import threading
-from time import perf_counter, sleep
+from time import perf_counter
 from types import FunctionType
 from pydofus2.com.ankamagames.dofus.kernel.net.DisconnectionReasonEnum import DisconnectionReasonEnum
 from pydofus2.com.ankamagames.dofus.network.messages.common.NetworkDataContainerMessage import NetworkDataContainerMessage

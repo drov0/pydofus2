@@ -1,7 +1,6 @@
 import base64
 from hashlib import md5, sha256
 import os
-import re
 from pydofus2.com.ankamagames.dofus.logic.shield.ShieldSecureLevel import ShieldSecureLevel
 from pydofus2.com.ankamagames.dofus.network.types.secure.TrustCertificate import TrustCertificate
 from pydofus2.com.ankamagames.jerakine.logger.Logger import Logger

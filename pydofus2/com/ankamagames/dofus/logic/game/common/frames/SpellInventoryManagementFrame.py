@@ -291,7 +291,6 @@ class SpellInventoryManagementFrame(Frame, metaclass=Singleton):
             return True
 
         elif isinstance(msg, FinishMoveListRequestAction):
-            fmlra = msg
             fmlrmsg = FinishMoveListRequestMessage()
             fmlrmsg.init()
             ConnectionsHandler.getConnection().send(fmlrmsg)

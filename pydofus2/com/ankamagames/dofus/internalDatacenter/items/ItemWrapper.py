@@ -1,7 +1,4 @@
 import math
-from pydofus2.com.ankamagames.dofus.datacenter.effects.instances.EffectInstanceDice import (
-    EffectInstanceDice,
-)
 from pydofus2.com.ankamagames.dofus.datacenter.effects.instances.EffectInstanceInteger import (
     EffectInstanceInteger,
 )
@@ -681,7 +678,7 @@ class ItemWrapper(Item, ISlotData, ICellZoneProvider, IDataCenter):
                 effectInstance.effectId == ActionIds.ACTION_MARK_NEVER_TRADABLE_STRONG
                 or effectInstance.effectId == ActionIds.ACTION_MARK_NEVER_TRADABLE
             ):
-                exchangeable = False
+                pass
             if effectInstance.effectId == ActionIds.ACTION_ITEM_WRAPPER_COMPATIBLE_OBJ_TYPE:
                 self.wrapperobjectCategory = effectInstance.value
             if effectInstance.effectId == ActionIds.ACTION_EVOLUTIVE_OBJECT_EXPERIENCE:

@@ -1,4 +1,3 @@
-import imp
 from pydofus2.com.ankamagames.dofus.datacenter.items.criterion.GroupItemCriterion import GroupItemCriterion
 import pydofus2.com.ankamagames.dofus.datacenter.quest.QuestCategory as qstcat
 from pydofus2.com.ankamagames.dofus.logic.game.common.managers.PlayedCharacterManager import PlayedCharacterManager

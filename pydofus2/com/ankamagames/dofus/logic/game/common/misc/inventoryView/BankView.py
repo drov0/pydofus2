@@ -4,7 +4,6 @@ from pydofus2.com.ankamagames.dofus.logic.game.common.managers.StorageOptionMana
 from pydofus2.com.ankamagames.dofus.logic.game.common.misc.inventoryView.StorageGenericView import (
     StorageGenericView,
 )
-from pydofus2.com.ankamagames.dofus.types.enums.ItemCategoryEnum import ItemCategoryEnum
 
 
 class BankView(StorageGenericView):

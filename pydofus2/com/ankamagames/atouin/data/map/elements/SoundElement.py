@@ -1,7 +1,6 @@
 from pydofus2.com.ankamagames.atouin.data.map.Cell import Cell
 from pydofus2.com.ankamagames.atouin.data.map.elements.BasicElement import BasicElement
 from pydofus2.com.ankamagames.atouin.enums.ElementTypesEnum import ElementTypesEnum
-from pydofus2.com.ankamagames.jerakine.data.BinaryStream import BinaryStream
 from pydofus2.com.ankamagames.jerakine.network.CustomDataWrapper import ByteArray
 
 

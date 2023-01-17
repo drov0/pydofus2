@@ -1,7 +1,7 @@
 import sys
 import threading
 import tracemalloc
-from pydofus2.com.ankamagames.berilia.managers.KernelEventsManager import KernelEventsManager
+from pydofus2.com.ankamagames.berilia.managers.KernelEventsManager import KernelEventsManager, KernelEvts
 from pydofus2.com.ankamagames.dofus.kernel.net.DisconnectionReason import DisconnectionReason
 from pydofus2.com.ankamagames.dofus.logic.common.managers.PlayerManager import PlayerManager
 from time import perf_counter, sleep
@@ -109,13 +109,16 @@ class DofusClient(metaclass=Singleton):
     def relogin(self):
         self.login(self._loginToken, self._serverId, self._characterId)
         
-    def interrupt(self, reason: DisconnectionReason):
+    def interrupt(self, reason: DisconnectionReason=None):
         self._stopReason = reason
         self._stop.set()
-        if not self._joined and reason.reason == DisconnectionReasonEnum.EXCEPTION_THROWN:
-            KernelEventsManager().dispatch(KernelEventsManager.CRASH, reason.message)
-            raise Exception(reason.message)
-        
+        if reason and reason.reason == DisconnectionReasonEnum.EXCEPTION_THROWN:
+            KernelEventsManager().send(KernelEvts.CRASH, message=reason.message)
+    
+    @property
+    def exitError(self) -> str:
+        return self._stopReason.message if self._stopReason else None
+    
     @property
     def mainConn(self) -> "ServerConnection":
         return connh.ConnectionsHandler.getConnection().mainConnection

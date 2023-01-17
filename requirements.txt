@@ -1,4 +1,3 @@
 pycryptodomex
 whistle
 Py3AMF
-xmltodict

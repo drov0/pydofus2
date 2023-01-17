@@ -1,3 +1,4 @@
+from pydofus2.com.ankamagames.berilia.managers.KernelEventsManager import KernelEventsManager
 from pydofus2.com.ankamagames.dofus.logic.common.frames.LatencyFrame import LatencyFrame
 from pydofus2.com.ankamagames.dofus.logic.common.managers.PlayerManager import PlayerManager
 from pydofus2.com.ankamagames.dofus.logic.common.managers.StatsManager import StatsManager
@@ -51,6 +52,7 @@ class Kernel(metaclass=Singleton):
 
         logger.debug("[KERNEL] Resetting ...")
         # TODO : missing feature manager reset here
+        KernelEventsManager().reset()
         StatsManager.clear()
         SpellModifiersManager.clear()
         if not autoRetry:

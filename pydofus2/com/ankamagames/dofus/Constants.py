@@ -14,7 +14,7 @@ EVENT_MODE_PARAM = ""
 
 CHARACTER_CREATION_ALLOWED = True
 
-PRE_GAME_MODULE = ["Ankama_Connection"]
+PRE_GAME_MODULE = [ "Ankama_Connection" ]
 
 COMMON_GAME_MODULE = [
     "Ankama_Common",
@@ -24,7 +24,7 @@ COMMON_GAME_MODULE = [
     "Ankama_ContextMenu",
 ]
 
-ADMIN_MODULE = ["Ankama_Admin"]
+ADMIN_MODULE = [ "Ankama_Admin" ]
 
 DETERMINIST_TACKLE = True
 
@@ -75,6 +75,3 @@ with open(
     "rb",
 ) as fs:
     SIGNATURE_KEY_DATA = SignatureKey.import_key(ByteArray(fs.read()))
-
-CONNECTION_HOST = "dofus2-co-production.ankama-games.com"
-DLM_ENCRYPTION_KEY = "649ae451ca33ec53bbcbcc33becf15f4"

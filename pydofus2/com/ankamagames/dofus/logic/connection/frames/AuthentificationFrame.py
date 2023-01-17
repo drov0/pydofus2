@@ -2,7 +2,7 @@ import base64
 import hashlib
 import random
 from time import perf_counter
-from pydofus2.com.ankamagames.berilia.managers.KernelEventsManager import KernelEventsManager
+from pydofus2.com.ankamagames.berilia.managers.KernelEventsManager import KernelEventsManager, KernelEvts
 from pydofus2.com.ankamagames.dofus import Constants
 import pydofus2.com.ankamagames.dofus.kernel.Kernel as krnl
 import pydofus2.com.ankamagames.dofus.kernel.net.ConnectionsHandler as connh
@@ -120,7 +120,7 @@ class AuthentificationFrame(Frame):
                 flashKeyMsg = ClientKeyMessage()
                 flashKeyMsg.key = InterClientManager().flashKey
                 connh.ConnectionsHandler.getConnection().send(flashKeyMsg)
-            KernelEventsManager().dispatch(KernelEventsManager.IN_GAME)
+            KernelEventsManager().send(KernelEvts.IN_GAME, msg)
             return True
 
         elif isinstance(msg, IdentificationSuccessMessage):
@@ -141,9 +141,9 @@ class AuthentificationFrame(Frame):
             PlayerManager().wasAlreadyConnected = ismsg.wasAlreadyConnected
             DataStoreType.ACCOUNT_ID = str(ismsg.accountId)
             # StoreDataManager().setData(Constants.DATASTORE_COMPUTER_OPTIONS, "lastAccountId", ismsg.accountId)
+            KernelEventsManager().send(KernelEvts.LOGGED_IN, ismsg)
             krnl.Kernel().getWorker().removeFrame(self)
             krnl.Kernel().getWorker().addFrame(ssfrm.ServerSelectionFrame())
-            KernelEventsManager().dispatch(KernelEventsManager.LOGGED_IN)
             return True
 
         elif isinstance(msg, IdentificationFailedMessage):
@@ -165,8 +165,8 @@ class AuthentificationFrame(Frame):
                 pass
             self._lastLoginHash = hashlib.md5(lva.username.encode("utf-8")).hexdigest()
             ports = XmlConfig().getEntry("config.connection.port")
-            connexionPorts = list(map(int, ports.split(",")))
-            connectionHostsEntry = Constants.CONNECTION_HOST
+            connexionPorts = [int(_) for _ in ports.split(",")]
+            connectionHostsEntry = XmlConfig().getEntry("config.connection.host")
             connexionHosts = (
                 [lva.host]
                 if lva.host

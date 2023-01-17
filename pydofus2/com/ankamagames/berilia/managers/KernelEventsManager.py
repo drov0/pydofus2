@@ -11,7 +11,6 @@ class KernelEvts(Enum):
     IN_GAME = 5
     DEAD = 6
     ALIVE = 7
-        
 class KernelEventsManager(EventDispatcher, metaclass=Singleton):
     __waiting_evts = list[threading.Event]()
     def __init__(self):
@@ -40,7 +39,7 @@ class KernelEventsManager(EventDispatcher, metaclass=Singleton):
     
     def send(self, event_id: KernelEvts, *args, return_value=None, **kwargs):
         if event_id == KernelEvts.CRASH:
-            self.stopAllwaiting()
+            self.reset()
         if event is None:
             event = Event()
         event.dispatcher = self
@@ -51,6 +50,10 @@ class KernelEventsManager(EventDispatcher, metaclass=Singleton):
             listener(event, *args, return_value, **kwargs)
             if event.propagation_stopped: break
     
+    def reset(self):
+        self.stopAllwaiting()
+        self._listeners.clear()
+        
     def stopAllwaiting(self):
         for evt in self.__waiting_evts:
             evt.set()

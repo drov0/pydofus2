@@ -1,5 +1,3 @@
-
-
 class Capabilities:
     os = "Windows 8"
     cpuArchitecture = "x86"

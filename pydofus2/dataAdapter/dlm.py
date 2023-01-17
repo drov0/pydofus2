@@ -4,7 +4,9 @@ import zlib, tempfile, io
 from pydofus2.com.ankamagames.atouin.data.map.Map import Map
 from pydofus2.com.ankamagames.jerakine.data.BinaryStream import BinaryStream
 from pydofus2.com.ankamagames.jerakine.logger.Logger import Logger
+
 logger = Logger("Dofus2")
+
 
 class InvalidDLMFile(Exception):
     pass
@@ -43,13 +45,11 @@ class DLM:
                 self.encryptedData = dlm_raw.readBytes(self.dataLen)
                 decryptedData = bytearray()
                 for i in range(self.dataLen):
-                    decryptedData.append(
-                        self.encryptedData[i] ^ ord(self._key[i % len(self._key)])
-                    )
+                    decryptedData.append(self.encryptedData[i] ^ ord(self._key[i % len(self._key)]))
                 cleanData = io.BytesIO(decryptedData)
                 raw = BinaryStream(cleanData, True)
             else:
-                raw = dlm_raw      
+                raw = dlm_raw
         map = Map(raw, id, map_version)
         dlm_uncompressed.close()
         del dlm_raw

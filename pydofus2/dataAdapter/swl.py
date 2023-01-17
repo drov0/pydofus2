@@ -13,11 +13,13 @@ class InvalidSWLFile(Exception):
         super(InvalidSWLFile, self).__init__(message)
         self.message = message
 
+
 # Classes
 
 
 class SWLReader:
     """Read SWL files"""
+
     def __init__(self, stream):
         """Load the class with the SWL stream given"""
         # Attributes
@@ -37,21 +39,19 @@ class SWLReader:
             raise InvalidSWLFile("First byte not found.")
 
         if byte_header != 76:
-            raise InvalidSWLFile("The first byte doesn't match"
-                                 " the SWL pattern.")
+            raise InvalidSWLFile("The first byte doesn't match" " the SWL pattern.")
 
         self._version = SWL_file_binary.readByte()
         self._frame_rate = SWL_file_binary.readUnsignedInt()
         classes_count = SWL_file_binary.readInt()
-        if ((self._version == b"" or self._frame_rate == b"" or
-             classes_count == b"")):
+        if self._version == b"" or self._frame_rate == b"" or classes_count == b"":
             raise InvalidSWLFile("The file doesn't match the SWL pattern.")
 
         self._classes = []
 
         i = 0
         while i < classes_count:
-            class_ = (SWL_file_binary.readUTF()).decode('utf-8')
+            class_ = (SWL_file_binary.readUTF()).decode("utf-8")
             if class_ == b"":
                 raise InvalidSWLFile("The file appears to be corrupt.")
             self._classes.append(class_)
@@ -88,6 +88,7 @@ class SWLReader:
 
 class SWLBuilder:
     """Build SWL files"""
+
     def __init__(self, template, target):
         self._template = template
         self._target = target

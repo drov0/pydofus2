@@ -28,7 +28,6 @@ import pydofus2.com.ankamagames.dofus.logic.game.fight.managers.SpellModifiersMa
 from pydofus2.com.ankamagames.dofus.network.enums.CharacterSpellModificationTypeEnum import (
     CharacterSpellModificationTypeEnum,
 )
-from pydofus2.com.ankamagames.jerakine.data.XmlConfig import XmlConfig
 from pydofus2.com.ankamagames.jerakine.interfaces.IDataCenter import IDataCenter
 from pydofus2.com.ankamagames.jerakine.interfaces.ISlotData import ISlotData
 from pydofus2.com.ankamagames.jerakine.interfaces.ISlotDataHolder import ISlotDataHolder

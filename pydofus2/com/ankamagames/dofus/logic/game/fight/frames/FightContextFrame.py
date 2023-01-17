@@ -184,18 +184,12 @@ from pydofus2.com.ankamagames.dofus.network.types.game.context.roleplay.party.Na
     NamedPartyTeam,
 )
 from pydofus2.com.ankamagames.dofus.network.types.game.idol.Idol import Idol
-from pydofus2.com.ankamagames.dofus.types.entities.AnimatedCharacter import AnimatedCharacter
 from pydofus2.com.ankamagames.jerakine.benchmark.BenchmarkTimer import BenchmarkTimer
 from pydofus2.com.ankamagames.jerakine.data.I18n import I18n
-from pydofus2.com.ankamagames.jerakine.data.XmlConfig import XmlConfig
-from pydofus2.com.ankamagames.jerakine.entities.interfaces.IEntity import IEntity
 from pydofus2.com.ankamagames.jerakine.logger.Logger import Logger
 from pydofus2.com.ankamagames.jerakine.messages.Frame import Frame
 from pydofus2.com.ankamagames.jerakine.messages.Message import Message
-from pydofus2.com.ankamagames.jerakine.network.INetworkMessage import INetworkMessage
-from pydofus2.com.ankamagames.jerakine.sequencer.SerialSequencer import SerialSequencer
 from pydofus2.com.ankamagames.jerakine.types.enums.Priority import Priority
-from pydofus2.com.ankamagames.jerakine.types.positions.MapPoint import MapPoint
 from pydofus2.com.ankamagames.jerakine.utils.memory.WeakReference import WeakReference
 
 logger = Logger("Dofus2")

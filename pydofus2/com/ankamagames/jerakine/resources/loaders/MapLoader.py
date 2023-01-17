@@ -1,7 +1,6 @@
 from functools import lru_cache
 from pathlib import Path
 from pydofus2.com.ankamagames.dofus import Constants
-from pydofus2.com.ankamagames.jerakine.data.XmlConfig import XmlConfig
 from pydofus2.com.ankamagames.jerakine.logger.Logger import Logger
 from pydofus2.com.ankamagames.jerakine.metaclasses.Singleton import Singleton
 from pydofus2.dataAdapter.dlm import DLM
@@ -10,7 +9,7 @@ logger = Logger("Dofus2")
 
 
 class MapLoader(metaclass=Singleton):
-    DLM_KEY = XmlConfig().getEntry("config.maps.encryptionKey")
+    DLM_KEY = Constants.DLM_ENCRYPTION_KEY
     logger.debug(f"Maps encryption key: {DLM_KEY}")
 
     def __init__(self) -> None:

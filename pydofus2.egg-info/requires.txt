@@ -2,6 +2,3 @@ pycryptodomex
 whistle
 Py3AMF
 xmltodict
-lxml
-cloudscraper
-httpx[http2]

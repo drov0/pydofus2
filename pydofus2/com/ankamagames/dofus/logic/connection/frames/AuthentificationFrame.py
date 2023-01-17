@@ -161,7 +161,7 @@ class AuthentificationFrame(Frame):
             self._lastLoginHash = hashlib.md5(lva.username.encode("utf-8")).hexdigest()
             ports = XmlConfig().getEntry("config.connection.port")
             connexionPorts = list(map(int, ports.split(",")))
-            connectionHostsEntry = XmlConfig().getEntry("config.connection.host")
+            connectionHostsEntry = Constants.CONNECTION_HOST
             connexionHosts = (
                 [lva.host]
                 if lva.host

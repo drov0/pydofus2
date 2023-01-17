@@ -5,7 +5,7 @@ class BinaryResource:
 
     @classmethod
     def getBinaries(cls):
-        MODULE = cls.__module__.removeprefix("pydofus2.")
-        RESOURCE_PATH = os.path.join(Constants.BINARY_DATA_DIR / f"{cls.ID}_{MODULE}_{MODULE}.bin")
-        with open(RESOURCE_PATH, "rb") as fp:
-            return fp.read()
+        MODULE = ".".join(cls.__module__.split(".")[1:])
+        RESOURCE_PATH = Constants.BINARY_DATA_DIR / f"{cls.ID}_{MODULE}_{MODULE}.bin"
+        fp = RESOURCE_PATH.resolve().open("rb")
+        return fp.read()

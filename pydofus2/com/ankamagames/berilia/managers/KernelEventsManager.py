@@ -7,3 +7,5 @@ class KernelEventsManager(EventDispatcher, metaclass=Singleton):
         super().__init__()
 
     MOVEMENT_STOPPED = "movementStopped"
+    SERVERS_LIST = "serversList"
+    CHARACTERS_LIST = "charactersList"

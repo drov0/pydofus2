@@ -23,7 +23,6 @@ from pydofus2.com.ankamagames.dofus.network.enums.FightEventEnum import FightEve
 from pydofus2.com.ankamagames.dofus.network.types.game.context.fight.GameFightFighterInformations import (
     GameFightFighterInformations,
 )
-from pydofus2.com.ankamagames.jerakine.data.XmlConfig import XmlConfig
 from pydofus2.com.ankamagames.jerakine.logger.Logger import Logger
 from pydofus2.com.ankamagames.jerakine.utils.display.EnterFrameConst import EnterFrameConst
 from pydofus2.com.ankamagames.jerakine.utils.display.EnterFrameDispatcher import (

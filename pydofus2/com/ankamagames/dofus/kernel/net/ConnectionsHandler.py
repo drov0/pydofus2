@@ -1,5 +1,3 @@
-from ctypes import ArgumentError
-
 import pydofus2.com.ankamagames.dofus.kernel.Kernel as krnl
 from pydofus2.com.ankamagames.dofus.kernel.net.ConnectionType import ConnectionType
 from pydofus2.com.ankamagames.dofus.kernel.net.DisconnectionReason import DisconnectionReason
@@ -194,7 +192,7 @@ class ConnectionsHandler:
         conn: IServerConnection = None
         if useSniffer:
             if proxy is not None:
-                raise ArgumentError("Can't etablish a connection using a proxy and the sniffer.")
+                raise Exception("Can't etablish a connection using a proxy and the sniffer.")
             conn = SnifferServerConnection(None, 0, id)
         elif proxy != None:
             conn = ProxyedServerConnection(proxy, None, 0, id)

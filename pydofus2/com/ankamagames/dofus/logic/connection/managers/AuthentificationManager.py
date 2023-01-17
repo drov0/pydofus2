@@ -11,7 +11,6 @@ from pydofus2.com.ankamagames.dofus.network.messages.connection.IdentificationMe
     IdentificationMessage,
 )
 from pydofus2.com.ankamagames.dofus.network.types.version.Version import Version
-from pydofus2.com.ankamagames.jerakine.data.XmlConfig import XmlConfig
 from pydofus2.com.ankamagames.jerakine.logger.Logger import Logger
 from pydofus2.com.ankamagames.jerakine.metaclasses.Singleton import Singleton
 from pydofus2.com.ankamagames.jerakine.network.CustomDataWrapper import ByteArray
@@ -86,7 +85,7 @@ class AuthentificationManager(metaclass=Singleton):
                 "autoconnect": self._lva.autoSelectServer,
                 "credentials": self.getAuthCredentials(),
                 "failedAttempts": [],
-                "lang": XmlConfig().getEntry("config.lang.current"),
+                "lang": "fr",
                 "serverId": self._lva.serverId,
                 "sessionOptionalSalt": 0,
                 "useCertificate": False,

@@ -1,4 +1,5 @@
 from types import FunctionType
+from pydofus2.com.ankamagames.berilia.managers.KernelEventsManager import KernelEventsManager
 from pydofus2.com.ankamagames.dofus.datacenter.servers.Server import Server
 import pydofus2.com.ankamagames.dofus.kernel.Kernel as krnl
 import pydofus2.com.ankamagames.dofus.kernel.net.ConnectionsHandler as connh
@@ -35,7 +36,6 @@ from pydofus2.com.ankamagames.jerakine.messages.Message import Message
 from pydofus2.com.ankamagames.jerakine.messages.WrongSocketClosureReasonMessage import (
     WrongSocketClosureReasonMessage,
 )
-from pydofus2.com.ankamagames.jerakine.network.NetworkMessage import NetworkMessage
 from pydofus2.com.ankamagames.jerakine.network.messages.ExpectedSocketClosureMessage import (
     ExpectedSocketClosureMessage,
 )
@@ -218,6 +218,7 @@ class ServerSelectionFrame(Frame):
             if server.charactersCount > 0:
                 self._serversUsedList.append(server)
                 PlayerManager().serversList.append(server.id)
+        KernelEventsManager().dispatch(KernelEventsManager.SERVERS_LIST)
 
     def getUpdateServerStatusFunction(self, serverId: int, newStatus: int) -> FunctionType:
         def function(

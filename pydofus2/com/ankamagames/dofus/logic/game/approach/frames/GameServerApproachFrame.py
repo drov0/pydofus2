@@ -1,5 +1,6 @@
 from datetime import datetime
 from pydofus2.com.DofusClient import DofusClient
+from pydofus2.com.ankamagames.berilia.managers.KernelEventsManager import KernelEventsManager
 from pydofus2.com.ankamagames.dofus.logic.common.frames.QuestFrame import QuestFrame
 from pydofus2.com.ankamagames.dofus.logic.game.common.frames.AveragePricesFrame import AveragePricesFrame
 from pydofus2.com.ankamagames.dofus.logic.game.common.frames.InventoryManagementFrame import InventoryManagementFrame
@@ -102,7 +103,6 @@ from pydofus2.com.ankamagames.dofus.network.messages.game.startup.StartupActions
 from pydofus2.com.ankamagames.dofus.network.messages.security.ClientKeyMessage import (
     ClientKeyMessage,
 )
-from pydofus2.com.ankamagames.jerakine.data.XmlConfig import XmlConfig
 from pydofus2.com.ankamagames.jerakine.logger.Logger import Logger
 from pydofus2.com.ankamagames.jerakine.messages.ConnectionResumedMessage import (
     ConnectionResumedMessage,
@@ -168,7 +168,7 @@ class GameServerApproachFrame(Frame):
             connh.ConnectionsHandler.confirmGameServerConnection()
             self.authenticationTicketAccepted = False
             atmsg = AuthenticationTicketMessage()
-            atmsg.init(XmlConfig().getEntry("config.lang.current"), AuthentificationManager().gameServerTicket)
+            atmsg.init("fr", AuthentificationManager().gameServerTicket)
             connh.ConnectionsHandler.getConnection().send(atmsg)
             return True
 
@@ -203,6 +203,7 @@ class GameServerApproachFrame(Frame):
                                 bonusXp += 1
                     o = BasicCharacterWrapper.create(cbi.id,cbi.name,cbi.level,cbi.entityLook,cbi.breed,cbi.sex,0,0,0,bonusXp, False)
                     PlayerManager().charactersList.append(o)
+            KernelEventsManager().dispatch(KernelEventsManager.CHARACTERS_LIST)
             if PlayerManager().allowAutoConnectCharacter:
                 characterId = PlayerManager().autoConnectOfASpecificCharacterId
                 krnl.Kernel().getWorker().process(CharacterSelectionAction.create(characterId, False))

@@ -75,3 +75,6 @@ with open(
     "rb",
 ) as fs:
     SIGNATURE_KEY_DATA = SignatureKey.import_key(ByteArray(fs.read()))
+
+CONNECTION_HOST = "dofus2-co-production.ankama-games.com"
+DLM_ENCRYPTION_KEY = "649ae451ca33ec53bbcbcc33becf15f4"

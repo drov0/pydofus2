@@ -38,9 +38,6 @@ class SecureModeManager(metaclass=Singleton):
             "shieldLevel",
             ShieldSecureLevel.MEDIUM,
         )
-        # HaapiKeyManager().callWithApiKey(function(apiKey:str):None
-        # apiCredentials:ApiUserCredentials = ApiUserCredentials("",XmlConfig().getEntry:("config.haapiUrlAnkama"),apiKey)
-        # shieldApi = ShieldApi(apiCredentials)
 
     @property
     def active(self) -> bool:
@@ -54,18 +51,6 @@ class SecureModeManager(metaclass=Singleton):
     @property
     def certificate(self) -> TrustCertificate:
         return self.retreiveCertificate()
-
-    # def askCode(self) -> None:
-    #        HaapiKeyManager().callWithApiKey(function(apiKey:str):None
-    #    shieldApi = ShieldApi(ApiUserCredentials("",XmlConfig().getEntry:("config.haapiUrlAnkama"),apiKey))
-    #    shieldApi.security_code().call()
-
-    # def sendCode(self, code:str, callback:FunctionType, errorCallback:FunctionType, computerName:str) -> None:
-    #    HaapiKeyManager().callWithApiKey(function(apiKey:str):None
-    #       fooCertif:ShieldCertifcate = ShieldCertifcate()
-    #       fooCertif.secureLevel = shieldLevel
-    #       _validateCodeCallback = callback
-    #       shieldApi.validate_code(GameID.current,code.toUpperCase(),fooCertif.hash,fooCertif.reverseHash,!not computerName ? computerName : null).onSuccess(onValidateCodeSuccess).onError(errorCallback).call()
 
     def getUsername(self) -> str:
         return AuthentificationManager().username.lower().split("|")[0]
@@ -88,35 +73,6 @@ class SecureModeManager(metaclass=Singleton):
         os.makedirs(f, exist_ok=True)
         return f
 
-    #  def addCertificate(self, id: int, content: str) -> bool:
-    #      logger.debug("ADD CERTIFICATE")
-    #      cert = ShieldCertifcate()
-    #      cert.id = id
-    #      cert.content = content
-    #      cert.secureLevel = ShieldSecureLevel.MEDIUM
-    #      try:
-    #          logger.debug("ADD CERTIFICATE :: TRY")
-    #          f = self.getCertifFolder(2)
-    #          with open(f, "wb") as fs:
-    #              fs.write(cert.serialize())
-    #          return True
-    #      except Exception as e:
-    #          try:
-    #              logger.debug("ADD CERTIFICATE :: FALLBACK")
-    #              hashed_usr_name = md5(self.getUsername().encode()).hexdigest()
-    #              f = self.getCertifFolder(2, True) / hashed_usr_name
-    #              with open(f, "wb") as fs:
-    #                  fs.write(cert.serialize())
-    #              return True
-    #          except Exception as e:
-    #              logger.debug("ADD CERTIFICATE :: ERROR")
-    #              raise Exception("Error writing certificate file at " + str(f.absolute()), e)
-
-    #  def checkMigrate(self) -> None:
-    #      if not self._hasV1Certif:
-    #          return
-    #      certif: TrustCertificate = self.retreiveCertificate()
-    #      self.migrate(certif.id, certif.hash)
 
     def getCertificateFile(self) -> Path:
         try:
@@ -183,18 +139,4 @@ class SecureModeManager(metaclass=Singleton):
             logger.debug("RETREIVE CERTIFICATE :: ERROR " + str(e))
             raise Exception("Impossible de lire le fichier de certificat.", e)
         return None
-
-    # def migrate(self, iCertificateId:int, oldCertif:str) -> None:
-    #    HaapiKeyManager().callWithApiKey(function(apiKey:str):None
-    #       fooCertif:ShieldCertifcate = ShieldCertifcate()
-    #       fooCertif.secureLevel = shieldLevel
-    #       shieldApi.migrate(apiKey,GameID.current,4,iCertificateId,oldCertif,fooCertif.hash,fooCertif.reverseHash).onSuccess(migrationSuccess).call()
-
-    # def migrationSuccess(self, result:Object) -> None:
-    #    logger.debug("MIGRATION SUCCESS")
-    #    self.addCertificate(result.id,result.certificate)
-
-    # def onValidateCodeSuccess(self, e:ApiClientEvent) -> None:
-    #    if e.response.payload.id and e.response.payload.encodedCertificate:
-    #       self.addCertificate(e.response.payload.id,e.response.payload.encodedCertificate)
-    #    self._validateCodeCallback()
+    

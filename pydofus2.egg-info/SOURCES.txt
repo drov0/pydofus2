@@ -2356,7 +2356,6 @@ pydofus2/com/ankamagames/dofus/types/enums/SpellStateIconVisibilityMaskEnum.py
 pydofus2/com/ankamagames/dofus/types/enums/__init__.py
 pydofus2/com/ankamagames/dofus/uiApi/PlayedCharacterApi.py
 pydofus2/com/ankamagames/dofus/uiApi/__init__.py
-pydofus2/com/ankamagames/haapi/Haapi.py
 pydofus2/com/ankamagames/haapi/__init__.py
 pydofus2/com/ankamagames/jerakine/JerakineConstants.py
 pydofus2/com/ankamagames/jerakine/__init__.py
@@ -2374,7 +2373,6 @@ pydofus2/com/ankamagames/jerakine/data/I18n.py
 pydofus2/com/ankamagames/jerakine/data/I18nFileAccessor.py
 pydofus2/com/ankamagames/jerakine/data/IPostInit.py
 pydofus2/com/ankamagames/jerakine/data/ModuleReader.py
-pydofus2/com/ankamagames/jerakine/data/XmlConfig.py
 pydofus2/com/ankamagames/jerakine/data/__init__.py
 pydofus2/com/ankamagames/jerakine/entities/__init__.py
 pydofus2/com/ankamagames/jerakine/entities/behaviours/IMovementBehavior.py

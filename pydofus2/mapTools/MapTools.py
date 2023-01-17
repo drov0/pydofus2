@@ -80,9 +80,7 @@ def floatAlmostEquals(param1: float, param2: float) -> bool:
 def getCellIdByCoord(param1: int, param2: int) -> int:
     if not isValidCoord(param1, param2):
         return -1
-    return int(
-        math.floor(float((param1 - param2) * MAP_GRID_WIDTH + param2 + (param1 - param2) / 2))
-    )
+    return int(math.floor(float((param1 - param2) * MAP_GRID_WIDTH + param2 + (param1 - param2) / 2)))
 
 
 def getCellIdXCoord(param1: int) -> int:
@@ -160,11 +158,7 @@ def getLookDirection8Exact(param1: int, param2: int) -> int:
     _loc14_: int = math.floor((_loc13_ + 1) / 2)
     _loc15_ = _loc13_ - _loc14_
     _loc16_ = param2 - _loc13_ * MAP_GRID_WIDTH
-    return int(
-        getLookDirection8ExactByCoord(
-            _loc4_ + _loc5_, _loc9_ - _loc8_, _loc11_ + _loc12_, _loc16_ - _loc15_
-        )
-    )
+    return int(getLookDirection8ExactByCoord(_loc4_ + _loc5_, _loc9_ - _loc8_, _loc11_ + _loc12_, _loc16_ - _loc15_))
 
 
 def getLookDirection8ExactByCoord(param1: int, param2: int, param3: int, param4: int) -> int:

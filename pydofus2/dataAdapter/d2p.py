@@ -66,9 +66,7 @@ class PakProtocol2:
         self.propertiesCount = fs.readUnsignedInt()
         print("dataOffset: ", self.dataOffset, "dataCount : ", self.dataCount)
         print("indexOffset: ", self.indexOffset, "indexCount : ", self.indexCount)
-        print(
-            "propertiesOffset: ", self.propertiesOffset, "propertiesCount : ", self.propertiesCount
-        )
+        print("propertiesOffset: ", self.propertiesOffset, "propertiesCount : ", self.propertiesCount)
         if (
             self.dataOffset == b""
             or self.dataCount == b""

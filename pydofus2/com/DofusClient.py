@@ -53,10 +53,7 @@ class DofusClient(metaclass=Singleton):
         logger.info("DofusClient initialized")
 
     def login(self, loginToken, serverId=0, characterId=None):
-        if (
-            self._lastLoginTime is not None
-            and perf_counter() - self._lastLoginTime < self._minLoginInterval
-        ):
+        if self._lastLoginTime is not None and perf_counter() - self._lastLoginTime < self._minLoginInterval:
             logger.info("Login request ignored, too soon")
             threading.Timer(
                 self._minLoginInterval - (perf_counter() - self._lastLoginTime) + 10,
@@ -79,15 +76,11 @@ class DofusClient(metaclass=Singleton):
             self._worker.addFrame(frame())
         if self._serverId == 0:
             self._worker.processImmediately(
-                LoginValidationWithTokenAction.create(
-                    autoSelectServer=False, serverId=self._serverId
-                )
+                LoginValidationWithTokenAction.create(autoSelectServer=False, serverId=self._serverId)
             )
         else:
             self._worker.processImmediately(
-                LoginValidationWithTokenAction.create(
-                    autoSelectServer=True, serverId=self._serverId
-                )
+                LoginValidationWithTokenAction.create(autoSelectServer=True, serverId=self._serverId)
             )
 
     def join(self):

@@ -2373,6 +2373,7 @@ pydofus2/com/ankamagames/jerakine/data/I18n.py
 pydofus2/com/ankamagames/jerakine/data/I18nFileAccessor.py
 pydofus2/com/ankamagames/jerakine/data/IPostInit.py
 pydofus2/com/ankamagames/jerakine/data/ModuleReader.py
+pydofus2/com/ankamagames/jerakine/data/XmlConfig.py
 pydofus2/com/ankamagames/jerakine/data/__init__.py
 pydofus2/com/ankamagames/jerakine/entities/__init__.py
 pydofus2/com/ankamagames/jerakine/entities/behaviours/IMovementBehavior.py

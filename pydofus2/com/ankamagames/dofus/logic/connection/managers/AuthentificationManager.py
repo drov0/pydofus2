@@ -9,8 +9,6 @@ from pydofus2.com.ankamagames.dofus.logic.connection.managers.AuthentificationMa
 from pydofus2.com.ankamagames.dofus.network.messages.connection.IdentificationMessage import (
     IdentificationMessage,
 )
-from pydofus2.com.ankamagames.dofus.network.types.version.Version import Version
-from pydofus2.com.ankamagames.jerakine.data.XmlConfig import XmlConfig
 from pydofus2.com.ankamagames.jerakine.logger.Logger import Logger
 from pydofus2.com.ankamagames.jerakine.metaclasses.Singleton import Singleton
 from pydofus2.com.ankamagames.jerakine.network.CustomDataWrapper import ByteArray

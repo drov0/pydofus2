@@ -1,5 +1,4 @@
 from threading import Timer
-from pydofus2.com.ankamagames.jerakine.benchmark.BenchmarkTimer import BenchmarkTimer
 from time import perf_counter
 from pydofus2.com.DofusClient import DofusClient
 from pydofus2.com.ankamagames.dofus import Constants
@@ -40,7 +39,7 @@ class DisconnectionHandlerFrame(Frame):
 
     _numberOfAttemptsAlreadyDone: int = 0
 
-    _timer: BenchmarkTimer
+    _timer: Timer
 
     _mustShowLoginInterface: bool = False
 
@@ -73,7 +72,7 @@ class DisconnectionHandlerFrame(Frame):
             "connection_fail_times",
             self._connectionUnexpectedFailureTimes,
         )
-        self._timer = BenchmarkTimer(4, self.reconnect)
+        self._timer = Timer(4, self.reconnect)
         self._timer.start()
 
     def process(self, msg: Message) -> bool:
@@ -112,7 +111,7 @@ class DisconnectionHandlerFrame(Frame):
                         )
                         if self._timer:
                             self._timer.cancel()
-                        self._timer = BenchmarkTimer(7, self.reconnect)
+                        self._timer = Timer(7, self.reconnect)
                         self._timer.start()
                     else:
                         logger.debug(

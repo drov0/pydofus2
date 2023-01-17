@@ -1,6 +1,6 @@
 from datetime import datetime
 from pydofus2.com.DofusClient import DofusClient
-from pydofus2.com.ankamagames.berilia.managers.KernelEventsManager import KernelEventsManager
+from pydofus2.com.ankamagames.berilia.managers.KernelEventsManager import KernelEventsManager, KernelEvts
 from pydofus2.com.ankamagames.dofus.logic.common.frames.QuestFrame import QuestFrame
 from pydofus2.com.ankamagames.dofus.logic.game.common.frames.AveragePricesFrame import AveragePricesFrame
 from pydofus2.com.ankamagames.dofus.logic.game.common.frames.InventoryManagementFrame import InventoryManagementFrame
@@ -199,7 +199,7 @@ class GameServerApproachFrame(Frame):
                                 bonusXp += 1
                     o = BasicCharacterWrapper.create(cbi.id,cbi.name,cbi.level,cbi.entityLook,cbi.breed,cbi.sex,0,0,0,bonusXp, False)
                     PlayerManager().charactersList.append(o)
-            KernelEventsManager().dispatch(KernelEventsManager.CHARACTERS_LIST)
+            KernelEventsManager().send(KernelEvts.CHARACTERS_LIST, return_value=PlayerManager().charactersList)
             if PlayerManager().allowAutoConnectCharacter:
                 characterId = PlayerManager().autoConnectOfASpecificCharacterId
                 krnl.Kernel().getWorker().process(CharacterSelectionAction.create(characterId, False))

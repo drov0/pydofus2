@@ -1,5 +1,5 @@
 from types import FunctionType
-from pydofus2.com.ankamagames.berilia.managers.KernelEventsManager import KernelEventsManager
+from pydofus2.com.ankamagames.berilia.managers.KernelEventsManager import KernelEventsManager, KernelEvts
 from pydofus2.com.ankamagames.dofus.datacenter.servers.Server import Server
 import pydofus2.com.ankamagames.dofus.kernel.Kernel as krnl
 import pydofus2.com.ankamagames.dofus.kernel.net.ConnectionsHandler as connh
@@ -214,11 +214,18 @@ class ServerSelectionFrame(Frame):
             if not self._serversTypeAvailableSlots.get(server.type):
                 self._serversTypeAvailableSlots[server.type] = 0
             if server.charactersCount < server.charactersSlots:
-                self._serversTypeAvailableSlots[server.type] = 1
+                self._serversTypeAvailableSlots[server.type] += 1
             if server.charactersCount > 0:
                 self._serversUsedList.append(server)
                 PlayerManager().serversList.append(server.id)
-        KernelEventsManager().dispatch(KernelEventsManager.SERVERS_LIST)
+        KernelEventsManager().send(
+            KernelEvts.SERVERS_LIST,
+            return_value={
+                'all': self._serversList, 
+                'used': self._serversUsedList,
+                'availableSlots': self._serversTypeAvailableSlots
+            }
+        )
 
     def getUpdateServerStatusFunction(self, serverId: int, newStatus: int) -> FunctionType:
         def function(

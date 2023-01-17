@@ -1,6 +1,7 @@
 import sys
 import threading
 import tracemalloc
+from pydofus2.com.ankamagames.berilia.managers.KernelEventsManager import KernelEventsManager
 from pydofus2.com.ankamagames.dofus.kernel.net.DisconnectionReason import DisconnectionReason
 from pydofus2.com.ankamagames.dofus.logic.common.managers.PlayerManager import PlayerManager
 from time import perf_counter, sleep
@@ -31,7 +32,8 @@ class DofusClient(metaclass=Singleton):
     _stop = threading.Event()
     _stopReason : DisconnectionReason = None
     _lastLoginTime = None
-    _minLoginInterval = 60 
+    _minLoginInterval = 60
+    _joined = False
     
     def __init__(self):
         krnl.Kernel().init()
@@ -71,6 +73,7 @@ class DofusClient(metaclass=Singleton):
             )
 
     def join(self):
+        self._joined = True
         while not self._stop.is_set():
             try:
                 sleep(1)
@@ -103,10 +106,15 @@ class DofusClient(metaclass=Singleton):
         connh.ConnectionsHandler.connectionGonnaBeClosed(DisconnectionReasonEnum.RESTARTING)
         conn.close()
             
-
+    def relogin(self):
+        self.login(self._loginToken, self._serverId, self._characterId)
+        
     def interrupt(self, reason: DisconnectionReason):
         self._stopReason = reason
         self._stop.set()
+        if not self._joined and reason.reason == DisconnectionReasonEnum.EXCEPTION_THROWN:
+            KernelEventsManager().dispatch(KernelEventsManager.CRASH, reason.message)
+            raise Exception(reason.message)
         
     @property
     def mainConn(self) -> "ServerConnection":

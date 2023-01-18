@@ -39,7 +39,7 @@ class DofusClient(metaclass=Singleton):
     _stop = threading.Event()
     _stopReason: DisconnectionReason = None
     _lastLoginTime = None
-    _minLoginInterval = 60
+    _minLoginInterval = 10
     _joined = False
 
     def __init__(self):
@@ -54,13 +54,10 @@ class DofusClient(metaclass=Singleton):
 
     def login(self, loginToken, serverId=0, characterId=None):
         if self._lastLoginTime is not None and perf_counter() - self._lastLoginTime < self._minLoginInterval:
-            logger.info("Login request ignored, too soon")
-            threading.Timer(
-                self._minLoginInterval - (perf_counter() - self._lastLoginTime) + 10,
-                self.login,
-                args=(loginToken, serverId, characterId),
-            ).start()
-            return
+            logger.info("Login request too soon, will wait some time")
+            sleep(self._minLoginInterval - (perf_counter() - self._lastLoginTime))
+        if krnl.Kernel().wasReseted:
+            krnl.Kernel().init()
         self._lastLoginTime = perf_counter()
         if self.LOG_MEMORY_USAGE:
             tracemalloc.start(10)
@@ -124,7 +121,7 @@ class DofusClient(metaclass=Singleton):
         self._stopReason = reason
         self._stop.set()
         if reason and reason.reason == DisconnectionReasonEnum.EXCEPTION_THROWN:
-            KernelEventsManager().send(KernelEvts.CRASH, message=reason.message)
+            KernelEventsManager().send(KernelEvts.CRASH, {'message': reason.message})
 
     @property
     def exitError(self) -> str:

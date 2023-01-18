@@ -97,7 +97,9 @@ class ServerSelectionFrame(Frame):
             self._serversList = slmsg.servers
             self._serversList.sort(key=lambda x: x.date)
             self.broadcastServersListUpdate()
-            krnl.Kernel().getWorker().processImmediately(ServerSelectionAction.create(AuthentificationManager()._lva.serverId))
+            krnl.Kernel().getWorker().processImmediately(
+                ServerSelectionAction.create(AuthentificationManager()._lva.serverId)
+            )
             return False
 
         elif isinstance(msg, ServerStatusUpdateMessage):
@@ -126,9 +128,13 @@ class ServerSelectionFrame(Frame):
                     ssmsg = ServerSelectionMessage()
                     ssmsg.init(AuthentificationManager()._lva.serverId)
                     krnl.Kernel().getWorker().processImmediately(ssmsg)
-                    logger.debug(f"Sending ServerSelectionMessage to server {AuthentificationManager()._lva.serverId}.")
+                    logger.debug(
+                        f"Sending ServerSelectionMessage to server {AuthentificationManager()._lva.serverId}."
+                    )
             else:
-                logger.debug(f"Not my server {int(ssumsg.server.id)} != {int(AuthentificationManager()._lva.serverId)}")
+                logger.debug(
+                    f"Not my server {int(ssumsg.server.id)} != {int(AuthentificationManager()._lva.serverId)}"
+                )
             self.broadcastServersListUpdate()
             return True
 
@@ -151,7 +157,9 @@ class ServerSelectionFrame(Frame):
                         connh.ConnectionsHandler.getConnection().send(ssmsg)
                         return True
                     else:
-                        logger.debug(f"Server {server.id} not online but has status {ServerStatusEnum(server.status).name}.")
+                        logger.debug(
+                            f"Server {server.id} not online but has status {ServerStatusEnum(server.status).name}."
+                        )
                         return True
             return True
 
@@ -221,10 +229,10 @@ class ServerSelectionFrame(Frame):
         KernelEventsManager().send(
             KernelEvts.SERVERS_LIST,
             return_value={
-                'all': self._serversList, 
-                'used': self._serversUsedList,
-                'availableSlots': self._serversTypeAvailableSlots
-            }
+                "all": self._serversList,
+                "used": self._serversUsedList,
+                "availableSlots": self._serversTypeAvailableSlots,
+            },
         )
 
     def getUpdateServerStatusFunction(self, serverId: int, newStatus: int) -> FunctionType:

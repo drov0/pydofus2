@@ -22,6 +22,7 @@ logger = Logger("Dofus2")
 class Kernel(metaclass=Singleton):
     _worker: Worker = Worker()
     beingInReconection: bool = False
+    _reseted = True
 
     def getWorker(self) -> Worker:
         return self._worker
@@ -34,10 +35,15 @@ class Kernel(metaclass=Singleton):
         self._worker.clear()
         ConnectionsHandler.closeConnection()
 
+    @property
+    def wasReseted(self) -> bool:
+        return self._reseted
+    
     def init(self) -> None:
         FrameIdManager()
         self._worker.clear()
         self.addInitialFrames()
+        self._reseted = False
         logger.info(f"Using protocole #{Metadata.PROTOCOL_BUILD}, built on {Metadata.PROTOCOL_DATE}")
 
     def reset(
@@ -70,6 +76,7 @@ class Kernel(metaclass=Singleton):
         if messagesToDispatchAfter is not None and len(messagesToDispatchAfter) > 0:
             for msg in messagesToDispatchAfter:
                 self._worker.process(msg)
+        self._reseted = True
         logger.debug("[KERNEL] Reseted")
 
     def addInitialFrames(self) -> None:

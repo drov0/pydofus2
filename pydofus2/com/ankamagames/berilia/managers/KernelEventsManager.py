@@ -1,7 +1,9 @@
 import threading
+from pydofus2.com.ankamagames.jerakine.logger.Logger import Logger
 from pydofus2.com.ankamagames.jerakine.metaclasses.Singleton import Singleton
 from whistle import Event, EventDispatcher
 from enum import Enum
+logger = Logger('KernelEventsManager')
 class KernelEvts(Enum):
     MOVEMENT_STOPPED = 0
     SERVERS_LIST = 1
@@ -25,19 +27,20 @@ class KernelEventsManager(EventDispatcher, metaclass=Singleton):
         self.once(event, onReceived)
         self.__waiting_evts.append(received)
         received.wait(timeout)
-        self.__waiting_evts.remove(received)
+        if received in self.__waiting_evts:
+            self.__waiting_evts.remove(received)
         return ret[0]
     
     def on(self, event: KernelEvts, callback):
         self.add_listener(event, callback)
     
     def once(self, event: KernelEvts, callback):
-        def onEvt(e):
+        def onEvt(e, *args, **kwargs):
             self.remove_listener(e, onEvt)
-            callback(e)
+            callback(e, *args, **kwargs)
         self.add_listener(event, onEvt)
     
-    def send(self, event_id: KernelEvts, *args, return_value=None, **kwargs):
+    def send(self, event_id: KernelEvts, event: Event=None, *args, **kwargs):
         if event_id == KernelEvts.CRASH:
             self.reset()
         if event is None:
@@ -47,7 +50,7 @@ class KernelEventsManager(EventDispatcher, metaclass=Singleton):
         if event_id not in self._listeners:
             return event
         for listener in self.get_listeners(event_id):
-            listener(event, *args, return_value, **kwargs)
+            listener(event, *args, **kwargs)
             if event.propagation_stopped: break
     
     def reset(self):

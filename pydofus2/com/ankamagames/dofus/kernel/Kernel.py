@@ -14,7 +14,6 @@ from pydofus2.com.ankamagames.dofus.network.Metadata import Metadata
 from pydofus2.com.ankamagames.jerakine.network.messages.Worker import Worker
 from pydofus2.com.ankamagames.jerakine.metaclasses.Singleton import Singleton
 from pydofus2.com.ankamagames.jerakine.logger.Logger import Logger
-from pydofus2.com.ankamagames.jerakine.utils.display.FrameIdManager import FrameIdManager
 
 logger = Logger("Dofus2")
 
@@ -40,7 +39,6 @@ class Kernel(metaclass=Singleton):
         return self._reseted
     
     def init(self) -> None:
-        FrameIdManager()
         self._worker.clear()
         self.addInitialFrames()
         self._reseted = False
@@ -57,7 +55,6 @@ class Kernel(metaclass=Singleton):
         from pydofus2.com.ankamagames.dofus.internalDatacenter.items.ItemWrapper import ItemWrapper
 
         logger.debug("[KERNEL] Resetting ...")
-        # TODO : missing feature manager reset here
         KernelEventsManager().reset()
         StatsManager.clear()
         SpellModifiersManager.clear()

@@ -2534,7 +2534,6 @@ pydofus2/com/ankamagames/jerakine/types/zones/__init__.py
 pydofus2/com/ankamagames/jerakine/utils/__init__.py
 pydofus2/com/ankamagames/jerakine/utils/display/EnterFrameConst.py
 pydofus2/com/ankamagames/jerakine/utils/display/EnterFrameDispatcher.py
-pydofus2/com/ankamagames/jerakine/utils/display/FrameIdManager.py
 pydofus2/com/ankamagames/jerakine/utils/display/__init__.py
 pydofus2/com/ankamagames/jerakine/utils/display/spellZone/ICellZoneProvider.py
 pydofus2/com/ankamagames/jerakine/utils/display/spellZone/IZoneShape.py

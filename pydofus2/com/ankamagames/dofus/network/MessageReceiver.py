@@ -60,6 +60,7 @@ class MessageReceiver(RawDataParser):
         if messageType.__name__ in self._messages_to_discard:
             message = messageType()
             message.unpacked = False
+            input.position += messageLength
             return message
         message = messageType.unpack(input, messageLength)
         message.unpacked = True

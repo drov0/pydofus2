@@ -17,7 +17,6 @@ from pydofus2.com.ankamagames.jerakine.messages.events.FramePushedEvent import F
 from pydofus2.com.ankamagames.jerakine.pools.GenericPool import GenericPool
 from pydofus2.com.ankamagames.jerakine.pools.Poolable import Poolable
 import pydofus2.com.ankamagames.jerakine.utils.display.EnterFrameDispatcher as efd
-from pydofus2.com.ankamagames.jerakine.utils.display.FrameIdManager import FrameIdManager
 
 logger = Logger("Kernel")
 
@@ -353,7 +352,7 @@ class Worker(EventDispatcher, MessageHandler):
             logger.debug("[DEBUG WORKER] Message: " + msg.__class__.__name__ + " processed.")
         if not processed and not isinstance(msg, DiscardableMessage):
             logger.debug(
-                f"[DEBUG WORKER] Discarded message: {msg.__class__.__name__} (at frame {FrameIdManager().frameId})"
+                f"[DEBUG WORKER] Discarded message: {msg.__class__.__name__}"
             )
 
     def processFramesInAndOut(self) -> None:

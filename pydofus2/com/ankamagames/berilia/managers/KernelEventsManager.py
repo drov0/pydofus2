@@ -14,9 +14,10 @@ class KernelEvts(Enum):
     DEAD = 6
     ALIVE = 7
 class KernelEventsManager(EventDispatcher, metaclass=Singleton):
-    __waiting_evts = list[threading.Event]()
+    __waiting_evts: list[threading.Event]
     def __init__(self):
         super().__init__()
+        self.__waiting_evts = list[threading.Event]()
         
     def wait(self, event: KernelEvts, timeout: float = None):
         received = threading.Event()

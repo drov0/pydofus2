@@ -520,10 +520,6 @@ class ServerConnection(IServerConnection):
             self._handler.process(ConnectedMessage())
 
     def onClose(self, e: Event) -> None:
-        if len(self._asyncMessages) != 0:
-            e.stopImmediatePropagation()
-            self._willClose = True
-            return
         logger.debug(f"[{self._id}] Connection closed received from the socket.")
         Timer(3, self.removeListeners).start()
         if self._lagometer:
@@ -535,9 +531,6 @@ class ServerConnection(IServerConnection):
         self._connecting = False
         self._outputBuffer.clear()
         EnterFrameDispatcher().removeEventListener(self.onEnterFrame)
-        self._asyncTrees.clear()
-        self._asyncMessages.clear()
-        self._asyncNetworkDataContainerMessage = None
         self._input.clear()
         self._splittedPacket = False
         self._staticHeader = -1

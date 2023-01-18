@@ -15,9 +15,11 @@ class KernelEvts(Enum):
     ALIVE = 7
 class KernelEventsManager(EventDispatcher, metaclass=Singleton):
     __waiting_evts: list[threading.Event]
+    __crashMessage = None
     def __init__(self):
         super().__init__()
         self.__waiting_evts = list[threading.Event]()
+        self.__crashMessage = None
         
     def wait(self, event: KernelEvts, timeout: float = None):
         received = threading.Event()
@@ -30,6 +32,8 @@ class KernelEventsManager(EventDispatcher, metaclass=Singleton):
         received.wait(timeout)
         if received in self.__waiting_evts:
             self.__waiting_evts.remove(received)
+        elif self.__crashMessage:
+            raise Exception(self.__crashMessage)
         return ret[0]
     
     def on(self, event: KernelEvts, callback):
@@ -41,12 +45,12 @@ class KernelEventsManager(EventDispatcher, metaclass=Singleton):
             callback(e, *args, **kwargs)
         self.add_listener(event, onEvt)
     
-    def send(self, event_id: KernelEvts, event: Event=None, *args, **kwargs):
+    def send(self, event_id: KernelEvts, *args, **kwargs):
         if event_id == KernelEvts.CRASH:
+            self.__crashMessage = kwargs.get('message', None)
             self.reset()
-        if event is None:
-            event = Event()
-        event.dispatcher = self
+        event = Event()
+        event.sender = self
         event.name = event_id
         if event_id not in self._listeners:
             return event

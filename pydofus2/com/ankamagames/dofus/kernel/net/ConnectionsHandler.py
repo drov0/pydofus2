@@ -145,7 +145,7 @@ class ConnectionsHandler:
     @classmethod
     def handleDisconnection(cls) -> DisconnectionReason:
         cls.closeConnection()
-        reason: DisconnectionReason = DisconnectionReason(cls._wantedSocketLost, cls._wantedSocketLostReason, cls._disconnectMessage)
+        reason: DisconnectionReason = DisconnectionReason(cls._wantedSocketLost, cls._wantedSocketLostReason, msg=cls._disconnectMessage)
         cls._wantedSocketLost = False
         cls._wantedSocketLostReason = DisconnectionReasonEnum.UNEXPECTED
         return reason

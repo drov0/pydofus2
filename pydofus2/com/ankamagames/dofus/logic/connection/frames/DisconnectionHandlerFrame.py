@@ -115,7 +115,7 @@ class DisconnectionHandlerFrame(Frame):
                         self._timer.start()
                     else:
                         logger.debug(
-                            f"The connection closure was expected (reason: {reason.reason})."
+                            f"The connection closure was expected (reason: {reason.reason}, {reason.message})."
                         )
                         if (reason.reason == DisconnectionReasonEnum.SWITCHING_TO_HUMAN_VENDOR
                             or reason.reason == DisconnectionReasonEnum.WANTED_SHUTDOWN

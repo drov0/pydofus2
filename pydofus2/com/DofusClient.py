@@ -121,11 +121,11 @@ class DofusClient(metaclass=Singleton):
         self._stopReason = reason
         self._stop.set()
         if reason and reason.reason == DisconnectionReasonEnum.EXCEPTION_THROWN:
-            KernelEventsManager().send(KernelEvts.CRASH, {'message': reason.message})
+            KernelEventsManager().send(KernelEvts.CRASH, message=reason.message)
 
     @property
-    def exitError(self) -> str:
-        return self._stopReason.message if self._stopReason else None
+    def exitError(self) -> DisconnectionReason:
+        return self._stopReason
 
     @property
     def mainConn(self) -> "ServerConnection":

@@ -147,11 +147,12 @@ class AuthentificationFrame(Frame):
             return True
 
         elif isinstance(msg, IdentificationFailedMessage):
-            logger.info("Identification failed for reason " + IdentificationFailureReasonEnum(msg.reason).name)
+            reasonName = IdentificationFailureReasonEnum(msg.reason).name
+            logger.info("Identification failed for reason " + reasonName)
             PlayerManager().destroy()
             connh.ConnectionsHandler.connectionGonnaBeClosed(
                 DisconnectionReasonEnum.EXCEPTION_THROWN, 
-                IdentificationFailureReasonEnum(msg.reason).name
+                f"Identification failed for reason : {reasonName}"
             )
             connh.ConnectionsHandler.closeConnection()
             if not self._dispatchModuleHook:

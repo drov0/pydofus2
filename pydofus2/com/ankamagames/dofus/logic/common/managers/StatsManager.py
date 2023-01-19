@@ -16,7 +16,6 @@ from pydofus2.com.ankamagames.dofus.network.types.game.character.characteristic.
 from pydofus2.com.ankamagames.dofus.network.types.game.character.characteristic.CharacterUsableCharacteristicDetailed import (
     CharacterUsableCharacteristicDetailed,
 )
-from pydofus2.com.ankamagames.jerakine.managers.StoreDataManager import StoreDataManager
 from pydofus2.com.ankamagames.jerakine.metaclasses.Singleton import Singleton
 from pydofus2.com.ankamagames.jerakine.types.DataStoreType import DataStoreType
 from pydofus2.com.ankamagames.jerakine.types.enums.DataStoreEnum import DataStoreEnum
@@ -34,19 +33,9 @@ class StatsManager(metaclass=Singleton):
         self._isVerbose = self.DEFAULT_IS_VERBOSE
         self._statListeners = dict[str, list[FunctionType]]()
         logger.info("Instantiating stats manager")
-        self._dataStoreType = DataStoreType(
-            self.DATA_STORE_CATEGORY,
-            True,
-            DataStoreEnum.LOCATION_LOCAL,
-            DataStoreEnum.BIND_COMPUTER,
-        )
-        rawIsVerbose = StoreDataManager().getData(self._dataStoreType, self.DATA_STORE_KEY_IS_VERBOSE)
-        self._isVerbose = rawIsVerbose if isinstance(rawIsVerbose, bool) else self.DEFAULT_IS_VERBOSE
+        self._isVerbose = self.DEFAULT_IS_VERBOSE
 
     def setStats(self, stats: EntityStats) -> bool:
-        # logger.info(
-        #     f"Setting stats {stats.__dict__} for entity with ID '{stats.entityId}'"
-        # )
         if stats is None:
             logger.error("Tried to set None stats. Aborting")
             return False

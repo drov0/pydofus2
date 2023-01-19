@@ -26,17 +26,20 @@ logger = Logger("Dofus2")
 class AuthentificationManager(metaclass=Singleton):
     _verifyKey = AuthentificationManager__verifyKey.create()
     AES_KEY_LENGTH = 32
-    _publicKey: str = None
-    _salt: str = None
-    gameServerTicket: str = None
-    _AESKey: ByteArray = None
-    nextToken: str = None
-    tokenMode: bool = None
-    username: str = "   "
-    _password = None
-    _certificate = None
-    _lva = None
 
+    def __init__(self) -> None:
+        self._publicKey: str = None
+        self._salt: str = None
+        self.gameServerTicket: str = None
+        self._AESKey: ByteArray = None
+        self.nextToken: str = None
+        self.tokenMode: bool = None
+        self.username: str = "   "
+        self._password = None
+        self._certificate = None
+        self._lva = None
+        super().__init__()
+    
     @property
     def loginValidationAction(self) -> LoginValidationAction:
         return self._lva

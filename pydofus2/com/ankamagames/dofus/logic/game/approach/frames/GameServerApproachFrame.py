@@ -161,11 +161,11 @@ class GameServerApproachFrame(Frame):
     def process(self, msg: Message) -> bool:
 
         if isinstance(msg, HelloGameMessage):
-            connh.ConnectionsHandler.confirmGameServerConnection()
+            connh.ConnectionsHandler().confirmGameServerConnection()
             self.authenticationTicketAccepted = False
             atmsg = AuthenticationTicketMessage()
             atmsg.init("fr", AuthentificationManager().gameServerTicket)
-            connh.ConnectionsHandler.getConnection().send(atmsg)
+            connh.ConnectionsHandler().getConnection().send(atmsg)
             return True
 
         elif isinstance(msg, AuthenticationTicketAcceptedMessage):
@@ -208,7 +208,7 @@ class GameServerApproachFrame(Frame):
         elif isinstance(msg, ServerConnectionFailedMessage):
             scfMsg = ServerConnectionFailedMessage(msg)
             self.authenticationTicketAccepted = False
-            if scfMsg.failedConnection == connh.ConnectionsHandler.getConnection().getSubConnection(scfMsg):
+            if scfMsg.failedConnection == connh.ConnectionsHandler().getConnection().getSubConnection(scfMsg):
                 PlayerManager().destroy()
             return True
 
@@ -249,19 +249,19 @@ class GameServerApproachFrame(Frame):
             krnl.Kernel().getWorker().addFrame(AveragePricesFrame())
             if krnl.Kernel().beingInReconection and not self._reconnectMsgSend:
                 self._reconnectMsgSend = True
-                connh.ConnectionsHandler.getConnection().send(CharacterSelectedForceReadyMessage())
+                connh.ConnectionsHandler().getConnection().send(CharacterSelectedForceReadyMessage())
             if InterClientManager.flashKey and (
                 not PlayerManager() or PlayerManager().server.id != 129 and PlayerManager().server.id != 130
             ):
                 flashKeyMsg = ClientKeyMessage()
-                flashKeyMsg.init(InterClientManager().flashKey)
-                connh.ConnectionsHandler.getConnection().send(flashKeyMsg)
+                flashKeyMsg.init(InterClientManager.flashKey)
+                connh.ConnectionsHandler().getConnection().send(flashKeyMsg)
             self._cssmsg = cssmsg
             PlayedCharacterManager().infos = self._cssmsg.infos
             DataStoreType.CHARACTER_ID = str(self._cssmsg.infos.id)
             krnl.Kernel().getWorker().removeFrame(self)
             gccrmsg = GameContextCreateRequestMessage()
-            connh.ConnectionsHandler.getConnection().send(gccrmsg)
+            connh.ConnectionsHandler().getConnection().send(gccrmsg)
             now = time.perf_counter()
             delta = now - self._loadingStart
             if delta > self.LOADING_TIMEOUT:
@@ -276,7 +276,7 @@ class GameServerApproachFrame(Frame):
                 krnl.Kernel().beingInReconection = True
                 self.characterId = msg.id
                 self._reconnectMsgSend = True
-                connh.ConnectionsHandler.getConnection().send(CharacterSelectedForceReadyMessage())
+                connh.ConnectionsHandler().getConnection().send(CharacterSelectedForceReadyMessage())
 
         elif isinstance(msg, BasicTimeMessage):
             btmsg = msg
@@ -318,7 +318,7 @@ class GameServerApproachFrame(Frame):
 
         elif isinstance(msg, PopupWarningCloseRequestAction):
             pwcrmsg = PopupWarningCloseRequestMessage()
-            connh.ConnectionsHandler.getConnection().send(pwcrmsg)
+            connh.ConnectionsHandler().getConnection().send(pwcrmsg)
             return True
 
         elif isinstance(msg, CharacterSelectionAction):
@@ -327,7 +327,7 @@ class GameServerApproachFrame(Frame):
             self._requestedToRemodelCharacterId = 0
             csmsg = CharacterSelectionMessage()
             csmsg.init(id_=characterId)
-            connh.ConnectionsHandler.getConnection().send(csmsg)
+            connh.ConnectionsHandler().getConnection().send(csmsg)
             return True
 
         return False
@@ -340,5 +340,5 @@ class GameServerApproachFrame(Frame):
 
     def requestCharactersList(self) -> None:
         clrmsg: CharactersListRequestMessage = CharactersListRequestMessage()
-        if connh.ConnectionsHandler.getConnection():
-            connh.ConnectionsHandler.getConnection().send(clrmsg)
+        if connh.ConnectionsHandler().getConnection():
+            connh.ConnectionsHandler().getConnection().send(clrmsg)

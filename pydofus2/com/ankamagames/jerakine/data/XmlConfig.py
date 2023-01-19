@@ -1,11 +1,11 @@
+from collections import OrderedDict
 import xml.etree.ElementTree as ET
 import re
 from pydofus2.com.ankamagames.dofus import Constants
-from pydofus2.com.ankamagames.jerakine.metaclasses.Singleton import Singleton
+from pydofus2.com.ankamagames.jerakine.metaclasses.ThreadSharedSingleton import ThreadSharedSingleton
 
-
-class XmlConfig(metaclass=Singleton):
-    _constants = dict[str, object]()
+class XmlConfig(metaclass=ThreadSharedSingleton):
+    _constants = OrderedDict[str, object]()
 
     def __init__(self) -> None:
         config_file_path = Constants.DOFUS_ROOTDIR / "config.xml"
@@ -41,3 +41,7 @@ class XmlConfig(metaclass=Singleton):
 
     def setEntry(self, sKey: str, sValue) -> None:
         self._constants[sKey] = sValue
+
+    @property
+    def entries(self):
+        return self._constants

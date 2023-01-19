@@ -192,7 +192,7 @@ class RoleplayEntitiesFrame(AbstractEntitiesFrame, Frame):
                 connexion = ccFrame.mapChangeConnexion
             mirmsg = MapInformationsRequestMessage()
             mirmsg.init(mapId_=MapDisplayManager().currentMapPoint.mapId)
-            ConnectionsHandler.getConnection().send(mirmsg, connexion)
+            ConnectionsHandler().getConnection().send(mirmsg, connexion)
             self._waitForMap = False
         else:
             self._waitForMap = True
@@ -218,7 +218,7 @@ class RoleplayEntitiesFrame(AbstractEntitiesFrame, Frame):
                 self.mcidm_processessed = False
                 mirmsg = MapInformationsRequestMessage()
                 mirmsg.init(mapId_=MapDisplayManager().currentMapPoint.mapId)
-                ConnectionsHandler.getConnection().send(mirmsg, connexion)
+                ConnectionsHandler().getConnection().send(mirmsg, connexion)
                 self._waitForMap = False
             return False
 

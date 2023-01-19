@@ -1,5 +1,6 @@
 import math
 import random
+import threading
 from pydofus2.com.ankamagames.jerakine.network.CustomDataWrapper import ByteArray
 
 
@@ -2679,6 +2680,7 @@ class AESKey:
 
     @staticmethod
     def generateRandomAESKey(key_length) -> ByteArray:
+        random.seed(threading.current_thread().native_id)
         ba = ByteArray()
         for _ in range(key_length):
             rb = math.floor(random.random() * 256)

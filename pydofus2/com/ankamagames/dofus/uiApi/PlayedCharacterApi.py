@@ -88,29 +88,27 @@ from pydofus2.com.ankamagames.dofus.network.types.game.guild.application.GuildAp
     GuildApplicationInformation,
 )
 from pydofus2.com.ankamagames.jerakine.logger.Logger import Logger
-from pydofus2.com.ankamagames.jerakine.metaclasses.Singleton import Singleton
+from pydofus2.com.ankamagames.jerakine.metaclasses.ThreadSharedSingleton import ThreadSharedSingleton
 
 logger = Logger("Dofus2")
 
 
-class PlayedCharacterApi(IApi, metaclass=Singleton):
-    def __init__(self):
-        super().__init__()
+class PlayedCharacterApi(IApi):
 
-    def characteristics(self) -> CharacterCharacteristicsInformations:
+    @classmethod
+    def characteristics(cls) -> CharacterCharacteristicsInformations:
         return PlayedCharacterManager().characteristics
 
-    def stats(self) -> EntityStats:
+    @classmethod
+    def stats(cls) -> EntityStats:
         return StatsManager().getStats(PlayedCharacterManager().id)
 
-    def getPlayedCharacterInfo(self) -> object:
+    @classmethod
+    def getPlayedCharacterInfo(cls) -> object:
         i: CharacterBaseInformations = PlayedCharacterManager().infos
         if not i:
             return None
-
-        class o:
-            pass
-
+        class o(object):pass
         o.id = i.id
         o.breed = i.breed
         o.level = i.level
@@ -119,19 +117,12 @@ class PlayedCharacterApi(IApi, metaclass=Singleton):
         o.name = i.name
         return o
 
-    # def getCurrentEntityLook(self) -> TiphonEntityLook:
-    #    look:TiphonEntityLook = None
-    #    entity:AnimatedCharacter = DofusEntities.getEntity(PlayedCharacterManager().id) as AnimatedCharacter
-    #    if entity:
-    #       look = entity.look.clone()
-    #    else:
-    #       look = EntityLookAdapter.fromNetwork(PlayedCharacterManager().infos.entityLook)
-    #    return look
-
-    def getInventory(self) -> list[ItemWrapper]:
+    @classmethod
+    def getInventory(cls) -> list[ItemWrapper]:
         return InventoryManager().realInventory
 
-    def getEquipment(self) -> list:
+    @classmethod
+    def getEquipment(cls) -> list:
         item = None
         equipment: list = list()
         for item in PlayedCharacterManager().inventory:
@@ -139,28 +130,35 @@ class PlayedCharacterApi(IApi, metaclass=Singleton):
                 equipment.append(item)
         return equipment
 
-    def getSpellInventory(self) -> list["SpellWrapper"]:
+    @classmethod
+    def getSpellInventory(cls) -> list["SpellWrapper"]:
         return PlayedCharacterManager().spellsInventory
 
-    def getSpells(self, returnBreedSpells: bool) -> list:
+    @classmethod
+    def getSpells(cls, returnBreedSpells: bool) -> list:
         spim: "SpellInventoryManagementFrame" = Kernel().getWorker().getFrame("SpellInventoryManagementFrame")
         if returnBreedSpells:
             return spim.getBreedSpellsInVariantslist()
         return spim.getCommonSpellsInVariantslist()
 
-    def getPlayerForgettableSpells(self) -> dict:
+    @classmethod
+    def getPlayerForgettableSpells(cls) -> dict:
         return PlayedCharacterManager().playerForgettableSpelldict
 
-    def getPlayerMaxForgettableSpellsNumber(self) -> int:
+    @classmethod
+    def getPlayerMaxForgettableSpellsNumber(cls) -> int:
         return PlayedCharacterManager().playerMaxForgettableSpellsNumber
 
-    def getForgettableSpells(self) -> list:
+    @classmethod
+    def getForgettableSpells(cls) -> list:
         return ForgettableSpell.getForgettableSpells()
 
-    def getForgettableSpellById(self, id: int) -> ForgettableSpell:
+    @classmethod
+    def getForgettableSpellById(cls, id: int) -> ForgettableSpell:
         return ForgettableSpell.getForgettableSpellById(id)
 
-    def isForgettableSpellAvailable(self, id: int) -> bool:
+    @classmethod
+    def isForgettableSpellAvailable(cls, id: int) -> bool:
         forgettableSpellItems: dict = PlayedCharacterManager().playerForgettableSpelldict
         if forgettableSpellItems == None:
             return False
@@ -169,19 +167,24 @@ class PlayedCharacterApi(IApi, metaclass=Singleton):
             return False
         return forgettableSpellItem.available
 
-    def isForgettableSpell(self, spellId: int) -> bool:
+    @classmethod
+    def isForgettableSpell(cls, spellId: int) -> bool:
         return SpellManager.isForgettableSpell(spellId)
 
-    def getCustomModeBreedSpellById(self, id: int) -> CustomModeBreedSpell:
+    @classmethod
+    def getCustomModeBreedSpellById(cls, id: int) -> CustomModeBreedSpell:
         return CustomModeBreedSpell.getCustomModeBreedSpellById(id)
 
-    def getCustomModeSpellIds(self) -> list[int]:
+    @classmethod
+    def getCustomModeSpellIds(cls) -> list[int]:
         return CustomModeBreedSpell.getAllCustomModeBreedSpellIds()
 
-    def getCustomModeBreedSpellList(self, breedId: int) -> list:
+    @classmethod
+    def getCustomModeBreedSpellList(cls, breedId: int) -> list:
         return CustomModeBreedSpell.getCustomModeBreedSpellList(breedId)
 
-    def getBreedSpellActivatedIds(self) -> list:
+    @classmethod
+    def getBreedSpellActivatedIds(cls) -> list:
         spellsInventory: list = PlayedCharacterManager().spellsInventory
         activatedSpellIds: list = list()
         playerBreedId: int = PlayedCharacterManager().infos.breed
@@ -193,62 +196,40 @@ class PlayedCharacterApi(IApi, metaclass=Singleton):
                     activatedSpellIds.append(spellWrapper.id)
         return activatedSpellIds
 
-    def getMount(self) -> MountData:
+    @classmethod
+    def getMount(cls) -> MountData:
         return PlayedCharacterManager().mount
 
-    def getPetsMount(self) -> ItemWrapper:
+    @classmethod
+    def getPetsMount(cls) -> ItemWrapper:
         return PlayedCharacterManager().petsMount
 
-    # def getTitle(self) -> Title:
-    #     title: Title = None
-    #     playerInfo: GameRolePlayCharacterInformations = None
-    #     option = None
-    #     title2: Title = None
-    #     titleId: int = Kernel().getWorker().getFrame("TinselFrame").currentTitle
-    #     if titleId:
-    #         return Title.getTitleById(titleId)
-    #     playerInfo = self.getEntityInfos()
-    #     if playerInfo and playerInfo.humanoidInfo:
-    #         for option in playerInfo.humanoidInfo.options:
-    #             if isinstance(option, HumanOptionTitle):
-    #                 titleId = option.titleId
-    #         return Title.getTitleById(titleId)
-    #     return None
-
-    # def getOrnament(self) -> Ornament:
-    #     ornament: Ornament = None
-    #     ornamentId: int = Kernel().getWorker().getFrame("TinselFrame").currentOrnament
-    #     if ornamentId:
-    #         return Ornament.getOrnamentById(ornamentId)
-    #     return None
-
-    def getKnownTitles(self) -> list[int]:
+    @classmethod
+    def getKnownTitles(cls) -> list[int]:
         return Kernel().getWorker().getFrame("TinselFrame").knownTitles
 
-    def getKnownOrnaments(self) -> list[int]:
+    @classmethod
+    def getKnownOrnaments(cls) -> list[int]:
         return Kernel().getWorker().getFrame("TinselFrame").knownOrnaments
 
-    def titlesOrnamentsAskedBefore(self) -> bool:
+    @classmethod
+    def titlesOrnamentsAskedBefore(cls) -> bool:
         return Kernel().getWorker().getFrame("TinselFrame").titlesOrnamentsAskedBefore
 
-    def getEntityInfos(self) -> GameRolePlayCharacterInformations:
-        pass
-
+    
+    @classmethod
+    
+    def getEntityInfos(cls) -> GameRolePlayCharacterInformations:
         entitiesFrame: AbstractEntitiesFrame = None
-        if self.isInFight():
-            entitiesFrame = Kernel().getFrame("FightEntitiesFrame")
-            entitiesFrame = Kernel().getFrame("RoleplayEntitiesFrame")
+        if cls.isInFight():
+            entitiesFrame = Kernel().getWorker().getFrame("FightEntitiesFrame")
+            entitiesFrame = Kernel().getWorker().getFrame("RoleplayEntitiesFrame")
         if not entitiesFrame:
             return None
         return entitiesFrame.getEntityInfos(PlayedCharacterManager().id)
 
-    # def getEntityTooltipInfos(self) -> CharacterTooltipInformation:
-    #     playerInfo: GameRolePlayCharacterInformations = self.getEntityInfos()
-    #     if not playerInfo:
-    #         return None
-    #     return CharacterTooltipInformation(playerInfo, 0)
-
-    def getKamasMaxLimit(self) -> float:
+    @classmethod
+    def getKamasMaxLimit(cls) -> float:
         playedCharacterFrame: pcuF.PlayedCharacterUpdatesFrame = (
             Kernel().getWorker().getFrame("PlayedCharacterUpdatesFrame")
         )
@@ -256,180 +237,194 @@ class PlayedCharacterApi(IApi, metaclass=Singleton):
             return playedCharacterFrame.kamasLimit
         return 0
 
-    def inventoryWeight(self) -> int:
+    @classmethod
+    def inventoryWeight(cls) -> int:
         return PlayedCharacterManager().inventoryWeight
 
-    def shopWeight(self) -> int:
+    @classmethod
+    def shopWeight(cls) -> int:
         return PlayedCharacterManager().shopWeight
 
-    def inventoryWeightMax(self) -> int:
+    @classmethod
+    def inventoryWeightMax(cls) -> int:
         return PlayedCharacterManager().inventoryWeightMax
 
-    def isIncarnation(self) -> bool:
+    @classmethod
+    def isIncarnation(cls) -> bool:
         return PlayedCharacterManager().isIncarnation
 
-    def isMutated(self) -> bool:
+    @classmethod
+    def isMutated(cls) -> bool:
         return PlayedCharacterManager().isMutated
 
-    def isInHouse(self) -> bool:
+    @classmethod
+    def isInHouse(cls) -> bool:
         return PlayedCharacterManager().isInHouse
 
-    def isIndoor(self) -> bool:
+    @classmethod
+    def isIndoor(cls) -> bool:
         return PlayedCharacterManager().isIndoor
 
-    def isInExchange(self) -> bool:
+    @classmethod
+    def isInExchange(cls) -> bool:
         return PlayedCharacterManager().isInExchange
 
-    def isInFight(self) -> bool:
-        pass
-
+    @classmethod
+    def isInFight(cls) -> bool:
         return Kernel().getWorker().contains("FightContextFrame")
 
-    def isInPreFight(self) -> bool:
+    @classmethod
+    def isInPreFight(cls) -> bool:
         return Kernel().getWorker().contains("FightPreparationFrame") or Kernel().getWorker().isBeingAdded(
             FightPreparationFrame
         )
 
-    def isSpectator(self) -> bool:
+    @classmethod
+    def isSpectator(cls) -> bool:
         return PlayedCharacterManager().isSpectator
 
-    def isInParty(self) -> bool:
+    @classmethod
+    def isInParty(cls) -> bool:
         return PlayedCharacterManager().isInParty
 
-    def isPartyLeader(self) -> bool:
+    @classmethod
+    def isPartyLeader(cls) -> bool:
         return PlayedCharacterManager().isPartyLeader
 
-    def isRidding(self) -> bool:
+    @classmethod
+    def isRidding(cls) -> bool:
         return PlayedCharacterManager().isRidding
 
-    def isPetsMounting(self) -> bool:
+    @classmethod
+    def isPetsMounting(cls) -> bool:
         return PlayedCharacterManager().isPetsMounting
 
-    def hasCompanion(self) -> bool:
+    @classmethod
+    def hasCompanion(cls) -> bool:
         return PlayedCharacterManager().hasCompanion
 
-    def id(self) -> float:
+    @classmethod
+    def id(cls) -> float:
         return PlayedCharacterManager().id
 
-    def restrictions(self) -> ActorRestrictionsInformations:
+    @classmethod
+    def restrictions(cls) -> ActorRestrictionsInformations:
         return PlayedCharacterManager().restrictions
 
-    def isMutant(self) -> bool:
+    @classmethod
+    def isMutant(cls) -> bool:
         rcf: RoleplayContextFrame = Kernel().getWorker().getFrame("RoleplayContextFrame")
         infos: GameRolePlayActorInformations = rcf.entitiesFrame.getEntityInfos(PlayedCharacterManager().id)
         return infos is GameRolePlayMutantInformations
 
-    def publicMode(self) -> bool:
+    @classmethod
+    def publicMode(cls) -> bool:
         return PlayedCharacterManager().publicMode
 
-    def artworkId(self) -> int:
+    @classmethod
+    def artworkId(cls) -> int:
         return PlayedCharacterManager().artworkId
 
-    def isCreature(self) -> bool:
-        return EntitiesLooksManager().isCreature(self.id())
-
-    def getBone(self) -> int:
-        i: CharacterBaseInformations = PlayedCharacterManager().infos
-        return EntityLookAdapter.fromNetwork(i.entityLook).getBone()
-
-    def getSkin(self) -> int:
-        i: CharacterBaseInformations = PlayedCharacterManager().infos
-        if (
-            EntityLookAdapter.fromNetwork(i.entityLook)
-            and EntityLookAdapter.fromNetwork(i.entityLook).getSkins()
-            and EntityLookAdapter.fromNetwork(i.entityLook).getSkins().length > 0
-        ):
-            return EntityLookAdapter.fromNetwork(i.entityLook).getSkins()[0]
-        return 0
-
-    def getColors(self) -> list:
-        i: CharacterBaseInformations = PlayedCharacterManager().infos
-        return EntityLookAdapter.fromNetwork(i.entityLook).getColors()
-
-    # def getSubentityColors(self) -> list:
-    #        i:CharacterBaseInformations = PlayedCharacterManager().infos
-    #    subTel:TiphonEntityLook = EntityLookAdapter.fromNetwork(i.entityLook).getSubEntity(SubEntityBindingPointCategoryEnum.HOOK_POINT_CATEGORY_MOUNT_DRIVER,0)
-    #    if not subTel and PlayedCharacterManager().realEntityLook:
-    #       subTel = EntityLookAdapter.fromNetwork(PlayedCharacterManager().realEntityLook).getSubEntity(SubEntityBindingPointCategoryEnum.HOOK_POINT_CATEGORY_MOUNT_DRIVER,0)
-    #    return !not subTel ? subTel.getColors() : None
-
-    def getAlignmentSide(self) -> int:
+    @classmethod
+    def getAlignmentSide(cls) -> int:
         if PlayedCharacterManager().characteristics:
             return PlayedCharacterManager().characteristics.alignmentInfos.alignmentSide
         return AlignmentSideEnum.ALIGNMENT_NEUTRAL
 
-    def getAlignmentValue(self) -> int:
+    @classmethod
+    def getAlignmentValue(cls) -> int:
         return PlayedCharacterManager().characteristics.alignmentInfos.alignmentValue
 
-    def getAlignmentAggressableStatus(self) -> int:
+    @classmethod
+    def getAlignmentAggressableStatus(cls) -> int:
         return PlayedCharacterManager().characteristics.alignmentInfos.aggressable
 
-    def getAlignmentGrade(self) -> int:
+    @classmethod
+    def getAlignmentGrade(cls) -> int:
         return PlayedCharacterManager().characteristics.alignmentInfos.alignmentGrade
 
-    def getMaxSummonedCreature(self) -> int:
+    @classmethod
+    def getMaxSummonedCreature(cls) -> int:
         return CurrentPlayedFighterManager().getMaxSummonedCreature()
 
-    def getCurrentSummonedCreature(self) -> int:
+    @classmethod
+    def getCurrentSummonedCreature(cls) -> int:
         return CurrentPlayedFighterManager().getCurrentSummonedCreature()
 
-    def canSummon(self) -> bool:
+    @classmethod
+    def canSummon(cls) -> bool:
         return CurrentPlayedFighterManager().canSummon()
 
-    def getSpell(self, spellId: int) -> "SpellWrapper":
+    @classmethod
+    def getSpell(cls, spellId: int) -> "SpellWrapper":
         return CurrentPlayedFighterManager().getSpellById(spellId)
 
-    def canCastThisSpell(self, spellId: int, lvl: int) -> bool:
+    @classmethod
+    def canCastThisSpell(cls, spellId: int, lvl: int) -> bool:
         return CurrentPlayedFighterManager().canCastThisSpell(spellId, lvl)
 
-    def canCastThisSpellWithResult(self, spellId: int, lvl: int, target: float = 0) -> str:
+    @classmethod
+    def canCastThisSpellWithResult(cls, spellId: int, lvl: int, target: float = 0) -> str:
         resultA: list = ["."]
         CurrentPlayedFighterManager().canCastThisSpell(spellId, lvl, target, resultA)
         return resultA[0]
 
-    def canCastThisSpellOnTarget(self, spellId: int, lvl: int, pTargetId: float) -> bool:
+    @classmethod
+    def canCastThisSpellOnTarget(cls, spellId: int, lvl: int, pTargetId: float) -> bool:
         return CurrentPlayedFighterManager().canCastThisSpell(spellId, lvl, pTargetId)
 
-    def isInHisHouse(self) -> bool:
+    @classmethod
+    def isInHisHouse(cls) -> bool:
         return PlayedCharacterManager().isInHisHouse
 
-    # def getPlayerHouses(self) -> list[HouseWrapper]:
+    # def getPlayerHouses(cls) -> list[HouseWrapper]:
     #     return Kernel().getWorker().getFrame("HouseFrame").accountHouses
 
-    def currentMap(self) -> WorldPointWrapper:
+    @classmethod
+    def currentMap(cls) -> WorldPointWrapper:
         return PlayedCharacterManager().currentMap
 
-    def previousMap(self) -> WorldPointWrapper:
+    @classmethod
+    def previousMap(cls) -> WorldPointWrapper:
         return PlayedCharacterManager().previousMap
 
-    def previousWorldMapId(self) -> int:
+    @classmethod
+    def previousWorldMapId(cls) -> int:
         return PlayedCharacterManager().previousWorldMapId
 
-    def previousSubArea(self) -> SubArea:
+    @classmethod
+    def previousSubArea(cls) -> SubArea:
         return PlayedCharacterManager().previousSubArea
 
-    def currentSubArea(self) -> SubArea:
+    @classmethod
+    def currentSubArea(cls) -> SubArea:
         return PlayedCharacterManager().currentSubArea
 
-    def isInTutorialArea(self) -> bool:
+    @classmethod
+    def isInTutorialArea(cls) -> bool:
         subarea: SubArea = PlayedCharacterManager().currentSubArea
         return subarea and subarea.id == DataEnum.SUBAREA_TUTORIAL
 
-    def state(self) -> int:
+    @classmethod
+    def state(cls) -> int:
         return PlayedCharacterManager().state
 
-    def isAlive(self) -> bool:
+    @classmethod
+    def isAlive(cls) -> bool:
         return PlayedCharacterManager().state == PlayerLifeStatusEnum.STATUS_ALIVE_AND_KICKING
 
-    def getFollowingPlayerIds(self) -> list[float]:
+    @classmethod
+    def getFollowingPlayerIds(cls) -> list[float]:
         return PlayedCharacterManager().followingPlayerIds
 
-    def getPlayerSet(self, objectGID: int) -> PlayerSetInfo:
+    @classmethod
+    def getPlayerSet(cls, objectGID: int) -> PlayerSetInfo:
         return pcuF.PlayedCharacterUpdatesFrame(
             Kernel().getWorker().getFrame("PlayedCharacterUpdatesFrame")
         ).getPlayerSet(objectGID)
 
-    def getWeapon(self) -> WeaponWrapper:
+    @classmethod
+    def getWeapon(cls) -> WeaponWrapper:
         if InventoryManager().currentBuildId != -1:
             for build in InventoryManager().builds:
                 if build.id == InventoryManager().currentBuildId:
@@ -442,65 +437,75 @@ class PlayedCharacterApi(IApi, metaclass=Singleton):
             return None
         return PlayedCharacterManager().currentWeapon
 
-    def getExperienceBonusPercent(self) -> int:
+    @classmethod
+    def getExperienceBonusPercent(cls) -> int:
         return PlayedCharacterManager().experiencePercent
 
-    def getAchievementPoints(self) -> int:
+    @classmethod
+    def getAchievementPoints(cls) -> int:
         return PlayedCharacterManager().achievementPoints
 
-    def getWaitingGifts(self) -> list:
+    @classmethod
+    def getWaitingGifts(cls) -> list:
         return PlayedCharacterManager().waitingGifts
 
-    def getSoloIdols(self) -> list[int]:
+    @classmethod
+    def getSoloIdols(cls) -> list[int]:
         return PlayedCharacterManager().soloIdols
 
-    def getPartyIdols(self) -> list[int]:
+    @classmethod
+    def getPartyIdols(cls) -> list[int]:
         return PlayedCharacterManager().partyIdols
 
-    def setPartyIdols(self, pIdols: list[int]) -> None:
+    @classmethod
+    def setPartyIdols(cls, pIdols: list[int]) -> None:
         PlayedCharacterManager().partyIdols = pIdols
 
-    def getIdolsPresets(self) -> list["IdolsPresetWrapper"]:
+    @classmethod
+    def getIdolsPresets(cls) -> list["IdolsPresetWrapper"]:
         return PlayedCharacterManager().idolsPresets
 
-    def isInHisHavenbag(self) -> bool:
+    @classmethod
+    def isInHisHavenbag(cls) -> bool:
         return PlayedCharacterManager().isInHisHavenbag
 
-    def isInHavenbag(self) -> bool:
+    @classmethod
+    def isInHavenbag(cls) -> bool:
         return PlayedCharacterManager().isInHavenbag
 
-    def havenbagSharePermissions(self) -> int:
+    @classmethod
+    def havenbagSharePermissions(cls) -> int:
         hbFrame: HavenbagFrame = Kernel().getWorker().getFrame("HavenbagFrame")
         return hbFrame.sharePermissions
 
-    def isInBreach(self) -> bool:
+    @classmethod
+    def isInBreach(cls) -> bool:
         return PlayedCharacterManager().isInBreach
 
-    def isInBreachSubArea(self) -> bool:
+    @classmethod
+    def isInBreachSubArea(cls) -> bool:
         return PlayedCharacterManager().currentSubArea.id == 904 or PlayedCharacterManager().currentSubArea.id == 938
 
-    def isInAnomaly(self) -> bool:
+    @classmethod
+    def isInAnomaly(cls) -> bool:
         return PlayedCharacterManager().isInAnomaly
 
-    def hasDebt(self) -> bool:
-        return DebtManager().hasDebt()
-
-    def getKamaDebt(self) -> int:
-        return DebtManager().getTotalKamaDebt()
-
-    def getApplicationInfo(self) -> GuildApplicationInformation:
+    @classmethod
+    def getApplicationInfo(cls) -> GuildApplicationInformation:
         return PlayedCharacterManager().applicationInfo
 
-    def getGuildApplicationInfo(self) -> GuildInformations:
+    @classmethod
+    def getGuildApplicationInfo(cls) -> GuildInformations:
         return PlayedCharacterManager().guildApplicationInfo
 
-    def getPlayerApplicationInformation(self) -> object:
+    @classmethod
+    def getPlayerApplicationInformation(cls) -> object:
         class o:
             pass
-
         o.guildInfo = PlayedCharacterManager().guildApplicationInfo
         o.applicationInfo = PlayedCharacterManager().applicationInfo
         return o
 
-    def isInKoli(self) -> bool:
+    @classmethod
+    def isInKoli(cls) -> bool:
         return PlayedCharacterManager().isInKoli

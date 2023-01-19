@@ -316,7 +316,7 @@ pydofus2/com/ankamagames/dofus/kernel/Kernel.py
 pydofus2/com/ankamagames/dofus/kernel/PanicMessages.py
 pydofus2/com/ankamagames/dofus/kernel/__init__.py
 pydofus2/com/ankamagames/dofus/kernel/net/ConnectionType.py
-pydofus2/com/ankamagames/dofus/kernel/net/ConnectionsHandler.py
+pydofus2/com/ankamagames/dofus/kernel/net/ConnectionsHandler().py
 pydofus2/com/ankamagames/dofus/kernel/net/DisconnectionReason.py
 pydofus2/com/ankamagames/dofus/kernel/net/DisconnectionReasonEnum.py
 pydofus2/com/ankamagames/dofus/kernel/net/__init__.py

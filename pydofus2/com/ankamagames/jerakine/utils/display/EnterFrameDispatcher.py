@@ -10,6 +10,7 @@ logger = Logger("Dofus2")
 
 
 class EnterFrameDispatcher(metaclass=Singleton):
+    
     def __init__(self):
         self._maxAllowedTime: int = 20
         self._listenerUp: bool = False

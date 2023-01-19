@@ -1,9 +1,4 @@
-from pydofus2.com.ankamagames.jerakine.metaclasses.Singleton import Singleton
 
-
-class InterClientManager(metaclass=Singleton):
+class InterClientManager:
 
     flashKey = "LQ9r8NAvccW6G5cmD8#01"
-
-    def __init__(self) -> None:
-        pass

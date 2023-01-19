@@ -9,43 +9,38 @@ from pydofus2.com.ankamagames.dofus.logic.game.common.managers.PlayedCharacterMa
 )
 from pydofus2.com.ankamagames.dofus.modules.utils.pathFinding.tools.TimeDebug import TimeDebug
 from pydofus2.com.ankamagames.jerakine.logger.Logger import Logger
-from pydofus2.com.ankamagames.jerakine.metaclasses.Singleton import Singleton
+from pydofus2.com.ankamagames.jerakine.metaclasses.ThreadSharedSingleton import ThreadSharedSingleton
 from pydofus2.com.ankamagames.jerakine.network.CustomDataWrapper import ByteArray
-
 logger = Logger("Dofus2")
 
 
-class WorldPathFinder(metaclass=Singleton):
-
-    playedCharacterManager: PlayedCharacterManager
-
+class WorldPathFinder(metaclass=ThreadSharedSingleton):
     worldGraph: WorldGraph = None
-
-    callback: FunctionType
-
-    src: Vertex
-
-    dst: float
-
-    linkedZone: int
-
+    
     def __init__(self):
+        self.callback: FunctionType = None
+        self.src: Vertex = None
+        self.dst: float = None
+        self.linkedZone: int = None
         self.init()
         super().__init__()
 
+    @property
+    def playedCharacterManager(self) -> PlayedCharacterManager:
+        return PlayedCharacterManager()
+    
     def init(self) -> None:
         if self.isInitialized():
             return
-        self.playedCharacterManager = PlayedCharacterManager()
         with open(Constants.WORLDGRAPH_PATH, "rb") as binaries:
             data = binaries.read()
-            self.worldGraph = WorldGraph(ByteArray(data))
+            WorldPathFinder.worldGraph = WorldGraph(ByteArray(data))
 
     def getWorldGraph(self) -> WorldGraph:
         return self.worldGraph
 
     def isInitialized(self) -> bool:
-        return self.worldGraph is not None
+        return WorldPathFinder.worldGraph is not None
 
     @property
     def currPlayerVertex(self) -> Vertex:

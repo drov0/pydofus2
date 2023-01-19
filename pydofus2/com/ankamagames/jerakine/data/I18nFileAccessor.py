@@ -1,16 +1,14 @@
 from pydofus2.com.ankamagames.dofus import Constants
 from pydofus2.com.ankamagames.jerakine.logger.Logger import Logger
-from pydofus2.com.ankamagames.jerakine.metaclasses.Singleton import Singleton
+from pydofus2.com.ankamagames.jerakine.metaclasses.ThreadSharedSingleton import ThreadSharedSingleton
 from pydofus2.com.ankamagames.jerakine.data.BinaryStream import BinaryStream
-
 logger = Logger("Dofus2")
 
 
-class I18nFileAccessor(metaclass=Singleton):
-
-    directBuffer = None
-
+class I18nFileAccessor(metaclass=ThreadSharedSingleton):
+        
     def __init__(self) -> None:
+        self.directBuffer = None
         self.init()
 
     def init(self):
@@ -60,8 +58,6 @@ class I18nFileAccessor(metaclass=Singleton):
         textKeys: list = []
         for textKey in self.textIndexes:
             textKeys.append(textKey)
-        # EnterFrameDispatcher.worker.addForeachTreatment(setEntries, [], textKeys)
-        # EnterFrameDispatcher.worker.addSingleTreatment(logInit, [])
 
     def logInit() -> None:
         logger.debug("Initialized !")

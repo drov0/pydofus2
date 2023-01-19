@@ -9,13 +9,13 @@ logger = Logger("Dofus2")
 
 class Pool:
 
-    _pooledClass: object
+    _pooledClass: type
     _pool: LinkedList
     _growSize: int
     _warnLimit: int
     _totalSize: int
 
-    def __init__(self, pooledClass: object, initialSize: int, growSize: int, warnLimit: int = 0):
+    def __init__(self, pooledClass: type, initialSize: int, growSize: int, warnLimit: int = 0):
         super().__init__()
         self._pooledClass = pooledClass
         if self._pooledClass is PoolableLinkedListNode:
@@ -31,7 +31,7 @@ class Pool:
         self._totalSize = initialSize
 
     @property
-    def pooledClass(self) -> object:
+    def pooledClass(self) -> type:
         return self._pooledClass
 
     @property
@@ -52,16 +52,14 @@ class Pool:
                 self._pool.append(self._pooledClass())
             self._totalSize += self._growSize
             if self._warnLimit > 0 and self._totalSize > self._warnLimit:
-                # logger.warn(f"Pool of {self._pooledClass.__name__} size beyond the warning limit. Size: {self._totalSize} , limit: {self._warnLimit}.")
-                pass
+                logger.warn(f"Pool of {self._pooledClass.__name__} size beyond the warning limit. Size: {self._totalSize} , limit: {self._warnLimit}.")
         node: LinkedListNode = self._pool.shift()
         if self._pooledClass is PoolableLinkedListNode:
             o = node
         else:
             o = node.value
             from pydofus2.com.ankamagames.jerakine.pools.PoolsManager import PoolsManager
-
-            PoolsManager().getLinkedListNodePool().checkIn(node)
+            PoolsManager.getLinkedListNodePool().checkIn(node)
         return o
 
     def checkIn(self, freedobject: Poolable) -> None:

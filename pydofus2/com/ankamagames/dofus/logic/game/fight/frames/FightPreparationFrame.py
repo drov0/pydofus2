@@ -226,7 +226,7 @@ class FightPreparationFrame(Frame):
             ):
                 gfpprmsg = GameFightPlacementPositionRequestMessage()
                 gfpprmsg.init(ccmsg.cellId)
-                ConnectionsHandler.getConnection().send(gfpprmsg)
+                ConnectionsHandler().getConnection().send(gfpprmsg)
             return True
 
         if isinstance(msg, GameFightPlacementPositionRequestAction):
@@ -234,7 +234,7 @@ class FightPreparationFrame(Frame):
             if not self._fightContextFrame.onlyTheOtherTeamCanPlace:
                 gfpprmsg2 = GameFightPlacementPositionRequestMessage()
                 gfpprmsg2.init(gfppra.cellId)
-                ConnectionsHandler.getConnection().send(gfpprmsg2)
+                ConnectionsHandler().getConnection().send(gfpprmsg2)
             return True
 
         if isinstance(msg, GameEntitiesDispositionMessage) or isinstance(msg, GameFightPlacementSwapPositionsMessage):
@@ -248,7 +248,7 @@ class FightPreparationFrame(Frame):
             gfpspra = msg
             gfpsprmsg = GameFightPlacementSwapPositionsRequestMessage()
             gfpsprmsg.init(gfpspra.requestedId, gfpspra.cellId)
-            ConnectionsHandler.getConnection().send(gfpsprmsg)
+            ConnectionsHandler().getConnection().send(gfpsprmsg)
             return True
 
         if isinstance(msg, GameFightPlacementSwapPositionsOfferMessage):
@@ -270,14 +270,14 @@ class FightPreparationFrame(Frame):
             gfpspaa = msg
             gfpspamsg = GameFightPlacementSwapPositionsAcceptMessage()
             gfpspamsg.init(gfpspaa.requestId)
-            ConnectionsHandler.getConnection().send(gfpspamsg)
+            ConnectionsHandler().getConnection().send(gfpspamsg)
             return True
 
         if isinstance(msg, GameFightPlacementSwapPositionsCancelAction):
             gfpspca = msg
             gfpspcmsg = GameFightPlacementSwapPositionsCancelMessage()
             gfpspcmsg.init(gfpspca.requestId)
-            ConnectionsHandler.getConnection().send(gfpspcmsg)
+            ConnectionsHandler().getConnection().send(gfpspcmsg)
             return True
 
         if isinstance(msg, GameFightPlacementSwapPositionsCancelledMessage):
@@ -301,7 +301,7 @@ class FightPreparationFrame(Frame):
             gfra = msg
             gfrmsg = GameFightReadyMessage()
             gfrmsg.init(gfra.isReady)
-            ConnectionsHandler.getConnection().send(gfrmsg)
+            ConnectionsHandler().getConnection().send(gfrmsg)
             return True
 
         if isinstance(msg, EntityClickMessage):
@@ -324,7 +324,7 @@ class FightPreparationFrame(Frame):
             gcka = msg
             gckmsg = GameContextKickMessage()
             gckmsg.init(gcka.targetId)
-            ConnectionsHandler.getConnection().send(gckmsg)
+            ConnectionsHandler().getConnection().send(gckmsg)
             return True
 
         if isinstance(msg, GameFightUpdateTeamMessage):

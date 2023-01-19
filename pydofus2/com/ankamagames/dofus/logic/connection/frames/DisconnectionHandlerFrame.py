@@ -1,4 +1,4 @@
-from threading import Timer
+from pydofus2.com.ankamagames.jerakine.benchmark.BenchmarkTimer import BenchmarkTimer
 from time import perf_counter
 from pydofus2.com.DofusClient import DofusClient
 from pydofus2.com.ankamagames.dofus import Constants
@@ -8,7 +8,6 @@ from pydofus2.com.ankamagames.dofus.kernel.net.DisconnectionReasonEnum import (
     DisconnectionReasonEnum,
 )
 from pydofus2.com.ankamagames.jerakine.logger.Logger import Logger
-from pydofus2.com.ankamagames.jerakine.managers.StoreDataManager import StoreDataManager
 from pydofus2.com.ankamagames.jerakine.messages.Frame import Frame
 from pydofus2.com.ankamagames.jerakine.messages.Message import Message
 from pydofus2.com.ankamagames.jerakine.messages.WrongSocketClosureReasonMessage import (
@@ -39,7 +38,7 @@ class DisconnectionHandlerFrame(Frame):
 
     _numberOfAttemptsAlreadyDone: int = 0
 
-    _timer: Timer
+    _timer:  BenchmarkTimer
 
     _mustShowLoginInterface: bool = False
 
@@ -54,7 +53,6 @@ class DisconnectionHandlerFrame(Frame):
 
     def resetConnectionAttempts(self) -> None:
         self._connectionUnexpectedFailureTimes = list()
-        StoreDataManager().setData(Constants.DATASTORE_MODULE_DEBUG, "connection_fail_times", None)
         self._numberOfAttemptsAlreadyDone = 0
 
     def pushed(self) -> bool:
@@ -67,12 +65,7 @@ class DisconnectionHandlerFrame(Frame):
             f"The connection was closed unexpectedly. Reconnection attempt {self._numberOfAttemptsAlreadyDone}/{self.CONNECTION_ATTEMPTS_NUMBER} will start in 4s."
         )
         self._connectionUnexpectedFailureTimes.append(perf_counter())
-        StoreDataManager().setData(
-            Constants.DATASTORE_MODULE_DEBUG,
-            "connection_fail_times",
-            self._connectionUnexpectedFailureTimes,
-        )
-        self._timer = Timer(4, self.reconnect)
+        self._timer = BenchmarkTimer(4, self.reconnect)
         self._timer.start()
 
     def process(self, msg: Message) -> bool:
@@ -80,11 +73,11 @@ class DisconnectionHandlerFrame(Frame):
         if isinstance(msg, ServerConnectionClosedMessage):
             logger.debug("Server Connection Closed.")
             if (
-                connh.ConnectionsHandler.getConnection()
-                and connh.ConnectionsHandler.getConnection().mainConnection
+                connh.ConnectionsHandler().getConnection()
+                and connh.ConnectionsHandler().getConnection().mainConnection
                 and (
-                    connh.ConnectionsHandler.getConnection().mainConnection.connected
-                    or connh.ConnectionsHandler.getConnection().mainConnection.connecting
+                    connh.ConnectionsHandler().getConnection().mainConnection.connected
+                    or connh.ConnectionsHandler().getConnection().mainConnection.connecting
                 )
             ):
                 logger.debug("The connection was closed before we even receive any message. Will halt.")
@@ -92,11 +85,11 @@ class DisconnectionHandlerFrame(Frame):
 
             logger.debug("The connection was closed. Checking reasons.")
             gsaF.GameServerApproachFrame.authenticationTicketAccepted = False
-            reason = connh.ConnectionsHandler.handleDisconnection()
-            if connh.ConnectionsHandler.hasReceivedMsg:
+            reason = connh.ConnectionsHandler().handleDisconnection()
+            if connh.ConnectionsHandler().hasReceivedMsg:
                 if (
                     not reason.expected and
-                    not connh.ConnectionsHandler.hasReceivedNetworkMsg
+                    not connh.ConnectionsHandler().hasReceivedNetworkMsg
                     and self._numberOfAttemptsAlreadyDone < self.CONNECTION_ATTEMPTS_NUMBER
                 ):
                     self.handleUnexpectedNoMsgReceived()
@@ -104,14 +97,9 @@ class DisconnectionHandlerFrame(Frame):
                     if not reason.expected:
                         logger.debug(f"The connection was closed unexpectedly. Reseting.")
                         self._connectionUnexpectedFailureTimes.append(perf_counter())
-                        StoreDataManager().setData(
-                            Constants.DATASTORE_MODULE_DEBUG,
-                            "connection_fail_times",
-                            self._connectionUnexpectedFailureTimes,
-                        )
                         if self._timer:
                             self._timer.cancel()
-                        self._timer = Timer(7, self.reconnect)
+                        self._timer = BenchmarkTimer(7, self.reconnect)
                         self._timer.start()
                     else:
                         logger.debug(
@@ -125,10 +113,10 @@ class DisconnectionHandlerFrame(Frame):
                             krnl.Kernel().reset()
                             DofusClient().interrupt(reason)
                         elif reason.reason == DisconnectionReasonEnum.RESTARTING or reason.reason == DisconnectionReasonEnum.DISCONNECTED_BY_POPUP:
-                            Timer(10, self.reconnect).start()
+                            BenchmarkTimer(10, self.reconnect).start()
                         elif reason.reason == DisconnectionReasonEnum.CONNECTION_LOST:
                             logger.debug(f"The connection was lost. Restarting in 10seconds.")
-                            Timer(10, self.reconnect).start()
+                            BenchmarkTimer(10, self.reconnect).start()
                         else:
                             krnl.Kernel().getWorker().process(ExpectedSocketClosureMessage(reason.reason))
             else:

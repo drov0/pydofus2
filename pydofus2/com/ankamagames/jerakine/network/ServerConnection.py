@@ -1,5 +1,5 @@
 import base64
-from threading import Timer
+from pydofus2.com.ankamagames.jerakine.benchmark.BenchmarkTimer import BenchmarkTimer
 import threading
 from time import perf_counter
 from types import FunctionType
@@ -40,13 +40,13 @@ class ServerConnection(IServerConnection):
 
     DEBUG_LOW_LEVEL_VERBOSE: bool = False
 
-    DEBUG_DATA: bool = False
+    DEBUG_DATA: bool = True
 
     LATENCY_AVG_BUFFER_SIZE: int = 50
 
     MESSAGE_SIZE_ASYNC_THRESHOLD: int = 300 * 1024
 
-    def __init__(self, host: str = None, port: int = 0, id: str = "", secure: bool = False):
+    def __init__(self, host: str = None, port: int = 0, id: str = ""):
         self._latencyBuffer = []
         self._asyncMessages = list[INetworkMessage]()
         self._asyncTrees = list[FuncTree]()
@@ -165,7 +165,7 @@ class ServerConnection(IServerConnection):
         self._remoteSrvHost = host
         self._remoteSrvPort = port
         self.addListeners()
-        self._timeoutTimer = Timer(interval=7, function=self.onSocketTimeOut)
+        self._timeoutTimer = BenchmarkTimer(interval=7, function=self.onSocketTimeOut)
         self._timeoutTimer.start()
         logger.info(f"[{self._id}] Connecting to {host}:{port}...")
         try:
@@ -204,8 +204,8 @@ class ServerConnection(IServerConnection):
             import pydofus2.com.ankamagames.dofus.kernel.net.ConnectionsHandler as connh
             logger.debug(str(e))
             if '[WinError 10054]' in str(e):
-                connh.ConnectionsHandler.connectionGonnaBeClosed(DisconnectionReasonEnum.CONNECTION_LOST, str(e))
-                connh.ConnectionsHandler.getConnection().close()
+                connh.ConnectionsHandler().connectionGonnaBeClosed(DisconnectionReasonEnum.CONNECTION_LOST, str(e))
+                connh.ConnectionsHandler().getConnection().close()
 
     def __str__(self) -> str:
         status = "Server connection status:\n"
@@ -319,8 +319,8 @@ class ServerConnection(IServerConnection):
             exc_type, exc_value, exc_traceback = sys.exc_info()
             traceback_in_var = traceback.format_tb(exc_traceback)
             error_trace = str(exc_type) + '\n' + str(exc_value) + '\n' + '\n'.join(traceback_in_var)
-            connh.ConnectionsHandler.connectionGonnaBeClosed(DisconnectionReasonEnum.EXCEPTION_THROWN, error_trace)
-            connh.ConnectionsHandler.getConnection().close()
+            connh.ConnectionsHandler().connectionGonnaBeClosed(DisconnectionReasonEnum.EXCEPTION_THROWN, error_trace)
+            connh.ConnectionsHandler().getConnection().close()
         self._processingSocketData = False
 
     def checkClosed(self) -> bool:
@@ -521,7 +521,7 @@ class ServerConnection(IServerConnection):
 
     def onClose(self, e: Event) -> None:
         logger.debug(f"[{self._id}] Connection closed received from the socket.")
-        Timer(3, self.removeListeners).start()
+        BenchmarkTimer(3, self.removeListeners).start()
         if self._lagometer:
             self._lagometer.stop()
         from pydofus2.com.ankamagames.jerakine.network.ServerConnectionClosedMessage import ServerConnectionClosedMessage

@@ -75,14 +75,14 @@ class HandshakeFrame(Frame):
         return Priority.HIGHEST
 
     def pushed(self) -> bool:
-        connh.ConnectionsHandler.hasReceivedNetworkMsg = False
+        connh.ConnectionsHandler().hasReceivedNetworkMsg = False
         return True
 
     def process(self, msg: Message) -> bool:
-        connh.ConnectionsHandler.hasReceivedMsg = True
+        connh.ConnectionsHandler().hasReceivedMsg = True
 
         if isinstance(msg, INetworkMessage):
-            connh.ConnectionsHandler.hasReceivedNetworkMsg = True
+            connh.ConnectionsHandler().hasReceivedNetworkMsg = True
             if self._timeoutTimer is not None:
                 self._timeoutTimer.cancel()
 
@@ -102,7 +102,7 @@ class HandshakeFrame(Frame):
 
     def onTimeout(self) -> None:
         pingMsg: BasicPingMessage = BasicPingMessage(quiet_=True)
-        connh.ConnectionsHandler.getConnection().send(pingMsg)
+        connh.ConnectionsHandler().getConnection().send(pingMsg)
 
     def pulled(self) -> bool:
         if self._timeoutTimer is not None:

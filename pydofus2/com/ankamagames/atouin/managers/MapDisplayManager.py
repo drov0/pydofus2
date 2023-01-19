@@ -8,6 +8,7 @@ from pydofus2.com.ankamagames.jerakine.logger.Logger import Logger
 from time import perf_counter
 import pydofus2.com.ankamagames.atouin.utils.DataMapProvider as dmpm
 from pydofus2.com.ankamagames.jerakine.metaclasses.Singleton import Singleton
+from pydofus2.com.ankamagames.jerakine.resources.loaders.MapLoader import MapLoader
 from pydofus2.com.ankamagames.jerakine.types.positions.MapPoint import MapPoint
 from pydofus2.com.ankamagames.jerakine.types.positions.WorldPoint import WorldPoint
 
@@ -15,25 +16,16 @@ logger = Logger("Dofus2")
 
 
 class MapDisplayManager(metaclass=Singleton):
-    _currentMap: WorldPoint
-    _mapInstanceId: float = 0
-    _lastMap: WorldPoint
-    _nMapLoadStart: int
-    _nMapLoadEnd: int
-    _identifiedElementPosition: dict[int, MapPoint]
-    _currentMapRendered = True
-    currentDataMap = None
-
+    
     def __init__(self) -> None:
-        from pydofus2.com.ankamagames.jerakine.resources.loaders.MapLoader import MapLoader
-
-        self._loader = MapLoader()
+        self._currentMapRendered = True
         self._currentMap = None
         self.currentDataMap = None
-        self._lastMap = None
+        self._lastMap: WorldPoint = None
         self._nMapLoadStart = 0
         self._nMapLoadEnd = 0
         self._forceReloadWithoutCache = False
+        self._identifiedElementPosition = dict[int, MapPoint]()
 
     @property
     def dataMap(self):
@@ -83,7 +75,7 @@ class MapDisplayManager(metaclass=Singleton):
         self._forceReloadWithoutCache = forceReloadWithoutCache
         self._currentMapRendered = False
         self._nMapLoadStart = perf_counter()
-        map = self._loader.load(mapId, key=decryptionKey)
+        map = MapLoader.load(mapId, key=decryptionKey)
         self._currentMapRendered = True
         self._nMapLoadEnd = perf_counter()
         logger.debug(f"Map {map.id} loaded in " + str(self._nMapLoadEnd - self._nMapLoadStart) + " seconds")

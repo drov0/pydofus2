@@ -94,17 +94,27 @@ class CustomSharedObject:
             try:
                 with open(self._file, "rb") as fp:
                     self._fileStream = fp
-                    c = pyamf.decode(fp.read())
+                    c = pyamf.decode(fp.read(), encoding=0)
                     c = list(c)
                     if c:
                         self.data = c[0]
                     else:
                         self.data = {}
             except Exception as e:
-                if self._fileStream:
-                    self._fileStream.close()
-                logger.warning(str(e))
-                if self.throwException:
-                    raise CustomSharedObjectFileFormatError("Malformated file : " + self._file)
+                try:
+                    with open(self._file, "rb") as fp:
+                        self._fileStream = fp
+                        c = pyamf.decode(fp.read(), encoding=3)
+                        c = list(c)
+                        if c:
+                            self.data = c[0]
+                        else:
+                            self.data = {}
+                except Exception as e:
+                    if self._fileStream:
+                        self._fileStream.close()
+                    logger.warning(str(e))
+                    if self.throwException:
+                        raise CustomSharedObjectFileFormatError("Malformated file : " + self._file)
         if not self.data:
             self.data = dict()

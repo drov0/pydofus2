@@ -11,6 +11,7 @@ from pydofus2.com.ankamagames.dofus.logic.game.fight.managers.FightersStateManag
 )
 import pydofus2.com.ankamagames.dofus.logic.game.common.managers.PlayedCharacterManager as pcm
 from pydofus2.com.ankamagames.dofus.network.Metadata import Metadata
+from pydofus2.com.ankamagames.jerakine.benchmark.BenchmarkTimer import BenchmarkTimer
 from pydofus2.com.ankamagames.jerakine.network.messages.Worker import Worker
 from pydofus2.com.ankamagames.jerakine.metaclasses.Singleton import Singleton
 from pydofus2.com.ankamagames.jerakine.logger.Logger import Logger
@@ -56,6 +57,7 @@ class Kernel(metaclass=Singleton):
 
         logger.debug("[KERNEL] Resetting ...")
         KernelEventsManager().reset()
+        BenchmarkTimer.clear()
         StatsManager.clear()
         SpellModifiersManager.clear()
         if not autoRetry:
@@ -94,3 +96,4 @@ class Kernel(metaclass=Singleton):
         self._worker.addFrame(dhF.DisconnectionHandlerFrame())
         if not self._worker.contains("CleanupCrewFrame"):
             self._worker.addFrame(CleanupCrewFrame())
+        

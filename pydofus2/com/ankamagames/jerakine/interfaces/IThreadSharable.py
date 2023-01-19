@@ -1,0 +1,2 @@
+class IThreadSharable:
+    pass

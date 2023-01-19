@@ -1,9 +1,9 @@
 from datetime import datetime
+import json
+import os
+from pydofus2.com.ankamagames.dofus import Constants
 from pydofus2.com.ankamagames.dofus.kernel.net.ConnectionsHandler import ConnectionsHandler
 from pydofus2.com.ankamagames.dofus.logic.common.managers.PlayerManager import PlayerManager
-from pydofus2.com.ankamagames.dofus.logic.game.common.managers.FeatureManager import (
-    FeatureManager,
-)
 from pydofus2.com.ankamagames.dofus.network.enums.GameContextEnum import GameContextEnum
 from pydofus2.com.ankamagames.dofus.network.messages.game.context.GameContextCreateMessage import (
     GameContextCreateMessage,
@@ -17,35 +17,28 @@ from pydofus2.com.ankamagames.dofus.network.messages.game.inventory.ObjectAverag
 from pydofus2.com.ankamagames.dofus.network.messages.game.inventory.ObjectAveragePricesMessage import (
     ObjectAveragePricesMessage,
 )
+from pydofus2.com.ankamagames.jerakine.benchmark.BenchmarkTimer import BenchmarkTimer
 from pydofus2.com.ankamagames.jerakine.logger.Logger import Logger
-from pydofus2.com.ankamagames.jerakine.managers.StoreDataManager import StoreDataManager
 from pydofus2.com.ankamagames.jerakine.messages.Frame import Frame
 from pydofus2.com.ankamagames.jerakine.messages.Message import Message
-from pydofus2.com.ankamagames.jerakine.types.DataStoreType import DataStoreType
-from pydofus2.com.ankamagames.jerakine.types.enums.DataStoreEnum import DataStoreEnum
 from pydofus2.com.ankamagames.jerakine.types.enums.Priority import Priority
-
 logger = Logger("Dofus2")
 
-
+class PricesData(object):
+    
+    def __init__(self):
+        self.lastUpdate: datetime = datetime.now()
+        self.items =  dict[int, float]()
+        
 class AveragePricesFrame(Frame):
-
-    _dataStoreType: DataStoreType = None
-
-    _serverName: str = ""
-
-    _pricesData: object = None
 
     def __init__(self):
         super().__init__()
+        self._pricesData = []
         self._serverName = PlayerManager().server.name
-        if not self._dataStoreType:
-            self._dataStoreType = DataStoreType(
-                "itemAveragePrices",
-                True,
-                DataStoreEnum.LOCATION_LOCAL,
-                DataStoreEnum.BIND_COMPUTER,
-            )
+        self.averagePricesPath = Constants.AVERAGE_PRICES_PATH
+        self.askDataTimer = None
+        self.nbrAsked = 0
 
     @property
     def priority(self) -> int:
@@ -60,10 +53,14 @@ class AveragePricesFrame(Frame):
         return self._pricesData
 
     def pushed(self) -> bool:
-        self._pricesData = StoreDataManager().getData(self._dataStoreType, self._serverName)
+        if os.path.exists(self.averagePricesPath):
+            self._pricesData = json.load(open(self.averagePricesPath, "r"))
         return True
 
     def pulled(self) -> bool:
+        if self.askDataTimer:
+            self.askDataTimer.cancel()
+        self._pricesData.clear()
         return True
 
     def process(self, pMsg: Message) -> bool:
@@ -73,37 +70,43 @@ class AveragePricesFrame(Frame):
                 self.askPricesData()
             return False
         if isinstance(pMsg, ObjectAveragePricesMessage):
+            if self.askDataTimer:
+                self.askDataTimer.cancel()
             oapm = pMsg
             self.updatePricesData(oapm.ids, oapm.avgPrices)
             return True
-        if isinstance(pMsg, ObjectAveragePricesErrorMessage):
+        if isinstance(pMsg, ObjectAveragePricesErrorMessage):           
+            logger.error("Error while getting average prices!")
             return True
         else:
             return False
 
     def updatePricesData(self, pItemsIds: list[int], pItemsAvgPrices: list[float]) -> None:
-        nbItems: int = len(pItemsIds)
-        self._pricesData = {"lastUpdate": datetime.now(), "items": dict()}
-        for i in range(nbItems):
-            self._pricesData.items[pItemsIds[i]] = pItemsAvgPrices[i]
-        StoreDataManager().setData(self._dataStoreType, self._serverName, self._pricesData)
+        self._pricesData = PricesData()
+        for itemId, averagePrice in zip(pItemsIds, pItemsAvgPrices):
+            self._pricesData.items[itemId] = averagePrice
+        if not os.path.exists(os.path.dirname(self.averagePricesPath)):
+            os.makedirs(os.path.dirname(self.averagePricesPath))
+        json.dump(self._pricesData, open(self.averagePricesPath, "w"))
 
     def updateAllowed(self) -> bool:
-        featureManager: FeatureManager = FeatureManager()
-        if not featureManager or not featureManager.isFeatureWithKeywordEnabled("trade.averagePricesAutoUpdate"):
-            return False
         if self.dataAvailable:
             now = datetime.now()
-            self._pricesData.lastUpdate.hour
             if (
-                now.getFullYear() == self._pricesData.lastUpdate.getFullYear()
-                and now.getMonth() == self._pricesData.lastUpdate.getMonth()
-                and now.getDate() == self._pricesData.lastUpdate.getDate()
+                now.year == self._pricesData.lastUpdate.year
+                and now.month == self._pricesData.lastUpdate.month
+                and now.date == self._pricesData.lastUpdate.date
             ):
                 return False
         return True
 
     def askPricesData(self) -> None:
+        self.nbrAsked += 1
+        if self.nbrAsked > 4:
+            logger.error("Failed to fetch average prices!")
+            return
         oapgm: ObjectAveragePricesGetMessage = ObjectAveragePricesGetMessage()
         oapgm.init()
         ConnectionsHandler().getConnection().send(oapgm)
+        self.askDataTimer = BenchmarkTimer(10, self.askPricesData)
+        self.askDataTimer.start()

@@ -4,42 +4,24 @@ from pydofus2.com.ankamagames.dofus.network.types.game.character.characteristic.
     CharacterSpellModification,
 )
 from pydofus2.com.ankamagames.jerakine.logger.Logger import Logger
-from pydofus2.com.ankamagames.jerakine.managers.StoreDataManager import StoreDataManager
 from pydofus2.com.ankamagames.jerakine.metaclasses.Singleton import Singleton
-from pydofus2.com.ankamagames.jerakine.types.DataStoreType import DataStoreType
-from pydofus2.com.ankamagames.jerakine.types.enums.DataStoreEnum import DataStoreEnum
 
 logger = Logger("Dofus2")
 
 
 class SpellModifiersManager(metaclass=Singleton):
 
-    _dataStoreType: DataStoreType = None
-
     DATA_STORE_CATEGORY: str = "ComputerModule_spellModifiersManager"
 
     DATA_STORE_KEY_IS_VERBOSE: str = "spellModifiersManagerIsVerbose"
 
     DEFAULT_IS_VERBOSE: bool = False
-
-    _entitiesMap: dict
-
-    _isVerbose: bool
-
+    
     def __init__(self):
         self._entitiesMap = dict()
         self._isVerbose = self.DEFAULT_IS_VERBOSE
         super().__init__()
         logger.info("Instantiating spells manager")
-        if self._dataStoreType is None:
-            self._dataStoreType = DataStoreType(
-                self.DATA_STORE_CATEGORY,
-                True,
-                DataStoreEnum.LOCATION_LOCAL,
-                DataStoreEnum.BIND_COMPUTER,
-            )
-        rawIsVerbose = StoreDataManager().getData(self._dataStoreType, self.DATA_STORE_KEY_IS_VERBOSE)
-        self._isVerbose = rawIsVerbose if isinstance(rawIsVerbose, bool) else self.DEFAULT_IS_VERBOSE
 
     @property
     def isVerbose(self) -> bool:
@@ -50,7 +32,6 @@ class SpellModifiersManager(metaclass=Singleton):
         if self._isVerbose == isVerbose:
             return
         self._isVerbose = isVerbose
-        StoreDataManager().setData(self._dataStoreType, self.DATA_STORE_KEY_IS_VERBOSE, self._isVerbose)
         verboseAction: str = "enabled" if self._isVerbose else "disabled"
         logger.info("Verbose mode has been " + verboseAction)
 

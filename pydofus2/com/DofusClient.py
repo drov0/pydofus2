@@ -31,7 +31,7 @@ from pydofus2.com.ankamagames.atouin.utils.DataMapProvider import DataMapProvide
 logger = Logger()
 
 
-class DofusClient:
+class DofusClient(metaclass=Singleton):
     LOG_MEMORY_USAGE: bool = False
     def __init__(self, id="unknown"):
         super().__init__()
@@ -46,8 +46,8 @@ class DofusClient:
         self._worker = krnl.Kernel().getWorker()
         self._registredInitFrames = []
         self._registredGameStartFrames = []
-        I18nFileAccessor().init()
-        DataMapProvider().init(AnimatedCharacter)
+        I18nFileAccessor()
+        DataMapProvider()
         logger.info("DofusClient initialized")
 
     def login(self, loginToken, serverId=0, characterId=None):
@@ -99,9 +99,11 @@ class DofusClient:
     def registerGameStartFrame(self, frame):
         self._registredGameStartFrames.append(frame)
 
-    def shutdown(self):
+    def shutdown(self, reason=None, msg=""):
         logger.info("Shuting down ...")
-        connh.ConnectionsHandler().connectionGonnaBeClosed(DisconnectionReasonEnum.WANTED_SHUTDOWN)
+        if reason is None:
+            reason = DisconnectionReasonEnum.WANTED_SHUTDOWN
+        connh.ConnectionsHandler().connectionGonnaBeClosed(reason, msg="")
         connh.ConnectionsHandler().getConnection().close()
 
     def restart(self):

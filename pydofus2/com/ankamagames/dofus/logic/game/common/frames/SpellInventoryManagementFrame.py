@@ -83,18 +83,15 @@ class SpellInventoryManagementFrame(Frame, metaclass=Singleton):
 
     def generateCurrentCustomModeBreedSpells(self) -> list:
         spellId: int = 0
-        playerApi: PlayedCharacterApi = PlayedCharacterApi()
-        if playerApi == None:
-            return []
         customSpells: list = []
-        playerBreed: int = playerApi.getPlayedCharacterInfo().breed
-        spellsInventory: list[SpellWrapper] = playerApi.getSpellInventory()
-        allSpellIds: list = playerApi.getCustomModeSpellIds()
+        playerBreed: int = PlayedCharacterApi.getPlayedCharacterInfo().breed
+        spellsInventory: list[SpellWrapper] = PlayedCharacterApi.getSpellInventory()
+        allSpellIds: list = PlayedCharacterApi.getCustomModeSpellIds()
         customModeBreedSpell: CustomModeBreedSpell = None
         for spellWrapper in spellsInventory:
             spellId = spellWrapper.spell.id
             if spellId in allSpellIds:
-                customModeBreedSpell = playerApi.getCustomModeBreedSpellById(spellId)
+                customModeBreedSpell = PlayedCharacterApi.getCustomModeBreedSpellById(spellId)
                 if not (customModeBreedSpell == None or customModeBreedSpell.breedId is not playerBreed):
                     customSpells.append([spellWrapper])
         return customSpells

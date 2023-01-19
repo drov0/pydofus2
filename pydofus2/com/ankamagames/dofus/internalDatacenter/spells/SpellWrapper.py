@@ -106,7 +106,7 @@ class SpellWrapper(ISlotData, ICellZoneProvider, IDataCenter):
     def getEntityId() -> float:
         from pydofus2.com.ankamagames.dofus.uiApi.PlayedCharacterApi import PlayedCharacterApi
 
-        if PlayedCharacterApi().isInFight():
+        if PlayedCharacterApi.isInFight():
             return cpfm.CurrentPlayedFighterManager().currentFighterId
         return PlayedCharacterManager().id
 
@@ -693,13 +693,3 @@ class SpellWrapper(ISlotData, ICellZoneProvider, IDataCenter):
                 elif healSpellModifier:
                     effectInstance.modificator = damageSpellModifier.totalValue - damageSpellModifier.additionalValue
             self.criticalEffect.append(effectInstance)
-        # llen = len(self._spellLevel.additionalEffectsZones)
-        # if llen > 0:
-        #     self.additionalEffectsZones = list[EffectZone]()
-        # for j in range(0, llen, 2):
-        #     self.additionalEffectsZones.append(
-        #         EffectZone(
-        #             self._spellLevel.additionalEffectsZones[j],
-        #             self._spellLevel.additionalEffectsZones[j + 1],
-        #         )
-        #     )

@@ -46,7 +46,7 @@ class ServerConnection(IServerConnection):
 
     MESSAGE_SIZE_ASYNC_THRESHOLD: int = 300 * 1024
 
-    def __init__(self, host: str = None, port: int = 0, id: str = "", secure: bool = False):
+    def __init__(self, host: str = None, port: int = 0, id: str = ""):
         self._latencyBuffer = []
         self._asyncMessages = list[INetworkMessage]()
         self._asyncTrees = list[FuncTree]()

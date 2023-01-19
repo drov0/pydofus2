@@ -14,8 +14,10 @@ class Socket(threading.Thread):
     MIN_TIME_BETWEEN_SEND = 0.0
 
     def __init__(self, host, port):
+        super().__init__()
         logger.info("Socket thread name: %s" % threading.current_thread().name)
         self.parent = threading.current_thread()
+        self.name = self.parent.name
         self.dispatcher = EventDispatcher()
         self._sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.connected = False
@@ -24,7 +26,6 @@ class Socket(threading.Thread):
         self._kill = threading.Event()
         self._buff = ByteArray()
         self._lastSent = 0
-        super().__init__(name=self.parent.name)
 
     @property
     def bytesAvailable(self):

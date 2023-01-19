@@ -44,6 +44,7 @@ MAX_LOGIN_ATTEMPTS = 3
 ROOTDIR = Path(os.path.dirname(__file__))
 
 MAPS_PATH = Path(os.getenv("APPDATA")) / "pydofus2" / "content" / "maps"
+AVERAGE_PRICES_PATH = Path(os.getenv("APPDATA")) / "pydofus2" / "content" / "average_prices.json"
 
 DOFUS_ROOTDIR = Path(os.getenv("LOCALAPPDATA")) / "Ankama" / "Dofus"
 

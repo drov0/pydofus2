@@ -43,7 +43,6 @@ from pydofus2.com.ankamagames.dofus.network.messages.security.ClientKeyMessage i
 )
 from pydofus2.com.ankamagames.jerakine.data.XmlConfig import XmlConfig
 from pydofus2.com.ankamagames.jerakine.logger.Logger import Logger
-from pydofus2.com.ankamagames.jerakine.managers.StoreDataManager import StoreDataManager
 from pydofus2.com.ankamagames.jerakine.messages.Frame import Frame
 from pydofus2.com.ankamagames.jerakine.messages.Message import Message
 from pydofus2.com.ankamagames.jerakine.network.messages.ServerConnectionFailedMessage import (
@@ -101,7 +100,6 @@ class AuthentificationFrame(Frame):
             self._currentLogIsForced = isinstance(iMsg, IdentificationAccountForceMessage)
             dhf = krnl.Kernel().getWorker().getFrame("DisconnectionHandlerFrame")
             time = perf_counter()
-            # failureTimes = StoreDataManager().getData(Constants.DATASTORE_MODULE_DEBUG, "connection_fail_times")
             failureTimes = []
             elapsedTimesSinceConnectionFail = list[int]([None] * len(failureTimes))
             if failureTimes:
@@ -111,9 +109,9 @@ class AuthentificationFrame(Frame):
                         elapsedTimesSinceConnectionFail[i] = int(elapsedSeconds)
                 dhf.resetConnectionAttempts()
             connh.ConnectionsHandler().getConnection().send(iMsg)
-            if InterClientManager().flashKey:
+            if InterClientManager.flashKey:
                 flashKeyMsg = ClientKeyMessage()
-                flashKeyMsg.key = InterClientManager().flashKey
+                flashKeyMsg.key = InterClientManager.flashKey
                 connh.ConnectionsHandler().getConnection().send(flashKeyMsg)
             KernelEventsManager().send(KernelEvts.IN_GAME, msg)
             return True
@@ -135,7 +133,6 @@ class AuthentificationFrame(Frame):
             PlayerManager().accountCreation = ismsg.accountCreation
             PlayerManager().wasAlreadyConnected = ismsg.wasAlreadyConnected
             DataStoreType.ACCOUNT_ID = str(ismsg.accountId)
-            # StoreDataManager().setData(Constants.DATASTORE_COMPUTER_OPTIONS, "lastAccountId", ismsg.accountId)
             KernelEventsManager().send(KernelEvts.LOGGED_IN, ismsg)
             krnl.Kernel().getWorker().removeFrame(self)
             krnl.Kernel().getWorker().addFrame(ssfrm.ServerSelectionFrame())
@@ -176,8 +173,7 @@ class AuthentificationFrame(Frame):
             connexionHosts = []
             for randomHost in tmpHosts:
                 connexionHosts.append(randomHost["host"])
-            defaultPort = StoreDataManager().getData(Constants.DATASTORE_COMPUTER_OPTIONS, "defaultConnectionPort")
-            defaultPort = int(defaultPort) if defaultPort else self.HIDDEN_PORT
+            defaultPort = self.HIDDEN_PORT
             self._connexionSequence = list()
             firstConnexionSequence = list()
             for host in connexionHosts:

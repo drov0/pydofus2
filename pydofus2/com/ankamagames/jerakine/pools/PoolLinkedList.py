@@ -9,6 +9,6 @@ class PoolLinkedList(LinkedList):
 
     def makeNode(self, value) -> LinkedListNode:
         node: LinkedListNode = None
-        node = poolsManager.PoolsManager().getLinkedListNodePool().checkOut()
+        node = poolsManager.PoolsManager.getLinkedListNodePool().checkOut()
         node.value = value
         return node

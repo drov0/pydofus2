@@ -254,7 +254,7 @@ class GameServerApproachFrame(Frame):
                 not PlayerManager() or PlayerManager().server.id != 129 and PlayerManager().server.id != 130
             ):
                 flashKeyMsg = ClientKeyMessage()
-                flashKeyMsg.init(InterClientManager().flashKey)
+                flashKeyMsg.init(InterClientManager.flashKey)
                 connh.ConnectionsHandler().getConnection().send(flashKeyMsg)
             self._cssmsg = cssmsg
             PlayedCharacterManager().infos = self._cssmsg.infos

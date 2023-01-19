@@ -8,7 +8,6 @@ from pydofus2.com.ankamagames.dofus.kernel.net.DisconnectionReasonEnum import (
     DisconnectionReasonEnum,
 )
 from pydofus2.com.ankamagames.jerakine.logger.Logger import Logger
-from pydofus2.com.ankamagames.jerakine.managers.StoreDataManager import StoreDataManager
 from pydofus2.com.ankamagames.jerakine.messages.Frame import Frame
 from pydofus2.com.ankamagames.jerakine.messages.Message import Message
 from pydofus2.com.ankamagames.jerakine.messages.WrongSocketClosureReasonMessage import (
@@ -54,7 +53,6 @@ class DisconnectionHandlerFrame(Frame):
 
     def resetConnectionAttempts(self) -> None:
         self._connectionUnexpectedFailureTimes = list()
-        StoreDataManager().setData(Constants.DATASTORE_MODULE_DEBUG, "connection_fail_times", None)
         self._numberOfAttemptsAlreadyDone = 0
 
     def pushed(self) -> bool:
@@ -67,11 +65,6 @@ class DisconnectionHandlerFrame(Frame):
             f"The connection was closed unexpectedly. Reconnection attempt {self._numberOfAttemptsAlreadyDone}/{self.CONNECTION_ATTEMPTS_NUMBER} will start in 4s."
         )
         self._connectionUnexpectedFailureTimes.append(perf_counter())
-        StoreDataManager().setData(
-            Constants.DATASTORE_MODULE_DEBUG,
-            "connection_fail_times",
-            self._connectionUnexpectedFailureTimes,
-        )
         self._timer = BenchmarkTimer(4, self.reconnect)
         self._timer.start()
 
@@ -104,11 +97,6 @@ class DisconnectionHandlerFrame(Frame):
                     if not reason.expected:
                         logger.debug(f"The connection was closed unexpectedly. Reseting.")
                         self._connectionUnexpectedFailureTimes.append(perf_counter())
-                        StoreDataManager().setData(
-                            Constants.DATASTORE_MODULE_DEBUG,
-                            "connection_fail_times",
-                            self._connectionUnexpectedFailureTimes,
-                        )
                         if self._timer:
                             self._timer.cancel()
                         self._timer = BenchmarkTimer(7, self.reconnect)

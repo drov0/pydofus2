@@ -6,7 +6,7 @@ logger = Logger("Dofus2")
 
 
 class I18nFileAccessor(metaclass=ThreadSharedSingleton):
-    
+        
     def __init__(self) -> None:
         self.directBuffer = None
         self.init()
@@ -58,8 +58,6 @@ class I18nFileAccessor(metaclass=ThreadSharedSingleton):
         textKeys: list = []
         for textKey in self.textIndexes:
             textKeys.append(textKey)
-        # EnterFrameDispatcher.worker.addForeachTreatment(setEntries, [], textKeys)
-        # EnterFrameDispatcher.worker.addSingleTreatment(logInit, [])
 
     def logInit() -> None:
         logger.debug("Initialized !")

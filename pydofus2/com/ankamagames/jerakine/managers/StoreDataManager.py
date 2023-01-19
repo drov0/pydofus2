@@ -27,14 +27,14 @@ class StoreDataManager(metaclass=ThreadSharedSingleton):
         self._aRegisteredClassAlias = dict()
         self._self = None
         aClass = self.getData(JerakineConstants.DATASTORE_CLASS_ALIAS, "classAliasList")
+        logger.debug("Class alias list : " + str(aClass))
         for s in aClass:
             className = base64.b64decode(s).decode()
             try:
                 oClass = getattr(sys.modules[__package__], className)
                 globals().update({aClass[s]: oClass})
             except Exception as e:
-                # logger.warn("Impossible de trouver la classe " + className)
-                self._aRegisteredClassAlias[className] = True
+                logger.warn("Impossible de trouver la classe " + className)
             self._aRegisteredClassAlias[className] = True
 
     def getSharedObject(self, sName: str) -> "CustomSharedObject":
@@ -51,7 +51,8 @@ class StoreDataManager(metaclass=ThreadSharedSingleton):
                 if so.data:
                     return so.data.get(sKey)
             elif dataType.location == DataStoreEnum.LOCATION_SERVER:
-                return None
+                pass
+            return None
         if dataType.category in self._aData:
             return self._aData[dataType.category][sKey]
         return None
@@ -62,23 +63,24 @@ class StoreDataManager(metaclass=ThreadSharedSingleton):
         else:
             return True
 
-    def registerClass(self, oInstance, deepClassScan: bool = False, keepClassInSo: bool = True) -> None:
+    def registerClass(self, oInstance: type, deepClassScan: bool = False, keepClassInSo: bool = True) -> None:
         if isinstance(oInstance, IExternalizable):
             raise Exception("Can't store a customized IExternalizable in a shared object.")
         if isinstance(oInstance, Secure):
             raise Exception("Can't store a Secure class")
         if self.isComplexType(oInstance):
-            className = oInstance.__class__.__name__
-            sAlias = className.__hash__()
-            if className not in self._aRegisteredClassAlias:
+            className = oInstance.__class__.__qualname__
+            if className in self._aRegisteredClassAlias:
                 return
+            sAlias = className.__hash__()
+            logger.debug("Register " + className + " with alias " + str(sAlias))
             try:
                 oClass = oInstance.__class__
                 globals().update({sAlias: oClass})
                 logger.warn("Register " + className)
             except Exception as e:
                 self._aRegisteredClassAlias[className] = True
-                logger.fatal("Impossible de trouver la classe " + className + " dans l'application domain courant")
+                # logger.fatal("Impossible de trouver la classe " + className + " dans l'application domain courant")
                 return
             if keepClassInSo:
                 aClassAlias = self.getSetData(JerakineConstants.DATASTORE_CLASS_ALIAS, "classAliasList", [])
@@ -107,7 +109,7 @@ class StoreDataManager(metaclass=ThreadSharedSingleton):
 
     def setData(self, dataType: DataStoreType, sKey: str, oValue, deepClassScan: bool = False) -> bool:
         so: CustomSharedObject = None
-        if self._aData.get(dataType.category) == None:
+        if self._aData.get(dataType.category) is None:
             self._aData[dataType.category] = dict()
         self._aData[dataType.category][sKey] = oValue
         if dataType.persistant:
@@ -117,9 +119,8 @@ class StoreDataManager(metaclass=ThreadSharedSingleton):
                 if not so.data:
                     so.data = {}
                 so.data[sKey] = oValue
-                if not self._bStoreSequence:
-                    if not so.flush():
-                        return False
+                if not self._bStoreSequence and not so.flush():
+                    return False
                 else:
                     self._aStoreSequence[dataType.category] = dataType
                 return True

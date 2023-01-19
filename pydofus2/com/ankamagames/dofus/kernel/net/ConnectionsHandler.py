@@ -23,33 +23,15 @@ class ConnectionsHandler(metaclass=Singleton):
     KOLI_SERVER: str = "koli_server"
 
     def __init__(self):
-        self._useSniffer: bool = False
-
         self._currentConnection: MultiConnection = None
-
         self._currentConnectionType: str = None
-
         self._wantedSocketLost: bool = False
-
         self._wantedSocketLostReason: int = 0
-
         self._hasReceivedMsg: bool = False
-
         self._hasReceivedNetworkMsg: bool = False
-
         self._connectionTimeout = None
-        
         self._disconnectMessage = ""
-
-    @property
-    def useSniffer(self) -> bool:
-        return self._useSniffer
-
-    @useSniffer.setter
-    def useSniffer(self, sniffer: bool) -> None:
-        self._useSniffer = sniffer
-
-    
+        
     @property
     def connectionType(self) -> str:
         return self._currentConnectionType
@@ -80,7 +62,7 @@ class ConnectionsHandler(metaclass=Singleton):
     def connectToLoginServer(self, host: str, port: int) -> None:
         if self._currentConnection != None:
             self.closeConnection()
-        self.etablishConnection(host, port, ConnectionType.TO_LOGIN_SERVER, self._useSniffer)
+        self.etablishConnection(host, port, ConnectionType.TO_LOGIN_SERVER)
         self._currentConnectionType = ConnectionType.TO_LOGIN_SERVER
 
     
@@ -91,8 +73,7 @@ class ConnectionsHandler(metaclass=Singleton):
         self.etablishConnection(
             gameServerHost,
             gameServerPort,
-            ConnectionType.TO_GAME_SERVER,
-            self._useSniffer,
+            ConnectionType.TO_GAME_SERVER
         )
         self._currentConnectionType = ConnectionType.TO_GAME_SERVER
         PlayerManager().gameServerPort = gameServerPort
@@ -105,8 +86,7 @@ class ConnectionsHandler(metaclass=Singleton):
         self.etablishConnection(
             gameServerHost,
             gameServerPort,
-            ConnectionType.TO_KOLI_SERVER,
-            self._useSniffer,
+            ConnectionType.TO_KOLI_SERVER
         )
         self._currentConnectionType = ConnectionType.TO_KOLI_SERVER
         PlayerManager().kisServerPort = gameServerPort
@@ -179,9 +159,7 @@ class ConnectionsHandler(metaclass=Singleton):
         self,
         host: str,
         port: int,
-        id: str,
-        useSniffer: bool = False,
-        proxy: IConnectionProxy = None,
+        id: str
     ) -> None:
         conn = ServerConnection(None, 0, id)
         if self._currentConnection is None:

@@ -1,4 +1,3 @@
-import sys
 import threading
 import tracemalloc
 from pydofus2.com.ankamagames.berilia.managers.KernelEventsManager import (
@@ -26,24 +25,23 @@ from pydofus2.com.ankamagames.jerakine.logger.Logger import Logger
 from typing import TYPE_CHECKING
 from pydofus2.com.ankamagames.jerakine.logger.MemoryProfiler import MemoryProfiler
 from pydofus2.com.ankamagames.jerakine.metaclasses.Singleton import Singleton
-
 if TYPE_CHECKING:
     from pydofus2.com.ankamagames.jerakine.network.ServerConnection import ServerConnection
 from pydofus2.com.ankamagames.atouin.utils.DataMapProvider import DataMapProvider
-
 logger = Logger()
 
 
-class DofusClient(metaclass=Singleton):
+class DofusClient:
     LOG_MEMORY_USAGE: bool = False
-    _stop = threading.Event()
-    _stopReason: DisconnectionReason = None
-    _lastLoginTime = None
-    _minLoginInterval = 10
-    _joined = False
-
-    def __init__(self):
+    def __init__(self, id="unknown"):
+        super().__init__()
+        self._stop = threading.Event()
+        self._stopReason: DisconnectionReason = None
+        self._lastLoginTime = None
+        self._minLoginInterval = 10
+        self._joined = False
         krnl.Kernel().init()
+        self.id = id
         logger.info("Kernel initialized ...")
         self._worker = krnl.Kernel().getWorker()
         self._registredInitFrames = []
@@ -81,7 +79,6 @@ class DofusClient(metaclass=Singleton):
             )
 
     def join(self):
-        self._joined = True
         while not self._stop.is_set():
             try:
                 sleep(1)
@@ -93,9 +90,7 @@ class DofusClient(metaclass=Singleton):
                 self.shutdown()
                 if self.LOG_MEMORY_USAGE:
                     MemoryProfiler.saveCollectedData()
-                sys.exit(0)
-
-        if self._stopReason.reason == DisconnectionReasonEnum.EXCEPTION_THROWN:
+        if self._stopReason and self._stopReason.reason == DisconnectionReasonEnum.EXCEPTION_THROWN:
             raise Exception(self._stopReason.message)
 
     def registerInitFrame(self, frame):
@@ -106,12 +101,12 @@ class DofusClient(metaclass=Singleton):
 
     def shutdown(self):
         logger.info("Shuting down ...")
-        connh.ConnectionsHandler.connectionGonnaBeClosed(DisconnectionReasonEnum.WANTED_SHUTDOWN)
-        connh.ConnectionsHandler.getConnection().close()
+        connh.ConnectionsHandler().connectionGonnaBeClosed(DisconnectionReasonEnum.WANTED_SHUTDOWN)
+        connh.ConnectionsHandler().getConnection().close()
 
     def restart(self):
-        conn = connh.ConnectionsHandler.getConnection()
-        connh.ConnectionsHandler.connectionGonnaBeClosed(DisconnectionReasonEnum.RESTARTING)
+        conn = connh.ConnectionsHandler().getConnection()
+        connh.ConnectionsHandler().connectionGonnaBeClosed(DisconnectionReasonEnum.RESTARTING)
         conn.close()
 
     def relogin(self):
@@ -129,7 +124,7 @@ class DofusClient(metaclass=Singleton):
 
     @property
     def mainConn(self) -> "ServerConnection":
-        return connh.ConnectionsHandler.getConnection().mainConnection
+        return connh.ConnectionsHandler().getConnection().mainConnection
 
     @property
     def registeredInitFrames(self) -> list:

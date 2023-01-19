@@ -22,7 +22,6 @@ logger = Logger("Kernel")
 
 
 class Worker(EventDispatcher, MessageHandler):
-
     DEBUG_FRAMES: bool = False
     DEBUG_MESSAGES: bool = False
     DEBUG_FRAMES_PROCESSING: bool = False

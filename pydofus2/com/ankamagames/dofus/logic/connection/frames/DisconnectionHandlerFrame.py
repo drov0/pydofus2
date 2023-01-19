@@ -1,4 +1,4 @@
-from threading import Timer
+from pydofus2.com.ankamagames.jerakine.benchmark.BenchmarkTimer import BenchmarkTimer
 from time import perf_counter
 from pydofus2.com.DofusClient import DofusClient
 from pydofus2.com.ankamagames.dofus import Constants
@@ -39,7 +39,7 @@ class DisconnectionHandlerFrame(Frame):
 
     _numberOfAttemptsAlreadyDone: int = 0
 
-    _timer: Timer
+    _timer:  BenchmarkTimer
 
     _mustShowLoginInterface: bool = False
 
@@ -72,7 +72,7 @@ class DisconnectionHandlerFrame(Frame):
             "connection_fail_times",
             self._connectionUnexpectedFailureTimes,
         )
-        self._timer = Timer(4, self.reconnect)
+        self._timer = BenchmarkTimer(4, self.reconnect)
         self._timer.start()
 
     def process(self, msg: Message) -> bool:
@@ -80,11 +80,11 @@ class DisconnectionHandlerFrame(Frame):
         if isinstance(msg, ServerConnectionClosedMessage):
             logger.debug("Server Connection Closed.")
             if (
-                connh.ConnectionsHandler.getConnection()
-                and connh.ConnectionsHandler.getConnection().mainConnection
+                connh.ConnectionsHandler().getConnection()
+                and connh.ConnectionsHandler().getConnection().mainConnection
                 and (
-                    connh.ConnectionsHandler.getConnection().mainConnection.connected
-                    or connh.ConnectionsHandler.getConnection().mainConnection.connecting
+                    connh.ConnectionsHandler().getConnection().mainConnection.connected
+                    or connh.ConnectionsHandler().getConnection().mainConnection.connecting
                 )
             ):
                 logger.debug("The connection was closed before we even receive any message. Will halt.")
@@ -92,11 +92,11 @@ class DisconnectionHandlerFrame(Frame):
 
             logger.debug("The connection was closed. Checking reasons.")
             gsaF.GameServerApproachFrame.authenticationTicketAccepted = False
-            reason = connh.ConnectionsHandler.handleDisconnection()
-            if connh.ConnectionsHandler.hasReceivedMsg:
+            reason = connh.ConnectionsHandler().handleDisconnection()
+            if connh.ConnectionsHandler().hasReceivedMsg:
                 if (
                     not reason.expected and
-                    not connh.ConnectionsHandler.hasReceivedNetworkMsg
+                    not connh.ConnectionsHandler().hasReceivedNetworkMsg
                     and self._numberOfAttemptsAlreadyDone < self.CONNECTION_ATTEMPTS_NUMBER
                 ):
                     self.handleUnexpectedNoMsgReceived()
@@ -111,7 +111,7 @@ class DisconnectionHandlerFrame(Frame):
                         )
                         if self._timer:
                             self._timer.cancel()
-                        self._timer = Timer(7, self.reconnect)
+                        self._timer = BenchmarkTimer(7, self.reconnect)
                         self._timer.start()
                     else:
                         logger.debug(
@@ -125,10 +125,10 @@ class DisconnectionHandlerFrame(Frame):
                             krnl.Kernel().reset()
                             DofusClient().interrupt(reason)
                         elif reason.reason == DisconnectionReasonEnum.RESTARTING or reason.reason == DisconnectionReasonEnum.DISCONNECTED_BY_POPUP:
-                            Timer(10, self.reconnect).start()
+                            BenchmarkTimer(10, self.reconnect).start()
                         elif reason.reason == DisconnectionReasonEnum.CONNECTION_LOST:
                             logger.debug(f"The connection was lost. Restarting in 10seconds.")
-                            Timer(10, self.reconnect).start()
+                            BenchmarkTimer(10, self.reconnect).start()
                         else:
                             krnl.Kernel().getWorker().process(ExpectedSocketClosureMessage(reason.reason))
             else:

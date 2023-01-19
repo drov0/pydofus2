@@ -56,7 +56,7 @@ class ContextChangeFrame(Frame):
 
         if isinstance(msg, GameContextQuitAction):
             gcqmsg = GameContextQuitMessage()
-            ConnectionsHandler.getConnection().send(gcqmsg)
+            ConnectionsHandler().getConnection().send(gcqmsg)
             return True
 
         if isinstance(msg, CurrentMapMessage):

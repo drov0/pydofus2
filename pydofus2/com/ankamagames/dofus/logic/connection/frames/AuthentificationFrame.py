@@ -56,22 +56,17 @@ logger = Logger("Dofus2")
 
 
 class AuthentificationFrame(Frame):
-
     HIDDEN_PORT: int = 443
-
     CONNEXION_MODULE_NAME: str = "ComputerModule_Ankama_Connection"
 
-    _lastTicket: str
-
-    _connexionHosts: list = []
-
-    _dispatchModuleHook: bool = False
-
-    _connexionSequence: list
-
-    _lastLoginHash: str = None
-
-    _currentLogIsForced: bool = False
+    def __init__(self) -> None:
+        super().__init__()
+        self._lastTicket: str
+        self._connexionHosts: list = []
+        self._dispatchModuleHook: bool = False
+        self._connexionSequence: list
+        self._lastLoginHash: str = None
+        self._currentLogIsForced: bool = False
 
     @property
     def priority(self) -> int:
@@ -87,12 +82,12 @@ class AuthentificationFrame(Frame):
 
         if isinstance(msg, ServerConnectionFailedMessage):
             scfMsg = msg
-            if scfMsg.failedConnection == connh.ConnectionsHandler.getConnection().getSubConnection(scfMsg):
-                connh.ConnectionsHandler.getConnection().mainConnection.stopConnectionTimeout()
+            if scfMsg.failedConnection == connh.ConnectionsHandler().getConnection().getSubConnection(scfMsg):
+                connh.ConnectionsHandler().getConnection().mainConnection.stopConnectionTimeout()
                 if self._connexionSequence:
                     retryConnInfo = self._connexionSequence.pop(0)
                     if retryConnInfo:
-                        connh.ConnectionsHandler.connectToLoginServer(retryConnInfo.host, retryConnInfo.port)
+                        connh.ConnectionsHandler().connectToLoginServer(retryConnInfo.host, retryConnInfo.port)
                     else:
                         PlayerManager().destroy()
             return True
@@ -115,11 +110,11 @@ class AuthentificationFrame(Frame):
                     if elapsedSeconds <= 3.6:
                         elapsedTimesSinceConnectionFail[i] = int(elapsedSeconds)
                 dhf.resetConnectionAttempts()
-            connh.ConnectionsHandler.getConnection().send(iMsg)
+            connh.ConnectionsHandler().getConnection().send(iMsg)
             if InterClientManager().flashKey:
                 flashKeyMsg = ClientKeyMessage()
                 flashKeyMsg.key = InterClientManager().flashKey
-                connh.ConnectionsHandler.getConnection().send(flashKeyMsg)
+                connh.ConnectionsHandler().getConnection().send(flashKeyMsg)
             KernelEventsManager().send(KernelEvts.IN_GAME, msg)
             return True
 
@@ -150,11 +145,11 @@ class AuthentificationFrame(Frame):
             reasonName = IdentificationFailureReasonEnum(msg.reason).name
             logger.info("Identification failed for reason " + reasonName)
             PlayerManager().destroy()
-            connh.ConnectionsHandler.connectionGonnaBeClosed(
+            connh.ConnectionsHandler().connectionGonnaBeClosed(
                 DisconnectionReasonEnum.EXCEPTION_THROWN, 
                 f"Identification failed for reason : {reasonName}"
             )
-            connh.ConnectionsHandler.closeConnection()
+            connh.ConnectionsHandler().closeConnection()
             if not self._dispatchModuleHook:
                 self._dispatchModuleHook = True
                 self.pushed()
@@ -213,26 +208,26 @@ class AuthentificationFrame(Frame):
 
             AuthentificationManager().loginValidationAction = lva
             connInfo = self._connexionSequence.pop(0)
-            connh.ConnectionsHandler.connectToLoginServer(connInfo["host"], connInfo["port"])
+            connh.ConnectionsHandler().connectToLoginServer(connInfo["host"], connInfo["port"])
             return True
 
         elif isinstance(msg, ServerConnectionFailedMessage):
             scfMsg = msg
-            connh.ConnectionsHandler.getConnection().mainConnection.stopConnectionTimeout()
+            connh.ConnectionsHandler().getConnection().mainConnection.stopConnectionTimeout()
             if self._connexionSequence:
                 retryConnInfo = self._connexionSequence.pop(0)
                 if retryConnInfo:
-                    connh.ConnectionsHandler.connectToLoginServer(retryConnInfo["host"], retryConnInfo["port"])
+                    connh.ConnectionsHandler().connectToLoginServer(retryConnInfo["host"], retryConnInfo["port"])
                 else:
                     logger.error(
                         "Unable to connect to the server for reason." + DisconnectionReasonEnum.UNEXPECTED.name
                     )
                     PlayerManager().destroy()
-                    connh.ConnectionsHandler.connectionGonnaBeClosed(
+                    connh.ConnectionsHandler().connectionGonnaBeClosed(
                         DisconnectionReasonEnum.EXCEPTION_THROWN, 
                         DisconnectionReasonEnum.UNEXPECTED.name
                     )
-                    connh.ConnectionsHandler.closeConnection()
+                    connh.ConnectionsHandler().closeConnection()
             return True
 
     def pushed(self) -> bool:

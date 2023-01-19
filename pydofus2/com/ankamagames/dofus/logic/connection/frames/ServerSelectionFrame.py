@@ -154,7 +154,7 @@ class ServerSelectionFrame(Frame):
                     ):
                         ssmsg = ServerSelectionMessage()
                         ssmsg.init(ssaction.serverId)
-                        connh.ConnectionsHandler.getConnection().send(ssmsg)
+                        connh.ConnectionsHandler().getConnection().send(ssmsg)
                         return True
                     else:
                         logger.debug(
@@ -182,12 +182,12 @@ class ServerSelectionFrame(Frame):
                 )
                 return True
             self._worker.addFrame(GameServerApproachFrame())
-            connh.ConnectionsHandler.connectToGameServer(self._selectedServer.address, self._selectedServer.ports[0])
+            connh.ConnectionsHandler().connectToGameServer(self._selectedServer.address, self._selectedServer.ports[0])
             return True
 
         if isinstance(msg, (SelectedServerDataMessage, SelectedServerDataExtendedMessage)):
             ssdmsg: SelectedServerDataMessage = msg
-            connh.ConnectionsHandler.connectionGonnaBeClosed(DisconnectionReasonEnum.SWITCHING_TO_GAME_SERVER)
+            connh.ConnectionsHandler().connectionGonnaBeClosed(DisconnectionReasonEnum.SWITCHING_TO_GAME_SERVER)
             self._selectedServer = ssdmsg
             AuthentificationManager().gameServerTicket = (
                 AuthentificationManager().decodeWithAES(ssdmsg.ticket).decode()

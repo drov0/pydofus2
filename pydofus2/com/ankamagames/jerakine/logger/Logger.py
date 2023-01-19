@@ -3,21 +3,50 @@ import datetime
 import os
 from pathlib import Path
 import sys
-from pydofus2.com.ankamagames.jerakine.metaclasses.Singleton import Singleton
+from pydofus2.com.ankamagames.jerakine.metaclasses.ThreadSharedSingleton import ThreadSharedSingleton
+import threading
 
-class Logger(logging.Logger, metaclass=Singleton):
-    _logger = None
-    prefix = None
-    LOGS_PATH = Path(os.getenv("APPDATA")) / "pydofus2" / "logs"
+LOGS_PATH = Path(os.getenv("APPDATA")) / "pydofus2" / "logs"
+if not os.path.isdir(LOGS_PATH):
+    os.makedirs(LOGS_PATH)
+class ThreadLogFilter(logging.Filter):
+    """
+    This filter only show log entries for specified thread name
+    """
+
+    def __init__(self, thread_name, *args, **kwargs):
+        logging.Filter.__init__(self, *args, **kwargs)
+        self.thread_name = thread_name
+
+    def filter(self, record):
+        return record.threadName == self.thread_name
+    
+class LoggerSingleton(type):
+    _instances = dict[int, dict[type, object]]()
+    
+    def __call__(cls, *args, **kwargs) -> object:
+        thrid = threading.current_thread().name
+        if thrid not in cls._instances:
+            cls._instances[thrid] = dict()
+        if cls not in cls._instances[thrid]:
+            cls._instances[thrid][cls] = super(LoggerSingleton, cls).__call__(*args, **kwargs)
+        return cls._instances[thrid][cls]
+
+    def clear(cls):
+        cls._instances[threading.current_thread().name].clear()
+
+# this class is a singleton
+class Logger(logging.Logger, metaclass=LoggerSingleton):
+    
     def __init__(self, log_prefix=""):
         super().__init__("logger")
         self.setLevel(logging.DEBUG)
-        formatter = logging.Formatter("%(asctime)s | %(levelname)s | %(filename)s:%(lineno)s | %(message)s", datefmt='%H:%M:%S')
+        self.prefix = threading.current_thread().name
+        formatter = logging.Formatter("%(threadName)s|%(asctime)s|%(levelname)s|%(filename)s:%(lineno)s | %(message)s", datefmt='%H:%M:%S')
         now = datetime.datetime.now()
-        if not os.path.isdir(self.LOGS_PATH):
-            os.makedirs(self.LOGS_PATH)
+            
         fileHandler = logging.FileHandler(
-            self.LOGS_PATH / f"{self.prefix}_{now.strftime('%Y-%m-%d')}.log"
+            LOGS_PATH / f"{self.prefix}_{now.strftime('%Y-%m-%d')}.log"
         )
         fileHandler.setFormatter(formatter)
         self.addHandler(fileHandler)
@@ -25,6 +54,12 @@ class Logger(logging.Logger, metaclass=Singleton):
         streamHandler = logging.StreamHandler(sys.stdout)
         streamHandler.setFormatter(formatter)
         self.addHandler(streamHandler)
+        self._instance = self
+    
+    def packArgs(self, *args, **kwargs):
+        strargs = ', '.join([str(arg) for arg in args])
+        strkwargs = ', '.join([f"{key}={value}" for key, value in kwargs.items()])
+        return f"{strargs}, {strkwargs}"
 
     def get_logger(self):
         return self

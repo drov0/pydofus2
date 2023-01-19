@@ -1,11 +1,11 @@
-from threading import Timer
+import threading
 from types import FunctionType
 from pydofus2.com.ankamagames.jerakine.logger.Logger import Logger
 
 logger = Logger("Dofus2")
 
 
-class BenchmarkTimer(Timer):
+class BenchmarkTimer(threading.Timer):
 
     startedTimers = set["BenchmarkTimer"]()
     name: str = "unamed"
@@ -15,6 +15,7 @@ class BenchmarkTimer(Timer):
         self.name = function.__name__
         super().__init__(interval, function, *args, **kwargs)
         BenchmarkTimer.startedTimers.add(self)
+        self.name = threading.current_thread().name
 
     def printUnstoppedTimers(self) -> None:
         for timer in BenchmarkTimer.startedTimers:

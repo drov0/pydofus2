@@ -7,13 +7,15 @@ from pydofus2.com.ankamagames.jerakine.events.ProgressEvent import ProgressEvent
 from pydofus2.com.ankamagames.jerakine.logger.Logger import Logger
 from pydofus2.com.ankamagames.jerakine.network.CustomDataWrapper import ByteArray
 
-logger = Logger("Dofus2")
+logger = Logger()
 
 
 class Socket(threading.Thread):
     MIN_TIME_BETWEEN_SEND = 0.0
 
     def __init__(self, host, port):
+        logger.info("Socket thread name: %s" % threading.current_thread().name)
+        self.parent = threading.current_thread()
         self.dispatcher = EventDispatcher()
         self._sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.connected = False
@@ -22,7 +24,7 @@ class Socket(threading.Thread):
         self._kill = threading.Event()
         self._buff = ByteArray()
         self._lastSent = 0
-        super().__init__()
+        super().__init__(name=self.parent.name)
 
     @property
     def bytesAvailable(self):

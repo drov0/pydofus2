@@ -14,14 +14,15 @@ from pydofus2.com.ankamagames.dofus.network.Metadata import Metadata
 from pydofus2.com.ankamagames.jerakine.network.messages.Worker import Worker
 from pydofus2.com.ankamagames.jerakine.metaclasses.Singleton import Singleton
 from pydofus2.com.ankamagames.jerakine.logger.Logger import Logger
-
 logger = Logger("Dofus2")
 
 
 class Kernel(metaclass=Singleton):
-    _worker: Worker = Worker()
-    beingInReconection: bool = False
-    _reseted = True
+    
+    def __init__(self) -> None:
+        self._worker: Worker = Worker()
+        self.beingInReconection: bool = False
+        self._reseted = True
 
     def getWorker(self) -> Worker:
         return self._worker
@@ -30,9 +31,8 @@ class Kernel(metaclass=Singleton):
         from pydofus2.com.ankamagames.dofus.kernel.net.ConnectionsHandler import (
             ConnectionsHandler,
         )
-
         self._worker.clear()
-        ConnectionsHandler.closeConnection()
+        ConnectionsHandler().closeConnection()
 
     @property
     def wasReseted(self) -> bool:

@@ -36,6 +36,7 @@ class MapMovementAdapter:
     def getClientMovement(cls, path: list[int]) -> MovementPath:
         mp: MovementPath = MovementPath()
         moveCount: int = 0
+        previousElement = None
         for movement in path:
             destination = MapPoint.fromCellId(movement & 4095)
             pe = PathElement()
@@ -48,6 +49,7 @@ class MapMovementAdapter:
                 mp.end = destination
                 break
             mp.addPoint(pe)
+            previousElement = pe
             moveCount += 1
         mp.fill()
         if cls.DEBUG_ADAPTER:

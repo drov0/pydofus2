@@ -1,7 +1,6 @@
 from pydofus2.com.ankamagames.jerakine.benchmark.BenchmarkTimer import BenchmarkTimer
 from time import perf_counter
 from pydofus2.com.DofusClient import DofusClient
-from pydofus2.com.ankamagames.dofus import Constants
 import pydofus2.com.ankamagames.dofus.kernel.Kernel as krnl
 import pydofus2.com.ankamagames.dofus.kernel.net.ConnectionsHandler as connh
 from pydofus2.com.ankamagames.dofus.kernel.net.DisconnectionReasonEnum import (

@@ -2,7 +2,6 @@ from pydofus2.com.ankamagames.jerakine.logger.Logger import Logger
 from whistle import Event, EventDispatcher
 from pydofus2.com.ankamagames.jerakine.network.IServerConnection import IServerConnection
 from pydofus2.com.ankamagames.jerakine.network.INetworkMessage import INetworkMessage
-from pydofus2.com.ankamagames.jerakine.network.NetworkSentEvent import NetworkSentEvent
 from pydofus2.com.ankamagames.jerakine.events.SocketEvent import SocketEvent
 from pydofus2.com.ankamagames.jerakine.events.IOErrorEvent import IOErrorEvent
 from pydofus2.com.ankamagames.jerakine.events.SecurityErrorEvent import SecurityErrorEvent
@@ -87,6 +86,7 @@ class MultiConnection(EventDispatcher):
         if self._mainConnection == conn:
             for otherConn in self._connectionById:
                 self._mainConnection = otherConn
+                break
         return True
 
     def getSubConnection(self, idOrMessageOrEvent=None) -> IServerConnection:
@@ -158,8 +158,7 @@ class MultiConnection(EventDispatcher):
                 self.getSubConnection(connectionId).send(msg)
         elif self._mainConnection:
             self._mainConnection.send(msg)
-        if self.has_listeners(NetworkSentEvent.EVENT_SENT):
-            self.dispatch(NetworkSentEvent.EVENT_SENT, NetworkSentEvent(msg))
+            
 
     def onSubConnectionEvent(self, e: Event) -> None:
         if e.name == SocketEvent.CONNECT:

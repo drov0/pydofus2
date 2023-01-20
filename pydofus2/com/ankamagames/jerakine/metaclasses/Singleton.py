@@ -1,6 +1,7 @@
 import threading
 from pydofus2.com.ankamagames.jerakine.logger.Logger import Logger
 
+
 logger = Logger()
 class Singleton(type):
     _instances = dict[int, dict[type, object]]()

@@ -17,8 +17,6 @@ from pydofus2.com.ankamagames.dofus.network.types.game.character.characteristic.
     CharacterUsableCharacteristicDetailed,
 )
 from pydofus2.com.ankamagames.jerakine.metaclasses.Singleton import Singleton
-from pydofus2.com.ankamagames.jerakine.types.DataStoreType import DataStoreType
-from pydofus2.com.ankamagames.jerakine.types.enums.DataStoreEnum import DataStoreEnum
 
 logger = Logger()
 

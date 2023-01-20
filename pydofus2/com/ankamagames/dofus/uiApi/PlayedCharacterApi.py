@@ -88,7 +88,6 @@ from pydofus2.com.ankamagames.dofus.network.types.game.guild.application.GuildAp
     GuildApplicationInformation,
 )
 from pydofus2.com.ankamagames.jerakine.logger.Logger import Logger
-from pydofus2.com.ankamagames.jerakine.metaclasses.ThreadSharedSingleton import ThreadSharedSingleton
 
 logger = Logger("Dofus2")
 

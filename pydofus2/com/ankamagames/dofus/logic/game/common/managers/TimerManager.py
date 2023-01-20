@@ -1,15 +1,13 @@
 from datetime import datetime, timezone
-from pydofus2.com.ankamagames.jerakine.metaclasses.Singleton import Singleton
+from pydofus2.com.ankamagames.jerakine.metaclasses.ThreadSharedSingleton import ThreadSharedSingleton
 
 
-class TimeManager(metaclass=Singleton):
+class TimeManager(metaclass=ThreadSharedSingleton):
+    
     def __init__(self) -> None:
         self.serverTimeLag: int = 0
-
         self.serverUtcTimeLag: int = 0
-
         self.timezoneOffset: int = 0
-
         self.dofusTimeYearLag: int = 0
 
     def getUtcTimestamp(self):

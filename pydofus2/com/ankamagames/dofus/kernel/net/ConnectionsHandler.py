@@ -11,7 +11,6 @@ from pydofus2.com.ankamagames.jerakine.benchmark.BenchmarkTimer import Benchmark
 from pydofus2.com.ankamagames.jerakine.logger.Logger import Logger
 from pydofus2.com.ankamagames.jerakine.messages.ConnectionResumedMessage import ConnectionResumedMessage
 from pydofus2.com.ankamagames.jerakine.metaclasses.Singleton import Singleton
-from pydofus2.com.ankamagames.jerakine.network.IConnectionProxy import IConnectionProxy
 from pydofus2.com.ankamagames.jerakine.network.MultiConnection import MultiConnection
 from pydofus2.com.ankamagames.jerakine.network.ServerConnection import ServerConnection
 
@@ -134,7 +133,6 @@ class ConnectionsHandler(metaclass=Singleton):
     def pause(self) -> None:
         logger.info("Pause connection")
         self._currentConnection.pause()
-
     
     def resume(self) -> None:
         logger.info("Resume connection")

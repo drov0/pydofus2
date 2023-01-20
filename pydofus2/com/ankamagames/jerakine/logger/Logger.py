@@ -3,7 +3,6 @@ import datetime
 import os
 from pathlib import Path
 import sys
-from pydofus2.com.ankamagames.jerakine.metaclasses.ThreadSharedSingleton import ThreadSharedSingleton
 import threading
 
 LOGS_PATH = Path(os.getenv("APPDATA")) / "pydofus2" / "logs"

@@ -1,12 +1,13 @@
 from types import FunctionType
 from pydofus2.com.ankamagames.dofus.datacenter.feature.OptionalFeature import OptionalFeature
 from pydofus2.com.ankamagames.jerakine.logger.Logger import Logger
-from pydofus2.com.ankamagames.jerakine.metaclasses.Singleton import Singleton
-
+from pydofus2.com.ankamagames.jerakine.metaclasses.ThreadSharedSingleton import ThreadSharedSingleton
+from threading import Lock
+lock = Lock()
 logger = Logger("Dofus2")
 
 
-class FeatureManager(metaclass=Singleton):
+class FeatureManager(metaclass=ThreadSharedSingleton):
 
     _enabledFeatureIds: list[int] = None
     _featureListeners: dict = None
@@ -23,7 +24,8 @@ class FeatureManager(metaclass=Singleton):
 
     def resetEnabledFeatures(self) -> None:
         logger.info("Resetting enabled features")
-        self._enabledFeatureIds = list[int]()
+        with lock:
+            self._enabledFeatureIds = list[int]()
 
     def resetEnabledServerFeatures(self) -> None:
         logger.info("Resetting enabled server features")
@@ -35,7 +37,8 @@ class FeatureManager(metaclass=Singleton):
             feature = OptionalFeature.getOptionalFeatureById(featureId)
             if feature == None:
                 logger.error("Feature with ID " + str(featureId) + " is enabled AND None. What happened? Disabling it")
-                del self._enabledFeatureIds[index]
+                with lock:
+                    del self._enabledFeatureIds[index]
             elif feature.isServer:
                 self.disableFeature(feature)
             else:
@@ -51,7 +54,8 @@ class FeatureManager(metaclass=Singleton):
             feature = OptionalFeature.getOptionalFeatureById(featureId)
             if feature is None:
                 logger.error("Feature with ID " + str(featureId) + " is enabled AND None. What happened? Disabling it")
-                del self._enabledFeatureIds[index]
+                with lock:
+                    del self._enabledFeatureIds[index]
             elif feature.isClient and not feature.isServer and feature.isActivationOnServerConnection:
                 self.disableFeature(feature)
             else:
@@ -114,7 +118,8 @@ class FeatureManager(metaclass=Singleton):
                 logger.error("Feature CANNOT be enabled (" + str(feature) + "). Aborting")
                 return False
             logger.warn("Feature cannot normally be enabled (" + str(feature) + "). But the FORCE flag has been set")
-        self._enabledFeatureIds.append(feature.id)
+        with lock:
+            self._enabledFeatureIds.append(feature.id)
         str(logger.info(feature) + " enabled")
         self.fireFeatureActivationUpdate(feature, True)
         return True
@@ -125,14 +130,15 @@ class FeatureManager(metaclass=Singleton):
         if feature == None:
             featureIdLabel = str(featureId)
             logger.error(
-                "Tried to disable non-existing feature (ID: " + str(featureIdLabel) + "). Is self an export issue?"
+                f"Tried to disable non-existing feature (ID: {featureIdLabel}). Is self an export issue?"
             )
             if featureId in self._enabledFeatureIds:
-                logger.warn("Yet non-existing feature (ID: " + str(featureIdLabel) + ") is enabled... Disabling it")
-                self._enabledFeatureIds.remove(featureId)
-                logger.warn("Non-existing feature (ID: " + str(featureIdLabel) + ") disabled")
+                logger.warn(f"Yet non-existing feature (ID: {featureIdLabel}) is enabled... Disabling it")
+                with lock:
+                    self._enabledFeatureIds.remove(featureId)
+                logger.warn(f"Non-existing feature (ID: {featureIdLabel}) disabled")
             else:
-                logger.warn("Non-existing feature (ID: " + featureIdLabel + ") is not enabled anyway")
+                logger.warn(f"Non-existing feature (ID: {featureIdLabel}) is not enabled anyway")
             return False
         return self.disableFeature(feature)
 
@@ -155,7 +161,8 @@ class FeatureManager(metaclass=Singleton):
         if featureIdIndex == -1:
             str(logger.warn(feature) + " already disabled")
             return False
-        del self._enabledFeatureIds[featureIdIndex]
+        with lock:
+            del self._enabledFeatureIds[featureIdIndex]
         str(logger.info(feature) + " disabled")
         self.fireFeatureActivationUpdate(feature, False)
         return True

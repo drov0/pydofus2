@@ -19,20 +19,22 @@ import pydofus2.com.ankamagames.dofus.kernel.net.ConnectionsHandler as connh
 from pydofus2.com.ankamagames.dofus.logic.game.common.managers.PlayedCharacterManager import (
     PlayedCharacterManager,
 )
-from pydofus2.com.ankamagames.dofus.types.entities.AnimatedCharacter import AnimatedCharacter
 from pydofus2.com.ankamagames.jerakine.data.I18nFileAccessor import I18nFileAccessor
 from pydofus2.com.ankamagames.jerakine.logger.Logger import Logger
 from typing import TYPE_CHECKING
 from pydofus2.com.ankamagames.jerakine.logger.MemoryProfiler import MemoryProfiler
 from pydofus2.com.ankamagames.jerakine.metaclasses.Singleton import Singleton
+
 if TYPE_CHECKING:
     from pydofus2.com.ankamagames.jerakine.network.ServerConnection import ServerConnection
 from pydofus2.com.ankamagames.atouin.utils.DataMapProvider import DataMapProvider
+
 logger = Logger()
 
 
 class DofusClient(metaclass=Singleton):
     LOG_MEMORY_USAGE: bool = False
+
     def __init__(self, id="unknown"):
         super().__init__()
         self._stop = threading.Event()

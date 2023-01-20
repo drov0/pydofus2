@@ -510,7 +510,6 @@ class FightBattleFrame(Frame):
             krnl.Kernel().getWorker().removeFrame(self._turnFrame)
         bffm.BuffManager.clear()
         if self._executingSequence or krnl.Kernel().getWorker().contains("FightSequenceFrame"):
-            # logger.warn("Wow, wait. We're pulling FightBattle but there's still sequences inside the worker !!")
             fsf = krnl.Kernel().getWorker().getFrame("FightSequenceFrame")
             krnl.Kernel().getWorker().removeFrame(fsf)
         self._currentSequenceFrame = None

@@ -11,9 +11,6 @@ class Singleton(type):
     
     def __call__(cls, *args, **kwargs) -> object:
         thrid = cls.threadName()
-        if 'pydofus2' not in thrid:
-            logger.info("uknown thread of qualname : " + threading.current_thread().__class__.__qualname__)
-            logger.warning(f"unknown thread name '{thrid}' asked to register instance of class {cls.__qualname__}!")
         if thrid not in cls._instances:
             logger.info("Wow new thread name: " + thrid)
             cls._instances[thrid] = dict()

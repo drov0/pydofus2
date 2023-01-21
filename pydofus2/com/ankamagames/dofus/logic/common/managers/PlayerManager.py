@@ -1,11 +1,10 @@
 import math
 import time
-from typing import TYPE_CHECKING
 from pydofus2.com.ankamagames.dofus.datacenter.servers.Server import Server
 from pydofus2.com.ankamagames.jerakine.metaclasses.Singleton import Singleton
-
+from typing import TYPE_CHECKING
 if TYPE_CHECKING:
-    pass
+    from pydofus2.com.ankamagames.dofus.internalDatacenter.connection.BasicCharacterWrapper import BasicCharacterWrapper
 from pydofus2.com.ankamagames.dofus.network.types.game.havenbag.HavenBagRoomPreviewInformation import (
     HavenBagRoomPreviewInformation,
 )
@@ -13,9 +12,8 @@ from pydofus2.com.ankamagames.jerakine.interfaces.IDestroyable import IDestroyab
 
 
 class PlayerManager(IDestroyable, metaclass=Singleton):
-
+    
     TAG_PREFIX: str = "#"
-
     TAG_ADMINS: str = "OFFI"
 
     def __init__(self):

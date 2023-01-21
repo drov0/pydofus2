@@ -96,4 +96,6 @@ class Kernel(metaclass=Singleton):
         self._worker.addFrame(dhF.DisconnectionHandlerFrame())
         if not self._worker.contains("CleanupCrewFrame"):
             self._worker.addFrame(CleanupCrewFrame())
+        logger.info("[KERNEL] initialized ...")
+
         

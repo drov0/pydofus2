@@ -10,9 +10,6 @@ class GameServerInformations(NetworkMessage):
     charactersSlots:int
     date:int
     isMonoAccount:bool
-    isSelectable:bool
-    isMonoAccount:bool
-    isSelectable:bool
     
 
     def init(self, id_:int, type_:int, status_:int, completion_:int, charactersCount_:int, charactersSlots_:int, date_:int, isMonoAccount_:bool, isSelectable_:bool):

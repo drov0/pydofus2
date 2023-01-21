@@ -41,13 +41,11 @@ class DofusClient(metaclass=Singleton):
         self._stopReason: DisconnectionReason = None
         self._lastLoginTime = None
         self._minLoginInterval = 10
-        self._joined = False
-        krnl.Kernel().init()
         self.id = id
-        logger.info("Kernel initialized ...")
         self._worker = krnl.Kernel().getWorker()
         self._registredInitFrames = []
         self._registredGameStartFrames = []
+        krnl.Kernel().init()
         I18nFileAccessor()
         DataMapProvider()
         logger.info("DofusClient initialized")
@@ -81,17 +79,16 @@ class DofusClient(metaclass=Singleton):
             )
 
     def join(self):
-        while not self._stop.is_set():
-            try:
-                sleep(1)
-                if self.LOG_MEMORY_USAGE:
+        if self.LOG_MEMORY_USAGE:
+            while not self._stop.wait(15):
+                try:
                     snapshot = tracemalloc.take_snapshot()
                     MemoryProfiler.logMemoryUsage(snapshot)
-            except KeyboardInterrupt:
-                logger.debug("Shutdown requested by user")
-                self.shutdown()
-                if self.LOG_MEMORY_USAGE:
+                except KeyboardInterrupt:
+                    self.shutdown()
                     MemoryProfiler.saveCollectedData()
+        else:
+            self._stop.wait()
         if self._stopReason and self._stopReason.reason == DisconnectionReasonEnum.EXCEPTION_THROWN:
             raise Exception(self._stopReason.message)
 
@@ -105,7 +102,7 @@ class DofusClient(metaclass=Singleton):
         logger.info("Shuting down ...")
         if reason is None:
             reason = DisconnectionReasonEnum.WANTED_SHUTDOWN
-        connh.ConnectionsHandler().connectionGonnaBeClosed(reason, msg="")
+        connh.ConnectionsHandler().connectionGonnaBeClosed(reason, msg)
         connh.ConnectionsHandler().getConnection().close()
 
     def restart(self):

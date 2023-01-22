@@ -4,7 +4,7 @@ from pydofus2.com.ankamagames.dofus.datacenter.servers.Server import Server
 from pydofus2.com.ankamagames.jerakine.metaclasses.Singleton import Singleton
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
-    from pydofus2.com.ankamagames.dofus.internalDatacenter.connection.BasicCharacterWrapper import BasicCharacterWrapper
+    pass
 from pydofus2.com.ankamagames.dofus.network.types.game.havenbag.HavenBagRoomPreviewInformation import (
     HavenBagRoomPreviewInformation,
 )
@@ -67,7 +67,7 @@ class PlayerManager(IDestroyable, metaclass=Singleton):
 
         self.serversList = list[int]()
 
-        self.charactersList = list["BasicCharacterWrapper"]()
+        self.charactersList = list['BasicCharacterWrapper']()
 
         self.allowAutoConnectCharacter: bool = False
 

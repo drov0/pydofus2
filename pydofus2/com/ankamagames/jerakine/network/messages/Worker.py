@@ -25,7 +25,7 @@ class Worker(EventDispatcher, MessageHandler):
     DEBUG_FRAMES: bool = False
     DEBUG_MESSAGES: bool = False
     DEBUG_FRAMES_PROCESSING: bool = False
-    LONG_MESSAGE_QUEUE: int = 100
+    MESSAGE_QUEUE_SIZE: int = 100
     MAX_TIME_FRAME: int = 40
 
     def __init__(self):
@@ -136,25 +136,20 @@ class Worker(EventDispatcher, MessageHandler):
             return
 
         if self._currentFrameTypesCache.get(str(frame)):
-            frameRemoving = False
-            frameAdding = False
+            wantToRemove = False
+            wantToAdd = False
             if self._processingMessage:
                 for f in self._framesToAdd:
                     if str(f) == str(frame):
-                        frameAdding = True
-                        break
-                if not frameAdding:
-                    for f in self._framesToRemove:
-                        if str(f) == str(frame):
-                            frameRemoving = True
-                            break
-            if not frameRemoving or frameAdding:
+                        wantToAdd = True
+                        for f in self._framesToRemove:
+                            if str(f) == str(frame):
+                                wantToRemove = True
+                                break
+            if wantToAdd and not wantToRemove:
                 logger.error(
-                    "Someone asked for the frame "
-                    + str(frame)
-                    + " to be "
-                    + "added to the worker, but there is already another "
-                    + "frame of the same type within it."
+                    f"Asked to add the frame '{frame}', the worker is busy so wanted to queue the add"
+                    +"but there is already another frame of the same type within the to add list!"
                 )
                 return
 
@@ -166,8 +161,7 @@ class Worker(EventDispatcher, MessageHandler):
             for f in self._framesToAdd:
                 if str(f) == str(frame):
                     isAlreadyIn = True
-                    if self.DEBUG_FRAMES:
-                        logger.debug(f"[DEBUG WORKER] Frame {frame} already in")
+                    logger.warning(f"[DEBUG WORKER] Asked to add Frame '{frame}' but its already in the to add list!")
                     break
             if not isAlreadyIn:
                 self._framesToAdd.append(frame)
@@ -254,6 +248,7 @@ class Worker(EventDispatcher, MessageHandler):
         self._currentFrameTypesCache.clear()
         self._processingMessage = False
         for frame in nonPulledFrameList:
+            logger.warning(f"[DEBUG WORKER] Frame '{frame}' was not pulled, will push it again.")
             self.pushFrame(frame)
         efd.EnterFrameDispatcher().removeWorker()
         self._paused = False
@@ -270,14 +265,14 @@ class Worker(EventDispatcher, MessageHandler):
             self._framesList.sort(key=lambda x: x.priority.value, reverse=True)
             self._currentFrameTypesCache[str(frame)] = frame
             if self.DEBUG_FRAMES:
-                logger.warn(f"[DEBUG WORKER] >> Frame {frame} pushed.")
+                logger.warn(f"[DEBUG WORKER] >> Frame '{frame}' pushed.")
             if self.has_listeners(FramePushedEvent.EVENT_FRAME_PUSHED):
                 self.dispatch(FramePushedEvent.EVENT_FRAME_PUSHED, FramePushedEvent(frame))
         else:
-            logger.warn(f"[DEBUG WORKER] Frame {frame} refused to be pushed.")
+            logger.warn(f"[DEBUG WORKER] Frame '{frame}' refused to be pushed.")
 
     def logFrameList(self):
-        logger.debug(f"[DEBUG WORKER] ew frame list {[str(f) for f in self._framesList]}")
+        logger.debug(f"[DEBUG WORKER] new frame list {[str(f) for f in self._framesList]}")
 
     def logFrameCache(self):
         logger.debug(f"[DEBUG WORKER] new frame cache {[f for f in  self._currentFrameTypesCache]}")
@@ -329,8 +324,10 @@ class Worker(EventDispatcher, MessageHandler):
                 self._treatmentsQueue.remove(treatment)
 
     def avoidFlood(self, omsg: Message) -> bool:
-        if len(self._messagesQueue) > self.LONG_MESSAGE_QUEUE:
-            toClean = [i for i, msg in enumerate(self._messagesQueue) if msg.__class__.__name__ == omsg.__class__.__name__]
+        if len(self._messagesQueue) > self.MESSAGE_QUEUE_SIZE:
+            toClean = [
+                i for i, msg in enumerate(self._messagesQueue) if msg.__class__.__name__ == omsg.__class__.__name__
+            ]
             if len(toClean) > 10:
                 for i in toClean:
                     del self._messagesQueue[i]
@@ -350,9 +347,7 @@ class Worker(EventDispatcher, MessageHandler):
         if self.DEBUG_MESSAGES:
             logger.debug("[DEBUG WORKER] Message: " + msg.__class__.__name__ + " processed.")
         if not processed and not isinstance(msg, DiscardableMessage):
-            logger.debug(
-                f"[DEBUG WORKER] Discarded message: {msg.__class__.__name__}"
-            )
+            logger.warning(f"[DEBUG WORKER] Discarded message: {msg.__class__.__name__}")
 
     def processFramesInAndOut(self) -> None:
         if self._framesToRemove:

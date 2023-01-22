@@ -118,6 +118,7 @@ class DofusClient(metaclass=Singleton):
         self._stop.set()
         if reason and reason.reason == DisconnectionReasonEnum.EXCEPTION_THROWN:
             KernelEventsManager().send(KernelEvts.CRASH, message=reason.message)
+        DofusClient.clear()
 
     @property
     def exitError(self) -> DisconnectionReason:

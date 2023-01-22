@@ -13,6 +13,7 @@ class KernelEvts(Enum):
     IN_GAME = 5
     DEAD = 6
     ALIVE = 7
+    ACTORSHOWED = 8
 class KernelEventsManager(EventDispatcher, metaclass=Singleton):
     __waiting_evts: list[threading.Event]
     __crashMessage = None

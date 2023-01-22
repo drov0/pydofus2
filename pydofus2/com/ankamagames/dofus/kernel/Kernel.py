@@ -54,20 +54,24 @@ class Kernel(metaclass=Singleton):
         import pydofus2.com.ankamagames.dofus.logic.game.fight.managers.CurrentPlayedFighterManager as cpfm
         from pydofus2.com.ankamagames.dofus.logic.game.fight.managers.SpellModifiersManager import SpellModifiersManager
         from pydofus2.com.ankamagames.dofus.internalDatacenter.items.ItemWrapper import ItemWrapper
+        from pydofus2.com.ankamagames.atouin.utils.DataMapProvider import DataMapProvider
+        from pydofus2.com.ankamagames.dofus.kernel.net.ConnectionsHandler import ConnectionsHandler
 
         logger.debug("[KERNEL] Resetting ...")
         KernelEventsManager().reset()
-        BenchmarkTimer.clear()
-        StatsManager.clear()
-        SpellModifiersManager.clear()
         if not autoRetry:
             AuthentificationManager.clear()
-        FightersStateManager().endFight()
-        cpfm.CurrentPlayedFighterManager().endFight()
-        pcm.PlayedCharacterManager.clear()
-        PlayerManager.clear()
+        FightersStateManager.clear()
+        cpfm.CurrentPlayedFighterManager.clear()
         DofusEntities.reset()
         ItemWrapper.clearCache()
+        pcm.PlayedCharacterManager.clear()
+        BenchmarkTimer.clear()
+        StatsManager.clear()
+        PlayerManager.clear()
+        DataMapProvider.clear()
+        ConnectionsHandler.clear()
+        SpellModifiersManager.clear()
         self._worker.clear()
         if reloadData:
             self.addInitialFrames()
@@ -76,6 +80,7 @@ class Kernel(metaclass=Singleton):
             for msg in messagesToDispatchAfter:
                 self._worker.process(msg)
         self._reseted = True
+        Kernel.clear()
         logger.debug("[KERNEL] Reseted")
 
     def addInitialFrames(self) -> None:

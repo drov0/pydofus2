@@ -316,7 +316,7 @@ pydofus2/com/ankamagames/dofus/kernel/Kernel.py
 pydofus2/com/ankamagames/dofus/kernel/PanicMessages.py
 pydofus2/com/ankamagames/dofus/kernel/__init__.py
 pydofus2/com/ankamagames/dofus/kernel/net/ConnectionType.py
-pydofus2/com/ankamagames/dofus/kernel/net/ConnectionsHandler().py
+pydofus2/com/ankamagames/dofus/kernel/net/ConnectionsHandler.py
 pydofus2/com/ankamagames/dofus/kernel/net/DisconnectionReason.py
 pydofus2/com/ankamagames/dofus/kernel/net/DisconnectionReasonEnum.py
 pydofus2/com/ankamagames/dofus/kernel/net/__init__.py
@@ -568,7 +568,6 @@ pydofus2/com/ankamagames/dofus/logic/game/roleplay/messages/__init__.py
 pydofus2/com/ankamagames/dofus/logic/game/roleplay/types/Fight.py
 pydofus2/com/ankamagames/dofus/logic/game/roleplay/types/FightTeam.py
 pydofus2/com/ankamagames/dofus/logic/game/roleplay/types/__init__.py
-pydofus2/com/ankamagames/dofus/logic/shield/SecureModeManager.py
 pydofus2/com/ankamagames/dofus/logic/shield/ShieldCertifcate.py
 pydofus2/com/ankamagames/dofus/logic/shield/ShieldSecureLevel.py
 pydofus2/com/ankamagames/dofus/logic/shield/__init__.py
@@ -2408,6 +2407,7 @@ pydofus2/com/ankamagames/jerakine/interfaces/IObstacle.py
 pydofus2/com/ankamagames/jerakine/interfaces/IRectangle.py
 pydofus2/com/ankamagames/jerakine/interfaces/ISlotData.py
 pydofus2/com/ankamagames/jerakine/interfaces/ISlotDataHolder.py
+pydofus2/com/ankamagames/jerakine/interfaces/IThreadSharable.py
 pydofus2/com/ankamagames/jerakine/interfaces/__init__.py
 pydofus2/com/ankamagames/jerakine/logger/Logger.py
 pydofus2/com/ankamagames/jerakine/logger/MemoryProfiler.py
@@ -2437,6 +2437,7 @@ pydofus2/com/ankamagames/jerakine/messages/__init__.py
 pydofus2/com/ankamagames/jerakine/messages/events/FramePushedEvent.py
 pydofus2/com/ankamagames/jerakine/messages/events/__init__.py
 pydofus2/com/ankamagames/jerakine/metaclasses/Singleton.py
+pydofus2/com/ankamagames/jerakine/metaclasses/ThreadSharedSingleton.py
 pydofus2/com/ankamagames/jerakine/metaclasses/__init__.py
 pydofus2/com/ankamagames/jerakine/network/CustomDataWrapper.py
 pydofus2/com/ankamagames/jerakine/network/IConnectionProxy.py
@@ -2534,6 +2535,7 @@ pydofus2/com/ankamagames/jerakine/types/zones/__init__.py
 pydofus2/com/ankamagames/jerakine/utils/__init__.py
 pydofus2/com/ankamagames/jerakine/utils/display/EnterFrameConst.py
 pydofus2/com/ankamagames/jerakine/utils/display/EnterFrameDispatcher.py
+pydofus2/com/ankamagames/jerakine/utils/display/FrameIdManager.py
 pydofus2/com/ankamagames/jerakine/utils/display/__init__.py
 pydofus2/com/ankamagames/jerakine/utils/display/spellZone/ICellZoneProvider.py
 pydofus2/com/ankamagames/jerakine/utils/display/spellZone/IZoneShape.py

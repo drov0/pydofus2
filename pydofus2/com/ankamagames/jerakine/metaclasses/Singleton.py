@@ -9,6 +9,10 @@ class Singleton(type):
     def threadName(cls):
         return threading.current_thread().name
     
+    @property
+    def lightInfo(cls):
+        return {thrid: [c.__qualname__ for c in cls._instances[thrid]] for thrid in cls._instances}
+    
     def __call__(cls, *args, **kwargs) -> object:
         thrid = cls.threadName()
         if thrid not in cls._instances:
@@ -16,9 +20,8 @@ class Singleton(type):
             cls._instances[thrid] = dict()
         if cls not in cls._instances[thrid]:
             cls._instances[thrid][cls] = super(Singleton, cls).__call__(*args, **kwargs)
-            lightobj = {thrid: [c.__qualname__ for c in cls._instances[thrid]] for thrid in cls._instances}
-            logger.debug(f"instances dict: {lightobj}")
         return cls._instances[thrid][cls]
 
     def clear(cls):
-        cls._instances[cls.threadName()].clear()
+        if cls in cls._instances[cls.threadName()]:
+            del cls._instances[cls.threadName()][cls]

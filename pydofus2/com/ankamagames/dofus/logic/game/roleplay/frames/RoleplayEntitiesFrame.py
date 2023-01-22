@@ -109,11 +109,16 @@ from pydofus2.com.ankamagames.jerakine.logger.Logger import Logger
 from pydofus2.com.ankamagames.jerakine.messages.Frame import Frame
 from pydofus2.com.ankamagames.jerakine.messages.Message import Message
 from pydofus2.com.ankamagames.dofus.logic.game.roleplay.types.FightTeam import FightTeam
+from pydofus2.com.ankamagames.berilia.managers.KernelEventsManager import KernelEventsManager, KernelEvts
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from pydofus2.com.ankamagames.dofus.logic.game.common.frames.ContextChangeFrame import ContextChangeFrame
 
 logger = Logger("Dofus2")
 
 
 class RoleplayEntitiesFrame(AbstractEntitiesFrame, Frame):
+    
     def __init__(self):
         self._fights = dict[int, Fight]()
 
@@ -174,11 +179,9 @@ class RoleplayEntitiesFrame(AbstractEntitiesFrame, Frame):
         self._objectsByCellId.clear()
         self._paddockItem.clear()
         self._housesList.clear()
-        # logger.debug("RoleplayEntitiesFrame pulled")
         return super().pulled()
 
     def pushed(self) -> bool:
-        # logger.debug("RoleplayEntitiesFrame pushed")
         self.initNewMap()
         self._playersId = list()
         self._merchantsList = list()
@@ -186,7 +189,7 @@ class RoleplayEntitiesFrame(AbstractEntitiesFrame, Frame):
         self._entitiesVisibleNumber = 0
         self.mcidm_processessed = False
         if MapDisplayManager()._currentMapRendered:
-            ccFrame = Kernel().getWorker().getFrame("ContextChangeFrame")
+            ccFrame: 'ContextChangeFrame' = Kernel().getWorker().getFrame("ContextChangeFrame")
             connexion = ""
             if ccFrame:
                 connexion = ccFrame.mapChangeConnexion
@@ -210,8 +213,7 @@ class RoleplayEntitiesFrame(AbstractEntitiesFrame, Frame):
 
         if isinstance(msg, MapLoadedMessage):
             if self._waitForMap:
-                logger.info(f"Map loaded received but waiting for map = {self._waitForMap}")
-                ccFrame = Kernel().getWorker().getFrame("ContextChangeFrame")
+                ccFrame: 'ContextChangeFrame' = Kernel().getWorker().getFrame("ContextChangeFrame")
                 connexion = ""
                 if ccFrame:
                     connexion = ccFrame.mapChangeConnexion
@@ -223,7 +225,6 @@ class RoleplayEntitiesFrame(AbstractEntitiesFrame, Frame):
             return False
 
         elif isinstance(msg, MapComplementaryInformationsDataMessage):
-            # logger.debug("Processing MapComplementaryInformationsDataMessage ...")
             mcidmsg = msg
             currentMapHasChanged = False
             currentSubAreaHasChanged = False
@@ -275,13 +276,6 @@ class RoleplayEntitiesFrame(AbstractEntitiesFrame, Frame):
             else:
                 self._worldPoint = WorldPointWrapper(int(mcidmsg.mapId))
 
-            # TODO: Add handling of this message later
-            # if isinstance(msg, MapComplementaryInformationsDataInHavenBagMessage):
-            #     Kernel().getWorker().addFrame(HavenbagFrame(msg.roomId,msg.theme,msg
-            #     PlayedCharacterManager().isInHavenbag = True
-            # elif HavenbagTheme.isMapIdInHavenbag(mcidmsg.mapId):
-            #     Atouin().showWorld(True)
-
             roleplayContextFrame: rcf.RoleplayContextFrame = Kernel().getWorker().getFrame("RoleplayContextFrame")
             previousMap = PlayedCharacterManager().currentMap
             if (
@@ -292,7 +286,6 @@ class RoleplayEntitiesFrame(AbstractEntitiesFrame, Frame):
             ):
                 currentMapHasChanged = True
                 PlayedCharacterManager().currentMap = self._worldPoint
-                # TODO: self.initNewMap()
 
             roleplayContextFrame.newCurrentMapIsReceived = False
             if self._currentSubAreaId != mcidmsg.subAreaId or not PlayedCharacterManager().currentSubArea:
@@ -376,26 +369,6 @@ class RoleplayEntitiesFrame(AbstractEntitiesFrame, Frame):
             for fightId in fightIdsToRemove:
                 del self._fights[fightId]
 
-            # TODO: Uncomment handling of houses infos later from here
-            # if mcidmsg.houses and len(mcidmsg.houses) > 0:
-            #     oldHousesList = dict()
-            #     for houseDoorKey in self._housesList:
-            #         oldHousesList[houseDoorKey] = self._housesList[houseDoorKey]
-            #     self._housesList = dict()
-            #     for house in mcidmsg.houses:
-            #         if len(house.doorsOnMap) != 0:
-            #             if oldHousesList[house.doorsOnMap[0]] and oldHousesList[house.doorsOnMap[0]].houseId == house.houseId:
-            #                 houseWrapper = oldHousesList[house.doorsOnMap[0]]
-            #             else:
-            #                 houseWrapper = HouseWrapper.create(house)
-            #                 houseWrapper.worldmapId = math.floor(self._worldPoint.mapId)
-            #                 houseWrapper.worldX = self._worldPoint.outdoorX
-            #                 houseWrapper.worldY = self._worldPoint.outdoorY
-            #             numDoors = len(house.doorsOnMap)
-            #             for i in range(numDoors):
-            #                 self._housesList[house.doorsOnMap[i]] = houseWrapper
-            #     oldHousesList = dict()
-
             if currentMapHasChanged:
                 for mo in mcidmsg.obstacles:
                     DataMapProvider().updateCellMovLov(
@@ -421,13 +394,6 @@ class RoleplayEntitiesFrame(AbstractEntitiesFrame, Frame):
 
             elif PlayedCharacterManager().isInAnomaly:
                 PlayedCharacterManager().isInAnomaly = False
-
-            # TODO: Here handle stuff related to the partyManagement when implementing party management frame
-            # if Kernel().getWorker().contains(PartyManagementFrame):
-            #     partyManagementFrame = Kernel().getWorker().getFrame("PartyManagementFrame")
-            #     if partyManagementFrame.playerShouldReceiveRewards:
-            #         partyManagementFrame.playerShouldReceiveRewards = False
-            #         partyManagementFrame.playerRewards = None
             
             logger.debug("MapComplementaryInformationsDataMessage processed")
             self.mcidm_processessed = True
@@ -438,19 +404,17 @@ class RoleplayEntitiesFrame(AbstractEntitiesFrame, Frame):
             return True
 
         if isinstance(msg, GameRolePlayShowActorMessage):
-            if Kernel().getWorker().avoidFlood(msg):
-                return True
-            grpsamsg = msg
-            if int(grpsamsg.informations.contextualId) == int(PlayedCharacterManager().id):
-                humi: HumanInformations = grpsamsg.informations.humanoidInfo
+            KernelEventsManager().send(KernelEvts.ACTORSHOWED, msg.informations)
+            if int(msg.informations.contextualId) == int(PlayedCharacterManager().id):
+                humi: HumanInformations = msg.informations.humanoidInfo
                 PlayedCharacterManager().restrictions = humi.restrictions
-                PlayedCharacterManager().infos.entityLook = grpsamsg.informations.look
+                PlayedCharacterManager().infos.entityLook = msg.informations.look
                 infos: GameRolePlayHumanoidInformations = self.getEntityInfos(PlayedCharacterManager().id)
                 if infos:
                     infos.humanoidInfo.restrictions = PlayedCharacterManager().restrictions
-            self.addOrUpdateActor(grpsamsg.informations)
-            if isinstance(grpsamsg.informations, GameRolePlayMerchantInformations):
-                self._merchantsList.append(grpsamsg.informations)
+            self.addOrUpdateActor(msg.informations)
+            if isinstance(msg.informations, GameRolePlayMerchantInformations):
+                self._merchantsList.append(msg.informations)
                 self._merchantsList.sort(key=lambda e: e.name)
             return True
 

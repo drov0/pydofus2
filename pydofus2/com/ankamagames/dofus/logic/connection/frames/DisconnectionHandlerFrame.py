@@ -108,7 +108,6 @@ class DisconnectionHandlerFrame(Frame):
                             or reason.reason == DisconnectionReasonEnum.WANTED_SHUTDOWN
                             or reason.reason == DisconnectionReasonEnum.EXCEPTION_THROWN
                         ):
-                            logger.debug(reason.message)
                             krnl.Kernel().reset()
                             DofusClient().interrupt(reason)
                         elif reason.reason == DisconnectionReasonEnum.RESTARTING or reason.reason == DisconnectionReasonEnum.DISCONNECTED_BY_POPUP:

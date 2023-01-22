@@ -91,6 +91,7 @@ from pydofus2.com.ankamagames.jerakine.pathfinding.Pathfinding import Pathfindin
 from pydofus2.com.ankamagames.jerakine.types.enums.Priority import Priority
 from pydofus2.com.ankamagames.jerakine.types.positions.MapPoint import MapPoint
 from pydofus2.com.ankamagames.jerakine.types.positions.MovementPath import MovementPath
+from pydofus2.com.ankamagames.berilia.managers.KernelEventsManager import KernelEvts
 
 if TYPE_CHECKING:
     from pydofus2.com.ankamagames.dofus.logic.game.roleplay.frames.RoleplayEntitiesFrame import RoleplayEntitiesFrame
@@ -325,7 +326,9 @@ class RoleplayMovementFrame(Frame):
             emcmsg = msg
             if self._movementAnimTimer:
                 self._movementAnimTimer.cancel()
+            Kernel().getWorker().process(CharacterMovementStoppedMessage())
             if emcmsg.entity.id == PlayedCharacterManager().id:
+                KernelEventsManager().send(KernelEvts.MOVEMENT_STOPPED)
                 if self.VERBOSE:
                     logger.debug(
                         f"[RolePlayMovement] Mouvement complete, arrived at '{emcmsg.entity.position.cellId}' and the requested destination was '{self._destinationPoint}'"
@@ -389,8 +392,6 @@ class RoleplayMovementFrame(Frame):
 
                 elif self._wantsToJoinFight:
                     self.joinFight(self._wantsToJoinFight["fighterId"], self._wantsToJoinFight["fightId"])
-
-                Kernel().getWorker().process(CharacterMovementStoppedMessage())
             return True
 
         elif isinstance(msg, EntityMovementStoppedMessage):

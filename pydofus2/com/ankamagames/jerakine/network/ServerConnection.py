@@ -1,118 +1,87 @@
-import base64
+import functools
+import errno
+import queue
+import threading as mp
+import socket
+import sys
+import traceback
+from time import perf_counter, sleep
 from pydofus2.com.ankamagames.jerakine.benchmark.BenchmarkTimer import BenchmarkTimer
-import threading
-from time import perf_counter
-from types import FunctionType
-from pydofus2.com.ankamagames.dofus.kernel.net.DisconnectionReasonEnum import DisconnectionReasonEnum
-from pydofus2.com.ankamagames.dofus.network.messages.common.NetworkDataContainerMessage import NetworkDataContainerMessage
-from pydofus2.com.ankamagames.jerakine.events.IOErrorEvent import IOErrorEvent
-from pydofus2.com.ankamagames.jerakine.events.ProgressEvent import ProgressEvent
-from pydofus2.com.ankamagames.jerakine.events.SocketEvent import SocketEvent
 from pydofus2.com.ankamagames.jerakine.logger.Logger import Logger
 from pydofus2.com.ankamagames.jerakine.messages.ConnectedMessage import ConnectedMessage
-from pydofus2.com.ankamagames.jerakine.messages.MessageHandler import MessageHandler
+from pydofus2.com.ankamagames.jerakine.messages.ConnectionProcessCrashedMessage import ConnectionProcessCrashedMessage
 from pydofus2.com.ankamagames.jerakine.network.CustomDataWrapper import ByteArray
-from pydofus2.com.ankamagames.jerakine.network.ILagometer import ILagometer
-from pydofus2.com.ankamagames.jerakine.network.INetworkDataContainerMessage import INetworkDataContainerMessage
-from pydofus2.com.ankamagames.jerakine.network.INetworkMessage import INetworkMessage
-from pydofus2.com.ankamagames.jerakine.network.IServerConnection import IServerConnection
-from pydofus2.com.ankamagames.jerakine.network.messages.ServerConnectionFailedMessage import ServerConnectionFailedMessage
+from pydofus2.com.ankamagames.jerakine.network.LagometerAck import LagometerAck
 from pydofus2.com.ankamagames.jerakine.network.NetworkMessage import NetworkMessage
-from pydofus2.com.ankamagames.jerakine.network.RawDataParser import RawDataParser
-from pydofus2.com.ankamagames.jerakine.network.UnpackMode import UnpackMode
-from pydofus2.com.ankamagames.jerakine.network.utils.FuncTree import FuncTree
-from pydofus2.com.ankamagames.jerakine.utils.display.EnterFrameConst import EnterFrameConst
-from pydofus2.com.ankamagames.jerakine.utils.display.EnterFrameDispatcher import EnterFrameDispatcher
-from pydofus2.mx.CustomSocket.Socket import Socket
-from whistle import Event
-lock = threading.Lock()
+from pydofus2.com.ankamagames.dofus.network.MessageReceiver import MessageReceiver
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from pydofus2.com.ankamagames.jerakine.network.INetworkMessage import INetworkMessage
 
-logger = Logger()
 
-class UnknowMessageId(Exception):
-    pass
+logger = Logger("ServerConnection")
 
-class ServerConnection(IServerConnection):
+
+def sendTrace(func):
+    @functools.wraps(func)
+    def wrapped(self: "ServerConnection", *args, **kwargs):
+        try:
+            return func(self, *args, **kwargs)
+        except:
+            exc_type, exc_value, exc_traceback = sys.exc_info()
+            traceback_in_var = traceback.format_tb(exc_traceback)
+            error_trace = str(exc_type) + "\n" + str(exc_value) + "\n" + "\n".join(traceback_in_var)
+            self._put(ConnectionProcessCrashedMessage(error_trace))
+    return wrapped
+
+class ServerConnection(mp.Thread):
 
     DEBUG_VERBOSE: bool = False
-
     LOG_ENCODED_CLIENT_MESSAGES: bool = False
-
     DEBUG_LOW_LEVEL_VERBOSE: bool = False
-
-    DEBUG_DATA: bool = True
-
+    DEBUG_DATA: bool = False
     LATENCY_AVG_BUFFER_SIZE: int = 50
-
     MESSAGE_SIZE_ASYNC_THRESHOLD: int = 300 * 1024
+    CONNECTION_TIMEOUT = 7
 
-    def __init__(self, host: str = None, port: int = 0, id: str = ""):
+    def __init__(self, id: str = "ServerConnection", receptionQueue: queue.Queue=None):
+        super().__init__(name=mp.current_thread().name)
+        self.id = id
         self._latencyBuffer = []
-        self._asyncMessages = list[INetworkMessage]()
-        self._asyncTrees = list[FuncTree]()
-        self._input = ByteArray()
-        self._socket = Socket(host, port)
-        self._remoteSrvHost = host
-        self._remoteSrvPort = port
-        self._id = id
-        self._connecting = False
-        self.disabled = False
-        self.disabledIn = False
-        self.disabledOut = False
-        self._rawParser: RawDataParser = None
-        self._handler: MessageHandler = None
-        self._outputBuffer = list[INetworkMessage]()
-        self._splittedPacket = False
-        self._staticHeader: int = -1
-        self._splittedPacketId: int = -1
-        self._splittedPacketLength: int = -1
-        self._inputBuffer = ByteArray()
-        self._pauseBuffer = list()
-        self._pause: bool = False
+        self._remoteSrvHost = None
+        self._remoteSrvPort = None
+
+        self._connecting = mp.Event()
+        self._connected = mp.Event()
+        self._closing = mp.Event()
+        self._paused = mp.Event()
+        self.finished = mp.Event()
+
+        self.__packetId = None
+        self.__msgLenLength = None
+        self.__messageLength = None
+
+        self.__receivedStream = ByteArray()
+        self.__pauseQueue = list["INetworkMessage"]()
+        self.__sendingQueue = list["INetworkMessage"]()
+
+        self._sendSequenceId: int = 0
         self._latestSent: int = 0
         self._lastSent: int = None
-        self._lagometer: ILagometer = None
-        self._sendSequenceId: int = 0
-        self._asyncNetworkDataContainerMessage: NetworkDataContainerMessage = None
-        self._willClose: bool = None
-        self._maxUnpackTime: int = float("inf")
+
         self._firstConnectionTry: bool = True
-        self._timeoutTimer = None
-        self._processingSocketData = False
-        super().__init__()
+        if receptionQueue is None:
+            self.__receptionQueue = queue.Queue(200)
+        else:
+            self.__receptionQueue = receptionQueue
+        self.__lagometer = LagometerAck()
+        self.__rawParser = MessageReceiver()
+        self.__socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
-    def close(self) -> None:
-        if self._socket.connected:
-            logger.debug(f"[{self._id}] Closing socket for connection!")
-            EnterFrameDispatcher().removeEventListener(self.onEnterFrame)
-            self._socket.close()
-        elif not self.checkClosed():
-            logger.warn(f"[{self._id}] Tried to close a socket while it had already been disconnected.")
-            EnterFrameDispatcher().removeEventListener(self.onEnterFrame)
-
-    @property
-    def rawParser(self) -> RawDataParser:
-        return self._rawParser
-
-    @rawParser.setter
-    def rawParser(self, value: RawDataParser) -> None:
-        self._rawParser = value
-
-    @property
-    def handler(self) -> MessageHandler:
-        return self._handler
-
-    @handler.setter
-    def handler(self, value: MessageHandler) -> None:
-        self._handler = value
-
-    @property
-    def pauseBuffer(self) -> list:
-        return self._pauseBuffer
+        self.__connectionTimeout = None
 
     @property
     def latencyAvg(self) -> int:
-        latency: int = 0
         if len(self._latencyBuffer) == 0:
             return 0
         total: int = 0
@@ -133,371 +102,125 @@ class ServerConnection(IServerConnection):
         return self._remoteSrvPort
 
     @property
-    def lastSent(self) -> int:
-        return self._lastSent
+    def host(self) -> int:
+        return self._remoteSrvHost
 
     @property
-    def lagometer(self) -> ILagometer:
-        return self._lagometer
-
-    @lagometer.setter
-    def lagometer(self, l: ILagometer) -> None:
-        self._lagometer = l
+    def lastSent(self) -> int:
+        return self._lastSent
 
     @property
     def sendSequenceId(self) -> int:
         return self._sendSequenceId
 
     @property
-    def connected(self) -> bool:
-        return self._socket.connected
+    def open(self) -> bool:
+        return self._connected.is_set()
 
     @property
     def connecting(self) -> bool:
-        return self._connecting
+        return self._connecting.is_set()
 
-    def connect(self, host: str, port: int) -> None:
-        if self._connecting or self.disabled or self.disabledIn and self.disabledOut:
+    @property
+    def paused(self) -> bool:
+        return self._paused.is_set()
+
+    def _put(self, msg):
+        self.__receptionQueue.put(msg)
+
+    @sendTrace
+    def close(self) -> None:
+        if self.closed:
+            logger.warn(f"[{self.id}] Tried to close a socket while it had already been disconnected.")
             return
-        self._connecting = True
-        self._connected = False
-        self._firstConnectionTry = True
-        self._remoteSrvHost = host
-        self._remoteSrvPort = port
-        self.addListeners()
-        self._timeoutTimer = BenchmarkTimer(interval=7, function=self.onSocketTimeOut)
-        self._timeoutTimer.start()
-        logger.info(f"[{self._id}] Connecting to {host}:{port}...")
-        try:
-            self._socket.connect(host, port)
-        except Exception as e:
-            logger.error(
-                "[" + str(self._id) + "] Could not establish connection to the serveur!\n",
-                exc_info=True,
-            )
+        logger.debug(f"[{self.id}] Closing connection...")
+        self.__socket.close()
+        self.__sendingQueue.clear()
+        self._closing.set()
 
-    def getType(self, v) -> str:
-        className: str = v.__class__.__name__
-        if className.find("list") != -1:
-            className = className.split("list[").join("list{")
-            className = className.split("]").join("}")
-        else:
-            className = className.split(".").pop()
-        if isinstance(v, INetworkMessage):
-            className += ", id: " + v.getMessageId()
-        return className
-
-    def send(self, msg: INetworkMessage, connectionId: str = "") -> None:
+    @sendTrace
+    def send(self, msg: "INetworkMessage") -> None:
+        if not self.open:
+            if self.connecting:
+                self.__sendingQueue.append(msg)
+            return
         if self.DEBUG_DATA:
-            logger.debug(f"[{self._id}] [SND] > {msg.__class__.__name__ if self.DEBUG_VERBOSE else msg}")
-        if self.disabled or self.disabledOut:
-            return
-        if not self._socket.connected:
-            if self._connecting:
-                if not self._outputBuffer:
-                    self._outputBuffer = []
-                self._outputBuffer.append(msg)
-            return
-        try:
-            self.lowSend(msg)
-        except ConnectionResetError as e:            
-            import pydofus2.com.ankamagames.dofus.kernel.net.ConnectionsHandler as connh
-            logger.debug(str(e))
-            if '[WinError 10054]' in str(e):
-                connh.ConnectionsHandler().connectionGonnaBeClosed(DisconnectionReasonEnum.CONNECTION_LOST, str(e))
-                connh.ConnectionsHandler().getConnection().close()
+            logger.debug(f"[{self.id}] [SND] > {msg}")
+        self.__socket.send(msg.pack())
+        self._latestSent = perf_counter()
+        self._lastSent = perf_counter()
+        self._sendSequenceId += 1
+        if self.__lagometer:
+            self.__lagometer.ping(msg)
 
     def __str__(self) -> str:
         status = "Server connection status:\n"
-        status += "  Connected:       " + ("Yes" if self._socket.connected else "No") + "\n"
-        if self._socket.connected:
+        status += "  Connected:       " + ("Yes" if self.__socket.connected else "No") + "\n"
+        if self.open:
             status += "  Connected to:    " + self._remoteSrvHost + ":" + self._remoteSrvPort + "\n"
         else:
             status += "  Connecting:      " + ("Yes" if self._connecting else "No") + "\n"
         if self._connecting:
             status += "  Connecting to:   " + self._remoteSrvHost + ":" + self._remoteSrvPort + "\n"
         status += "  Raw parser:      " + self.rawParser + "\n"
-        status += "  Message handler: " + self.handler + "\n"
-        if self._outputBuffer:
-            status += "  Output buffer:   " + len(self._outputBuffer) + " message(s)\n"
-        if self._inputBuffer:
-            status += "  Input buffer:    " + len(self._inputBuffer) + " byte(s)\n"
-        if self._splittedPacket:
+        if self.__sendingQueue:
+            status += "  Output buffer:   " + len(self.__sendingQueue) + " message(s)\n"
+        if self.__receivedStream:
+            status += "  Input buffer:    " + len(self.__receivedStream) + " byte(s)\n"
+        if self._handlingSplitedPckt:
             status += "  Splitted message in the input buffer:\n"
-            status += "    Message ID:      " + self._splittedPacketId + "\n"
-            status += "    Awaited length:  " + self._splittedPacketLength + "\n"
+            status += "    Message ID:      " + self.__packetId + "\n"
+            status += "    Awaited length:  " + self._packetLength + "\n"
         return status
 
     def pause(self) -> None:
-        self._pause = True
+        self._paused.set()
 
+    @sendTrace
     def resume(self) -> None:
-        self._pause = False
-        while len(self._pauseBuffer) and not self._pause:
-            msg = self._pauseBuffer.pop(0)
+        self._paused.clear()
+        while self.__pauseQueue and not self.paused:
+            msg = self.__pauseQueue.pop(0)
             if self.DEBUG_DATA:
-                logger.debug("[" + str(self._id) + "] [RCV] (after Resume) " + msg.__class__.__name__)
-            self._handler.process(msg)
-        self._pauseBuffer = []
+                logger.debug(f"[{self.id}] [RCV] (after Resume) {msg}")
+            self.__receptionQueue.put(msg)
 
-    def stopConnectionTimeout(self) -> None:
-        if self._timeoutTimer:
-            self._timeoutTimer.cancel()
-            self._timeoutTimer = None
-
-    def addEventListener(
-        self,
-        type: str,
-        listener: FunctionType,
-        useCapture: bool = False,
-        priority: int = 0,
-        useWeakReference: bool = False,
-    ) -> None:
-        self._socket.addEventListener(type, listener, useCapture, priority, useWeakReference)
-
-    def dispatchEvent(self, event: Event) -> bool:
-        return self._socket.dispatchEvent(event)
-
-    def hasEventListener(self, type: str) -> bool:
-        return self._socket.hasEventListener(type)
-
-    def removeEventListener(self, type: str, listener: FunctionType, useCapture: bool = False) -> None:
-        self._socket.removeEventListener(type, listener, useCapture)
-
-    def willTrigger(self, type: str) -> bool:
-        return self._socket.willTrigger(type)
-
-    def ConnectingOnAnotherPort(self, port: int) -> None:
-        self.connect(self._remoteSrvHost, port)
-
-    def addListeners(self) -> None:
-        self._socket.addEventListener(ProgressEvent.SOCKET_DATA, self.onSocketData, 0)
-        self._socket.addEventListener(SocketEvent.CONNECT, self.onConnect, 0)
-        self._socket.addEventListener(SocketEvent.CLOSE, self.onClose, float("inf"))
-        self._socket.addEventListener(IOErrorEvent.IO_ERROR, self.onSocketError, 0)
-        EnterFrameDispatcher().addEventListener(self.onEnterFrame, EnterFrameConst.SERVER_CONNECTION)
-
-    def removeListeners(self) -> None:
-        self._socket.removeEventListener(ProgressEvent.SOCKET_DATA, self.onSocketData)
-        self._socket.removeEventListener(SocketEvent.CONNECT, self.onConnect)
-        self._socket.removeEventListener(SocketEvent.CLOSE, self.onClose)
-        self._socket.removeEventListener(IOErrorEvent.IO_ERROR, self.onSocketError)
-        EnterFrameDispatcher().removeEventListener(self.onEnterFrame)
-
-    def receive(self, input: ByteArray, fromEnterFrame: bool = False) -> None:
-        try:
-            if input.remaining() >= 2:
-                if self.DEBUG_LOW_LEVEL_VERBOSE:
-                    if fromEnterFrame:
-                        logger.info(
-                            f"[{self._id}] Handling data, bytes available : {input.remaining()}  triggered by a timer"
-                        )
-                    else:
-                        logger.info(f"[{self._id}] Handling data, bytes available : {input.remaining()}")
-                msg: NetworkMessage = self.lowReceive(input)
-                while msg is not None:
-                    input.trim()
-                    if self._lagometer:
-                        self._lagometer.pong(msg)
-                    msg.receptionTime = perf_counter()
-                    msg.sourceConnection = self._id
-                    self.process(msg)
-                    if self.checkClosed() and not self._socket.connected:
-                        break
-                    if input.remaining() < 2:
-                        break
-                    if self.DEBUG_LOW_LEVEL_VERBOSE:
-                        logger.debug(
-                            f"[{self._id}] Processed one parsed message from buffer, will low receive the remaining {input.remaining()} bytes"
-                        )
-                    msg = self.lowReceive(input)
-        except Exception as e:                
-            import pydofus2.com.ankamagames.dofus.kernel.net.ConnectionsHandler as connh
-            logger.error(f"[{self._id}] Error while reading socket. \n", exc_info=True)
-            import sys
-            import traceback
-            exc_type, exc_value, exc_traceback = sys.exc_info()
-            traceback_in_var = traceback.format_tb(exc_traceback)
-            error_trace = str(exc_type) + '\n' + str(exc_value) + '\n' + '\n'.join(traceback_in_var)
-            connh.ConnectionsHandler().connectionGonnaBeClosed(DisconnectionReasonEnum.EXCEPTION_THROWN, error_trace)
-            connh.ConnectionsHandler().getConnection().close()
-        self._processingSocketData = False
-
-    def checkClosed(self) -> bool:
-        if self._willClose:
-            if len(self._asyncTrees) == 0:
-                self._willClose = False
-                self.dispatchEvent(SocketEvent.CLOSE)
-            return True
-        return False
-
-    def process(self, msg: INetworkMessage) -> None:
-        if msg.unpacked:
-            if isinstance(msg, INetworkDataContainerMessage):
-                self._asyncNetworkDataContainerMessage = msg
-            elif not self._pause:
-                if self.DEBUG_DATA and msg.getMessageId() not in [176, 6362]:
-                    logger.debug(f"[{self._id}] [RCV] " + msg.__class__.__name__)
-                if not self.disabledIn:
-                    self._handler.process(msg)
-            else:
-                self._pauseBuffer.append(msg)
-
-    def getMessageId(self, firstOctet: int) -> int:
-        return firstOctet >> NetworkMessage.BIT_RIGHT_SHIFT_LEN_PACKET_ID
-
-    def readMessageLength(self, staticHeader: int, src: ByteArray) -> int:
-        byteLenDynamicHeader: int = staticHeader & NetworkMessage.BIT_MASK
-        messageLength = 0
-        if byteLenDynamicHeader == 0:
-            pass
-        elif byteLenDynamicHeader == 1:
-            messageLength: int = src.readUnsignedByte()
-        elif byteLenDynamicHeader == 2:
-            messageLength: int = src.readUnsignedShort()
-        elif byteLenDynamicHeader == 3:
-            messageLength: int = (
-                ((src.readByte() & 255) << 16) + ((src.readByte() & 255) << 8) + (src.readByte() & 255)
-            )
-        return messageLength
-
-    def lowSend(self, msg: NetworkMessage) -> None:
-        if self.LOG_ENCODED_CLIENT_MESSAGES and msg.getMessageId() not in [
-            5607,
-            6372,
-            6156,
-            6609,
-            4,
-            6119,
-            110,
-            6540,
-            6648,
-            6608,
-        ]:
-            data = msg.pack()
-            logger.debug("[{self._id}] [SND] > {msg} ---" + str(base64.encodebytes(data)) + "---")
-        self._socket.send(msg.pack())
-        self._latestSent = perf_counter()
-        self._lastSent = perf_counter()
-        self._sendSequenceId += 1
-        if self._lagometer:
-            self._lagometer.ping(msg)
-
-    def lowReceive(self, src: ByteArray) -> NetworkMessage:
-        if self.DEBUG_LOW_LEVEL_VERBOSE and self._splittedPacket:
-            logger.debug(
-                f"Gathering splited packet of length {self._splittedPacketLength},"
-                f"already received {len(self._inputBuffer)}, remaining {self._splittedPacketLength - len(self._inputBuffer)}. I just received {src.remaining()}"
-            )
-        messageLength = 0
-        if not self._splittedPacket:
-            if src.remaining() < 2:
-                if self.DEBUG_LOW_LEVEL_VERBOSE:
-                    logger.info(
-                        f"[{self._id}] Not enough data to read the header, byte available : {src.remaining()} (needed : 2)"
-                    )
-                return None
-            staticHeader = src.readUnsignedShort()
-            messageId = self.getMessageId(staticHeader)
-            if messageId not in self._rawParser._messagesTypes:
-                raise UnknowMessageId(f"Unknown message id {messageId}")
-            byteLenDynamicHeader: int = staticHeader & NetworkMessage.BIT_MASK
-            if src.remaining() >= byteLenDynamicHeader:
-                messageLength = self.readMessageLength(staticHeader, src)
-                if src.remaining() >= messageLength:
-                    self.updateLatency()
-                    msg = self._rawParser.parse(src, messageId, messageLength)
-                    if self.DEBUG_LOW_LEVEL_VERBOSE:
-                        logger.info(f"[{self._id}] Full parsing done, remaining : {src.remaining()}")
-                    return msg
-                if self.DEBUG_LOW_LEVEL_VERBOSE:
-                    logger.info(
-                        f"[{self._id}] Not enough data to read msg content, byte available : {src.remaining()} (needed : {messageLength} bytes)"
-                    )
-                self._staticHeader = -1
-                self._splittedPacketLength = messageLength
-                self._splittedPacketId = messageId
-                self._splittedPacket = True
-                self._inputBuffer = src.read(src.remaining())
-                return None
-
-            if self.DEBUG_LOW_LEVEL_VERBOSE:
-                logger.info(
-                    f"[{self._id}] Not enough data to read message ID, byte available : {src.remaining()}  (needed :  {staticHeader & NetworkMessage.BIT_MASK} )"
-                )
-
-            self._staticHeader = staticHeader
-            self._splittedPacketLength = messageLength
-            self._splittedPacketId = messageId
-            self._splittedPacket = True
-            return None
-
-        if self._staticHeader != -1:
-            try:
-                self._splittedPacketLength = self.readMessageLength(self._staticHeader, src)
-            except IndexError as e:
-                return None
-            self._staticHeader = -1
-
-        if src.remaining() + len(self._inputBuffer) >= self._splittedPacketLength:
-            self._inputBuffer = self._inputBuffer + src.read(self._splittedPacketLength - len(self._inputBuffer))
-            self._inputBuffer.position = 0
-            self.updateLatency()
-            msg = self._rawParser.parse(
-                self._inputBuffer,
-                self._splittedPacketId,
-                self._splittedPacketLength,
-            )
-            if self.DEBUG_LOW_LEVEL_VERBOSE:
-                logger.info(f"[{self._id}] Full parsing done, remaining : {src.remaining()}")
-            self._splittedPacket = False
-            self._inputBuffer.clear()
-            return msg
-
-        self._inputBuffer += src.read(src.remaining())
-        return None
-
-    def getUnpackMode(self, messageId: int, messageLength: int) -> int:
-        if messageLength == 0:
-            return UnpackMode.SYNC
-        result: int = self._rawParser.getUnpackMode(messageId)
-        if result != UnpackMode.DEFAULT:
-            return result
-        if messageLength > self.MESSAGE_SIZE_ASYNC_THRESHOLD:
-            result = UnpackMode.ASYNC
-            logger.info(f"Handling too heavy message of id {messageId} asynchronously (size : {messageLength})")
-        else:
-            result = UnpackMode.SYNC
-        return result
-
-    def computeMessage(self, msg: INetworkMessage, tree: FuncTree) -> None:
-        if not tree.goDown():
-            msg.unpacked = True
-            return
-        self._asyncMessages.append(msg)
-        self._asyncTrees.append(tree)
-        EnterFrameDispatcher().addEventListener(self.onEnterFrame, EnterFrameConst.SERVER_CONNECTION)
-
-    def onEnterFrame(self) -> None:
-        start = perf_counter()
-        if self._socket.connected:
-            self.receive(self._socket._buff, True)
-        if len(self._asyncMessages) and len(self._asyncTrees):
-            while True:
-                if not self._asyncTrees[0].next():
-                    if self.DEBUG_LOW_LEVEL_VERBOSE:
-                        logger.info(f"[{self._id}] Async {self.getType(self._asyncMessages[0])} parsing complete")
-                    self._asyncTrees.pop(0)
-                    self._asyncMessages[0].unpacked = True
-                    self.process(self._asyncMessages.pop(0))
-                    if len(self._asyncTrees) == 0:
-                        EnterFrameDispatcher().removeEventListener(self.onEnterFrame)
-                        return
-                if perf_counter() - start < self._maxUnpackTime:
+    def __parse(self, buffer: ByteArray) -> NetworkMessage:
+        while buffer.remaining() and not self._closing.is_set():
+            if self.__msgLenLength is None:
+                if buffer.remaining() < 2: 
                     break
+                staticHeader = buffer.readUnsignedShort()
+                self.__packetId = staticHeader >> NetworkMessage.BIT_RIGHT_SHIFT_LEN_PACKET_ID
+                self.__msgLenLength = staticHeader & NetworkMessage.BIT_MASK
 
+            if self.__messageLength is None:
+                if buffer.remaining() < self.__msgLenLength: 
+                    break
+                self.__messageLength = int.from_bytes(buffer.read(self.__msgLenLength), "big")
+
+            if buffer.remaining() >= self.__messageLength:
+                self.updateLatency()
+                msg: NetworkMessage = self.__rawParser.parse(buffer, self.__packetId, self.__messageLength)
+                if msg.unpacked:
+                    msg.receptionTime = perf_counter()
+                    msg.sourceConnection = self.id
+                    if not self._paused.is_set():
+                        if self.DEBUG_DATA:
+                            logger.debug(f"[{self.id}] [RCV] {msg}")
+                        self.__receptionQueue.put(msg)
+                    else:
+                        self.__pauseQueue.append(msg)
+                self.__packetId = None
+                self.__msgLenLength = None
+                self.__messageLength = None
+            else:
+                break
+        buffer.trim()
+        
+    @sendTrace
     def updateLatency(self) -> None:
-        if self._pause or len(self._pauseBuffer) > 0 or self._latestSent == 0:
+        if self._paused.is_set() or len(self.__pauseQueue) > 0 or self._latestSent == 0:
             return
         packetReceived: int = perf_counter()
         latency: int = packetReceived - self._latestSent
@@ -505,62 +228,107 @@ class ServerConnection(IServerConnection):
         self._latencyBuffer.append(latency)
         if len(self._latencyBuffer) > self.LATENCY_AVG_BUFFER_SIZE:
             self._latencyBuffer.pop(0)
-
-    def onConnect(self, e: Event) -> None:
-        self._connecting = False
-        self._connected = False
+            
+    def stopConnectionTimeout(self) -> None:
+        if self.__connectionTimeout:
+            self.__connectionTimeout.cancel()
+            
+    def __onConnect(self) -> None:
+        logger.debug(f"[{self.id}] Connection established.")
         self.stopConnectionTimeout()
-        if self.DEBUG_DATA:
-            logger.debug(f"[{self._id}] Connection opened.")
-        for msg in self._outputBuffer:
-            self.lowSend(msg)
-        self._inputBuffer = ByteArray()
-        self._outputBuffer = []
-        if self._handler:
-            self._handler.process(ConnectedMessage())
+        self._connecting.clear()
+        self._connected.set()
+        for msg in self.__sendingQueue:
+            self.send(msg)
+        self.__receivedStream = ByteArray()
+        self.__receptionQueue.put(ConnectedMessage())
 
-    def onClose(self, e: Event) -> None:
-        logger.debug(f"[{self._id}] Connection closed received from the socket.")
-        BenchmarkTimer(3, self.removeListeners).start()
-        if self._lagometer:
-            self._lagometer.stop()
+    @sendTrace
+    def receive(self) -> "INetworkMessage":
+        return self.__receptionQueue.get()
+
+    @sendTrace
+    def __onClose(self, err) -> None:
+        self.stopConnectionTimeout()
+        logger.debug(f"[{self.id}] Connection closed. {err}")
+        if self.__lagometer:
+            self.__lagometer.stop()
+        self.__socket.close()
+        self._connected.clear()
+        self._connecting.clear()
         from pydofus2.com.ankamagames.jerakine.network.ServerConnectionClosedMessage import ServerConnectionClosedMessage
+        self.__receptionQueue.put(ServerConnectionClosedMessage(self.id))
+        self.finished.set()
+        logger.info(f"[{self.id}] Finished.")
+        if err:
+            raise err
 
-        self._connected = False
-        self._handler.process(ServerConnectionClosedMessage(self))
-        self._connecting = False
-        self._outputBuffer.clear()
-        EnterFrameDispatcher().removeEventListener(self.onEnterFrame)
-        self._input.clear()
-        self._splittedPacket = False
-        self._staticHeader = -1
+    @property
+    def closed(self) -> bool:
+        return self._closing.is_set()
 
-    def onSocketData(self, pe: ProgressEvent) -> None:
-        if self.DEBUG_LOW_LEVEL_VERBOSE:
-            logger.info(f"[{self._id}] Receive Event, byte available : {self._socket.bytesAvailable}")
-        with lock:
-            self.receive(self._socket._buff)
-
-    def onSocketError(self, e: IOErrorEvent) -> None:
-        if self._lagometer:
-            self._lagometer.stop()
-        logger.debug(f"[{self._id}] Failure while opening socket.")
-        self._connecting = False
-        self._handler.process(ServerConnectionFailedMessage(self, e.text))
-
-    def onSocketTimeOut(self) -> None:
-        if self._lagometer:
-            self._lagometer.stop()
-        self._connecting = False
+    def __onConnectionTimeout(self) -> None:
+        from pydofus2.com.ankamagames.jerakine.network.messages.ServerConnectionFailedMessage import (
+            ServerConnectionFailedMessage,
+        )
+        self.stopConnectionTimeout()
+        if self.open or self.finished.is_set() or self.closed :
+            return
+        if self.__lagometer:
+            self.__lagometer.stop()
+        self._connecting.clear()
         if self._firstConnectionTry:
-            logger.debug(f"[{self._id}] Failure while opening socket, timeout, but WWJD ? Give a second chance !")
+            logger.debug(f"[{self.id}] Connection timeout, but WWJD ? Give a second chance !")
             self.connect(self._remoteSrvHost, self._remoteSrvPort)
             self._firstConnectionTry = False
         else:
-            logger.debug(f"[{self._id}] Failure while opening socket, timeout.")
-            self._handler.process(ServerConnectionFailedMessage(self, "timeout"))
+            self.__receptionQueue.put(ServerConnectionFailedMessage(self.id, "Connection timeout!"))
 
-    def checkClosed(self) -> bool:
-        if self._willClose:
-            return True
-        return False
+    @sendTrace
+    def connect(self, host: str, port: int, timeout=CONNECTION_TIMEOUT) -> None:
+        if self.connecting:
+            logger.warn(f"[{self.id}] Tried to connect while already connecting.")
+            return
+        self._connected.clear()
+        self._connecting.set()
+        self._closing.clear()
+        self._firstConnectionTry = True
+        self._remoteSrvHost = host
+        self._remoteSrvPort = port
+        logger.info(f"[{self.id}] Connecting to {host}:{port}...")
+        self.__connectionTimeout = BenchmarkTimer(timeout, self.__onConnectionTimeout)
+        self.__connectionTimeout.start()
+        self.__socket.connect((host, port))
+
+    def expectConnectionClose(self, reason, msg) -> None:
+        self.__dontHandleClose = False
+        
+    @sendTrace
+    def run(self):
+        err = ""
+        while not self._closing.is_set() and not self.finished.is_set():
+            try:
+                rdata = self.__socket.recv(2056)
+                if rdata:
+                    if self._connecting.is_set():
+                        self.__onConnect()
+                    self.__receivedStream += rdata
+                    self.__parse(self.__receivedStream)
+                else:
+                    logger.debug(f"[{self.id}] Connection closed by remote host")
+                    self._closing.set()
+            except (KeyboardInterrupt, SystemExit) as e:
+                logger.debug(f"[{self.id}] Interrupted suddenly!")
+                self._closing.set()
+                err = e
+            except OSError as e:
+                if e.errno == errno.WSAENOTCONN:
+                    logger.debug(f"[{self.id}] Waiting for socket to connect...")
+                    sleep(0.5)
+                elif e.errno == errno.WSAECONNABORTED:
+                    logger.debug(f"[{self.id}] Connection aborted by user.")
+                    self._closing.set()
+                else:
+                    err = e
+                    self._closing.set()
+        self.__onClose(err)

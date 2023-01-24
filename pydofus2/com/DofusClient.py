@@ -1,13 +1,9 @@
 import threading
-import tracemalloc
-from pydofus2.com.ankamagames.berilia.managers.KernelEventsManager import (
-    KernelEventsManager,
-    KernelEvts,
-)
+from pydofus2.com.ankamagames.berilia.managers.KernelEventsManager import KernelEventsManager, KernelEvts
 from pydofus2.com.ankamagames.dofus.kernel.net.DisconnectionReason import DisconnectionReason
 from pydofus2.com.ankamagames.dofus.logic.common.managers.PlayerManager import PlayerManager
 from time import perf_counter, sleep
-import pydofus2.com.ankamagames.dofus.kernel.Kernel as krnl
+from pydofus2.com.ankamagames.dofus.kernel.Kernel import Kernel
 from pydofus2.com.ankamagames.dofus.kernel.net.DisconnectionReasonEnum import (
     DisconnectionReasonEnum,
 )
@@ -15,15 +11,13 @@ from pydofus2.com.ankamagames.dofus.logic.connection.actions.LoginValidationWith
     LoginValidationWithTokenAction,
 )
 import pydofus2.com.ankamagames.dofus.logic.connection.managers.AuthentificationManager as auth
-import pydofus2.com.ankamagames.dofus.kernel.net.ConnectionsHandler as connh
+from pydofus2.com.ankamagames.dofus.kernel.net.ConnectionsHandler import ConnectionsHandler
 from pydofus2.com.ankamagames.dofus.logic.game.common.managers.PlayedCharacterManager import (
     PlayedCharacterManager,
 )
 from pydofus2.com.ankamagames.jerakine.data.I18nFileAccessor import I18nFileAccessor
 from pydofus2.com.ankamagames.jerakine.logger.Logger import Logger
 from typing import TYPE_CHECKING
-from pydofus2.com.ankamagames.jerakine.logger.MemoryProfiler import MemoryProfiler
-from pydofus2.com.ankamagames.jerakine.metaclasses.Singleton import Singleton
 
 if TYPE_CHECKING:
     from pydofus2.com.ankamagames.jerakine.network.ServerConnection import ServerConnection
@@ -31,66 +25,33 @@ from pydofus2.com.ankamagames.atouin.utils.DataMapProvider import DataMapProvide
 
 logger = Logger()
 
-
-class DofusClient(metaclass=Singleton):
-    LOG_MEMORY_USAGE: bool = False
-
-    def __init__(self, id="unknown"):
-        super().__init__()
-        self._stop = threading.Event()
+class DofusClient(threading.Thread):
+    
+    def __init__(self, name="unknown"):
+        super().__init__(name=name)
+        self._killSig = threading.Event()
+    
+    def init(self):
         self._stopReason: DisconnectionReason = None
         self._lastLoginTime = None
         self._minLoginInterval = 10
-        self.id = id
-        self._worker = krnl.Kernel().getWorker()
+        self._worker = Kernel().worker
         self._registredInitFrames = []
         self._registredGameStartFrames = []
-        krnl.Kernel().init()
+        Kernel().init()
         I18nFileAccessor()
         DataMapProvider()
-        logger.info("DofusClient initialized")
+        KernelEventsManager().once(KernelEvts.CHARACTER_SELECTION_SUCCESS, self._onCharacterSelectionSuccess)
+        KernelEventsManager().once(KernelEvts.CRASH, self._onCrash)
+        KernelEventsManager().once(KernelEvts.SHUTDOWN, self._onShutdown)
+        KernelEventsManager().once(KernelEvts.RESTART, self._onRestart)
+        logger.info("[DofusClient] initialized")
 
     def login(self, loginToken, serverId=0, characterId=None):
-        if self._lastLoginTime is not None and perf_counter() - self._lastLoginTime < self._minLoginInterval:
-            logger.info("Login request too soon, will wait some time")
-            sleep(self._minLoginInterval - (perf_counter() - self._lastLoginTime))
-        if krnl.Kernel().wasReseted:
-            krnl.Kernel().init()
-        self._lastLoginTime = perf_counter()
-        if self.LOG_MEMORY_USAGE:
-            tracemalloc.start(10)
         self._serverId = serverId
         self._characterId = characterId
         self._loginToken = loginToken
-        auth.AuthentificationManager().setToken(self._loginToken)
-        if characterId:
-            PlayerManager().allowAutoConnectCharacter = True
-            PlayedCharacterManager().id = characterId
-            PlayerManager().autoConnectOfASpecificCharacterId = characterId
-        for frame in self._registredInitFrames:
-            self._worker.addFrame(frame())
-        if self._serverId == 0:
-            self._worker.processImmediately(
-                LoginValidationWithTokenAction.create(autoSelectServer=False, serverId=self._serverId)
-            )
-        else:
-            self._worker.processImmediately(
-                LoginValidationWithTokenAction.create(autoSelectServer=True, serverId=self._serverId)
-            )
-
-    def join(self):
-        if self.LOG_MEMORY_USAGE:
-            while not self._stop.wait(15):
-                try:
-                    snapshot = tracemalloc.take_snapshot()
-                    MemoryProfiler.logMemoryUsage(snapshot)
-                except KeyboardInterrupt:
-                    self.shutdown()
-                    MemoryProfiler.saveCollectedData()
-        else:
-            self._stop.wait()
-        if self._stopReason and self._stopReason.reason == DisconnectionReasonEnum.EXCEPTION_THROWN:
-            raise Exception(self._stopReason.message)
+        self.start()
 
     def registerInitFrame(self, frame):
         self._registredInitFrames.append(frame)
@@ -98,36 +59,32 @@ class DofusClient(metaclass=Singleton):
     def registerGameStartFrame(self, frame):
         self._registredGameStartFrames.append(frame)
 
-    def shutdown(self, reason=None, msg=""):
+    def _onCharacterSelectionSuccess(self, event):
+        for frame in self._registredGameStartFrames:
+            self._worker.addFrame(frame())
+    
+    def _onCrash(self, event, message):
+        self._killSig.set()
+        logger.debug(f"[DofusClient] Crashed for reason: {message}")
+    
+    def _onShutdown(self, event, message):
+        self._killSig.set()
+        logger.debug(f"[DofusClient] Shutdown requested for reason: {message}")
+    
+    def _onRestart(self, event, message):
+        logger.debug(f"[DofusClient] Restart requested for reason: {message}")
+        
+    def shutdown(self, reason=DisconnectionReasonEnum.WANTED_SHUTDOWN, msg=""):
         logger.info("Shuting down ...")
-        if reason is None:
-            reason = DisconnectionReasonEnum.WANTED_SHUTDOWN
-        connh.ConnectionsHandler().connectionGonnaBeClosed(reason, msg)
-        connh.ConnectionsHandler().getConnection().close()
-
-    def restart(self):
-        conn = connh.ConnectionsHandler().getConnection()
-        connh.ConnectionsHandler().connectionGonnaBeClosed(DisconnectionReasonEnum.RESTARTING)
-        conn.close()
+        ConnectionsHandler().closeConnection(reason, msg)
 
     def relogin(self):
         self.login(self._loginToken, self._serverId, self._characterId)
 
-    def interrupt(self, reason: DisconnectionReason = None):
-        self._stopReason = reason
-        self._stop.set()
-        if reason and reason.reason == DisconnectionReasonEnum.EXCEPTION_THROWN:
-            KernelEventsManager().send(KernelEvts.CRASH, message=reason.message)
-        DofusClient.clear()
-
     @property
-    def exitError(self) -> DisconnectionReason:
-        return self._stopReason
-
-    @property
-    def mainConn(self) -> "ServerConnection":
-        return connh.ConnectionsHandler().getConnection().mainConnection
-
+    def connection(self) -> "ServerConnection":
+        return ConnectionsHandler().conn
+    
     @property
     def registeredInitFrames(self) -> list:
         return self._registredInitFrames
@@ -135,3 +92,35 @@ class DofusClient(metaclass=Singleton):
     @property
     def registeredGameStartFrames(self) -> list:
         return self._registredGameStartFrames
+
+    def run(self):
+        logger.debug(f"current thread: {threading.current_thread().name}")
+        self.init()
+        try:
+            if self._lastLoginTime is not None and perf_counter() - self._lastLoginTime < self._minLoginInterval:
+                logger.info("[DofusClient] Login request too soon, will wait some time")
+                sleep(self._minLoginInterval - (perf_counter() - self._lastLoginTime))
+            self._lastLoginTime = perf_counter()
+            if Kernel().reseted:
+                Kernel().init()
+            auth.AuthentificationManager().setToken(self._loginToken)
+            if self._characterId:
+                PlayerManager().allowAutoConnectCharacter = True
+                PlayedCharacterManager().id = self._characterId
+                PlayerManager().autoConnectOfASpecificCharacterId = self._characterId
+            for frame in self._registredInitFrames:
+                self._worker.addFrame(frame())
+            if self._serverId == 0:
+                self._worker.processImmediately(
+                    LoginValidationWithTokenAction.create(autoSelectServer=False, serverId=self._serverId)
+                )
+            else:
+                self._worker.processImmediately(
+                    LoginValidationWithTokenAction.create(autoSelectServer=True, serverId=self._serverId)
+                )
+            while not self._killSig.is_set():
+                msg = ConnectionsHandler().conn.receive()
+                self._worker.process(msg)
+        except:
+            logger.error(f"[DofusClient] Error in main loop.", exc_info=True)
+        logger.info("[DofusClient] Stopped")

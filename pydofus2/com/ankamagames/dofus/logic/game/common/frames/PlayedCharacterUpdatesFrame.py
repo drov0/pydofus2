@@ -127,7 +127,7 @@ class PlayedCharacterUpdatesFrame(Frame):
 
     @property
     def roleplayContextFrame(self) -> rplCF.RoleplayContextFrame:
-        return krnl.Kernel().getWorker().getFrame("RoleplayContextFrame")
+        return krnl.Kernel().worker.getFrame("RoleplayContextFrame")
 
     @property
     def kamasLimit(self) -> float:
@@ -144,7 +144,7 @@ class PlayedCharacterUpdatesFrame(Frame):
             scrmsg = msg
             if scrmsg.actorId == pcm.PlayedCharacterManager().id:
                 pcm.PlayedCharacterManager().restrictions = scrmsg.restrictions
-            rpEntitiesFrame: "RoleplayEntitiesFrame" = krnl.Kernel().getWorker().getFrame("RoleplayEntitiesFrame")
+            rpEntitiesFrame: "RoleplayEntitiesFrame" = krnl.Kernel().worker.getFrame("RoleplayEntitiesFrame")
             if rpEntitiesFrame:
                 infos: "GameRolePlayHumanoidInformations" = rpEntitiesFrame.getEntityInfos(scrmsg.actorId)
                 if infos and infos.humanoidInfo:
@@ -158,7 +158,7 @@ class PlayedCharacterUpdatesFrame(Frame):
 
         if isinstance(msg, CharacterStatsListMessage):
             cslmsg = msg
-            fightBattleFrame: "FightBattleFrame" = krnl.Kernel().getWorker().getFrame("FightBattleFrame")
+            fightBattleFrame: "FightBattleFrame" = krnl.Kernel().worker.getFrame("FightBattleFrame")
             if fightBattleFrame is not None and fightBattleFrame.executingSequence:
                 fightBattleFrame.delayCharacterStatsList(cslmsg)
             else:
@@ -167,9 +167,9 @@ class PlayedCharacterUpdatesFrame(Frame):
                 playerInfos = self.roleplayContextFrame.entitiesFrame.getEntityInfos(pcm.PlayedCharacterManager().id)
                 if playerInfos:
                     playerInfos.alignmentInfos = cslmsg.stats.alignmentInfos
-            if krnl.Kernel().getWorker().getFrame("QuestFrame"):
-                if krnl.Kernel().getWorker().getFrame("QuestFrame").achievmentsListProcessed == False:
-                    krnl.Kernel().getWorker().getFrame("QuestFrame")
+            if krnl.Kernel().worker.getFrame("QuestFrame"):
+                if krnl.Kernel().worker.getFrame("QuestFrame").achievmentsListProcessed == False:
+                    krnl.Kernel().worker.getFrame("QuestFrame")
             return False
 
         if isinstance(msg, MapComplementaryInformationsDataMessage):
@@ -199,8 +199,8 @@ class PlayedCharacterUpdatesFrame(Frame):
             #    if PrismSubAreaWrapper.prismList[newSubArea.id]:
             #       prism = PrismSubAreaWrapper.prismList[newSubArea.id]
             #       if prism.state == PrismStateEnum.PRISM_STATE_VULNERABLE:
-            #          if krnl.Kernel().getWorker().contains(AllianceFrame):
-            #             allianceFrame = krnl.Kernel().getWorker().getFrame("AllianceFrame")
+            #          if krnl.Kernel().worker.contains(AllianceFrame):
+            #             allianceFrame = krnl.Kernel().worker.getFrame("AllianceFrame")
 
             return False
 
@@ -213,14 +213,14 @@ class PlayedCharacterUpdatesFrame(Frame):
         #    rcsra = msg
         #    rcsrmsg = ResetCharacterStatsRequestMessage()
         #    rcsrmsg.initResetCharacterStatsRequestMessage()
-        #    ConnectionsHandler().getConnection().send(rcsrmsg)
+        #    ConnectionsHandler().conn.send(rcsrmsg)
         #    return True
 
         # if isinstance(msg, StatsUpgradeRequestAction):
         #    sura = msg
         #    surqmsg = StatsUpgradeRequestMessage()
         #    surqmsg.initStatsUpgradeRequestMessage(sura.useAdditionnal,sura.statId,sura.boostPoint)
-        #    ConnectionsHandler().getConnection().send(surqmsg)
+        #    ConnectionsHandler().conn.send(surqmsg)
         #    return True
 
         if isinstance(msg, StatsUpgradeResultMessage):
@@ -291,7 +291,7 @@ class PlayedCharacterUpdatesFrame(Frame):
             # name = "flag_srv" + crmsg.type
 
             # if crmsg.type  == CompassTypeEnum.COMPASS_TYPE_SPOUSE:
-            #    socialFrame = krnl.Kernel().getWorker().getFrame("SocialFrame")
+            #    socialFrame = krnl.Kernel().worker.getFrame("SocialFrame")
             #    socialFrame.spouse.followSpouse = False
 
             # if crmsg.type  == CompassTypeEnum.COMPASS_TYPE_PARTY:
@@ -358,14 +358,14 @@ class PlayedCharacterUpdatesFrame(Frame):
         #    gar = msg
         #    sao = StartupActionsObjetAttributionMessage()
         #    sao.initStartupActionsObjetAttributionMessage(gar.giftId,gar.characterId)
-        #    ConnectionsHandler().getConnection().send(sao)
+        #    ConnectionsHandler().conn.send(sao)
         #    return True
 
         # if isinstance(msg, GiftAssignAllRequestAction):
         #    gaara = msg
         #    saaamsg = StartupActionsAllAttributionMessage()
         #    saaamsg.initStartupActionsAllAttributionMessage(gaara.characterId)
-        #    ConnectionsHandler().getConnection().send(saaamsg)
+        #    ConnectionsHandler().conn.send(saaamsg)
         #    return True
 
         if isinstance(msg, StartupActionFinishedMessage):

@@ -98,11 +98,11 @@ class RoleplayWorldFrame(Frame):
     def roleplayContextFrame(self) -> "RoleplayContextFrame":
         pass
 
-        return Kernel().getWorker().getFrame("RoleplayContextFrame")
+        return Kernel().worker.getFrame("RoleplayContextFrame")
 
     @property
     def roleplayMovementFrame(self) -> RoleplayMovementFrame:
-        return Kernel().getWorker().getFrame("RoleplayMovementFrame")
+        return Kernel().worker.getFrame("RoleplayMovementFrame")
 
     def pushed(self) -> bool:
         self._allowOnlyCharacterInteraction = False
@@ -167,7 +167,7 @@ class RoleplayWorldFrame(Frame):
                     self.roleplayMovementFrame.setFollowingMessage(gfjrmsg)
                     playerEntity3
                 else:
-                    ConnectionsHandler().getConnection().send(gfjrmsg)
+                    ConnectionsHandler()._conn.send(gfjrmsg)
             elif entityc.id != PlayedCharacterManager().id:
                 self.roleplayMovementFrame.setFollowingInteraction(None)
                 if isinstance(entityClickInfo, GameRolePlayActorInformations) and isinstance(
@@ -181,7 +181,7 @@ class RoleplayWorldFrame(Frame):
             sendInteractiveUseRequest = True
             ieamsg = msg
             interactiveFrame: riF.RoleplayInteractivesFrame = (
-                Kernel().getWorker().getFrame("RoleplayInteractivesFrame")
+                Kernel().worker.getFrame("RoleplayInteractivesFrame")
             )
             if interactiveFrame.usingInteractive:
                 logger.debug("Interactive element already in use")
@@ -216,7 +216,7 @@ class RoleplayWorldFrame(Frame):
     def onMerchantPlayerBuyClick(self, vendorId: float, vendorCellId: int) -> None:
         eohvrmsg: ExchangeOnHumanVendorRequestMessage = ExchangeOnHumanVendorRequestMessage()
         eohvrmsg.init(vendorId, vendorCellId)
-        ConnectionsHandler().getConnection().send(eohvrmsg)
+        ConnectionsHandler()._conn.send(eohvrmsg)
 
     def getNearestCellToIe(self, ie: InteractiveElement, iePos: MapPoint) -> Tuple[MapPoint, bool]:
         forbiddenCellsIds = list()

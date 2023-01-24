@@ -79,7 +79,7 @@ class SpellInventoryManagementFrame(Frame, metaclass=Singleton):
         super().__init__()
 
     def getCurrentInstance(self) -> "SpellInventoryManagementFrame":
-        return Kernel().getWorker().getFrame("SpellInventoryManagementFrame")
+        return Kernel().worker.getFrame("SpellInventoryManagementFrame")
 
     def generateCurrentCustomModeBreedSpells(self) -> list:
         spellId: int = 0
@@ -257,9 +257,9 @@ class SpellInventoryManagementFrame(Frame, metaclass=Singleton):
                                 spellWrapper.id, True, spellWrapper.spellLevel
                             )
                             spellManager.resetInitialCooldown(spellCastManager.currentTurn)
-            if Kernel().getWorker().contains("FightSpellCastFrame"):
-                Kernel().getWorker().removeFrame(Kernel().getWorker().getFrame("FightSpellCastFrame"))
-            # imf = Kernel().getWorker().getFrame("InventoryManagementFrame")
+            if Kernel().worker.contains("FightSpellCastFrame"):
+                Kernel().worker.removeFrame(Kernel().worker.getFrame("FightSpellCastFrame"))
+            # imf = Kernel().worker.getFrame("InventoryManagementFrame")
             # InventoryManager().shortcutBarSpells = imf.getWrappersFromShortcuts(sscmsg.shortcuts)
             return False
 
@@ -267,7 +267,7 @@ class SpellInventoryManagementFrame(Frame, metaclass=Singleton):
             svara = msg
             svarmsg = SpellVariantActivationRequestMessage()
             svarmsg.init(svara.spellId)
-            ConnectionsHandler().getConnection().send(svarmsg)
+            ConnectionsHandler()._conn.send(svarmsg)
             return True
 
         elif isinstance(msg, SpellVariantActivationMessage):
@@ -290,7 +290,7 @@ class SpellInventoryManagementFrame(Frame, metaclass=Singleton):
         elif isinstance(msg, FinishMoveListRequestAction):
             fmlrmsg = FinishMoveListRequestMessage()
             fmlrmsg.init()
-            ConnectionsHandler().getConnection().send(fmlrmsg)
+            ConnectionsHandler()._conn.send(fmlrmsg)
             return True
 
         elif isinstance(msg, FinishMoveSetRequestAction):
@@ -298,11 +298,11 @@ class SpellInventoryManagementFrame(Frame, metaclass=Singleton):
             for fmId in fmsra.enabledFinishedMoves:
                 fmsrmsg = FinishMoveSetRequestMessage()
                 fmsrmsg.init(fmId, True)
-                ConnectionsHandler().getConnection().send(fmsrmsg)
+                ConnectionsHandler()._conn.send(fmsrmsg)
             for fmId in fmsra.disabledFinishedMoves:
                 fmsrmsg = FinishMoveSetRequestMessage()
                 fmsrmsg.init(fmId, False)
-                ConnectionsHandler().getConnection().send(fmsrmsg)
+                ConnectionsHandler()._conn.send(fmsrmsg)
             return True
 
         elif isinstance(msg, FinishMoveListMessage):

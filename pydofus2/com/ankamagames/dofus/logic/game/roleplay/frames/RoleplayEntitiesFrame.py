@@ -189,13 +189,10 @@ class RoleplayEntitiesFrame(AbstractEntitiesFrame, Frame):
         self._entitiesVisibleNumber = 0
         self.mcidm_processessed = False
         if MapDisplayManager()._currentMapRendered:
-            ccFrame: 'ContextChangeFrame' = Kernel().getWorker().getFrame("ContextChangeFrame")
-            connexion = ""
-            if ccFrame:
-                connexion = ccFrame.mapChangeConnexion
+            ccFrame: 'ContextChangeFrame' = Kernel().worker.getFrame("ContextChangeFrame")
             mirmsg = MapInformationsRequestMessage()
             mirmsg.init(mapId_=MapDisplayManager().currentMapPoint.mapId)
-            ConnectionsHandler().getConnection().send(mirmsg, connexion)
+            ConnectionsHandler()._conn.send(mirmsg)
             self._waitForMap = False
         else:
             self._waitForMap = True
@@ -213,14 +210,14 @@ class RoleplayEntitiesFrame(AbstractEntitiesFrame, Frame):
 
         if isinstance(msg, MapLoadedMessage):
             if self._waitForMap:
-                ccFrame: 'ContextChangeFrame' = Kernel().getWorker().getFrame("ContextChangeFrame")
+                ccFrame: 'ContextChangeFrame' = Kernel().worker.getFrame("ContextChangeFrame")
                 connexion = ""
                 if ccFrame:
                     connexion = ccFrame.mapChangeConnexion
                 self.mcidm_processessed = False
                 mirmsg = MapInformationsRequestMessage()
                 mirmsg.init(mapId_=MapDisplayManager().currentMapPoint.mapId)
-                ConnectionsHandler().getConnection().send(mirmsg, connexion)
+                ConnectionsHandler()._conn.send(mirmsg)
                 self._waitForMap = False
             return False
 
@@ -276,7 +273,7 @@ class RoleplayEntitiesFrame(AbstractEntitiesFrame, Frame):
             else:
                 self._worldPoint = WorldPointWrapper(int(mcidmsg.mapId))
 
-            roleplayContextFrame: rcf.RoleplayContextFrame = Kernel().getWorker().getFrame("RoleplayContextFrame")
+            roleplayContextFrame: rcf.RoleplayContextFrame = Kernel().worker.getFrame("RoleplayContextFrame")
             previousMap = PlayedCharacterManager().currentMap
             if (
                 roleplayContextFrame.newCurrentMapIsReceived
@@ -319,7 +316,7 @@ class RoleplayEntitiesFrame(AbstractEntitiesFrame, Frame):
                                     option.objectGID,
                                     option.delayEndTime,
                                 )
-                                Kernel().getWorker().process(dam)
+                                Kernel().worker.process(dam)
                             elif isinstance(option, HumanOptionSkillUse):
                                 hosu = option
                                 duration = hosu.skillEndTime - TimeManager().getUtcTimestamp()
@@ -334,7 +331,7 @@ class RoleplayEntitiesFrame(AbstractEntitiesFrame, Frame):
                                             "elemId": hosu.elementId,
                                         }
                                     )
-                                    Kernel().getWorker().process(iumsg)
+                                    Kernel().worker.process(iumsg)
                 if mapWithNoMonsters:
                     if isinstance(actor1, GameRolePlayGroupMonsterInformations):
                         mapWithNoMonsters = False
@@ -376,7 +373,7 @@ class RoleplayEntitiesFrame(AbstractEntitiesFrame, Frame):
                         mo.state == MapObstacleStateEnum.OBSTACLE_OPENED,
                     )
 
-            rpIntFrame: rif.RoleplayInteractivesFrame = Kernel().getWorker().getFrame("RoleplayInteractivesFrame")
+            rpIntFrame: rif.RoleplayInteractivesFrame = Kernel().worker.getFrame("RoleplayInteractivesFrame")
             if rpIntFrame:
                 imumsg = InteractiveMapUpdateMessage()
                 imumsg.init(mcidmsg.interactiveElements)

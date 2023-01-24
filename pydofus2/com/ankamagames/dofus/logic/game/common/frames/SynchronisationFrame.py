@@ -50,11 +50,11 @@ class SynchronisationFrame(Frame):
             self._synchroStepByServer[snrMsg.sourceConnection] += 1
             snMsg = SequenceNumberMessage()
             snMsg.init(number_=self._synchroStepByServer[snrMsg.sourceConnection])
-            ConnectionsHandler().getConnection().send(snMsg, snrMsg.sourceConnection)
+            ConnectionsHandler()._conn.send(snMsg)
             return True
 
         if isinstance(msg, CurrentMapMessage):
-            rplmvf: "RoleplayMovementFrame" = Kernel().getWorker().getFrame("RoleplayMovementFrame")
+            rplmvf: "RoleplayMovementFrame" = Kernel().worker.getFrame("RoleplayMovementFrame")
             if rplmvf and rplmvf._changeMapTimeout:
                 logger.debug("Cancel change map timeout")
                 rplmvf._changeMapTimeout.cancel()
@@ -64,7 +64,7 @@ class SynchronisationFrame(Frame):
 
         if isinstance(msg, GameContextCreateMessage):
             if msg.context == GameContextEnum.FIGHT:
-                rplmvf: "RoleplayMovementFrame" = Kernel().getWorker().getFrame("RoleplayMovementFrame")
+                rplmvf: "RoleplayMovementFrame" = Kernel().worker.getFrame("RoleplayMovementFrame")
                 if rplmvf and rplmvf._requestFightTimeout:
                     rplmvf._requestFightTimeout.cancel()
                     rplmvf._requestFighFails = 0

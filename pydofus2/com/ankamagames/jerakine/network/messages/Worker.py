@@ -66,6 +66,7 @@ class Worker(EventDispatcher, MessageHandler):
 
     def process(self, msg: Message) -> bool:
         if self._terminated:
+            logger.debug(f"Can't process message {msg} because the worker is terminated")
             return False
         self._messagesQueue.append(msg)
         self.run()
@@ -80,12 +81,6 @@ class Worker(EventDispatcher, MessageHandler):
         if len(self._treatmentsQueue) == 0:
             efd.EnterFrameDispatcher().addWorker(self)
         self._treatmentsQueue.append(Treatment(object, func, params))
-
-    def addUniqueSingleTreatment(self, object, func: FunctionType, params: list) -> None:
-        if len(self._treatmentsQueue) == 0:
-            efd.EnterFrameDispatcher().addWorker(self)
-        if not self.hasSingleTreatment(object, func, params):
-            self._treatmentsQueue.append(Treatment(object, func, params))
 
     def addForTreatment(self, object, func: FunctionType, params: list, iterations: int) -> None:
         if iterations == 0:

@@ -17,7 +17,6 @@ from pydofus2.com.ankamagames.jerakine.messages.Frame import Frame
 from pydofus2.com.ankamagames.jerakine.messages.Message import Message
 from pydofus2.com.ankamagames.jerakine.network.INetworkMessage import INetworkMessage
 from pydofus2.com.ankamagames.jerakine.types.enums.Priority import Priority
-from pydofus2.com.ankamagames.dofus.kernel.PanicMessages import PanicMessages
 
 logger = Logger("Dofus2")
 

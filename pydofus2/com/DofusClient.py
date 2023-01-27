@@ -30,15 +30,15 @@ class DofusClient(threading.Thread):
     def __init__(self, name="unknown"):
         super().__init__(name=name)
         self._killSig = threading.Event()
-    
-    def init(self):
+        self._registredInitFrames = []
+        self._registredGameStartFrames = []
         self._stopReason: DisconnectionReason = None
         self._lastLoginTime = None
         self._minLoginInterval = 10
-        self._worker = Kernel().worker
-        self._registredInitFrames = []
-        self._registredGameStartFrames = []
+    
+    def init(self):
         Kernel().init()
+        self._worker = Kernel().worker
         I18nFileAccessor()
         DataMapProvider()
         KernelEventsManager().once(KernelEvts.CHARACTER_SELECTION_SUCCESS, self._onCharacterSelectionSuccess)
@@ -95,7 +95,7 @@ class DofusClient(threading.Thread):
     @property
     def registeredGameStartFrames(self) -> list:
         return self._registredGameStartFrames
-
+    
     def run(self):
         logger.debug(f"current thread: {threading.current_thread().name}")
         self.init()

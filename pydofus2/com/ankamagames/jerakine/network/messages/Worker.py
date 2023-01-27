@@ -130,6 +130,9 @@ class Worker(EventDispatcher, MessageHandler):
             logger.debug(f"[DEBUG WORKER] Cannot add {frame}, worker is terminated")
             return
 
+        if self.contains(str(frame)):
+            return
+        
         if self._currentFrameTypesCache.get(str(frame)):
             wantToRemove = False
             wantToAdd = False
@@ -358,4 +361,6 @@ class Worker(EventDispatcher, MessageHandler):
         self._unstoppableMsgClassList.clear()
 
     def removeFrameByName(self, frameName: str) -> None:
+        if not self.contains(frameName):
+            return
         self.removeFrame(self.getFrame(frameName))

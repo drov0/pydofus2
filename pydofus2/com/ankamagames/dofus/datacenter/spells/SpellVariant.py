@@ -11,16 +11,12 @@ logger = Logger("Dofus2")
 class SpellVariant(IDataCenter):
     MODULE: str = "SpellVariants"
 
-    id: int
-
-    breedId: int
-
-    spellIds: list[int]
-
-    _spells: list = []
-
     def __init__(self):
         super().__init__()
+        self.id: int
+        self.breedId: int
+        self.spellIds = list[int]()
+        self._spells = list["Spell"]()
 
     @classmethod
     def getSpellVariantById(cls, id: int) -> "SpellVariant":
@@ -33,13 +29,11 @@ class SpellVariant(IDataCenter):
     @property
     def spells(self) -> list["Spell"]:
         from pydofus2.com.ankamagames.dofus.datacenter.spells.Spell import Spell
-
         if not self._spells:
-            self._spells = list()
             for spellId in self.spellIds:
-                spellToCopy = Spell.getSpellById(spellId)
-                if spellToCopy:
-                    self._spells.append(spellToCopy)
+                spell = Spell.getSpellById(spellId)
+                if spell:
+                    self._spells.append(spell)
         return self._spells
 
     def __str__(self) -> str:

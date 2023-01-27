@@ -36,91 +36,91 @@ class EffectInstance(IDataCenter):
 
     UNDEFINED_DESCRIPTION: str = "undefined"
 
-    effectUid: int
-
-    baseEffectId: int
-
-    effectId: int
-
-    order: int
-
-    targetId: int
-
-    targetMask: str
-
-    duration: int
-
-    delay: int
-
-    random: float
-
-    group: int
-
-    modificator: int
-
-    trigger: bool
-
-    triggers: str
-
-    visibleInTooltip: bool = True
-
-    visibleInBuffUi: bool = True
-
-    visibleInFightLog: bool = True
-
-    visibleOnTerrain: bool = True
-
-    forClientOnly: bool = False
-
-    dispellable: int = 1
-
-    zoneSize: object = None
-
-    zoneShape: int = None
-
-    zoneMinSize: object = None
-
-    zoneEfficiencyPercent: object = None
-
-    zoneMaxEfficiency: object = None
-
-    zoneStopAtTarget: object = None
-
-    effectElement: int = None
-
-    spellId: int = None
-
-    _effectData: Effect = None
-
-    _durationstrValue: int
-
-    _delaystrValue: int
-
-    _durationstr: str
-
-    _bonusType: int = -2
-
-    _oppositeId: int = -1
-
-    _category: int = -2
-
-    _description: str = UNDEFINED_DESCRIPTION
-
-    _theoricDescription: str = "None"
-
-    _descriptionForTooltip: str = "None"
-
-    _theoricDescriptionForTooltip: str = "None"
-
-    _showSet: int = -1
-
-    _priority: int = 0
-
-    _rawZone: str
-
-    _theoricShortDescriptionForTooltip: str = "None"
 
     def __init__(self):
+        self.effectUid: int = None
+
+        self.baseEffectId: int = None
+
+        self.effectId: int = None
+
+        self.order: int = None
+
+        self.targetId: int = None
+
+        self.targetMask: str = None
+
+        self.duration: int = None
+
+        self.delay: int = None
+
+        self.random: float = None
+
+        self.group: int = None
+
+        self.modificator: int = None
+
+        self.trigger: bool = None
+
+        self.triggers: str = None
+
+        self.visibleInTooltip: bool = True
+
+        self.visibleInBuffUi: bool = True
+
+        self.visibleInFightLog: bool = True
+
+        self.visibleOnTerrain: bool = True
+
+        self.forClientOnly: bool = False
+
+        self.dispellable: int = 1
+
+        self.zoneSize: object = None
+
+        self.zoneShape: int = None
+
+        self.zoneMinSize: object = None
+
+        self.zoneEfficiencyPercent: object = None
+
+        self.zoneMaxEfficiency: object = None
+
+        self.zoneStopAtTarget: object = None
+
+        self.effectElement: int = None
+
+        self.spellId: int = None
+
+        self._effectData: Effect = None
+
+        self._durationstrValue: int
+
+        self._delaystrValue: int
+
+        self._durationstr: str
+
+        self._bonusType: int = -2
+
+        self._oppositeId: int = -1
+
+        self._category: int = -2
+
+        self._description: str = self.UNDEFINED_DESCRIPTION
+
+        self._theoricDescription: str = "None"
+
+        self._descriptionForTooltip: str = "None"
+
+        self._theoricDescriptionForTooltip: str = "None"
+
+        self._showSet: int = -1
+
+        self._priority: int = 0
+
+        self._rawZone: str
+
+        self._theoricShortDescriptionForTooltip: str = "None"
         super().__init__()
 
     @property

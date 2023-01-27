@@ -78,25 +78,8 @@ logger = Logger("Dofus2")
 
 class InventoryManager(metaclass=Singleton):
 
-    _watchSelf: "InventoryManager"
-
-    _inventory: Inventory
-
-    _bankInventory: Inventory
-
-    _shortcutBarSpells: list
-
-    _shortcutBarItems: list
-
-    _builds: list
-
-    _currentBuildId: int = -1
-
-    _maxBuildCount: int
-
-    _presetsItemPositionsOrder: list
-
     def __init__(self):
+        super().__init__()
         self._presetsItemPositionsOrder = [
             CharacterInventoryPositionEnum.ACCESSORY_POSITION_HAT,
             CharacterInventoryPositionEnum.ACCESSORY_POSITION_CAPE,
@@ -117,7 +100,10 @@ class InventoryManager(metaclass=Singleton):
             CharacterInventoryPositionEnum.INVENTORY_POSITION_DOFUS_5,
             CharacterInventoryPositionEnum.INVENTORY_POSITION_DOFUS_6,
         ]
-        super().__init__()
+        self._watchSelf: "InventoryManager" = None
+        self._bankInventory: Inventory = None
+        self._currentBuildId: int = -1
+        self._presetsItemPositionsOrder: list = None
         self._maxBuildCount = ProtocolConstantsEnum.MAX_PRESET_COUNT
         self._inventory = PlayerInventory()
         self._builds = list()

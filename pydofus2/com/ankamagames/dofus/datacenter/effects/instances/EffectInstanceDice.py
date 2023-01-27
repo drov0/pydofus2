@@ -12,13 +12,13 @@ logger = Logger("Dofus2")
 
 class EffectInstanceDice(EffectInstanceInteger):
 
-    diceNum: int
 
-    diceSide: int
 
     def __init__(self):
         super().__init__()
-
+        diceNum: int = None
+        diceSide: int = None
+ 
     def clone(self) -> "EffectInstance":
         o: EffectInstanceDice = EffectInstanceDice()
         o.rawZone = self.rawZone

@@ -43,11 +43,9 @@ class StatsManager(metaclass=Singleton):
 
     def getStats(self, entityId: float) -> EntityStats:
         key = str(float(entityId))
-        # logger.info(f"Getting stats for entity with ID {key}")
         return self._entityStats.get(key)
 
     def addRawStats(self, entityId: float, rawStats: list[CharacterCharacteristic]) -> None:
-        # logger.debug(f"Adding rawStats count {len(rawStats)} for entity with ID {entityId}")
         entityKey = str(float(entityId))
         entityStats: EntityStats = self._entityStats.get(entityKey)
 
@@ -56,7 +54,6 @@ class StatsManager(metaclass=Singleton):
             self.setStats(entityStats)
 
         for rawStat in rawStats:
-            # logger.debug(f"update rawStat for entity {entityId} total {rawStat.to_json()}")
             if isinstance(rawStat, CharacterUsableCharacteristicDetailed):
                 rawUsableStat = rawStat
                 entityStat = UsableStat(

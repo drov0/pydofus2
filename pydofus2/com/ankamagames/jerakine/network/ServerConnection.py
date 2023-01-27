@@ -130,7 +130,7 @@ class ServerConnection(mp.Thread):
 
     @sendTrace
     def close(self) -> None:
-        if self.closed:
+        if self.closed or self.finished.is_set():
             logger.warn(f"[{self.id}] Tried to close a socket while it had already been disconnected.")
             return
         logger.debug(f"[{self.id}] Closing connection...")

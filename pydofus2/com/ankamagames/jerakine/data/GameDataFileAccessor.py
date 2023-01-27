@@ -17,42 +17,41 @@ class GameDataFileAccessor(metaclass=ThreadSharedSingleton):
     def __init__(self) -> None:
         self._modules = dict[str, ModuleReader]()
 
-    def init(self, file: str) -> None:
-        with lock:
-            nativeFile = Path(file)
-            moduleName: str = nativeFile.name.split(".d2o")[0]
-            s = perf_counter()
-            self._modules[moduleName] = ModuleReader(nativeFile.open("rb"))
-            logger.info(f"Loaded '{nativeFile.name}' module in {perf_counter() - s:.2f}s")
+    def __addModule(self, file: str) -> None:
+        nativeFile = Path(file)
+        moduleName: str = nativeFile.name.split(".d2o")[0]
+        s = perf_counter()
+        self._modules[moduleName] = ModuleReader(nativeFile.open("rb"), name=moduleName)
+        logger.info(f"[GameData] Loaded '{nativeFile.name}' module in {perf_counter() - s:.2f}s")
 
-    def initFromModuleName(self, moduleName: str) -> None:
+    def __addModuleByName(self, moduleName: str) -> None:
         if moduleName not in self._modules:
             modle_file_path = Constants.DOFUS_COMMON_DIR / f"{moduleName}.d2o"
-            self.init(modle_file_path)
+            self.__addModule(modle_file_path)
 
     def initFromBinaryStream(self, modulename: str, moduleBinaries: BinaryStream):
         self._modules[modulename] = ModuleReader(moduleBinaries)
 
-    def getDataProcessor(self, moduleName: str) -> "GameDataProcess":
+    def getModule(self, moduleName: str) -> ModuleReader:
         if moduleName not in self._modules:
-            self.initFromModuleName(moduleName)
-        return self._modules[moduleName]._gameDataProcessor
+            with lock:
+                self.__addModuleByName(moduleName)
+        return self._modules.get(moduleName)
+    
+    def getDataProcessor(self, moduleName: str) -> "GameDataProcess":
+        return self.getModule(moduleName)._gameDataProcessor
 
     def getClassDefinition(self, moduleName: str, classId: int) -> "GameDataClassDefinition":
-        return self._modules[moduleName]._classes[classId]
+        return self.getModule(moduleName)._classes[classId]
 
     def getCount(self, moduleName: str) -> int:
-        if moduleName not in self._modules:
-            self.initFromModuleName(moduleName)
-        return self._modules[moduleName]._counter
+        return self.getModule(moduleName)._counter
 
     def getObject(self, moduleName: str, objectId) -> Any:
-        return self._modules[moduleName].getObject(objectId)
+        return self.getModule(moduleName).getObject(objectId)
 
     def getObjects(self, moduleName: str) -> list[object]:
-        if moduleName not in self._modules:
-            self.initFromModuleName(moduleName)
-        return self._modules[moduleName].getObjects()
+        return self.getModule(moduleName).getObjects()
 
     def close(self) -> None:
         for module in self._modules:

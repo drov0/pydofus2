@@ -30,9 +30,6 @@ class BenchmarkTimer(threading.Timer):
         super().cancel()
         if self in BenchmarkTimer._startedTimers:
             BenchmarkTimer._startedTimers.remove(self)
-        # logger.debug(f"Running timers = {len(BenchmarkTimer._startedTimers)}")
-        # for timer in BenchmarkTimer._startedTimers:
-        #     logger.debug(f"[{self.callerName}] is still running on thread {timer.name} for {timer.interval} seconds")
         del self
     
     @classmethod

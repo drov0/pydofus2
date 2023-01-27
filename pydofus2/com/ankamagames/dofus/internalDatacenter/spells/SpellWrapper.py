@@ -1,3 +1,4 @@
+from functools import lru_cache
 from typing import Any, TYPE_CHECKING
 from pydofus2.com.ankamagames.berilia.types.messages.managers.SlotDataHolderManager import (
     SlotDataHolderManager,
@@ -42,7 +43,8 @@ from pydofus2.com.ankamagames.dofus.logic.game.common.managers.InventoryManager 
 )
 
 logger = Logger("Dofus2")
-
+import threading
+lock = threading.Lock()
 
 class SpellWrapper(ISlotData, ICellZoneProvider, IDataCenter):
 
@@ -105,11 +107,23 @@ class SpellWrapper(ISlotData, ICellZoneProvider, IDataCenter):
     @staticmethod
     def getEntityId() -> float:
         from pydofus2.com.ankamagames.dofus.uiApi.PlayedCharacterApi import PlayedCharacterApi
-
         if PlayedCharacterApi.isInFight():
             return cpfm.CurrentPlayedFighterManager().currentFighterId
         return PlayedCharacterManager().id
 
+    @classmethod
+    @lru_cache(maxsize=64, typed=False)
+    def getSpellCached(cls, spellID: int, playerId: float = 0) -> "SpellWrapper":
+        return cls.getSpell(spellID, playerId)
+    
+    @classmethod
+    def getSpell(cls, spellID: int, playerId: float = 0) -> "SpellWrapper":
+        spell = SpellWrapper()
+        spell.id = spellID
+        spell._slotDataHolderManager = SlotDataHolderManager(spell)
+        spell.playerId = playerId
+        return spell
+    
     @classmethod
     def create(
         cls,
@@ -120,44 +134,33 @@ class SpellWrapper(ISlotData, ICellZoneProvider, IDataCenter):
         variantActivated: bool = False,
         areModifiers: bool = True,
     ) -> "SpellWrapper":
-        spell: SpellWrapper = None
-        if spellID == 0:
-            useCache = False
-        if useCache:
-            if spellID in cls._cache and not playerId:
-                spell = cls._cache[spellID]
-            elif playerId in cls._playersCache and spellID in cls._playersCache[playerId]:
-                spell = cls._playersCache[playerId][spellID]
-        if spellID == 0 and cls._cac != None:
-            spell = cls._cac
-        if not spell:
-            spell = SpellWrapper()
-            spell.id = spellID
-            if useCache:
-                if playerId:
-                    if playerId not in cls._playersCache:
-                        cls._playersCache[playerId] = {}
-                    if spellID not in cls._playersCache[playerId]:
-                        cls._playersCache[playerId][spellID] = spell
-                else:
-                    cls._cache[spellID] = spell
-            spell._slotDataHolderManager = SlotDataHolderManager(spell)
-        if spellID != 0 or not cls._cac:
+        with lock:
+            spell = None
             if spellID == 0:
-                cls._cac = spell
-            spell.id = spellID
-            spell.gfxId = spellID
-            spell.variantActivated = variantActivated
-        spell.playerId = playerId
-        spellData: Spell = Spell.getSpellById(spellID)
-        if not spellData:
-            return None
-        if spellLevel == 0:
-            spell.updateSpellLevelAccordingToPlayerLevel()
-        else:
-            spell.spellLevel = spellLevel
-            spell._spellLevel = spellData.getSpellLevel(spell.spellLevel)
-        spell.setSpellEffects(areModifiers)
+                useCache = False
+            if useCache:
+                spell = cls.getSpellCached(spellID, playerId)
+            else:
+                spell = cls.getSpell(spellID, playerId)
+            if spell is None:
+                raise Exception("Something went wrong when creating spell")
+            if spellID == 0 and cls._cac != None:
+                spell = cls._cac
+            if spellID != 0 or not cls._cac:
+                if spellID == 0:
+                    cls._cac = spell
+                spell.id = spellID
+                spell.gfxId = spellID
+                spell.variantActivated = variantActivated
+            spellData: Spell = Spell.getSpellById(spellID)
+            if not spellData:
+                raise Exception("Spell not found")
+            if spellLevel == 0:
+                spell.updateSpellLevelAccordingToPlayerLevel()
+            else:
+                spell.spellLevel = spellLevel
+                spell._spellLevel = spellData.getSpellLevel(spell.spellLevel)
+            spell.setSpellEffects(areModifiers)
         return spell
 
     @classmethod

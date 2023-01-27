@@ -4,7 +4,7 @@ from pydofus2.com.ankamagames.jerakine.enum.GameDataTypeEnum import GameDataType
 from pydofus2.com.ankamagames.jerakine.data.BinaryStream import BinaryStream
 
 if TYPE_CHECKING:
-    from ankamagames.jerakine.data.ModuleReader import ModuleReader
+    from pydofus2.com.ankamagames.jerakine.data.ModuleReader import ModuleReader
 logger = Logger("Dofus2")
 
 
@@ -87,7 +87,7 @@ class GameDataField:
         if classIdentifier == self.NULL_IDENTIFIER:
             return None
         classDefinition = self.moduleReader.getClassDefinition(classIdentifier)
-        return classDefinition.getInstance(stream)
+        return classDefinition.from_stream(stream)
 
     @classmethod
     def getobjectByName(cls, className: str) -> object:

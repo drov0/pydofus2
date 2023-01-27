@@ -1,11 +1,7 @@
 import importlib
-import sys
 from typing import Any, TYPE_CHECKING
-
-
 if TYPE_CHECKING:
     from pydofus2.com.ankamagames.jerakine.data.ModuleReader import ModuleReader
-
 from pydofus2.com.ankamagames.jerakine.data.IPostInit import IPostInit
 from pydofus2.com.ankamagames.jerakine.data.BinaryStream import BinaryStream
 from pydofus2.com.ankamagames.jerakine.data.GameDataField import GameDataField
@@ -13,10 +9,9 @@ from pydofus2.com.ankamagames.jerakine.data.GameDataField import GameDataField
 
 class GameDataClassDefinition:
     def __init__(self, packageName: str, className: str, moduleReader: "ModuleReader") -> None:
-        self._fields = list()
         moduleName = f"pydofus2.{packageName}.{className}"
         try:
-            module = sys.modules[moduleName]
+            module = globals()[moduleName]
         except:
             module = importlib.import_module(moduleName)
         self._moduleName = moduleName
@@ -29,7 +24,7 @@ class GameDataClassDefinition:
     def fields(self) -> list[GameDataField]:
         return self._fields
 
-    def getInstance(self, stream: BinaryStream) -> Any:
+    def from_stream(self, stream: BinaryStream) -> Any:
         inst = self._class()
         for field in self._fields:
             attrib = field.name

@@ -35,15 +35,14 @@ from pydofus2.com.ankamagames.jerakine.utils.display.spellZone.IZoneShape import
 from pydofus2.com.ankamagames.jerakine.utils.display.spellZone.ZoneEffect import ZoneEffect
 from pydofus2.com.ankamagames.jerakine.utils.misc.StringUtils import StringUtils
 from typing import TYPE_CHECKING
-
+import threading
 if TYPE_CHECKING:
     from pydofus2.com.ankamagames.dofus.datacenter.effects.EffectInstance import EffectInstance
-
+lock = threading.Lock()
 logger = Logger("Dofus2")
 
 
 class ItemWrapper(Item, ISlotData, ICellZoneProvider, IDataCenter):
-
     LEVEL_STEP: list = [
         0,
         10,
@@ -72,72 +71,73 @@ class ItemWrapper(Item, ISlotData, ICellZoneProvider, IDataCenter):
     _cacheGId: dict = dict()
 
     _uniqueIndex: int = 0
-
-    _active: bool = True
-
-    _uri: str
-
-    _shortName: str = None
-
-    _nameWithoutAccent: str
-
-    _mimicryItemSkinGID: int
-
-    _wrapperItemSkinGID: int
-
-    _setCount: int = 0
-
-    _searchContent: str
-
-    position: int = 63
-
-    sortOrder: int = 0
-
-    objectUID: int = 0
-
-    objectGID: int = 0
-
-    quantity: int = 0
-
-    effects: list["EffectInstance"]
-
-    effectsList: list[ObjectEffect]
-
-    livingobjectId: int = None
-
-    livingobjectMood: int = None
-    livingobjectSkin: int = None
-
-    livingobjectCategory: int = None
-
-    livingobjectXp: int = None
-
-    livingobjectMaxXp: int = None
-
-    livingobjectLevel: int = None
-
-    livingobjectFoodDate: str = None
-
-    wrapperobjectCategory: int = None
-
-    _isobjectWrapped: bool = None
-
-    exchangeAllowed: bool = None
-
-    isPresetobject: bool = None
-
-    isOkForMultiUse: bool = None
-
-    givenExperienceAsSuperFood: float = 0
-
-    experiencePoints: int = 0
-
-    evolutiveLevel: int = 0
     
-    dropPriority: int = 0
-
     def __init__(self):
         self.effects = list["EffectInstance"]()
+
+        self._active: bool = True
+
+        self._uri: str
+
+        self._shortName: str = None
+
+        self._nameWithoutAccent: str
+
+        self._mimicryItemSkinGID: int
+
+        self._wrapperItemSkinGID: int
+
+        self._setCount: int = 0
+
+        self._searchContent: str
+
+        self.position: int = 63
+
+        self.sortOrder: int = 0
+
+        self.objectUID: int = 0
+
+        self.objectGID: int = 0
+
+        self.quantity: int = 0
+
+        self.effects: list["EffectInstance"]
+
+        self.effectsList: list[ObjectEffect]
+
+        self.livingobjectId: int = None
+
+        self.livingobjectMood: int = None
+        self.livingobjectSkin: int = None
+
+        self.livingobjectCategory: int = None
+
+        self.livingobjectXp: int = None
+
+        self.livingobjectMaxXp: int = None
+
+        self.livingobjectLevel: int = None
+
+        self.livingobjectFoodDate: str = None
+
+        self.wrapperobjectCategory: int = None
+
+        self._isobjectWrapped: bool = None
+
+        self.exchangeAllowed: bool = None
+
+        self.isPresetobject: bool = None
+
+        self.isOkForMultiUse: bool = None
+
+        self.givenExperienceAsSuperFood: float = 0
+
+        self.experiencePoints: int = 0
+
+        self.evolutiveLevel: int = 0
+        
+        self.dropPriority: int = 0
+
         super().__init__()
 
     @classmethod
@@ -155,23 +155,24 @@ class ItemWrapper(Item, ISlotData, ICellZoneProvider, IDataCenter):
         effect: "EffectInstance" = None
         refItem: Item = Item.getItemById(objectGID)
         cachedItem: ItemWrapper = cls._cache.get(objectUID) if objectUID > 0 else cls._cacheGId.get(objectGID)
-        if not cachedItem or not useCache:
-            if refItem.isWeapon:
-                from pydofus2.com.ankamagames.dofus.internalDatacenter.items.WeaponWrapper import (
-                    WeaponWrapper,
-                )
+        with lock:
+            if not cachedItem or not useCache:
+                if refItem.isWeapon:
+                    from pydofus2.com.ankamagames.dofus.internalDatacenter.items.WeaponWrapper import (
+                        WeaponWrapper,
+                    )
 
-                item = WeaponWrapper()
-            else:
-                item = ItemWrapper()
-            item.objectUID = objectUID
-            if useCache:
-                if objectUID > 0:
-                    cls._cache[objectUID] = item
+                    item = WeaponWrapper()
                 else:
-                    cls._cacheGId[objectGID] = item
-        else:
-            item = cachedItem
+                    item = ItemWrapper()
+                item.objectUID = objectUID
+                if useCache:
+                    if objectUID > 0:
+                        cls._cache[objectUID] = item
+                    else:
+                        cls._cacheGId[objectGID] = item
+            else:
+                item = cachedItem
         item._nameWithoutAccent = StringUtils.noAccent(refItem.name)
         item.effectsList = newEffects
         item.isPresetobject = (objectGID == DataEnum.ITEM_GID_PRESET_SHORTCUT)
@@ -182,7 +183,8 @@ class ItemWrapper(Item, ISlotData, ICellZoneProvider, IDataCenter):
         item.position = position
         item.objectGID = objectGID
         item.quantity = quantity
-        cls._uniqueIndex += 1
+        with lock:
+            cls._uniqueIndex += 1
         item.sortOrder = cls._uniqueIndex
         item.livingobjectCategory = 0
         item.wrapperobjectCategory = 0
@@ -241,8 +243,9 @@ class ItemWrapper(Item, ISlotData, ICellZoneProvider, IDataCenter):
 
     @classmethod
     def clearCache(cls) -> None:
-        cls._cache.clear()
-        cls._cacheGId.clear()
+        with lock:
+            cls._cache.clear()
+            cls._cacheGId.clear()
 
     @property
     def weight(self) -> int:

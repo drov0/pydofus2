@@ -22,5 +22,4 @@ class SoftReference:
             self.timeout.start()
 
     def clearReference(self) -> None:
-        del self.value
         self.value = None

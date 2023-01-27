@@ -91,7 +91,14 @@ from pydofus2.com.ankamagames.jerakine.logger.Logger import Logger
 
 logger = Logger("Dofus2")
 
-
+class PlayedCharacterInfo(object):
+    def __init__(self, i:CharacterBaseInformations) -> None:
+        self.id = i.id
+        self.breed = i.breed
+        self.level = i.level
+        self.limitedLevel = PlayedCharacterManager().limitedLevel
+        self.sex = i.sex
+        self.name = i.name
 class PlayedCharacterApi(IApi):
 
     @classmethod
@@ -103,18 +110,11 @@ class PlayedCharacterApi(IApi):
         return StatsManager().getStats(PlayedCharacterManager().id)
 
     @classmethod
-    def getPlayedCharacterInfo(cls) -> object:
+    def getPlayedCharacterInfo(cls) -> PlayedCharacterInfo:
         i: CharacterBaseInformations = PlayedCharacterManager().infos
         if not i:
             return None
-        class o(object):pass
-        o.id = i.id
-        o.breed = i.breed
-        o.level = i.level
-        o.limitedLevel = PlayedCharacterManager().limitedLevel
-        o.sex = i.sex
-        o.name = i.name
-        return o
+        return PlayedCharacterInfo(i)
 
     @classmethod
     def getInventory(cls) -> list[ItemWrapper]:

@@ -32,13 +32,13 @@ class HandshakeFrame(Frame):
         super().__init__()
 
     def checkProtocolVersions(self, serverVersion: str) -> None:
-        logger.info(f"Server protocol version {serverVersion}. Client version {Metadata.PROTOCOL_BUILD}.")
+        logger.info(f"[HandShake] Server protocol version {serverVersion}. Client version {Metadata.PROTOCOL_BUILD}.")
         if not serverVersion or not Metadata.PROTOCOL_BUILD:
             KernelEventsManager().send(KernelEvts.CRASH, "MALFORMED_PROTOCOL: A protocol version is empty or None. What happened?")
             return
         clientHash: str = self.extractHashFromProtocolVersion(Metadata.PROTOCOL_BUILD)
         if not clientHash:
-            logger.fatal("The client protocol version is malformed: " + Metadata.PROTOCOL_BUILD)
+            logger.fatal("[HandShake] The client protocol version is malformed: " + Metadata.PROTOCOL_BUILD)
             KernelEventsManager().send(KernelEvts.CRASH, "MALFORMED_PROTOCOL: The client protocol version is malformed")
             return
         serverHash: str = self.extractHashFromProtocolVersion(serverVersion)

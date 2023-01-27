@@ -65,29 +65,20 @@ from pydofus2.com.ankamagames.jerakine.messages.Frame import Frame
 from pydofus2.com.ankamagames.jerakine.messages.Message import Message
 from pydofus2.com.ankamagames.jerakine.types.enums.Priority import Priority
 from functools import cmp_to_key
-
 logger = Logger("Dofus2")
-
 
 class SpellInventoryManagementFrame(Frame, metaclass=Singleton):
 
-    _spellsGlobalCooldowns: dict[int, list[GameFightSpellCooldown]]()
-
     def __init__(self):
         self._fullSpellList = dict[int, list[SpellWrapper]]()
-        self._spellsGlobalCooldowns = dict()
+        self._spellsGlobalCooldowns: dict[int, list[GameFightSpellCooldown]]()
         super().__init__()
 
-    def getCurrentInstance(self) -> "SpellInventoryManagementFrame":
-        return Kernel().worker.getFrame("SpellInventoryManagementFrame")
-
     def generateCurrentCustomModeBreedSpells(self) -> list:
-        spellId: int = 0
         customSpells: list = []
         playerBreed: int = PlayedCharacterApi.getPlayedCharacterInfo().breed
         spellsInventory: list[SpellWrapper] = PlayedCharacterApi.getSpellInventory()
         allSpellIds: list = PlayedCharacterApi.getCustomModeSpellIds()
-        customModeBreedSpell: CustomModeBreedSpell = None
         for spellWrapper in spellsInventory:
             spellId = spellWrapper.spell.id
             if spellId in allSpellIds:
@@ -113,7 +104,7 @@ class SpellInventoryManagementFrame(Frame, metaclass=Singleton):
             for spell in slmsg.spells:
                 spellData = Spell.getSpellById(spell.spellId)
                 if spellData == None:
-                    logger.warn("Unknown spell with id " + spell.spellId)
+                    raise Exception("Unknown spell with id " + str(spell.spellId))
                 elif not spellData.spellVariant:
                     self._fullSpellList[playerId].append(
                         SpellWrapper.create(

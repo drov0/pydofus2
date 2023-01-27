@@ -47,10 +47,13 @@ class DofusClient(threading.Thread):
         KernelEventsManager().once(KernelEvts.RESTART, self._onRestart)
         logger.info("[DofusClient] initialized")
 
-    def login(self, loginToken, serverId=0, characterId=None):
+    def setCreds(self, loginToken, serverId=0, characterId=None):
         self._serverId = serverId
         self._characterId = characterId
         self._loginToken = loginToken
+        
+    def login(self, loginToken, serverId=0, characterId=None):
+        self.setCreds(loginToken, serverId, characterId)
         self.start()
 
     def registerInitFrame(self, frame):
@@ -59,7 +62,7 @@ class DofusClient(threading.Thread):
     def registerGameStartFrame(self, frame):
         self._registredGameStartFrames.append(frame)
 
-    def _onCharacterSelectionSuccess(self, event):
+    def _onCharacterSelectionSuccess(self, event, return_value):
         for frame in self._registredGameStartFrames:
             self._worker.addFrame(frame())
     
@@ -123,4 +126,5 @@ class DofusClient(threading.Thread):
                 self._worker.process(msg)
         except:
             logger.error(f"[DofusClient] Error in main loop.", exc_info=True)
+        Kernel().reset()
         logger.info("[DofusClient] Stopped")

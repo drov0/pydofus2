@@ -18,56 +18,32 @@ class Spell(IDataCenter):
 
     MODULE: str = "Spells"
 
-    _indexedParam: list
-
-    _indexedCriticalParam: list
-
-    id: int
-
-    nameId: int
-
-    descriptionId: int
-
-    typeId: int
-
-    order: int
-
-    scriptParams: str
-
-    scriptParamsCritical: str
-
-    scriptId: int
-
-    scriptIdCritical: int
-
-    iconId: int
-
-    spellLevels: list[int]
-
-    useParamCache: bool = True
-
-    verbose_cast: bool = False
-
-    default_zone: str = "0"
-
-    bypassSummoningLimit: bool = False
-
-    canAlwaysTriggerSpells: bool = False
-
-    adminName: str = ""
-
-    _name: str = ""
-
-    _description: str = ""
-
-    _spellLevels: list["SpellLevel"] = []
-
-    _spellVariant: SpellVariant = None
-
     def __init__(self):
-        self._spellLevels = []
         super().__init__()
-
+        self._indexedParam: list = None
+        self._indexedCriticalParam: list = None
+        self.id: int = 0
+        self.nameId: int = 0
+        self.descriptionId: int = 0
+        self.typeId: int = 0
+        self.order: int = 0
+        self.scriptParams: str = ""
+        self.scriptParamsCritical: str = ""
+        self.scriptId: int = None
+        self.scriptIdCritical: int = None 
+        self.iconId: int = None
+        self.spellLevels = list[int]()
+        self.useParamCache: bool = True
+        self.verbose_cast: bool = False
+        self.default_zone: str = "0"
+        self.bypassSummoningLimit: bool = False
+        self.canAlwaysTriggerSpells: bool = False
+        self.adminName: str = ""
+        self._name: str = ""
+        self._description: str = ""
+        self._spellLevels = list["SpellLevel"]()
+        self._spellVariant: SpellVariant = None
+        
     @classmethod
     def getSpellById(cls, id: int) -> "Spell":
         return GameData.getObject(cls.MODULE, id)
@@ -98,7 +74,7 @@ class Spell(IDataCenter):
     def spellVariant(self) -> SpellVariant:
         allSpellVariants: list = None
         variant: SpellVariant = None
-        if not self._spellVariant:
+        if self._spellVariant is None:
             allSpellVariants = SpellVariant.getSpellVariants()
             for variant in allSpellVariants:
                 if self.id in variant.spellIds:

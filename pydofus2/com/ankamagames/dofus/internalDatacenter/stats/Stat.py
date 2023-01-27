@@ -10,15 +10,12 @@ logger = Logger("Dofus2")
 class Stat:
 
     UNKNOWN_STAT_NAME: str = "unknown"
-    _entityId: float = None
-    _id: float = StatIds.UNKNOWN
-    _totalValue: float = 0
-    _name: str = None
 
     def __init__(self, id: float, totalValue: float):
         self._id = id
         self._totalValue = totalValue
         self._name = self.getStatName()
+        self._entityId: float = None
 
     def getStatName(self) -> str:
         characteristic: Characteristic = Characteristic.getCharacteristicById(self._id)

@@ -12,8 +12,8 @@ class FeatureManager(metaclass=ThreadSharedSingleton):
     def __init__(self):
         super().__init__()
         logger.info("Instantiating feature manager")
-        self. _enabledFeatureIds: list[int] = None
-        self._featureListeners: dict = None
+        self. _enabledFeatureIds = list[int]()
+        self._featureListeners = dict()
         self._featureListeners = dict()
 
     @property

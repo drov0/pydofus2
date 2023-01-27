@@ -64,6 +64,9 @@ class Kernel(metaclass=Singleton):
         StatsManager.clear()
         PlayerManager.clear()
         DataMapProvider.clear()
+        if not ConnectionsHandler().conn.closed:
+            ConnectionsHandler().conn.close()
+            ConnectionsHandler().conn.join()
         ConnectionsHandler.clear()
         SpellModifiersManager.clear()
         self._worker.clear()

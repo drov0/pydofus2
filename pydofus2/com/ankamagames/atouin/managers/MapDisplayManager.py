@@ -1,6 +1,3 @@
-# from pydofus2.com.ankamagames.atouin.managers.InteractiveCellManager import (
-#     InteractiveCellManager,
-# )
 from pydofus2.com.ankamagames.atouin.data.map.Layer import Layer
 from pydofus2.com.ankamagames.atouin.enums.ElementTypesEnum import ElementTypesEnum
 from pydofus2.com.ankamagames.atouin.messages.MapLoadedMessage import MapLoadedMessage
@@ -78,7 +75,7 @@ class MapDisplayManager(metaclass=Singleton):
         map = MapLoader.load(mapId, key=decryptionKey)
         self._currentMapRendered = True
         self._nMapLoadEnd = perf_counter()
-        logger.debug(f"Map {map.id} loaded in " + str(self._nMapLoadEnd - self._nMapLoadStart) + " seconds")
+        logger.debug(f"Map {map.id} loaded in {self._nMapLoadEnd - self._nMapLoadStart} seconds")
         dmpm.DataMapProvider().resetUpdatedCell()
         dmpm.DataMapProvider().resetSpecialEffects()
         self.currentDataMap = map

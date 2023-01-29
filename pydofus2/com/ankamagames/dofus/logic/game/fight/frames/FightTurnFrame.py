@@ -511,7 +511,7 @@ class FightTurnFrame(Frame):
             keyMovements = MapMovementAdapter.getServerMovement(path)
             currMapId = PlayedCharacterManager().currentMap.mapId
             gmmrmsg.init(keyMovements, currMapId)
-            ConnectionsHandler()._conn.send(gmmrmsg)
+            ConnectionsHandler().conn.send(gmmrmsg)
             Logger().debug(f"Sent movement request {keyMovements}")
         else:
             Logger().debug("Fight is not paused, and battle frame is running can't move")
@@ -522,7 +522,7 @@ class FightTurnFrame(Frame):
     def finishTurn(self) -> None:
         gftfmsg: GameFightTurnFinishMessage = GameFightTurnFinishMessage()
         gftfmsg.init(False)
-        ConnectionsHandler()._conn.send(gftfmsg)
+        ConnectionsHandler().conn.send(gftfmsg)
         self.removeMovementArea()
         self._finishingTurn = False
 
@@ -541,11 +541,11 @@ class FightTurnFrame(Frame):
             ):
                 scrmsg = ShowCellRequestMessage()
                 scrmsg.init(cellId)
-                ConnectionsHandler()._conn.send(scrmsg)
+                ConnectionsHandler().conn.send(scrmsg)
                 text = I18n.getUiText(
                     "ui.fightAutomsg.cell",
                     ["{cell," + str(cellId) + "::" + str(cellId) + "}"],
                 )
                 ccmmsg = ChatClientMultiMessage()
                 ccmmsg.init(content_=text, channel_=ChatActivableChannelsEnum.CHANNEL_TEAM)
-                ConnectionsHandler()._conn.send(ccmmsg)
+                ConnectionsHandler().conn.send(ccmmsg)

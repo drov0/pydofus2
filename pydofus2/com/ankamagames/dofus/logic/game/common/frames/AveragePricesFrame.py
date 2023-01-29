@@ -102,4 +102,4 @@ class AveragePricesFrame(Frame):
     def askPricesData(self) -> None:
         oapgm: ObjectAveragePricesGetMessage = ObjectAveragePricesGetMessage()
         oapgm.init()
-        ConnectionsHandler()._conn.send(oapgm)
+        ConnectionsHandler().conn.send(oapgm)

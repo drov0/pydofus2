@@ -67,7 +67,7 @@ class WorldFrame(Frame):
 
         elif isinstance(msg, AnomalySubareaInformationRequestAction):
             sireqmsg = AnomalySubareaInformationRequestMessage()
-            ConnectionsHandler()._conn.send(sireqmsg)
+            ConnectionsHandler().conn.send(sireqmsg)
             return True
 
         elif isinstance(msg, AnomalySubareaInformationResponseMessage):

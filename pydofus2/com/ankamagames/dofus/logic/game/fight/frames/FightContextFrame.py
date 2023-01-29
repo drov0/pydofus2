@@ -653,7 +653,7 @@ class FightContextFrame(Frame):
             ctlra = msg
             ctlrmsg = ChallengeTargetsListRequestMessage()
             ctlrmsg.init(ctlra.challengeId)
-            ConnectionsHandler()._conn.send(ctlrmsg)
+            ConnectionsHandler().conn.send(ctlrmsg)
             return True
 
         elif isinstance(msg, ChallengeTargetsListMessage):

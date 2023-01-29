@@ -220,7 +220,7 @@ class RoleplayMovementFrame(Frame):
             return
         gfjrmsg = GameFightJoinRequestMessage()
         gfjrmsg.init(fighterId, fightId)
-        ConnectionsHandler()._conn.send(gfjrmsg)
+        ConnectionsHandler().conn.send(gfjrmsg)
         if self._joinFightTimer is not None:
             self._joinFightTimer.cancel()
         self._joinFightTimer = BenchmarkTimer(self.JOINFIGHT_TIMEOUT, self.joinFight, [fighterId, fightId])
@@ -349,7 +349,7 @@ class RoleplayMovementFrame(Frame):
                         f"[RolePlayMovement] Mouvement complete, arrived at '{emcmsg.entity.position.cellId}' and the requested destination was '{self._destinationPoint}'"
                     )
                 gmmcmsg = GameMapMovementConfirmMessage()
-                ConnectionsHandler()._conn.send(gmmcmsg)
+                ConnectionsHandler().conn.send(gmmcmsg)
                 if self._wantToChangeMap is not None:
                     Logger().debug(f"[RolePlayMovement] Wants to change map to '{self._wantToChangeMap}'")
                     self._isRequestingMovement = False
@@ -416,7 +416,7 @@ class RoleplayMovementFrame(Frame):
             if emsmsg.entity.id == PlayedCharacterManager().id:
                 canceledMoveMessage = GameMapMovementCancelMessage()
                 canceledMoveMessage.init(emsmsg.entity.position.cellId)
-                ConnectionsHandler()._conn.send(canceledMoveMessage)
+                ConnectionsHandler().conn.send(canceledMoveMessage)
                 self._isRequestingMovement = False
                 if self._followingMove and self._canMove:
                     self.askMoveTo(self._followingMove)
@@ -425,7 +425,7 @@ class RoleplayMovementFrame(Frame):
                     if isinstance(self._followingMessage, PlayerFightRequestAction):
                         Kernel().worker.process(self._followingMessage)
                     else:
-                        ConnectionsHandler()._conn.send(self._followingMessage)
+                        ConnectionsHandler().conn.send(self._followingMessage)
                     self._followingMessage = None
             return True
 
@@ -633,7 +633,7 @@ class RoleplayMovementFrame(Frame):
         gmmrmsg.init(keymoves, MapDisplayManager().currentMapPoint.mapId)
         if self.VERBOSE:
             Logger().debug(f"[RolePlayMovement] Sending movement request with keymoves {keymoves}")
-        ConnectionsHandler()._conn.send(gmmrmsg)
+        ConnectionsHandler().conn.send(gmmrmsg)
         if self.VERBOSE:
             Logger().debug(f"[RolePlayMovement] Movement request sent to server.")
         self._moveRequestTimer = BenchmarkTimer(
@@ -648,7 +648,7 @@ class RoleplayMovementFrame(Frame):
             Kernel().worker.process(MovementRequestTimeoutMessage(gmmrmsg))
 
         else:
-            ConnectionsHandler()._conn.send(gmmrmsg)
+            ConnectionsHandler().conn.send(gmmrmsg)
             self._moveRequestTimer = BenchmarkTimer(
                 self.MOVEMENT_REQUEST_TIMEOUT, self.onMovementRequestTimeout, [gmmrmsg]
             )
@@ -673,7 +673,7 @@ class RoleplayMovementFrame(Frame):
         Logger().debug(f"[RolePlayMovement] Asking for a map change to {self._wantToChangeMap}")
         cmmsg: ChangeMapMessage = ChangeMapMessage()
         cmmsg.init(int(self._wantToChangeMap), False)
-        ConnectionsHandler()._conn.send(cmmsg)
+        ConnectionsHandler().conn.send(cmmsg)
         if self._changeMapTimeout is not None:
             self._changeMapTimeout.cancel()
         timer_uuid = uuid.uuid4().hex
@@ -735,11 +735,11 @@ class RoleplayMovementFrame(Frame):
             if additionalParam == 0:
                 iurmsg = InteractiveUseRequestMessage()
                 iurmsg.init(int(elementId), int(skillInstanceId))
-                ConnectionsHandler()._conn.send(iurmsg)
+                ConnectionsHandler().conn.send(iurmsg)
             else:
                 iuwprmsg = InteractiveUseWithParamRequestMessage()
                 iuwprmsg.init(int(elementId), int(skillInstanceId), int(additionalParam))
-                ConnectionsHandler()._conn.send(iuwprmsg)
+                ConnectionsHandler().conn.send(iuwprmsg)
             self._canMove = False
 
     def requestMonsterFight(self, monsterGroupId: int) -> None:
@@ -754,7 +754,7 @@ class RoleplayMovementFrame(Frame):
         self._followingMonsterGroup = None
         grpamrmsg: GameRolePlayAttackMonsterRequestMessage = GameRolePlayAttackMonsterRequestMessage()
         grpamrmsg.init(monsterGroupId)
-        ConnectionsHandler()._conn.send(grpamrmsg)
+        ConnectionsHandler().conn.send(grpamrmsg)
         self._requestFightTimeout = BenchmarkTimer(5, self.attackMonsters, (monsterGroupId,))
         self._requestFightTimeout.start()
         self._requestFighFails += 1
@@ -769,7 +769,7 @@ class RoleplayMovementFrame(Frame):
         cmmsg = GameMapMovementCancelMessage()
         cmmsg.init(self._destinationPoint)
         Kernel().worker.process(cmmsg)
-        ConnectionsHandler()._conn.send(cmmsg)
+        ConnectionsHandler().conn.send(cmmsg)
 
     def cancelFollowingActor(self):
         self._isRequestingMovement = False
@@ -783,4 +783,4 @@ class RoleplayMovementFrame(Frame):
         cmmsg = GameMapMovementCancelMessage()
         cmmsg.init(self._destinationPoint)
         Kernel().worker.process(cmmsg)
-        ConnectionsHandler()._conn.send(cmmsg)
+        ConnectionsHandler().conn.send(cmmsg)

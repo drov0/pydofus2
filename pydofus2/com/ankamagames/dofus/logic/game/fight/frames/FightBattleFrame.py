@@ -667,7 +667,7 @@ class FightBattleFrame(Frame):
         ack.init(True, self._sequenceFrameCached.ackIdent)
         self._sequenceFrameCached = None
         try:
-            ConnectionsHandler()._conn.send(ack)
+            ConnectionsHandler().conn.send(ack)
         except Exception as e:
             pass
 
@@ -748,7 +748,7 @@ class FightBattleFrame(Frame):
             spellCastManager.nextTurn()
         turnEnd: GameFightTurnReadyMessage = GameFightTurnReadyMessage()
         turnEnd.init(True)
-        ConnectionsHandler()._conn.send(turnEnd)
+        ConnectionsHandler().conn.send(turnEnd)
         # Logger().debug("Turn end confirmed.")
 
     def endBattle(self, fightEnd: GameFightEndMessage) -> None:

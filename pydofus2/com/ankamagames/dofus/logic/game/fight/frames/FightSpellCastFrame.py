@@ -621,13 +621,13 @@ class FightSpellCastFrame(Frame):
         ):
             gafcotrmsg = GameActionFightCastOnTargetRequestMessage()
             gafcotrmsg.init(self._spellId, targetId)
-            ConnectionsHandler()._conn.send(gafcotrmsg)
+            ConnectionsHandler().conn.send(gafcotrmsg)
         elif self.isValidCell(cell):
             self.removeSummoningPreview()
             self.removeTeleportationPreview(True)
             gafcrmsg = GameActionFightCastRequestMessage()
             gafcrmsg.init(self._spellId, cell)
-            ConnectionsHandler()._conn.send(gafcrmsg)
+            ConnectionsHandler().conn.send(gafcrmsg)
         self.cancelCast()
 
     def cancelCast(self, *args) -> None:

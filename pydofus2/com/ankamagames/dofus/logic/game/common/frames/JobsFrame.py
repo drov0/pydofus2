@@ -160,7 +160,7 @@ class JobsFrame(Frame):
             jcddsa = msg
             jcddsmsg = JobCrafterDirectoryDefineSettingsMessage()
             jcddsmsg.init(jcddsa.settings)
-            ConnectionsHandler()._conn.send(jcddsmsg)
+            ConnectionsHandler().conn.send(jcddsmsg)
             return True
         if isinstance(msg, JobExperienceOtherPlayerUpdateMessage):
             return True
@@ -192,7 +192,7 @@ class JobsFrame(Frame):
             jbsra = msg
             exmsg = JobBookSubscribeRequestMessage()
             exmsg.init(jbsra.jobIds)
-            ConnectionsHandler()._conn.send(exmsg)
+            ConnectionsHandler().conn.send(exmsg)
             return True
         if isinstance(msg, JobBookSubscriptionMessage):
             jbsmsg = msg
@@ -221,7 +221,7 @@ class JobsFrame(Frame):
             jcdlra = msg
             jcdlrmsg = JobCrafterDirectoryListRequestMessage()
             jcdlrmsg.initJobCrafterDirectoryListRequestMessage(jcdlra.jobId)
-            ConnectionsHandler()._conn.send(jcdlrmsg)
+            ConnectionsHandler().conn.send(jcdlrmsg)
             return True
         if isinstance(msg, JobCrafterContactLookRequestAction):
             jcclra = msg
@@ -230,7 +230,7 @@ class JobsFrame(Frame):
             else:
                 clrbimsg = ContactLookRequestByIdMessage()
                 clrbimsg.init(0, SocialContactCategoryEnum.SOCIAL_CONTACT_CRAFTER, jcclra.crafterId)
-                ConnectionsHandler()._conn.send(clrbimsg)
+                ConnectionsHandler().conn.send(clrbimsg)
             return True
         if isinstance(msg, ExchangeStartOkJobIndexMessage):
             esokimsg = msg

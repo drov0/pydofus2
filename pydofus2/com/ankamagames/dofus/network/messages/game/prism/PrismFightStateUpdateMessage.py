@@ -2,11 +2,9 @@ from pydofus2.com.ankamagames.jerakine.network.NetworkMessage import NetworkMess
 
 
 class PrismFightStateUpdateMessage(NetworkMessage):
-    state:int
-    
+    state: int
 
-    def init(self, state_:int):
+    def init(self, state_: int):
         self.state = state_
-        
+
         super().__init__()
-    

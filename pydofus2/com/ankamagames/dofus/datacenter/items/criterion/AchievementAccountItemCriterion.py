@@ -27,10 +27,7 @@ class AchievementAccountItemCriterion(ItemCriterion, IDataCenter):
     def isRespected(self) -> bool:
         serverType: int = PlayerManager().server.gameTypeId
         if self._operator.text == ItemCriterionOperator.DIFFERENT:
-            if (
-                self.getCriterion() == 0
-                or serverType == GameServerTypeEnum.SERVER_TYPE_EPIC
-            ):
+            if self.getCriterion() == 0 or serverType == GameServerTypeEnum.SERVER_TYPE_EPIC:
                 return True
             return False
         if self.getCriterion() == 1:
@@ -39,16 +36,10 @@ class AchievementAccountItemCriterion(ItemCriterion, IDataCenter):
 
     @property
     def text(self) -> str:
-        readableValue = (
-            " '" + Achievement.getAchievementById(self._criterionValue).name + "'"
-        )
-        readableCriterion: str = I18n.getUiText(
-            "ui.tooltip.unlockAchievement", [readableValue]
-        )
+        readableValue = " '" + Achievement.getAchievementById(self._criterionValue).name + "'"
+        readableCriterion: str = I18n.getUiText("ui.tooltip.unlockAchievement", [readableValue])
         if self._operator.text == ItemCriterionOperator.DIFFERENT:
-            readableCriterion = I18n.getUiText(
-                "ui.tooltip.dontUnlockAchievement", [readableValue]
-            )
+            readableCriterion = I18n.getUiText("ui.tooltip.dontUnlockAchievement", [readableValue])
         return readableCriterion
 
     def clone(self) -> IItemCriterion:
@@ -56,9 +47,7 @@ class AchievementAccountItemCriterion(ItemCriterion, IDataCenter):
 
     def getCriterion(self) -> int:
         ach: AchievementAchieved = None
-        achievementFinishedList: list[AchievementAchieved] = (
-            Kernel().worker.getFrame("QuestFrame")
-        )
+        achievementFinishedList: list[AchievementAchieved] = Kernel().worker.getFrame("QuestFrame")
         characterId: float = PlayedCharacterManager().id
         for ach in achievementFinishedList:
             if ach.id == self._criterionValue and ach.achievedBy != characterId:

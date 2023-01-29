@@ -2,11 +2,9 @@ from pydofus2.com.ankamagames.jerakine.network.NetworkMessage import NetworkMess
 
 
 class TreasureHuntLegendaryRequestMessage(NetworkMessage):
-    legendaryId:int
-    
+    legendaryId: int
 
-    def init(self, legendaryId_:int):
+    def init(self, legendaryId_: int):
         self.legendaryId = legendaryId_
-        
+
         super().__init__()
-    

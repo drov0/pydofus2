@@ -43,8 +43,6 @@ from pydofus2.com.ankamagames.jerakine.network.messages.ExpectedSocketClosureMes
 from pydofus2.com.ankamagames.jerakine.network.messages.Worker import Worker
 from pydofus2.com.ankamagames.jerakine.types.enums.Priority import Priority
 
-logger = Logger("Dofus2")
-
 
 class ServerSelectionFrame(Frame):
 
@@ -98,9 +96,7 @@ class ServerSelectionFrame(Frame):
             self._serversList = slmsg.servers
             self._serversList.sort(key=lambda x: x.date)
             self.broadcastServersListUpdate()
-            krnl.Kernel().worker.processImmediately(
-                ServerSelectionAction.create(AuthentificationManager()._lva.serverId)
-            )
+            krnl.Kernel().worker.process(ServerSelectionAction.create(AuthentificationManager()._lva.serverId))
             return False
 
         elif isinstance(msg, ServerStatusUpdateMessage):
@@ -116,11 +112,13 @@ class ServerSelectionFrame(Frame):
             if not serverHasBeenUpdated:
                 self._serversList.append(ssumsg.server)
                 self._serversList.sort(key=lambda x: x.date)
-            logger.info(f"Server {ssumsg.server.id} status changed to {ServerStatusEnum(ssumsg.server.status).name}.")
-            logger.info(f"My server id {AuthentificationManager()._lva.serverId}.")
+            Logger().info(
+                f"Server {ssumsg.server.id} status changed to {ServerStatusEnum(ssumsg.server.status).name}."
+            )
+            Logger().info(f"My server id {AuthentificationManager()._lva.serverId}.")
             if int(ssumsg.server.id) == int(AuthentificationManager()._lva.serverId):
                 if ServerStatusEnum(ssumsg.server.status) != ServerStatusEnum.ONLINE:
-                    logger.debug(
+                    Logger().debug(
                         f"Waiting for my server {ssumsg.server.id} to be online current status {ServerStatusEnum(ssumsg.server.status)}."
                     )
                     self._waitingServerOnline = True
@@ -128,12 +126,12 @@ class ServerSelectionFrame(Frame):
                     self._waitingServerOnline = False
                     ssmsg = ServerSelectionMessage()
                     ssmsg.init(AuthentificationManager()._lva.serverId)
-                    krnl.Kernel().worker.processImmediately(ssmsg)
-                    logger.debug(
+                    krnl.Kernel().worker.process(ssmsg)
+                    Logger().debug(
                         f"Sending ServerSelectionMessage to server {AuthentificationManager()._lva.serverId}."
                     )
             else:
-                logger.debug(
+                Logger().debug(
                     f"Not my server {int(ssumsg.server.id)} != {int(AuthentificationManager()._lva.serverId)}"
                 )
             self.broadcastServersListUpdate()
@@ -147,7 +145,7 @@ class ServerSelectionFrame(Frame):
                 self.serverSelectedName = Server.getServerById(ssaction.serverId).name
                 return True
             for server in self._serversList:
-                logger.info(f"Server {server.id} status {ServerStatusEnum(server.status).name}.")
+                Logger().info(f"Server {server.id} status {ServerStatusEnum(server.status).name}.")
                 if str(server.id) == str(ssaction.serverId):
                     if (
                         ServerStatusEnum(server.status) == ServerStatusEnum.ONLINE
@@ -158,7 +156,7 @@ class ServerSelectionFrame(Frame):
                         ConnectionsHandler().conn.send(ssmsg)
                         return True
                     else:
-                        logger.debug(
+                        Logger().debug(
                             f"Server {server.id} not online but has status {ServerStatusEnum(server.status).name}."
                         )
                         BenchmarkTimer(60, lambda: krnl.Kernel().worker.process(msg)).start()
@@ -175,6 +173,7 @@ class ServerSelectionFrame(Frame):
             from pydofus2.com.ankamagames.dofus.logic.game.approach.frames.GameServerApproachFrame import (
                 GameServerApproachFrame,
             )
+
             escmsg = msg
             if escmsg.reason != DisconnectionReasonEnum.SWITCHING_TO_GAME_SERVER:
                 self._worker.process(

@@ -6,9 +6,7 @@ class MonthItemCriterion(ItemCriterion, IDataCenter):
     def text(self) -> str:
         readableCriterionValue: str = Month.getMonthById(_criterionValue).name
         readableCriterionRef: str = I18n.getUiText("ui.time.months")
-        return (
-            readableCriterionRef + " " + _operator.text + " " + readableCriterionValue
-        )
+        return readableCriterionRef + " " + _operator.text + " " + readableCriterionValue
 
     def clone(self) -> IItemCriterion:
         return MonthItemCriterion(self.basicText)

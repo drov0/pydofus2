@@ -73,11 +73,8 @@ from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from pydofus2.com.ankamagames.dofus.internalDatacenter.items.ItemWrapper import ItemWrapper
 
-logger = Logger("Dofus2")
-
 
 class InventoryManager(metaclass=Singleton):
-
     def __init__(self):
         super().__init__()
         self._presetsItemPositionsOrder = [

@@ -36,10 +36,10 @@ from pydofus2.com.ankamagames.jerakine.utils.display.spellZone.ZoneEffect import
 from pydofus2.com.ankamagames.jerakine.utils.misc.StringUtils import StringUtils
 from typing import TYPE_CHECKING
 import threading
+
 if TYPE_CHECKING:
     from pydofus2.com.ankamagames.dofus.datacenter.effects.EffectInstance import EffectInstance
 lock = threading.Lock()
-logger = Logger("Dofus2")
 
 
 class ItemWrapper(Item, ISlotData, ICellZoneProvider, IDataCenter):
@@ -71,7 +71,7 @@ class ItemWrapper(Item, ISlotData, ICellZoneProvider, IDataCenter):
     _cacheGId: dict = dict()
 
     _uniqueIndex: int = 0
-    
+
     def __init__(self):
         self.effects = list["EffectInstance"]()
 
@@ -135,7 +135,7 @@ class ItemWrapper(Item, ISlotData, ICellZoneProvider, IDataCenter):
         self.experiencePoints: int = 0
 
         self.evolutiveLevel: int = 0
-        
+
         self.dropPriority: int = 0
 
         super().__init__()
@@ -175,7 +175,7 @@ class ItemWrapper(Item, ISlotData, ICellZoneProvider, IDataCenter):
                 item = cachedItem
         item._nameWithoutAccent = StringUtils.noAccent(refItem.name)
         item.effectsList = newEffects
-        item.isPresetobject = (objectGID == DataEnum.ITEM_GID_PRESET_SHORTCUT)
+        item.isPresetobject = objectGID == DataEnum.ITEM_GID_PRESET_SHORTCUT
         if item.objectGID != objectGID:
             item._uri = None
             item._uriPngMode = None

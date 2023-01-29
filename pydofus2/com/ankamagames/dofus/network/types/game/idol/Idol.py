@@ -2,15 +2,13 @@ from pydofus2.com.ankamagames.jerakine.network.NetworkMessage import NetworkMess
 
 
 class Idol(NetworkMessage):
-    id:int
-    xpBonusPercent:int
-    dropBonusPercent:int
-    
+    id: int
+    xpBonusPercent: int
+    dropBonusPercent: int
 
-    def init(self, id_:int, xpBonusPercent_:int, dropBonusPercent_:int):
+    def init(self, id_: int, xpBonusPercent_: int, dropBonusPercent_: int):
         self.id = id_
         self.xpBonusPercent = xpBonusPercent_
         self.dropBonusPercent = dropBonusPercent_
-        
+
         super().__init__()
-    

@@ -14,10 +14,7 @@ class StorageEquipmentView(StorageGenericView):
         return "storageEquipment"
 
     def isListening(self, item: ItemWrapper) -> bool:
-        return (
-            super().isListening(item)
-            and item.category == ItemCategoryEnum.EQUIPMENT_CATEGORY
-        )
+        return super().isListening(item) and item.category == ItemCategoryEnum.EQUIPMENT_CATEGORY
 
     def updateView(self) -> None:
         super().updateView()

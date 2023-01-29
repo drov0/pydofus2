@@ -85,7 +85,5 @@ class Skill(IDataCenter):
     @property
     def gatheredRessource(self) -> ItemWrapper:
         if not self._gatheredRessource and self.gatheredRessourceItem != -1:
-            self._gatheredRessource = ItemWrapper.create(
-                0, 0, self.gatheredRessourceItem, 1, [], False
-            )
+            self._gatheredRessource = ItemWrapper.create(0, 0, self.gatheredRessourceItem, 1, [], False)
         return self._gatheredRessource

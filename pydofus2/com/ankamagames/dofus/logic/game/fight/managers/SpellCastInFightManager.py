@@ -16,8 +16,6 @@ if TYPE_CHECKING:
         SpellInventoryManagementFrame,
     )
 
-logger = Logger("Dofus2")
-
 
 class SpellCastInFightManager:
 

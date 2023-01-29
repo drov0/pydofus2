@@ -2,11 +2,9 @@ from pydofus2.com.ankamagames.jerakine.network.NetworkMessage import NetworkMess
 
 
 class BreachSavedMessage(NetworkMessage):
-    saved:bool
-    
+    saved: bool
 
-    def init(self, saved_:bool):
+    def init(self, saved_: bool):
         self.saved = saved_
-        
+
         super().__init__()
-    

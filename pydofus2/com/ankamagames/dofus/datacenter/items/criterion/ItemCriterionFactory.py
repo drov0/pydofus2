@@ -6,7 +6,9 @@ from pydofus2.com.ankamagames.dofus.datacenter.items.criterion.AchievementPoints
     AchievementPointsItemCriterion,
 )
 from pydofus2.com.ankamagames.dofus.datacenter.items.criterion.ArenaDuelRankCriterion import ArenaDuelRankCriterion
-from pydofus2.com.ankamagames.dofus.datacenter.items.criterion.ArenaMaxTeamRankCriterion import ArenaMaxTeamRankCriterion
+from pydofus2.com.ankamagames.dofus.datacenter.items.criterion.ArenaMaxTeamRankCriterion import (
+    ArenaMaxTeamRankCriterion,
+)
 from pydofus2.com.ankamagames.dofus.datacenter.items.criterion.ArenaTeamRankCriterion import ArenaTeamRankCriterion
 from pydofus2.com.ankamagames.dofus.datacenter.items.criterion.BonesItemCriterion import BonesItemCriterion
 from pydofus2.com.ankamagames.dofus.datacenter.items.criterion.BonusSetItemCriterion import BonusSetItemCriterion
@@ -15,12 +17,16 @@ from pydofus2.com.ankamagames.dofus.datacenter.items.criterion.GiftItemCriterion
 from pydofus2.com.ankamagames.dofus.datacenter.items.criterion.GuildItemCriterion import GuildItemCriterion
 from pydofus2.com.ankamagames.dofus.datacenter.items.criterion.ItemCriterion import ItemCriterion
 from pydofus2.com.ankamagames.dofus.datacenter.items.criterion.JobItemCriterion import JobItemCriterion
-from pydofus2.com.ankamagames.dofus.datacenter.items.criterion.MapCharactersItemCriterion import MapCharactersItemCriterion
+from pydofus2.com.ankamagames.dofus.datacenter.items.criterion.MapCharactersItemCriterion import (
+    MapCharactersItemCriterion,
+)
 from pydofus2.com.ankamagames.dofus.datacenter.items.criterion.MonsterGroupChallengeCriterion import (
     MonsterGroupChallengeCriterion,
 )
 from pydofus2.com.ankamagames.dofus.datacenter.items.criterion.MountFamilyItemCriterion import MountFamilyItemCriterion
-from pydofus2.com.ankamagames.dofus.datacenter.items.criterion.NumberOfItemMadeCriterion import NumberOfItemMadeCriterion
+from pydofus2.com.ankamagames.dofus.datacenter.items.criterion.NumberOfItemMadeCriterion import (
+    NumberOfItemMadeCriterion,
+)
 from pydofus2.com.ankamagames.dofus.datacenter.items.criterion.NumberOfMountBirthedCriterion import (
     NumberOfMountBirthedCriterion,
 )
@@ -29,10 +35,16 @@ from pydofus2.com.ankamagames.dofus.datacenter.items.criterion.QuestItemCriterio
 from pydofus2.com.ankamagames.dofus.datacenter.items.criterion.QuestObjectiveItemCriterion import (
     QuestObjectiveItemCriterion,
 )
-from pydofus2.com.ankamagames.dofus.datacenter.items.criterion.RuneByBreakingItemCriterion import RuneByBreakingItemCriterion
-from pydofus2.com.ankamagames.dofus.datacenter.items.criterion.SpecializationItemCriterion import SpecializationItemCriterion
+from pydofus2.com.ankamagames.dofus.datacenter.items.criterion.RuneByBreakingItemCriterion import (
+    RuneByBreakingItemCriterion,
+)
+from pydofus2.com.ankamagames.dofus.datacenter.items.criterion.SpecializationItemCriterion import (
+    SpecializationItemCriterion,
+)
 from pydofus2.com.ankamagames.dofus.datacenter.items.criterion.SpellItemCriterion import SpellItemCriterion
-from pydofus2.com.ankamagames.dofus.datacenter.items.criterion.StaticCriterionItemCriterion import StaticCriterionItemCriterion
+from pydofus2.com.ankamagames.dofus.datacenter.items.criterion.StaticCriterionItemCriterion import (
+    StaticCriterionItemCriterion,
+)
 from pydofus2.com.ankamagames.dofus.datacenter.items.criterion.SubscribeItemCriterion import (
     SubscribeItemCriterion,
 )
@@ -44,8 +56,6 @@ from pydofus2.com.ankamagames.dofus.datacenter.items.criterion.IItemCriterion im
 from pydofus2.com.ankamagames.dofus.datacenter.items.criterion.UnusableItemCriterion import (
     UnusableItemCriterion,
 )
-
-logger = Logger("Dofus2")
 
 
 class ItemCriterionFactory:
@@ -297,7 +307,7 @@ class ItemCriterionFactory:
             criterion = CommunityItemCriterion(pServerCriterionForm)
 
         else:
-            # logger.warn("Criterion '" + s + "' unknow or unused (" + pServerCriterionForm + ")")
+            # Logger().warn("Criterion '" + s + "' unknow or unused (" + pServerCriterionForm + ")")
             pass
 
         return criterion

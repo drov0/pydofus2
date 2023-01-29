@@ -99,9 +99,7 @@ class MountData(IDataCenter):
         self.ability = list()
         super().__init__()
 
-    def makeMountData(
-        self, o: MountClientData, cache: bool = True, xpRatio: int = 0
-    ) -> "MountData":
+    def makeMountData(self, o: MountClientData, cache: bool = True, xpRatio: int = 0) -> "MountData":
         ability: int = 0
         nEffect: int = 0
         i: int = 0
@@ -132,9 +130,7 @@ class MountData(IDataCenter):
         mountData.effectList = list()
         nEffect = len(o.effectList)
         for i in range(nEffect):
-            mountData.effectList.append(
-                ObjectEffectAdapter.fromNetwork(o.effectList[i])
-            )
+            mountData.effectList.append(ObjectEffectAdapter.fromNetwork(o.effectList[i]))
         mountData.maxPods = o.maxPods
         mountData.isRideable = o.isRideable
         mountData.isWild = o.isWild
@@ -164,9 +160,7 @@ class MountData(IDataCenter):
     def getMountFromCache(self, id: int) -> "MountData":
         return self._dictionary_cache[id]
 
-    def makeParent(
-        self, ancestor: list[int], generation: int, start: int, index: int
-    ) -> object:
+    def makeParent(self, ancestor: list[int], generation: int, start: int, index: int) -> object:
         nextStart: int = start + math.pow(2, generation - 1)
         ancestorIndex: int = nextStart + index
         if len(ancestor) <= ancestorIndex:
@@ -176,12 +170,8 @@ class MountData(IDataCenter):
             return None
         return {
             "mount": mount,
-            "mother": self.makeParent(
-                ancestor, generation + 1, nextStart, 0 + 2 * (ancestorIndex - nextStart)
-            ),
-            "father": self.makeParent(
-                ancestor, generation + 1, nextStart, 1 + 2 * (ancestorIndex - nextStart)
-            ),
+            "mother": self.makeParent(ancestor, generation + 1, nextStart, 0 + 2 * (ancestorIndex - nextStart)),
+            "father": self.makeParent(ancestor, generation + 1, nextStart, 1 + 2 * (ancestorIndex - nextStart)),
             "entityLook": None,
         }
 

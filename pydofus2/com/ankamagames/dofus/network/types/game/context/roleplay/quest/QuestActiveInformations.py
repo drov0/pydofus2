@@ -2,11 +2,9 @@ from pydofus2.com.ankamagames.jerakine.network.NetworkMessage import NetworkMess
 
 
 class QuestActiveInformations(NetworkMessage):
-    questId:int
-    
+    questId: int
 
-    def init(self, questId_:int):
+    def init(self, questId_: int):
         self.questId = questId_
-        
+
         super().__init__()
-    

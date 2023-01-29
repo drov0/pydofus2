@@ -2,11 +2,9 @@ from pydofus2.com.ankamagames.dofus.network.messages.game.context.roleplay.Curre
 
 
 class CurrentMapInstanceMessage(CurrentMapMessage):
-    instantiatedMapId:int
-    
+    instantiatedMapId: int
 
-    def init(self, instantiatedMapId_:int, mapId_:int):
+    def init(self, instantiatedMapId_: int, mapId_: int):
         self.instantiatedMapId = instantiatedMapId_
-        
+
         super().init(mapId_)
-    

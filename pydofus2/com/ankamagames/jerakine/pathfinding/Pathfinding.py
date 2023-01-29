@@ -1,257 +1,130 @@
+import heapq
 import math
-
+from pydofus2.com.ankamagames.jerakine.metaclasses.Singleton import Singleton
 import pydofus2.mapTools.MapTools as MapTools
-from pydofus2.com.ankamagames.jerakine.logger.Logger import Logger
 from pydofus2.com.ankamagames.jerakine.map.IDataMapProvider import IDataMapProvider
 from pydofus2.com.ankamagames.jerakine.types.positions.MapPoint import MapPoint
 from pydofus2.com.ankamagames.jerakine.types.positions.MovementPath import MovementPath
 from pydofus2.com.ankamagames.jerakine.types.positions.PathElement import PathElement
 
-logger = Logger("Dofus2")
 
-
-class Pathfinding:
+class Pathfinding(metaclass=Singleton):
     VERBOSE = False
     HV_COST: int = 10
-
     DIAG_COST: int = 15
-
-    HEURISTIC_COST: int = 10
-
+    HEURISTIC_SCALE: int = 10
     INFINITE_COST: int = float("inf")
-
-    _isInit: bool = False
-
-    _parentOfCell = list[int]()
-
-    _costOfCell = list[int]()
-
-    _openListWeights = list[int]()
-
-    _isCellClosed = list[bool]()
-
-    _isEntityOnCell = list[bool]()
-
-    _openList = list()
 
     def __init__(self):
         super().__init__()
 
-    @classmethod
-    def init(cls):
-        cls._costOfCell = MapTools.mapCountCell * [None]
-        cls._openListWeights = MapTools.mapCountCell * [0]
-        cls._parentOfCell = MapTools.mapCountCell * [None]
-        cls._isCellClosed = MapTools.mapCountCell * [None]
-        cls._isEntityOnCell = MapTools.mapCountCell * [None]
-        cls._openList = list(40 * [-1])
-        cls._isInit = True
-
-    @classmethod
-    def isChild(
-        cls,
-        mapData: IDataMapProvider,
-        cellId: int,
-        x,
-        y,
-        endCellId,
-        parentId,
-        parentX,
-        parentY,
-        bAllowTroughEntity: bool,
-        allowDiag: bool,
-        avoidObstacles: bool,
-    ) -> bool:
-        canMoveFromParentToEnd = mapData.pointMov(
-            x,
-            y,
-            bAllowTroughEntity,
-            parentId,
-            endCellId,
-            avoidObstacles,
-        )
-        # logger.debug(f"can move from parent {parentId} -> curr {cellId} -> to end {endCellId}: {canMoveFromParentToEnd}")
+    def isChild(self, x, y, parentId) -> bool:
+        cellId = MapTools.getCellIdByCoord(x, y)
+        parentX = MapTools.getCellIdXCoord(parentId)
+        parentY = MapTools.getCellIdYCoord(parentId)
+        canMoveFromParentToEnd = self.pointMov(x, y, parentId)
         return (
-            cellId != MapTools.INVALID_CELL_ID
-            and not cls._isCellClosed[cellId]
+            cellId is not None
+            and cellId not in self._isCellClosed
             and cellId != parentId
             and canMoveFromParentToEnd
             and (
                 y == parentY
                 or x == parentX
-                or allowDiag
-                and (
-                    mapData.pointMov(
-                        parentX,
-                        y,
-                        bAllowTroughEntity,
-                        parentId,
-                        endCellId,
-                        avoidObstacles,
-                    )
-                    or mapData.pointMov(
-                        x,
-                        parentY,
-                        bAllowTroughEntity,
-                        parentId,
-                        endCellId,
-                        avoidObstacles,
-                    )
-                )
+                or self._allowDiag
+                and (self._mapData.pointMov(parentX, y, parentId) or self._mapData.pointMov(x, parentY, parentId))
             )
         )
 
-    @classmethod
-    def findPath(
-        cls,
-        mapData: IDataMapProvider,
-        start: MapPoint,
-        end: MapPoint,
-        allowDiag: bool = True,
-        bAllowTroughEntity: bool = True,
-        avoidObstacles: bool = True,
-    ) -> MovementPath:
-        itt = 0
-        endCellId: int = end.cellId
-        startCellId: int = start.cellId
-        # logger.debug(f"[CellPathFinding] Looking for path from {startCellId} to {endCellId}")
-        endX: int = end.x
-        endY: int = end.y
-        endCellAuxId: int = startCellId
-        distanceToEnd: int = MapTools.getDistance(startCellId, endCellId)
-        if not cls._isInit:
-            cls.init()
-        for i in range(MapTools.mapCountCell):
-            cls._parentOfCell[i] = MapTools.INVALID_CELL_ID
-            cls._isCellClosed[i] = False
-            cls._isEntityOnCell[i] = False
-        cls._openList.clear()
-        mapData.fillEntityOnCellArray(cls._isEntityOnCell, bAllowTroughEntity)
-        cls._costOfCell[startCellId] = 0
-        cls._openList.append(startCellId)
-        while len(cls._openList) > 0 and not cls._isCellClosed[endCellId]:
-            # logger.debug(f"iteration : {itt}")
-            minimum = cls.INFINITE_COST
-            smallestCostIndex = 0
-            for i in range(len(cls._openList)):
-                cost = cls._openListWeights[cls._openList[i]]
-                if cost <= minimum:
-                    minimum = cost
-                    smallestCostIndex = i
-            parentId = cls._openList[smallestCostIndex]
-            parentX = MapTools.getCellIdXCoord(parentId)
-            parentY = MapTools.getCellIdYCoord(parentId)
-            del cls._openList[smallestCostIndex]
-            cls._isCellClosed[parentId] = True
-            for y in range(parentY - 1, parentY + 2):
-                for x in range(parentX - 1, parentX + 2):
-                    cellId = MapTools.getCellIdByCoord(x, y)
-                    if cls.isChild(
-                        mapData,
-                        cellId,
-                        x,
-                        y,
-                        endCellId,
-                        parentId,
-                        parentX,
-                        parentY,
-                        bAllowTroughEntity,
-                        allowDiag,
-                        avoidObstacles,
-                    ):
-                        pointWeight = cls.getMapPointWeight(mapData, cellId, endCellId, x, y, bAllowTroughEntity)
-                        movementCost = (
-                            cls._costOfCell[parentId]
-                            + (cls.HV_COST if y == parentY or x == parentX else cls.DIAG_COST) * pointWeight
-                        )
-                        if bAllowTroughEntity:
-                            cellOnEndColumn = x + y == endX + endY
-                            cellOnStartColumn = x + y == start.x + start.y
-                            cellOnEndLine = x - y == endX - endY
-                            cellOnStartLine = x - y == start.x - start.y
-                            if (
-                                not cellOnEndColumn
-                                and not cellOnEndLine
-                                or not cellOnStartColumn
-                                and not cellOnStartLine
-                            ):
-                                movementCost += MapTools.getDistance(cellId, endCellId)
-                                movementCost += MapTools.getDistance(cellId, startCellId)
-                            if x == endX or y == endY:
-                                movementCost -= 3
-                            if (
-                                cellOnEndColumn
-                                or cellOnEndLine
-                                or x + y == parentX + parentY
-                                or x - y == parentX - parentY
-                            ):
-                                movementCost -= 2
-                            if i == start.x or y == start.y:
-                                movementCost -= 3
-                            if cellOnStartColumn or cellOnStartLine:
-                                movementCost -= 2
-                            distanceTmpToEnd = MapTools.getDistance(cellId, endCellId)
-                            if distanceTmpToEnd < distanceToEnd:
-                                endCellAuxId = cellId
-                                distanceToEnd = distanceTmpToEnd
-                        if (
-                            cls._parentOfCell[cellId] == MapTools.INVALID_CELL_ID
-                            or movementCost < cls._costOfCell[cellId]
-                        ):
-                            cls._parentOfCell[cellId] = parentId
-                            cls._costOfCell[cellId] = movementCost
-                            heuristic = cls.HEURISTIC_COST * math.sqrt(
-                                (endY - y) * (endY - y) + (endX - x) * (endX - x)
-                            )
-                            cls._openListWeights[cellId] = heuristic + movementCost
-                            if cellId not in cls._openList:
-                                cls._openList.append(cellId)
-            itt += 1
+    def initAlgo(
+        self, mapData: IDataMapProvider, start: MapPoint, end: MapPoint, allowDiag, bAllowTroughEntity, avoidObstacles
+    ):
+        self._allowDiag = allowDiag
+        self._allowTroughEntity = bAllowTroughEntity
+        self._avoidObstacles = avoidObstacles
+        self._end = end
+        self._start = start
+        self._mapData = mapData
+        self._parentOfCell = {}
+        self._isCellClosed = set()
+        self._isEntityOnCell = {}
+        self._costOfCell = {}
+        self._costOfCell[self._start.cellId] = 0
+        self._endCellAuxId = start.cellId
+        self._distToEnd = self.distFromEnd(start.cellId)
+        mapData.fillEntityOnCellArray(self._isEntityOnCell, bAllowTroughEntity)
+
+    def distFromStart(self, cellId):
+        return MapTools.getDistance(cellId, self._start.cellId)
+
+    def distFromEnd(self, cellId):
+        return MapTools.getDistance(cellId, self._end.cellId)
+
+    def moveCost(self, x, y, parentId):
+        cellId = MapTools.getCellIdByCoord(x, y)
+        pointWeight = self.getMapPointWeight(x, y)
+        parentX = MapTools.getCellIdXCoord(parentId)
+        parentY = MapTools.getCellIdYCoord(parentId)
+        movementCost = (
+            self._costOfCell[parentId]
+            + (self.HV_COST if y == parentY or x == parentX else self.DIAG_COST) * pointWeight
+        )
+        if self._allowTroughEntity:
+            cellOnEndColumn = x + y == self._end.y + self._end.y
+            cellOnStartColumn = x + y == self._start.x + self._start.y
+            cellOnEndLine = x - y == self._end.x - self._end.y
+            cellOnStartLine = x - y == self._start.x - self._start.y
+            if not cellOnEndColumn and not cellOnEndLine or not cellOnStartColumn and not cellOnStartLine:
+                movementCost += self.distFromEnd(cellId)
+                movementCost += self.distFromStart(cellId)
+            if x == self._end.x or y == self._end.y:
+                movementCost -= 3
+            if cellOnEndColumn or cellOnEndLine or x + y == parentX + parentY or x - y == parentX - parentY:
+                movementCost -= 2
+            if x == self._start.x or y == self._start.y:
+                movementCost -= 3
+            if cellOnStartColumn or cellOnStartLine:
+                movementCost -= 2
+        return movementCost
+
+    def iterChilds(self, parentId):
+        parentX = MapTools.getCellIdXCoord(parentId)
+        parentY = MapTools.getCellIdYCoord(parentId)
+        for y in range(parentY - 1, parentY + 2):
+            for x in range(parentX - 1, parentX + 2):
+                if self.isChild(x, y, parentId):
+                    yield x, y
+
+    def pointMov(self, x, y, dstCell):
+        return self._mapData.pointMov(x, y, self._allowTroughEntity, dstCell, self._end.cellId, self._avoidObstacles)
+
+    def buildPath(self):
         movPath: MovementPath = MovementPath()
-        movPath.start = start
-        if cls._parentOfCell[endCellId] == MapTools.INVALID_CELL_ID:
-            endCellId = endCellAuxId
-            movPath.end = MapPoint.fromCellId(endCellId)
+        movPath.start = self._start
+        cursor = self._end.cellId
+        if self._parentOfCell.get(self._end.cellId) is None:
+            cursor = self._endCellAuxId
+            movPath.end = MapPoint.fromCellId(self._endCellAuxId)
         else:
-            movPath.end = end
-        cursor = endCellId
-        MAX_IT = 200
-        currIt = 0
-        while cursor != startCellId:
-            currIt = currIt + 1
-            if currIt > MAX_IT:
-                raise Exception("Max iterations reached")
-            if allowDiag:
-                parent = cls._parentOfCell[cursor]
-                grandParent = (
-                    int(MapTools.INVALID_CELL_ID)
-                    if parent == MapTools.INVALID_CELL_ID
-                    else int(cls._parentOfCell[parent])
-                )
-                grandGrandParent = (
-                    int(MapTools.INVALID_CELL_ID)
-                    if grandParent == MapTools.INVALID_CELL_ID
-                    else int(cls._parentOfCell[grandParent])
-                )
+            movPath.end = self._end
+        while cursor != self._start.cellId:
+            if self._allowDiag:
+                parent = self._parentOfCell.get(cursor)
+                grandParent = self._parentOfCell.get(parent)
+                grandGrandParent = self._parentOfCell.get(grandParent)
                 kX = MapTools.getCellIdXCoord(cursor)
                 kY = MapTools.getCellIdYCoord(cursor)
-                if grandParent != MapTools.INVALID_CELL_ID and MapTools.getDistance(cursor, grandParent) == 1:
-                    if mapData.pointMov(kX, kY, bAllowTroughEntity, grandParent, endCellId):
-                        cls._parentOfCell[cursor] = grandParent
-                elif (
-                    grandGrandParent != MapTools.INVALID_CELL_ID
-                    and MapTools.getDistance(cursor, grandGrandParent) == 2
-                ):
+                if grandParent is not None and MapTools.getDistance(cursor, grandParent) == 1:
+                    if self.pointMov(kX, kY, grandParent):
+                        self._parentOfCell[cursor] = grandParent
+                elif grandGrandParent is not None and MapTools.getDistance(cursor, grandGrandParent) == 2:
                     nextX = MapTools.getCellIdXCoord(grandGrandParent)
                     nextY = MapTools.getCellIdYCoord(grandGrandParent)
                     interX = kX + round((nextX - kX) / 2)
                     interY = kY + round((nextY - kY) / 2)
-                    if (
-                        mapData.pointMov(interX, interY, bAllowTroughEntity, cursor, endCellId)
-                        and mapData.pointWeight(interX, interY) < 2
-                    ):
-                        cls._parentOfCell[cursor] = MapTools.getCellIdByCoord(interX, interY)
-                elif grandParent != MapTools.INVALID_CELL_ID and MapTools.getDistance(cursor, grandParent) == 2:
+                    if self.pointMov(interX, interY, cursor) and self._mapData.pointWeight(interX, interY) < 2:
+                        self._parentOfCell[cursor] = MapTools.getCellIdByCoord(interX, interY)
+                elif grandParent is not None and MapTools.getDistance(cursor, grandParent) == 2:
                     nextX = MapTools.getCellIdXCoord(grandParent)
                     nextY = MapTools.getCellIdYCoord(grandParent)
                     interX = MapTools.getCellIdXCoord(parent)
@@ -259,81 +132,113 @@ class Pathfinding:
                     if (
                         kX + kY == nextX + nextY
                         and kX - kY != interX - interY
-                        and not mapData.isChangeZone(
+                        and not self._mapData.isChangeZone(
                             MapTools.getCellIdByCoord(kX, kY),
                             MapTools.getCellIdByCoord(interX, interY),
                         )
-                        and not mapData.isChangeZone(
+                        and not self._mapData.isChangeZone(
                             MapTools.getCellIdByCoord(interX, interY),
                             MapTools.getCellIdByCoord(nextX, nextY),
                         )
                     ):
-                        cls._parentOfCell[cursor] = grandParent
+                        self._parentOfCell[cursor] = grandParent
                     elif (
                         kX - kY == nextX - nextY
                         and kX - kY != interX - interY
-                        and not mapData.isChangeZone(
+                        and not self._mapData.isChangeZone(
                             MapTools.getCellIdByCoord(kX, kY),
                             MapTools.getCellIdByCoord(interX, interY),
                         )
-                        and not mapData.isChangeZone(
+                        and not self._mapData.isChangeZone(
                             MapTools.getCellIdByCoord(interX, interY),
                             MapTools.getCellIdByCoord(nextX, nextY),
                         )
                     ):
-                        cls._parentOfCell[cursor] = grandParent
+                        self._parentOfCell[cursor] = grandParent
                     elif (
                         kX == nextX
                         and kX != interX
-                        and mapData.pointWeight(kX, interY) < 2
-                        and mapData.pointMov(kX, interY, bAllowTroughEntity, cursor, endCellId)
+                        and self._mapData.pointWeight(kX, interY) < 2
+                        and self._mapData.pointMov(kX, interY, cursor)
                     ):
-                        cls._parentOfCell[cursor] = MapTools.getCellIdByCoord(kX, interY)
+                        self._parentOfCell[cursor] = MapTools.getCellIdByCoord(kX, interY)
                     elif (
                         kY == nextY
                         and kY != interY
-                        and mapData.pointWeight(interX, kY) < 2
-                        and mapData.pointMov(interX, kY, bAllowTroughEntity, cursor, endCellId)
+                        and self._mapData.pointWeight(interX, kY) < 2
+                        and self._mapData.pointMov(interX, kY, cursor)
                     ):
-                        cls._parentOfCell[cursor] = MapTools.getCellIdByCoord(interX, kY)
+                        self._parentOfCell[cursor] = MapTools.getCellIdByCoord(interX, kY)
             movPath.addPoint(
                 PathElement(
-                    MapPoint.fromCellId(cls._parentOfCell[cursor]),
-                    MapTools.getLookDirection8Exact(cls._parentOfCell[cursor], cursor),
+                    MapPoint.fromCellId(self._parentOfCell[cursor]),
+                    MapTools.getLookDirection8Exact(self._parentOfCell[cursor], cursor),
                 )
             )
-            cursor = cls._parentOfCell[cursor]
+            cursor = self._parentOfCell[cursor]
         movPath.path.reverse()
-        if cls.VERBOSE:
+        return movPath
+
+    def findPath(
+        self,
+        mapData: IDataMapProvider,
+        start: MapPoint,
+        end: MapPoint,
+        allowDiag: bool = True,
+        bAllowTroughEntity: bool = True,
+        avoidObstacles: bool = True,
+    ) -> MovementPath:
+        self.initAlgo(mapData, start, end, allowDiag, bAllowTroughEntity, avoidObstacles)
+        open_list = []
+        heapq.heappush(open_list, (0, start.cellId))
+        while open_list:
+            _, parentId = heapq.heappop(open_list)
+            if parentId in self._isCellClosed:
+                continue
+            self._isCellClosed.add(parentId)
+            for x, y in self.iterChilds(parentId):
+                cellId = MapTools.getCellIdByCoord(x, y)
+                moveCost = self.moveCost(x, y, parentId)
+                if self._allowTroughEntity:
+                    distTmpToEnd = self.distFromEnd(cellId)
+                    if distTmpToEnd < self._distToEnd:
+                        self._endCellAuxId = cellId
+                        self._distToEnd = distTmpToEnd
+                if cellId not in self._parentOfCell or moveCost < self._costOfCell[cellId]:
+                    self._parentOfCell[cellId] = parentId
+                    self._costOfCell[cellId] = moveCost
+                    heuristic = self.HEURISTIC_SCALE * (abs(self._end.x - x) + abs(self._end.y - y))
+                    totalCost = heuristic + moveCost
+                    heapq.heappush(open_list, (totalCost, cellId))
+        movPath = self.buildPath()
+        if self.VERBOSE:
             logger.debug(f"[CellPathFinding] Path found: {movPath}")
         return movPath
 
-    @classmethod
-    def getMapPointWeight(cls, mapData: IDataMapProvider, cellId, endCellId, x, y, bAllowTroughEntity):
+    def getMapPointWeight(self, x, y):
+        cellId = MapTools.getCellIdByCoord(x, y)
+        if cellId == self._end.cellId:
+            return 1
         pointWeight = 0
-        if cellId == endCellId:
-            pointWeight = 1
-        else:
-            speed = mapData.getCellSpeed(cellId)
-            if bAllowTroughEntity:
-                if cls._isEntityOnCell[cellId]:
-                    pointWeight = 20
-                elif speed >= 0:
-                    pointWeight = 6 - speed
-                else:
-                    pointWeight = 12 + abs(speed)
+        speed = self._mapData.getCellSpeed(cellId)
+        entity_on_cell = self._isEntityOnCell.get(cellId)
+        if self._allowTroughEntity:
+            if entity_on_cell:
+                pointWeight = 20
+            elif speed >= 0:
+                pointWeight = 6 - speed
             else:
-                pointWeight = 1
-                if cls._isEntityOnCell[cellId]:
+                pointWeight = 12 + abs(speed)
+        else:
+            pointWeight = 1
+            if entity_on_cell:
+                pointWeight += 0.3
+            for dx, dy in ((1, 0), (0, 1), (-1, 0), (0, -1)):
+                if MapTools.isValidCoord(x + dx, y + dy) and self._isEntityOnCell.get(
+                    MapTools.getCellIdByCoord(x + dx, y + dy)
+                ):
                     pointWeight += 0.3
-                if MapTools.isValidCoord(x + 1, y) and cls._isEntityOnCell[MapTools.getCellIdByCoord(x + 1, y)]:
-                    pointWeight += 0.3
-                if MapTools.isValidCoord(x, y + 1) and cls._isEntityOnCell[MapTools.getCellIdByCoord(x, y + 1)]:
-                    pointWeight += 0.3
-                if MapTools.isValidCoord(x - 1, y) and cls._isEntityOnCell[MapTools.getCellIdByCoord(x - 1, y)]:
-                    pointWeight += 0.3
-                if MapTools.isValidCoord(x, y - 1) and cls._isEntityOnCell[MapTools.getCellIdByCoord(x, y - 1)]:
-                    pointWeight += 0.3
-                if mapData.pointSpecialEffects(x, y) & 2 == 2:
-                    pointWeight += 0.2
+
+            if self._mapData.pointSpecialEffects(x, y) & 2 == 2:
+                pointWeight += 0.2
         return pointWeight

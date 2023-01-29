@@ -2,13 +2,11 @@ from pydofus2.com.ankamagames.jerakine.network.NetworkMessage import NetworkMess
 
 
 class TreasureHuntDigRequestAnswerMessage(NetworkMessage):
-    questType:int
-    result:int
-    
+    questType: int
+    result: int
 
-    def init(self, questType_:int, result_:int):
+    def init(self, questType_: int, result_: int):
         self.questType = questType_
         self.result = result_
-        
+
         super().__init__()
-    

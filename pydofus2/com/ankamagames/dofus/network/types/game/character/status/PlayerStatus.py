@@ -2,11 +2,9 @@ from pydofus2.com.ankamagames.jerakine.network.NetworkMessage import NetworkMess
 
 
 class PlayerStatus(NetworkMessage):
-    statusId:int
-    
+    statusId: int
 
-    def init(self, statusId_:int):
+    def init(self, statusId_: int):
         self.statusId = statusId_
-        
+
         super().__init__()
-    

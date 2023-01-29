@@ -50,9 +50,7 @@ class OptionalFeature(IDataCenter):
     def canBeEnabled(self) -> bool:
         if not self.activationCriterions:
             return True
-        groupFeatureCriterion: GroupFeatureCriterion = GroupFeatureCriterion(
-            self.activationCriterions
-        )
+        groupFeatureCriterion: GroupFeatureCriterion = GroupFeatureCriterion(self.activationCriterions)
         return groupFeatureCriterion.isRespected
 
     def __str__(self) -> str:
@@ -65,16 +63,6 @@ class OptionalFeature(IDataCenter):
             featureTypeLabel = "Client/Server"
         else:
             featureTypeLabel = "???"
-        return (
-            "Feature "
-            + self.keyword
-            + " (ID: "
-            + str(self.id)
-            + ") ["
-            + featureTypeLabel
-            + "]"
-        )
+        return "Feature " + self.keyword + " (ID: " + str(self.id) + ") [" + featureTypeLabel + "]"
 
-    idAccessors: IdAccessors = IdAccessors(
-        getOptionalFeatureById, getAllOptionalFeatures
-    )
+    idAccessors: IdAccessors = IdAccessors(getOptionalFeatureById, getAllOptionalFeatures)

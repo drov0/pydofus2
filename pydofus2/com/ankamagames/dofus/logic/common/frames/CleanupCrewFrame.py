@@ -48,8 +48,6 @@ from pydofus2.com.ankamagames.jerakine.network.messages.ServerConnectionFailedMe
 )
 from pydofus2.com.ankamagames.jerakine.types.enums.Priority import Priority
 
-logger = Logger("Dofus2")
-
 
 class CleanupCrewFrame(Frame):
     def __init__(self):
@@ -83,7 +81,7 @@ class CleanupCrewFrame(Frame):
         if msg.__class__ in msgClassList:
             return True
         else:
-            # logger.info(f"[Warning] {msg.__class__.__name__} wasn't stopped by a frame.")
+            # Logger().info(f"[Warning] {msg.__class__.__name__} wasn't stopped by a frame.")
             return True
 
     def pulled(self) -> bool:

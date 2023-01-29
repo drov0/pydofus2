@@ -8,8 +8,6 @@ class EvolutiveItemType(IDataCenter):
 
     MODULE: str = "EvolutiveItemTypes"
 
-    logger = Logger("Dofus2")
-
     id: int
 
     maxLevel: int

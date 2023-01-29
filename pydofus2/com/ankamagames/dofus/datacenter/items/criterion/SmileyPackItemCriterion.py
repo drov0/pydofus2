@@ -27,12 +27,7 @@ class SmileyPackItemCriterion(ItemCriterion, IDataCenter):
             readableCriterion = I18n.getUiText("ui.tooltip.dontPossessSmileyPack")
         else:
             readableCriterion = I18n.getUiText("ui.tooltip.possessSmileyPack")
-        return (
-            readableCriterion
-            + " '"
-            + SmileyPack.getSmileyPackById(self._criterionValue).name
-            + "'"
-        )
+        return readableCriterion + " '" + SmileyPack.getSmileyPackById(self._criterionValue).name + "'"
 
     def clone(self) -> IItemCriterion:
         return SmileyPackItemCriterion(self.basicText)

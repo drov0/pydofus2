@@ -2,11 +2,9 @@ from pydofus2.com.ankamagames.jerakine.network.NetworkMessage import NetworkMess
 
 
 class EmoteListMessage(NetworkMessage):
-    emoteIds:list[int]
-    
+    emoteIds: list[int]
 
-    def init(self, emoteIds_:list[int]):
+    def init(self, emoteIds_: list[int]):
         self.emoteIds = emoteIds_
-        
+
         super().__init__()
-    

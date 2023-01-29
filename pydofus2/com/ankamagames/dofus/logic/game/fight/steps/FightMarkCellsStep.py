@@ -21,8 +21,6 @@ from pydofus2.com.ankamagames.jerakine.logger.Logger import Logger
 from pydofus2.com.ankamagames.jerakine.sequencer.AbstractSequencable import AbstractSequencable
 from pydofus2.com.ankamagames.jerakine.types.positions.PathElement import PathElement
 
-logger = Logger("Dofus2")
-
 
 class FightMarkCellsStep(AbstractSequencable, IFightStep):
 
@@ -101,7 +99,7 @@ class FightMarkCellsStep(AbstractSequencable, IFightStep):
             if mi.markType == GameActionMarkTypeEnum.RUNE:
                 evt = FightEventEnum.RUNE_APPEARED
             else:
-                logger.warn(f"Unknown mark type ({mi.markType}).")
+                Logger().warn(f"Unknown mark type ({mi.markType}).")
             FightEventsHelper().sendFightEvent(evt, [mi.associatedSpell.id], 0, self.castingSpellId)
             ftf = Kernel().worker.getFrame("FightTurnFrame")
             if ftf and ftf.myTurn and ftf.lastPath:

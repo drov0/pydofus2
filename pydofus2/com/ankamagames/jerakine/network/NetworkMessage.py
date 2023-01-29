@@ -14,7 +14,6 @@ class NetworkMessage(INetworkMessage):
     BIT_MASK: int = 3
     HASH_FUNCTION: FunctionType
 
-
     def __init__(self):
         NetworkMessage.GLOBAL_INSTANCE_ID = (NetworkMessage.GLOBAL_INSTANCE_ID + 1) % 1000
         self._instance_id = NetworkMessage.GLOBAL_INSTANCE_ID

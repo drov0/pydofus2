@@ -2,15 +2,13 @@ from pydofus2.com.ankamagames.jerakine.network.NetworkMessage import NetworkMess
 
 
 class MountRidingMessage(NetworkMessage):
-    isRiding:bool
-    isAutopilot:bool
-    isRiding:bool
-    isAutopilot:bool
-    
+    isRiding: bool
+    isAutopilot: bool
+    isRiding: bool
+    isAutopilot: bool
 
-    def init(self, isRiding_:bool, isAutopilot_:bool):
+    def init(self, isRiding_: bool, isAutopilot_: bool):
         self.isRiding = isRiding_
         self.isAutopilot = isAutopilot_
-        
+
         super().__init__()
-    

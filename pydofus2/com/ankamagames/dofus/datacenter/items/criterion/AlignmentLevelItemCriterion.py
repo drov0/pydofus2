@@ -22,19 +22,11 @@ class AlignmentLevelItemCriterion(icFactory.ItemCriterionFactory, datacenter):
     @property
     def text(self) -> str:
         readableCriterionRef: str = I18n.getUiText("ui.tooltip.AlignmentLevel")
-        return (
-            readableCriterionRef
-            + " "
-            + self._operator.text
-            + " "
-            + self._criterionValue
-        )
+        return readableCriterionRef + " " + self._operator.text + " " + self._criterionValue
 
     def clone(self) -> IItemCriterion:
         return AlignmentLevelItemCriterion(self.basicText)
 
     def getCriterion(self) -> int:
-        alignInfo: ActorExtendedAlignmentInformations = (
-            PlayedCharacterManager().characteristics.alignmentInfos
-        )
+        alignInfo: ActorExtendedAlignmentInformations = PlayedCharacterManager().characteristics.alignmentInfos
         return alignInfo.alignmentValue

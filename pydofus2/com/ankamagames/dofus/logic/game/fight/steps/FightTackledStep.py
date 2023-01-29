@@ -10,8 +10,6 @@ from pydofus2.com.ankamagames.jerakine.sequencer.AbstractSequencable import Abst
 from pydofus2.com.ankamagames.jerakine.sequencer.ISequencable import ISequencable
 from pydofus2.com.ankamagames.jerakine.sequencer.ISequencableListener import ISequencableListener
 
-logger = Logger("Dofus2")
-
 
 class FightTackledStep(AbstractSequencable, IFightStep, ISequencableListener):
 
@@ -28,9 +26,9 @@ class FightTackledStep(AbstractSequencable, IFightStep, ISequencableListener):
         return "tackled"
 
     def start(self) -> None:
-        tackledEntity: IEntity = DofusEntities.getEntity(self._fighterId)
+        tackledEntity: IEntity = DofusEntities().getEntity(self._fighterId)
         if not tackledEntity:
-            logger.warn("Unable to play tackle of an unexisting fighter " + str(self._fighterId) + ".")
+            Logger().warn("Unable to play tackle of an unexisting fighter " + str(self._fighterId) + ".")
         self.stepFinished(self)
 
     def stepFinished(self, step: ISequencable, withTimout: bool = False) -> None:

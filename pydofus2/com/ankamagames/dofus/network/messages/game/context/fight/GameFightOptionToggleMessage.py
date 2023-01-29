@@ -2,11 +2,9 @@ from pydofus2.com.ankamagames.jerakine.network.NetworkMessage import NetworkMess
 
 
 class GameFightOptionToggleMessage(NetworkMessage):
-    option:int
-    
+    option: int
 
-    def init(self, option_:int):
+    def init(self, option_: int):
         self.option = option_
-        
+
         super().__init__()
-    

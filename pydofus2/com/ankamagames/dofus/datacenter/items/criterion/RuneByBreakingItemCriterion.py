@@ -17,9 +17,7 @@ class RuneByBreakingItemCriterion(ItemCriterion, IDataCenter):
     def text(self) -> str:
         readableCriterionValue: str = self._criterionValueText
         runeBybreakingItem: int = int(readableCriterionValue.split(",")[1]) + 1
-        return I18n.getUiText(
-            "ui.smithmagic.runeByBreakingItemCriterion", [runeBybreakingItem]
-        )
+        return I18n.getUiText("ui.smithmagic.runeByBreakingItemCriterion", [runeBybreakingItem])
 
     def clone(self) -> IItemCriterion:
         return MonsterGroupChallengeCriterion(self.basicText)

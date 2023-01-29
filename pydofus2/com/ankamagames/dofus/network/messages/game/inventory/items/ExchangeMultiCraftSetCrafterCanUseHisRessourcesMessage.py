@@ -2,11 +2,9 @@ from pydofus2.com.ankamagames.jerakine.network.NetworkMessage import NetworkMess
 
 
 class ExchangeMultiCraftSetCrafterCanUseHisRessourcesMessage(NetworkMessage):
-    allow:bool
-    
+    allow: bool
 
-    def init(self, allow_:bool):
+    def init(self, allow_: bool):
         self.allow = allow_
-        
+
         super().__init__()
-    

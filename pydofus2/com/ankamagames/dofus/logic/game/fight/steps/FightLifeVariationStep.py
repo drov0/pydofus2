@@ -13,12 +13,7 @@ from pydofus2.com.ankamagames.dofus.network.types.game.context.fight.GameFightFi
     GameFightFighterInformations,
 )
 from pydofus2.com.ankamagames.jerakine.logger.Logger import Logger
-from pydofus2.com.ankamagames.jerakine.utils.display.EnterFrameDispatcher import (
-    EnterFrameDispatcher,
-)
 from pydofus2.damageCalculation.tools.StatIds import StatIds
-
-logger = Logger("Dofus2")
 
 
 class FightLifeVariationStep(AbstractStatContextualStep, IFightStep):
@@ -65,10 +60,10 @@ class FightLifeVariationStep(AbstractStatContextualStep, IFightStep):
     def start(self) -> None:
         self._fighterInfo = FightEntitiesFrame.getCurrentInstance().getEntityInfos(self._targetId)
         if not self._fighterInfo:
-            logger.error(f"Can't find fighter info for entity {self._targetId}")
+            Logger().error(f"Can't find fighter info for entity {self._targetId}")
             super().executeCallbacks()
             return
-        EnterFrameDispatcher().worker.addSingleTreatment(self, self.apply, [])
+        self.apply()
 
     def apply(self) -> None:
         stats: EntityStats = StatsManager().getStats(self._targetId)

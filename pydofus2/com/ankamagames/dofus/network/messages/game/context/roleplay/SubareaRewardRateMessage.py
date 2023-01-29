@@ -2,11 +2,9 @@ from pydofus2.com.ankamagames.jerakine.network.NetworkMessage import NetworkMess
 
 
 class SubareaRewardRateMessage(NetworkMessage):
-    subAreaRate:int
-    
+    subAreaRate: int
 
-    def init(self, subAreaRate_:int):
+    def init(self, subAreaRate_: int):
         self.subAreaRate = subAreaRate_
-        
+
         super().__init__()
-    

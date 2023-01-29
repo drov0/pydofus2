@@ -9,7 +9,9 @@ from pydofus2.com.ankamagames.dofus.logic.game.roleplay.messages.InteractiveElem
     InteractiveElementActivationMessage,
 )
 from pydofus2.com.ankamagames.dofus.network.enums.MapObstacleStateEnum import MapObstacleStateEnum
-from pydofus2.com.ankamagames.dofus.network.messages.game.context.GameContextDestroyMessage import GameContextDestroyMessage
+from pydofus2.com.ankamagames.dofus.network.messages.game.context.GameContextDestroyMessage import (
+    GameContextDestroyMessage,
+)
 from pydofus2.com.ankamagames.dofus.network.messages.game.context.roleplay.MapObstacleUpdateMessage import (
     MapObstacleUpdateMessage,
 )
@@ -19,7 +21,9 @@ from pydofus2.com.ankamagames.dofus.network.messages.game.interactive.Interactiv
 from pydofus2.com.ankamagames.dofus.network.messages.game.interactive.InteractiveMapUpdateMessage import (
     InteractiveMapUpdateMessage,
 )
-from pydofus2.com.ankamagames.dofus.network.messages.game.interactive.InteractiveUsedMessage import InteractiveUsedMessage
+from pydofus2.com.ankamagames.dofus.network.messages.game.interactive.InteractiveUsedMessage import (
+    InteractiveUsedMessage,
+)
 from pydofus2.com.ankamagames.dofus.network.messages.game.interactive.InteractiveUseEndedMessage import (
     InteractiveUseEndedMessage,
 )
@@ -29,9 +33,13 @@ from pydofus2.com.ankamagames.dofus.network.messages.game.interactive.Interactiv
 from pydofus2.com.ankamagames.dofus.network.messages.game.interactive.StatedElementUpdatedMessage import (
     StatedElementUpdatedMessage,
 )
-from pydofus2.com.ankamagames.dofus.network.messages.game.interactive.StatedMapUpdateMessage import StatedMapUpdateMessage
+from pydofus2.com.ankamagames.dofus.network.messages.game.interactive.StatedMapUpdateMessage import (
+    StatedMapUpdateMessage,
+)
 from pydofus2.com.ankamagames.dofus.network.types.game.interactive.InteractiveElement import InteractiveElement
-from pydofus2.com.ankamagames.dofus.network.types.game.interactive.InteractiveElementSkill import InteractiveElementSkill
+from pydofus2.com.ankamagames.dofus.network.types.game.interactive.InteractiveElementSkill import (
+    InteractiveElementSkill,
+)
 from pydofus2.com.ankamagames.dofus.network.types.game.interactive.StatedElement import StatedElement
 from pydofus2.com.ankamagames.jerakine.benchmark.BenchmarkTimer import BenchmarkTimer
 from pydofus2.com.ankamagames.jerakine.logger.Logger import Logger
@@ -44,8 +52,6 @@ if TYPE_CHECKING:
     from pydofus2.com.ankamagames.dofus.logic.game.roleplay.frames.RoleplayEntitiesFrame import RoleplayEntitiesFrame
     from pydofus2.com.ankamagames.dofus.logic.game.roleplay.frames.RoleplayMovementFrame import RoleplayMovementFrame
     from pydofus2.com.ankamagames.dofus.logic.game.roleplay.frames.RoleplayWorldFrame import RoleplayWorldFrame
-
-logger = Logger("Dofus2")
 
 
 class CollectableElement:
@@ -165,7 +171,7 @@ class RoleplayInteractivesFrame(Frame):
         return self._collectableIe
 
     def pushed(self) -> bool:
-        # logger.debug("InteractiveElement pushed")
+        # Logger().debug("InteractiveElement pushed")
         return True
 
     def process(self, msg: Message) -> bool:
@@ -215,7 +221,7 @@ class RoleplayInteractivesFrame(Frame):
                     and self.movementFrame._followingIe["ie"].elementId == iumsg.elemId
                 ):
                     self.movementFrame.cancelFollowingIe()
-                logger.debug(
+                Logger().debug(
                     f"[RolePlayInteractives] Interactive element {iumsg.elemId} is being used by the Entity '{'CurrentPlayer' if iumsg.entityId == PlayedCharacterManager().id else iumsg.entityId}'"
                 )
             return False
@@ -265,7 +271,7 @@ class RoleplayInteractivesFrame(Frame):
         self._nextInteractiveUsed = None
         self._interactiveActionTimers.clear()
         self._collectableIe.clear()
-        # logger.debug("InteractiveElement pulled")
+        # Logger().debug("InteractiveElement pulled")
         return True
 
     def enableWorldInteraction(self, pEnable: bool) -> None:

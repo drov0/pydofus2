@@ -2,11 +2,9 @@ from pydofus2.com.ankamagames.jerakine.network.NetworkMessage import NetworkMess
 
 
 class ExchangeObjectMessage(NetworkMessage):
-    remote:bool
-    
+    remote: bool
 
-    def init(self, remote_:bool):
+    def init(self, remote_: bool):
         self.remote = remote_
-        
+
         super().__init__()
-    

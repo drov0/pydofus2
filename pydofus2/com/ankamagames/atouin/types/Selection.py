@@ -2,8 +2,6 @@ from pydofus2.com.ankamagames.atouin.managers.MapDisplayManager import MapDispla
 from pydofus2.com.ankamagames.jerakine.logger.Logger import Logger
 from pydofus2.com.ankamagames.jerakine.types.zones.IZone import IZone
 
-logger = Logger("Dofus2")
-
 
 class Selection:
     _mapId: float = None

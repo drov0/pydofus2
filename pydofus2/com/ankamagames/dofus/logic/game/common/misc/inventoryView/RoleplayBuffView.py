@@ -5,8 +5,6 @@ from pydofus2.com.ankamagames.dofus.network.enums.CharacterInventoryPositionEnum
 )
 from pydofus2.com.ankamagames.jerakine.logger.Logger import Logger
 
-logger = Logger("Dofus2")
-
 
 class RoleplayBuffView(IInventoryView):
 
@@ -38,7 +36,7 @@ class RoleplayBuffView(IInventoryView):
 
     def removeItem(self, item: ItemWrapper, invisible: int) -> None:
         if item not in self.content:
-            logger.warn("L'item qui doit �tre supprim� n'est pas pr�sent dans la liste")
+            Logger().warn("L'item qui doit �tre supprim� n'est pas pr�sent dans la liste")
         self.content.remove(item)
         self.updateView()
 

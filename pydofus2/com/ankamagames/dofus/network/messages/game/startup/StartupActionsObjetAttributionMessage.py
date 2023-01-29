@@ -2,13 +2,11 @@ from pydofus2.com.ankamagames.jerakine.network.NetworkMessage import NetworkMess
 
 
 class StartupActionsObjetAttributionMessage(NetworkMessage):
-    actionId:int
-    characterId:int
-    
+    actionId: int
+    characterId: int
 
-    def init(self, actionId_:int, characterId_:int):
+    def init(self, actionId_: int, characterId_: int):
         self.actionId = actionId_
         self.characterId = characterId_
-        
+
         super().__init__()
-    

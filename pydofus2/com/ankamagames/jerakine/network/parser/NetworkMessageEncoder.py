@@ -8,7 +8,7 @@ import pydofus2.com.ankamagames.jerakine.network.NetworkMessage as bnm
 from pydofus2.com.ankamagames.jerakine.network.parser.TypeEnum import TypeEnum
 from pydofus2.com.ankamagames.jerakine.network.parser.ProtocolSpec import D2PROTOCOL
 
-logger = Logger("Dofus2")
+
 dataWrite = {
     name: (getattr(ByteArray, "read" + name), getattr(ByteArray, "write" + name)) for name in D2PROTOCOL["primitives"]
 }
@@ -23,7 +23,7 @@ class NetworkMessageEncoder:
         try:
             return cls._encode(spec, inst, data, random_hash)
         except:
-            logger.error("Error while encoding %s", inst.__dict__)
+            Logger().error("Error while encoding %s", inst.__dict__)
             raise
 
     @classmethod
@@ -45,7 +45,7 @@ class NetworkMessageEncoder:
             try:
                 dataWrite[spec["type"]][1](data, inst)
             except:
-                logger.error("Error while writing %s", inst)
+                Logger().error("Error while writing %s", inst)
                 raise
             return data
 
@@ -78,7 +78,7 @@ class NetworkMessageEncoder:
                 try:
                     cls._encode(field, getattr(inst, field["name"]), data)
                 except:
-                    logger.error("Error while writing %s", field)
+                    Logger().error("Error while writing %s", field)
                     raise
 
         if hasattr(inst, "hash_function"):

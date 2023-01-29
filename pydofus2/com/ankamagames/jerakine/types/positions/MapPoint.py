@@ -5,8 +5,6 @@ from pydofus2.com.ankamagames.jerakine.map.ILosDetector import ILosDetector
 from pydofus2.com.ankamagames.jerakine.types.enums.DirectionsEnum import DirectionsEnum
 from pydofus2.flash.geom.Point import Point
 
-logger = Logger("Dofus2")
-
 
 class MapPoint:
     RIGHT = 0
@@ -177,7 +175,7 @@ class MapPoint:
         target_theta = math.atan2(target.x, target.y)
         self_theta = math.atan2(self.x, self.y)
         angle = self_theta - target_theta
-        logger.debug("angle: %f", angle / math.pi * 180)
+        Logger().debug("angle: %f", angle / math.pi * 180)
         if fourDir:
             angle = round(2 * (angle / math.pi)) + 1 % 8
         else:

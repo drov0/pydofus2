@@ -19,8 +19,6 @@ from pydofus2.com.ankamagames.jerakine.logger.Logger import Logger
 
 class SpellManager:
 
-    logger = Logger("Dofus2")
-
     _spellId: int = 0
 
     _spellLevel: int = 0

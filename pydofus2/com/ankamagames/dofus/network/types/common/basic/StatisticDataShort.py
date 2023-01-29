@@ -2,11 +2,9 @@ from pydofus2.com.ankamagames.dofus.network.types.common.basic.StatisticData imp
 
 
 class StatisticDataShort(StatisticData):
-    value:int
-    
+    value: int
 
-    def init(self, value_:int):
+    def init(self, value_: int):
         self.value = value_
-        
+
         super().init()
-    

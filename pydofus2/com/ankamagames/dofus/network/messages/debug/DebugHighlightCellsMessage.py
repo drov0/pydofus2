@@ -2,13 +2,11 @@ from pydofus2.com.ankamagames.jerakine.network.NetworkMessage import NetworkMess
 
 
 class DebugHighlightCellsMessage(NetworkMessage):
-    color:int
-    cells:list[int]
-    
+    color: int
+    cells: list[int]
 
-    def init(self, color_:int, cells_:list[int]):
+    def init(self, color_: int, cells_: list[int]):
         self.color = color_
         self.cells = cells_
-        
+
         super().__init__()
-    

@@ -2,17 +2,15 @@ from pydofus2.com.ankamagames.jerakine.network.NetworkMessage import NetworkMess
 
 
 class GameRolePlayMonsterAngryAtPlayerMessage(NetworkMessage):
-    playerId:int
-    monsterGroupId:int
-    angryStartTime:int
-    attackTime:int
-    
+    playerId: int
+    monsterGroupId: int
+    angryStartTime: int
+    attackTime: int
 
-    def init(self, playerId_:int, monsterGroupId_:int, angryStartTime_:int, attackTime_:int):
+    def init(self, playerId_: int, monsterGroupId_: int, angryStartTime_: int, attackTime_: int):
         self.playerId = playerId_
         self.monsterGroupId = monsterGroupId_
         self.angryStartTime = angryStartTime_
         self.attackTime = attackTime_
-        
+
         super().__init__()
-    

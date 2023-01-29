@@ -3,8 +3,6 @@ from pydofus2.com.ankamagames.jerakine.types.positions.MapPoint import MapPoint
 from pydofus2.com.ankamagames.jerakine.types.positions.MovementPath import MovementPath
 from pydofus2.com.ankamagames.jerakine.types.positions.PathElement import PathElement
 
-logger = Logger("Dofus2")
-
 
 class MapMovementAdapter:
 
@@ -29,7 +27,7 @@ class MapMovementAdapter:
             movStr = ""
             for movCell in movement:
                 movStr += str(movCell & 4095) + " > "
-            logger.debug("Sending path : " + movStr)
+            Logger().debug("Sending path : " + movStr)
         return movement
 
     @classmethod
@@ -56,5 +54,5 @@ class MapMovementAdapter:
             movStr = f"Start : {mp.start.cellId} | "
             for movElement in mp.path:
                 movStr += str(movElement.step.cellId) + " > "
-            logger.debug(f"Received path : {movStr} | End : {mp.end.cellId}")
+            Logger().debug(f"Received path : {movStr} | End : {mp.end.cellId}")
         return mp

@@ -4,8 +4,6 @@ from pydofus2.com.ankamagames.jerakine.types.zones.IZone import IZone
 
 class Custom(IZone):
 
-    logger = Logger("Dofus2")
-
     _aCells: list[int]
 
     def __init__(self, cells: list[int]):

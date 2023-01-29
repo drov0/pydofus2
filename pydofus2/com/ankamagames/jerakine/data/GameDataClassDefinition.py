@@ -1,5 +1,6 @@
 import importlib
 from typing import Any, TYPE_CHECKING
+
 if TYPE_CHECKING:
     from pydofus2.com.ankamagames.jerakine.data.ModuleReader import ModuleReader
 from pydofus2.com.ankamagames.jerakine.data.IPostInit import IPostInit

@@ -5,8 +5,9 @@ from pydofus2.com.ankamagames.jerakine.data.XmlConfig import XmlConfig
 from pydofus2.com.ankamagames.jerakine.logger.Logger import Logger
 from pydofus2.dataAdapter.dlm import DLM
 import threading
-logger = Logger("Dofus2")
+
 lock = threading.Lock()
+
 
 class MapLoader:
     DLM_KEY = XmlConfig().getEntry("config.maps.encryptionKey")

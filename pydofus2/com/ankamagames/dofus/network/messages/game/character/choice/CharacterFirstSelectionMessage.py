@@ -1,12 +1,12 @@
-from pydofus2.com.ankamagames.dofus.network.messages.game.character.choice.CharacterSelectionMessage import CharacterSelectionMessage
+from pydofus2.com.ankamagames.dofus.network.messages.game.character.choice.CharacterSelectionMessage import (
+    CharacterSelectionMessage,
+)
 
 
 class CharacterFirstSelectionMessage(CharacterSelectionMessage):
-    doTutorial:bool
-    
+    doTutorial: bool
 
-    def init(self, doTutorial_:bool, id_:int):
+    def init(self, doTutorial_: bool, id_: int):
         self.doTutorial = doTutorial_
-        
+
         super().init(id_)
-    

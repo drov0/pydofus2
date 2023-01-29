@@ -2,11 +2,9 @@ from pydofus2.com.ankamagames.jerakine.network.NetworkMessage import NetworkMess
 
 
 class JobAllowMultiCraftRequestMessage(NetworkMessage):
-    enabled:bool
-    
+    enabled: bool
 
-    def init(self, enabled_:bool):
+    def init(self, enabled_: bool):
         self.enabled = enabled_
-        
+
         super().__init__()
-    

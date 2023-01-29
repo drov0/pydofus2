@@ -26,8 +26,6 @@ from pydofus2.com.ankamagames.jerakine.logger.Logger import Logger
 from pydofus2.com.ankamagames.jerakine.sequencer.AbstractSequencable import AbstractSequencable
 from pydofus2.com.ankamagames.jerakine.types.positions.MapPoint import MapPoint
 
-logger = Logger("Dofus2")
-
 
 class FightEntitySlideStep(AbstractSequencable, IFightStep):
 
@@ -52,7 +50,7 @@ class FightEntitySlideStep(AbstractSequencable, IFightStep):
         self._endCell = endCell
         infos: "GameFightFighterInformations" = FightEntitiesFrame.getCurrentInstance().getEntityInfos(fighterId)
         infos.disposition.cellId = endCell.cellId
-        self._entity: "AnimatedCharacter" = DofusEntities.getEntity(self._fighterId)
+        self._entity: "AnimatedCharacter" = DofusEntities().getEntity(self._fighterId)
         self._fightContextFrame: "FightContextFrame" = Kernel().worker.getFrame("FightContextFrame")
 
     @property
@@ -63,7 +61,7 @@ class FightEntitySlideStep(AbstractSequencable, IFightStep):
         if self._entity:
             self._entity.direction = self._startCell.advancedOrientationTo(self._endCell)
             if not self._entity.position == self._startCell:
-                logger.warn(
+                Logger().warn(
                     f"We were ordered to slide {self._fighterId} from {self._startCell.cellId}, but self fighter is on {self._entity.position.cellId}."
                 )
             fighterInfos = FightEntitiesFrame.getCurrentInstance().getEntityInfos(self._fighterId)
@@ -75,7 +73,7 @@ class FightEntitySlideStep(AbstractSequencable, IFightStep):
             # path.addPoint(PathElement(self._entity.position, path.start.orientationTo(path.end)))
             # path.fill()
         else:
-            logger.warn("Unable to slide unexisting fighter " + self._fighterId + ".")
+            Logger().warn("Unable to slide unexisting fighter " + self._fighterId + ".")
         self.slideFinished()
 
     @property

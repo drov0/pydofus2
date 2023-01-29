@@ -7,12 +7,18 @@ from pydofus2.com.ankamagames.dofus.logic.game.common.misc.ISpellCastProvider im
 from pydofus2.com.ankamagames.dofus.logic.game.fight.frames.FightSpellCastFrame import FightSpellCastFrame
 from pydofus2.com.ankamagames.dofus.logic.game.fight.frames.FightTurnFrame import FightTurnFrame
 from pydofus2.com.ankamagames.dofus.logic.game.fight.managers.MarkedCellsManager import MarkedCellsManager
-from pydofus2.com.ankamagames.dofus.logic.game.fight.messages.GameActionFightLeaveMessage import GameActionFightLeaveMessage
+from pydofus2.com.ankamagames.dofus.logic.game.fight.messages.GameActionFightLeaveMessage import (
+    GameActionFightLeaveMessage,
+)
 from pydofus2.com.ankamagames.dofus.logic.game.fight.miscs.ActionIdHelper import ActionIdHelper
 from pydofus2.com.ankamagames.dofus.logic.game.fight.miscs.ActionIdProtocol import ActionIdProtocol
 from pydofus2.com.ankamagames.dofus.logic.game.fight.miscs.SpellScriptBuffer import SpellScriptBuffer
-from pydofus2.com.ankamagames.dofus.logic.game.fight.steps.FightActionPointsLossDodgeStep import FightActionPointsLossDodgeStep
-from pydofus2.com.ankamagames.dofus.logic.game.fight.steps.FightActionPointsVariationStep import FightActionPointsVariationStep
+from pydofus2.com.ankamagames.dofus.logic.game.fight.steps.FightActionPointsLossDodgeStep import (
+    FightActionPointsLossDodgeStep,
+)
+from pydofus2.com.ankamagames.dofus.logic.game.fight.steps.FightActionPointsVariationStep import (
+    FightActionPointsVariationStep,
+)
 from pydofus2.com.ankamagames.dofus.logic.game.fight.steps.FightCarryCharacterStep import FightCarryCharacterStep
 from pydofus2.com.ankamagames.dofus.logic.game.fight.steps.FightChangeVisibilityStep import FightChangeVisibilityStep
 from pydofus2.com.ankamagames.dofus.logic.game.fight.steps.FightCloseCombatStep import FightCloseCombatStep
@@ -35,7 +41,9 @@ from pydofus2.com.ankamagames.dofus.logic.game.fight.steps.FightLifeVariationSte
 from pydofus2.com.ankamagames.dofus.logic.game.fight.steps.FightMarkActivateStep import FightMarkActivateStep
 from pydofus2.com.ankamagames.dofus.logic.game.fight.steps.FightMarkCellsStep import FightMarkCellsStep
 from pydofus2.com.ankamagames.dofus.logic.game.fight.steps.FightMarkTriggeredStep import FightMarkTriggeredStep
-from pydofus2.com.ankamagames.dofus.logic.game.fight.steps.FightModifyEffectsDurationStep import FightModifyEffectsDurationStep
+from pydofus2.com.ankamagames.dofus.logic.game.fight.steps.FightModifyEffectsDurationStep import (
+    FightModifyEffectsDurationStep,
+)
 from pydofus2.com.ankamagames.dofus.logic.game.fight.steps.FightMovementPointsLossDodgeStep import (
     FightMovementPointsLossDodgeStep,
 )
@@ -47,7 +55,9 @@ from pydofus2.com.ankamagames.dofus.logic.game.fight.steps.FightReducedDamagesSt
 from pydofus2.com.ankamagames.dofus.logic.game.fight.steps.FightReflectedDamagesStep import FightReflectedDamagesStep
 from pydofus2.com.ankamagames.dofus.logic.game.fight.steps.FightReflectedSpellStep import FightReflectedSpellStep
 from pydofus2.com.ankamagames.dofus.logic.game.fight.steps.FightRefreshFighterStep import FightRefreshFighterStep
-from pydofus2.com.ankamagames.dofus.logic.game.fight.steps.FightShieldPointsVariationStep import FightShieldPointsVariationStep
+from pydofus2.com.ankamagames.dofus.logic.game.fight.steps.FightShieldPointsVariationStep import (
+    FightShieldPointsVariationStep,
+)
 from pydofus2.com.ankamagames.dofus.logic.game.fight.steps.FightSpellCastStep import FightSpellCastStep
 from pydofus2.com.ankamagames.dofus.logic.game.fight.steps.FightSpellCooldownVariationStep import (
     FightSpellCooldownVariationStep,
@@ -97,12 +107,16 @@ from pydofus2.com.ankamagames.dofus.logic.game.common.managers.PlayedCharacterMa
 from pydofus2.com.ankamagames.dofus.logic.game.common.misc.DofusEntities import DofusEntities
 from pydofus2.com.ankamagames.dofus.logic.game.fight.frames.FightEntitiesFrame import FightEntitiesFrame
 from pydofus2.com.ankamagames.dofus.logic.game.fight.managers.BuffManager import BuffManager
-from pydofus2.com.ankamagames.dofus.logic.game.fight.managers.CurrentPlayedFighterManager import CurrentPlayedFighterManager
+from pydofus2.com.ankamagames.dofus.logic.game.fight.managers.CurrentPlayedFighterManager import (
+    CurrentPlayedFighterManager,
+)
 from pydofus2.com.ankamagames.dofus.logic.game.fight.types.BasicBuff import BasicBuff
 from pydofus2.com.ankamagames.dofus.logic.game.fight.types.CastingSpell import CastingSpell
 from pydofus2.com.ankamagames.dofus.misc.utils.GameDebugManager import GameDebugManager
 from pydofus2.com.ankamagames.dofus.network.enums.FightSpellCastCriticalEnum import FightSpellCastCriticalEnum
-from pydofus2.com.ankamagames.dofus.network.messages.game.actions.AbstractGameActionMessage import AbstractGameActionMessage
+from pydofus2.com.ankamagames.dofus.network.messages.game.actions.AbstractGameActionMessage import (
+    AbstractGameActionMessage,
+)
 from pydofus2.com.ankamagames.dofus.network.messages.game.actions.fight.GameActionFightActivateGlyphTrapMessage import (
     GameActionFightActivateGlyphTrapMessage,
 )
@@ -218,8 +232,12 @@ from pydofus2.com.ankamagames.dofus.network.messages.game.actions.fight.GameActi
     GameActionFightVanishMessage,
 )
 from pydofus2.com.ankamagames.dofus.network.messages.game.actions.sequence.SequenceEndMessage import SequenceEndMessage
-from pydofus2.com.ankamagames.dofus.network.messages.game.actions.sequence.SequenceStartMessage import SequenceStartMessage
-from pydofus2.com.ankamagames.dofus.network.messages.game.character.stats.FighterStatsListMessage import FighterStatsListMessage
+from pydofus2.com.ankamagames.dofus.network.messages.game.actions.sequence.SequenceStartMessage import (
+    SequenceStartMessage,
+)
+from pydofus2.com.ankamagames.dofus.network.messages.game.character.stats.FighterStatsListMessage import (
+    FighterStatsListMessage,
+)
 from pydofus2.com.ankamagames.dofus.network.messages.game.context.fight.character.GameFightRefreshFighterMessage import (
     GameFightRefreshFighterMessage,
 )
@@ -232,7 +250,9 @@ from pydofus2.com.ankamagames.dofus.network.messages.game.context.fight.characte
 from pydofus2.com.ankamagames.dofus.network.messages.game.context.fight.GameFightSynchronizeMessage import (
     GameFightSynchronizeMessage,
 )
-from pydofus2.com.ankamagames.dofus.network.messages.game.context.fight.GameFightTurnListMessage import GameFightTurnListMessage
+from pydofus2.com.ankamagames.dofus.network.messages.game.context.fight.GameFightTurnListMessage import (
+    GameFightTurnListMessage,
+)
 from pydofus2.com.ankamagames.dofus.network.messages.game.context.fight.RefreshCharacterStatsMessage import (
     RefreshCharacterStatsMessage,
 )
@@ -240,7 +260,9 @@ from pydofus2.com.ankamagames.dofus.network.messages.game.context.GameMapMovemen
 from pydofus2.com.ankamagames.dofus.network.types.game.actions.fight.AbstractFightDispellableEffect import (
     AbstractFightDispellableEffect,
 )
-from pydofus2.com.ankamagames.dofus.network.types.game.actions.fight.FightTemporaryBoostEffect import FightTemporaryBoostEffect
+from pydofus2.com.ankamagames.dofus.network.types.game.actions.fight.FightTemporaryBoostEffect import (
+    FightTemporaryBoostEffect,
+)
 from pydofus2.com.ankamagames.dofus.network.types.game.context.fight.GameFightCharacterInformations import (
     GameFightCharacterInformations,
 )
@@ -256,14 +278,24 @@ from pydofus2.com.ankamagames.dofus.network.types.game.context.fight.GameFightFi
 from pydofus2.com.ankamagames.dofus.network.types.game.context.fight.GameFightMonsterInformations import (
     GameFightMonsterInformations,
 )
-from pydofus2.com.ankamagames.dofus.network.types.game.context.fight.GameFightSpellCooldown import GameFightSpellCooldown
-from pydofus2.com.ankamagames.dofus.network.types.game.context.fight.SpawnCharacterInformation import SpawnCharacterInformation
-from pydofus2.com.ankamagames.dofus.network.types.game.context.fight.SpawnCompanionInformation import SpawnCompanionInformation
-from pydofus2.com.ankamagames.dofus.network.types.game.context.fight.SpawnMonsterInformation import SpawnMonsterInformation
+from pydofus2.com.ankamagames.dofus.network.types.game.context.fight.GameFightSpellCooldown import (
+    GameFightSpellCooldown,
+)
+from pydofus2.com.ankamagames.dofus.network.types.game.context.fight.SpawnCharacterInformation import (
+    SpawnCharacterInformation,
+)
+from pydofus2.com.ankamagames.dofus.network.types.game.context.fight.SpawnCompanionInformation import (
+    SpawnCompanionInformation,
+)
+from pydofus2.com.ankamagames.dofus.network.types.game.context.fight.SpawnMonsterInformation import (
+    SpawnMonsterInformation,
+)
 from pydofus2.com.ankamagames.dofus.network.types.game.context.fight.SpawnScaledMonsterInformation import (
     SpawnScaledMonsterInformation,
 )
-from pydofus2.com.ankamagames.dofus.network.types.game.context.GameContextActorInformations import GameContextActorInformations
+from pydofus2.com.ankamagames.dofus.network.types.game.context.GameContextActorInformations import (
+    GameContextActorInformations,
+)
 from pydofus2.com.ankamagames.jerakine.messages.Frame import Frame
 from pydofus2.com.ankamagames.jerakine.messages.Message import Message
 from pydofus2.com.ankamagames.jerakine.sequencer.AbstractSequencable import AbstractSequencable
@@ -273,8 +305,6 @@ from pydofus2.com.ankamagames.jerakine.sequencer.SerialSequencer import SerialSe
 from pydofus2.com.ankamagames.jerakine.types.enums.Priority import Priority
 from pydofus2.com.ankamagames.jerakine.types.positions.MapPoint import MapPoint
 from pydofus2.com.ankamagames.jerakine.types.positions.MovementPath import MovementPath
-
-logger = Logger("Dofus2")
 
 
 class FightSequenceFrame(Frame, ISpellCastProvider):
@@ -389,10 +419,10 @@ class FightSequenceFrame(Frame, ISpellCastProvider):
     @property
     def fightEntitiesFrame(self) -> "FightEntitiesFrame":
         return Kernel().worker.getFrame("FightEntitiesFrame")
-    
+
     def addSubSequence(self, sequence: ISequencer) -> None:
         self._subSequenceWaitingCount += 1
-        # logger.debug(f"Adding ParallelStartSequenceStep to sequence #{self._instanceId}")
+        # Logger().debug(f"Adding ParallelStartSequenceStep to sequence #{self._instanceId}")
         self._stepsBuffer.append(ParallelStartSequenceStep([sequence], False))
 
     def process(self, msg: Message) -> bool:
@@ -443,7 +473,7 @@ class FightSequenceFrame(Frame, ISpellCastProvider):
             tempCastingSpell.portalIds = gafscmsg.portalsIds
             tempCastingSpell.portalMapPoints = MarkedCellsManager().getMapPointsFromMarkIds(gafscmsg.portalsIds)
             if GameDebugManager().buffsDebugActivated:
-                logger.debug(
+                Logger().debug(
                     "\r[BUFFS DEBUG] Sort "
                     + tempCastingSpell.spell.name
                     + " ("
@@ -606,9 +636,7 @@ class FightSequenceFrame(Frame, ISpellCastProvider):
                                         True,
                                     )
                                 )
-                    simf: "SpellInventoryManagementFrame" = (
-                        Kernel().worker.getFrame("SpellInventoryManagementFrame")
-                    )
+                    simf: "SpellInventoryManagementFrame" = Kernel().worker.getFrame("SpellInventoryManagementFrame")
                     for fighterInfos in entities:
                         gfsc = GameFightSpellCooldown()
                         if (
@@ -633,7 +661,7 @@ class FightSequenceFrame(Frame, ISpellCastProvider):
                         shape = ei.zoneShape
                         break
                 if shape == SpellShapeEnum.P:
-                    ts = DofusEntities.getEntity(gafscmsg.targetId)
+                    ts = DofusEntities().getEntity(gafscmsg.targetId)
                     if ts and self._castingSpell and self._castingSpell.targetedCell:
                         targetedCell = InteractiveCellManager().getCell(self._castingSpell.targetedCell.cellId)
                         cellPos = targetedCell.parent.localToGlobal(
@@ -767,7 +795,7 @@ class FightSequenceFrame(Frame, ISpellCastProvider):
             if not inviInfo:
                 return True
             if GameDebugManager().buffsDebugActivated:
-                logger.debug(
+                Logger().debug(
                     "[BUFFS DEBUG] Changement de l'invisibilit� de "
                     + str(gafimsg.targetId)
                     + " (cellule "
@@ -776,7 +804,7 @@ class FightSequenceFrame(Frame, ISpellCastProvider):
                     + " nouvel �tat "
                     + str(gafimsg.state)
                 )
-            
+
             self.fightEntitiesFrame.setLastKnownEntityPosition(gafimsg.targetId, inviInfo.disposition.cellId)
             self.fightEntitiesFrame.setLastKnownEntityMovementPoint(gafimsg.targetId, 0, True)
             self.pushStep(FightChangeVisibilityStep(gafimsg.targetId, gafimsg.state))
@@ -790,7 +818,7 @@ class FightSequenceFrame(Frame, ISpellCastProvider):
         if isinstance(msg, GameActionFightDeathMessage):
             gafdmsg = msg
             fightEntitiesFrame = FightEntitiesFrame.getCurrentInstance()
-            logger.info(f"[FightSequence] Fighter {msg.targetId} died")
+            Logger().info(f"[FightSequence] Fighter {msg.targetId} died")
             fbf: "FightBattleFrame" = Kernel().worker.getFrame("FightBattleFrame")
             self.fighterHasBeenKilled(gafdmsg)
             return True
@@ -810,7 +838,7 @@ class FightSequenceFrame(Frame, ISpellCastProvider):
         if isinstance(msg, GameActionFightDispellEffectMessage):
             gafdiemsg = msg
             if GameDebugManager().buffsDebugActivated:
-                logger.debug(
+                Logger().debug(
                     "[BUFFS DEBUG] Message of the retrieval of buff "
                     + str(gafdiemsg.boostUID)
                     + " belonging to "
@@ -822,7 +850,7 @@ class FightSequenceFrame(Frame, ISpellCastProvider):
         if isinstance(msg, GameActionFightDispellSpellMessage):
             gafdsmsg = msg
             if GameDebugManager().buffsDebugActivated:
-                logger.debug(
+                Logger().debug(
                     "[BUFFS DEBUG] Message de retrait des buffs du sort "
                     + str(gafdsmsg.spellId)
                     + " de "
@@ -834,7 +862,7 @@ class FightSequenceFrame(Frame, ISpellCastProvider):
         if isinstance(msg, GameActionFightDispellMessage):
             gafdimsg = msg
             if GameDebugManager().buffsDebugActivated:
-                logger.debug("[BUFFS DEBUG] Message de retrait de tous les buffs de " + str(gafdimsg.targetId))
+                Logger().debug("[BUFFS DEBUG] Message de retrait de tous les buffs de " + str(gafdimsg.targetId))
             self.pushStep(FightDispellStep(gafdimsg.targetId))
             return True
 
@@ -922,7 +950,7 @@ class FightSequenceFrame(Frame, ISpellCastProvider):
             if gafcchmsg.cellId != -1:
                 fightContextFrame_gafcchmsg: "FightContextFrame" = Kernel().worker.getFrame("FightContextFrame")
                 fightContextFrame_gafcchmsg.saveFighterPosition(gafcchmsg.targetId, gafcchmsg.cellId)
-                carried = DofusEntities.getEntity(gafcchmsg.targetId)
+                carried = DofusEntities().getEntity(gafcchmsg.targetId)
                 carriedByCarried = carried.carriedEntity
                 while carriedByCarried:
                     fightContextFrame_gafcchmsg.saveFighterPosition(carriedByCarried.id, gafcchmsg.cellId)
@@ -953,7 +981,7 @@ class FightSequenceFrame(Frame, ISpellCastProvider):
         if isinstance(msg, GameActionFightInvisibleDetectedMessage):
             gafidMsg = msg
             self.pushStep(
-                FightInvisibleTemporarilyDetectedStep(DofusEntities.getEntity(gafidMsg.sourceId), gafidMsg.cellId)
+                FightInvisibleTemporarilyDetectedStep(DofusEntities().getEntity(gafidMsg.sourceId), gafidMsg.cellId)
             )
             FightEntitiesFrame.getCurrentInstance().setLastKnownEntityPosition(gafidMsg.targetId, gafidMsg.cellId)
             FightEntitiesFrame.getCurrentInstance().setLastKnownEntityMovementPoint(gafidMsg.targetId, 0)
@@ -968,23 +996,23 @@ class FightSequenceFrame(Frame, ISpellCastProvider):
             return False
 
         if isinstance(msg, AbstractGameActionMessage):
-            logger.error("Unsupported game action " + msg + " ! This action was discarded.")
+            Logger().error("Unsupported game action " + msg + " ! This action was discarded.")
             return True
 
         else:
             return False
 
     def execute(self, callback: FunctionType = None) -> None:
-        # logger.debug(f"[SEQ DEBUG] Executing sequence #{self._instanceId}")
+        # Logger().debug(f"[SEQ DEBUG] Executing sequence #{self._instanceId}")
         self._sequencer = SerialSequencer(self.FIGHT_SEQUENCERS_CATEGORY)
         self._sequencer.add_listener(SequencerEvent.SEQUENCE_STEP_FINISH, self.onStepEnd)
         if self._parent:
-            # logger.info(
+            # Logger().info(
             #     f"Adding sequence #{self._instanceId} sequencer to parent #{self._parent.instanceId} subsequences"
             # )
             self._parent.addSubSequence(self._sequencer)
         else:
-            # logger.info(f"Executing the sequence #{self._instanceId} right the way")
+            # Logger().info(f"Executing the sequence #{self._instanceId} right the way")
             pass
         self.executeBuffer(callback)
 
@@ -999,13 +1027,13 @@ class FightSequenceFrame(Frame, ISpellCastProvider):
         playerId = PlayedCharacterManager().id
         self.fightEntitiesFrame.getEntityInfos(gafdmsg.sourceId)
         targetInfos = self.fightEntitiesFrame.getEntityInfos(gafdmsg.targetId)
-        
+
         playerInfos = self.fightEntitiesFrame.getEntityInfos(playerId)
         summonDestroyedWithSummoner = False
         summonerIsMe = True
         if (
-            targetInfos and 
-            targetInfos.stats.summoned
+            targetInfos
+            and targetInfos.stats.summoned
             and not isinstance(targetInfos, GameFightFighterNamedInformations)
             and not isinstance(targetInfos, GameFightEntityInformation)
         ):
@@ -1203,7 +1231,7 @@ class FightSequenceFrame(Frame, ISpellCastProvider):
                 gfsfrsmsg = GameFightShowFighterRandomStaticPoseMessage()
                 gfsfrsmsg.init(summon)
                 Kernel().worker.getFrame("process(gfsfrsmsg")
-                illusionCreature = DofusEntities.getEntity(summon.contextualId)
+                illusionCreature = DofusEntities().getEntity(summon.contextualId)
                 if illusionCreature:
                     illusionCreature.visible = False
                 self.pushStep(FightVisibilityStep(summon.contextualId, True))
@@ -1241,11 +1269,11 @@ class FightSequenceFrame(Frame, ISpellCastProvider):
     def fighterHasMoved(self, gmmmsg: GameMapMovementMessage) -> None:
         movementPath: MovementPath = MapMovementAdapter.getClientMovement(gmmmsg.keyMovements)
         movementPathCells: list[int] = movementPath.getCells()
-        logger.debug(f"Fighter {gmmmsg.actorId} has moved following the path {movementPathCells}")
+        Logger().debug(f"Fighter {gmmmsg.actorId} has moved following the path {movementPathCells}")
         fightContextFrame: "FightContextFrame" = Kernel().worker.getFrame("FightContextFrame")
         if not fightContextFrame:
             return
-        movingEntity: IMovable = DofusEntities.getEntity(gmmmsg.actorId)
+        movingEntity: IMovable = DofusEntities().getEntity(gmmmsg.actorId)
         movingEntity.position.cellId = movementPath.end.cellId
         nbCells = len(movementPathCells)
         for i in range(1, nbCells):
@@ -1309,7 +1337,7 @@ class FightSequenceFrame(Frame, ISpellCastProvider):
             description = ""
             if e != None:
                 description = e.description
-            logger.debug(
+            Logger().debug(
                 "\r[BUFFS DEBUG] New Buff '"
                 + description
                 + "' ("
@@ -1387,7 +1415,7 @@ class FightSequenceFrame(Frame, ISpellCastProvider):
 
     def logBuffer(self):
         bufferStepsNames = [_.__class__.__name__ for _ in self._stepsBuffer]
-        logger.debug(f"\r[SEQ DEBUG] Buffer {bufferStepsNames} of sequence #{self._instanceId}")
+        Logger().debug(f"\r[SEQ DEBUG] Buffer {bufferStepsNames} of sequence #{self._instanceId}")
 
     def executeBuffer(self, callback: FunctionType) -> None:
         step: ISequencable = None
@@ -1448,15 +1476,15 @@ class FightSequenceFrame(Frame, ISpellCastProvider):
 
     def subSequenceInitDone(self) -> None:
         self._subSequenceWaitingCount -= 1
-        # logger.debug(
+        # Logger().debug(
         #     f"\r[STEPS DEBUG] sequence #{self._instanceId} has {self._subSequenceWaitingCount} subsequences waiting and {self._scriptInit} script init"
         # )
-        # logger.debug(f"\r[STEPS DEBUG] init subsequence isWaiting {self.isWaiting}, sequencer {self._sequencer}")
+        # Logger().debug(f"\r[STEPS DEBUG] init subsequence isWaiting {self.isWaiting}, sequencer {self._sequencer}")
         if not self.isWaiting and self._sequencer and not self._sequencer.running:
-            # logger.warn("Sub sequence init end -- Run main sequence")
+            # Logger().warn("Sub sequence init end -- Run main sequence")
             self._sequencer.start()
         else:
-            # logger.warn(f"warning did not start sequener of sequence #{self._instanceId}")
+            # Logger().warn(f"warning did not start sequener of sequence #{self._instanceId}")
             pass
 
     def pushTeleportStep(self, fighterId: float, destinationCell: int) -> None:
@@ -1491,7 +1519,7 @@ class FightSequenceFrame(Frame, ISpellCastProvider):
         ]:
             step = FightMovementPointsVariationStep(fighterId, delta, False)
         else:
-            logger.warn(f"Points variation with unsupported action ({actionId}), skipping.")
+            Logger().warn(f"Points variation with unsupported action ({actionId}), skipping.")
             return
         if self.castingSpell is not None:
             step.castingSpellId = self.castingSpell.castingSpellId
@@ -1500,7 +1528,7 @@ class FightSequenceFrame(Frame, ISpellCastProvider):
     def pushStep(self, step: AbstractSequencable) -> None:
         if self.castingSpell is not None:
             step.castingSpellId = self.castingSpell.castingSpellId
-        # logger.debug(
+        # Logger().debug(
         #     f"[SEQ DEBUG] Push step of type {step.__class__.__name__} to buffer of sequence #{self._instanceId}"
         # )
         self._stepsBuffer.append(step)
@@ -1512,7 +1540,7 @@ class FightSequenceFrame(Frame, ISpellCastProvider):
         elif actionId == ActionIdProtocol.ACTION_FIGHT_SPELL_DODGED_PM:
             step = FightMovementPointsLossDodgeStep(fighterId, amount)
         else:
-            logger.warn(f"Points dodge with unsupported action ({actionId}), skipping.")
+            Logger().warn(f"Points dodge with unsupported action ({actionId}), skipping.")
             return
         if self.castingSpell is not None:
             step.castingSpellId = self.castingSpell.castingSpellId
@@ -1582,7 +1610,7 @@ class FightSequenceFrame(Frame, ISpellCastProvider):
         Kernel().worker.process(gfsgmsg)
         if ActionIdHelper.isRevive(actionId):
             self.fightEntitiesFrame.removeLastKilledAlly(entity.spawnInfo.teamId)
-        summonedCreature = DofusEntities.getEntity(entity.contextualId)
+        summonedCreature = DofusEntities().getEntity(entity.contextualId)
         if summonedCreature:
             summonedCreature.visible = False
         self.pushStep(FightSummonStep(sourceId, entity))

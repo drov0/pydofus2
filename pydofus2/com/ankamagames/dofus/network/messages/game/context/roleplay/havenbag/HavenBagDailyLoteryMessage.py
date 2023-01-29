@@ -2,13 +2,11 @@ from pydofus2.com.ankamagames.jerakine.network.NetworkMessage import NetworkMess
 
 
 class HavenBagDailyLoteryMessage(NetworkMessage):
-    returnType:int
-    gameActionId:str
-    
+    returnType: int
+    gameActionId: str
 
-    def init(self, returnType_:int, gameActionId_:str):
+    def init(self, returnType_: int, gameActionId_: str):
         self.returnType = returnType_
         self.gameActionId = gameActionId_
-        
+
         super().__init__()
-    

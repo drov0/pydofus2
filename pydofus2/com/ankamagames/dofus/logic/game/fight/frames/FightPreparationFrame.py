@@ -110,8 +110,6 @@ from pydofus2.com.ankamagames.jerakine.messages.Message import Message
 from pydofus2.com.ankamagames.jerakine.types.enums.Priority import Priority
 from pydofus2.com.ankamagames.jerakine.types.positions.MapPoint import MapPoint
 
-logger = Logger("Dofus2")
-
 
 class FightPreparationFrame(Frame):
 
@@ -294,7 +292,7 @@ class FightPreparationFrame(Frame):
             return True
 
         if isinstance(msg, GameEntityDispositionErrorMessage):
-            logger.error("Cette position n'est pas accessible.")
+            Logger().error("Cette position n'est pas accessible.")
             return True
 
         if isinstance(msg, GameFightReadyAction):

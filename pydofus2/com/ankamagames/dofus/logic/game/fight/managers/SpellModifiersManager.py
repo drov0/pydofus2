@@ -6,8 +6,6 @@ from pydofus2.com.ankamagames.dofus.network.types.game.character.characteristic.
 from pydofus2.com.ankamagames.jerakine.logger.Logger import Logger
 from pydofus2.com.ankamagames.jerakine.metaclasses.Singleton import Singleton
 
-logger = Logger("Dofus2")
-
 
 class SpellModifiersManager(metaclass=Singleton):
 
@@ -16,12 +14,12 @@ class SpellModifiersManager(metaclass=Singleton):
     DATA_STORE_KEY_IS_VERBOSE: str = "spellModifiersManagerIsVerbose"
 
     DEFAULT_IS_VERBOSE: bool = False
-    
+
     def __init__(self):
         self._entitiesMap = dict()
         self._isVerbose = self.DEFAULT_IS_VERBOSE
         super().__init__()
-        logger.info("Instantiating spells manager")
+        Logger().info("Instantiating spells manager")
 
     @property
     def isVerbose(self) -> bool:
@@ -33,15 +31,15 @@ class SpellModifiersManager(metaclass=Singleton):
             return
         self._isVerbose = isVerbose
         verboseAction: str = "enabled" if self._isVerbose else "disabled"
-        logger.info("Verbose mode has been " + verboseAction)
+        Logger().info("Verbose mode has been " + verboseAction)
 
     def reset(self) -> None:
-        logger.info("Singleton instance has been destroyed")
+        Logger().info("Singleton instance has been destroyed")
 
     def setSpellModifiers(self, spellModifiers: SpellModifiers) -> bool:
         spellsModifierStats: dict = None
         if spellModifiers == None:
-            logger.error("Tried to set None spell modifier stats. Aborting")
+            Logger().error("Tried to set None spell modifier stats. Aborting")
             return False
         entityKey: str = str(spellModifiers.entityId)
         spellKey: str = str(spellModifiers.spellId)
@@ -116,19 +114,19 @@ class SpellModifiersManager(metaclass=Singleton):
     def deleteSpellsModifiers(self, entityId: float) -> bool:
         key: str = str(entityId)
         if key not in self._entitiesMap:
-            logger.error(
+            Logger().error(
                 "Tried to del spells modifier stats for entity with ID " + key + ", but none were found. Aborting"
             )
             return False
         del self._entitiesMap[key]
-        logger.info("Spells modifiers for entity with ID " + key + " deleted")
+        Logger().info("Spells modifiers for entity with ID " + key + " deleted")
         return True
 
     def deleteSpellModifiers(self, entityId: float, spellId: float) -> bool:
         entityKey: str = str(entityId)
         spellKey: str = str(spellId)
         if entityKey not in self._entitiesMap:
-            logger.error(
+            Logger().error(
                 "Tried to del spell "
                 + spellKey
                 + " modifiers for entity with ID "
@@ -138,7 +136,7 @@ class SpellModifiersManager(metaclass=Singleton):
             return False
         spellModifiers: SpellModifiers = self._entitiesMap[entityKey]
         if not spellModifiers or spellKey not in spellModifiers:
-            logger.error(
+            Logger().error(
                 "Tried to del spell "
                 + spellKey
                 + " modifiers for entity with ID "
@@ -147,5 +145,5 @@ class SpellModifiersManager(metaclass=Singleton):
             )
             return False
         del spellModifiers[spellKey]
-        logger.info("Spell " + spellKey + " modifiers for entity with ID " + entityKey + " deleted")
+        Logger().info("Spell " + spellKey + " modifiers for entity with ID " + entityKey + " deleted")
         return True

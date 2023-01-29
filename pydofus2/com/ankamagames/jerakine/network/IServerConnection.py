@@ -5,7 +5,6 @@ from pydofus2.com.ankamagames.jerakine.network.RawDataParser import RawDataParse
 
 
 class IServerConnection:
-    
     @property
     def rawParser(self) -> RawDataParser:
         raise NotImplementedError()

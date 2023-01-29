@@ -1,5 +1,3 @@
-
-
 class GameActionFightInvisibilityStateEnum:
     INVISIBLE: int = 1
     DETECTED: int = 2

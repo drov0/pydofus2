@@ -2,15 +2,13 @@ from pydofus2.com.ankamagames.jerakine.network.NetworkMessage import NetworkMess
 
 
 class GuildChangeMemberParametersMessage(NetworkMessage):
-    memberId:int
-    rankId:int
-    experienceGivenPercent:int
-    
+    memberId: int
+    rankId: int
+    experienceGivenPercent: int
 
-    def init(self, memberId_:int, rankId_:int, experienceGivenPercent_:int):
+    def init(self, memberId_: int, rankId_: int, experienceGivenPercent_: int):
         self.memberId = memberId_
         self.rankId = rankId_
         self.experienceGivenPercent = experienceGivenPercent_
-        
+
         super().__init__()
-    

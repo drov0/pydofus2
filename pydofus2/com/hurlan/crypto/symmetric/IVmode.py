@@ -54,11 +54,7 @@ class IVMode:
         if self.iv:
             vec.writeByteArray(self.iv)
         else:
-            vec = ByteArray(
-                self.prng.getrandbits(8 * self.blockSize).to_bytes(
-                    self.blockSize, "big"
-                )
-            )
+            vec = ByteArray(self.prng.getrandbits(8 * self.blockSize).to_bytes(self.blockSize, "big"))
         self.lastIV.length = 0
         self.lastIV.writeByteArray(vec)
         return vec

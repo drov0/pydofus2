@@ -1,6 +1,8 @@
 from pydofus2.com.ankamagames.dofus.datacenter.quest.NpcMessage import NpcMessage
 from pydofus2.com.ankamagames.dofus.datacenter.quest.QuestObjectiveType import QuestObjectiveType
-from pydofus2.com.ankamagames.dofus.datacenter.quest.objectives.QuestObjectiveParameters import QuestObjectiveParameters
+from pydofus2.com.ankamagames.dofus.datacenter.quest.objectives.QuestObjectiveParameters import (
+    QuestObjectiveParameters,
+)
 from pydofus2.com.ankamagames.dofus.types.IdAccessors import IdAccessors
 from pydofus2.com.ankamagames.jerakine.data.GameData import GameData
 from pydofus2.com.ankamagames.jerakine.interfaces.IDataCenter import IDataCenter
@@ -10,8 +12,6 @@ from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
     from pydofus2.com.ankamagames.dofus.datacenter.quest.QuestStep import QuestStep
-
-logger = Logger("Dofus2")
 
 
 class QuestObjective(IDataCenter):
@@ -68,7 +68,7 @@ class QuestObjective(IDataCenter):
     @property
     def text(self) -> str:
         if not self._text:
-            logger.warn("Unknown objective type " + self.typeId + ", cannot display specific, parametrized text.")
+            Logger().warn("Unknown objective type " + self.typeId + ", cannot display specific, parametrized text.")
             self._text = self.type.name
         return self._text
 

@@ -97,9 +97,7 @@ class Signature:
         testedContentLen: int = input.remaining()
         signHash: str = decryptedHash.readUTFBytes(decryptedHash.remaining())[1:]
         output = ByteArray(input.readBytes())
-        contentHash: str = hashlib.md5(
-            output.readUTFBytes(output.remaining())
-        ).hexdigest()[1:]
+        contentHash: str = hashlib.md5(output.readUTFBytes(output.remaining())).hexdigest()[1:]
         if signHash and signHash == contentHash and contentLen == testedContentLen:
             return output
         else:

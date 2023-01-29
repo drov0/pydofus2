@@ -2,13 +2,11 @@ from pydofus2.com.ankamagames.jerakine.network.NetworkMessage import NetworkMess
 
 
 class ExchangeBidHouseSearchMessage(NetworkMessage):
-    objectGID:int
-    follow:bool
-    
+    objectGID: int
+    follow: bool
 
-    def init(self, objectGID_:int, follow_:bool):
+    def init(self, objectGID_: int, follow_: bool):
         self.objectGID = objectGID_
         self.follow = follow_
-        
+
         super().__init__()
-    

@@ -19,7 +19,7 @@ class FightVisibilityStep(AbstractSequencable, IFightStep):
         return "visibility"
 
     def start(self) -> None:
-        entity = DofusEntities.getEntity(self._fighterId)
+        entity = DofusEntities().getEntity(self._fighterId)
         if entity:
             entity.visible = self._visibility
         self.executeCallbacks()

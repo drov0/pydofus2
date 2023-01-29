@@ -2,11 +2,9 @@ from pydofus2.com.ankamagames.jerakine.network.NetworkMessage import NetworkMess
 
 
 class BreachInvitationAnswerMessage(NetworkMessage):
-    accept:bool
-    
+    accept: bool
 
-    def init(self, accept_:bool):
+    def init(self, accept_: bool):
         self.accept = accept_
-        
+
         super().__init__()
-    

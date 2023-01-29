@@ -2,11 +2,9 @@ from pydofus2.com.ankamagames.jerakine.network.NetworkMessage import NetworkMess
 
 
 class CharacterCapabilitiesMessage(NetworkMessage):
-    guildEmblemSymbolCategories:int
-    
+    guildEmblemSymbolCategories: int
 
-    def init(self, guildEmblemSymbolCategories_:int):
+    def init(self, guildEmblemSymbolCategories_: int):
         self.guildEmblemSymbolCategories = guildEmblemSymbolCategories_
-        
+
         super().__init__()
-    

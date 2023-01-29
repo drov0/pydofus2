@@ -2,13 +2,11 @@ from pydofus2.com.ankamagames.jerakine.network.NetworkMessage import NetworkMess
 
 
 class BreachRewardBoughtMessage(NetworkMessage):
-    id:int
-    bought:bool
-    
+    id: int
+    bought: bool
 
-    def init(self, id_:int, bought_:bool):
+    def init(self, id_: int, bought_: bool):
         self.id = id_
         self.bought = bought_
-        
+
         super().__init__()
-    

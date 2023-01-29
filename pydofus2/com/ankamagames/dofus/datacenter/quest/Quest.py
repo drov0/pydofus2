@@ -14,8 +14,6 @@ from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from pydofus2.com.ankamagames.dofus.datacenter.quest.QuestStep import QuestStep
 
-logger = Logger("Dofus2")
-
 
 class Quest(IDataCenter):
 

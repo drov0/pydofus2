@@ -2,9 +2,6 @@ from pydofus2.com.ankamagames.dofus.network.messages.authorized.AdminCommandMess
 
 
 class AdminQuietCommandMessage(AdminCommandMessage):
-    
+    def init(self, content_: str):
 
-    def init(self, content_:str):
-        
         super().init(content_)
-    

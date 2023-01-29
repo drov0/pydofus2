@@ -2,9 +2,6 @@ from pydofus2.com.ankamagames.jerakine.network.NetworkMessage import NetworkMess
 
 
 class ExchangeSellOkMessage(NetworkMessage):
-    
-
     def init(self):
-        
+
         super().__init__()
-    

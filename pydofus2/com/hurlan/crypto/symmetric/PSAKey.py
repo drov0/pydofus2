@@ -3,8 +3,6 @@ from Cryptodome.PublicKey import RSA as RSA
 from pydofus2.com.ankamagames.jerakine.network.CustomDataWrapper import ByteArray
 from pydofus2.com.hurlan.crypto.symmetric.IPad import IPad
 
-logger = Logger("Dofus2")
-
 
 class RSACipher:
     def __init__(self, key: RSA.RsaKey, padding: IPad) -> None:
@@ -21,7 +19,7 @@ class RSACipher:
             b = chunk.to_bytes(self.blockSize, "big", signed=False)
             plain_text_block = self.padding.unpad(b, 1)
             if not plain_text_block:
-                logger.error("Decrypt error - padding function returned None!")
+                Logger().error("Decrypt error - padding function returned None!")
                 return False
             out.writeByteArray(plain_text_block)
         out.position = 0

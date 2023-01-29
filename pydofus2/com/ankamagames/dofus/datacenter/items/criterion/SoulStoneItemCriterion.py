@@ -49,9 +49,7 @@ class SoulStoneItemCriterion(ItemCriterion, IDataCenter):
 
     @property
     def text(self) -> str:
-        return I18n.getUiText(
-            "ui.tooltip.possessSoulStone", [self._quantityMonster, self._monsterName]
-        )
+        return I18n.getUiText("ui.tooltip.possessSoulStone", [self._quantityMonster, self._monsterName])
 
     def clone(self) -> IItemCriterion:
         return SoulStoneItemCriterion(self.basicText)

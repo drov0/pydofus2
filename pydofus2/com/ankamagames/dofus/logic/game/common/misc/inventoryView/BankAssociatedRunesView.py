@@ -32,9 +32,7 @@ class BankAssociatedRunesView(StorageGenericView):
         return "bankAssociatedRunes"
 
     def isListening(self, rune: ItemWrapper) -> bool:
-        itemEffects: list[EffectInstance] = self._item.effects.extend(
-            self._item.possibleEffects
-        )
+        itemEffects: list[EffectInstance] = self._item.effects.extend(self._item.possibleEffects)
         if rune.typeId != DataEnum.ITEM_TYPE_SMITHMAGIC_RUNE:
             return False
         runeEffects = rune.effects.extend(rune.possibleEffects)
@@ -47,14 +45,10 @@ class BankAssociatedRunesView(StorageGenericView):
                     return True
         return False
 
-    def addItem(
-        self, item: ItemWrapper, invisible: int, needUpdateView: bool = True
-    ) -> None:
+    def addItem(self, item: ItemWrapper, invisible: int, needUpdateView: bool = True) -> None:
         super().addItem(item, invisible, needUpdateView)
 
-    def modifyItem(
-        self, item: ItemWrapper, oldItem: ItemWrapper, invisible: int
-    ) -> None:
+    def modifyItem(self, item: ItemWrapper, oldItem: ItemWrapper, invisible: int) -> None:
         super().modifyItem(item, oldItem, invisible)
 
     def updateView(self) -> None:

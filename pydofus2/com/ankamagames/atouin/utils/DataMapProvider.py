@@ -1,3 +1,4 @@
+from pydofus2.com.ankamagames.dofus.types.entities.AnimatedCharacter import AnimatedCharacter
 from pydofus2.com.ankamagames.jerakine.logger.Logger import Logger
 from pydofus2.com.ankamagames.atouin.AtouinConstants import AtouinConstants
 from typing import TYPE_CHECKING
@@ -12,22 +13,17 @@ from pydofus2.com.ankamagames.jerakine.metaclasses.Singleton import Singleton
 from pydofus2.com.ankamagames.jerakine.types.positions.MapPoint import MapPoint
 from pydofus2.mapTools import MapTools
 
-logger = Logger("Dofus2")
-
 
 class DataMapProvider(IDataMapProvider, metaclass=Singleton):
     TOLERANCE_ELEVATION: int = 11
-    obstaclesCells = list[int]()
-    _updatedCell = dict()
-    _specialEffects = dict()
-    _playerobject = None
-    isInFight = False
 
     def __init__(self):
         super().__init__()
-
-    def init(self, playerobject: object):
-        self._playerobject = playerobject
+        self.obstaclesCells = list[int]()
+        self._updatedCell = dict()
+        self._specialEffects = dict()
+        self.isInFight = False
+        self._playerobject = AnimatedCharacter
 
     def pointLos(self, x: int, y: int, bAllowTroughEntity: bool = True) -> bool:
         cellId: int = MapTools.getCellIdByCoord(x, y)
@@ -90,7 +86,7 @@ class DataMapProvider(IDataMapProvider, metaclass=Singleton):
                 ):
                     mov = False
             if not bAllowTroughEntity:
-                # logger.debug(f"avoiding through entity {list(EntitiesManager().entities.keys())}")
+                # Logger().debug(f"avoiding through entity {list(EntitiesManager().entities.keys())}")
                 for e in EntitiesManager().entities.values():
                     if isinstance(e, IObstacle) and e.position and e.position.cellId == cellId:
                         if not (endCellId == cellId and e.canWalkTo):

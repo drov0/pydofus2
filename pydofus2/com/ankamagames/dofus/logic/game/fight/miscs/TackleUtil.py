@@ -44,41 +44,29 @@ class TackleUtil:
         position: MapPoint,
     ) -> float:
         stats: EntityStats = StatsManager().getStats(playerInfos.contextualId)
-        entitiesFrame: "FightEntitiesFrame" = (
-            Kernel().worker.getFrame("FightEntitiesFrame")
-        )
+        entitiesFrame: "FightEntitiesFrame" = Kernel().worker.getFrame("FightEntitiesFrame")
         if Constants.DETERMINIST_TACKLE:
             if not cls.canBeTackled(playerInfos, position):
                 return 1
             x = position.x
             y = position.y
             tackleEvadeStat = stats.getStat(StatIds.TACKLE_EVADE)
-            evade = (
-                int(tackleEvadeStat.totalValue) if tackleEvadeStat is not None else 0
-            )
+            evade = int(tackleEvadeStat.totalValue) if tackleEvadeStat is not None else 0
             if evade < 0:
                 evade = 0
             entities = list[IEntity]()
 
             if MapPoint.isInMap(x - 1, y):
-                entities.append(
-                    cls.getTacklerOnCell(MapTools.getCellIdByCoord(x - 1, y))
-                )
+                entities.append(cls.getTacklerOnCell(MapTools.getCellIdByCoord(x - 1, y)))
 
             if MapPoint.isInMap(x + 1, y):
-                entities.append(
-                    cls.getTacklerOnCell(MapTools.getCellIdByCoord(x + 1, y))
-                )
+                entities.append(cls.getTacklerOnCell(MapTools.getCellIdByCoord(x + 1, y)))
 
             if MapPoint.isInMap(x, y - 1):
-                entities.append(
-                    cls.getTacklerOnCell(MapTools.getCellIdByCoord(x, y - 1))
-                )
+                entities.append(cls.getTacklerOnCell(MapTools.getCellIdByCoord(x, y - 1)))
 
             if MapPoint.isInMap(x, y + 1):
-                entities.append(
-                    cls.getTacklerOnCell(MapTools.getCellIdByCoord(x, y + 1))
-                )
+                entities.append(cls.getTacklerOnCell(MapTools.getCellIdByCoord(x, y + 1)))
 
             evadePercent = 1
             for entity in entities:
@@ -113,19 +101,11 @@ class TackleUtil:
         if not cls.canBeTackler(tackler, tackled):
             return 1
         tackledStats: EntityStats = StatsManager().getStats(tackled.contextualId)
-        evade: int = (
-            int(tackledStats.getStatTotalValue(StatIds.TACKLE_EVADE))
-            if tackledStats is not None
-            else 0
-        )
+        evade: int = int(tackledStats.getStatTotalValue(StatIds.TACKLE_EVADE)) if tackledStats is not None else 0
         if evade < 0:
             evade = 0
         tacklerStats: EntityStats = StatsManager().getStats(tackler.contextualId)
-        tackle: int = (
-            int(tacklerStats.getStatTotalValue(StatIds.TACKLE_BLOCK))
-            if tacklerStats is not None
-            else 0
-        )
+        tackle: int = int(tacklerStats.getStatTotalValue(StatIds.TACKLE_BLOCK)) if tacklerStats is not None else 0
         if tackle < 0:
             tackle = 0
         return (evade + 2) / (tackle + 2) / 2
@@ -134,49 +114,29 @@ class TackleUtil:
     def getTacklerOnCell(cls, cellId: int) -> IEntity:
         entity: "AnimatedCharacter" = None
         infos: "GameFightFighterInformations" = None
-        entitiesFrame: "FightEntitiesFrame" = (
-            Kernel().worker.getFrame("FightEntitiesFrame")
-        )
-        entities: list[IEntity] = EntitiesManager().getEntitiesOnCell(
-            cellId, AnimatedCharacter
-        )
+        entitiesFrame: "FightEntitiesFrame" = Kernel().worker.getFrame("FightEntitiesFrame")
+        entities: list[IEntity] = EntitiesManager().getEntitiesOnCell(cellId, AnimatedCharacter)
         for entity in entities:
-            infos: "GameFightFighterInformations" = entitiesFrame.getEntityInfos(
-                entity.id
-            )
-            if infos and isinstance(
-                infos.disposition, FightEntityDispositionInformations
-            ):
-                if not FightersStateManager().hasState(
-                    entity.id, DataEnum.SPELL_STATE_CARRIED
-                ):
+            infos: "GameFightFighterInformations" = entitiesFrame.getEntityInfos(entity.id)
+            if infos and isinstance(infos.disposition, FightEntityDispositionInformations):
+                if not FightersStateManager().hasState(entity.id, DataEnum.SPELL_STATE_CARRIED):
                     return entity
         return None
 
     @classmethod
-    def canBeTackled(
-        cls, fighter: "GameFightFighterInformations", position: "MapPoint" = None
-    ) -> bool:
+    def canBeTackled(cls, fighter: "GameFightFighterInformations", position: "MapPoint" = None) -> bool:
         fedi: "FightEntityDispositionInformations" = None
         if (
-            FightersStateManager().hasState(
-                fighter.contextualId, DataEnum.SPELL_STATE_CANT_BE_LOCKED
-            )
-            or FightersStateManager().hasState(
-                fighter.contextualId, DataEnum.SPELL_STATE_ROOTED
-            )
-            or fighter.stats.invisibilityState
-            == GameActionFightInvisibilityStateEnum.INVISIBLE
-            or fighter.stats.invisibilityState
-            == GameActionFightInvisibilityStateEnum.DETECTED
+            FightersStateManager().hasState(fighter.contextualId, DataEnum.SPELL_STATE_CANT_BE_LOCKED)
+            or FightersStateManager().hasState(fighter.contextualId, DataEnum.SPELL_STATE_ROOTED)
+            or fighter.stats.invisibilityState == GameActionFightInvisibilityStateEnum.INVISIBLE
+            or fighter.stats.invisibilityState == GameActionFightInvisibilityStateEnum.DETECTED
             or FightersStateManager().getStatus(fighter.contextualId).cantBeTackled
         ):
             return False
         if isinstance(fighter.disposition, FightEntityDispositionInformations):
             fedi = fighter.disposition
-            if fedi.carryingCharacterId and (
-                (not position or fighter.disposition.cellId == position.cellId)
-            ):
+            if fedi.carryingCharacterId and ((not position or fighter.disposition.cellId == position.cellId)):
                 return False
         return True
 
@@ -188,28 +148,16 @@ class TackleUtil:
     ) -> bool:
         monster: Monster = None
         if (
-            FightersStateManager().hasState(
-                fighter.contextualId, DataEnum.SPELL_STATE_CARRIED
-            )
-            or FightersStateManager().hasState(
-                fighter.contextualId, DataEnum.SPELL_STATE_ROOTED
-            )
-            or FightersStateManager().hasState(
-                fighter.contextualId, DataEnum.SPELL_STATE_CANT_LOCK
-            )
-            or fighter.stats.invisibilityState
-            == GameActionFightInvisibilityStateEnum.INVISIBLE
-            or fighter.stats.invisibilityState
-            == GameActionFightInvisibilityStateEnum.DETECTED
+            FightersStateManager().hasState(fighter.contextualId, DataEnum.SPELL_STATE_CARRIED)
+            or FightersStateManager().hasState(fighter.contextualId, DataEnum.SPELL_STATE_ROOTED)
+            or FightersStateManager().hasState(fighter.contextualId, DataEnum.SPELL_STATE_CANT_LOCK)
+            or fighter.stats.invisibilityState == GameActionFightInvisibilityStateEnum.INVISIBLE
+            or fighter.stats.invisibilityState == GameActionFightInvisibilityStateEnum.DETECTED
             or FightersStateManager().getStatus(fighter.contextualId).cantTackle
         ):
             return False
-        entitiesFrame: "FightEntitiesFrame" = (
-            Kernel().worker.getFrame("FightEntitiesFrame")
-        )
-        infos: "GameFightFighterInformations" = entitiesFrame.getEntityInfos(
-            fighter.contextualId
-        )
+        entitiesFrame: "FightEntitiesFrame" = Kernel().worker.getFrame("FightEntitiesFrame")
+        infos: "GameFightFighterInformations" = entitiesFrame.getEntityInfos(fighter.contextualId)
         if infos and infos.spawnInfo.teamId == target.spawnInfo.teamId:
             return False
         if isinstance(fighter, GameFightMonsterInformations):
@@ -227,13 +175,9 @@ class TackleUtil:
     ) -> bool:
         stats: EntityStats = StatsManager().getStats(pPlayer.contextualId)
         tackleEvadeStat: Stat = stats.getStat(StatIds.TACKLE_EVADE)
-        evade: int = (
-            int(tackleEvadeStat.totalValue) if tackleEvadeStat is not None else 0
-        )
+        evade: int = int(tackleEvadeStat.totalValue) if tackleEvadeStat is not None else 0
         tackleBlockStat: Stat = stats.getStat(StatIds.TACKLE_BLOCK)
-        block: int = (
-            int(tackleBlockStat.totalValue) if tackleBlockStat is not None else 0
-        )
+        block: int = int(tackleBlockStat.totalValue) if tackleBlockStat is not None else 0
         if pPlayerPath and cls.canBeTackler(pTackler, pPlayer):
             for pe in pPlayerPath:
                 if cls.canBeTackled(pPlayer, pe.step):
@@ -245,7 +189,5 @@ class TackleUtil:
                             if ac and ac.id == pTackler.contextualId:
                                 playerEvasion = 0 if evade < 0 else int(evade)
                                 tacklerBlock = 0 if block < 0 else int(block)
-                                return (
-                                    (playerEvasion + 2) / (tacklerBlock + 2) / 2
-                                ) < 1
+                                return ((playerEvasion + 2) / (tacklerBlock + 2) / 2) < 1
         return False

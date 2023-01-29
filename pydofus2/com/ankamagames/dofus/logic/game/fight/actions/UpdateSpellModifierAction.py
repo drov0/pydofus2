@@ -10,9 +10,7 @@ class UpdateSpellModifierAction(AbstractAction, Action):
         self._statId = statId
 
     @classmethod
-    def create(
-        cls, entityId: float, spellId: float, statId: float
-    ) -> "UpdateSpellModifierAction":
+    def create(cls, entityId: float, spellId: float, statId: float) -> "UpdateSpellModifierAction":
         return cls(entityId, spellId, statId)
 
     @property

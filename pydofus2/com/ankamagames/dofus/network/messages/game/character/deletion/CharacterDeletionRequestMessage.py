@@ -2,13 +2,11 @@ from pydofus2.com.ankamagames.jerakine.network.NetworkMessage import NetworkMess
 
 
 class CharacterDeletionRequestMessage(NetworkMessage):
-    characterId:int
-    secretAnswerHash:str
-    
+    characterId: int
+    secretAnswerHash: str
 
-    def init(self, characterId_:int, secretAnswerHash_:str):
+    def init(self, characterId_: int, secretAnswerHash_: str):
         self.characterId = characterId_
         self.secretAnswerHash = secretAnswerHash_
-        
+
         super().__init__()
-    

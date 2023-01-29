@@ -200,25 +200,13 @@ class ActionIdHelper:
 
     @classmethod
     def isBasedOnCasterLifeMissing(cls, param1: int) -> bool:
-        if (
-            param1 == 279
-            or param1 == 275
-            or param1 == 276
-            or param1 == 277
-            or param1 == 278
-        ):
+        if param1 == 279 or param1 == 275 or param1 == 276 or param1 == 277 or param1 == 278:
             return True
         return False
 
     @classmethod
     def isBasedOnCasterLifeMissingMaxLife(cls, param1: int) -> bool:
-        if (
-            param1 == 1118
-            or param1 == 1121
-            or param1 == 1122
-            or param1 == 1119
-            or param1 == 1120
-        ):
+        if param1 == 1118 or param1 == 1121 or param1 == 1122 or param1 == 1119 or param1 == 1120:
             return True
         return False
 
@@ -270,26 +258,13 @@ class ActionIdHelper:
 
     @classmethod
     def isBasedOnMovementPoints(cls, param1: int) -> bool:
-        if (
-            param1 == 1012
-            or param1 == 1013
-            or param1 == 1016
-            or param1 == 1015
-            or param1 == 1014
-        ):
+        if param1 == 1012 or param1 == 1013 or param1 == 1016 or param1 == 1015 or param1 == 1014:
             return True
         return False
 
     @classmethod
     def isBasedOnTargetLifePercent(cls, param1: int) -> bool:
-        if (
-            param1 == 1071
-            or param1 == 1068
-            or param1 == 1070
-            or param1 == 1067
-            or param1 == 1069
-            or param1 == 1048
-        ):
+        if param1 == 1071 or param1 == 1068 or param1 == 1070 or param1 == 1067 or param1 == 1069 or param1 == 1048:
             return True
         return False
 
@@ -310,9 +285,7 @@ class ActionIdHelper:
 
     @classmethod
     def isBasedOnTargetLife(cls, param1: int) -> bool:
-        if not (
-            cls.isBasedOnTargetLifePercent(param1) or cls.isBasedOnTargetMaxLife(param1)
-        ):
+        if not (cls.isBasedOnTargetLifePercent(param1) or cls.isBasedOnTargetMaxLife(param1)):
             return bool(cls.isBasedOnTargetLifeMissingMaxLife(param1))
         return True
 
@@ -322,13 +295,7 @@ class ActionIdHelper:
 
     @classmethod
     def isBasedOnTargetLifeMissingMaxLife(cls, param1: int) -> bool:
-        if (
-            param1 == 1092
-            or param1 == 1095
-            or param1 == 1096
-            or param1 == 1093
-            or param1 == 1094
-        ):
+        if param1 == 1092 or param1 == 1095 or param1 == 1096 or param1 == 1093 or param1 == 1094:
             return True
         return False
 
@@ -751,10 +718,9 @@ class ActionIdHelper:
 
     @classmethod
     def isStatModifier(cls, actionId: int) -> bool:
-        if (
-            actionId in cls.STAT_BUFF_ACTION_IDS
-            or actionId in cls.STAT_DEBUFF_ACTION_IDS
-        ) and not cls.isShield(actionId):
+        if (actionId in cls.STAT_BUFF_ACTION_IDS or actionId in cls.STAT_DEBUFF_ACTION_IDS) and not cls.isShield(
+            actionId
+        ):
             return True
         return False
 
@@ -796,13 +762,7 @@ class ActionIdHelper:
 
     @classmethod
     def isStatSteal(cls, param1: int) -> bool:
-        if not (
-            param1 == 266
-            or param1 == 267
-            or param1 == 268
-            or param1 == 269
-            or param1 == 270
-        ):
+        if not (param1 == 266 or param1 == 267 or param1 == 268 or param1 == 269 or param1 == 270):
             return param1 == 271
         return True
 

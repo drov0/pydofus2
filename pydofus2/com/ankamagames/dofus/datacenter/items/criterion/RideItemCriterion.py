@@ -9,13 +9,9 @@ class RideItemCriterion(ItemCriterion, IDataCenter):
         if _criterionValue == 0 or not mountModel:
             return ""
         if _operator.text == ItemCriterionOperator.EQUAL:
-            readableCriterion = I18n.getUiText(
-                "ui.tooltip.mountEquiped", [mountModel.name]
-            )
+            readableCriterion = I18n.getUiText("ui.tooltip.mountEquiped", [mountModel.name])
         elif _operator.text == ItemCriterionOperator.DIFFERENT:
-            readableCriterion = I18n.getUiText(
-                "ui.tooltip.mountNonEquiped", [mountModel.name]
-            )
+            readableCriterion = I18n.getUiText("ui.tooltip.mountNonEquiped", [mountModel.name])
         return readableCriterion
 
     def clone(self) -> IItemCriterion:

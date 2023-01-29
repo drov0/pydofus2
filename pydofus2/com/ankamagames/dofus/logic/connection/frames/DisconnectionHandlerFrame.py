@@ -25,8 +25,6 @@ from pydofus2.com.ankamagames.jerakine.network.messages.UnexpectedSocketClosureM
 from pydofus2.com.ankamagames.jerakine.types.enums.Priority import Priority
 import pydofus2.com.ankamagames.dofus.logic.game.approach.frames.GameServerApproachFrame as gsaF
 
-logger = Logger("Dofus2")
-
 
 class DisconnectionHandlerFrame(Frame):
 
@@ -47,12 +45,12 @@ class DisconnectionHandlerFrame(Frame):
         self._conxTries = 0
 
     def pushed(self) -> bool:
-        logger.debug("DisconnectionHandlerFrame pushed")
+        Logger().debug("DisconnectionHandlerFrame pushed")
         return True
 
     def handleUnexpectedNoMsgReceived(self):
         self._conxTries += 1
-        logger.warn(
+        Logger().warn(
             f"The connection was closed unexpectedly. Reconnection attempt {self._conxTries}/{self.MAX_TRIES} will start in 4s."
         )
         self._connectionUnexpectedFailureTimes.append(perf_counter())
@@ -62,29 +60,34 @@ class DisconnectionHandlerFrame(Frame):
     @property
     def connection(self):
         return self.connHandle.conn
-    
+
     @property
     def connHandle(self):
         return connh.ConnectionsHandler()
-    
+
     def process(self, msg: Message) -> bool:
 
         if isinstance(msg, ServerConnectionClosedMessage):
             gsaF.GameServerApproachFrame.authenticationTicketAccepted = False
             reason = self.connHandle.handleDisconnection()
             if self.connHandle.hasReceivedMsg:
-                if not reason.expected and not self.connHandle.hasReceivedNetworkMsg and self._conxTries < self.MAX_TRIES:
+                if (
+                    not reason.expected
+                    and not self.connHandle.hasReceivedNetworkMsg
+                    and self._conxTries < self.MAX_TRIES
+                ):
                     self.handleUnexpectedNoMsgReceived()
                 else:
                     if not reason.expected:
-                        logger.debug(f"The connection was closed unexpectedly. Reseting.")
+                        Logger().debug(f"The connection was closed unexpectedly. Reseting.")
                         self._connectionUnexpectedFailureTimes.append(perf_counter())
                         if self._timer:
                             self._timer.cancel()
                         self._timer = BenchmarkTimer(10, self.reconnect)
                         self._timer.start()
                     else:
-                        if (reason.reason == Reason.SWITCHING_TO_HUMAN_VENDOR
+                        if (
+                            reason.reason == Reason.SWITCHING_TO_HUMAN_VENDOR
                             or reason.reason == Reason.WANTED_SHUTDOWN
                             or reason.reason == Reason.EXCEPTION_THROWN
                         ):
@@ -92,20 +95,22 @@ class DisconnectionHandlerFrame(Frame):
                                 KernelEventsManager().send(KernelEvts.CRASH, message=reason.message)
                             else:
                                 KernelEventsManager().send(KernelEvts.SHUTDOWN, message=reason.message)
-                        elif reason.reason == Reason.RESTARTING or \
-                            reason.reason == Reason.DISCONNECTED_BY_POPUP or \
-                            reason.reason == Reason.CONNECTION_LOST:
+                        elif (
+                            reason.reason == Reason.RESTARTING
+                            or reason.reason == Reason.DISCONNECTED_BY_POPUP
+                            or reason.reason == Reason.CONNECTION_LOST
+                        ):
                             KernelEventsManager().send(KernelEvts.RESTART, message=reason.message)
                         else:
                             Kernel().worker.process(ExpectedSocketClosureMessage(reason.reason))
             else:
-                logger.warn("The connection hasn't even start.")
+                Logger().warn("The connection hasn't even start.")
             return True
 
         elif isinstance(msg, WrongSocketClosureReasonMessage):
             wscrmsg = msg
             gsaF.GameServerApproachFrame.authenticationTicketAccepted = False
-            logger.error(
+            Logger().error(
                 "Expecting socket closure for reason "
                 + str(wscrmsg.expectedReason)
                 + ", got reason "
@@ -116,19 +121,19 @@ class DisconnectionHandlerFrame(Frame):
             return True
 
         elif isinstance(msg, UnexpectedSocketClosureMessage):
-            logger.debug("got hook UnexpectedSocketClosure")
+            Logger().debug("got hook UnexpectedSocketClosure")
             gsaF.GameServerApproachFrame.authenticationTicketAccepted = False
             KernelEventsManager().send(KernelEvts.CRASH, message="Unexpected socket closure")
             return True
 
         elif isinstance(msg, ConnectionProcessCrashedMessage):
-            logger.debug("Connection process crashed with error : " + msg.err)
+            Logger().debug("Connection process crashed with error : " + msg.err)
             gsaF.GameServerApproachFrame.authenticationTicketAccepted = False
             raise Exception(msg.err)
 
     def reconnect(self) -> None:
-        logger.debug("Reconnecting...")
-        Kernel().reset(reloadData=True, autoRetry=True)
+        Logger().debug("Reconnecting...")
+        KernelEventsManager().send(KernelEvts.RECONNECT)
 
     def pulled(self) -> bool:
         return True

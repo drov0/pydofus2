@@ -2,11 +2,9 @@ from pydofus2.com.ankamagames.dofus.network.types.game.shortcut.Shortcut import 
 
 
 class ShortcutSpell(Shortcut):
-    spellId:int
-    
+    spellId: int
 
-    def init(self, spellId_:int, slot_:int):
+    def init(self, spellId_: int, slot_: int):
         self.spellId = spellId_
-        
+
         super().init(slot_)
-    

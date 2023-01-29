@@ -6,8 +6,6 @@ from pydofus2.com.ankamagames.dofus.logic.game.fight.actions.UpdateSpellModifier
 import pydofus2.com.ankamagames.dofus.logic.game.fight.managers.SpellModifiersManager as spellmm
 from pydofus2.com.ankamagames.jerakine.logger.Logger import Logger
 
-logger = Logger("Dofus2")
-
 
 class SpellModifiers:
     def __init__(self, entityId: float, spellId: float):
@@ -48,7 +46,7 @@ class SpellModifiers:
         modifier.spellId = self._spellId
         self._modifiers[str(modifier.id)] = modifier
         if self.isVerbose:
-            logger.info(
+            Logger().info(
                 "Set modifier for entity with ID "
                 + str(self.entityId)
                 + " and spell with ID "
@@ -70,7 +68,7 @@ class SpellModifiers:
         modifierKey: str = str(modifierId)
         modifier: SpellModifier = self._modifiers[modifierKey]
         if self.isVerbose:
-            logger.info(
+            Logger().info(
                 "Deleted modifier for entity with ID "
                 + str(self._entityId)
                 + " and spell with ID "
@@ -82,7 +80,7 @@ class SpellModifiers:
 
     def resetModifiers(self) -> None:
         if self.isVerbose:
-            logger.info(
+            Logger().info(
                 "Modifiers reset for entity with ID "
                 + str(self._entityId)
                 + " and spell with ID "

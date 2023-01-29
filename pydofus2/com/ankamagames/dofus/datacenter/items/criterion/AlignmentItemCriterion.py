@@ -19,18 +19,12 @@ class AlignmentItemCriterion(ItemCriterion, IDataCenter):
 
     @property
     def text(self) -> str:
-        readableCriterionValue: str = AlignmentSide.getAlignmentSideById(
-            int(self._criterionValue)
-        ).name
+        readableCriterionValue: str = AlignmentSide.getAlignmentSideById(int(self._criterionValue)).name
         readableCriterionRef: str = I18n.getUiText("ui.common.alignment")
         readableOperator: str = ":"
         if self._operator.text == ItemCriterionOperator.DIFFERENT:
-            readableOperator = I18n.getUiText(
-                "ui.common.differentFrom"
-            ) + I18n.getUiText("ui.common.colon")
-        return (
-            readableCriterionRef + " " + readableOperator + " " + readableCriterionValue
-        )
+            readableOperator = I18n.getUiText("ui.common.differentFrom") + I18n.getUiText("ui.common.colon")
+        return readableCriterionRef + " " + readableOperator + " " + readableCriterionValue
 
     def clone(self) -> IItemCriterion:
         return AlignmentItemCriterion(self.basicText)

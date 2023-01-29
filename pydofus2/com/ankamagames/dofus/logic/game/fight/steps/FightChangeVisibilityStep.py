@@ -55,7 +55,7 @@ class FightChangeVisibilityStep(AbstractSequencable, IFightStep):
 
             if isinstance(invisibleEntity, AnimatedCharacter):
                 invisibleEntityPos = invisibleEntity.position
-                entitiesFrame: FightEntitiesFrame = Kernel().worker.getFrame('FightEntitiesFrame')
+                entitiesFrame: FightEntitiesFrame = Kernel().worker.getFrame("FightEntitiesFrame")
                 fightEntities = entitiesFrame.entities
                 for entityId in fightEntities:
                     entityInfos = entitiesFrame.getEntityInfos(entityId)
@@ -102,7 +102,7 @@ class FightChangeVisibilityStep(AbstractSequencable, IFightStep):
     def unspawnEntity(self) -> None:
         if FightEntitiesHolder().getEntity(self._entityId):
             return
-        entity: IDisplayable = DofusEntities.getEntity(self._entityId)
+        entity: IDisplayable = DofusEntities().getEntity(self._entityId)
         FightEntitiesHolder().holdEntity(entity)
 
     def respawnEntity(self) -> IEntity:
@@ -114,4 +114,4 @@ class FightChangeVisibilityStep(AbstractSequencable, IFightStep):
             return tiphonSprite
         if FightEntitiesHolder().getEntity(self._entityId):
             FightEntitiesHolder().unholdEntity(self._entityId)
-        return DofusEntities.getEntity(self._entityId)
+        return DofusEntities().getEntity(self._entityId)

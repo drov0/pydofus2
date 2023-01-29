@@ -3,7 +3,7 @@ from pydofus2.com.ankamagames.jerakine.sequencer.ISequencable import ISequencabl
 from pydofus2.com.ankamagames.jerakine.sequencer.ISequencableListener import ISequencableListener
 
 
-class ISequencer(ISequencableListener,EventDispatcher):
+class ISequencer(ISequencableListener, EventDispatcher):
     def addStep(self, param1: ISequencable) -> None:
         pass
 

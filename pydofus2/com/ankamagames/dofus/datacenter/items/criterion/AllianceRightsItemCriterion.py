@@ -41,25 +41,17 @@ class AllianceRightsItemCriterion(ItemCriterion, IDataCenter):
         if self.value == AllianceRightsBitEnum.ALLIANCE_RIGHT_KICK_GUILDS:
             readableCriterionValue = I18n.getUiText("ui.social.guildRightsBann")
         if self.value == AllianceRightsBitEnum.ALLIANCE_RIGHT_MANAGE_PRISMS:
-            readableCriterionValue = I18n.getUiText(
-                "ui.social.guildRightsSetAlliancePrism"
-            )
+            readableCriterionValue = I18n.getUiText("ui.social.guildRightsSetAlliancePrism")
         if self.value == AllianceRightsBitEnum.ALLIANCE_RIGHT_MANAGE_RIGHTS:
             readableCriterionValue = I18n.getUiText("ui.social.guildManageRights")
         if self.value == AllianceRightsBitEnum.ALLIANCE_RIGHT_RECRUIT_GUILDS:
             readableCriterionValue = I18n.getUiText("ui.social.guildRightsInvit")
         if self.value == AllianceRightsBitEnum.ALLIANCE_RIGHT_TALK_IN_CHAN:
-            readableCriterionValue = I18n.getUiText(
-                "ui.social.guildRightsTalkInAllianceChannel"
-            )
+            readableCriterionValue = I18n.getUiText("ui.social.guildRightsTalkInAllianceChannel")
         if self.operator.text == ItemCriterionOperator.EQUAL:
-            readableCriterion = I18n.getUiText(
-                "ui.criterion.allianceRights", [readableCriterionValue]
-            )
+            readableCriterion = I18n.getUiText("ui.criterion.allianceRights", [readableCriterionValue])
         if self.operator.text == ItemCriterionOperator.DIFFERENT:
-            readableCriterion = I18n.getUiText(
-                "ui.criterion.notAllianceRights", [readableCriterionValue]
-            )
+            readableCriterion = I18n.getUiText("ui.criterion.notAllianceRights", [readableCriterionValue])
         return readableCriterion
 
     def clone(self) -> IItemCriterion:

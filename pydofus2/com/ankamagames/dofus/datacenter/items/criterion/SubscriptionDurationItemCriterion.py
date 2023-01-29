@@ -21,16 +21,8 @@ class SubscriptionDurationItemCriterion(ItemCriterion, IDataCenter):
             self._criterionValue <= 1,
             self._criterionValue == 0,
         )
-        readableCriterionRef: str = I18n.getUiText(
-            "ui.veteran.totalSubscriptionDuration"
-        )
-        return (
-            readableCriterionRef
-            + " "
-            + self._operator.text
-            + " "
-            + readableCriterionValue
-        )
+        readableCriterionRef: str = I18n.getUiText("ui.veteran.totalSubscriptionDuration")
+        return readableCriterionRef + " " + self._operator.text + " " + readableCriterionValue
 
     def clone(self) -> IItemCriterion:
         return SubscriptionDurationItemCriterion(self.basicText)

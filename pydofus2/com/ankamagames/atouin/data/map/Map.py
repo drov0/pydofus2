@@ -8,8 +8,6 @@ from pydofus2.com.ankamagames.jerakine.logger.Logger import Logger
 from pydofus2.com.ankamagames.jerakine.types.enums.DirectionsEnum import DirectionsEnum
 from pydofus2.com.ankamagames.jerakine.types.positions.MapPoint import MapPoint
 
-logger = Logger("Dofus2")
-
 
 class Map:
     def __init__(self, raw: BinaryStream, id, version: int):
@@ -176,10 +174,10 @@ class Map:
         return neighbours
 
     def getDirectionToNeighbor(self, dstMapId):
-        logger.debug("current map id: %d", self.id)
+        Logger().debug("current map id: %d", self.id)
         for direction in DirectionsEnum.getMapChangeDirections():
             neighbour = self.getNeighborIdFromDirection(direction)
-            logger.debug("Neighbour: %s", neighbour)
+            Logger().debug("Neighbour: %s", neighbour)
             if int(neighbour) == int(dstMapId):
                 return direction
 

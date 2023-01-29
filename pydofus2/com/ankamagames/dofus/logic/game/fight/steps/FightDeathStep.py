@@ -20,7 +20,6 @@ from pydofus2.damageCalculation.tools.StatIds import StatIds
 if TYPE_CHECKING:
     from pydofus2.com.ankamagames.dofus.logic.game.fight.frames.FightBattleFrame import FightBattleFrame
     from pydofus2.com.ankamagames.dofus.logic.game.fight.frames.FightContextFrame import FightContextFrame
-logger = Logger("Dofus2")
 
 
 class FightDeathStep(AbstractSequencable, IFightStep):
@@ -50,9 +49,9 @@ class FightDeathStep(AbstractSequencable, IFightStep):
         return self._entityId
 
     def start(self) -> None:
-        dyingEntity: IEntity = DofusEntities.getEntity(self._entityId)
+        dyingEntity: IEntity = DofusEntities().getEntity(self._entityId)
         if not dyingEntity:
-            logger.warn("Unable to play death of an unexisting fighter " + self._entityId + ".")
+            Logger().warn("Unable to play death of an unexisting fighter " + self._entityId + ".")
             return
         fightEntitites = FightEntitiesFrame.getCurrentInstance()
         fighterInfos: GameFightFighterInformations = fightEntitites.getEntityInfos(self._entityId)

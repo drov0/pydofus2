@@ -2,8 +2,6 @@ from pydofus2.com.ankamagames.jerakine.logger.Logger import Logger
 from pydofus2.com.ankamagames.dofus.logic.game.fight.types.FighterStatus import FighterStatus
 from pydofus2.com.ankamagames.jerakine.metaclasses.Singleton import Singleton
 
-logger = Logger("Dofus2")
-
 
 class FightersStateManager(metaclass=Singleton):
     def __init__(self) -> None:
@@ -25,7 +23,7 @@ class FightersStateManager(metaclass=Singleton):
         targetKey = float(targetId)
         statKey = int(stateId)
         if not self._entityStates.get(targetKey):
-            logger.error(f"Can't find state list for {targetKey} to remove state")
+            Logger().error(f"Can't find state list for {targetKey} to remove state")
             return
 
         if self._entityStates[targetKey].get(statKey):

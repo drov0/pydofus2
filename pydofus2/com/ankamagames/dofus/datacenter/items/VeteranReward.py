@@ -21,7 +21,5 @@ class VeteranReward(IDataCenter):
     @property
     def item(self) -> ItemWrapper:
         if not self._itemWrapper:
-            self._itemWrapper = ItemWrapper.create(
-                0, 0, self.itemGID, self.itemQuantity, None, False
-            )
+            self._itemWrapper = ItemWrapper.create(0, 0, self.itemGID, self.itemQuantity, None, False)
         return self._itemWrapper

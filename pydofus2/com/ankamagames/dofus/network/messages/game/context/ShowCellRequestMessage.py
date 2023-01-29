@@ -2,11 +2,9 @@ from pydofus2.com.ankamagames.jerakine.network.NetworkMessage import NetworkMess
 
 
 class ShowCellRequestMessage(NetworkMessage):
-    cellId:int
-    
+    cellId: int
 
-    def init(self, cellId_:int):
+    def init(self, cellId_: int):
         self.cellId = cellId_
-        
+
         super().__init__()
-    

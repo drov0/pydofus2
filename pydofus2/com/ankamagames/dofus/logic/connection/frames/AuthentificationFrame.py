@@ -48,7 +48,6 @@ from pydofus2.com.ankamagames.jerakine.network.messages.ServerConnectionFailedMe
 )
 from pydofus2.com.ankamagames.jerakine.types.DataStoreType import DataStoreType
 from pydofus2.com.ankamagames.jerakine.types.enums.Priority import Priority
-logger = Logger("Dofus2")
 
 
 class AuthentificationFrame(Frame):
@@ -126,8 +125,7 @@ class AuthentificationFrame(Frame):
             reasonName = IdentificationFailureReasonEnum(msg.reason).name
             PlayerManager().destroy()
             ConnectionsHandler().closeConnection(
-                DisconnectionReasonEnum.EXCEPTION_THROWN, 
-                f"Identification failed for reason : {reasonName}"
+                DisconnectionReasonEnum.EXCEPTION_THROWN, f"Identification failed for reason : {reasonName}"
             )
             if not self._dispatchModuleHook:
                 self._dispatchModuleHook = True
@@ -179,15 +177,14 @@ class AuthentificationFrame(Frame):
                 else:
                     PlayerManager().destroy()
                     ConnectionsHandler().closeConnection(
-                        DisconnectionReasonEnum.EXCEPTION_THROWN, 
-                        DisconnectionReasonEnum.UNEXPECTED.name
+                        DisconnectionReasonEnum.EXCEPTION_THROWN, DisconnectionReasonEnum.UNEXPECTED.name
                     )
             return True
 
     def pushed(self) -> bool:
-        logger.debug("[Auth] LoginFrame started")
+        Logger().debug("[Auth] LoginFrame started")
         return True
 
     def pulled(self) -> bool:
-        logger.debug("[Auth] LoginFrame finished")
+        Logger().debug("[Auth] LoginFrame finished")
         return True

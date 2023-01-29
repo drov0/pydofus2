@@ -13,8 +13,6 @@ from pydofus2.com.ankamagames.dofus.logic.common.managers.StatsManager import St
 from pydofus2.com.ankamagames.jerakine.data import I18n
 from pydofus2.damageCalculation.tools.StatIds import StatIds
 
-logger = Logger("Dofus2")
-
 
 class ItemCriterion(IItemCriterion):
 

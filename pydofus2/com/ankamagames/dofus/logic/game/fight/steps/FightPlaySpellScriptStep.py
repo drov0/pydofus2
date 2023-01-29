@@ -7,8 +7,6 @@ from pydofus2.com.ankamagames.dofus.logic.game.fight.steps.IFightStep import IFi
 from pydofus2.com.ankamagames.jerakine.logger.Logger import Logger
 from pydofus2.com.ankamagames.jerakine.sequencer.AbstractSequencable import AbstractSequencable
 
-logger = Logger("Dofus2")
-
 
 class FightPlaySpellScriptStep(AbstractSequencable, IFightStep):
 
@@ -52,14 +50,14 @@ class FightPlaySpellScriptStep(AbstractSequencable, IFightStep):
         if not sl or not sl.playAnimation:
             return
         if self._spellCastProvider.castingSpell.spell:
-            logger.info(
+            Logger().info(
                 "Executing Spell "
                 + self._spellCastProvider.castingSpell.spell.name
                 + "' ("
                 + str(self._spellCastProvider.castingSpell.spell.id)
                 + ")"
             )
-        # logger.debug("Script successfuly executed")
+        # Logger().debug("Script successfuly executed")
 
     @property
     def stepType(self) -> str:

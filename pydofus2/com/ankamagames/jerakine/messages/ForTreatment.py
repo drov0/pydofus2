@@ -4,9 +4,7 @@ from pydofus2.com.ankamagames.jerakine.messages.Treatment import Treatment
 
 
 class ForTreatment(Treatment):
-    def __init__(
-        self, object, func: FunctionType, params: list, iterations: int, worker: Worker
-    ):
+    def __init__(self, object, func: FunctionType, params: list, iterations: int, worker: Worker):
         params.insert(0, None)
         super().__init__(object, func, params)
         self._iterations: int = 0

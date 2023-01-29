@@ -2,11 +2,9 @@ from pydofus2.com.ankamagames.jerakine.network.NetworkMessage import NetworkMess
 
 
 class EmoteRemoveMessage(NetworkMessage):
-    emoteId:int
-    
+    emoteId: int
 
-    def init(self, emoteId_:int):
+    def init(self, emoteId_: int):
         self.emoteId = emoteId_
-        
+
         super().__init__()
-    

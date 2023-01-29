@@ -2,27 +2,25 @@ from pydofus2.com.ankamagames.dofus.types.IdAccessors import IdAccessors
 from pydofus2.com.ankamagames.jerakine.data.GameData import GameData
 from pydofus2.com.ankamagames.jerakine.data.I18n import I18n
 from pydofus2.com.ankamagames.jerakine.interfaces.IDataCenter import IDataCenter
-from pydofus2.com.ankamagames.jerakine.logger.Logger import Logger
 
-logger = Logger('Dofus2')
 
 class NpcMessage(IDataCenter):
-  
-    MODULE:str = "NpcMessages"
 
-    id:int
+    MODULE: str = "NpcMessages"
 
-    messageId:int
+    id: int
 
-    messageParams:list[str]
+    messageId: int
 
-    _messageText:str
+    messageParams: list[str]
+
+    _messageText: str
 
     def __init__(self):
         super().__init__()
 
-    @classmethod      
-    def getNpcMessageById(cls, id:int) -> 'NpcMessage':      
+    @classmethod
+    def getNpcMessageById(cls, id: int) -> "NpcMessage":
         return GameData.getObject(cls.MODULE, id)
 
     @property
@@ -31,4 +29,4 @@ class NpcMessage(IDataCenter):
             self._messageText = I18n.getText(self.messageId)
         return self._messageText
 
-    idAccessors:IdAccessors = IdAccessors(getNpcMessageById, None)
+    idAccessors: IdAccessors = IdAccessors(getNpcMessageById, None)

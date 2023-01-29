@@ -2,13 +2,11 @@ from pydofus2.com.ankamagames.jerakine.network.NetworkMessage import NetworkMess
 
 
 class JobBookSubscription(NetworkMessage):
-    jobId:int
-    subscribed:bool
-    
+    jobId: int
+    subscribed: bool
 
-    def init(self, jobId_:int, subscribed_:bool):
+    def init(self, jobId_: int, subscribed_: bool):
         self.jobId = jobId_
         self.subscribed = subscribed_
-        
+
         super().__init__()
-    

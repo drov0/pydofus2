@@ -8,8 +8,6 @@ import pydofus2.mapTools.MapTools as MapTools
 
 class Cross(IZone):
 
-    logger = Logger("Dofus2")
-
     _radius: int = 0
 
     _minRadius: int = 0

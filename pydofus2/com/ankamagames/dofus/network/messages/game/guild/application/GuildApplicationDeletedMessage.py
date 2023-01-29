@@ -2,11 +2,9 @@ from pydofus2.com.ankamagames.jerakine.network.NetworkMessage import NetworkMess
 
 
 class GuildApplicationDeletedMessage(NetworkMessage):
-    deleted:bool
-    
+    deleted: bool
 
-    def init(self, deleted_:bool):
+    def init(self, deleted_: bool):
         self.deleted = deleted_
-        
+
         super().__init__()
-    

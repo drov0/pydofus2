@@ -2,11 +2,9 @@ from pydofus2.com.ankamagames.jerakine.network.NetworkMessage import NetworkMess
 
 
 class SocialNoticeSetErrorMessage(NetworkMessage):
-    reason:int
-    
+    reason: int
 
-    def init(self, reason_:int):
+    def init(self, reason_: int):
         self.reason = reason_
-        
+
         super().__init__()
-    

@@ -2,11 +2,9 @@ from pydofus2.com.ankamagames.jerakine.network.NetworkMessage import NetworkMess
 
 
 class GameMapSpeedMovementMessage(NetworkMessage):
-    speedMultiplier:int
-    
+    speedMultiplier: int
 
-    def init(self, speedMultiplier_:int):
+    def init(self, speedMultiplier_: int):
         self.speedMultiplier = speedMultiplier_
-        
+
         super().__init__()
-    

@@ -9,8 +9,6 @@ from pydofus2.com.ankamagames.jerakine.entities.interfaces.IEntity import IEntit
 from pydofus2.com.ankamagames.jerakine.sequencer.AbstractSequencable import AbstractSequencable
 from pydofus2.com.ankamagames.jerakine.sequencer.ISequencer import ISequencer
 
-logger = Logger("Dofus2")
-
 
 class FightVanishStep(AbstractSequencable, IFightStep):
 
@@ -34,9 +32,9 @@ class FightVanishStep(AbstractSequencable, IFightStep):
         return self._entityId
 
     def start(self) -> None:
-        vanishingEntity: IEntity = DofusEntities.getEntity(self._entityId)
+        vanishingEntity: IEntity = DofusEntities().getEntity(self._entityId)
         if not vanishingEntity:
-            logger.warn("Unable to play vanish of an unexisting fighter " + str(self._entityId) + ".")
+            Logger().warn("Unable to play vanish of an unexisting fighter " + str(self._entityId) + ".")
             self.executeCallbacks()
             return
         BuffManager().dispell(vanishingEntity.id, False, False, True)

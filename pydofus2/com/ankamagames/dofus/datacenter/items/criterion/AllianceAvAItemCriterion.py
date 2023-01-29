@@ -25,9 +25,7 @@ class AllianceAvAItemCriterion(IItemCriterion, IDataCenter):
         subArea: SubArea = None
         currentPrism: PrismSubAreaWrapper = None
         if self._operator.text == ItemCriterionOperator.EQUAL:
-            aggressable = (
-                PlayedCharacterManager().characteristics.alignmentInfos.aggressable
-            )
+            aggressable = PlayedCharacterManager().characteristics.alignmentInfos.aggressable
             if (
                 aggressable != AggressableStatusEnum.AvA_ENABLED_AGGRESSABLE
                 and aggressable != AggressableStatusEnum.AvA_PREQUALIFIED_AGGRESSABLE

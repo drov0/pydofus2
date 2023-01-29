@@ -2,13 +2,11 @@ from pydofus2.com.ankamagames.jerakine.network.NetworkMessage import NetworkMess
 
 
 class TrustCertificate(NetworkMessage):
-    id:int
-    hash:str
-    
+    id: int
+    hash: str
 
-    def init(self, id_:int, hash_:str):
+    def init(self, id_: int, hash_: str):
         self.id = id_
         self.hash = hash_
-        
+
         super().__init__()
-    

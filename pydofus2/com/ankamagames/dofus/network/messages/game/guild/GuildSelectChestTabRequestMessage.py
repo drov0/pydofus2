@@ -2,11 +2,9 @@ from pydofus2.com.ankamagames.jerakine.network.NetworkMessage import NetworkMess
 
 
 class GuildSelectChestTabRequestMessage(NetworkMessage):
-    tabNumber:int
-    
+    tabNumber: int
 
-    def init(self, tabNumber_:int):
+    def init(self, tabNumber_: int):
         self.tabNumber = tabNumber_
-        
+
         super().__init__()
-    

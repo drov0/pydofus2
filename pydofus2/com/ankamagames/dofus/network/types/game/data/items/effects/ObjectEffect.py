@@ -2,11 +2,9 @@ from pydofus2.com.ankamagames.jerakine.network.NetworkMessage import NetworkMess
 
 
 class ObjectEffect(NetworkMessage):
-    actionId:int
-    
+    actionId: int
 
-    def init(self, actionId_:int):
+    def init(self, actionId_: int):
         self.actionId = actionId_
-        
+
         super().__init__()
-    

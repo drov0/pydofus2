@@ -16,7 +16,9 @@ from pydofus2.com.ankamagames.dofus.logic.common.managers.StatsManager import St
 from pydofus2.com.ankamagames.dofus.logic.game.common.managers.InventoryManager import InventoryManager
 from pydofus2.com.ankamagames.dofus.logic.game.common.managers.TimerManager import TimeManager
 from pydofus2.com.ankamagames.dofus.logic.game.common.misc.DofusEntities import DofusEntities
-from pydofus2.com.ankamagames.dofus.logic.game.fight.managers.CurrentPlayedFighterManager import CurrentPlayedFighterManager
+from pydofus2.com.ankamagames.dofus.logic.game.fight.managers.CurrentPlayedFighterManager import (
+    CurrentPlayedFighterManager,
+)
 from pydofus2.com.ankamagames.dofus.logic.game.fight.managers.SpellModifiersManager import SpellModifiersManager
 from pydofus2.com.ankamagames.dofus.network.enums.AggressableStatusEnum import AggressableStatusEnum
 from pydofus2.com.ankamagames.dofus.network.enums.GameServerTypeEnum import GameServerTypeEnum
@@ -47,11 +49,15 @@ from pydofus2.com.ankamagames.dofus.network.messages.game.character.spell.forget
 from pydofus2.com.ankamagames.dofus.network.messages.game.character.stats.CharacterExperienceGainMessage import (
     CharacterExperienceGainMessage,
 )
-from pydofus2.com.ankamagames.dofus.network.messages.game.character.stats.CharacterLevelUpMessage import CharacterLevelUpMessage
+from pydofus2.com.ankamagames.dofus.network.messages.game.character.stats.CharacterLevelUpMessage import (
+    CharacterLevelUpMessage,
+)
 from pydofus2.com.ankamagames.dofus.network.messages.game.character.stats.CharacterStatsListMessage import (
     CharacterStatsListMessage,
 )
-from pydofus2.com.ankamagames.dofus.network.messages.game.context.GameMapSpeedMovementMessage import GameMapSpeedMovementMessage
+from pydofus2.com.ankamagames.dofus.network.messages.game.context.GameMapSpeedMovementMessage import (
+    GameMapSpeedMovementMessage,
+)
 from pydofus2.com.ankamagames.dofus.network.messages.game.context.roleplay.death.GameRolePlayGameOverMessage import (
     GameRolePlayGameOverMessage,
 )
@@ -73,16 +79,22 @@ from pydofus2.com.ankamagames.dofus.network.messages.game.initialization.ServerE
 from pydofus2.com.ankamagames.dofus.network.messages.game.initialization.SetCharacterRestrictionsMessage import (
     SetCharacterRestrictionsMessage,
 )
-from pydofus2.com.ankamagames.dofus.network.messages.game.interactive.zaap.KnownZaapListMessage import KnownZaapListMessage
+from pydofus2.com.ankamagames.dofus.network.messages.game.interactive.zaap.KnownZaapListMessage import (
+    KnownZaapListMessage,
+)
 from pydofus2.com.ankamagames.dofus.network.messages.game.inventory.exchanges.ExchangeMoneyMovementInformationMessage import (
     ExchangeMoneyMovementInformationMessage,
 )
 from pydofus2.com.ankamagames.dofus.network.messages.game.inventory.items.SetUpdateMessage import SetUpdateMessage
-from pydofus2.com.ankamagames.dofus.network.messages.game.startup.StartupActionAddMessage import StartupActionAddMessage
+from pydofus2.com.ankamagames.dofus.network.messages.game.startup.StartupActionAddMessage import (
+    StartupActionAddMessage,
+)
 from pydofus2.com.ankamagames.dofus.network.messages.game.startup.StartupActionFinishedMessage import (
     StartupActionFinishedMessage,
 )
-from pydofus2.com.ankamagames.dofus.network.messages.game.startup.StartupActionsListMessage import StartupActionsListMessage
+from pydofus2.com.ankamagames.dofus.network.messages.game.startup.StartupActionsListMessage import (
+    StartupActionsListMessage,
+)
 from pydofus2.com.ankamagames.dofus.network.types.game.character.characteristic.CharacterCharacteristicsInformations import (
     CharacterCharacteristicsInformations,
 )
@@ -100,8 +112,6 @@ if TYPE_CHECKING:
     from pydofus2.com.ankamagames.dofus.network.types.game.context.roleplay.GameRolePlayHumanoidInformations import (
         GameRolePlayHumanoidInformations,
     )
-
-logger = Logger("Dofus2")
 
 
 class PlayedCharacterUpdatesFrame(Frame):
@@ -269,7 +279,7 @@ class PlayedCharacterUpdatesFrame(Frame):
             grplsmsg = msg
             state = PlayerLifeStatusEnum(grplsmsg.state)
             pcm.PlayedCharacterManager().state = state
-            logger.debug(f"Player state is {state.name}")
+            Logger().debug(f"Player state is {state.name}")
             return False
 
         if isinstance(msg, GameRolePlayGameOverMessage):
@@ -446,10 +456,10 @@ class PlayedCharacterUpdatesFrame(Frame):
             newSpeedAjust = 10 * (gmsmm.speedMultiplier - 1)
             pcm.PlayedCharacterManager().speedAjust = newSpeedAjust
             if (
-                DofusEntities.getEntity(pcm.PlayedCharacterManager().id) is not None
+                DofusEntities().getEntity(pcm.PlayedCharacterManager().id) is not None
                 and self.roleplayContextFrame is not None
             ):
-                DofusEntities.getEntity(pcm.PlayedCharacterManager().id).speedAdjust = newSpeedAjust
+                DofusEntities().getEntity(pcm.PlayedCharacterManager().id).speedAdjust = newSpeedAjust
             return True
 
         return False

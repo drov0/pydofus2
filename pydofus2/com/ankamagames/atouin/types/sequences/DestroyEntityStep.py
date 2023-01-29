@@ -11,9 +11,7 @@ class DestroyEntityStep(AbstractSequencable):
 
     _waitAnimForCallback: bool
 
-    def __init__(
-        self, entity: IEntity, waitAnim: bool = False, waitAnimForCallback: bool = False
-    ):
+    def __init__(self, entity: IEntity, waitAnim: bool = False, waitAnimForCallback: bool = False):
         super().__init__()
         self._entity = entity
         self._waitAnim = waitAnim

@@ -9,8 +9,6 @@ from pydofus2.com.ankamagames.jerakine.logger.Logger import Logger
 from pydofus2.com.ankamagames.jerakine.utils.misc.StringUtils import StringUtils
 from pydofus2.flash.geom.Rectangle import Rectangle
 
-logger = Logger("Dofus2")
-
 
 class Area(IDataCenter):
 

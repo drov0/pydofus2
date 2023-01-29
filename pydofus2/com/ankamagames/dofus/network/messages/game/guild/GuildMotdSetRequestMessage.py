@@ -1,12 +1,12 @@
-from pydofus2.com.ankamagames.dofus.network.messages.game.social.SocialNoticeSetRequestMessage import SocialNoticeSetRequestMessage
+from pydofus2.com.ankamagames.dofus.network.messages.game.social.SocialNoticeSetRequestMessage import (
+    SocialNoticeSetRequestMessage,
+)
 
 
 class GuildMotdSetRequestMessage(SocialNoticeSetRequestMessage):
-    content:str
-    
+    content: str
 
-    def init(self, content_:str):
+    def init(self, content_: str):
         self.content = content_
-        
+
         super().init()
-    

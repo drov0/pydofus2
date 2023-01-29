@@ -2,11 +2,9 @@ from pydofus2.com.ankamagames.jerakine.network.NetworkMessage import NetworkMess
 
 
 class EnterHavenBagRequestMessage(NetworkMessage):
-    havenBagOwner:int
-    
+    havenBagOwner: int
 
-    def init(self, havenBagOwner_:int):
+    def init(self, havenBagOwner_: int):
         self.havenBagOwner = havenBagOwner_
-        
+
         super().__init__()
-    

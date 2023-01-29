@@ -4,9 +4,7 @@ from pydofus2.com.ankamagames.jerakine.types.zones.ZRectangle import ZRectangle
 
 
 class Square(ZRectangle):
-    def __init__(
-        self, nMinRadius: int, nRadius: int, dataMapProvider: IDataMapProvider
-    ):
+    def __init__(self, nMinRadius: int, nRadius: int, dataMapProvider: IDataMapProvider):
         super().__init__(nMinRadius, nRadius, nRadius, dataMapProvider)
 
     @property

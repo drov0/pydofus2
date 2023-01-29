@@ -22,8 +22,6 @@ from pydofus2.com.ankamagames.jerakine.sequencer.AbstractSequencable import Abst
 from pydofus2.com.ankamagames.jerakine.sequencer.ISequencer import ISequencer
 from pydofus2.com.ankamagames.jerakine.types.positions.MapPoint import MapPoint
 
-logger = Logger("Dofus2")
-
 
 class FightCarryCharacterStep(AbstractSequencable, IFightStep):
 
@@ -67,12 +65,12 @@ class FightCarryCharacterStep(AbstractSequencable, IFightStep):
         entitiesFrame: FightEntitiesFrame = None
         carriedAC: AnimatedCharacter = None
         carriedEntityInfos: GameFightFighterInformations = None
-        cEntity: IEntity = DofusEntities.getEntity(self._fighterId)
+        cEntity: IEntity = DofusEntities().getEntity(self._fighterId)
         position: MapPoint = cEntity.position
         carryingEntity = cEntity
-        carriedEntity: IEntity = DofusEntities.getEntity(self._carriedId)
+        carriedEntity: IEntity = DofusEntities().getEntity(self._carriedId)
         if not carryingEntity or not carriedEntity:
-            logger.warn(
+            Logger().warn(
                 "Unable to make "
                 + self._fighterId
                 + " carry "
@@ -104,8 +102,8 @@ class FightCarryCharacterStep(AbstractSequencable, IFightStep):
 
     def updateCarriedEntityPosition(self, pCarryingEntity: IMovable, pCarriedEntity: IMovable) -> None:
         carried: AnimatedCharacter = None
-        if not pCarryingEntity and DofusEntities.getEntity(self._fighterId):
-            pCarryingEntity = DofusEntities.getEntity(self._fighterId)
+        if not pCarryingEntity and DofusEntities().getEntity(self._fighterId):
+            pCarryingEntity = DofusEntities().getEntity(self._fighterId)
         if pCarryingEntity and pCarriedEntity:
             pCarriedEntity.position.cellId = pCarryingEntity.position.cellId
             carried = pCarriedEntity
@@ -115,8 +113,8 @@ class FightCarryCharacterStep(AbstractSequencable, IFightStep):
     def carryFinished(self, e=None) -> None:
         carrierAnimatedEntity: AnimatedCharacter = None
         carriedAnimatedEntity: AnimatedCharacter = None
-        carriedEntity: IEntity = DofusEntities.getEntity(self._carriedId)
-        carryingEntity = DofusEntities.getEntity(self._fighterId)
+        carriedEntity: IEntity = DofusEntities().getEntity(self._carriedId)
+        carryingEntity = DofusEntities().getEntity(self._fighterId)
         FightEventsHelper().sendFightEvent(
             FightEventEnum.FIGHTER_CARRY,
             [self._fighterId, self._carriedId],

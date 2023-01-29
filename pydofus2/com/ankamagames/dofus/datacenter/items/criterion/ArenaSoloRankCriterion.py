@@ -21,19 +21,11 @@ class ArenaSoloRankCriterion(ItemCriterion, IDataCenter):
         readableOperator = ">"
         if self._operator.text == ItemCriterionOperator.DIFFERENT:
             readableOperator = I18n.getUiText("ui.common.differentFrom") + " >"
-        return (
-            readableCriterionRef + " " + readableOperator + " " + readableCriterionValue
-        )
+        return readableCriterionRef + " " + readableOperator + " " + readableCriterionValue
 
     def clone(self) -> IItemCriterion:
         return ArenaSoloRankCriterion(self.basicText)
 
     def getCriterion(self) -> int:
-        frame: PartyManagementFrame = (
-            Kernel().worker.getFrame("PartyManagementFrame")
-        )
-        return (
-            int(frame.arenaRankSoloInfos.rank)
-            if frame and int(frame.arenaRankSoloInfos)
-            else 0
-        )
+        frame: PartyManagementFrame = Kernel().worker.getFrame("PartyManagementFrame")
+        return int(frame.arenaRankSoloInfos.rank) if frame and int(frame.arenaRankSoloInfos) else 0

@@ -4,8 +4,6 @@ from pydofus2.com.ankamagames.dofus.internalDatacenter.stats.Stat import Stat
 from pydofus2.com.ankamagames.dofus.internalDatacenter.stats.UsableStat import UsableStat
 from pydofus2.damageCalculation.tools.StatIds import StatIds
 
-logger = Logger("Dofus2")
-
 
 class EntityStats:
     _entityId: float = None
@@ -28,14 +26,14 @@ class EntityStats:
         return self.__class__.__name__ + " (Entity ID: " + str(self._entityId) + "): " + message
 
     def setStat(self, stat: Stat, isBulkUpdate: bool = True) -> None:
-        # logger.debug(f"Set stat {stat} for entity {self._entityId}")
+        # Logger().debug(f"Set stat {stat} for entity {self._entityId}")
         stat.entityId = float(self._entityId)
         self._stats[str(stat.id)] = stat
 
     def getStat(self, statId: float) -> Stat:
         statKey = str(statId)
         if statKey not in self._stats:
-            logger.error(self.getFormattedMessage("Stat ID " + statKey + " not found in stats"))
+            Logger().error(self.getFormattedMessage("Stat ID " + statKey + " not found in stats"))
             return None
         return self._stats[statKey]
 
@@ -127,7 +125,7 @@ class EntityStats:
         for stat in self._stats.values():
             statsDump += "\n\t" + str(stat)
         if not statsDump:
-            logger.debug(self._stats)
+            Logger().debug(self._stats)
             statsDump = "\n\tNo stats to display."
         return self.getFormattedMessage(statsDump)
 

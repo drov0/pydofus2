@@ -3,8 +3,6 @@ from pydofus2.com.ankamagames.jerakine.logger.Logger import Logger
 from pydofus2.com.ankamagames.jerakine.sequencer.IPausableSequencable import IPausableSequencable
 from pydofus2.com.ankamagames.jerakine.sequencer.ISequencableListener import ISequencableListener
 
-logger = Logger("Dofus2")
-
 
 class AbstractSequencable(IPausableSequencable):
 
@@ -116,7 +114,7 @@ class AbstractSequencable(IPausableSequencable):
         return self._withTimeOut
 
     def onTimeOut(self) -> None:
-        logger.error(f"Time out sur la step {self} ({self._timeOut}")
+        Logger().error(f"Time out sur la step {self} ({self._timeOut}")
         self._withTimeOut = True
         if self._timeOut:
             self._timeOut.cancel()

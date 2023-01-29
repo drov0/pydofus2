@@ -2,11 +2,9 @@ from pydofus2.com.ankamagames.jerakine.network.NetworkMessage import NetworkMess
 
 
 class GameRolePlayAttackMonsterRequestMessage(NetworkMessage):
-    monsterGroupId:int
-    
+    monsterGroupId: int
 
-    def init(self, monsterGroupId_:int):
+    def init(self, monsterGroupId_: int):
         self.monsterGroupId = monsterGroupId_
-        
+
         super().__init__()
-    

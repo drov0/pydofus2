@@ -24,17 +24,13 @@ class ArenaMaxDuelRankCriterion(icf.ItemCriterionFactory, IDataCenter):
         readableOperator = ">"
         if self._operator.text == ItemCriterionOperator.DIFFERENT:
             readableOperator = I18n.getUiText("ui.common.differentFrom") + " >"
-        return (
-            readableCriterionRef + " " + readableOperator + " " + readableCriterionValue
-        )
+        return readableCriterionRef + " " + readableOperator + " " + readableCriterionValue
 
     def clone(self) -> "IItemCriterion":
         return ArenaMaxDuelRankCriterion(self.basicText)
 
     def getCriterion(self) -> int:
-        frame: PartyManagementFrame = (
-            Kernel().worker.getFrame("PartyManagementFrame")
-        )
+        frame: PartyManagementFrame = Kernel().worker.getFrame("PartyManagementFrame")
         maxRank: int = 0
         if frame.arenaRankDuelInfos and frame.arenaRankDuelInfos.maxRank > maxRank:
             maxRank = frame.arenaRankDuelInfos.maxRank

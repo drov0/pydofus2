@@ -2,13 +2,11 @@ from pydofus2.com.ankamagames.jerakine.network.NetworkMessage import NetworkMess
 
 
 class BasicTimeMessage(NetworkMessage):
-    timestamp:int
-    timezoneOffset:int
-    
+    timestamp: int
+    timezoneOffset: int
 
-    def init(self, timestamp_:int, timezoneOffset_:int):
+    def init(self, timestamp_: int, timezoneOffset_: int):
         self.timestamp = timestamp_
         self.timezoneOffset = timezoneOffset_
-        
+
         super().__init__()
-    

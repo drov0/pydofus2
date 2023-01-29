@@ -9,7 +9,6 @@ from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
     from pydofus2.com.ankamagames.dofus.datacenter.world.SubArea import SubArea
-logger = Logger("Dofus2")
 
 
 class MapPosition(IDataCenter):

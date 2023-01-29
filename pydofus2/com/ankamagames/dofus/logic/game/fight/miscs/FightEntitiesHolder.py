@@ -4,36 +4,39 @@ from pydofus2.com.ankamagames.dofus.logic.game.common.misc.IEntityLocalizer impo
 )
 from pydofus2.com.ankamagames.jerakine.entities.interfaces.IEntity import IEntity
 from pydofus2.com.ankamagames.jerakine.logger.Logger import Logger
-from pydofus2.com.ankamagames.jerakine.metaclasses.Singleton import Singleton
+from pydofus2.com.ankamagames.jerakine.metaclasses.ThreadSharedSingleton import ThreadSharedSingleton
+import threading
 
-logger = Logger()
+lock = threading.Lock()
 
 
-class FightEntitiesHolder(IEntityLocalizer, metaclass=Singleton):
-
-    _holdedEntities = dict()
-
+class FightEntitiesHolder(IEntityLocalizer, metaclass=ThreadSharedSingleton):
     def __init__(self):
         self._holdedEntities = dict()
-        DofusEntities.registerLocalizer(self)
+        DofusEntities().registerLocalizer(self)
         super().__init__()
 
     def getEntity(self, entityId: float) -> IEntity:
         return self._holdedEntities.get(entityId)
 
     def holdEntity(self, entity: IEntity) -> None:
-        self._holdedEntities[entity.id] = entity
+        with lock:
+            if entity.id not in self._holdedEntities:
+                self._holdedEntities[entity.id] = entity
 
     def unholdEntity(self, entityId: float) -> None:
-        if entityId in self._holdedEntities:
-            del self._holdedEntities[entityId]
-        # logger.warn("Unholded entity with ID " + str(entityId))
+        with lock:
+            if entityId in self._holdedEntities:
+                del self._holdedEntities[entityId]
 
     def reset(self) -> None:
-        self._holdedEntities.clear()
+        with lock:
+            self._holdedEntities.clear()
 
     def getEntities(self) -> dict:
         return self._holdedEntities
 
     def unregistered(self) -> None:
-        self._holdedEntities.clear()
+        with lock:
+            self._holdedEntities.clear()
+            FightEntitiesHolder.clear()

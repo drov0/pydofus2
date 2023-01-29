@@ -4,8 +4,6 @@ from pydofus2.com.ankamagames.jerakine.pools.PoolableLinkedListNode import Poola
 from pydofus2.mx.utils.LinkedList import LinkedList
 from pydofus2.mx.utils.LinkedListNode import LinkedListNode
 
-logger = Logger("Dofus2")
-
 
 class Pool:
 
@@ -52,7 +50,7 @@ class Pool:
                 self._pool.append(self._pooledClass())
             self._totalSize += self._growSize
             if self._warnLimit > 0 and self._totalSize > self._warnLimit:
-                #logger.warn(f"Pool of {self._pooledClass.__name__} size beyond the warning limit. Size: {self._totalSize} , limit: {self._warnLimit}.")
+                # Logger().warn(f"Pool of {self._pooledClass.__name__} size beyond the warning limit. Size: {self._totalSize} , limit: {self._warnLimit}.")
                 pass
         node: LinkedListNode = self._pool.shift()
         if self._pooledClass is PoolableLinkedListNode:
@@ -60,6 +58,7 @@ class Pool:
         else:
             o = node.value
             from pydofus2.com.ankamagames.jerakine.pools.PoolsManager import PoolsManager
+
             PoolsManager.getLinkedListNodePool().checkIn(node)
         return o
 

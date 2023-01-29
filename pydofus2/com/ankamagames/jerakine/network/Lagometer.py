@@ -4,8 +4,6 @@ from pydofus2.com.ankamagames.jerakine.logger.Logger import Logger
 from pydofus2.com.ankamagames.jerakine.network.ILagometer import ILagometer
 from pydofus2.com.ankamagames.jerakine.network.INetworkMessage import INetworkMessage
 
-logger = Logger("Dofus2")
-
 
 class Lagometer(ILagometer):
 

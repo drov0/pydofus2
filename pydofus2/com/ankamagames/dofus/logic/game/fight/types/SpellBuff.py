@@ -5,8 +5,6 @@ from pydofus2.com.ankamagames.dofus.network.types.game.actions.fight.FightTempor
 )
 from pydofus2.com.ankamagames.jerakine.logger.Logger import Logger
 
-logger = Logger("Dofus2")
-
 
 class SpellBuff(BasicBuff):
     spellId: int

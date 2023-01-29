@@ -54,7 +54,7 @@ class FightSummonStep(AbstractSequencable, IFightStep):
         return "summon"
 
     def start(self) -> None:
-        summonedCreature = DofusEntities.getEntity(self._summonInfos.contextualId)
+        summonedCreature = DofusEntities().getEntity(self._summonInfos.contextualId)
         if summonedCreature:
             summonedCreature.visible = True
         else:

@@ -2,11 +2,9 @@ from pydofus2.com.ankamagames.jerakine.network.NetworkMessage import NetworkMess
 
 
 class LeaveDialogMessage(NetworkMessage):
-    dialogType:int
-    
+    dialogType: int
 
-    def init(self, dialogType_:int):
+    def init(self, dialogType_: int):
         self.dialogType = dialogType_
-        
+
         super().__init__()
-    

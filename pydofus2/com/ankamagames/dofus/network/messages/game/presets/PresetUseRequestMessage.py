@@ -2,11 +2,9 @@ from pydofus2.com.ankamagames.jerakine.network.NetworkMessage import NetworkMess
 
 
 class PresetUseRequestMessage(NetworkMessage):
-    presetId:int
-    
+    presetId: int
 
-    def init(self, presetId_:int):
+    def init(self, presetId_: int):
         self.presetId = presetId_
-        
+
         super().__init__()
-    

@@ -1,14 +1,14 @@
-from pydofus2.com.ankamagames.dofus.network.messages.game.inventory.exchanges.ExchangeRequestedMessage import ExchangeRequestedMessage
+from pydofus2.com.ankamagames.dofus.network.messages.game.inventory.exchanges.ExchangeRequestedMessage import (
+    ExchangeRequestedMessage,
+)
 
 
 class ExchangeRequestedTradeMessage(ExchangeRequestedMessage):
-    source:int
-    target:int
-    
+    source: int
+    target: int
 
-    def init(self, source_:int, target_:int, exchangeType_:int):
+    def init(self, source_: int, target_: int, exchangeType_: int):
         self.source = source_
         self.target = target_
-        
+
         super().init(exchangeType_)
-    

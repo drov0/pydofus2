@@ -22,9 +22,7 @@ class IncarnationLevel(IDataCenter):
     def getIncarnationLevelById(cls, id: int) -> "IncarnationLevel":
         return GameData.getObject(cls.MODULE, id)
 
-    def getIncarnationLevelByIdAndLevel(
-        self, incarnationId: int, level: int
-    ) -> "IncarnationLevel":
+    def getIncarnationLevelByIdAndLevel(self, incarnationId: int, level: int) -> "IncarnationLevel":
         id: int = incarnationId * 100 + level
         return self.getIncarnationLevelById(id)
 

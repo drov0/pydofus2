@@ -2,11 +2,9 @@ from pydofus2.com.ankamagames.dofus.network.types.game.data.items.Item import It
 
 
 class GoldItem(Item):
-    sum:int
-    
+    sum: int
 
-    def init(self, sum_:int):
+    def init(self, sum_: int):
         self.sum = sum_
-        
+
         super().init()
-    

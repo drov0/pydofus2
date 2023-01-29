@@ -2,13 +2,11 @@ from pydofus2.com.ankamagames.jerakine.network.NetworkMessage import NetworkMess
 
 
 class UpdateSelfAgressableStatusMessage(NetworkMessage):
-    status:int
-    probationTime:int
-    
+    status: int
+    probationTime: int
 
-    def init(self, status_:int, probationTime_:int):
+    def init(self, status_: int, probationTime_: int):
         self.status = status_
         self.probationTime = probationTime_
-        
+
         super().__init__()
-    

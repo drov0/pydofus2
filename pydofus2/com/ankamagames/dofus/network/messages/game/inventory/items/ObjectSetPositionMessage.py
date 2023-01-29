@@ -2,15 +2,13 @@ from pydofus2.com.ankamagames.jerakine.network.NetworkMessage import NetworkMess
 
 
 class ObjectSetPositionMessage(NetworkMessage):
-    objectUID:int
-    position:int
-    quantity:int
-    
+    objectUID: int
+    position: int
+    quantity: int
 
-    def init(self, objectUID_:int, position_:int, quantity_:int):
+    def init(self, objectUID_: int, position_: int, quantity_: int):
         self.objectUID = objectUID_
         self.position = position_
         self.quantity = quantity_
-        
+
         super().__init__()
-    

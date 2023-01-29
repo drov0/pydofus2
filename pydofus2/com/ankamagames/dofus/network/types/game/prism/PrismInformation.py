@@ -2,19 +2,19 @@ from pydofus2.com.ankamagames.jerakine.network.NetworkMessage import NetworkMess
 
 
 class PrismInformation(NetworkMessage):
-    typeId:int
-    state:int
-    nextVulnerabilityDate:int
-    placementDate:int
-    rewardTokenCount:int
-    
+    typeId: int
+    state: int
+    nextVulnerabilityDate: int
+    placementDate: int
+    rewardTokenCount: int
 
-    def init(self, typeId_:int, state_:int, nextVulnerabilityDate_:int, placementDate_:int, rewardTokenCount_:int):
+    def init(
+        self, typeId_: int, state_: int, nextVulnerabilityDate_: int, placementDate_: int, rewardTokenCount_: int
+    ):
         self.typeId = typeId_
         self.state = state_
         self.nextVulnerabilityDate = nextVulnerabilityDate_
         self.placementDate = placementDate_
         self.rewardTokenCount = rewardTokenCount_
-        
+
         super().__init__()
-    

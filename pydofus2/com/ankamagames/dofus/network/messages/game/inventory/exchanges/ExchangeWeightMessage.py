@@ -2,13 +2,11 @@ from pydofus2.com.ankamagames.jerakine.network.NetworkMessage import NetworkMess
 
 
 class ExchangeWeightMessage(NetworkMessage):
-    currentWeight:int
-    maxWeight:int
-    
+    currentWeight: int
+    maxWeight: int
 
-    def init(self, currentWeight_:int, maxWeight_:int):
+    def init(self, currentWeight_: int, maxWeight_: int):
         self.currentWeight = currentWeight_
         self.maxWeight = maxWeight_
-        
+
         super().__init__()
-    

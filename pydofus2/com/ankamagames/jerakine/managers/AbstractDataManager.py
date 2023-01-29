@@ -8,8 +8,6 @@ from pydofus2.com.ankamagames.jerakine.newCache.impl.cache import Cache
 from pydofus2.com.ankamagames.jerakine.newCache.impl.infiniteCache import InfiniteCache
 from pydofus2.com.ankamagames.jerakine.types.CustomSharedObject import CustomSharedObject
 
-logger = Logger("Dofus2")
-
 
 class AbstractDataManager(object):
 

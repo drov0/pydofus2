@@ -6,9 +6,7 @@ class GuildLevelItemCriterion(ItemCriterion, IDataCenter):
     def text(self) -> str:
         readableCriterionValue: str = str(_criterionValue)
         readableCriterionRef: str = I18n.getUiText("ui.guild.guildLevel")
-        return (
-            readableCriterionRef + " " + _operator.text + " " + readableCriterionValue
-        )
+        return readableCriterionRef + " " + _operator.text + " " + readableCriterionValue
 
     def clone(self) -> IItemCriterion:
         return GuildLevelItemCriterion(self.basicText)

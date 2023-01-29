@@ -7,15 +7,17 @@ from pydofus2.com.ankamagames.jerakine.metaclasses.ThreadSharedSingleton import 
 from pydofus2.com.ankamagames.jerakine.types.CustomSharedObject import CustomSharedObject
 from pydofus2.com.ankamagames.jerakine.types.DataStoreType import DataStoreType
 from pydofus2.com.ankamagames.jerakine.types.enums.DataStoreEnum import DataStoreEnum
-logger = Logger("Dofus2")
+
+
 class IExternalizable:
     pass
+
 
 class Secure:
     pass
 
+
 class StoreDataManager(metaclass=ThreadSharedSingleton):
-    
     def __init__(self) -> None:
         self._aData = dict()
         self._bStoreSequence: bool = False
@@ -27,14 +29,14 @@ class StoreDataManager(metaclass=ThreadSharedSingleton):
         self._aRegisteredClassAlias = dict()
         self._self = None
         aClass = self.getData(JerakineConstants.DATASTORE_CLASS_ALIAS, "classAliasList")
-        logger.debug("Class alias list : " + str(aClass))
+        Logger().debug("Class alias list : " + str(aClass))
         for s in aClass:
             className = base64.b64decode(s).decode()
             try:
                 oClass = getattr(sys.modules[__package__], className)
                 globals().update({aClass[s]: oClass})
             except Exception as e:
-                logger.warn("Impossible de trouver la classe " + className)
+                Logger().warn("Impossible de trouver la classe " + className)
             self._aRegisteredClassAlias[className] = True
 
     def getSharedObject(self, sName: str) -> "CustomSharedObject":
@@ -73,11 +75,11 @@ class StoreDataManager(metaclass=ThreadSharedSingleton):
             if className in self._aRegisteredClassAlias:
                 return
             sAlias = className.__hash__()
-            logger.debug("Register " + className + " with alias " + str(sAlias))
+            Logger().debug("Register " + className + " with alias " + str(sAlias))
             try:
                 oClass = oInstance.__class__
                 globals().update({sAlias: oClass})
-                logger.warn("Register " + className)
+                Logger().warn("Register " + className)
             except Exception as e:
                 self._aRegisteredClassAlias[className] = True
                 # logger.fatal("Impossible de trouver la classe " + className + " dans l'application domain courant")

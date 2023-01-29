@@ -12,8 +12,6 @@ class GameFightPlacementSwapPositionsCancelAction(AbstractAction, Action):
 
     @classmethod
     def create(cls, pRequestId: int) -> "GameFightPlacementSwapPositionsCancelAction":
-        action: GameFightPlacementSwapPositionsCancelAction = (
-            GameFightPlacementSwapPositionsCancelAction(argv)
-        )
+        action: GameFightPlacementSwapPositionsCancelAction = GameFightPlacementSwapPositionsCancelAction(argv)
         action.requestId = pRequestId
         return action

@@ -37,9 +37,7 @@ class StorageCraftFilterView(StorageGenericView):
         return "storageCraftFilter"
 
     def isListening(self, item: ItemWrapper) -> bool:
-        return self._parent.isListening(item) and self._ingredients.hasOwnProperty(
-            item.objectGID
-        )
+        return self._parent.isListening(item) and self._ingredients.hasOwnProperty(item.objectGID)
 
     def updateView(self) -> None:
         super().updateView()

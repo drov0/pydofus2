@@ -2,13 +2,11 @@ from pydofus2.com.ankamagames.jerakine.network.NetworkMessage import NetworkMess
 
 
 class ChannelEnablingMessage(NetworkMessage):
-    channel:int
-    enable:bool
-    
+    channel: int
+    enable: bool
 
-    def init(self, channel_:int, enable_:bool):
+    def init(self, channel_: int, enable_: bool):
         self.channel = channel_
         self.enable = enable_
-        
+
         super().__init__()
-    

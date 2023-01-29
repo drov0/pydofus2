@@ -2,13 +2,11 @@ from pydofus2.com.ankamagames.jerakine.network.NetworkMessage import NetworkMess
 
 
 class PaddockInformations(NetworkMessage):
-    maxOutdoorMount:int
-    maxItems:int
-    
+    maxOutdoorMount: int
+    maxItems: int
 
-    def init(self, maxOutdoorMount_:int, maxItems_:int):
+    def init(self, maxOutdoorMount_: int, maxItems_: int):
         self.maxOutdoorMount = maxOutdoorMount_
         self.maxItems = maxItems_
-        
+
         super().__init__()
-    

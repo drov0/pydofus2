@@ -141,9 +141,7 @@ class FightResultEntryWrapper(IDataCenter):
             elif isinstance(infos, GameFightTaxCollectorInformations):
                 tcInfos = infos
                 self.name = (
-                    TaxCollectorFirstname.getTaxCollectorFirstnameById(
-                        tcInfos.firstNameId
-                    ).firstname
+                    TaxCollectorFirstname.getTaxCollectorFirstnameById(tcInfos.firstNameId).firstname
                     + " "
                     + TaxCollectorName.getTaxCollectorNameById(tcInfos.lastNameId).name
                 )
@@ -169,26 +167,16 @@ class FightResultEntryWrapper(IDataCenter):
                             self.experience = addInfo.experience
                             self.showExperience = addInfo.showExperience
                             self.experienceLevelFloor = addInfo.experienceLevelFloor
-                            self.showExperienceLevelFloor = (
-                                addInfo.showExperienceLevelFloor
-                            )
-                            self.experienceNextLevelFloor = (
-                                addInfo.experienceNextLevelFloor
-                            )
-                            self.showExperienceNextLevelFloor = (
-                                addInfo.showExperienceNextLevelFloor
-                            )
+                            self.showExperienceLevelFloor = addInfo.showExperienceLevelFloor
+                            self.experienceNextLevelFloor = addInfo.experienceNextLevelFloor
+                            self.showExperienceNextLevelFloor = addInfo.showExperienceNextLevelFloor
                             self.experienceFightDelta = addInfo.experienceFightDelta
-                            self.showExperienceFightDelta = (
-                                addInfo.showExperienceFightDelta
-                            )
+                            self.showExperienceFightDelta = addInfo.showExperienceFightDelta
                             self.experienceForGuild = addInfo.experienceForGuild
                             self.showExperienceForGuild = addInfo.showExperienceForGuild
                             self.experienceForRide = addInfo.experienceForMount
                             self.showExperienceForRide = addInfo.showExperienceForMount
-                            self.isIncarnationExperience = (
-                                addInfo.isIncarnationExperience
-                            )
+                            self.isIncarnationExperience = addInfo.isIncarnationExperience
                             self.honorDelta = -1
                         elif isinstance(addInfo, FightResultPvpData):
                             self.grade = addInfo.grade
@@ -201,9 +189,7 @@ class FightResultEntryWrapper(IDataCenter):
             info = infos
             if info:
                 self.name = (
-                    TaxCollectorFirstname.getTaxCollectorFirstnameById(
-                        info.firstNameId
-                    ).firstname
+                    TaxCollectorFirstname.getTaxCollectorFirstnameById(info.firstNameId).firstname
                     + " "
                     + TaxCollectorName.getTaxCollectorNameById(info.lastNameId).name
                 )
@@ -227,11 +213,7 @@ class FightResultEntryWrapper(IDataCenter):
                 monster = Monster.getMonsterById(monsterInfos.creatureGenericId)
                 self.name = monster.name
                 breachFrame = Kernel().worker.getFrame("BreachFrame")
-                if (
-                    PlayedCharacterManager().isInBreach
-                    and breachFrame
-                    and not isSpectator
-                ):
+                if PlayedCharacterManager().isInBreach and breachFrame and not isSpectator:
                     self.level = breachFrame.floor
                 else:
                     self.level = monsterInfos.creatureLevel

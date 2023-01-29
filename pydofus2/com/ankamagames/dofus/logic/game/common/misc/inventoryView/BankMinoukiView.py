@@ -29,9 +29,7 @@ class BankMinoukiView(StorageGenericView):
     def updateView(self) -> None:
         super().updateView()
 
-    def addItem(
-        self, item: ItemWrapper, invisible: int, needUpdateView: bool = True
-    ) -> None:
+    def addItem(self, item: ItemWrapper, invisible: int, needUpdateView: bool = True) -> None:
         type: int = 0
         clone: ItemWrapper = item.clone()
         clone.quantity -= invisible
@@ -58,10 +56,7 @@ class BankMinoukiView(StorageGenericView):
             return
         for effect in item.possibleEffects:
             if effect.effectId == ActionIds.ACTION_ITEM_CUSTOM_EFFECT:
-                if (
-                    self._typesQty[effect.parameter2]
-                    and self._typesQty[effect.parameter2] > 0
-                ):
+                if self._typesQty[effect.parameter2] and self._typesQty[effect.parameter2] > 0:
                     self._typesQty[effect.parameter2] -= 1
                     if self._typesQty[effect.parameter2] == 0:
                         del self._types[effect.parameter2]

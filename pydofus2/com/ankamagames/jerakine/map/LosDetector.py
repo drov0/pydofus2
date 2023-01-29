@@ -4,8 +4,6 @@ from pydofus2.com.ankamagames.jerakine.map.ILosDetector import ILosDetector
 from pydofus2.com.ankamagames.jerakine.types.positions.MapPoint import MapPoint
 from pydofus2.mapTools import MapTools
 
-logger = Logger("Dofus2")
-
 
 class LosDetector(ILosDetector):
     @classmethod

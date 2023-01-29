@@ -10,8 +10,6 @@ class ServerCommunity(IDataCenter):
 
     MODULE: str = "ServerCommunities"
 
-    logger = Logger("Dofus2")
-
     id: int
 
     nameId: int

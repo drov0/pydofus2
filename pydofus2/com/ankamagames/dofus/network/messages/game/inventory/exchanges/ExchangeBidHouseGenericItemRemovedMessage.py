@@ -2,11 +2,9 @@ from pydofus2.com.ankamagames.jerakine.network.NetworkMessage import NetworkMess
 
 
 class ExchangeBidHouseGenericItemRemovedMessage(NetworkMessage):
-    objGenericId:int
-    
+    objGenericId: int
 
-    def init(self, objGenericId_:int):
+    def init(self, objGenericId_: int):
         self.objGenericId = objGenericId_
-        
+
         super().__init__()
-    

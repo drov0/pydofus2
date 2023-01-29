@@ -2,11 +2,9 @@ from pydofus2.com.ankamagames.dofus.network.types.game.data.items.effects.Object
 
 
 class ObjectEffectString(ObjectEffect):
-    value:str
-    
+    value: str
 
-    def init(self, value_:str, actionId_:int):
+    def init(self, value_: str, actionId_: int):
         self.value = value_
-        
+
         super().init(actionId_)
-    

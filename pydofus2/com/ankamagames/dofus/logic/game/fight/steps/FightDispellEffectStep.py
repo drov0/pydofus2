@@ -37,14 +37,10 @@ class FightDispellEffectStep(AbstractSequencable, IFightStep, ISequencableListen
         if buff and buff is StateBuff:
             sb = buff
             if sb.actionId == ActionIds.ACTION_FIGHT_DISABLE_STATE:
-                self._virtualStep = FightEnteringStateStep(
-                    sb.targetId, sb.stateId, sb.effect.durationString, buff
-                )
+                self._virtualStep = FightEnteringStateStep(sb.targetId, sb.stateId, sb.effect.durationString, buff)
             else:
                 self._virtualStep = FightLeavingStateStep(sb.targetId, sb.stateId, buff)
-        BuffManager().dispellUniqueBuff(
-            self._fighterId, self._boostUID, True, False, True
-        )
+        BuffManager().dispellUniqueBuff(self._fighterId, self._boostUID, True, False, True)
         if not self._virtualStep:
             self.executeCallbacks()
         else:

@@ -14,7 +14,7 @@ EVENT_MODE_PARAM = ""
 
 CHARACTER_CREATION_ALLOWED = True
 
-PRE_GAME_MODULE = [ "Ankama_Connection" ]
+PRE_GAME_MODULE = ["Ankama_Connection"]
 
 COMMON_GAME_MODULE = [
     "Ankama_Common",
@@ -24,7 +24,7 @@ COMMON_GAME_MODULE = [
     "Ankama_ContextMenu",
 ]
 
-ADMIN_MODULE = [ "Ankama_Admin" ]
+ADMIN_MODULE = ["Ankama_Admin"]
 
 DETERMINIST_TACKLE = True
 
@@ -56,9 +56,7 @@ DOFUS_LOCAL_DATA_STORE = Path(os.getenv("APPDATA")) / "Dofus"
 
 DOFUS_CONTENT_DIR = DOFUS_ROOTDIR / "content"
 
-PROTOCOL_SPEC_PATH = (
-    ROOTDIR / ".." / "jerakine" / "network" / "parser" / "D2protocol.json"
-)
+PROTOCOL_SPEC_PATH = ROOTDIR / ".." / "jerakine" / "network" / "parser" / "D2protocol.json"
 
 WORLDGRAPH_PATH = DOFUS_CONTENT_DIR / "maps" / "world-graph.binary"
 

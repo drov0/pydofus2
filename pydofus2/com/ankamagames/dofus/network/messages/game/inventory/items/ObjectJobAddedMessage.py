@@ -2,11 +2,9 @@ from pydofus2.com.ankamagames.jerakine.network.NetworkMessage import NetworkMess
 
 
 class ObjectJobAddedMessage(NetworkMessage):
-    jobId:int
-    
+    jobId: int
 
-    def init(self, jobId_:int):
+    def init(self, jobId_: int):
         self.jobId = jobId_
-        
+
         super().__init__()
-    

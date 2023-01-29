@@ -2,8 +2,6 @@ from pydofus2.com.ankamagames.dofus.internalDatacenter.items.ItemWrapper import 
 from pydofus2.com.ankamagames.dofus.logic.game.common.misc.IInventoryView import IInventoryView
 from pydofus2.com.ankamagames.jerakine.logger.Logger import Logger
 
-logger = Logger("Dofus2")
-
 
 class ListView(IInventoryView):
     _view: list[ItemWrapper]

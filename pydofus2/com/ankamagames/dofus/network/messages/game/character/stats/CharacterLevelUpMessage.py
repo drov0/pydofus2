@@ -2,11 +2,9 @@ from pydofus2.com.ankamagames.jerakine.network.NetworkMessage import NetworkMess
 
 
 class CharacterLevelUpMessage(NetworkMessage):
-    newLevel:int
-    
+    newLevel: int
 
-    def init(self, newLevel_:int):
+    def init(self, newLevel_: int):
         self.newLevel = newLevel_
-        
+
         super().__init__()
-    

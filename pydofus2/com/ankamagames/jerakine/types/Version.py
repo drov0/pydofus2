@@ -31,9 +31,7 @@ class Version(IExternalizable, IDataCenter):
             self._buildType = int(args[1])
 
     @classmethod
-    def fromServerData(
-        cls, major: int, minor: int, code: int, build: int, buildType: int
-    ) -> "Version":
+    def fromServerData(cls, major: int, minor: int, code: int, build: int, buildType: int) -> "Version":
         version = cls()
         version._major = major
         version._minor = minor
@@ -75,9 +73,7 @@ class Version(IExternalizable, IDataCenter):
             return f"{self._major}.{self._minor}.{self._code}"
         if self._buildType == 0:
             return f"{self._major}.{self._minor}.{self._code}.{self._build}"
-        return (
-            f"{self._major}.{self._minor}.{self._code}.{self._build}-{self._buildType}"
-        )
+        return f"{self._major}.{self._minor}.{self._code}.{self._build}-{self._buildType}"
 
     def toStringForAppName(self) -> str:
         version = self._major + "." + self._minor + "." + self._code + "." + self._build

@@ -105,9 +105,7 @@ class Recipe(IDataCenter):
             ingredientsCount = len(self.ingredientIds)
             self._ingredients = [True] * ingredientsCount
             for i in range(ingredientsCount):
-                self._ingredients[i] = ItemWrapper.create(
-                    0, 0, self.ingredientIds[i], self.quantities[i], [], False
-                )
+                self._ingredients[i] = ItemWrapper.create(0, 0, self.ingredientIds[i], self.quantities[i], [], False)
         return self._ingredients
 
     @property
@@ -115,9 +113,7 @@ class Recipe(IDataCenter):
         if not self._words:
             self._words = I18nFileAccessor().getUnDiacriticalText(self.resultNameId)
             for ingredient in self.ingredients:
-                self._words += " " + I18nFileAccessor().getUnDiacriticalText(
-                    ingredient.nameId
-                )
+                self._words += " " + I18nFileAccessor().getUnDiacriticalText(ingredient.nameId)
             self._words = self._words.toLowerCase()
         return self._words
 

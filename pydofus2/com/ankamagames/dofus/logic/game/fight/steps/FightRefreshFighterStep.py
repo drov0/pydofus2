@@ -26,18 +26,14 @@ class FightRefreshFighterStep(AbstractSequencable, IFightStep):
         return "refreshFighter"
 
     def start(self) -> None:
-        fightEntitiesFrame: "FightEntitiesFrame" = (
-            Kernel().worker.getFrame("FightEntitiesFrame")
-        )
-        currentFighterInfos: "GameContextActorInformations" = (
-            fightEntitiesFrame.getEntityInfos(self._infos.contextualId)
+        fightEntitiesFrame: "FightEntitiesFrame" = Kernel().worker.getFrame("FightEntitiesFrame")
+        currentFighterInfos: "GameContextActorInformations" = fightEntitiesFrame.getEntityInfos(
+            self._infos.contextualId
         )
         if currentFighterInfos:
             currentFighterInfos.disposition = self._infos.disposition
             currentFighterInfos.look = self._infos.look
-            fightEntitiesFrame.setRealFighterLook(
-                currentFighterInfos.contextualId, self._infos.look
-            )
+            fightEntitiesFrame.setRealFighterLook(currentFighterInfos.contextualId, self._infos.look)
             fightEntitiesFrame.updateActor(currentFighterInfos, True)
         self.executeCallbacks()
 

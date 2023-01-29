@@ -2,13 +2,11 @@ from pydofus2.com.ankamagames.jerakine.network.NetworkMessage import NetworkMess
 
 
 class HavenBagRoomPreviewInformation(NetworkMessage):
-    roomId:int
-    themeId:int
-    
+    roomId: int
+    themeId: int
 
-    def init(self, roomId_:int, themeId_:int):
+    def init(self, roomId_: int, themeId_: int):
         self.roomId = roomId_
         self.themeId = themeId_
-        
+
         super().__init__()
-    

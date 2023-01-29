@@ -16,8 +16,6 @@ from pydofus2.com.ankamagames.jerakine.types.positions.MovementPath import Movem
 
 class Projectile(IDisplayable, IMovable, IEntity):
 
-    logger = Logger("Dofus2")
-
     _id: float
 
     _position: MapPoint

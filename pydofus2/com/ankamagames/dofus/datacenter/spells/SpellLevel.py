@@ -17,8 +17,6 @@ from pydofus2.com.ankamagames.jerakine.utils.display.spellZone.ICellZoneProvider
 from pydofus2.com.ankamagames.jerakine.utils.display.spellZone.IZoneShape import IZoneShape
 from pydofus2.com.ankamagames.jerakine.utils.display.spellZone.ZoneEffect import ZoneEffect
 
-logger = Logger("Dofus2")
-
 
 class SpellLevel(ICellZoneProvider, IDataCenter):
 
@@ -74,7 +72,7 @@ class SpellLevel(ICellZoneProvider, IDataCenter):
 
     playAnimation: bool
 
-    stateCriterion : str
+    stateCriterion: str
 
     statesAuthorized: list[int]
 

@@ -6,8 +6,6 @@ from pydofus2.com.ankamagames.jerakine.logger.Logger import Logger
 from pydofus2.com.ankamagames.jerakine.network.INetworkMessage import INetworkMessage
 from pydofus2.com.ankamagames.jerakine.network.Lagometer import Lagometer
 
-logger = Logger("Dofus2")
-
 
 class LagometerAck(Lagometer):
 
@@ -43,7 +41,7 @@ class LagometerAck(Lagometer):
         if isinstance(msg, BasicAckMessage):
             latency = perf_counter() - self._msgTimeStack.pop(0)
             if latency > self.SHOW_LAG_DELAY:
-                logger.debug(latency + " ms de latence (bas� sur ACK)")
+                Logger().debug(latency + " ms de latence (bas� sur ACK)")
                 self.startLag()
                 self._timer.cancel()
             else:

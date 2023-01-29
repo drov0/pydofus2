@@ -2,11 +2,9 @@ from pydofus2.com.ankamagames.jerakine.network.NetworkMessage import NetworkMess
 
 
 class BasicWhoAmIRequestMessage(NetworkMessage):
-    verbose:bool
-    
+    verbose: bool
 
-    def init(self, verbose_:bool):
+    def init(self, verbose_: bool):
         self.verbose = verbose_
-        
+
         super().__init__()
-    

@@ -89,18 +89,18 @@ from pydofus2.com.ankamagames.dofus.network.types.game.guild.application.GuildAp
 )
 from pydofus2.com.ankamagames.jerakine.logger.Logger import Logger
 
-logger = Logger("Dofus2")
 
 class PlayedCharacterInfo(object):
-    def __init__(self, i:CharacterBaseInformations) -> None:
+    def __init__(self, i: CharacterBaseInformations) -> None:
         self.id = i.id
         self.breed = i.breed
         self.level = i.level
         self.limitedLevel = PlayedCharacterManager().limitedLevel
         self.sex = i.sex
         self.name = i.name
-class PlayedCharacterApi(IApi):
 
+
+class PlayedCharacterApi(IApi):
     @classmethod
     def characteristics(cls) -> CharacterCharacteristicsInformations:
         return PlayedCharacterManager().characteristics
@@ -215,9 +215,7 @@ class PlayedCharacterApi(IApi):
     def titlesOrnamentsAskedBefore(cls) -> bool:
         return Kernel().worker.getFrame("TinselFrame").titlesOrnamentsAskedBefore
 
-    
     @classmethod
-    
     def getEntityInfos(cls) -> GameRolePlayCharacterInformations:
         entitiesFrame: AbstractEntitiesFrame = None
         if cls.isInFight():
@@ -229,8 +227,8 @@ class PlayedCharacterApi(IApi):
 
     @classmethod
     def getKamasMaxLimit(cls) -> float:
-        playedCharacterFrame: pcuF.PlayedCharacterUpdatesFrame = (
-            Kernel().worker.getFrame("PlayedCharacterUpdatesFrame")
+        playedCharacterFrame: pcuF.PlayedCharacterUpdatesFrame = Kernel().worker.getFrame(
+            "PlayedCharacterUpdatesFrame"
         )
         if playedCharacterFrame:
             return playedCharacterFrame.kamasLimit
@@ -274,9 +272,7 @@ class PlayedCharacterApi(IApi):
 
     @classmethod
     def isInPreFight(cls) -> bool:
-        return Kernel().worker.contains("FightPreparationFrame") or Kernel().worker.isBeingAdded(
-            FightPreparationFrame
-        )
+        return Kernel().worker.contains("FightPreparationFrame") or Kernel().worker.isBeingAdded(FightPreparationFrame)
 
     @classmethod
     def isSpectator(cls) -> bool:
@@ -418,9 +414,9 @@ class PlayedCharacterApi(IApi):
 
     @classmethod
     def getPlayerSet(cls, objectGID: int) -> PlayerSetInfo:
-        return pcuF.PlayedCharacterUpdatesFrame(
-            Kernel().worker.getFrame("PlayedCharacterUpdatesFrame")
-        ).getPlayerSet(objectGID)
+        return pcuF.PlayedCharacterUpdatesFrame(Kernel().worker.getFrame("PlayedCharacterUpdatesFrame")).getPlayerSet(
+            objectGID
+        )
 
     @classmethod
     def getWeapon(cls) -> WeaponWrapper:
@@ -501,6 +497,7 @@ class PlayedCharacterApi(IApi):
     def getPlayerApplicationInformation(cls) -> object:
         class o:
             pass
+
         o.guildInfo = PlayedCharacterManager().guildApplicationInfo
         o.applicationInfo = PlayedCharacterManager().applicationInfo
         return o

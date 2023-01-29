@@ -2,15 +2,13 @@ from pydofus2.com.ankamagames.dofus.network.types.game.social.AbstractSocialGrou
 
 
 class BasicGuildInformations(AbstractSocialGroupInfos):
-    guildId:int
-    guildName:str
-    guildLevel:int
-    
+    guildId: int
+    guildName: str
+    guildLevel: int
 
-    def init(self, guildId_:int, guildName_:str, guildLevel_:int):
+    def init(self, guildId_: int, guildName_: str, guildLevel_: int):
         self.guildId = guildId_
         self.guildName = guildName_
         self.guildLevel = guildLevel_
-        
+
         super().init()
-    

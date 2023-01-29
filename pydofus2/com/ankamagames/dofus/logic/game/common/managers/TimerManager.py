@@ -3,7 +3,6 @@ from pydofus2.com.ankamagames.jerakine.metaclasses.ThreadSharedSingleton import 
 
 
 class TimeManager(metaclass=ThreadSharedSingleton):
-    
     def __init__(self) -> None:
         self.serverTimeLag: int = 0
         self.serverUtcTimeLag: int = 0

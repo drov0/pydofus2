@@ -2,13 +2,11 @@ from pydofus2.com.ankamagames.jerakine.network.NetworkMessage import NetworkMess
 
 
 class AccountTagInformation(NetworkMessage):
-    nickname:str
-    tagNumber:str
-    
+    nickname: str
+    tagNumber: str
 
-    def init(self, nickname_:str, tagNumber_:str):
+    def init(self, nickname_: str, tagNumber_: str):
         self.nickname = nickname_
         self.tagNumber = tagNumber_
-        
+
         super().__init__()
-    

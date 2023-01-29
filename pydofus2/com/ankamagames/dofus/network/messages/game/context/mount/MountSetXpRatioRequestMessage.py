@@ -2,11 +2,9 @@ from pydofus2.com.ankamagames.jerakine.network.NetworkMessage import NetworkMess
 
 
 class MountSetXpRatioRequestMessage(NetworkMessage):
-    xpRatio:int
-    
+    xpRatio: int
 
-    def init(self, xpRatio_:int):
+    def init(self, xpRatio_: int):
         self.xpRatio = xpRatio_
-        
+
         super().__init__()
-    

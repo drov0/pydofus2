@@ -42,34 +42,13 @@ class ElementEnum:
                                                                 if _loc2_ != 87:
                                                                     if _loc2_ != 93:
                                                                         if _loc2_ != 98:
-                                                                            if (
-                                                                                _loc2_
-                                                                                != 277
-                                                                            ):
-                                                                                if (
-                                                                                    _loc2_
-                                                                                    != 1013
-                                                                                ):
-                                                                                    if (
-                                                                                        _loc2_
-                                                                                        != 1064
-                                                                                    ):
-                                                                                        if (
-                                                                                            _loc2_
-                                                                                            != 1067
-                                                                                        ):
-                                                                                            if (
-                                                                                                _loc2_
-                                                                                                != 1093
-                                                                                            ):
-                                                                                                if (
-                                                                                                    _loc2_
-                                                                                                    != 1125
-                                                                                                ):
-                                                                                                    if (
-                                                                                                        _loc2_
-                                                                                                        != 1225
-                                                                                                    ):
+                                                                            if _loc2_ != 277:
+                                                                                if _loc2_ != 1013:
+                                                                                    if _loc2_ != 1064:
+                                                                                        if _loc2_ != 1067:
+                                                                                            if _loc2_ != 1093:
+                                                                                                if _loc2_ != 1125:
+                                                                                                    if _loc2_ != 1225:
                                                                                                         if (
                                                                                                             _loc2_
                                                                                                             != 85

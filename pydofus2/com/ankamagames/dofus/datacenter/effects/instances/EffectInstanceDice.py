@@ -7,18 +7,13 @@ from pydofus2.com.ankamagames.dofus.datacenter.effects.instances.EffectInstanceI
     EffectInstanceInteger,
 )
 
-logger = Logger("Dofus2")
-
 
 class EffectInstanceDice(EffectInstanceInteger):
-
-
-
     def __init__(self):
         super().__init__()
         diceNum: int = None
         diceSide: int = None
- 
+
     def clone(self) -> "EffectInstance":
         o: EffectInstanceDice = EffectInstanceDice()
         o.rawZone = self.rawZone
@@ -94,5 +89,5 @@ class EffectInstanceDice(EffectInstanceInteger):
             self.diceSide = int(self.diceSide + term.value) if self.diceSide != 0 else int(0)
             self.forceDescriptionRefresh()
         else:
-            logger.error(term + " cannot be added to EffectInstanceDice.")
+            Logger().error(term + " cannot be added to EffectInstanceDice.")
         return self

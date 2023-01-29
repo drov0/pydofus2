@@ -6,9 +6,7 @@ class ServerItemCriterion(ItemCriterion, IDataCenter):
     def text(self) -> str:
         readableCriterionValue: str = Server.getServerById(_criterionValue).name
         readableCriterionRef: str = I18n.getUiText("ui.header.server")
-        return (
-            readableCriterionRef + " " + _operator.text + " " + readableCriterionValue
-        )
+        return readableCriterionRef + " " + _operator.text + " " + readableCriterionValue
 
     def clone(self) -> IItemCriterion:
         return ServerItemCriterion(self.basicText)

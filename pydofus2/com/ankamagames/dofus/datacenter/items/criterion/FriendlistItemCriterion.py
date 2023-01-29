@@ -20,9 +20,7 @@ class FriendlistItemCriterion(ItemCriterion, IDataCenter):
         readableOperator: str = self._operator.text
         if readableOperator == ItemCriterionOperator.EQUAL:
             readableOperator = ":"
-        return (
-            readableCriterionRef + " " + readableOperator + " " + self._criterionValue
-        )
+        return readableCriterionRef + " " + readableOperator + " " + self._criterionValue
 
     def clone(self) -> IItemCriterion:
         return FriendlistItemCriterion(self.basicText)

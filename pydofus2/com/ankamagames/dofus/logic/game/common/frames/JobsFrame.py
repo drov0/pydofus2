@@ -40,7 +40,9 @@ from pydofus2.com.ankamagames.dofus.network.messages.game.context.roleplay.job.J
 from pydofus2.com.ankamagames.dofus.network.messages.game.context.roleplay.job.JobExperienceUpdateMessage import (
     JobExperienceUpdateMessage,
 )
-from pydofus2.com.ankamagames.dofus.network.messages.game.context.roleplay.job.JobLevelUpMessage import JobLevelUpMessage
+from pydofus2.com.ankamagames.dofus.network.messages.game.context.roleplay.job.JobLevelUpMessage import (
+    JobLevelUpMessage,
+)
 from pydofus2.com.ankamagames.dofus.network.messages.game.inventory.exchanges.ExchangeStartOkJobIndexMessage import (
     ExchangeStartOkJobIndexMessage,
 )
@@ -50,7 +52,9 @@ from pydofus2.com.ankamagames.dofus.network.messages.game.inventory.exchanges.Jo
 from pydofus2.com.ankamagames.dofus.network.messages.game.social.ContactLookRequestByIdMessage import (
     ContactLookRequestByIdMessage,
 )
-from pydofus2.com.ankamagames.dofus.network.types.game.context.roleplay.job.JobBookSubscription import JobBookSubscription
+from pydofus2.com.ankamagames.dofus.network.types.game.context.roleplay.job.JobBookSubscription import (
+    JobBookSubscription,
+)
 from pydofus2.com.ankamagames.dofus.network.types.game.context.roleplay.job.JobCrafterDirectorySettings import (
     JobCrafterDirectorySettings,
 )
@@ -61,8 +65,6 @@ from pydofus2.com.ankamagames.jerakine.logger.Logger import Logger
 from pydofus2.com.ankamagames.jerakine.messages.Frame import Frame
 from pydofus2.com.ankamagames.jerakine.messages.Message import Message
 from pydofus2.com.ankamagames.jerakine.types.enums.Priority import Priority
-
-logger = Logger("Dofus2")
 
 
 class JobsFrame(Frame):
@@ -184,7 +186,7 @@ class JobsFrame(Frame):
             newJobLevel -= jobsNumber
             podsBonus = self.jobLevelupPodsBonus(newJobLevel, lastJobLevel)
             levelUpTextMessage = I18n.getUiText("ui.craft.newJobLevel", [jobName, jlumsg.newLevel, podsBonus])
-            logger.info(levelUpTextMessage)
+            Logger().info(levelUpTextMessage)
             return True
         if isinstance(msg, JobBookSubscribeRequestAction):
             jbsra = msg
@@ -213,7 +215,7 @@ class JobsFrame(Frame):
                     text = I18n.getUiText("ui.craft.referenceAddAll")
                 else:
                     text = I18n.getUiText("ui.craft.referenceRemoveAll")
-            logger.info(text)
+            Logger().info(text)
             return True
         if isinstance(msg, JobCrafterDirectoryListRequestAction):
             jcdlra = msg

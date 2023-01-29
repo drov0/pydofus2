@@ -2,11 +2,9 @@ from pydofus2.com.ankamagames.jerakine.network.NetworkMessage import NetworkMess
 
 
 class GuildSpellUpgradeRequestMessage(NetworkMessage):
-    spellId:int
-    
+    spellId: int
 
-    def init(self, spellId_:int):
+    def init(self, spellId_: int):
         self.spellId = spellId_
-        
+
         super().__init__()
-    

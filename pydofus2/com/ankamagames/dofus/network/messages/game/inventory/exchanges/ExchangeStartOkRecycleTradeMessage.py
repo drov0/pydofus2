@@ -2,13 +2,11 @@ from pydofus2.com.ankamagames.jerakine.network.NetworkMessage import NetworkMess
 
 
 class ExchangeStartOkRecycleTradeMessage(NetworkMessage):
-    percentToPrism:int
-    percentToPlayer:int
-    
+    percentToPrism: int
+    percentToPlayer: int
 
-    def init(self, percentToPrism_:int, percentToPlayer_:int):
+    def init(self, percentToPrism_: int, percentToPlayer_: int):
         self.percentToPrism = percentToPrism_
         self.percentToPlayer = percentToPlayer_
-        
+
         super().__init__()
-    

@@ -2,11 +2,9 @@ from pydofus2.com.ankamagames.jerakine.network.NetworkMessage import NetworkMess
 
 
 class GuildFightJoinRequestMessage(NetworkMessage):
-    taxCollectorId:int
-    
+    taxCollectorId: int
 
-    def init(self, taxCollectorId_:int):
+    def init(self, taxCollectorId_: int):
         self.taxCollectorId = taxCollectorId_
-        
+
         super().__init__()
-    

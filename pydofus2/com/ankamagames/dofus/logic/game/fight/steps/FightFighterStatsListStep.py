@@ -39,12 +39,8 @@ class FightFighterStatsListStep(AbstractSequencable, IFightStep):
     def start(self) -> None:
         self._playerId = PlayedCharacterManager().id
         isRealPlayer: bool = CurrentPlayedFighterManager().isRealPlayer()
-        CurrentPlayedFighterManager().setCharacteristicsInformations(
-            self._playerId, self._stats
-        )
-        characterFrame: "PlayedCharacterUpdatesFrame" = (
-            Kernel().worker.getFrame("PlayedCharacterUpdatesFrame")
-        )
+        CurrentPlayedFighterManager().setCharacteristicsInformations(self._playerId, self._stats)
+        characterFrame: "PlayedCharacterUpdatesFrame" = Kernel().worker.getFrame("PlayedCharacterUpdatesFrame")
         if characterFrame and isRealPlayer:
             characterFrame.updateCharacterStatsList(self._stats)
         SpellWrapper.refreshAllPlayerSpellHolder(self._playerId)
@@ -66,10 +62,7 @@ class FightFighterStatsListStep(AbstractSequencable, IFightStep):
             )
         if newStat.additional != oldStat.additional:
             characterBaseCharacteristicChangeDetails += (
-                "\r        - additional : "
-                + str(oldStat.additional)
-                + " � "
-                + str(newStat.additional)
+                "\r        - additional : " + str(oldStat.additional) + " � " + str(newStat.additional)
             )
         if newStat.objectsAndMountBonus != oldStat.objectsAndMountBonus:
             characterBaseCharacteristicChangeDetails += (
@@ -80,16 +73,10 @@ class FightFighterStatsListStep(AbstractSequencable, IFightStep):
             )
         if newStat.alignGiftBonus != oldStat.alignGiftBonus:
             characterBaseCharacteristicChangeDetails += (
-                "\r        - alignGiftBonus : "
-                + str(oldStat.alignGiftBonus)
-                + " � "
-                + str(newStat.alignGiftBonus)
+                "\r        - alignGiftBonus : " + str(oldStat.alignGiftBonus) + " � " + str(newStat.alignGiftBonus)
             )
         if newStat.contextModif != oldStat.contextModif:
             characterBaseCharacteristicChangeDetails += (
-                "\r        - contextModif : "
-                + str(oldStat.contextModif)
-                + " � "
-                + str(newStat.contextModif)
+                "\r        - contextModif : " + str(oldStat.contextModif) + " � " + str(newStat.contextModif)
             )
         return characterBaseCharacteristicChangeDetails

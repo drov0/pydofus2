@@ -27,8 +27,6 @@ from pydofus2.com.ankamagames.jerakine.entities.interfaces.IEntity import IEntit
 from pydofus2.com.ankamagames.jerakine.sequencer.AbstractSequencable import AbstractSequencable
 from pydofus2.com.ankamagames.jerakine.types.positions.MapPoint import MapPoint
 
-logger = Logger("Dofus2")
-
 
 class FightThrowCharacterStep(AbstractSequencable, IFightStep):
 
@@ -59,19 +57,19 @@ class FightThrowCharacterStep(AbstractSequencable, IFightStep):
 
     def start(self) -> None:
         entitiesFrame: FightEntitiesFrame = Kernel().worker.getFrame(FightEntitiesFrame)
-        carryingEntity = DofusEntities.getEntity(self._fighterId)
+        carryingEntity = DofusEntities().getEntity(self._fighterId)
         carryingEntityInfos: GameFightFighterInformations = entitiesFrame.getEntityInfos(self._fighterId)
-        carriedEntity: IEntity = DofusEntities.getEntity(self._carriedId)
+        carriedEntity: IEntity = DofusEntities().getEntity(self._carriedId)
         carriedEntityInfos: GameFightFighterInformations = entitiesFrame.getEntityInfos(self._carriedId)
         carryingFighterExist: bool = True
         if not carriedEntity or not carriedEntityInfos.spawnInfo.alive:
-            logger.error(f"Attention, l'entit� [{self._fighterId}] ne porte pas [{self._carriedId}]")
+            Logger().error(f"Attention, l'entit� [{self._fighterId}] ne porte pas [{self._carriedId}]")
             if carriedEntity:
                 del carriedEntity
             self.throwFinished()
             return
         if not carryingEntity or not carryingEntityInfos.spawnInfo.alive:
-            logger.error(f"Attention, l'entit� [{self._fighterId}] ne porte pas [{self._carriedId}]")
+            Logger().error(f"Attention, l'entit� [{self._fighterId}] ne porte pas [{self._carriedId}]")
             carryingFighterExist = False
         fighterInfos: "GameFightFighterInformations" = FightEntitiesFrame.getCurrentInstance().getEntityInfos(
             self._carriedId
@@ -85,7 +83,7 @@ class FightThrowCharacterStep(AbstractSequencable, IFightStep):
         invisibility: bool = False
         if fighterInfos.stats.invisibilityState == GameActionFightInvisibilityStateEnum.INVISIBLE:
             invisibility = True
-        logger.debug(f"{self._fighterId} is throwing {self._carriedId} (invisibility : {invisibility})")
+        Logger().debug(f"{self._fighterId} is throwing {self._carriedId} (invisibility : {invisibility})")
         if not invisibility:
             FightEntitiesHolder().unholdEntity(self._carriedId)
         if carryingFighterExist:

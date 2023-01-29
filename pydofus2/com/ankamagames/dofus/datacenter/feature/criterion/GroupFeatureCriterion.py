@@ -7,8 +7,6 @@ from pydofus2.com.ankamagames.dofus.datacenter.items.criterion.IItemCriterion im
 from pydofus2.com.ankamagames.dofus.datacenter.items.criterion.ItemCriterion import ItemCriterion
 from pydofus2.com.ankamagames.jerakine.logger.Logger import Logger
 
-logger = Logger("Dofus2")
-
 
 class GroupFeatureCriterion(GroupItemCriterion):
     def __init__(self, criteria: str):

@@ -5,8 +5,6 @@ import os
 from pydofus2.com.ankamagames.dofus import Constants as Constants
 import pyamf
 
-logger = Logger()
-
 
 class CustomSharedObjectFileFormatError(Exception):
     pass
@@ -82,14 +80,14 @@ class CustomSharedObject:
         except Exception as e:
             if self._fileStream:
                 self._fileStream.close()
-            logger.error(f"Unable to write file : {self._file}", exc_info=True)
+            Logger().error(f"Unable to write file : {self._file}", exc_info=True)
             return False
         return True
 
     def getDataFromFile(self) -> None:
         if not self._file:
             self._file = os.path.join(self.COMMON_FOLDER, self._name + "." + self.DATAFILE_EXTENSION)
-        logger.debug("Loading file : " + self._name + "." + self.DATAFILE_EXTENSION)
+        Logger().debug("Loading file : " + self._name + "." + self.DATAFILE_EXTENSION)
         if os.path.exists(self._file):
             try:
                 with open(self._file, "rb") as fp:
@@ -113,7 +111,7 @@ class CustomSharedObject:
                 except Exception as e:
                     if self._fileStream:
                         self._fileStream.close()
-                    logger.warning(str(e))
+                    Logger().warning(str(e))
                     if self.throwException:
                         raise CustomSharedObjectFileFormatError("Malformated file : " + self._file)
         if not self.data:

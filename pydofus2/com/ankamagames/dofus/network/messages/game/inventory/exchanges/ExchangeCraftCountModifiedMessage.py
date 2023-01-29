@@ -2,11 +2,9 @@ from pydofus2.com.ankamagames.jerakine.network.NetworkMessage import NetworkMess
 
 
 class ExchangeCraftCountModifiedMessage(NetworkMessage):
-    count:int
-    
+    count: int
 
-    def init(self, count_:int):
+    def init(self, count_: int):
         self.count = count_
-        
+
         super().__init__()
-    

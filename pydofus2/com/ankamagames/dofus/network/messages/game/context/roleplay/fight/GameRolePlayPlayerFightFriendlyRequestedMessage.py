@@ -2,15 +2,13 @@ from pydofus2.com.ankamagames.jerakine.network.NetworkMessage import NetworkMess
 
 
 class GameRolePlayPlayerFightFriendlyRequestedMessage(NetworkMessage):
-    fightId:int
-    sourceId:int
-    targetId:int
-    
+    fightId: int
+    sourceId: int
+    targetId: int
 
-    def init(self, fightId_:int, sourceId_:int, targetId_:int):
+    def init(self, fightId_: int, sourceId_: int, targetId_: int):
         self.fightId = fightId_
         self.sourceId = sourceId_
         self.targetId = targetId_
-        
+
         super().__init__()
-    

@@ -2,11 +2,9 @@ from pydofus2.com.ankamagames.jerakine.network.NetworkMessage import NetworkMess
 
 
 class GameContextReadyMessage(NetworkMessage):
-    mapId:int
-    
+    mapId: int
 
-    def init(self, mapId_:int):
+    def init(self, mapId_: int):
         self.mapId = mapId_
-        
+
         super().__init__()
-    

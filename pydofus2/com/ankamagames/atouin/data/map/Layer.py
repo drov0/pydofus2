@@ -3,8 +3,6 @@ from pydofus2.com.ankamagames.atouin.data.map.elements.BasicElement import Basic
 from pydofus2.com.ankamagames.jerakine.data.BinaryStream import BinaryStream
 from pydofus2.com.ankamagames.jerakine.logger.Logger import Logger
 
-logger = Logger("Dofus2")
-
 
 class Layer:
 
@@ -42,6 +40,6 @@ class LayerCell:
         for i in range(self.elementsCount):
             be = BasicElement.getElementFromType(raw.readByte(), self)
             if AtouinConstants.DEBUG_FILES_PARSING:
-                logger.debug("    (Cell) Element at index " + i + " :")
+                Logger().debug("    (Cell) Element at index " + i + " :")
             be.fromRaw(raw, self.mapVersion)
             self.elements[i] = be

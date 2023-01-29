@@ -11,8 +11,6 @@ from pydofus2.com.ankamagames.jerakine.enum.GameDataTypeEnum import GameDataType
 from pydofus2.com.ankamagames.jerakine.logger.Logger import Logger
 from pydofus2.com.ankamagames.jerakine.utils.misc.StringUtils import StringUtils
 
-logger = Logger("Dofus2")
-
 
 class GameDataQuery:
     def getQueryableFields(cls, target: object) -> list[str]:
@@ -185,7 +183,7 @@ class GameDataQuery:
         if name not in fields:
             fieldType = GameDataFileAccessor().getDataProcessor(module).getFieldType(name + "Id")
             if name + "Id" not in fields or GameDataTypeEnum(fieldType) != GameDataTypeEnum.I18N:
-                logger.error("Field " + name + " not found in " + target.__name__)
+                Logger().error("Field " + name + " not found in " + target.__name__)
                 return None
             name += "Id"
         return name

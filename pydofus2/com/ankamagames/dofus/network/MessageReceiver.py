@@ -1,8 +1,5 @@
 import importlib
 import json
-import sys
-from types import FunctionType
-from pydofus2.com.ankamagames.jerakine.logger.Logger import Logger
 from pydofus2.com.ankamagames.jerakine.managers.StoreDataManager import StoreDataManager
 from pydofus2.com.ankamagames.jerakine.metaclasses.ThreadSharedSingleton import ThreadSharedSingleton
 from pydofus2.com.ankamagames.jerakine.network.CustomDataWrapper import ByteArray
@@ -12,18 +9,21 @@ from pydofus2.com.ankamagames.jerakine.network.RawDataParser import RawDataParse
 from pydofus2.com.ankamagames.jerakine.network.UnpackMode import UnpackMode
 import pydofus2.com.ankamagames.dofus.Constants as Constants
 
-logger = Logger("Dofus2")
+
 with open(Constants.PROTOCOL_MSG_SHUFFLE_PATH, "r") as fp:
     msgShuffle: dict = json.load(fp)
 
+
 class UnknowMessageId(Exception):
     pass
+
+
 class MessageReceiver(RawDataParser, metaclass=ThreadSharedSingleton):
-    logger = Logger("Dofus2")
+
     _messages_to_discard: set = {
-        "SetCharacterRestrictionsMessage", 
-        "GameContextRefreshEntityLookMessage", 
-        "ChatServerMessage", 
+        "SetCharacterRestrictionsMessage",
+        "GameContextRefreshEntityLookMessage",
+        "ChatServerMessage",
         "ChatServerWithObjectMessage",
         "UpdateMapPlayersAgressableStatusMessage",
         "GameContextRemoveElementMessage",
@@ -32,8 +32,7 @@ class MessageReceiver(RawDataParser, metaclass=ThreadSharedSingleton):
         "ListMapNpcsQuestStatusUpdateMessage",
         "GameMapChangeOrientationMessage",
         "HousePropertiesMessage",
-        "KnownZaapListMessage"
-        "GuildGetInformationsMessage",
+        "KnownZaapListMessage" "GuildGetInformationsMessage",
         "KnownZaapListMessage",
         "PrismsListMessage",
         "ChatCommunityChannelCommunityMessage",
@@ -55,8 +54,7 @@ class MessageReceiver(RawDataParser, metaclass=ThreadSharedSingleton):
         "StartupActionsListMessage",
         "EmoteListMessage",
         "JobCrafterDirectorySettingsMessage",
-        "EnabledChannelsMessage"
-        "ServerSettingsMessage",
+        "EnabledChannelsMessage" "ServerSettingsMessage",
         "ServerOptionalFeaturesMessage",
         "ServerSessionConstantsMessage",
         "AccountCapabilitiesMessage",
@@ -67,7 +65,9 @@ class MessageReceiver(RawDataParser, metaclass=ThreadSharedSingleton):
         "AccountHouseMessage",
         "EnabledChannelsMessage",
         "PrismsListUpdateMessage",
-        "TrustStatusMessage"
+        "TrustStatusMessage",
+        "NotificationListMessage",
+        "AchievementListMessage",
     }
 
     def __init__(self):
@@ -86,7 +86,7 @@ class MessageReceiver(RawDataParser, metaclass=ThreadSharedSingleton):
     def register(self) -> None:
         for cls in self._messagesTypes.values():
             StoreDataManager().registerClass(cls(), True, True)
-    
+
     def parse(self, input: ByteArray, messageId: int, messageLength: int) -> INetworkMessage:
         messageType = self._messagesTypes.get(messageId)
         if not messageType:
@@ -97,7 +97,7 @@ class MessageReceiver(RawDataParser, metaclass=ThreadSharedSingleton):
         message = messageType.unpack(input, messageLength)
         message.unpacked = True
         return message
-    
+
     def getUnpackMode(self, messageId: int) -> int:
         return self._unpackModes[messageId] if messageId in self._unpackModes else UnpackMode.DEFAULT
 

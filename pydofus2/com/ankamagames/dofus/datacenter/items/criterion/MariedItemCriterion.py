@@ -1,4 +1,3 @@
-      
 from pydofus2.com.ankamagames.dofus.datacenter.items.criterion import ItemCriterion
 from pydofus2.com.ankamagames.jerakine.interfaces import IDataCenter
 from pydofus2.com.ankamagames.dofus.datacenter.items.criterion import ItemCriterionOperator
@@ -7,14 +6,12 @@ from pydofus2.com.ankamagames.dofus.datacenter.items.criterion import IItemCrite
 
 
 class MariedItemCriterion(ItemCriterion, IDataCenter):
-      
-   
-    def __init__(self, pCriterion:str):
+    def __init__(self, pCriterion: str):
         super().__init__(pCriterion)
-   
+
     @property
     def text(self) -> str:
-        readableCriterion:str = ""
+        readableCriterion: str = ""
         if self._operator.text == ItemCriterionOperator.EQUAL:
             if self._criterionValue == 1:
                 readableCriterion = I18n.getUiText("ui.tooltip.beMaried")
@@ -26,8 +23,8 @@ class MariedItemCriterion(ItemCriterion, IDataCenter):
             else:
                 readableCriterion = I18n.getUiText("ui.tooltip.beSingle")
         return readableCriterion
-   
-    def clone(self) -> 'IItemCriterion':
+
+    def clone(self) -> "IItemCriterion":
         return MariedItemCriterion(self.basicText)
 
     def getCriterion(self) -> int:

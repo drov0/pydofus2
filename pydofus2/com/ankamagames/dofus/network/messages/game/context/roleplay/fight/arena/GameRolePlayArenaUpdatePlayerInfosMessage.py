@@ -1,16 +1,16 @@
 from pydofus2.com.ankamagames.jerakine.network.NetworkMessage import NetworkMessage
 from typing import TYPE_CHECKING
+
 if TYPE_CHECKING:
-    from pydofus2.com.ankamagames.dofus.network.types.game.context.roleplay.fight.arena.ArenaRankInfos import ArenaRankInfos
-    
+    from pydofus2.com.ankamagames.dofus.network.types.game.context.roleplay.fight.arena.ArenaRankInfos import (
+        ArenaRankInfos,
+    )
 
 
 class GameRolePlayArenaUpdatePlayerInfosMessage(NetworkMessage):
-    solo:'ArenaRankInfos'
-    
+    solo: "ArenaRankInfos"
 
-    def init(self, solo_:'ArenaRankInfos'):
+    def init(self, solo_: "ArenaRankInfos"):
         self.solo = solo_
-        
+
         super().__init__()
-    

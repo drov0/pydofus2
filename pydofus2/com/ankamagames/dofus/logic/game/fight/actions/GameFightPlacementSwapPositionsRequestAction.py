@@ -13,12 +13,8 @@ class GameFightPlacementSwapPositionsRequestAction(AbstractAction, Action):
         super().__init__(params)
 
     @classmethod
-    def create(
-        cls, pCellId: int, pRequestedId: float
-    ) -> "GameFightPlacementSwapPositionsRequestAction":
-        action: GameFightPlacementSwapPositionsRequestAction = (
-            GameFightPlacementSwapPositionsRequestAction(argv)
-        )
+    def create(cls, pCellId: int, pRequestedId: float) -> "GameFightPlacementSwapPositionsRequestAction":
+        action: GameFightPlacementSwapPositionsRequestAction = GameFightPlacementSwapPositionsRequestAction(argv)
         action.cellId = pCellId
         action.requestedId = pRequestedId
         return action

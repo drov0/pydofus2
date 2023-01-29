@@ -2,13 +2,11 @@ from pydofus2.com.ankamagames.dofus.network.types.game.context.roleplay.HumanOpt
 
 
 class HumanOptionEmote(HumanOption):
-    emoteId:int
-    emoteStartTime:int
-    
+    emoteId: int
+    emoteStartTime: int
 
-    def init(self, emoteId_:int, emoteStartTime_:int):
+    def init(self, emoteId_: int, emoteStartTime_: int):
         self.emoteId = emoteId_
         self.emoteStartTime = emoteStartTime_
-        
+
         super().init()
-    

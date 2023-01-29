@@ -23,8 +23,6 @@ if TYPE_CHECKING:
     from pydofus2.com.ankamagames.jerakine.types.positions.MovementPath import MovementPath
     from pydofus2.com.ankamagames.dofus.logic.game.fight.frames.FightTurnFrame import FightTurnFrame
 
-logger = Logger("Dofus2")
-
 
 class FightEntityMovementStep(AbstractSequencable, IFightStep):
 
@@ -52,7 +50,7 @@ class FightEntityMovementStep(AbstractSequencable, IFightStep):
         return "entityMovement"
 
     def start(self) -> None:
-        self._entity = DofusEntities.getEntity(self._entityId)
+        self._entity = DofusEntities().getEntity(self._entityId)
         if self._entity:
             fighterInfos = FightEntitiesFrame.getCurrentInstance().getEntityInfos(self._entityId)
             ftf: "FightTurnFrame" = Kernel().worker.getFrame("FightTurnFrame")
@@ -61,7 +59,7 @@ class FightEntityMovementStep(AbstractSequencable, IFightStep):
             self._entity.position.cellId = self._path.end.cellId
             fighterInfos.disposition.cellId = self._path.end.cellId
         else:
-            logger.warn(f"Unable to move unknown entity {self._entityId}.")
+            Logger().warn(f"Unable to move unknown entity {self._entityId}.")
         self.movementEnd()
 
     @property

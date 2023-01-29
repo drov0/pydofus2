@@ -3,8 +3,6 @@ from pydofus2.com.ankamagames.dofus.types.IdAccessors import IdAccessors
 from pydofus2.com.ankamagames.jerakine.interfaces.IDataCenter import IDataCenter
 from pydofus2.com.ankamagames.jerakine.logger.Logger import Logger
 
-logger = Logger("Dofus2")
-
 
 class Weapon(Item, IDataCenter):
 

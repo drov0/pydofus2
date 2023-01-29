@@ -73,8 +73,6 @@ if TYPE_CHECKING:
         FightEntitiesFrame,
     )
 
-logger = Logger("Dofus2")
-
 
 class FightSpellCastFrame(Frame):
 
@@ -173,7 +171,7 @@ class FightSpellCastFrame(Frame):
         fighters = fef.entities
         for actorInfos in fighters:
             fighterInfos = actorInfos
-            character = DofusEntities.getEntity(fighterInfos.contextualId)
+            character = DofusEntities().getEntity(fighterInfos.contextualId)
             if (
                 character
                 and fighterInfos.contextualId != CurrentPlayedFighterManager().currentFighterId
@@ -225,7 +223,7 @@ class FightSpellCastFrame(Frame):
 
         elif isinstance(msg, TimelineEntityOverAction):
             teoa = msg
-            timelineEntity = DofusEntities.getEntity(teoa.targetId)
+            timelineEntity = DofusEntities().getEntity(teoa.targetId)
             if timelineEntity and timelineEntity.position and timelineEntity.position.cellId > -1:
                 FightContextFrame.currentCell = timelineEntity.position.cellId
                 self.refreshTarget()
@@ -233,7 +231,7 @@ class FightSpellCastFrame(Frame):
 
         if isinstance(msg, TimelineEntityOutAction):
             teouta = msg
-            DofusEntities.getEntity(teouta.targetId)
+            DofusEntities().getEntity(teouta.targetId)
             self.removeTeleportationPreview()
             self.removeSummoningPreview()
             return False
@@ -282,7 +280,7 @@ class FightSpellCastFrame(Frame):
             fighters = fef.entities
             for actorInfos in fighters:
                 fighterInfos = actorInfos
-                character = DofusEntities.getEntity(actorInfos.contextualId)
+                character = DofusEntities().getEntity(actorInfos.contextualId)
                 if (
                     character
                     and actorInfos.contextualId != CurrentPlayedFighterManager().currentFighterId
@@ -602,7 +600,7 @@ class FightSpellCastFrame(Frame):
             return
         if forceCheckForRange and self._spellLevel["maximalRange"] < 63:
             if cell == 0 and targetId != 0:
-                entity = DofusEntities.getEntity(targetId)
+                entity = DofusEntities().getEntity(targetId)
                 if entity and entity.position:
                     cell = entity.position.cellId
             if SelectionManager().isInside(cell, self.SELECTION_RANGE) or not SelectionManager().isInside(

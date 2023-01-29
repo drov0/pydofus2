@@ -25,8 +25,6 @@ from pydofus2.com.ankamagames.jerakine.logger.Logger import Logger
 
 class FightTeam(GameContextActorInformations):
 
-    logger = Logger("Dofus2")
-
     fight: "Fight"
 
     teamType: int

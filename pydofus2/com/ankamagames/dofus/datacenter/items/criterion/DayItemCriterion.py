@@ -12,12 +12,8 @@ class DayItemCriterion(ItemCriterion, IDataCenter):
     @property
     def text(self) -> str:
         readableCriterionValue: str = str(self._criterionValue)
-        readableCriterionRef: str = PatternDecoder.combine(
-            I18n.getUiText("ui.time.days"), "n", True
-        )
-        return (
-            readableCriterionRef + " " + self._operator.text + " " + readableCriterionValue
-        )
+        readableCriterionRef: str = PatternDecoder.combine(I18n.getUiText("ui.time.days"), "n", True)
+        return readableCriterionRef + " " + self._operator.text + " " + readableCriterionValue
 
     def clone(self) -> "IItemCriterion":
         return DayItemCriterion(self.basicText)

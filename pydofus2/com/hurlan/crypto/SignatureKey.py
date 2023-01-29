@@ -12,10 +12,7 @@ class SignatureKey(RSA.RsaKey):
     @classmethod
     def import_key(cls, input: ByteArray) -> "SignatureKey":
         header: str = input.readUTF()
-        if (
-            header != SignatureKey.PUBLIC_KEY_HEADER
-            and header != SignatureKey.PRIVATE_KEY_HEADER
-        ):
+        if header != SignatureKey.PUBLIC_KEY_HEADER and header != SignatureKey.PRIVATE_KEY_HEADER:
             raise Exception("Invalid public or private header")
         if header == SignatureKey.PUBLIC_KEY_HEADER:
             N = input.readUTF()

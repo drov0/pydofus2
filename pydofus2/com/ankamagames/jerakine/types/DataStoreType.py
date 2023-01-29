@@ -15,14 +15,10 @@ class DataStoreType:
         self._bPersistant = bPersistant
         if bPersistant:
             if nLocation is None:
-                raise JerakineError(
-                    "When DataStoreType is a persistant data, arg 'nLocation' must be defined."
-                )
+                raise JerakineError("When DataStoreType is a persistant data, arg 'nLocation' must be defined.")
             self._nLocation = nLocation
             if nBind is None:
-                raise JerakineError(
-                    "When DataStoreType is a persistant data, arg 'nBind' must be defined."
-                )
+                raise JerakineError("When DataStoreType is a persistant data, arg 'nBind' must be defined.")
             self._nBind = nBind
         self._ACCOUNT_ID: str = None
         self._CHARACTER_ID: str = None

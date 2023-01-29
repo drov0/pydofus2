@@ -2,11 +2,9 @@ from pydofus2.com.ankamagames.jerakine.network.NetworkMessage import NetworkMess
 
 
 class GuildGetInformationsMessage(NetworkMessage):
-    infoType:int
-    
+    infoType: int
 
-    def init(self, infoType_:int):
+    def init(self, infoType_: int):
         self.infoType = infoType_
-        
+
         super().__init__()
-    

@@ -2,13 +2,11 @@ from pydofus2.com.ankamagames.jerakine.network.NetworkMessage import NetworkMess
 
 
 class ChallengeTargetUpdateMessage(NetworkMessage):
-    challengeId:int
-    targetId:int
-    
+    challengeId: int
+    targetId: int
 
-    def init(self, challengeId_:int, targetId_:int):
+    def init(self, challengeId_: int, targetId_: int):
         self.challengeId = challengeId_
         self.targetId = targetId_
-        
+
         super().__init__()
-    

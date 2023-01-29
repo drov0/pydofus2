@@ -18,8 +18,6 @@ from pydofus2.com.ankamagames.jerakine.messages.Message import Message
 from pydofus2.com.ankamagames.jerakine.network.INetworkMessage import INetworkMessage
 from pydofus2.com.ankamagames.jerakine.types.enums.Priority import Priority
 
-logger = Logger("Dofus2")
-
 
 class HandshakeFrame(Frame):
 
@@ -32,22 +30,33 @@ class HandshakeFrame(Frame):
         super().__init__()
 
     def checkProtocolVersions(self, serverVersion: str) -> None:
-        logger.info(f"[HandShake] Server protocol version {serverVersion}. Client version {Metadata.PROTOCOL_BUILD}.")
+        Logger().info(
+            f"[HandShake] Server protocol version {serverVersion}. Client version {Metadata.PROTOCOL_BUILD}."
+        )
         if not serverVersion or not Metadata.PROTOCOL_BUILD:
-            KernelEventsManager().send(KernelEvts.CRASH, "MALFORMED_PROTOCOL: A protocol version is empty or None. What happened?")
+            KernelEventsManager().send(
+                KernelEvts.CRASH, "MALFORMED_PROTOCOL: A protocol version is empty or None. What happened?"
+            )
             return
         clientHash: str = self.extractHashFromProtocolVersion(Metadata.PROTOCOL_BUILD)
         if not clientHash:
             logger.fatal("[HandShake] The client protocol version is malformed: " + Metadata.PROTOCOL_BUILD)
-            KernelEventsManager().send(KernelEvts.CRASH, "MALFORMED_PROTOCOL: The client protocol version is malformed")
+            KernelEventsManager().send(
+                KernelEvts.CRASH, "MALFORMED_PROTOCOL: The client protocol version is malformed"
+            )
             return
         serverHash: str = self.extractHashFromProtocolVersion(serverVersion)
         if not serverHash:
-            KernelEventsManager().send(KernelEvts.CRASH, "MALFORMED_PROTOCOL: The server protocol version is malformed")
+            KernelEventsManager().send(
+                KernelEvts.CRASH, "MALFORMED_PROTOCOL: The server protocol version is malformed"
+            )
             return
         if clientHash != serverHash:
-            KernelEventsManager().send(KernelEvts.CRASH, "PROTOCOL_MISMATCH: The server protocol is different from the client protocol")
+            KernelEventsManager().send(
+                KernelEvts.CRASH, "PROTOCOL_MISMATCH: The server protocol is different from the client protocol"
+            )
             return
+
     def extractHashFromProtocolVersion(self, protocolVersion: str) -> str:
         if not protocolVersion:
             return None

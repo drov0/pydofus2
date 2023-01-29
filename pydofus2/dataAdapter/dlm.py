@@ -5,8 +5,6 @@ from pydofus2.com.ankamagames.atouin.data.map.Map import Map
 from pydofus2.com.ankamagames.jerakine.data.BinaryStream import BinaryStream
 from pydofus2.com.ankamagames.jerakine.logger.Logger import Logger
 
-logger = Logger("Dofus2")
-
 
 class InvalidDLMFile(Exception):
     pass
@@ -31,7 +29,7 @@ class DLM:
         if header != 77:
             raise Exception("Unknown file format.")
         map_version = dlm_raw.readByte()
-        logger.debug(f"Map version: {map_version}")
+        Logger().debug(f"Map version: {map_version}")
         id = dlm_raw.readUnsignedInt()
 
         if map_version >= 7:
@@ -39,7 +37,7 @@ class DLM:
             self.encryptionVersion = dlm_raw.readByte()
             self.dataLen = dlm_raw.readInt()
             if self.encrypted:
-                logger.debug(f"Map is encrypted with version {self.encryptionVersion}")
+                Logger().debug(f"Map is encrypted with version {self.encryptionVersion}")
                 if not self._key:
                     raise Exception("Map decryption key is empty.")
                 self.encryptedData = dlm_raw.readBytes(self.dataLen)

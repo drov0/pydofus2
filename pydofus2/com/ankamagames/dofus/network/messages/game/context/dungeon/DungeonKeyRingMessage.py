@@ -2,13 +2,11 @@ from pydofus2.com.ankamagames.jerakine.network.NetworkMessage import NetworkMess
 
 
 class DungeonKeyRingMessage(NetworkMessage):
-    availables:list[int]
-    unavailables:list[int]
-    
+    availables: list[int]
+    unavailables: list[int]
 
-    def init(self, availables_:list[int], unavailables_:list[int]):
+    def init(self, availables_: list[int], unavailables_: list[int]):
         self.availables = availables_
         self.unavailables = unavailables_
-        
+
         super().__init__()
-    

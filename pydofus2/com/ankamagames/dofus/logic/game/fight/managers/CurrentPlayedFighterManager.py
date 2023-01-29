@@ -4,7 +4,9 @@ from pydofus2.com.ankamagames.dofus.datacenter.items.criterion.GroupItemCriterio
 from pydofus2.com.ankamagames.dofus.datacenter.items.criterion.ItemCriterionOperator import ItemCriterionOperator
 from pydofus2.com.ankamagames.dofus.logic.game.fight.managers.SpellModifiersManager import SpellModifiersManager
 from pydofus2.com.ankamagames.dofus.network.ProtocolConstantsEnum import ProtocolConstantsEnum
-from pydofus2.com.ankamagames.dofus.network.enums.CharacterSpellModificationTypeEnum import CharacterSpellModificationTypeEnum
+from pydofus2.com.ankamagames.dofus.network.enums.CharacterSpellModificationTypeEnum import (
+    CharacterSpellModificationTypeEnum,
+)
 from pydofus2.com.ankamagames.jerakine.data.I18n import I18n
 
 if TYPE_CHECKING:
@@ -39,28 +41,15 @@ from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from pydofus2.com.ankamagames.dofus.types.entities.AnimatedCharacter import AnimatedCharacter
 
-logger = Logger("Dofus2")
-
 
 class CurrentPlayedFighterManager(metaclass=Singleton):
-
-    _currentFighterId: float = 0
-
-    _currentFighterIsRealPlayer: bool = True
-
-    _characteristicsInformationsList: dict
-
-    _spellCastInFightManagerList: dict
-
-    _currentSummonedCreature: dict
-
-    _currentSummonedBomb: dict
-
     def __init__(self):
         self._characteristicsInformationsList = dict()
         self._spellCastInFightManagerList = dict()
         self._currentSummonedCreature = dict()
         self._currentSummonedBomb = dict()
+        self._currentFighterIsRealPlayer: bool = True
+        self._currentFighterId: float = 0
         super().__init__()
 
     @property
@@ -75,12 +64,12 @@ class CurrentPlayedFighterManager(metaclass=Singleton):
         self._currentFighterId = id
         playerManager = pcm.PlayedCharacterManager()
         self._currentFighterIsRealPlayer = self._currentFighterId == playerManager.id
-        lastFighterEntity: "AnimatedCharacter" = DofusEntities.getEntity(lastFighterId)
+        lastFighterEntity: "AnimatedCharacter" = DofusEntities().getEntity(lastFighterId)
         if lastFighterEntity:
             lastFighterEntity.canSeeThrough = False
             lastFighterEntity.canWalkThrough = False
             lastFighterEntity.canWalkTo = False
-        currentFighterEntity: "AnimatedCharacter" = DofusEntities.getEntity(self._currentFighterId)
+        currentFighterEntity: "AnimatedCharacter" = DofusEntities().getEntity(self._currentFighterId)
         if currentFighterEntity:
             currentFighterEntity.canSeeThrough = True
             currentFighterEntity.canWalkThrough = True
@@ -101,7 +90,7 @@ class CurrentPlayedFighterManager(metaclass=Singleton):
         playerManager = pcm.PlayedCharacterManager()
         # inventoryManager:InventoryManager = InventoryManager()
         if playerManager.spellsInventory != playerManager.playerSpellList:
-            logger.info("Remise à jour de la liste des sorts du joueur")
+            Logger().info("Remise à jour de la liste des sorts du joueur")
             playerManager.spellsInventory = playerManager.playerSpellList
             if knl.Kernel().worker.contains("FightSpellCastFrame"):
                 knl.Kernel().worker.removeFrame(knl.Kernel().worker.getFrame("FightSpellCastFrame"))
@@ -255,7 +244,10 @@ class CurrentPlayedFighterManager(metaclass=Singleton):
                 criterion = GroupItemCriterion(spellLevel.statesCriterion)
                 isRequired = False
                 for requiredStateCriterion in criterion.criteria:
-                    if isinstance(requiredStateCriterion, StateCriterion) and  requiredStateCriterion.operatorText == ItemCriterionOperator.EQUAL:
+                    if (
+                        isinstance(requiredStateCriterion, StateCriterion)
+                        and requiredStateCriterion.operatorText == ItemCriterionOperator.EQUAL
+                    ):
                         if int(requiredStateCriterion.criterionValue == currentState.id):
                             isRequired = True
                             break
@@ -264,9 +256,7 @@ class CurrentPlayedFighterManager(metaclass=Singleton):
             gic = GroupItemCriterion(spellLevel.statesCriterion)
             if not gic.isRespected:
                 if result:
-                    result[0] = I18n.getUiText(
-                        "ui.fightAutomsg.spellcast.notAvailable", [spellName]
-                    )
+                    result[0] = I18n.getUiText("ui.fightAutomsg.spellcast.notAvailable", [spellName])
                 return False
         if not spell.bypassSummoningLimit and spellLevel.canSummon and not self.canSummon():
             if result:
@@ -318,7 +308,7 @@ class CurrentPlayedFighterManager(metaclass=Singleton):
         if pcm.PlayedCharacterManager().id != self._currentFighterId:
             self.currentFighterId = pcm.PlayedCharacterManager().id
             self.resetPlayerSpellList()
-            # self.updatePortrait(DofusEntities.getEntity(self._currentFighterId))
+            # self.updatePortrait(DofusEntities().getEntity(self._currentFighterId))
         self._currentFighterId = 0
         self._characteristicsInformationsList = dict()
         self._spellCastInFightManagerList = dict()

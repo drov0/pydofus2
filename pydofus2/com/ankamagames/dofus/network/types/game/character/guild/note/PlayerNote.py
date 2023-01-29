@@ -2,13 +2,11 @@ from pydofus2.com.ankamagames.jerakine.network.NetworkMessage import NetworkMess
 
 
 class PlayerNote(NetworkMessage):
-    content:str
-    lastEditDate:int
-    
+    content: str
+    lastEditDate: int
 
-    def init(self, content_:str, lastEditDate_:int):
+    def init(self, content_: str, lastEditDate_: int):
         self.content = content_
         self.lastEditDate = lastEditDate_
-        
+
         super().__init__()
-    

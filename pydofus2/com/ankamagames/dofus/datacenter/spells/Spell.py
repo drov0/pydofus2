@@ -11,7 +11,6 @@ from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
     from pydofus2.com.ankamagames.dofus.datacenter.spells.SpellLevel import SpellLevel
-logger = Logger("Dofus2")
 
 
 class Spell(IDataCenter):
@@ -30,7 +29,7 @@ class Spell(IDataCenter):
         self.scriptParams: str = ""
         self.scriptParamsCritical: str = ""
         self.scriptId: int = None
-        self.scriptIdCritical: int = None 
+        self.scriptIdCritical: int = None
         self.iconId: int = None
         self.spellLevels = list[int]()
         self.useParamCache: bool = True
@@ -43,7 +42,7 @@ class Spell(IDataCenter):
         self._description: str = ""
         self._spellLevels = list["SpellLevel"]()
         self._spellVariant: SpellVariant = None
-        
+
     @classmethod
     def getSpellById(cls, id: int) -> "Spell":
         return GameData.getObject(cls.MODULE, id)

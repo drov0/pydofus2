@@ -2,11 +2,9 @@ from pydofus2.com.ankamagames.jerakine.network.NetworkMessage import NetworkMess
 
 
 class PrismSetSabotagedRequestMessage(NetworkMessage):
-    subAreaId:int
-    
+    subAreaId: int
 
-    def init(self, subAreaId_:int):
+    def init(self, subAreaId_: int):
         self.subAreaId = subAreaId_
-        
+
         super().__init__()
-    

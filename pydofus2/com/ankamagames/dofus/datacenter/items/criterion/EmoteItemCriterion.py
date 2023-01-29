@@ -28,12 +28,7 @@ class EmoteItemCriterion(ItemCriterion, IDataCenter):
         readableCriterion: str = I18n.getUiText("ui.tooltip.possessEmote")
         if self._operator.text == ItemCriterionOperator.DIFFERENT:
             readableCriterion = I18n.getUiText("ui.tooltip.dontPossessEmote")
-        return (
-            readableCriterion
-            + " '"
-            + Emoticon.getEmoticonById(self._criterionValue).name
-            + "'"
-        )
+        return readableCriterion + " '" + Emoticon.getEmoticonById(self._criterionValue).name + "'"
 
     def clone(self) -> IItemCriterion:
         return EmoteItemCriterion(self.basicText)

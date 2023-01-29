@@ -2,11 +2,9 @@ from pydofus2.com.ankamagames.jerakine.network.NetworkMessage import NetworkMess
 
 
 class ClientKeyMessage(NetworkMessage):
-    key:str
-    
+    key: str
 
-    def init(self, key_:str):
+    def init(self, key_: str):
         self.key = key_
-        
+
         super().__init__()
-    

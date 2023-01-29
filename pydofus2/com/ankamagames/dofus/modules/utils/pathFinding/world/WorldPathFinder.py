@@ -11,12 +11,11 @@ from pydofus2.com.ankamagames.dofus.modules.utils.pathFinding.tools.TimeDebug im
 from pydofus2.com.ankamagames.jerakine.logger.Logger import Logger
 from pydofus2.com.ankamagames.jerakine.metaclasses.ThreadSharedSingleton import ThreadSharedSingleton
 from pydofus2.com.ankamagames.jerakine.network.CustomDataWrapper import ByteArray
-logger = Logger("Dofus2")
 
 
 class WorldPathFinder(metaclass=ThreadSharedSingleton):
     worldGraph: WorldGraph = None
-    
+
     def __init__(self):
         self.callback: FunctionType = None
         self.src: Vertex = None
@@ -28,7 +27,7 @@ class WorldPathFinder(metaclass=ThreadSharedSingleton):
     @property
     def playedCharacterManager(self) -> PlayedCharacterManager:
         return PlayedCharacterManager()
-    
+
     def init(self) -> None:
         if self.isInitialized():
             return
@@ -57,14 +56,16 @@ class WorldPathFinder(metaclass=ThreadSharedSingleton):
             return
         TimeDebug.reset()
         self.src = self.currPlayerVertex
-        logger.info(f"[WoldPathFinder] Start searching path from {self.currPlayerVertex} to destMapId {destinationMapId}")
+        Logger().info(
+            f"[WoldPathFinder] Start searching path from {self.currPlayerVertex} to destMapId {destinationMapId}"
+        )
         if self.src is None:
             callback(None)
             return
         if linkedZone is None:
             linkedZone = 1
         self.linkedZone = linkedZone
-        WorldPathFinder.callback = callback
+        self.callback = callback
         self.dst = destinationMapId
         if int(PlayedCharacterManager().currentMap.mapId) == int(self.dst):
             callback([])
@@ -72,22 +73,22 @@ class WorldPathFinder(metaclass=ThreadSharedSingleton):
         self.next()
 
     def abortPathSearch(self) -> None:
-        AStar.stopSearch()
+        AStar().stopSearch()
 
     def onAStarComplete(self, path: list[Edge]) -> None:
         if path is None:
             self.next()
         else:
-            logger.debug(f"[WoldPathFinder] Path to map {str(self.dst)} found in {str(TimeDebug.getElapsedTime())}s")
+            Logger().debug(f"[WoldPathFinder] Path to map {str(self.dst)} found in {str(TimeDebug.getElapsedTime())}s")
             self.callback(path)
 
     def next(self) -> None:
         dstV: Vertex = self.worldGraph.getVertex(self.dst, self.linkedZone)
         self.linkedZone += 1
         if dstV is None:
-            logger.debug(f"[WoldPathFinder] No path found to map {str(self.dst)}")
+            Logger().debug(f"[WoldPathFinder] No path found to map {str(self.dst)}")
             cb = self.callback
             self.callback = None
             cb(None)
             return
-        AStar.search(self.worldGraph, self.src, dstV, self.onAStarComplete)
+        AStar().search(self.worldGraph, self.src, dstV, self.onAStarComplete)

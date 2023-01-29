@@ -28,9 +28,7 @@ class FightModifyEffectsDurationStep(AbstractSequencable, IFightStep):
         return "modifyEffectsDuration"
 
     def start(self) -> None:
-        BuffManager().incrementDuration(
-            self._targetId, self._delta, True, BuffManager.INCREMENT_MODE_TARGET
-        )
+        BuffManager().incrementDuration(self._targetId, self._delta, True, BuffManager.INCREMENT_MODE_TARGET)
         FightEventsHelper().sendFightEvent(
             FightEventEnum.FIGHTER_EFFECTS_MODIFY_DURATION,
             [self._sourceId, self._targetId, self._delta],

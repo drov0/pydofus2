@@ -8,8 +8,6 @@ import pydofus2.com.ankamagames.dofus.datacenter.effects.EffectInstance as effin
 from pydofus2.com.ankamagames.jerakine.interfaces.IDataCenter import IDataCenter
 from pydofus2.com.ankamagames.jerakine.logger.Logger import Logger
 
-logger = Logger("Dofus2")
-
 
 class EffectInstanceInteger(effinst.EffectInstance, IDataCenter):
 
@@ -59,5 +57,5 @@ class EffectInstanceInteger(effinst.EffectInstance, IDataCenter):
             self.value += term.value
             self.forceDescriptionRefresh()
         else:
-            logger.error(term + " cannot be added to EffectInstanceInteger.")
+            Logger().error(term + " cannot be added to EffectInstanceInteger.")
         return self

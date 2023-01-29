@@ -2,11 +2,9 @@ from pydofus2.com.ankamagames.jerakine.network.NetworkMessage import NetworkMess
 
 
 class InvalidPresetsMessage(NetworkMessage):
-    presetIds:list[int]
-    
+    presetIds: list[int]
 
-    def init(self, presetIds_:list[int]):
+    def init(self, presetIds_: list[int]):
         self.presetIds = presetIds_
-        
+
         super().__init__()
-    

@@ -5,7 +5,9 @@ from pydofus2.com.ankamagames.dofus.datacenter.items.criterion.AchievementAccoun
 from pydofus2.com.ankamagames.dofus.datacenter.items.criterion.GroupItemCriterion import GroupItemCriterion
 from pydofus2.com.ankamagames.dofus.datacenter.items.criterion.IItemCriterion import IItemCriterion
 from pydofus2.com.ankamagames.dofus.datacenter.items.criterion.LevelItemCriterion import LevelItemCriterion
-from pydofus2.com.ankamagames.dofus.datacenter.items.criterion.PrestigeLevelItemCriterion import PrestigeLevelItemCriterion
+from pydofus2.com.ankamagames.dofus.datacenter.items.criterion.PrestigeLevelItemCriterion import (
+    PrestigeLevelItemCriterion,
+)
 from pydofus2.com.ankamagames.dofus.datacenter.quest.AchievementObjective import AchievementObjective
 from pydofus2.com.ankamagames.dofus.datacenter.quest.Quest import Quest
 from pydofus2.com.ankamagames.dofus.datacenter.quest.QuestObjective import QuestObjective
@@ -14,12 +16,9 @@ from pydofus2.com.ankamagames.dofus.types.IdAccessors import IdAccessors
 from pydofus2.com.ankamagames.jerakine.data.GameData import GameData
 from pydofus2.com.ankamagames.jerakine.data.I18n import I18n
 from pydofus2.com.ankamagames.jerakine.interfaces.IDataCenter import IDataCenter
-from pydofus2.com.ankamagames.jerakine.logger.Logger import Logger
 
 
 class Achievement(IDataCenter):
-
-    logger = Logger("pyd2bot")
 
     MODULE: str = "Achievements"
 

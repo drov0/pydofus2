@@ -28,6 +28,4 @@ class MonsterSuperRace(IDataCenter):
             self._name = I18n.getText(self.nameId)
         return self._name
 
-    idAccessors: IdAccessors = IdAccessors(
-        getMonsterSuperRaceById, getMonsterSuperRaces
-    )
+    idAccessors: IdAccessors = IdAccessors(getMonsterSuperRaceById, getMonsterSuperRaces)

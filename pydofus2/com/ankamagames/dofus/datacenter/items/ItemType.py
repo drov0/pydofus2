@@ -7,9 +7,6 @@ from pydofus2.com.ankamagames.jerakine.interfaces.IDataCenter import IDataCenter
 from pydofus2.com.ankamagames.jerakine.logger.Logger import Logger
 
 
-logger = Logger("Dofus2")
-
-
 class ItemType(IDataCenter):
 
     MODULE: str = "ItemTypes"
@@ -105,4 +102,4 @@ class ItemType(IDataCenter):
             else:
                 self._zoneMinSize = 0
         else:
-            logger.error("Zone incorrect (" + self.rawZone + ")")
+            Logger().error("Zone incorrect (" + self.rawZone + ")")

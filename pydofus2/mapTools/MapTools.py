@@ -11,18 +11,16 @@ MIN_Y_COORD: int = -19
 MAX_Y_COORD: int = 13
 EVERY_CELL_ID: list
 mapCountCell: int = 560
-INVALID_CELL_ID: int = -1
+INVALID_CELL_ID: int = None
 PSEUDO_INFINITE: int = 63
 COEFF_FOR_REBASE_ON_CLOSEST_8_DIRECTION: float = math.tan(math.pi / 8)
 COORDINATES_DIRECTION: list = ""
-
-logger = Logger("Dofus2")
 
 
 def getCellsIdBetween(param1: int, param2: int) -> list:
     mp1 = MapPoint.fromCellId(param1)
     mp2 = MapPoint.fromCellId(param2)
-    # logger.debug(f"getCellsIdBetween({mp1}, {mp2})")
+    # Logger().debug(f"getCellsIdBetween({mp1}, {mp2})")
     if param1 == param2:
         return []
     if not isValidCellId(param1) or not isValidCellId(param2):

@@ -2,11 +2,9 @@ from pydofus2.com.ankamagames.dofus.network.messages.game.dialog.LeaveDialogMess
 
 
 class ExchangeLeaveMessage(LeaveDialogMessage):
-    success:bool
-    
+    success: bool
 
-    def init(self, success_:bool, dialogType_:int):
+    def init(self, success_: bool, dialogType_: int):
         self.success = success_
-        
+
         super().init(dialogType_)
-    

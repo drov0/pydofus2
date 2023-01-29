@@ -2,11 +2,9 @@ from pydofus2.com.ankamagames.jerakine.network.NetworkMessage import NetworkMess
 
 
 class BreachCharactersMessage(NetworkMessage):
-    characters:list[int]
-    
+    characters: list[int]
 
-    def init(self, characters_:list[int]):
+    def init(self, characters_: list[int]):
         self.characters = characters_
-        
+
         super().__init__()
-    

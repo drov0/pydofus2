@@ -1,5 +1,3 @@
-
-
 class GameServerTypeEnum:
     SERVER_TYPE_UNDEFINED: int = -1
 

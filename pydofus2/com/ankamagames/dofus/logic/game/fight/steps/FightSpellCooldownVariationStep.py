@@ -52,12 +52,8 @@ class FightSpellCooldownVariationStep(AbstractSequencable, IFightStep):
             self._fighterId == CurrentPlayedFighterManager().currentFighterId
             or self._fighterId == PlayedCharacterManager().id
         ):
-            spellCastManager = CurrentPlayedFighterManager().getSpellCastManagerById(
-                self._fighterId
-            )
-            simf: "SpellInventoryManagementFrame" = (
-                Kernel().worker.getFrame("SpellInventoryManagementFrame")
-            )
+            spellCastManager = CurrentPlayedFighterManager().getSpellCastManagerById(self._fighterId)
+            simf: "SpellInventoryManagementFrame" = Kernel().worker.getFrame("SpellInventoryManagementFrame")
             spellList = simf.getFullSpellListByOwnerId(self._fighterId)
             for spellKnown in spellList:
                 if spellKnown.id == self._spellId:
@@ -76,20 +72,12 @@ class FightSpellCooldownVariationStep(AbstractSequencable, IFightStep):
                 spellWrapper = None
                 for entityId in entityIds:
                     if self._fighterId == entityId:
-                        spellCastManager = (
-                            CurrentPlayedFighterManager().getSpellCastManagerById(
-                                entityId
-                            )
-                        )
+                        spellCastManager = CurrentPlayedFighterManager().getSpellCastManagerById(entityId)
                         if spellCastManager is not None:
-                            spellWrapper = SpellWrapper.getSpellWrapperById(
-                                self._spellId, entityId
-                            )
+                            spellWrapper = SpellWrapper.getSpellWrapperById(self._spellId, entityId)
                             if spellWrapper is not None:
-                                spellManager = (
-                                    spellCastManager.getSpellManagerBySpellId(
-                                        self._spellId, True, spellWrapper.spellLevel
-                                    )
+                                spellManager = spellCastManager.getSpellManagerBySpellId(
+                                    self._spellId, True, spellWrapper.spellLevel
                                 )
                                 spellManager.forceCooldown(self._value)
         self.executeCallbacks()

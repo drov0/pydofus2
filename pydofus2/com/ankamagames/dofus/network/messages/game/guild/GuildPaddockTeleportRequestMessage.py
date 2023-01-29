@@ -2,11 +2,9 @@ from pydofus2.com.ankamagames.jerakine.network.NetworkMessage import NetworkMess
 
 
 class GuildPaddockTeleportRequestMessage(NetworkMessage):
-    paddockId:int
-    
+    paddockId: int
 
-    def init(self, paddockId_:int):
+    def init(self, paddockId_: int):
         self.paddockId = paddockId_
-        
+
         super().__init__()
-    

@@ -13,8 +13,6 @@ from pydofus2.com.ankamagames.dofus.network.enums.GameActionMarkTypeEnum import 
 from pydofus2.com.ankamagames.jerakine.logger.Logger import Logger
 from pydofus2.com.ankamagames.jerakine.sequencer.AbstractSequencable import AbstractSequencable
 
-logger = Logger("Dofus2")
-
 
 class FightUnmarkCellsStep(AbstractSequencable, IFightStep):
 
@@ -31,7 +29,7 @@ class FightUnmarkCellsStep(AbstractSequencable, IFightStep):
     def start(self) -> None:
         mi: MarkInstance = MarkedCellsManager().getMarkDatas(self._markId)
         if not mi:
-            logger.error("Trying to remove an unknown mark (" + str(self._markId) + "). Aborting.")
+            Logger().error("Trying to remove an unknown mark (" + str(self._markId) + "). Aborting.")
             self.executeCallbacks()
             return
         MarkedCellsManager().removeGlyph(self._markId)
@@ -47,7 +45,7 @@ class FightUnmarkCellsStep(AbstractSequencable, IFightStep):
         elif mi.markType == GameActionMarkTypeEnum.WALL:
             pass
         else:
-            logger.warn("Unknown mark type (" + mi.markType + ").")
+            Logger().warn("Unknown mark type (" + mi.markType + ").")
         FightEventsHelper().sendFightEvent(evt, [mi.associatedSpell.id], 0, self.castingSpellId)
         MarkedCellsManager().removeMark(self._markId)
         self.executeCallbacks()

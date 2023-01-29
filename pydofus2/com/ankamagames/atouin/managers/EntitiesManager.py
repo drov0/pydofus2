@@ -2,8 +2,6 @@ from pydofus2.com.ankamagames.jerakine.logger.Logger import Logger
 from pydofus2.com.ankamagames.jerakine.entities.interfaces.IEntity import IEntity
 from pydofus2.com.ankamagames.jerakine.metaclasses.Singleton import Singleton
 
-logger = Logger("Dofus2")
-
 
 class EntitiesManager(metaclass=Singleton):
     RANDOM_ENTITIES_ID_START: float = -1000000
@@ -17,7 +15,7 @@ class EntitiesManager(metaclass=Singleton):
         if not isinstance(entity, IEntity):
             raise Exception("entity must be an IEntity, not a " + str(type(entity)))
         if self._entities.get(float(entityId)) is not None:
-            logger.warn(f"Entity overwriting! Entity {float(entityId)} has been replaced.")
+            Logger().warn(f"Entity overwriting! Entity {float(entityId)} has been replaced.")
         self._entities[float(entityId)] = entity
 
     def getEntity(self, entityId: float) -> "IEntity":

@@ -10,14 +10,15 @@ from pydofus2.com.ankamagames.jerakine.data.GameDataClassDefinition import (
     GameDataClassDefinition,
 )
 import threading
+
 lock = threading.Lock()
-logger = Logger("Dofus2")
 
 
 class InvalidD2OFile(Exception):
     pass
+
+
 class ModuleReader:
-    
     def __init__(self, stream: BinaryStream, name: str) -> None:
         if not isinstance(stream, BinaryStream):
             stream = BinaryStream(stream, True)
@@ -56,9 +57,9 @@ class ModuleReader:
             self._gameDataProcessor = GameDataProcess(stream)
 
     def clearObjectsCache(self):
-        logger.info(f"[Modulee {self._name}] Clearing objects cache.")
+        Logger().info(f"[Modulee {self._name}] Clearing objects cache.")
         self.getObjects.cache_clear()
-        
+
     @lru_cache(maxsize=32, typed=False)
     def getObjects(self):
         with lock:
@@ -87,15 +88,15 @@ class ModuleReader:
     def getClassDefinition(self, object_id: int) -> GameDataClassDefinition:
         return self._classes[object_id]
 
-    @lru_cache(maxsize=32, typed=False)
+    @lru_cache(maxsize=200, typed=False)
     def getObject(self, objectId: int) -> Any:
         with lock:
             if not self._indexes:
-                logger.warning(f"[Module {self._name}] No indexes found in the D2O file")
+                Logger().warning(f"[Module {self._name}] No indexes found in the D2O file")
                 return None
             pointer = self._indexes.get(objectId)
             if pointer is None:
-                logger.warning(f"[Module {self._name}] No object found with id {objectId}")
+                Logger().warning(f"[Module {self._name}] No object found with id {objectId}")
                 return None
             self._stream.seek(pointer)
             classId: int = self._stream.readInt()

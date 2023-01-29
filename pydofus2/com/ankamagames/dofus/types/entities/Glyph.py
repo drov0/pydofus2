@@ -25,10 +25,7 @@ class Glyph(Projectile, IObstacle):
 
     def canWalkThrough(self) -> bool:
         v: bool = True
-        if (
-            self.glyphType == GameActionMarkTypeEnum.TRAP
-            or self.glyphType == GameActionMarkTypeEnum.PORTAL
-        ):
+        if self.glyphType == GameActionMarkTypeEnum.TRAP or self.glyphType == GameActionMarkTypeEnum.PORTAL:
             v = False
         return v
 

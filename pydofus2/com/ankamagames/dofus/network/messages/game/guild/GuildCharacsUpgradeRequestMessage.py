@@ -2,11 +2,9 @@ from pydofus2.com.ankamagames.jerakine.network.NetworkMessage import NetworkMess
 
 
 class GuildCharacsUpgradeRequestMessage(NetworkMessage):
-    charaTypeTarget:int
-    
+    charaTypeTarget: int
 
-    def init(self, charaTypeTarget_:int):
+    def init(self, charaTypeTarget_: int):
         self.charaTypeTarget = charaTypeTarget_
-        
+
         super().__init__()
-    

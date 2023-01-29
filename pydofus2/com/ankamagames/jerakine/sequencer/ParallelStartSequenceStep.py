@@ -6,8 +6,6 @@ from pydofus2.com.ankamagames.jerakine.sequencer.ISubSequenceSequencable import 
 )
 from pydofus2.com.ankamagames.jerakine.types.events.SequencerEvent import SequencerEvent
 
-logger = Logger("Dofus2")
-
 
 class ParallelStartSequenceStep(AbstractSequencable, ISubSequenceSequencable):
 
@@ -33,10 +31,10 @@ class ParallelStartSequenceStep(AbstractSequencable, ISubSequenceSequencable):
     def start(self) -> None:
         for i in range(len(self._aSequence)):
             self._aSequence[i].add_listener(SequencerEvent.SEQUENCE_END, self.onSequenceEnd)
-            # logger.debug(f"ParallelStartSequenceStep start sequencer {i} that has {self._aSequence[i].steps} steps")
+            # Logger().debug(f"ParallelStartSequenceStep start sequencer {i} that has {self._aSequence[i].steps} steps")
             self._aSequence[i].start()
         if not self._waitAllSequenceEnd and not self._waitFirstEndSequence:
-            # logger.debug("first executeCallbacks")
+            # Logger().debug("first executeCallbacks")
             self.executeCallbacks()
 
     @property

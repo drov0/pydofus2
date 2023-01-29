@@ -2,11 +2,9 @@ from pydofus2.com.ankamagames.jerakine.network.NetworkMessage import NetworkMess
 
 
 class AreaFightModificatorUpdateMessage(NetworkMessage):
-    spellPairId:int
-    
+    spellPairId: int
 
-    def init(self, spellPairId_:int):
+    def init(self, spellPairId_: int):
         self.spellPairId = spellPairId_
-        
+
         super().__init__()
-    

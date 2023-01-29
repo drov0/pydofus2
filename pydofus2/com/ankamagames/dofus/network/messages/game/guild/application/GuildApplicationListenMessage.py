@@ -2,11 +2,9 @@ from pydofus2.com.ankamagames.jerakine.network.NetworkMessage import NetworkMess
 
 
 class GuildApplicationListenMessage(NetworkMessage):
-    listen:bool
-    
+    listen: bool
 
-    def init(self, listen_:bool):
+    def init(self, listen_: bool):
         self.listen = listen_
-        
+
         super().__init__()
-    

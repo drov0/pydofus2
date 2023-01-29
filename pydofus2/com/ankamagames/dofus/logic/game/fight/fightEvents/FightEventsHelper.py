@@ -23,12 +23,6 @@ from pydofus2.com.ankamagames.dofus.network.types.game.context.fight.GameFightFi
     GameFightFighterInformations,
 )
 from pydofus2.com.ankamagames.jerakine.logger.Logger import Logger
-from pydofus2.com.ankamagames.jerakine.utils.display.EnterFrameConst import EnterFrameConst
-from pydofus2.com.ankamagames.jerakine.utils.display.EnterFrameDispatcher import (
-    EnterFrameDispatcher,
-)
-
-logger = Logger()
 
 
 class FightEventsHelper(metaclass=Singleton):
@@ -151,13 +145,9 @@ class FightEventsHelper(metaclass=Singleton):
         targetEvent.append(fightEvent)
 
     def sendAllFightEvent(self, now: bool = False) -> None:
-        if now:
-            self.sendEvents(None)
-        else:
-            EnterFrameDispatcher().addEventListener(self.sendEvents, EnterFrameConst.SEND_FIGHT_EVENTS_HELPER)
+        self.sendEvents(None)
 
     def sendEvents(self, pEvt: Event = None) -> None:
-        EnterFrameDispatcher().removeEventListener(self.sendEvents)
         self.sendFightEvent(None, None, 0, -1)
         self.sendAllFightEvents()
         entitiesFrame: "FightEntitiesFrame" = Kernel().worker.getFrame("FightEntitiesFrame")
@@ -365,19 +355,14 @@ class FightEventsHelper(metaclass=Singleton):
             elif team == "other":
                 self.removeEventFromEventsList(pEventList, listToConcat)
             if team == "none":
-                logger.warn("Failed to group FightEvents for the team 'none'")
+                Logger().warn("Failed to group FightEvents for the team 'none'")
             else:
                 for t in pEntitiesList.values():
                     if isinstance(t, GameFightFighterInformations):
                         teamId = t.spawnInfo.teamId
                     else:
                         teamId = t.teamId
-                    if (
-                        "allies" in team
-                        and teamId == playerTeamId
-                        or "enemies" in team
-                        and teamId != playerTeamId
-                    ):
+                    if "allies" in team and teamId == playerTeamId or "enemies" in team and teamId != playerTeamId:
                         if t.contextualId in elist:
                             elist.remove(t.contextualId)
                 self.removeEventFromEventsList(pEventList, listToConcat)

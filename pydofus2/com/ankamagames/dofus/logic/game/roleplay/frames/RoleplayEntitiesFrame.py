@@ -56,7 +56,9 @@ from pydofus2.com.ankamagames.dofus.network.messages.game.interactive.Interactiv
 from pydofus2.com.ankamagames.dofus.network.messages.game.interactive.StatedMapUpdateMessage import (
     StatedMapUpdateMessage,
 )
-from pydofus2.com.ankamagames.dofus.network.types.game.context.GameContextActorInformations import GameContextActorInformations
+from pydofus2.com.ankamagames.dofus.network.types.game.context.GameContextActorInformations import (
+    GameContextActorInformations,
+)
 from pydofus2.com.ankamagames.dofus.network.types.game.context.fight.FightCommonInformations import (
     FightCommonInformations,
 )
@@ -111,14 +113,12 @@ from pydofus2.com.ankamagames.jerakine.messages.Message import Message
 from pydofus2.com.ankamagames.dofus.logic.game.roleplay.types.FightTeam import FightTeam
 from pydofus2.com.ankamagames.berilia.managers.KernelEventsManager import KernelEventsManager, KernelEvts
 from typing import TYPE_CHECKING
+
 if TYPE_CHECKING:
     from pydofus2.com.ankamagames.dofus.logic.game.common.frames.ContextChangeFrame import ContextChangeFrame
 
-logger = Logger("Dofus2")
-
 
 class RoleplayEntitiesFrame(AbstractEntitiesFrame, Frame):
-    
     def __init__(self):
         self._fights = dict[int, Fight]()
 
@@ -167,8 +167,8 @@ class RoleplayEntitiesFrame(AbstractEntitiesFrame, Frame):
         # self._aggressions = list[Aggression]()
 
         self._aggroTimeoutIdsMonsterAssoc = dict()
-        
-        self.mcidm_processessed : bool = False
+
+        self.mcidm_processessed: bool = False
 
         super().__init__()
 
@@ -188,13 +188,15 @@ class RoleplayEntitiesFrame(AbstractEntitiesFrame, Frame):
         self._monstersIds = list[float]()
         self._entitiesVisibleNumber = 0
         self.mcidm_processessed = False
+        Logger().debug("pushing RoleplayEntitiesFrame")
         if MapDisplayManager()._currentMapRendered:
-            ccFrame: 'ContextChangeFrame' = Kernel().worker.getFrame("ContextChangeFrame")
+            Logger().debug("Map already rendered, sending MapInformationsRequestMessage")
             mirmsg = MapInformationsRequestMessage()
             mirmsg.init(mapId_=MapDisplayManager().currentMapPoint.mapId)
-            ConnectionsHandler()._conn.send(mirmsg)
+            ConnectionsHandler().conn.send(mirmsg)
             self._waitForMap = False
         else:
+            Logger().debug("Map not rendered, waiting for MapLoadedMessage")
             self._waitForMap = True
         self._interactiveElements = list[InteractiveElement]()
         return super().pushed()
@@ -210,14 +212,10 @@ class RoleplayEntitiesFrame(AbstractEntitiesFrame, Frame):
 
         if isinstance(msg, MapLoadedMessage):
             if self._waitForMap:
-                ccFrame: 'ContextChangeFrame' = Kernel().worker.getFrame("ContextChangeFrame")
-                connexion = ""
-                if ccFrame:
-                    connexion = ccFrame.mapChangeConnexion
                 self.mcidm_processessed = False
                 mirmsg = MapInformationsRequestMessage()
                 mirmsg.init(mapId_=MapDisplayManager().currentMapPoint.mapId)
-                ConnectionsHandler()._conn.send(mirmsg)
+                ConnectionsHandler().conn.send(mirmsg)
                 self._waitForMap = False
             return False
 
@@ -391,8 +389,9 @@ class RoleplayEntitiesFrame(AbstractEntitiesFrame, Frame):
 
             elif PlayedCharacterManager().isInAnomaly:
                 PlayedCharacterManager().isInAnomaly = False
-            
-            logger.debug("MapComplementaryInformationsDataMessage processed")
+
+            Logger().debug("MapComplementaryInformationsDataMessage processed")
+            KernelEventsManager().send(KernelEvts.MAPPROCESSED)
             self.mcidm_processessed = True
             return False
 
@@ -441,7 +440,7 @@ class RoleplayEntitiesFrame(AbstractEntitiesFrame, Frame):
         if fight is None:
             return
         for team in fight.teams:
-            logger.debug(f"Removing the team {team.teamEntity.id}")
+            Logger().debug(f"Removing the team {team.teamEntity.id}")
             self.unregisterActor(team.teamEntity.id)
             del team.teamEntity
         del self._fights[fightId]

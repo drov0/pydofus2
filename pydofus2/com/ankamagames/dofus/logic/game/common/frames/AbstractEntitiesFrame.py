@@ -13,7 +13,9 @@ from pydofus2.com.ankamagames.dofus.network.types.game.context.fight.GameFightFi
 from pydofus2.com.ankamagames.dofus.network.types.game.context.fight.GameFightMonsterInformations import (
     GameFightMonsterInformations,
 )
-from pydofus2.com.ankamagames.dofus.network.types.game.context.GameContextActorInformations import GameContextActorInformations
+from pydofus2.com.ankamagames.dofus.network.types.game.context.GameContextActorInformations import (
+    GameContextActorInformations,
+)
 from pydofus2.com.ankamagames.dofus.network.types.game.context.roleplay.GameRolePlayHumanoidInformations import (
     GameRolePlayHumanoidInformations,
 )
@@ -24,8 +26,6 @@ from pydofus2.com.ankamagames.jerakine.messages.Frame import Frame
 from pydofus2.com.ankamagames.jerakine.messages.Message import Message
 from pydofus2.com.ankamagames.jerakine.types.enums.Priority import Priority
 from pydofus2.com.ankamagames.jerakine.types.positions.MapPoint import MapPoint
-
-logger = Logger("Dofus2")
 
 
 class AbstractEntitiesFrame(Frame):
@@ -104,7 +104,7 @@ class AbstractEntitiesFrame(Frame):
         if not self._entities or not self._entitiesTotal:
             return None
         if self._entities.get(entityId) is None:
-            # logger.error(f"Entity {entityId} is unknown. Available actor Ids are {list(self._entities.keys())}")
+            # Logger().error(f"Entity {entityId} is unknown. Available actor Ids are {list(self._entities.keys())}")
             if entityId <= EntitiesManager.RANDOM_ENTITIES_ID_START:
                 return None
             return None
@@ -145,7 +145,7 @@ class AbstractEntitiesFrame(Frame):
         StatsManager().deleteStats(actorId)
 
     def addOrUpdateActor(self, infos: GameContextActorInformations) -> AnimatedCharacter:
-        characterEntity: AnimatedCharacter = DofusEntities.getEntity(infos.contextualId)
+        characterEntity: AnimatedCharacter = DofusEntities().getEntity(infos.contextualId)
         self.registerActor(infos)
         if isinstance(infos, GameFightFighterInformations):
             StatsManager().addRawStats(infos.contextualId, infos.stats.characteristics.characteristics)
@@ -160,7 +160,7 @@ class AbstractEntitiesFrame(Frame):
                 pcm.PlayedCharacterManager().restrictions = humanoid.humanoidInfo.restrictions
         if infos.disposition.cellId != -1:
             characterEntity.position = MapPoint.fromCellId(infos.disposition.cellId)
-        # logger.debug(f"addOrUpdateActor new actor added {infos.contextualId} position is {characterEntity.position}")
+        # Logger().debug(f"addOrUpdateActor new actor added {infos.contextualId} position is {characterEntity.position}")
 
         return characterEntity
 
@@ -169,7 +169,7 @@ class AbstractEntitiesFrame(Frame):
         if self._entities.get(actorId):
             self._entities[actorId].disposition = newDisposition
         else:
-            logger.error(f"Cannot update unknown actor disposition ({actorId}) in informations.")
+            Logger().error(f"Cannot update unknown actor disposition ({actorId}) in informations.")
 
     def removeActor(self, actorId: float) -> None:
         self.unregisterActor(actorId)

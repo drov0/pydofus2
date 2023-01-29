@@ -2,11 +2,9 @@ from pydofus2.com.ankamagames.jerakine.network.NetworkMessage import NetworkMess
 
 
 class BasicPingMessage(NetworkMessage):
-    quiet:bool
-    
+    quiet: bool
 
-    def init(self, quiet_:bool):
+    def init(self, quiet_: bool):
         self.quiet = quiet_
-        
+
         super().__init__()
-    

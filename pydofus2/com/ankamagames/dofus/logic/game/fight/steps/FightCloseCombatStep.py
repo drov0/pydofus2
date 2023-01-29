@@ -19,9 +19,7 @@ class FightCloseCombatStep(AbstractSequencable, IFightStep):
 
     _verboseCast: bool
 
-    def __init__(
-        self, fighterId: float, weaponId: int, critical: int, verboseCast: bool
-    ):
+    def __init__(self, fighterId: float, weaponId: int, critical: int, verboseCast: bool):
         super().__init__()
         self._fighterId = fighterId
         self._weaponId = weaponId

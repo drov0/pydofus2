@@ -2,11 +2,9 @@ from pydofus2.com.ankamagames.dofus.network.types.game.achievement.AchievementAc
 
 
 class AchievementAchievedRewardable(AchievementAchieved):
-    finishedlevel:int
-    
+    finishedlevel: int
 
-    def init(self, finishedlevel_:int, id_:int, achievedBy_:int):
+    def init(self, finishedlevel_: int, id_: int, achievedBy_: int):
         self.finishedlevel = finishedlevel_
-        
+
         super().init(id_, achievedBy_)
-    

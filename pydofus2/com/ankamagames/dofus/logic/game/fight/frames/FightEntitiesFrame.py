@@ -13,7 +13,9 @@ from pydofus2.com.ankamagames.dofus.logic.game.fight.actions.RemoveEntityAction 
 if TYPE_CHECKING:
     pass
 
-from pydofus2.com.ankamagames.dofus.logic.game.fight.managers.CurrentPlayedFighterManager import CurrentPlayedFighterManager
+from pydofus2.com.ankamagames.dofus.logic.game.fight.managers.CurrentPlayedFighterManager import (
+    CurrentPlayedFighterManager,
+)
 from pydofus2.com.ankamagames.dofus.logic.game.fight.miscs.FightEntitiesHolder import FightEntitiesHolder
 from pydofus2.com.ankamagames.dofus.network.enums.GameActionFightInvisibilityStateEnum import (
     GameActionFightInvisibilityStateEnum,
@@ -70,9 +72,13 @@ from pydofus2.com.ankamagames.dofus.network.messages.game.context.roleplay.MapCo
 from pydofus2.com.ankamagames.dofus.network.messages.game.context.roleplay.MapComplementaryInformationsWithCoordsMessage import (
     MapComplementaryInformationsWithCoordsMessage,
 )
-from pydofus2.com.ankamagames.dofus.network.messages.game.context.roleplay.MapRewardRateMessage import MapRewardRateMessage
+from pydofus2.com.ankamagames.dofus.network.messages.game.context.roleplay.MapRewardRateMessage import (
+    MapRewardRateMessage,
+)
 from pydofus2.com.ankamagames.dofus.network.messages.game.context.ShowCellMessage import ShowCellMessage
-from pydofus2.com.ankamagames.dofus.network.messages.game.context.ShowCellSpectatorMessage import ShowCellSpectatorMessage
+from pydofus2.com.ankamagames.dofus.network.messages.game.context.ShowCellSpectatorMessage import (
+    ShowCellSpectatorMessage,
+)
 from pydofus2.com.ankamagames.dofus.network.types.game.context.EntityDispositionInformations import (
     EntityDispositionInformations,
 )
@@ -94,7 +100,9 @@ from pydofus2.com.ankamagames.dofus.network.types.game.context.fight.GameFightMo
 from pydofus2.com.ankamagames.dofus.network.types.game.context.FightEntityDispositionInformations import (
     FightEntityDispositionInformations,
 )
-from pydofus2.com.ankamagames.dofus.network.types.game.context.GameContextActorInformations import GameContextActorInformations
+from pydofus2.com.ankamagames.dofus.network.types.game.context.GameContextActorInformations import (
+    GameContextActorInformations,
+)
 from pydofus2.com.ankamagames.dofus.network.types.game.context.GameContextActorPositionInformations import (
     GameContextActorPositionInformations,
 )
@@ -107,8 +115,6 @@ from pydofus2.com.ankamagames.jerakine.messages.Frame import Frame
 from pydofus2.com.ankamagames.jerakine.messages.Message import Message
 from pydofus2.com.ankamagames.jerakine.types.positions.MapPoint import MapPoint
 from pydofus2.damageCalculation.tools.StatIds import StatIds
-
-logger = Logger("Dofus2")
 
 
 class FightEntitiesFrame(AbstractEntitiesFrame, Frame):
@@ -403,7 +409,9 @@ class FightEntitiesFrame(AbstractEntitiesFrame, Frame):
 
     def registerInteractive(self, ie: InteractiveElement, firstSkill: int) -> None:
         if not MapDisplayManager().isIdentifiedElement(ie.elementId):
-            logger.error("Unknown identified element " + str(ie.elementId) + ", unable to register it as interactive.")
+            Logger().error(
+                "Unknown identified element " + str(ie.elementId) + ", unable to register it as interactive."
+            )
             return
         found: bool = False
         for s, cie in enumerate(self.interactiveElements):
@@ -421,7 +429,7 @@ class FightEntitiesFrame(AbstractEntitiesFrame, Frame):
 
     def updateStatedElement(self, se: StatedElement) -> None:
         if not MapDisplayManager().isIdentifiedElement(se.elementId):
-            logger.error(
+            Logger().error(
                 "Unknown identified element "
                 + str(se.elementId)
                 + " unable to change its state to "
@@ -546,7 +554,7 @@ class FightEntitiesFrame(AbstractEntitiesFrame, Frame):
         if isinstance(fighterInfos.disposition, FightEntityDispositionInformations):
             fedi = fighterInfos.disposition
             if fedi.carryingCharacterId:
-                carryingEntity = DofusEntities.getEntity(fedi.carryingCharacterId)
+                carryingEntity = DofusEntities().getEntity(fedi.carryingCharacterId)
                 if not carryingEntity:
                     self._tempFighterList.append(TmpFighterInfos(fighterInfos.contextualId, fedi.carryingCharacterId))
 
@@ -588,7 +596,7 @@ class FightEntitiesFrame(AbstractEntitiesFrame, Frame):
     def updateActorDisposition(self, actorId: float, newDisposition: EntityDispositionInformations) -> None:
         super().updateActorDisposition(actorId, newDisposition)
         if newDisposition.cellId == -1:
-            actor = DofusEntities.getEntity(actorId)
+            actor = DofusEntities().getEntity(actorId)
             if actor:
                 FightEntitiesHolder().holdEntity(actor)
         else:

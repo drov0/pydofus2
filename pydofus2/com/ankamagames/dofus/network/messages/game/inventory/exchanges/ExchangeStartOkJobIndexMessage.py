@@ -2,11 +2,9 @@ from pydofus2.com.ankamagames.jerakine.network.NetworkMessage import NetworkMess
 
 
 class ExchangeStartOkJobIndexMessage(NetworkMessage):
-    jobs:list[int]
-    
+    jobs: list[int]
 
-    def init(self, jobs_:list[int]):
+    def init(self, jobs_: list[int]):
         self.jobs = jobs_
-        
+
         super().__init__()
-    

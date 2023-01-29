@@ -2,8 +2,6 @@ from pydofus2.com.ankamagames.jerakine.logger.Logger import Logger
 from pydofus2.com.ankamagames.jerakine.network.CustomDataWrapper import ByteArray
 from pydofus2.com.hurlan.crypto.symmetric.IPad import IPad
 
-logger = Logger("Dofus2")
-
 
 class PKCS5(IPad):
 
@@ -23,7 +21,7 @@ class PKCS5(IPad):
             raise Exception("PKCS#5::unpad: ByteArray.length isn't a multiple of the blockSize")
         c = a[-1]
         for _ in range(c):
-            logger.debug("PKCS#5::unpad: %s", a[-1])
+            Logger().debug("PKCS#5::unpad: %s", a[-1])
             v = a[-1]
             del a[-1]
             if c != v:

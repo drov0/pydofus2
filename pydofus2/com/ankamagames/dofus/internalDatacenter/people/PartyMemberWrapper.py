@@ -1,55 +1,78 @@
 from pydofus2.com.ankamagames.dofus.network.types.game.look.EntityLook import EntityLook
 from pydofus2.com.ankamagames.jerakine.interfaces.IDataCenter import IDataCenter
 
+
 class PartyMemberWrapper(IDataCenter):
 
-    id:float
+    id: float
 
-    name:str
+    name: str
 
-    isMember:bool
+    isMember: bool
 
-    isLeader:bool
+    isLeader: bool
 
-    level:int
+    level: int
 
-    breedId:int
+    breedId: int
 
-    entityLook:EntityLook
+    entityLook: EntityLook
 
-    lifePoints:int
+    lifePoints: int
 
-    maxLifePoints:int
+    maxLifePoints: int
 
-    maxInitiative:int
+    maxInitiative: int
 
-    prospecting:int
+    prospecting: int
 
-    rank:int
+    rank: int
 
-    alignmentSide:int
+    alignmentSide: int
 
-    regenRate:int
+    regenRate: int
 
-    hostId:float
+    hostId: float
 
-    hostName:str
+    hostName: str
 
-    worldX:int = 0
+    worldX: int = 0
 
-    worldY:int = 0
+    worldY: int = 0
 
-    mapId:float = 0
+    mapId: float = 0
 
-    subAreaId:int = 0
+    subAreaId: int = 0
 
-    status:int = 1
+    status: int = 1
 
-    companions:list
+    companions: list
 
-    isInArenaParty:bool = False
+    isInArenaParty: bool = False
 
-    def __init__(self, id:float, name:str, status:int, isMember:bool, isLeader:bool = False, level:int = 0, entityLook:EntityLook = None, lifePoints:int = 0, maxLifePoints:int = 0, maxInitiative:int = 0, prospecting:int = 0, alignmentSide:int = 0, regenRate:int = 0, rank:int = 0, worldX:int = 0, worldY:int = 0, mapId:float = 0, subAreaId:int = 0, breedId:int = 0, companions:list = None):
+    def __init__(
+        self,
+        id: float,
+        name: str,
+        status: int,
+        isMember: bool,
+        isLeader: bool = False,
+        level: int = 0,
+        entityLook: EntityLook = None,
+        lifePoints: int = 0,
+        maxLifePoints: int = 0,
+        maxInitiative: int = 0,
+        prospecting: int = 0,
+        alignmentSide: int = 0,
+        regenRate: int = 0,
+        rank: int = 0,
+        worldX: int = 0,
+        worldY: int = 0,
+        mapId: float = 0,
+        subAreaId: int = 0,
+        breedId: int = 0,
+        companions: list = None,
+    ):
         self.companions = list()
         super().__init__()
         self.id = id
@@ -79,5 +102,3 @@ class PartyMemberWrapper(IDataCenter):
     @property
     def initiative(self) -> int:
         return self.maxInitiative * self.lifePoints / self.maxLifePoints
-
-

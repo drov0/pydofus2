@@ -9,8 +9,6 @@ import pydofus2.com.ankamagames.dofus.logic.game.common.managers.StorageOptionMa
 from pydofus2.com.ankamagames.dofus.logic.game.common.misc.IStorageView import IStorageView
 from pydofus2.com.ankamagames.jerakine.logger.Logger import Logger
 
-logger = Logger("Dofus2")
-
 
 class StorageGenericView(IStorageView):
 

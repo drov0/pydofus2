@@ -2,11 +2,9 @@ from pydofus2.com.ankamagames.jerakine.network.NetworkMessage import NetworkMess
 
 
 class GameActionFightNoSpellCastMessage(NetworkMessage):
-    spellLevelId:int
-    
+    spellLevelId: int
 
-    def init(self, spellLevelId_:int):
+    def init(self, spellLevelId_: int):
         self.spellLevelId = spellLevelId_
-        
+
         super().__init__()
-    

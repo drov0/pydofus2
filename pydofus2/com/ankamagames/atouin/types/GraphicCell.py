@@ -4,8 +4,6 @@ from pydofus2.com.ankamagames.jerakine.interfaces.ICustomUnicNameGetter import (
 )
 from pydofus2.com.ankamagames.jerakine.logger.Logger import Logger
 
-logger = Logger("Dofus2")
-
 
 class GraphicCell(ICustomUnicNameGetter):
 

@@ -2,11 +2,9 @@ from pydofus2.com.ankamagames.jerakine.network.NetworkMessage import NetworkMess
 
 
 class ExchangeRequestMessage(NetworkMessage):
-    exchangeType:int
-    
+    exchangeType: int
 
-    def init(self, exchangeType_:int):
+    def init(self, exchangeType_: int):
         self.exchangeType = exchangeType_
-        
+
         super().__init__()
-    

@@ -4,8 +4,6 @@ from pydofus2.com.ankamagames.jerakine.types.enums.DirectionsEnum import Directi
 from pydofus2.com.ankamagames.jerakine.types.positions.MapPoint import MapPoint
 from pydofus2.com.ankamagames.jerakine.types.positions.PathElement import PathElement
 
-logger = Logger("Dofus2")
-
 
 class MovementPath:
 
@@ -101,7 +99,7 @@ class MovementPath:
             pFinal.step = self._oEnd
             self._aPath.append(pFinal)
             while elem < len(self._aPath) - 1:
-                # logger.debug(f"({self._aPath[elem].step}, {self._aPath[elem].orientation}) and ({self._aPath[elem + 1].step}, {self._aPath[elem + 1].orientation})")
+                # Logger().debug(f"({self._aPath[elem].step}, {self._aPath[elem].orientation}) and ({self._aPath[elem + 1].step}, {self._aPath[elem + 1].orientation})")
                 if (
                     abs(self._aPath[elem].step.x - self._aPath[elem + 1].step.x) > 1
                     or abs(self._aPath[elem].step.y - self._aPath[elem + 1].step.y) > 1

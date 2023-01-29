@@ -34,7 +34,9 @@ from pydofus2.com.ankamagames.dofus.network.messages.game.context.roleplay.MapFi
 from pydofus2.com.ankamagames.dofus.network.messages.game.inventory.exchanges.ExchangeOnHumanVendorRequestMessage import (
     ExchangeOnHumanVendorRequestMessage,
 )
-from pydofus2.com.ankamagames.dofus.network.types.game.context.fight.FightStartingPositions import FightStartingPositions
+from pydofus2.com.ankamagames.dofus.network.types.game.context.fight.FightStartingPositions import (
+    FightStartingPositions,
+)
 from pydofus2.com.ankamagames.dofus.network.types.game.context.roleplay.GameRolePlayActorInformations import (
     GameRolePlayActorInformations,
 )
@@ -49,8 +51,6 @@ from pydofus2.com.ankamagames.jerakine.messages.Frame import Frame
 from pydofus2.com.ankamagames.jerakine.messages.Message import Message
 from pydofus2.com.ankamagames.jerakine.types.enums.Priority import Priority
 from pydofus2.com.ankamagames.jerakine.types.positions.MapPoint import MapPoint
-
-logger = Logger("Dofus2")
 
 
 class RoleplayWorldFrame(Frame):
@@ -126,9 +126,9 @@ class RoleplayWorldFrame(Frame):
                 return False
             if self.cellClickEnabled:
                 amcmsg = msg
-                playedEntity = DofusEntities.getEntity(PlayedCharacterManager().id)
+                playedEntity = DofusEntities().getEntity(PlayedCharacterManager().id)
                 if not playedEntity:
-                    logger.warn("The player tried to move before its character was added to the scene. Aborting.")
+                    Logger().warn("The player tried to move before its character was added to the scene. Aborting.")
                     return False
                 self.roleplayMovementFrame.setNextMoveMapChange(amcmsg.adjacentMapId)
                 if playedEntity.position != MapPoint.fromCellId(amcmsg.cellId):
@@ -162,7 +162,7 @@ class RoleplayWorldFrame(Frame):
                 fightTeamLeader = self.roleplayContextFrame.entitiesFrame.getFightLeaderId(entityc.id)
                 gfjrmsg = GameFightJoinRequestMessage()
                 gfjrmsg.init(fightTeamLeader, fightId)
-                playerEntity3 = DofusEntities.getEntity(PlayedCharacterManager().id)
+                playerEntity3 = DofusEntities().getEntity(PlayedCharacterManager().id)
                 if playerEntity3:
                     self.roleplayMovementFrame.setFollowingMessage(gfjrmsg)
                     playerEntity3
@@ -180,11 +180,9 @@ class RoleplayWorldFrame(Frame):
         if isinstance(msg, InteractiveElementActivationMessage):
             sendInteractiveUseRequest = True
             ieamsg = msg
-            interactiveFrame: riF.RoleplayInteractivesFrame = (
-                Kernel().worker.getFrame("RoleplayInteractivesFrame")
-            )
+            interactiveFrame: riF.RoleplayInteractivesFrame = Kernel().worker.getFrame("RoleplayInteractivesFrame")
             if interactiveFrame.usingInteractive:
-                logger.debug("Interactive element already in use")
+                Logger().debug("Interactive element already in use")
             if not (interactiveFrame and interactiveFrame.usingInteractive):
                 playerEntity = PlayedCharacterManager().entity
                 if not playerEntity:
@@ -208,7 +206,9 @@ class RoleplayWorldFrame(Frame):
         return True
 
     def onFramePushed(self, pEvent: FramePushedEvent) -> None:
-        from pydofus2.com.ankamagames.dofus.logic.game.roleplay.frames.RoleplayEntitiesFrame import RoleplayEntitiesFrame
+        from pydofus2.com.ankamagames.dofus.logic.game.roleplay.frames.RoleplayEntitiesFrame import (
+            RoleplayEntitiesFrame,
+        )
 
         if isinstance(pEvent.frame, RoleplayEntitiesFrame):
             pEvent.currentTarget.removeEventListener(FramePushedEvent.EVENT_FRAME_PUSHED, self.onFramePushed)
@@ -244,7 +244,7 @@ class RoleplayWorldFrame(Frame):
                     if not forbiddenCellsIds:
                         forbiddenCellsIds = []
                     forbiddenCellsIds.append(mp.cellId)
-        # logger.debug("Forbidden cells: %s", forbiddenCellsIds)
+        # Logger().debug("Forbidden cells: %s", forbiddenCellsIds)
         ieCellData = cells[iePos.cellId]
 
         if ie:
@@ -264,7 +264,7 @@ class RoleplayWorldFrame(Frame):
             nearestCell = PlayedCharacterManager().entity.position
         else:
             orientationToCell = iePos.advancedOrientationTo(PlayedCharacterManager().entity.position)
-            # logger.debug("Orientation to cell: %s", DirectionsEnum(orientationToCell).name)
+            # Logger().debug("Orientation to cell: %s", DirectionsEnum(orientationToCell).name)
             nearestCell = iePos.getNearestFreeCellInDirection(
                 orientationToCell,
                 DataMapProvider(),
@@ -273,7 +273,7 @@ class RoleplayWorldFrame(Frame):
                 False,
                 forbiddenCellsIds,
             )
-            # logger.debug("Nearest cell: %s", nearestCell)
+            # Logger().debug("Nearest cell: %s", nearestCell)
             if minimalRange > 1:
                 for _ in range(minimalRange - 1):
                     forbiddenCellsIds.append(nearestCell.cellId)

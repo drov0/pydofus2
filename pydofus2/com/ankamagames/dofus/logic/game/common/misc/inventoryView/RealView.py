@@ -10,9 +10,7 @@ class RealView(ListView):
     def name(self) -> str:
         return "real"
 
-    def addItem(
-        self, item: ItemWrapper, invisible: int, needUpdateView: bool = True
-    ) -> None:
+    def addItem(self, item: ItemWrapper, invisible: int, needUpdateView: bool = True) -> None:
         super().addItem(item, invisible, needUpdateView)
         if needUpdateView:
             self.updateView()
@@ -21,9 +19,7 @@ class RealView(ListView):
         super().removeItem(item, invisible)
         self.updateView()
 
-    def modifyItem(
-        self, item: ItemWrapper, oldItem: ItemWrapper, invisible: int
-    ) -> None:
+    def modifyItem(self, item: ItemWrapper, oldItem: ItemWrapper, invisible: int) -> None:
         super().modifyItem(item, oldItem, invisible)
         if item.quantity != oldItem.quantity:
             pass

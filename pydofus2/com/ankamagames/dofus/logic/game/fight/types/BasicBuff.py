@@ -32,8 +32,6 @@ from pydofus2.com.ankamagames.dofus.network.types.game.context.fight.GameFightFi
 )
 from pydofus2.com.ankamagames.jerakine.logger.Logger import Logger
 
-logger = Logger("Dofus2")
-
 
 class BasicBuff:
 
@@ -112,7 +110,7 @@ class BasicBuff:
         self.parentBoostUid = self.parentBoostUid
         self.initParam(param1, param2, param3)
         if GameDebugManager().buffsDebugActivated:
-            logger.debug(
+            Logger().debug(
                 f"[BUFFS DEBUG] Buff {self.id} créé ! Params {param1}, {param2}, {param3}, aliveSource {self.aliveSource} '{self._effect.description}'"
             )
 
@@ -129,12 +127,12 @@ class BasicBuff:
         if isinstance(self._effect, EffectInstanceDice):
             return self._effect.diceNum
         return None
-    
+
     @param1.setter
     def param1(self, value: Any) -> None:
         if isinstance(self._effect, EffectInstanceDice):
             self._effect.diceNum = value
-            
+
     @property
     def param2(self) -> Any:
         if isinstance(self._effect, EffectInstanceDice):
@@ -289,7 +287,7 @@ class BasicBuff:
 
     def onDisabled(self) -> None:
         if GameDebugManager().buffsDebugActivated:
-            logger.debug(f"[BUFFS DEBUG] Buff {self.uid} disabled")
+            Logger().debug(f"[BUFFS DEBUG] Buff {self.uid} disabled")
         self._disabled = True
 
     @property
@@ -299,19 +297,19 @@ class BasicBuff:
     def onReenable(self) -> None:
         if not self._removed:
             if GameDebugManager().buffsDebugActivated:
-                logger.debug(f"[BUFFS DEBUG] Buff {self.uid} reactivated")
+                Logger().debug(f"[BUFFS DEBUG] Buff {self.uid} reactivated")
             self._disabled = False
 
     def onRemoved(self) -> None:
         if GameDebugManager().buffsDebugActivated:
-            logger.debug(f"[BUFFS DEBUG] Buff {self.uid} retrieved")
+            Logger().debug(f"[BUFFS DEBUG] Buff {self.uid} retrieved")
         self._removed = True
         if not self._disabled:
             self.onDisabled()
 
     def onApplied(self) -> None:
         if GameDebugManager().buffsDebugActivated:
-            logger.debug(f"[BUFFS DEBUG] Buff {self.uid} applied")
+            Logger().debug(f"[BUFFS DEBUG] Buff {self.uid} applied")
         self._disabled = False
         self._removed = False
 
@@ -445,7 +443,7 @@ class BasicBuff:
             if self.param3:
                 self.param3 += buff.param3
         if GameDebugManager().buffsDebugActivated:
-            logger.debug("[BUFFS DEBUG] Buff {self.uid} : ajout du buff {buff.uid} {additionDetails}")
+            Logger().debug("[BUFFS DEBUG] Buff {self.uid} : ajout du buff {buff.uid} {additionDetails}")
         self.refreshDescription()
 
     def updateParam(self, value1: int = 0, value2: int = 0, value3: int = 0, buffId: int = -1) -> None:
@@ -512,7 +510,7 @@ class BasicBuff:
             self.param2 = p2
             self.param3 = p3
         if GameDebugManager().buffsDebugActivated:
-            logger.debug(
+            Logger().debug(
                 "[BUFFS DEBUG] Buff "
                 + self.id
                 + " rafraichissement des params "
@@ -531,7 +529,7 @@ class BasicBuff:
         oldDuration: int = 0
         if GameDebugManager().buffsDebugActivated:
             if dispellEffect:
-                logger.debug(f"[BUFFS DEBUG] Buff {self.id} durée modifiée de {delta} (desenvoutement de l'effet)")
+                Logger().debug(f"[BUFFS DEBUG] Buff {self.id} durée modifiée de {delta} (desenvoutement de l'effet)")
         if not dispellEffect or self.canBeDispell():
             if self.duration >= 63 or self.duration == -1000:
                 return False
@@ -540,7 +538,7 @@ class BasicBuff:
                 self.duration += delta
                 self.effect.duration += delta
                 if GameDebugManager().buffsDebugActivated:
-                    logger.debug(
+                    Logger().debug(
                         f"[BUFFS DEBUG] Buff {self.id} duration modified from {oldDuration} to {self.duration}"
                     )
                 return True
@@ -548,7 +546,7 @@ class BasicBuff:
                 self.duration = 0
                 self.effect.duration = 0
                 if GameDebugManager().buffsDebugActivated:
-                    logger.debug(
+                    Logger().debug(
                         f"[BUFFS DEBUG] Buff {self.id} duration modified from {oldDuration} to {self.duration}"
                     )
                 return True

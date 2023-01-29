@@ -2,15 +2,13 @@ from pydofus2.com.ankamagames.jerakine.network.NetworkMessage import NetworkMess
 
 
 class MoodSmileyUpdateMessage(NetworkMessage):
-    accountId:int
-    playerId:int
-    smileyId:int
-    
+    accountId: int
+    playerId: int
+    smileyId: int
 
-    def init(self, accountId_:int, playerId_:int, smileyId_:int):
+    def init(self, accountId_: int, playerId_: int, smileyId_: int):
         self.accountId = accountId_
         self.playerId = playerId_
         self.smileyId = smileyId_
-        
+
         super().__init__()
-    

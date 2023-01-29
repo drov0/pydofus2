@@ -29,9 +29,7 @@ class StorageMinoukiView(StorageGenericView):
     #   if StorageOptionManager().currentStorageView == self:
     #      _hookLock.addHook(InventoryHookList.StorageViewContent,[content,InventoryManager().inventory.kamas])
 
-    def addItem(
-        self, item: ItemWrapper, invisible: int, needUpdateView: bool = True
-    ) -> None:
+    def addItem(self, item: ItemWrapper, invisible: int, needUpdateView: bool = True) -> None:
         type: int = 0
         clone: ItemWrapper = item.clone()
         clone.quantity -= invisible
@@ -58,11 +56,8 @@ class StorageMinoukiView(StorageGenericView):
             return
         for effect in item.possibleEffects:
             if effect.effectId == ActionIds.ACTION_ITEM_CUSTOM_EFFECT:
-                if (
-                    self._typesQty[effect.parameter2]
-                    and self._typesQty[effect.parameter2] > 0
-                ):
-                    self._typesQty[effect.parameter2]-=1
+                if self._typesQty[effect.parameter2] and self._typesQty[effect.parameter2] > 0:
+                    self._typesQty[effect.parameter2] -= 1
                     if self._typesQty[effect.parameter2] == 0:
                         del self._types[effect.parameter2]
         self._content.splice(idx, 1)

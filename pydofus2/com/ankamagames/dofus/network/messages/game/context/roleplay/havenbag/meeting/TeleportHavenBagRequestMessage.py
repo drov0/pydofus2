@@ -2,11 +2,9 @@ from pydofus2.com.ankamagames.jerakine.network.NetworkMessage import NetworkMess
 
 
 class TeleportHavenBagRequestMessage(NetworkMessage):
-    guestId:int
-    
+    guestId: int
 
-    def init(self, guestId_:int):
+    def init(self, guestId_: int):
         self.guestId = guestId_
-        
+
         super().__init__()
-    

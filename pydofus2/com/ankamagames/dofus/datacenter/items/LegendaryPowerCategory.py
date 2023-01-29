@@ -8,8 +8,6 @@ class LegendaryPowerCategory(IDataCenter):
 
     MODULE: str = "LegendaryPowersCategories"
 
-    logger = Logger("Dofus2")
-
     id: int
 
     categoryName: str

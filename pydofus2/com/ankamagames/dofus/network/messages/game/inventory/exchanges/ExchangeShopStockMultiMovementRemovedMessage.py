@@ -2,11 +2,9 @@ from pydofus2.com.ankamagames.jerakine.network.NetworkMessage import NetworkMess
 
 
 class ExchangeShopStockMultiMovementRemovedMessage(NetworkMessage):
-    objectIdList:list[int]
-    
+    objectIdList: list[int]
 
-    def init(self, objectIdList_:list[int]):
+    def init(self, objectIdList_: list[int]):
         self.objectIdList = objectIdList_
-        
+
         super().__init__()
-    

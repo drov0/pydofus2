@@ -2,11 +2,9 @@ from pydofus2.com.ankamagames.dofus.network.types.game.shortcut.ShortcutObject i
 
 
 class ShortcutObjectIdolsPreset(ShortcutObject):
-    presetId:int
-    
+    presetId: int
 
-    def init(self, presetId_:int, slot_:int):
+    def init(self, presetId_: int, slot_: int):
         self.presetId = presetId_
-        
+
         super().init(slot_)
-    

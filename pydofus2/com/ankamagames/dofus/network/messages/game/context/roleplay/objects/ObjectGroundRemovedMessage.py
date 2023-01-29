@@ -2,11 +2,9 @@ from pydofus2.com.ankamagames.jerakine.network.NetworkMessage import NetworkMess
 
 
 class ObjectGroundRemovedMessage(NetworkMessage):
-    cell:int
-    
+    cell: int
 
-    def init(self, cell_:int):
+    def init(self, cell_: int):
         self.cell = cell_
-        
+
         super().__init__()
-    

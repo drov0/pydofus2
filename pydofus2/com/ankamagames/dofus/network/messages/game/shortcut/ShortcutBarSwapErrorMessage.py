@@ -2,11 +2,9 @@ from pydofus2.com.ankamagames.jerakine.network.NetworkMessage import NetworkMess
 
 
 class ShortcutBarSwapErrorMessage(NetworkMessage):
-    error:int
-    
+    error: int
 
-    def init(self, error_:int):
+    def init(self, error_: int):
         self.error = error_
-        
+
         super().__init__()
-    

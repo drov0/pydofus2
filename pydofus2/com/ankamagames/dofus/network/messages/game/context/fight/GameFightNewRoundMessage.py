@@ -2,11 +2,9 @@ from pydofus2.com.ankamagames.jerakine.network.NetworkMessage import NetworkMess
 
 
 class GameFightNewRoundMessage(NetworkMessage):
-    roundNumber:int
-    
+    roundNumber: int
 
-    def init(self, roundNumber_:int):
+    def init(self, roundNumber_: int):
         self.roundNumber = roundNumber_
-        
+
         super().__init__()
-    

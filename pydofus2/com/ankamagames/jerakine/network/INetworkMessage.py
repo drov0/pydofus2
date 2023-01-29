@@ -6,22 +6,19 @@ from pydofus2.com.ankamagames.jerakine.network.utils.FuncTree import FuncTree
 
 class INetworkMessage(IdentifiedMessage, QueueableMessage):
     def pack(self, param1: ByteArray) -> None:
-        pass
+        raise NotImplementedError("This method must be overriden")
 
     def unpack(self, param1: ByteArray, param2: int) -> None:
-        pass
-
-    def unpackAsync(self, param1: ByteArray, param2: int) -> FuncTree:
-        pass
+        raise NotImplementedError("This method must be overriden")
 
     @property
     def isInitialized(self) -> bool:
-        pass
+        raise NotImplementedError("This method must be overriden")
 
     @property
     def unpacked(self) -> bool:
-        pass
+        raise NotImplementedError("This method must be overriden")
 
     @unpacked.setter
     def unpacked(self, param1: bool) -> None:
-        pass
+        raise NotImplementedError("This method must be overriden")

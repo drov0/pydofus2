@@ -18,9 +18,6 @@ from pydofus2.com.ankamagames.dofus.network.types.game.context.fight.GameFightFi
     GameFightFighterInformations,
 )
 from pydofus2.com.ankamagames.dofus.types.entities.AnimatedCharacter import AnimatedCharacter
-from pydofus2.com.ankamagames.jerakine.utils.display.EnterFrameDispatcher import (
-    EnterFrameDispatcher,
-)
 from pydofus2.damageCalculation.tools.StatIds import StatIds
 
 
@@ -43,9 +40,7 @@ class FightShieldPointsVariationStep(AbstractStatContextualStep, IFightStep):
     _target: AnimatedCharacter = None
 
     def __init__(self, entityId: float, value: int, elementId: int):
-        super().__init__(
-            self.COLOR, str(value), entityId, GameContextEnum.FIGHT, self.BLOCKING
-        )
+        super().__init__(self.COLOR, str(value), entityId, GameContextEnum.FIGHT, self.BLOCKING)
         self._intValue = value
         self._elementId = elementId
         self._virtual = False
@@ -70,14 +65,12 @@ class FightShieldPointsVariationStep(AbstractStatContextualStep, IFightStep):
         self._virtual = pValue
 
     def start(self) -> None:
-        self._target = DofusEntities.getEntity(self._targetId)
-        self._fighterInfo = FightEntitiesFrame.getCurrentInstance().getEntityInfos(
-            self._targetId
-        )
+        self._target = DofusEntities().getEntity(self._targetId)
+        self._fighterInfo = FightEntitiesFrame.getCurrentInstance().getEntityInfos(self._targetId)
         if not self._fighterInfo:
             super().executeCallbacks()
             return
-        EnterFrameDispatcher().worker.addSingleTreatment(self, self.apply, [])
+        self.apply()
 
     def apply(self) -> None:
         if self._intValue < 0:

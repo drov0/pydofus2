@@ -65,13 +65,12 @@ from pydofus2.com.ankamagames.jerakine.messages.Frame import Frame
 from pydofus2.com.ankamagames.jerakine.messages.Message import Message
 from pydofus2.com.ankamagames.jerakine.types.enums.Priority import Priority
 from functools import cmp_to_key
-logger = Logger("Dofus2")
+
 
 class SpellInventoryManagementFrame(Frame, metaclass=Singleton):
-
     def __init__(self):
         self._fullSpellList = dict[int, list[SpellWrapper]]()
-        self._spellsGlobalCooldowns: dict[int, list[GameFightSpellCooldown]]()
+        self._spellsGlobalCooldowns = dict[int, list[GameFightSpellCooldown]]()
         super().__init__()
 
     def generateCurrentCustomModeBreedSpells(self) -> list:
@@ -149,7 +148,7 @@ class SpellInventoryManagementFrame(Frame, metaclass=Singleton):
                         if spellId in idsList:
                             spellData = Spell.getSpellById(spellId)
                             if spellData == None:
-                                logger.warn("Unknown spell with id " + spellId)
+                                Logger().warn("Unknown spell with id " + spellId)
                             elif not spellData.spellVariant:
                                 self._fullSpellList[playerId].append(
                                     SpellWrapper.create(

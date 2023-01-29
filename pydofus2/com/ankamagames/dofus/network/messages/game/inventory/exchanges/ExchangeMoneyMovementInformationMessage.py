@@ -2,11 +2,9 @@ from pydofus2.com.ankamagames.jerakine.network.NetworkMessage import NetworkMess
 
 
 class ExchangeMoneyMovementInformationMessage(NetworkMessage):
-    limit:int
-    
+    limit: int
 
-    def init(self, limit_:int):
+    def init(self, limit_: int):
         self.limit = limit_
-        
+
         super().__init__()
-    

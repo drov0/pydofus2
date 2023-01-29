@@ -17,8 +17,6 @@ from pydofus2.com.ankamagames.jerakine.messages.Frame import Frame
 from pydofus2.com.ankamagames.jerakine.messages.Message import Message
 from pydofus2.com.ankamagames.jerakine.types.enums.Priority import Priority
 
-logger = Logger("Dofus2")
-
 
 class ContextChangeFrame(Frame):
     def __init__(self):
@@ -39,11 +37,13 @@ class ContextChangeFrame(Frame):
             self.currentContext = msg.context
             if self.currentContext == GameContextEnum.ROLE_PLAY:
                 import pydofus2.com.ankamagames.dofus.logic.game.roleplay.frames.RoleplayContextFrame as rplCF
+
                 Kernel().worker.addFrame(rplCF.RoleplayContextFrame())
 
             elif self.currentContext == GameContextEnum.FIGHT:
-                logger.debug("Fight context started")
+                Logger().debug("Fight context started")
                 import pydofus2.com.ankamagames.dofus.logic.game.fight.frames.FightContextFrame as fcf
+
                 Kernel().worker.addFrame(fcf.FightContextFrame())
 
             else:

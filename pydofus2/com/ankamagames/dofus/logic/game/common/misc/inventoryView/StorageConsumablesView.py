@@ -14,10 +14,7 @@ class StorageConsumablesView(StorageGenericView):
         return "storageConsumables"
 
     def isListening(self, item: ItemWrapper) -> bool:
-        return (
-            super().isListening(item)
-            and item.category == ItemCategoryEnum.CONSUMABLES_CATEGORY
-        )
+        return super().isListening(item) and item.category == ItemCategoryEnum.CONSUMABLES_CATEGORY
 
     def updateView(self) -> None:
         super().updateView()

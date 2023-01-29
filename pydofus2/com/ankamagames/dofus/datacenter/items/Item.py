@@ -19,8 +19,6 @@ from pydofus2.com.ankamagames.jerakine.data.GameDataFileAccessor import GameData
 from pydofus2.com.ankamagames.jerakine.interfaces.IDataCenter import IDataCenter
 from pydofus2.com.ankamagames.jerakine.logger.Logger import Logger
 
-logger = Logger("Dofus2")
-
 
 class Item(IPostInit, IDataCenter):
 
@@ -280,7 +278,7 @@ class Item(IPostInit, IDataCenter):
         item: Item = GameData.getObject(cls.MODULE, id)
         if item or not returnDefaultItemIfNull:
             return item
-        logger.error(f"Impossible de trouver l'objet {id}, remplacement par l'objet 666")
+        Logger().error(f"Impossible de trouver l'objet {id}, remplacement par l'objet 666")
         return GameData.getObject(cls.MODULE, 666)
 
     @staticmethod

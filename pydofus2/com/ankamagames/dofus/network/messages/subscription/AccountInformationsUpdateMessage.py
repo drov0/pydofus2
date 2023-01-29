@@ -2,11 +2,9 @@ from pydofus2.com.ankamagames.jerakine.network.NetworkMessage import NetworkMess
 
 
 class AccountInformationsUpdateMessage(NetworkMessage):
-    subscriptionEndDate:int
-    
+    subscriptionEndDate: int
 
-    def init(self, subscriptionEndDate_:int):
+    def init(self, subscriptionEndDate_: int):
         self.subscriptionEndDate = subscriptionEndDate_
-        
+
         super().__init__()
-    

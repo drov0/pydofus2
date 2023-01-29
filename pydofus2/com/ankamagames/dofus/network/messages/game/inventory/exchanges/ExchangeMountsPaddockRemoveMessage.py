@@ -2,11 +2,9 @@ from pydofus2.com.ankamagames.jerakine.network.NetworkMessage import NetworkMess
 
 
 class ExchangeMountsPaddockRemoveMessage(NetworkMessage):
-    mountsId:list[int]
-    
+    mountsId: list[int]
 
-    def init(self, mountsId_:list[int]):
+    def init(self, mountsId_: list[int]):
         self.mountsId = mountsId_
-        
+
         super().__init__()
-    

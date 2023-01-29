@@ -10,9 +10,6 @@ from pydofus2.com.hurlan.crypto.symmetric.ECBMode import ECBMode
 from flash.Capabilities import Capabilities
 
 
-logger = Logger("Dofus2")
-
-
 class ShieldCertifcate:
     HEADER_BEGIN: str = "SV"
 
@@ -95,10 +92,10 @@ class ShieldCertifcate:
             for _ in range(infoLen):
                 name = data.readUTF()
                 value = data.readBoolean()
-                logger.debug(f"{name} = {value}")
+                Logger().debug(f"{name} = {value}")
                 setattr(result, name, value)
             result.content = result.decrypt(data)
-        logger.debug("Certificat V{} : {}".format(result.version, result.content))
+        Logger().debug("Certificat V{} : {}".format(result.version, result.content))
         return result
 
     @property
@@ -178,7 +175,7 @@ class ShieldCertifcate:
         try:
             ecb.decrypt(cryptedData)
         except Exception as e:
-            logger.error("Certificat V2 non valide (clef invalide)", exc_info=True)
+            Logger().error("Certificat V2 non valide (clef invalide)", exc_info=True)
             raise
         cryptedData.position = 0
         return cryptedData.decode("utf-8")
@@ -192,7 +189,7 @@ class ShieldCertifcate:
             elif "Darwin" in Capabilities.os and self.version > 3:
                 data.append("Mac OS")
             else:
-                logger.debug("cert version : {}".format(self.version))
+                Logger().debug("cert version : {}".format(self.version))
                 data.append(Capabilities.os)
             data.append(Capabilities.maxLevelIDC)
             data.append(Capabilities.language)
@@ -200,20 +197,20 @@ class ShieldCertifcate:
             try:
                 data.append(os.getlogin())
             except Exception as e:
-                logger.error("User non disponible.")
+                Logger().error("User non disponible.")
         if reverse:
             data.reverse()
         data_str = ",".join(data)
-        logger.debug(f"data before Hash : {data_str}")
+        Logger().debug(f"data before Hash : {data_str}")
         hash = md5(data_str.encode()).hexdigest()
         return hash
 
     # def traceInfo(self, target, maxDepth:int = 5, inc:str = "") -> None:
-    #    logger.info("-----------")
-    #    logger.info("active : " + target.active)
-    #    logger.info("hardwareAddress : " + target.hardwareAddress)
-    #    logger.info("name : " + target.hardwareAddress)
-    #    logger.info("displayName : " + target.displayName)
-    #    logger.info("parent : " + target.parent)
+    #    Logger().info("-----------")
+    #    Logger().info("active : " + target.active)
+    #    Logger().info("hardwareAddress : " + target.hardwareAddress)
+    #    Logger().info("name : " + target.hardwareAddress)
+    #    Logger().info("displayName : " + target.displayName)
+    #    Logger().info("parent : " + target.parent)
     #    if target.parent and maxDepth:
     #       self.traceInfo(target.parent,maxDepth--,inc + "...")

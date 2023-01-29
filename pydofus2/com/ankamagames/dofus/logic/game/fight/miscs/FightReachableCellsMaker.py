@@ -21,8 +21,6 @@ from pydofus2.damageCalculation.tools.StatIds import StatIds
 from pydofus2.com.ankamagames.atouin.data.map.Cell import Cell
 from pydofus2.com.ankamagames.jerakine.types.positions.MapPoint import MapPoint
 
-logger = Logger("Dofus2")
-
 
 class _ReachableCellData:
     STATE_UNDEFINED: int = 0
@@ -125,7 +123,7 @@ class FightReachableCellsMaker:
 
         else:
             if infos.disposition.cellId == -1:
-                logger.warn(
+                Logger().warn(
                     "Failed to initialize FightReachableCellsMaker for entity "
                     + infos.contextualId
                     + " because its cellId is -1"

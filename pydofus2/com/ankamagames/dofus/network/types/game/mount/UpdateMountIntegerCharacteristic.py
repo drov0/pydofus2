@@ -2,11 +2,9 @@ from pydofus2.com.ankamagames.dofus.network.types.game.mount.UpdateMountCharacte
 
 
 class UpdateMountIntegerCharacteristic(UpdateMountCharacteristic):
-    value:int
-    
+    value: int
 
-    def init(self, value_:int, type_:int):
+    def init(self, value_: int, type_: int):
         self.value = value_
-        
+
         super().init(type_)
-    

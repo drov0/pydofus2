@@ -2,11 +2,9 @@ from pydofus2.com.ankamagames.jerakine.network.NetworkMessage import NetworkMess
 
 
 class ServerExperienceModificatorMessage(NetworkMessage):
-    experiencePercent:int
-    
+    experiencePercent: int
 
-    def init(self, experiencePercent_:int):
+    def init(self, experiencePercent_: int):
         self.experiencePercent = experiencePercent_
-        
+
         super().__init__()
-    

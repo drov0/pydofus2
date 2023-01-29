@@ -13,8 +13,6 @@ from pydofus2.com.ankamagames.dofus.network.enums.GameActionMarkTypeEnum import 
 from pydofus2.com.ankamagames.jerakine.logger.Logger import Logger
 from pydofus2.com.ankamagames.jerakine.sequencer.AbstractSequencable import AbstractSequencable
 
-logger = Logger("Dofus2")
-
 
 class FightMarkTriggeredStep(AbstractSequencable, IFightStep):
 
@@ -37,7 +35,7 @@ class FightMarkTriggeredStep(AbstractSequencable, IFightStep):
     def start(self) -> None:
         mi: MarkInstance = MarkedCellsManager().getMarkDatas(self._markId)
         if not mi:
-            logger.error(f"Trying to trigger an unknown mark ({self._markId}). Aborting.")
+            Logger().error(f"Trying to trigger an unknown mark ({self._markId}). Aborting.")
             self.executeCallbacks()
             return
         evt: str = FightEventEnum.UNKNOWN_FIGHT_EVENT
@@ -48,7 +46,7 @@ class FightMarkTriggeredStep(AbstractSequencable, IFightStep):
         if mi.markType == GameActionMarkTypeEnum.PORTAL:
             evt = FightEventEnum.FIGHTER_TRIGGERED_PORTAL
         else:
-            logger.warn("Unknown mark type triggered (" + str(mi.markType) + ").")
+            Logger().warn("Unknown mark type triggered (" + str(mi.markType) + ").")
         FightEventsHelper().sendFightEvent(
             evt,
             [self._fighterId, self._casterId, mi.associatedSpell.id],

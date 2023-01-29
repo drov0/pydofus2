@@ -2,11 +2,9 @@ from pydofus2.com.ankamagames.jerakine.network.NetworkMessage import NetworkMess
 
 
 class GuestModeMessage(NetworkMessage):
-    active:bool
-    
+    active: bool
 
-    def init(self, active_:bool):
+    def init(self, active_: bool):
         self.active = active_
-        
+
         super().__init__()
-    

@@ -2,13 +2,11 @@ from pydofus2.com.ankamagames.jerakine.network.NetworkMessage import NetworkMess
 
 
 class UpdateMapPlayersAgressableStatusMessage(NetworkMessage):
-    playerIds:list[int]
-    enable:list[int]
-    
+    playerIds: list[int]
+    enable: list[int]
 
-    def init(self, playerIds_:list[int], enable_:list[int]):
+    def init(self, playerIds_: list[int], enable_: list[int]):
         self.playerIds = playerIds_
         self.enable = enable_
-        
+
         super().__init__()
-    

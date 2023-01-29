@@ -2,13 +2,11 @@ from pydofus2.com.ankamagames.dofus.network.types.game.context.roleplay.HumanOpt
 
 
 class HumanOptionTitle(HumanOption):
-    titleId:int
-    titleParam:str
-    
+    titleId: int
+    titleParam: str
 
-    def init(self, titleId_:int, titleParam_:str):
+    def init(self, titleId_: int, titleParam_: str):
         self.titleId = titleId_
         self.titleParam = titleParam_
-        
+
         super().init()
-    

@@ -21,9 +21,7 @@ class ForgettableSpell(IDataCenter):
     def getForgettableSpellById(cls, id: int) -> "ForgettableSpell":
         return GameData.getObject(cls.MODULE, id)
 
-    idAccessors: IdAccessors = IdAccessors(
-        getForgettableSpellById, getForgettableSpells
-    )
+    idAccessors: IdAccessors = IdAccessors(getForgettableSpellById, getForgettableSpells)
 
     def __init__(self):
         super().__init__()

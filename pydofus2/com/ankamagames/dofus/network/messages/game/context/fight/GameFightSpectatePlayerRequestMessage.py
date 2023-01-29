@@ -2,11 +2,9 @@ from pydofus2.com.ankamagames.jerakine.network.NetworkMessage import NetworkMess
 
 
 class GameFightSpectatePlayerRequestMessage(NetworkMessage):
-    playerId:int
-    
+    playerId: int
 
-    def init(self, playerId_:int):
+    def init(self, playerId_: int):
         self.playerId = playerId_
-        
+
         super().__init__()
-    

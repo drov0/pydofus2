@@ -19,7 +19,7 @@ class SoundElement(BasicElement):
     @property
     def elementType(self) -> ElementTypesEnum:
         return ElementTypesEnum.SOUND
-    
+
     def fromRaw(self, raw: ByteArray, mapVersion: int) -> None:
         self.soundId = raw.readInt()
         self.baseVolume = raw.readShort()

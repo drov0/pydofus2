@@ -2,11 +2,9 @@ from pydofus2.com.ankamagames.jerakine.network.NetworkMessage import NetworkMess
 
 
 class SymbioticObjectAssociatedMessage(NetworkMessage):
-    hostUID:int
-    
+    hostUID: int
 
-    def init(self, hostUID_:int):
+    def init(self, hostUID_: int):
         self.hostUID = hostUID_
-        
+
         super().__init__()
-    

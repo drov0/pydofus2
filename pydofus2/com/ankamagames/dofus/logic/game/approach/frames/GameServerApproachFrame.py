@@ -5,7 +5,9 @@ from pydofus2.com.ankamagames.dofus.logic.common.frames.QuestFrame import QuestF
 from pydofus2.com.ankamagames.dofus.logic.game.common.frames.AveragePricesFrame import AveragePricesFrame
 from pydofus2.com.ankamagames.dofus.logic.game.common.frames.InventoryManagementFrame import InventoryManagementFrame
 from pydofus2.com.ankamagames.dofus.logic.game.common.frames.JobsFrame import JobsFrame
-from pydofus2.com.ankamagames.dofus.logic.game.common.frames.SpellInventoryManagementFrame import SpellInventoryManagementFrame
+from pydofus2.com.ankamagames.dofus.logic.game.common.frames.SpellInventoryManagementFrame import (
+    SpellInventoryManagementFrame,
+)
 from pydofus2.com.ankamagames.dofus.logic.game.common.managers.FeatureManager import FeatureManager
 from pydofus2.com.ankamagames.dofus.network.enums.GameServerTypeEnum import GameServerTypeEnum
 from pydofus2.com.ankamagames.jerakine.benchmark.BenchmarkTimer import BenchmarkTimer
@@ -109,8 +111,6 @@ from pydofus2.com.ankamagames.jerakine.network.messages.ServerConnectionFailedMe
 from pydofus2.com.ankamagames.jerakine.types.DataStoreType import DataStoreType
 from pydofus2.com.ankamagames.jerakine.types.enums.Priority import Priority
 
-logger = Logger()
-
 
 class GameServerApproachFrame(Frame):
 
@@ -176,24 +176,43 @@ class GameServerApproachFrame(Frame):
         elif isinstance(msg, CharactersListMessage):
             clmsg = msg
             self._charactersList = clmsg.characters
-            server = PlayerManager().server;
-            if FeatureManager().isFeatureWithKeywordEnabled("server.heroic") or server.gameTypeId == GameServerTypeEnum.SERVER_TYPE_EPIC:
+            server = PlayerManager().server
+            if (
+                FeatureManager().isFeatureWithKeywordEnabled("server.heroic")
+                or server.gameTypeId == GameServerTypeEnum.SERVER_TYPE_EPIC
+            ):
                 for chi in clmsg.characters:
                     if chi.deathMaxLevel > chi.level:
                         bonusXp = 6
                     else:
                         bonusXp = 3
-                    o = BasicCharacterWrapper.create(chi.id,chi.name,chi.level,chi.entityLook,chi.breed,chi.sex,chi.deathState,chi.deathCount,chi.deathMaxLevel,bonusXp,False);
+                    o = BasicCharacterWrapper.create(
+                        chi.id,
+                        chi.name,
+                        chi.level,
+                        chi.entityLook,
+                        chi.breed,
+                        chi.sex,
+                        chi.deathState,
+                        chi.deathCount,
+                        chi.deathMaxLevel,
+                        bonusXp,
+                        False,
+                    )
                     PlayerManager().charactersList.append(o)
             else:
-                bonusXpFeatureActivated = FeatureManager().isFeatureWithKeywordEnabled("character.xp.bonusForYoungerCharacters")
+                bonusXpFeatureActivated = FeatureManager().isFeatureWithKeywordEnabled(
+                    "character.xp.bonusForYoungerCharacters"
+                )
                 for cbi in clmsg.characters:
                     bonusXp = 1
                     if bonusXpFeatureActivated:
                         for cbi2 in clmsg.characters:
-                            if cbi2.id != cbi.id and cbi2.level > cbi.level and bonusXp < 4: 
+                            if cbi2.id != cbi.id and cbi2.level > cbi.level and bonusXp < 4:
                                 bonusXp += 1
-                    o = BasicCharacterWrapper.create(cbi.id,cbi.name,cbi.level,cbi.entityLook,cbi.breed,cbi.sex,0,0,0,bonusXp, False)
+                    o = BasicCharacterWrapper.create(
+                        cbi.id, cbi.name, cbi.level, cbi.entityLook, cbi.breed, cbi.sex, 0, 0, 0, bonusXp, False
+                    )
                     PlayerManager().charactersList.append(o)
             KernelEventsManager().send(KernelEvts.CHARACTERS_LIST, return_value=PlayerManager().charactersList)
             if PlayerManager().allowAutoConnectCharacter:
@@ -258,7 +277,7 @@ class GameServerApproachFrame(Frame):
             now = time.perf_counter()
             delta = now - self._loadingStart
             if delta > self.LOADING_TIMEOUT:
-                logger.warn(f"Client took too long to load ({delta}s).")
+                Logger().warn(f"Client took too long to load ({delta}s).")
             return True
 
         elif isinstance(msg, ConnectionResumedMessage):
@@ -303,7 +322,7 @@ class GameServerApproachFrame(Frame):
                         self._charaListMinusDeadPeople.append(perso)
             else:
                 Kernel().worker.removeFrame(self)
-                logger.warn("Empty Gift List Received")
+                Logger().warn("Empty Gift List Received")
             return True
 
         elif isinstance(msg, PopupWarningClosedMessage):

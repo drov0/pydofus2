@@ -2,13 +2,11 @@ from pydofus2.com.ankamagames.jerakine.network.NetworkMessage import NetworkMess
 
 
 class ExchangeObjectTransfertListWithQuantityToInvMessage(NetworkMessage):
-    ids:list[int]
-    qtys:list[int]
-    
+    ids: list[int]
+    qtys: list[int]
 
-    def init(self, ids_:list[int], qtys_:list[int]):
+    def init(self, ids_: list[int], qtys_: list[int]):
         self.ids = ids_
         self.qtys = qtys_
-        
+
         super().__init__()
-    

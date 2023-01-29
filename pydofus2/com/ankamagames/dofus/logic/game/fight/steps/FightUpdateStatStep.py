@@ -6,8 +6,6 @@ from pydofus2.com.ankamagames.dofus.network.types.game.character.characteristic.
 from pydofus2.com.ankamagames.jerakine.logger.Logger import Logger
 from pydofus2.com.ankamagames.jerakine.sequencer.AbstractSequencable import AbstractSequencable
 
-logger = Logger("Dofus2")
-
 
 class FightUpdateStatStep(AbstractSequencable, IFightStep):
 

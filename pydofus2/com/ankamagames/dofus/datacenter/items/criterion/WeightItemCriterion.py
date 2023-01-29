@@ -17,13 +17,7 @@ class WeightItemCriterion(ItemCriterion, IDataCenter):
     def text(self) -> str:
         readableCriterionValue: str = str(self._criterionValue)
         readableCriterionRef: str = I18n.getUiText("ui.common.weight")
-        return (
-            readableCriterionRef
-            + " "
-            + self._operator.text
-            + " "
-            + readableCriterionValue
-        )
+        return readableCriterionRef + " " + self._operator.text + " " + readableCriterionValue
 
     def clone(self) -> IItemCriterion:
         return WeightItemCriterion(self.basicText)

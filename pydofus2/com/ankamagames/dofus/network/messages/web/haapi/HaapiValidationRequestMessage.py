@@ -2,11 +2,9 @@ from pydofus2.com.ankamagames.jerakine.network.NetworkMessage import NetworkMess
 
 
 class HaapiValidationRequestMessage(NetworkMessage):
-    transaction:str
-    
+    transaction: str
 
-    def init(self, transaction_:str):
+    def init(self, transaction_: str):
         self.transaction = transaction_
-        
+
         super().__init__()
-    

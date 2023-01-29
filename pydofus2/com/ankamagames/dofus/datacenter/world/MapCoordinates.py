@@ -5,9 +5,6 @@ from pydofus2.com.ankamagames.jerakine.interfaces.IDataCenter import IDataCenter
 from pydofus2.com.ankamagames.jerakine.logger.Logger import Logger
 
 
-logger = Logger("Dofus2")
-
-
 class MapCoordinates(IDataCenter):
 
     MODULE: str = "MapCoordinates"

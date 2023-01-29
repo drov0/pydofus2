@@ -3,8 +3,6 @@ from pydofus2.com.ankamagames.atouin.enums.ElementTypesEnum import ElementTypesE
 from pydofus2.com.ankamagames.jerakine.logger.Logger import Logger
 from pydofus2.com.ankamagames.jerakine.network.CustomDataWrapper import ByteArray
 
-logger = Logger("Dofus2")
-
 
 class BasicElement:
 

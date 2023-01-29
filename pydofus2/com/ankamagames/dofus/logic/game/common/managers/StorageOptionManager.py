@@ -27,8 +27,6 @@ from pydofus2.com.ankamagames.dofus.types.enums.ItemCategoryEnum import ItemCate
 from pydofus2.com.ankamagames.jerakine.logger.Logger import Logger
 from pydofus2.com.ankamagames.jerakine.metaclasses.Singleton import Singleton
 
-logger = Logger("Dofus2")
-
 
 class StorageOptionManager(metaclass=Singleton):
 
@@ -281,7 +279,7 @@ class StorageOptionManager(metaclass=Singleton):
         if not skill:
             craftFrame = Kernel().worker.getFrame("CraftFrame")
             if not craftFrame:
-                logger.error("Activation des filtres de forgemagie alors que la craftFrame n'est pas active")
+                Logger().error("Activation des filtres de forgemagie alors que la craftFrame n'est pas active")
                 return
             skill = Skill.getSkillById(craftFrame.skillId)
         name: str = self.currentStorageView.name
@@ -298,7 +296,7 @@ class StorageOptionManager(metaclass=Singleton):
         if not skill:
             craftFrame = Kernel().worker.getFrame("CraftFrame")
             if not craftFrame:
-                logger.error("Activation des filtres de forgemagie alors que la craftFrame n'est pas active")
+                Logger().error("Activation des filtres de forgemagie alors que la craftFrame n'est pas active")
                 return
             skill = Skill.getSkillById(craftFrame.skillId)
         name: str = self.currentStorageView.name

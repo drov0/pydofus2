@@ -2,11 +2,9 @@ from pydofus2.com.ankamagames.jerakine.network.NetworkMessage import NetworkMess
 
 
 class ListenersOfSynchronizedStorageMessage(NetworkMessage):
-    players:list[str]
-    
+    players: list[str]
 
-    def init(self, players_:list[str]):
+    def init(self, players_: list[str]):
         self.players = players_
-        
+
         super().__init__()
-    

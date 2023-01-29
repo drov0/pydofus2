@@ -1,7 +1,11 @@
 from types import FunctionType
 import pydofus2.com.ankamagames.dofus.datacenter.quest.Quest as qst
-from pydofus2.com.ankamagames.dofus.network.messages.game.achievement.AchievementListMessage import AchievementListMessage
-from pydofus2.com.ankamagames.dofus.network.messages.game.context.roleplay.quest.QuestListMessage import QuestListMessage
+from pydofus2.com.ankamagames.dofus.network.messages.game.achievement.AchievementListMessage import (
+    AchievementListMessage,
+)
+from pydofus2.com.ankamagames.dofus.network.messages.game.context.roleplay.quest.QuestListMessage import (
+    QuestListMessage,
+)
 from pydofus2.com.ankamagames.dofus.network.messages.game.context.roleplay.quest.QuestStepInfoMessage import (
     QuestStepInfoMessage,
 )
@@ -25,9 +29,6 @@ from pydofus2.com.ankamagames.jerakine.logger.Logger import Logger
 from pydofus2.com.ankamagames.jerakine.messages.Frame import Frame
 from pydofus2.com.ankamagames.jerakine.messages.Message import Message
 from pydofus2.com.ankamagames.jerakine.types.enums.Priority import Priority
-
-
-logger = Logger("Dofus2")
 
 
 class QuestFrame(Frame):

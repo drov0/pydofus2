@@ -2,13 +2,11 @@ from pydofus2.com.ankamagames.jerakine.network.NetworkMessage import NetworkMess
 
 
 class InteractiveElementSkill(NetworkMessage):
-    skillId:int
-    skillInstanceUid:int
-    
+    skillId: int
+    skillInstanceUid: int
 
-    def init(self, skillId_:int, skillInstanceUid_:int):
+    def init(self, skillId_: int, skillInstanceUid_: int):
         self.skillId = skillId_
         self.skillInstanceUid = skillInstanceUid_
-        
+
         super().__init__()
-    

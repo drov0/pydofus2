@@ -1,5 +1,6 @@
 from enum import Enum
 
+
 class DisconnectionReasonEnum(Enum):
 
     RESTARTING: int = 6
@@ -17,7 +18,7 @@ class DisconnectionReasonEnum(Enum):
     NEVER_CONNECTED: int = 4
 
     WANTED_SHUTDOWN = 7
-    
+
     EXCEPTION_THROWN = 8
-    
+
     CONNECTION_LOST = 9

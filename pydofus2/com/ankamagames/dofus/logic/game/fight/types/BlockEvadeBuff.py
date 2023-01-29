@@ -34,10 +34,5 @@ class BlockEvadeBuff(StatBuff):
 
     def updateMovementPath(self) -> None:
         ftf: "FightTurnFrame" = Kernel().worker.getFrame("FightTurnFrame")
-        if (
-            self.targetId == CurrentPlayedFighterManager().currentFighterId
-            and ftf
-            and ftf.myTurn
-            and ftf.lastPath
-        ):
+        if self.targetId == CurrentPlayedFighterManager().currentFighterId and ftf and ftf.myTurn and ftf.lastPath:
             ftf.updatePath()

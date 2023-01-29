@@ -6,8 +6,6 @@ from pydofus2.com.ankamagames.jerakine.types.positions.MapPoint import MapPoint
 from pydofus2.com.ankamagames.jerakine.types.zones.IZone import IZone
 import pydofus2.mapTools.MapTools as MapTools
 
-logger = Logger("Dofus2")
-
 
 class Cone(IZone):
 

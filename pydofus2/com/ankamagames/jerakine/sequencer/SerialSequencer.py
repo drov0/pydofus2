@@ -9,12 +9,7 @@ from pydofus2.com.ankamagames.jerakine.sequencer.ISequencer import ISequencer
 from pydofus2.com.ankamagames.jerakine.sequencer.ISubSequenceSequencable import (
     ISubSequenceSequencable,
 )
-from pydofus2.com.ankamagames.jerakine.utils.display.EnterFrameDispatcher import (
-    EnterFrameDispatcher,
-)
 from pydofus2.com.ankamagames.jerakine.sequencer.AbstractSequencable import AbstractSequencable
-
-logger = Logger("Dofus2")
 
 
 class SerialSequencer(ISequencer, EventDispatcher):
@@ -96,19 +91,16 @@ class SerialSequencer(ISequencer, EventDispatcher):
         if item:
             self.addStep(item)
         else:
-            logger.error("Tried to add a null step to the LUA script sequence, self step will be ignored")
+            Logger().error("Tried to add a null step to the LUA script sequence, self step will be ignored")
 
     def addStep(self, item: ISequencable) -> None:
         self._aStep.append(item)
 
     def start(self) -> None:
-        if self._running:
-            logger.debug("[Sequencer] start asked but already running")
         if not self._running:
             self._running = len(self._aStep) != 0
             if self._running:
                 while len(self._aStep) > 0 and self._running:
-                    # logger.debug(f"[Sequencer] running on current step {self._currentStep}")
                     self.execute()
                     if (
                         self._currentStep
@@ -116,16 +108,8 @@ class SerialSequencer(ISequencer, EventDispatcher):
                         and not self._currentStep.finished
                     ):
                         self._running = False
-                    if self._running and not EnterFrameDispatcher().remainsTime():
-                        self._running = False
-                        worker = EnterFrameDispatcher().worker
-                        worker.addSingleTreatmentAtPos(
-                            self,
-                            self.start,
-                            [],
-                            len(worker.findTreatments(None, self.start, [])),
-                        )
             else:
+                Logger().debug("[Sequencer] start asked but already running")
                 self.dispatch(SequencerEvent.SEQUENCE_END, SequencerEvent(self))
 
     def clear(self) -> None:
@@ -149,10 +133,8 @@ class SerialSequencer(ISequencer, EventDispatcher):
     def execute(self) -> None:
         self._lastStep = self._currentStep
         self._currentStep = self._aStep.pop(0)
-        # logger.debug(f"[Sequencer] working on step {self._currentStep.__class__.__name__}")
         if not self._currentStep:
             return
-        # FightProfiler().start()
         self._currentStep.addListener(self)
         try:
             if isinstance(self._currentStep, ISubSequenceSequencable):
@@ -165,13 +147,12 @@ class SerialSequencer(ISequencer, EventDispatcher):
                     SequencerEvent.SEQUENCE_STEP_START,
                     SequencerEvent(self, self._currentStep),
                 )
-            # logger.debug(f"Sequencer starting step {self._currentStep.__class__.__name__}")
             self._currentStep.start()
         except Exception as e:
             if isinstance(self._currentStep, ISubSequenceSequencable):
                 self._activeSubSequenceCount -= 1
                 self._currentStep.remove_listener(SequencerEvent.SEQUENCE_END, self.onSubSequenceEnd)
-            logger.error(f"Exception on step {self._currentStep}", exc_info=True)
+            Logger().error(f"Exception on step {self._currentStep}", exc_info=True)
             if isinstance(self._currentStep, AbstractSequencable):
                 self._currentStep.finished = True
             self.stepFinished(self._currentStep)
@@ -196,8 +177,7 @@ class SerialSequencer(ISequencer, EventDispatcher):
         else:
             if self.has_listeners(SequencerEvent.SEQUENCE_STEP_FINISH):
                 self.dispatch(SequencerEvent.SEQUENCE_STEP_FINISH, SequencerEvent(self, self._currentStep))
-            worker = EnterFrameDispatcher().worker
-            worker.addSingleTreatmentAtPos(self, self.start, [], len(worker.findTreatments(None, self.start, [])))
+            self.start()
 
     def onSubSequenceEnd(self, e: SequencerEvent) -> None:
         self._activeSubSequenceCount -= 1

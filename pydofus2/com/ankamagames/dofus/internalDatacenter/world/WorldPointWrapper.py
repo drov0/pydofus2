@@ -4,8 +4,6 @@ from pydofus2.com.ankamagames.dofus.datacenter.world.MapScrollAction import MapS
 from pydofus2.com.ankamagames.jerakine.logger.Logger import Logger
 from pydofus2.com.ankamagames.jerakine.types.positions.WorldPoint import WorldPoint
 
-logger = Logger("Dofus2")
-
 
 class WorldPointWrapper(WorldPoint):
 

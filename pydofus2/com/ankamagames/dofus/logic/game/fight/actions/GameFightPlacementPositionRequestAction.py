@@ -12,8 +12,6 @@ class GameFightPlacementPositionRequestAction(AbstractAction, Action):
 
     @classmethod
     def create(cls, id: int) -> "GameFightPlacementPositionRequestAction":
-        a: GameFightPlacementPositionRequestAction = (
-            GameFightPlacementPositionRequestAction(argv)
-        )
+        a: GameFightPlacementPositionRequestAction = GameFightPlacementPositionRequestAction(argv)
         a.cellId = id
         return a

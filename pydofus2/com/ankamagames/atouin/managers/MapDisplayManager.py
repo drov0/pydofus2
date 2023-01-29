@@ -9,11 +9,8 @@ from pydofus2.com.ankamagames.jerakine.resources.loaders.MapLoader import MapLoa
 from pydofus2.com.ankamagames.jerakine.types.positions.MapPoint import MapPoint
 from pydofus2.com.ankamagames.jerakine.types.positions.WorldPoint import WorldPoint
 
-logger = Logger("Dofus2")
-
 
 class MapDisplayManager(metaclass=Singleton):
-    
     def __init__(self) -> None:
         self._currentMapRendered = True
         self._currentMap = None
@@ -68,6 +65,7 @@ class MapDisplayManager(metaclass=Singleton):
 
     def loadMap(self, mapId: int, forceReloadWithoutCache: bool = False, decryptionKey=None) -> None:
         from pydofus2.com.ankamagames.dofus.kernel.Kernel import Kernel
+
         self.currentDataMap = None
         self._forceReloadWithoutCache = forceReloadWithoutCache
         self._currentMapRendered = False
@@ -75,7 +73,7 @@ class MapDisplayManager(metaclass=Singleton):
         map = MapLoader.load(mapId, key=decryptionKey)
         self._currentMapRendered = True
         self._nMapLoadEnd = perf_counter()
-        logger.debug(f"Map {map.id} loaded in {self._nMapLoadEnd - self._nMapLoadStart} seconds")
+        Logger().debug(f"Map {map.id} loaded in {self._nMapLoadEnd - self._nMapLoadStart} seconds")
         dmpm.DataMapProvider().resetUpdatedCell()
         dmpm.DataMapProvider().resetSpecialEffects()
         self.currentDataMap = map
@@ -88,4 +86,4 @@ class MapDisplayManager(metaclass=Singleton):
         elif Kernel().worker.contains("FightContextFrame"):
             Kernel().worker.getFrame("FightContextFrame").process(msg)
         else:
-            logger.warning("No context frame found!")
+            Logger().warning("No context frame found!")

@@ -185,8 +185,6 @@ from pydofus2.com.ankamagames.jerakine.messages.Message import Message
 from pydofus2.com.ankamagames.jerakine.types.enums.Priority import Priority
 from pydofus2.com.ankamagames.jerakine.utils.memory.WeakReference import WeakReference
 
-logger = Logger("Dofus2")
-
 
 class FightContextFrame(Frame):
 
@@ -415,26 +413,12 @@ class FightContextFrame(Frame):
             self._fightAttackerId = gfsmsg.attackerId
             PlayedCharacterManager().fightId = gfsmsg.fightId
             if PlayerManager().kisServerPort > 0:
-                logger.log(
-                    2,
-                    "KIS fight started : "
-                    + str(gfsmsg.fightId)
-                    + "-"
-                    + str(PlayedCharacterManager().currentMap.mapId)
-                    + " (port : "
-                    + str(PlayerManager().kisServerPort)
-                    + ")",
+                Logger().debug(
+                    f"KIS fight started : {gfsmsg.fightId}-{PlayedCharacterManager().currentMap.mapId} (port : {PlayerManager().kisServerPort})"
                 )
             else:
-                logger.log(
-                    2,
-                    "Game fight started : "
-                    + str(gfsmsg.fightId)
-                    + "-"
-                    + str(PlayedCharacterManager().currentMap.mapId)
-                    + " (port : "
-                    + str(PlayerManager().gameServerPort)
-                    + ")",
+                Logger().debug(
+                    f"Game fight started : {gfsmsg.fightId}-{PlayedCharacterManager().currentMap.mapId} (port : {PlayerManager().gameServerPort})"
                 )
             CurrentPlayedFighterManager().currentFighterId = PlayedCharacterManager().id
             CurrentPlayedFighterManager().getSpellCastManager().currentTurn = 1
@@ -442,7 +426,7 @@ class FightContextFrame(Frame):
 
         elif isinstance(msg, CurrentMapMessage):
             mcmsg = msg
-            logger.debug(f"[FightContext] Loading the fight map {msg.mapId}...")
+            Logger().debug(f"[FightContext] Loading the fight map {msg.mapId}...")
             if isinstance(mcmsg, CurrentMapInstanceMessage):
                 mdm.MapDisplayManager().mapInstanceId = mcmsg.instantiatedMapId
             else:
@@ -457,7 +441,7 @@ class FightContextFrame(Frame):
         elif isinstance(msg, MapLoadedMessage):
             gcrmsg = GameContextReadyMessage()
             gcrmsg.init(mdm.MapDisplayManager().currentMapPoint.mapId)
-            ConnectionsHandler()._conn.send(gcrmsg)
+            ConnectionsHandler().conn.send(gcrmsg)
             return True
 
         elif isinstance(msg, GameFightResumeMessage):
@@ -549,33 +533,6 @@ class FightContextFrame(Frame):
 
         elif isinstance(msg, GameFightLeaveMessage):
             return False
-
-        # if isinstance(msg, TimelineEntityOverAction):
-        #     teoa = msg
-        #     self._timelineOverEntity = True
-        #     self._timelineOverEntityId = teoa.targetId
-        #     fscf = Kernel().worker.getFrame("FightSpellCastFrame")
-        #     self.overEntity(
-        #         teoa.targetId,
-        #         teoa.showRange,
-        #         teoa.highlightTimelineFighter,
-        #         teoa.timelineTarget,
-        #     )
-        #     return True
-
-        # if isinstance(msg, TimelineEntityOutAction):
-        #     tleoutaction = msg
-        #     entities = self._entitiesFrame.getEntitiesIdsList()
-        #     self._timelineOverEntity = False
-        #     self.outEntity(tleoutaction.targetId)
-        #     return True
-
-        # if isinstance(msg, TogglePointCellAction):
-        #     if Kernel().worker.contains("PointCellFrame"):
-        #         Kernel().worker.removeFrame(PointCellFrame())
-        #     else:
-        #         Kernel().worker.addFrame(PointCellFrame())
-        #     return True
 
         elif isinstance(msg, GameFightEndMessage):
             gfemsg = msg
@@ -689,7 +646,7 @@ class FightContextFrame(Frame):
                 if PlayerManager().kisServerPort > 0:
                     pass
             Kernel().worker.removeFrame(self)
-            # logger.debug(resultsRecap)
+            # Logger().debug(resultsRecap)
             return False
 
         elif isinstance(msg, ChallengeTargetsListRequestAction):
@@ -721,26 +678,8 @@ class FightContextFrame(Frame):
             return True
 
         elif isinstance(msg, GameActionFightNoSpellCastMessage):
-            # logger.debug(f"failed to cast spell {msg.to_json()}")
+            Logger().debug(f"failed to cast spell {msg.to_json()}")
             return False
-
-        # if isinstance(msg, BreachEnterMessage):
-        #     bemsg = msg
-        #     PlayedCharacterManager().isInBreach = True
-        #     if not Kernel().worker.getFrame("BreachFrame"):
-        #         breachFrame = BreachFrame()
-        #         breachFrame.ownerId = bemsg.owner
-        #         Kernel().worker.addFrame(breachFrame)
-        #     return True
-
-        # if isinstance(msg, BreachExitResponseMessage):
-        #     if PlayedCharacterManager().isInBreach:
-        #         PlayedCharacterManager().isInBreach = False
-        #         if Kernel().worker.getFrame("BreachFrame"):
-        #             Kernel().worker.removeFrame(
-        #                 Kernel().worker.getFrame("BreachFrame")
-        #             )
-        #     return True
 
         elif isinstance(msg, UpdateSpellModifierAction):
             usma = msg
@@ -824,7 +763,7 @@ class FightContextFrame(Frame):
 
     def refreshTimelineOverEntityInfos(self) -> None:
         if self._timelineOverEntity and self._timelineOverEntityId:
-            entity = DofusEntities.getEntity(self._timelineOverEntityId)
+            entity = DofusEntities().getEntity(self._timelineOverEntityId)
             if entity and entity.position:
                 FightContextFrame.currentCell = entity.position.cellId
 

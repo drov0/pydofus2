@@ -1,4 +1,3 @@
-
 class GameDataTypeEnum:
 
     INT: int = -1

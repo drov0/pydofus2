@@ -2,11 +2,9 @@ from pydofus2.com.ankamagames.jerakine.network.NetworkMessage import NetworkMess
 
 
 class GameFightPauseMessage(NetworkMessage):
-    isPaused:bool
-    
+    isPaused: bool
 
-    def init(self, isPaused_:bool):
+    def init(self, isPaused_: bool):
         self.isPaused = isPaused_
-        
+
         super().__init__()
-    

@@ -1,16 +1,16 @@
 from pydofus2.com.ankamagames.jerakine.network.NetworkMessage import NetworkMessage
 from typing import TYPE_CHECKING
+
 if TYPE_CHECKING:
-    from pydofus2.com.ankamagames.dofus.network.types.game.character.choice.CharacterBaseInformations import CharacterBaseInformations
-    
+    from pydofus2.com.ankamagames.dofus.network.types.game.character.choice.CharacterBaseInformations import (
+        CharacterBaseInformations,
+    )
 
 
 class BasicCharactersListMessage(NetworkMessage):
-    characters:list['CharacterBaseInformations']
-    
+    characters: list["CharacterBaseInformations"]
 
-    def init(self, characters_:list['CharacterBaseInformations']):
+    def init(self, characters_: list["CharacterBaseInformations"]):
         self.characters = characters_
-        
+
         super().__init__()
-    

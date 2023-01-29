@@ -2,11 +2,9 @@ from pydofus2.com.ankamagames.jerakine.network.NetworkMessage import NetworkMess
 
 
 class SkillActionDescription(NetworkMessage):
-    skillId:int
-    
+    skillId: int
 
-    def init(self, skillId_:int):
+    def init(self, skillId_: int):
         self.skillId = skillId_
-        
+
         super().__init__()
-    

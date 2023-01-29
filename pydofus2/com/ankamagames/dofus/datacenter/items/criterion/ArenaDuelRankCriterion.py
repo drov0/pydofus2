@@ -20,9 +20,7 @@ class ArenaDuelRankCriterion(ItemCriterion, IDataCenter):
         readableOperator = ">"
         if self._operator.text == ItemCriterionOperator.DIFFERENT:
             readableOperator = I18n.getUiText("ui.common.differentFrom") + " >"
-        return (
-            readableCriterionRef + " " + readableOperator + " " + readableCriterionValue
-        )
+        return readableCriterionRef + " " + readableOperator + " " + readableCriterionValue
 
     def clone(self) -> IItemCriterion:
         return ArenaDuelRankCriterion(self.basicText)
@@ -30,9 +28,7 @@ class ArenaDuelRankCriterion(ItemCriterion, IDataCenter):
     def getCriterion(self) -> int:
         from pydofus2.com.ankamagames.dofus.kernel.Kernel import Kernel
 
-        frame: PartyManagementFrame = (
-            Kernel().worker.getFrame("PartyManagementFrame")
-        )
+        frame: PartyManagementFrame = Kernel().worker.getFrame("PartyManagementFrame")
         rank: int = 0
         if frame.arenaRankDuelInfos and frame.arenaRankDuelInfos.rank > rank:
             rank = frame.arenaRankDuelInfos.rank

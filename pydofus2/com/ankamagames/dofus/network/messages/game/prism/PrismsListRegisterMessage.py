@@ -2,11 +2,9 @@ from pydofus2.com.ankamagames.jerakine.network.NetworkMessage import NetworkMess
 
 
 class PrismsListRegisterMessage(NetworkMessage):
-    listen:int
-    
+    listen: int
 
-    def init(self, listen_:int):
+    def init(self, listen_: int):
         self.listen = listen_
-        
+
         super().__init__()
-    

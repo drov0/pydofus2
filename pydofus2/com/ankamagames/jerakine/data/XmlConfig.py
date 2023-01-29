@@ -6,6 +6,8 @@ from pydofus2.com.ankamagames.jerakine.metaclasses.ThreadSharedSingleton import 
 import threading
 
 lock = threading.Lock()
+
+
 class XmlConfig(metaclass=ThreadSharedSingleton):
     _constants = OrderedDict[str, object]()
 
@@ -16,7 +18,7 @@ class XmlConfig(metaclass=ThreadSharedSingleton):
         root = tree.getroot()
         for child in root:
             v = child.text
-            key = "config." + child.attrib['key']
+            key = "config." + child.attrib["key"]
             m = re.match(pattern, v)
             if m:
                 var = m.group(0).replace("[", "").replace("]", "")
@@ -24,7 +26,7 @@ class XmlConfig(metaclass=ThreadSharedSingleton):
             if key == "config.root.path":
                 v = str(Constants.DOFUS_ROOTDIR)
             self._constants[key] = v
-            
+
     def init(self, constants: dict[str, object]) -> None:
         with lock:
             self._constants = constants

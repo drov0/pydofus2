@@ -25,7 +25,7 @@ class BasicCharacterWrapper(IDataCenter):
 
     unusable: bool
 
-    _breed:Breed
+    _breed: Breed
 
     def __init__(self):
         super().__init__()
@@ -61,9 +61,9 @@ class BasicCharacterWrapper(IDataCenter):
 
     @property
     def breed(self) -> Breed:
-       if not self._breed:
-          self._breed = Breed.getBreedById(self.breedId)
-       return self._breed
+        if not self._breed:
+            self._breed = Breed.getBreedById(self.breedId)
+        return self._breed
 
     def __str__(self) -> str:
         return f"[BasicCharacterWrapper#{self.id}_{self.name}]"

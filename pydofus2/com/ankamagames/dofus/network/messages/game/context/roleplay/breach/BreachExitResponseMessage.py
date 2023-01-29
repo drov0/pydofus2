@@ -2,11 +2,9 @@ from pydofus2.com.ankamagames.jerakine.network.NetworkMessage import NetworkMess
 
 
 class BreachExitResponseMessage(NetworkMessage):
-    exited:bool
-    
+    exited: bool
 
-    def init(self, exited_:bool):
+    def init(self, exited_: bool):
         self.exited = exited_
-        
+
         super().__init__()
-    

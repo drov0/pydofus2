@@ -16,8 +16,8 @@ class IDataMapProvider:
         y: int,
         allowThroughtEntity: bool = True,
         cellId: int = -1,
-        param5: int = -1,
-        param6: bool = True,
+        endCellId: int = -1,
+        avoidObstacles: bool = True,
     ) -> bool:
         pass
 

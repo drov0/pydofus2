@@ -2,13 +2,11 @@ from pydofus2.com.ankamagames.jerakine.network.NetworkMessage import NetworkMess
 
 
 class QuestObjectiveValidationMessage(NetworkMessage):
-    questId:int
-    objectiveId:int
-    
+    questId: int
+    objectiveId: int
 
-    def init(self, questId_:int, objectiveId_:int):
+    def init(self, questId_: int, objectiveId_: int):
         self.questId = questId_
         self.objectiveId = objectiveId_
-        
+
         super().__init__()
-    

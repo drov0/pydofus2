@@ -28,11 +28,7 @@ class FightLeavingStateStep(AbstractSequencable, IFightStep):
         return "leavingState"
 
     def start(self) -> None:
-        if (
-            not SpellState.getSpellStateById(self._stateId).isSilent
-            and self._buff
-            and self._buff.isVisibleInFightLog
-        ):
+        if not SpellState.getSpellStateById(self._stateId).isSilent and self._buff and self._buff.isVisibleInFightLog:
             FightEventsHelper().sendFightEvent(
                 FightEventEnum.FIGHTER_LEAVING_STATE,
                 [self._fighterId, self._stateId],

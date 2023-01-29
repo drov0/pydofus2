@@ -1,7 +1,7 @@
 import pydofus2.com.ankamagames.dofus.Constants as Constants
 
-class BinaryResource:
 
+class BinaryResource:
     @classmethod
     def getBinaries(cls):
         MODULE = ".".join(cls.__module__.split(".")[1:])

@@ -2,11 +2,9 @@ from pydofus2.com.ankamagames.jerakine.network.NetworkMessage import NetworkMess
 
 
 class PortalUseRequestMessage(NetworkMessage):
-    portalId:int
-    
+    portalId: int
 
-    def init(self, portalId_:int):
+    def init(self, portalId_: int):
         self.portalId = portalId_
-        
+
         super().__init__()
-    

@@ -2,13 +2,11 @@ from pydofus2.com.ankamagames.jerakine.network.NetworkMessage import NetworkMess
 
 
 class HouseInformations(NetworkMessage):
-    houseId:int
-    modelId:int
-    
+    houseId: int
+    modelId: int
 
-    def init(self, houseId_:int, modelId_:int):
+    def init(self, houseId_: int, modelId_: int):
         self.houseId = houseId_
         self.modelId = modelId_
-        
+
         super().__init__()
-    

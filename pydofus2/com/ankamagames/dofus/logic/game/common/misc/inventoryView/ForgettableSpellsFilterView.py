@@ -41,22 +41,14 @@ class ForgettableSpellsFilterView(StorageGenericView):
         if self._parent is None:
             return False
         data: Item = Item.getItemById(item.objectGID)
-        return bool(
-            self._parent.isListening(item)
-            and super().isListening(item)
-            and data.typeId in self._allowedTypes
-        )
+        return bool(self._parent.isListening(item) and super().isListening(item) and data.typeId in self._allowedTypes)
 
-    def addItem(
-        self, item: ItemWrapper, invisible: int, needUpdateView: bool = True
-    ) -> None:
+    def addItem(self, item: ItemWrapper, invisible: int, needUpdateView: bool = True) -> None:
         if item is not None and self.isItemFiltered(item.id):
             return
         super().addItem(item, invisible, needUpdateView)
 
-    def modifyItem(
-        self, item: ItemWrapper, oldItem: ItemWrapper, invisible: int
-    ) -> None:
+    def modifyItem(self, item: ItemWrapper, oldItem: ItemWrapper, invisible: int) -> None:
         if item is not None and self.isItemFiltered(item.id):
             return
         super().modifyItem(item, oldItem, invisible)
@@ -76,13 +68,9 @@ class ForgettableSpellsFilterView(StorageGenericView):
         playerForgettableSpells: dict = None
         if not self._isHideLearnedSpells:
             return False
-        forgettableSpell: ForgettableSpell = (
-            ForgettableSpell.getForgettableSpellByScrollId(scrollId)
-        )
+        forgettableSpell: ForgettableSpell = ForgettableSpell.getForgettableSpellByScrollId(scrollId)
         if forgettableSpell is not None:
-            playerForgettableSpells = (
-                PlayedCharacterManager().playerForgettableSpelldict
-            )
+            playerForgettableSpells = PlayedCharacterManager().playerForgettableSpelldict
             if forgettableSpell.id in playerForgettableSpells:
                 return True
         return False

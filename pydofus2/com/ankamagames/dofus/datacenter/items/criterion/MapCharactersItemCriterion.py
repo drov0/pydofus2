@@ -2,7 +2,9 @@ from pydofus2.com.ankamagames.dofus.datacenter.items.criterion.IItemCriterion im
 from pydofus2.com.ankamagames.dofus.datacenter.items.criterion.ItemCriterion import ItemCriterion
 from pydofus2.com.ankamagames.dofus.kernel.Kernel import Kernel
 from pydofus2.com.ankamagames.dofus.logic.game.common.managers.PlayedCharacterManager import PlayedCharacterManager
-from pydofus2.com.ankamagames.dofus.network.types.game.context.GameContextActorInformations import GameContextActorInformations
+from pydofus2.com.ankamagames.dofus.network.types.game.context.GameContextActorInformations import (
+    GameContextActorInformations,
+)
 from pydofus2.com.ankamagames.dofus.network.types.game.context.roleplay.GameRolePlayActorInformations import (
     GameRolePlayActorInformations,
 )

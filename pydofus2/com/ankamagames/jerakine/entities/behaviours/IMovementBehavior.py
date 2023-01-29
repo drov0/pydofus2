@@ -5,9 +5,7 @@ from pydofus2.com.ankamagames.jerakine.types.positions.MovementPath import Movem
 
 
 class IMovementBehavior:
-    def move(
-        self, param1: IMovable, param2: MovementPath, param3: FunctionType = None
-    ) -> None:
+    def move(self, param1: IMovable, param2: MovementPath, param3: FunctionType = None) -> None:
         raise NotImplementedError()
 
     def jump(self, param1: IMovable, param2: MapPoint) -> None:

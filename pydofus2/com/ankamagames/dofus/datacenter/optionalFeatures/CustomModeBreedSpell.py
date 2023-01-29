@@ -30,9 +30,7 @@ class CustomModeBreedSpell(IDataCenter):
     def getCustomModeBreedSpells(cls) -> list["CustomModeBreedSpell"]:
         return GameData.getObjects(cls.MODULE)
 
-    idAccessors: IdAccessors = IdAccessors(
-        getCustomModeBreedSpellById, getCustomModeBreedSpells
-    )
+    idAccessors: IdAccessors = IdAccessors(getCustomModeBreedSpellById, getCustomModeBreedSpells)
 
     @classmethod
     def getAllCustomModeBreedSpellIds(cls) -> list:

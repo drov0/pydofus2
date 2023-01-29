@@ -2,11 +2,9 @@ from pydofus2.com.ankamagames.jerakine.network.NetworkMessage import NetworkMess
 
 
 class ObjectDeletedMessage(NetworkMessage):
-    objectUID:int
-    
+    objectUID: int
 
-    def init(self, objectUID_:int):
+    def init(self, objectUID_: int):
         self.objectUID = objectUID_
-        
+
         super().__init__()
-    

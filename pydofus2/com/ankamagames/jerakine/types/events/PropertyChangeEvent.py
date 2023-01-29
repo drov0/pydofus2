@@ -14,9 +14,7 @@ class PropertyChangeEvent(Event):
 
     _propertyOldValue: Any
 
-    def __init__(
-        self, watchedClassInstance, propertyName: str, propertyValue, propertyOldValue
-    ):
+    def __init__(self, watchedClassInstance, propertyName: str, propertyValue, propertyOldValue):
         super().__init__()
         self._watchedClassInstance = watchedClassInstance
         self._propertyName = propertyName

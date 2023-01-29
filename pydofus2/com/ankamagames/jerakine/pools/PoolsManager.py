@@ -3,9 +3,6 @@ from pydofus2.com.ankamagames.jerakine.logger.Logger import Logger
 import pydofus2.com.ankamagames.jerakine.pools.Pool as pool
 
 
-logger = Logger("Dofus2")
-
-
 class PoolsManager:
     _linkedListNodePool = None
 
@@ -15,6 +12,7 @@ class PoolsManager:
             from pydofus2.com.ankamagames.jerakine.pools.PoolableLinkedListNode import (
                 PoolableLinkedListNode,
             )
+
             cls._linkedListNodePool = pool.Pool(
                 pooledClass=PoolableLinkedListNode,
                 initialSize=JerakineConstants.LINKED_LIST_NODE_POOL_INITIAL_SIZE,

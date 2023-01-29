@@ -7,8 +7,6 @@ from pydofus2.com.ankamagames.jerakine.network.CustomDataWrapper import ByteArra
 from pydofus2.com.ankamagames.jerakine.types.ColorMultiplicator import ColorMultiplicator
 from pydofus2.flash.geom.Point import Point
 
-logger = Logger("Dofus2")
-
 
 class GraphicalElement(BasicElement):
 
@@ -51,12 +49,12 @@ class GraphicalElement(BasicElement):
         self.subFromRaw(raw, mapVersion)
         self.identifier = raw.readUnsignedInt()
         if AtouinConstants.DEBUG_FILES_PARSING_ELEMENTS:
-            logger.debug("      (GraphicalElement) Identifier : " + str(self.identifier))
+            Logger().debug("      (GraphicalElement) Identifier : " + str(self.identifier))
 
     def subFromRaw(self, raw: ByteArray, mapVersion: int) -> None:
         self.elementId = raw.readUnsignedInt()
         if AtouinConstants.DEBUG_FILES_PARSING_ELEMENTS:
-            logger.debug("      (GraphicalElement) Element id : " + str(self.elementId))
+            Logger().debug("      (GraphicalElement) Element id : " + str(self.elementId))
         self.calculateFinalTeint(
             raw.readByte(),
             raw.readByte(),
@@ -66,7 +64,7 @@ class GraphicalElement(BasicElement):
             raw.readByte(),
         )
         if AtouinConstants.DEBUG_FILES_PARSING_ELEMENTS:
-            logger.debug("      (GraphicalElement) Teint : " + str(self.finalTeint))
+            Logger().debug("      (GraphicalElement) Teint : " + str(self.finalTeint))
         self.pixelOffset = Point()
         if mapVersion <= 4:
             self.pixelOffset.x = raw.readByte() * AtouinConstants.CELL_HALF_WIDTH
@@ -75,7 +73,7 @@ class GraphicalElement(BasicElement):
             self.pixelOffset.x = raw.readShort()
             self.pixelOffset.y = raw.readShort()
         if AtouinConstants.DEBUG_FILES_PARSING_ELEMENTS:
-            logger.debug(
+            Logger().debug(
                 "      (GraphicalElement) Pixel Offset : ("
                 + str(self.pixelOffset.x)
                 + ""
@@ -84,4 +82,4 @@ class GraphicalElement(BasicElement):
             )
         self.altitude = raw.readByte()
         if AtouinConstants.DEBUG_FILES_PARSING_ELEMENTS:
-            logger.debug("      (GraphicalElement) Altitude : " + str(self.altitude))
+            Logger().debug("      (GraphicalElement) Altitude : " + str(self.altitude))

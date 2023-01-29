@@ -2,13 +2,11 @@ from pydofus2.com.ankamagames.jerakine.network.NetworkMessage import NetworkMess
 
 
 class HaapiCancelBidRequestMessage(NetworkMessage):
-    id:int
-    type:int
-    
+    id: int
+    type: int
 
-    def init(self, id_:int, type_:int):
+    def init(self, id_: int, type_: int):
         self.id = id_
         self.type = type_
-        
+
         super().__init__()
-    

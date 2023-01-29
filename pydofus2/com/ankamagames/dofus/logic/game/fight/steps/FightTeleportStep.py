@@ -24,8 +24,6 @@ from pydofus2.com.ankamagames.jerakine.logger.Logger import Logger
 from pydofus2.com.ankamagames.jerakine.sequencer.AbstractSequencable import AbstractSequencable
 from pydofus2.com.ankamagames.jerakine.types.positions.MapPoint import MapPoint
 
-logger = Logger("Dofus2")
-
 
 class FightTeleportStep(AbstractSequencable, IFightStep):
 
@@ -43,14 +41,14 @@ class FightTeleportStep(AbstractSequencable, IFightStep):
         return "teleport"
 
     def start(self) -> None:
-        entity: IMovable = DofusEntities.getEntity(self._fighterId)
+        entity: IMovable = DofusEntities().getEntity(self._fighterId)
         if entity:
             entity.jump(self._destinationCell)
         else:
-            logger.warn("Unable to teleport unknown entity " + self._fighterId + ".")
+            Logger().warn("Unable to teleport unknown entity " + self._fighterId + ".")
         infos: "GameFightFighterInformations" = FightEntitiesFrame.getCurrentInstance().getEntityInfos(self._fighterId)
         infos.disposition.cellId = self._destinationCell.cellId
-        carryingEntity: AnimatedCharacter = DofusEntities.getEntity(self._fighterId)
+        carryingEntity: AnimatedCharacter = DofusEntities().getEntity(self._fighterId)
         carriedEntity: AnimatedCharacter = carryingEntity.carriedEntity if carryingEntity.carriedEntity else None
         if carriedEntity:
             carriedEntityInfos = FightEntitiesFrame.getCurrentInstance().getEntityInfos(carriedEntity.id)

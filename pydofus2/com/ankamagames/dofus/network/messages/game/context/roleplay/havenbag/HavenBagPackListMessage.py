@@ -2,11 +2,9 @@ from pydofus2.com.ankamagames.jerakine.network.NetworkMessage import NetworkMess
 
 
 class HavenBagPackListMessage(NetworkMessage):
-    packIds:list[int]
-    
+    packIds: list[int]
 
-    def init(self, packIds_:list[int]):
+    def init(self, packIds_: list[int]):
         self.packIds = packIds_
-        
+
         super().__init__()
-    

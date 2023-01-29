@@ -2,11 +2,9 @@ from pydofus2.com.ankamagames.jerakine.network.NetworkMessage import NetworkMess
 
 
 class BreachTeleportResponseMessage(NetworkMessage):
-    teleported:bool
-    
+    teleported: bool
 
-    def init(self, teleported_:bool):
+    def init(self, teleported_: bool):
         self.teleported = teleported_
-        
+
         super().__init__()
-    

@@ -2,13 +2,11 @@ from pydofus2.com.ankamagames.jerakine.network.NetworkMessage import NetworkMess
 
 
 class ExchangeBidHouseBuyResultMessage(NetworkMessage):
-    uid:int
-    bought:bool
-    
+    uid: int
+    bought: bool
 
-    def init(self, uid_:int, bought_:bool):
+    def init(self, uid_: int, bought_: bool):
         self.uid = uid_
         self.bought = bought_
-        
+
         super().__init__()
-    

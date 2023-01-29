@@ -2,11 +2,9 @@ from pydofus2.com.ankamagames.jerakine.network.NetworkMessage import NetworkMess
 
 
 class PrismInfoJoinLeaveRequestMessage(NetworkMessage):
-    join:bool
-    
+    join: bool
 
-    def init(self, join_:bool):
+    def init(self, join_: bool):
         self.join = join_
-        
+
         super().__init__()
-    

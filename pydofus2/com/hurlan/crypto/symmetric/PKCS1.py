@@ -37,8 +37,7 @@ class PKCS1(IPad):
         msglength = len(message)
         if msglength > max_msglength:
             raise OverflowError(
-                "%i bytes needed for message, but there is only"
-                " space for %i" % (msglength, max_msglength)
+                "%i bytes needed for message, but there is only" " space for %i" % (msglength, max_msglength)
             )
         padding = b""
         padding_length = self.blockSize - msglength - 3

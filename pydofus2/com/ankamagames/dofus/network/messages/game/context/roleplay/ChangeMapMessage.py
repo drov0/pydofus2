@@ -2,13 +2,11 @@ from pydofus2.com.ankamagames.jerakine.network.NetworkMessage import NetworkMess
 
 
 class ChangeMapMessage(NetworkMessage):
-    mapId:int
-    autopilot:bool
-    
+    mapId: int
+    autopilot: bool
 
-    def init(self, mapId_:int, autopilot_:bool):
+    def init(self, mapId_: int, autopilot_: bool):
         self.mapId = mapId_
         self.autopilot = autopilot_
-        
+
         super().__init__()
-    

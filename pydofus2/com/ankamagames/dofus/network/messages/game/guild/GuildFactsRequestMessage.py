@@ -2,11 +2,9 @@ from pydofus2.com.ankamagames.jerakine.network.NetworkMessage import NetworkMess
 
 
 class GuildFactsRequestMessage(NetworkMessage):
-    guildId:int
-    
+    guildId: int
 
-    def init(self, guildId_:int):
+    def init(self, guildId_: int):
         self.guildId = guildId_
-        
+
         super().__init__()
-    

@@ -71,7 +71,7 @@ class ByteArray(bytearray):
             raise IndexError(self.position, l, len(self))
 
     def read(self, l):
-        if (l == 0):
+        if l == 0:
             return ByteArray()
         self.verif(l)
         pos = self.position

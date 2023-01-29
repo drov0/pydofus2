@@ -3,8 +3,6 @@ from pydofus2.com.ankamagames.jerakine.entities.interfaces.IEntity import IEntit
 from pydofus2.com.ankamagames.jerakine.logger.Logger import Logger
 from pydofus2.com.ankamagames.jerakine.sequencer.AbstractSequencable import AbstractSequencable
 
-logger = Logger("Dofus2")
-
 
 class AbstractStatContextualStep(AbstractSequencable):
 
@@ -40,7 +38,7 @@ class AbstractStatContextualStep(AbstractSequencable):
 
     @property
     def target(self) -> IEntity:
-        return DofusEntities.getEntity(self._targetId)
+        return DofusEntities().getEntity(self._targetId)
 
     @property
     def targets(self) -> list[float]:

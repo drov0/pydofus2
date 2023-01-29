@@ -2,11 +2,9 @@ from pydofus2.com.ankamagames.jerakine.network.NetworkMessage import NetworkMess
 
 
 class TreasureHuntShowLegendaryUIMessage(NetworkMessage):
-    availableLegendaryIds:list[int]
-    
+    availableLegendaryIds: list[int]
 
-    def init(self, availableLegendaryIds_:list[int]):
+    def init(self, availableLegendaryIds_: list[int]):
         self.availableLegendaryIds = availableLegendaryIds_
-        
+
         super().__init__()
-    

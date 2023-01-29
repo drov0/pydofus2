@@ -2,11 +2,9 @@ from pydofus2.com.ankamagames.jerakine.network.NetworkMessage import NetworkMess
 
 
 class ExchangeCraftResultMessage(NetworkMessage):
-    craftResult:int
-    
+    craftResult: int
 
-    def init(self, craftResult_:int):
+    def init(self, craftResult_: int):
         self.craftResult = craftResult_
-        
+
         super().__init__()
-    

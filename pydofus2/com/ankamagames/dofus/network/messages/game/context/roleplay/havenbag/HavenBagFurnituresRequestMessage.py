@@ -2,15 +2,13 @@ from pydofus2.com.ankamagames.jerakine.network.NetworkMessage import NetworkMess
 
 
 class HavenBagFurnituresRequestMessage(NetworkMessage):
-    cellIds:list[int]
-    funitureIds:list[int]
-    orientations:list[int]
-    
+    cellIds: list[int]
+    funitureIds: list[int]
+    orientations: list[int]
 
-    def init(self, cellIds_:list[int], funitureIds_:list[int], orientations_:list[int]):
+    def init(self, cellIds_: list[int], funitureIds_: list[int], orientations_: list[int]):
         self.cellIds = cellIds_
         self.funitureIds = funitureIds_
         self.orientations = orientations_
-        
+
         super().__init__()
-    

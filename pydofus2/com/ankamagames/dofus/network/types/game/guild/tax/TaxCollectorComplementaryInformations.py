@@ -2,9 +2,6 @@ from pydofus2.com.ankamagames.jerakine.network.NetworkMessage import NetworkMess
 
 
 class TaxCollectorComplementaryInformations(NetworkMessage):
-    
-
     def init(self):
-        
+
         super().__init__()
-    

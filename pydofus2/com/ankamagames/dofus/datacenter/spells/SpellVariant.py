@@ -5,7 +5,6 @@ from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
     from pydofus2.com.ankamagames.dofus.datacenter.spells.Spell import Spell
-logger = Logger("Dofus2")
 
 
 class SpellVariant(IDataCenter):
@@ -29,6 +28,7 @@ class SpellVariant(IDataCenter):
     @property
     def spells(self) -> list["Spell"]:
         from pydofus2.com.ankamagames.dofus.datacenter.spells.Spell import Spell
+
         if not self._spells:
             for spellId in self.spellIds:
                 spell = Spell.getSpellById(spellId)

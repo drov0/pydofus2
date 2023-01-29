@@ -2,11 +2,9 @@ from pydofus2.com.ankamagames.jerakine.network.NetworkMessage import NetworkMess
 
 
 class DungeonPartyFinderRegisterSuccessMessage(NetworkMessage):
-    dungeonIds:list[int]
-    
+    dungeonIds: list[int]
 
-    def init(self, dungeonIds_:list[int]):
+    def init(self, dungeonIds_: list[int]):
         self.dungeonIds = dungeonIds_
-        
+
         super().__init__()
-    

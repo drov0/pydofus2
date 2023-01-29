@@ -2,11 +2,9 @@ from pydofus2.com.ankamagames.jerakine.network.NetworkMessage import NetworkMess
 
 
 class ChatAbstractClientMessage(NetworkMessage):
-    content:str
-    
+    content: str
 
-    def init(self, content_:str):
+    def init(self, content_: str):
         self.content = content_
-        
+
         super().__init__()
-    

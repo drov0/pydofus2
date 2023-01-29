@@ -3,6 +3,7 @@ import time
 from pydofus2.com.ankamagames.dofus.datacenter.servers.Server import Server
 from pydofus2.com.ankamagames.jerakine.metaclasses.Singleton import Singleton
 from typing import TYPE_CHECKING
+
 if TYPE_CHECKING:
     pass
 from pydofus2.com.ankamagames.dofus.network.types.game.havenbag.HavenBagRoomPreviewInformation import (
@@ -12,7 +13,7 @@ from pydofus2.com.ankamagames.jerakine.interfaces.IDestroyable import IDestroyab
 
 
 class PlayerManager(IDestroyable, metaclass=Singleton):
-    
+
     TAG_PREFIX: str = "#"
     TAG_ADMINS: str = "OFFI"
 
@@ -67,7 +68,7 @@ class PlayerManager(IDestroyable, metaclass=Singleton):
 
         self.serversList = list[int]()
 
-        self.charactersList = list['BasicCharacterWrapper']()
+        self.charactersList = list["BasicCharacterWrapper"]()
 
         self.allowAutoConnectCharacter: bool = False
 

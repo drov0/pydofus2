@@ -27,8 +27,6 @@ from pydofus2.com.ankamagames.jerakine.types.zones.Cross import Cross
 from pydofus2.com.ankamagames.jerakine.types.zones.Custom import Custom
 from pydofus2.com.ankamagames.jerakine.types.zones.Lozenge import Lozenge
 
-logger = Logger("Dofus2")
-
 
 class MarkedCellsManager(IDestroyable, metaclass=Singleton):
 
@@ -74,7 +72,7 @@ class MarkedCellsManager(IDestroyable, metaclass=Singleton):
             elif cells and len(cells) and cells[0]:
                 mi.markImpactCellId = cells[0].cellId
             else:
-                logger.warn("Adding a mark with unknown markImpactCellId!")
+                Logger().warn("Adding a mark with unknown markImpactCellId!")
             if len(cells) > 0:
                 markedCell = cells[0]
                 s = Selection()
@@ -180,7 +178,7 @@ class MarkedCellsManager(IDestroyable, metaclass=Singleton):
             if self._marks[markId] and self._marks[markId].cells and len(self._marks[markId].cells) == 1:
                 cellIds.append(self._marks[markId].cells[0])
             else:
-                logger.warn("Can't find cellId for markId " + markId + " in getCellIdsFromMarkIds()")
+                Logger().warn("Can't find cellId for markId " + markId + " in getCellIdsFromMarkIds()")
         return cellIds
 
     def getMapPointsFromMarkIds(self, markIds: list[int]) -> list[MapPoint]:
@@ -189,7 +187,7 @@ class MarkedCellsManager(IDestroyable, metaclass=Singleton):
             if self._marks[markId] and self._marks[markId].cells and len(self._marks[markId].cells) == 1:
                 mapPoints.append(MapPoint.fromCellId(self._marks[markId].cells[0]))
             else:
-                logger.warn("Can't find cellId for markId " + markId + " in getMapPointsFromMarkIds()")
+                Logger().warn("Can't find cellId for markId " + markId + " in getMapPointsFromMarkIds()")
         return mapPoints
 
     def getActivePortalsCount(self, teamId: int = 2) -> int:

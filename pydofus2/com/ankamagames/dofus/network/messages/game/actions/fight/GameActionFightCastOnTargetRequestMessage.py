@@ -2,13 +2,11 @@ from pydofus2.com.ankamagames.jerakine.network.NetworkMessage import NetworkMess
 
 
 class GameActionFightCastOnTargetRequestMessage(NetworkMessage):
-    spellId:int
-    targetId:int
-    
+    spellId: int
+    targetId: int
 
-    def init(self, spellId_:int, targetId_:int):
+    def init(self, spellId_: int, targetId_: int):
         self.spellId = spellId_
         self.targetId = targetId_
-        
+
         super().__init__()
-    

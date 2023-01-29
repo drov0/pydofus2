@@ -12,13 +12,7 @@ class PVPRankItemCriterion(ItemCriterion, IDataCenter):
 
     @property
     def text(self) -> str:
-        return (
-            I18n.getUiText("ui.pvp.rank")
-            + " "
-            + self._operator.text
-            + " "
-            + self._criterionValue
-        )
+        return I18n.getUiText("ui.pvp.rank") + " " + self._operator.text + " " + self._criterionValue
 
     def clone(self) -> IItemCriterion:
         return PVPRankItemCriterion(self.basicText)

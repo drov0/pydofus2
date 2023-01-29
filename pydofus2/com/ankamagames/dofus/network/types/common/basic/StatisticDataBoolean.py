@@ -2,11 +2,9 @@ from pydofus2.com.ankamagames.dofus.network.types.common.basic.StatisticData imp
 
 
 class StatisticDataBoolean(StatisticData):
-    value:bool
-    
+    value: bool
 
-    def init(self, value_:bool):
+    def init(self, value_: bool):
         self.value = value_
-        
+
         super().init()
-    

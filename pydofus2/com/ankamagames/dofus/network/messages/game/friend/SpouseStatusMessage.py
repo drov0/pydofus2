@@ -2,11 +2,9 @@ from pydofus2.com.ankamagames.jerakine.network.NetworkMessage import NetworkMess
 
 
 class SpouseStatusMessage(NetworkMessage):
-    hasSpouse:bool
-    
+    hasSpouse: bool
 
-    def init(self, hasSpouse_:bool):
+    def init(self, hasSpouse_: bool):
         self.hasSpouse = hasSpouse_
-        
+
         super().__init__()
-    

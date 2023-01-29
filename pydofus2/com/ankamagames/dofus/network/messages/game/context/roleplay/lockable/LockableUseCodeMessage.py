@@ -2,11 +2,9 @@ from pydofus2.com.ankamagames.jerakine.network.NetworkMessage import NetworkMess
 
 
 class LockableUseCodeMessage(NetworkMessage):
-    code:str
-    
+    code: str
 
-    def init(self, code_:str):
+    def init(self, code_: str):
         self.code = code_
-        
+
         super().__init__()
-    

@@ -14,10 +14,7 @@ class StorageCosmeticsView(StorageGenericView):
         return "storageCosmetics"
 
     def isListening(self, item: ItemWrapper) -> bool:
-        return (
-            super().isListening(item)
-            and item.category == ItemCategoryEnum.COSMETICS_CATEGORY
-        )
+        return super().isListening(item) and item.category == ItemCategoryEnum.COSMETICS_CATEGORY
 
     def updateView(self) -> None:
         super().updateView()

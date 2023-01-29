@@ -2,11 +2,9 @@ from pydofus2.com.ankamagames.jerakine.network.NetworkMessage import NetworkMess
 
 
 class ExchangeBidHouseItemRemoveOkMessage(NetworkMessage):
-    sellerId:int
-    
+    sellerId: int
 
-    def init(self, sellerId_:int):
+    def init(self, sellerId_: int):
         self.sellerId = sellerId_
-        
+
         super().__init__()
-    

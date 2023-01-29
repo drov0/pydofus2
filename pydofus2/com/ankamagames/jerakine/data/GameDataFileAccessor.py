@@ -1,28 +1,31 @@
 from pathlib import Path
-from time import perf_counter
+from time import perf_counter, perf_counter_ns
 from typing import TYPE_CHECKING, Any
 from pydofus2.com.ankamagames.dofus import Constants
 from pydofus2.com.ankamagames.jerakine.logger.Logger import Logger
+
 if TYPE_CHECKING:
     from pydofus2.com.ankamagames.jerakine.data.GameDataClassDefinition import GameDataClassDefinition
     from pydofus2.com.ankamagames.jerakine.data.GameDataProcess import GameDataProcess
 from pydofus2.com.ankamagames.jerakine.data.ModuleReader import ModuleReader
 from pydofus2.com.ankamagames.jerakine.metaclasses.ThreadSharedSingleton import ThreadSharedSingleton
 from pydofus2.com.ankamagames.jerakine.data.BinaryStream import BinaryStream
-logger = Logger("Dofus2")
+
 import threading
+
 lock = threading.Lock()
+
+
 class GameDataFileAccessor(metaclass=ThreadSharedSingleton):
-    
     def __init__(self) -> None:
         self._modules = dict[str, ModuleReader]()
 
     def __addModule(self, file: str) -> None:
         nativeFile = Path(file)
         moduleName: str = nativeFile.name.split(".d2o")[0]
-        s = perf_counter()
+        s = perf_counter_ns()
         self._modules[moduleName] = ModuleReader(nativeFile.open("rb"), name=moduleName)
-        logger.info(f"[GameData] Loaded '{nativeFile.name}' module in {perf_counter() - s:.2f}s")
+        Logger().info(f"[GameData] Loaded '{nativeFile.name}' module in {(perf_counter_ns() - s)/10e9:.4f}s")
 
     def __addModuleByName(self, moduleName: str) -> None:
         if moduleName not in self._modules:
@@ -37,7 +40,7 @@ class GameDataFileAccessor(metaclass=ThreadSharedSingleton):
             with lock:
                 self.__addModuleByName(moduleName)
         return self._modules.get(moduleName)
-    
+
     def getDataProcessor(self, moduleName: str) -> "GameDataProcess":
         return self.getModule(moduleName)._gameDataProcessor
 

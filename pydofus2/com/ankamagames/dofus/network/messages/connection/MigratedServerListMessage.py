@@ -2,11 +2,9 @@ from pydofus2.com.ankamagames.jerakine.network.NetworkMessage import NetworkMess
 
 
 class MigratedServerListMessage(NetworkMessage):
-    migratedServerIds:list[int]
-    
+    migratedServerIds: list[int]
 
-    def init(self, migratedServerIds_:list[int]):
+    def init(self, migratedServerIds_: list[int]):
         self.migratedServerIds = migratedServerIds_
-        
+
         super().__init__()
-    

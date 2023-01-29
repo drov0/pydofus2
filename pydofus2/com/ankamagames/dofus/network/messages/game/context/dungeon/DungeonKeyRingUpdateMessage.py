@@ -2,13 +2,11 @@ from pydofus2.com.ankamagames.jerakine.network.NetworkMessage import NetworkMess
 
 
 class DungeonKeyRingUpdateMessage(NetworkMessage):
-    dungeonId:int
-    available:bool
-    
+    dungeonId: int
+    available: bool
 
-    def init(self, dungeonId_:int, available_:bool):
+    def init(self, dungeonId_: int, available_: bool):
         self.dungeonId = dungeonId_
         self.available = available_
-        
+
         super().__init__()
-    

@@ -1,14 +1,14 @@
-from pydofus2.com.ankamagames.dofus.network.messages.game.actions.AbstractGameActionMessage import AbstractGameActionMessage
+from pydofus2.com.ankamagames.dofus.network.messages.game.actions.AbstractGameActionMessage import (
+    AbstractGameActionMessage,
+)
 
 
 class GameActionFightLifePointsGainMessage(AbstractGameActionMessage):
-    targetId:int
-    delta:int
-    
+    targetId: int
+    delta: int
 
-    def init(self, targetId_:int, delta_:int, actionId_:int, sourceId_:int):
+    def init(self, targetId_: int, delta_: int, actionId_: int, sourceId_: int):
         self.targetId = targetId_
         self.delta = delta_
-        
+
         super().init(actionId_, sourceId_)
-    

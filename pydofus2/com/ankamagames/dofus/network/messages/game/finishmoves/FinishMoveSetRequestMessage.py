@@ -2,13 +2,11 @@ from pydofus2.com.ankamagames.jerakine.network.NetworkMessage import NetworkMess
 
 
 class FinishMoveSetRequestMessage(NetworkMessage):
-    finishMoveId:int
-    finishMoveState:bool
-    
+    finishMoveId: int
+    finishMoveState: bool
 
-    def init(self, finishMoveId_:int, finishMoveState_:bool):
+    def init(self, finishMoveId_: int, finishMoveState_: bool):
         self.finishMoveId = finishMoveId_
         self.finishMoveState = finishMoveState_
-        
+
         super().__init__()
-    

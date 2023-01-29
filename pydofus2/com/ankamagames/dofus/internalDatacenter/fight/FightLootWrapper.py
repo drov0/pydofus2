@@ -18,13 +18,7 @@ class FightLootWrapper(IDataCenter):
         for reward in loot.objects:
             self.objects.append(
                 ItemWrapper.create(
-                    63,
-                    0,
-                    reward.objectId,
-                    reward.quantity,
-                    list[ObjectEffect](),
-                    False,
-                    reward.priorityHint
+                    63, 0, reward.objectId, reward.quantity, list[ObjectEffect](), False, reward.priorityHint
                 )
             )
         self.kamas = loot.kamas

@@ -2,11 +2,9 @@ from pydofus2.com.ankamagames.jerakine.network.NetworkMessage import NetworkMess
 
 
 class IdolPartyRegisterRequestMessage(NetworkMessage):
-    register:bool
-    
+    register: bool
 
-    def init(self, register_:bool):
+    def init(self, register_: bool):
         self.register = register_
-        
+
         super().__init__()
-    

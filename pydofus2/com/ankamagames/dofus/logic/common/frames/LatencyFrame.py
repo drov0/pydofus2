@@ -16,8 +16,6 @@ from pydofus2.com.ankamagames.jerakine.messages.Message import Message
 from pydofus2.com.ankamagames.jerakine.network.IServerConnection import IServerConnection
 from pydofus2.com.ankamagames.jerakine.types.enums.Priority import Priority
 
-logger = Logger("Dofus2")
-
 
 class LatencyFrame(Frame):
 
@@ -48,7 +46,7 @@ class LatencyFrame(Frame):
             delay = pongReceived - self.pingRequested
             self.pingRequested = 0
             msg = f'[LatencyMeter] Pong {delay}ms ! {datetime.now().strftime("%H:%M:%S")}'
-            logger.debug(msg)
+            Logger().debug(msg)
             return True
         elif isinstance(msg, BasicLatencyStatsRequestMessage):
             connection = connh.ConnectionsHandler().conn

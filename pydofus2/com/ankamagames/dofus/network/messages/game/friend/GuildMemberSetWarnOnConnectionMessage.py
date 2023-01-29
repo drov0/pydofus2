@@ -2,11 +2,9 @@ from pydofus2.com.ankamagames.jerakine.network.NetworkMessage import NetworkMess
 
 
 class GuildMemberSetWarnOnConnectionMessage(NetworkMessage):
-    enable:bool
-    
+    enable: bool
 
-    def init(self, enable_:bool):
+    def init(self, enable_: bool):
         self.enable = enable_
-        
+
         super().__init__()
-    

@@ -2,11 +2,9 @@ from pydofus2.com.ankamagames.jerakine.network.NetworkMessage import NetworkMess
 
 
 class ClientUIOpenedMessage(NetworkMessage):
-    type:int
-    
+    type: int
 
-    def init(self, type_:int):
+    def init(self, type_: int):
         self.type = type_
-        
+
         super().__init__()
-    

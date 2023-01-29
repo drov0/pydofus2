@@ -2,11 +2,9 @@ from pydofus2.com.ankamagames.jerakine.network.NetworkMessage import NetworkMess
 
 
 class GameFightReadyMessage(NetworkMessage):
-    isReady:bool
-    
+    isReady: bool
 
-    def init(self, isReady_:bool):
+    def init(self, isReady_: bool):
         self.isReady = isReady_
-        
+
         super().__init__()
-    

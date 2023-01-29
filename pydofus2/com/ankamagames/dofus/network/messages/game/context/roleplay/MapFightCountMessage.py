@@ -2,11 +2,9 @@ from pydofus2.com.ankamagames.jerakine.network.NetworkMessage import NetworkMess
 
 
 class MapFightCountMessage(NetworkMessage):
-    fightCount:int
-    
+    fightCount: int
 
-    def init(self, fightCount_:int):
+    def init(self, fightCount_: int):
         self.fightCount = fightCount_
-        
+
         super().__init__()
-    

@@ -2,13 +2,11 @@ from pydofus2.com.ankamagames.jerakine.network.NetworkMessage import NetworkMess
 
 
 class PaddockSellRequestMessage(NetworkMessage):
-    price:int
-    forSale:bool
-    
+    price: int
+    forSale: bool
 
-    def init(self, price_:int, forSale_:bool):
+    def init(self, price_: int, forSale_: bool):
         self.price = price_
         self.forSale = forSale_
-        
+
         super().__init__()
-    

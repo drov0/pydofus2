@@ -2,11 +2,9 @@ from pydofus2.com.ankamagames.jerakine.network.NetworkMessage import NetworkMess
 
 
 class NotificationListMessage(NetworkMessage):
-    flags:list[int]
-    
+    flags: list[int]
 
-    def init(self, flags_:list[int]):
+    def init(self, flags_: list[int]):
         self.flags = flags_
-        
+
         super().__init__()
-    

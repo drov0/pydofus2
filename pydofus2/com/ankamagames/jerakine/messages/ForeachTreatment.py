@@ -12,9 +12,7 @@ class ForeachTreatment(Treatment):
 
     _worker: "Worker"
 
-    def __init__(
-        self, obj, func: FunctionType, params: list, iterable, worker: "Worker"
-    ):
+    def __init__(self, obj, func: FunctionType, params: list, iterable, worker: "Worker"):
         self.params = []
         self.params.insert(0, None)
         super().__init__(obj, func, params)

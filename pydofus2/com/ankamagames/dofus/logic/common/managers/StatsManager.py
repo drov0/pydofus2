@@ -18,8 +18,6 @@ from pydofus2.com.ankamagames.dofus.network.types.game.character.characteristic.
 )
 from pydofus2.com.ankamagames.jerakine.metaclasses.Singleton import Singleton
 
-logger = Logger()
-
 
 class StatsManager(metaclass=Singleton):
     DEFAULT_IS_VERBOSE = True
@@ -30,12 +28,12 @@ class StatsManager(metaclass=Singleton):
         self._entityStats = dict()
         self._isVerbose = self.DEFAULT_IS_VERBOSE
         self._statListeners = dict[str, list[FunctionType]]()
-        logger.info("Instantiating stats manager")
+        Logger().info("Instantiating stats manager")
         self._isVerbose = self.DEFAULT_IS_VERBOSE
 
     def setStats(self, stats: EntityStats) -> bool:
         if stats is None:
-            logger.error("Tried to set None stats. Aborting")
+            Logger().error("Tried to set None stats. Aborting")
             return False
         key = str(float(stats.entityId))
         self._entityStats[key] = stats
@@ -77,7 +75,7 @@ class StatsManager(metaclass=Singleton):
                 )
             else:
                 if not isinstance(rawStat, CharacterCharacteristicValue):
-                    logger.debug(f"Skipping rawStat {rawStat} of type {type(rawStat)}")
+                    Logger().debug(f"Skipping rawStat {rawStat} of type {type(rawStat)}")
                     continue
                 else:
                     entityStat = Stat(rawStat.characteristicId, rawStat.total)
@@ -88,7 +86,7 @@ class StatsManager(metaclass=Singleton):
         if entityKey not in self._entityStats:
             return False
         del self._entityStats[entityKey]
-        logger.info("Stats for entity with ID " + entityKey + " deleted")
+        Logger().info("Stats for entity with ID " + entityKey + " deleted")
         return True
 
     def isStatHasListener(self, statId: float, listener: FunctionType) -> bool:
@@ -106,7 +104,7 @@ class StatsManager(metaclass=Singleton):
 
     def addListenerToStat(self, statId: float, listener: FunctionType) -> bool:
         if listener is None:
-            logger.error("Listener provided is None")
+            Logger().error("Listener provided is None")
             return False
         isListenerAdded: bool = False
         key: str = str(float(statId))
@@ -116,16 +114,16 @@ class StatsManager(metaclass=Singleton):
             self._statListeners[key].append(listener)
             isListenerAdded = True
         if isListenerAdded:
-            logger.info(f"Listener {listener.__name__}{listener.__annotations__} added to stat with ID " + key)
+            Logger().info(f"Listener {listener.__name__}{listener.__annotations__} added to stat with ID " + key)
         else:
-            logger.error(
+            Logger().error(
                 f"Listener {listener.__name__}{listener.__annotations__} could NOT be added to stat with ID " + key
             )
         return isListenerAdded
 
     def removeListenerFromStat(self, statId: float, listener: FunctionType) -> bool:
         if listener is None:
-            logger.error("Listener provided is None")
+            Logger().error("Listener provided is None")
             return False
         isListenerRemoved: bool = False
         key: str = str(float(statId))
@@ -133,9 +131,9 @@ class StatsManager(metaclass=Singleton):
             self._statListeners[key].remove(listener)
             isListenerRemoved = True
         if isListenerRemoved:
-            logger.info(f"Listener {listener.__name__}{listener.__annotations__} removed from stat with ID " + key)
+            Logger().info(f"Listener {listener.__name__}{listener.__annotations__} removed from stat with ID " + key)
         else:
-            logger.error(
+            Logger().error(
                 f"Listener {listener.__name__}{listener.__annotations__} could NOT be removed from stat with ID " + key
             )
         return isListenerRemoved

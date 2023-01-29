@@ -22,16 +22,15 @@ from pydofus2.com.ankamagames.jerakine.logger.Logger import Logger
 from pydofus2.com.ankamagames.jerakine.messages.Frame import Frame
 from pydofus2.com.ankamagames.jerakine.messages.Message import Message
 from pydofus2.com.ankamagames.jerakine.types.enums.Priority import Priority
-logger = Logger("Dofus2")
+
 
 class PricesData(object):
-    
     def __init__(self):
         self.lastUpdate: datetime = datetime.now()
-        self.items =  dict[int, float]()
-        
-class AveragePricesFrame(Frame):
+        self.items = dict[int, float]()
 
+
+class AveragePricesFrame(Frame):
     def __init__(self):
         super().__init__()
         self._pricesData = []
@@ -75,8 +74,8 @@ class AveragePricesFrame(Frame):
             oapm = pMsg
             self.updatePricesData(oapm.ids, oapm.avgPrices)
             return True
-        if isinstance(pMsg, ObjectAveragePricesErrorMessage):           
-            logger.error("Error while getting average prices!")
+        if isinstance(pMsg, ObjectAveragePricesErrorMessage):
+            Logger().error("Error while getting average prices!")
             return True
         else:
             return False

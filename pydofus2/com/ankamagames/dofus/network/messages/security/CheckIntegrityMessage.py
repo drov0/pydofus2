@@ -2,11 +2,9 @@ from pydofus2.com.ankamagames.jerakine.network.NetworkMessage import NetworkMess
 
 
 class CheckIntegrityMessage(NetworkMessage):
-    data:list[int]
-    
+    data: list[int]
 
-    def init(self, data_:list[int]):
+    def init(self, data_: list[int]):
         self.data = data_
-        
+
         super().__init__()
-    

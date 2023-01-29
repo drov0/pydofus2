@@ -17,8 +17,6 @@ from pydofus2.com.ankamagames.jerakine.utils.display.spellZone.SpellShapeEnum im
     SpellShapeEnum,
 )
 
-logger = Logger("Dofus2")
-
 
 class EffectInstance(IDataCenter):
 
@@ -35,7 +33,6 @@ class EffectInstance(IDataCenter):
     UNDEFINED_SHOW: int = -1
 
     UNDEFINED_DESCRIPTION: str = "undefined"
-
 
     def __init__(self):
         self.effectUid: int = None
@@ -322,7 +319,7 @@ class EffectInstance(IDataCenter):
                     self.zoneEfficiencyPercent = None
                     self.zoneMaxEfficiency = None
         else:
-            logger.error(f"Zone incorrect ({self.rawZone})")
+            Logger().error(f"Zone incorrect ({self.rawZone})")
 
     @property
     def parameter0(self):

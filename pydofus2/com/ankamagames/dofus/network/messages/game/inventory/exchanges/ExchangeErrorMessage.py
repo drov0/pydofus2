@@ -2,11 +2,9 @@ from pydofus2.com.ankamagames.jerakine.network.NetworkMessage import NetworkMess
 
 
 class ExchangeErrorMessage(NetworkMessage):
-    errorType:int
-    
+    errorType: int
 
-    def init(self, errorType_:int):
+    def init(self, errorType_: int):
         self.errorType = errorType_
-        
+
         super().__init__()
-    

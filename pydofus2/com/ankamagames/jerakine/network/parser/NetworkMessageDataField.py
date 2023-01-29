@@ -4,8 +4,6 @@ from pydofus2.com.ankamagames.jerakine.network.parser.ProtocolSpec import Protoc
 from pydofus2.com.ankamagames.jerakine.network.parser.TypeEnum import TypeEnum
 import pydofus2.com.ankamagames.jerakine.network.parser.NetworkMessageClassDefinition as nmcd
 
-logger = Logger("Dofus2")
-
 
 class NetMsgDataField:
 
@@ -48,7 +46,7 @@ class NetMsgDataField:
             lTypeId = self._spec.get("lengthTypeId")
             if lTypeId is not None:
                 if self.TRACE:
-                    logger.debug("field has length type id " + str(lTypeId))
+                    Logger().debug("field has length type id " + str(lTypeId))
                 return self.readPrimitive(TypeEnum(lTypeId))
         return l
 
@@ -69,7 +67,7 @@ class NetMsgDataField:
             raise Exception(f"Type id {typeId} not found in known types ids")
         ret = getattr(self._raw, dataReader)()
         if self.TRACE:
-            logger.debug(f"{self._spec['name']} : {TypeEnum(self._spec['typeId']).name} =  value is {ret}")
+            Logger().debug(f"{self._spec['name']} : {TypeEnum(self._spec['typeId']).name} =  value is {ret}")
         return ret
 
     def readObject(self):
@@ -79,20 +77,20 @@ class NetMsgDataField:
             classSpec = ProtocolSpec.getTypeSpecById(typeId)
             className = classSpec["name"]
         if self.TRACE:
-            logger.debug(className + " {")
+            Logger().debug(className + " {")
         obj = nmcd.NetworkMessageClassDefinition(className, self._raw).deserialize()
         if self.TRACE:
-            logger.debug("}")
+            Logger().debug("}")
         return obj
 
     def readVector(self):
         if self.TRACE:
-            logger.debug("reading vector of length " + str(self.length))
+            Logger().debug("reading vector of length " + str(self.length))
         ret = []
         for i in range(self.length):
             if self.TRACE:
-                logger.debug("------------------------------------------------")
-                logger.debug("Reading vector element " + str(i))
+                Logger().debug("------------------------------------------------")
+                Logger().debug("Reading vector element " + str(i))
             if self.isPrimitive:
                 ret.append(self.readPrimitive())
             else:

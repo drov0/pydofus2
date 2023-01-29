@@ -8,8 +8,6 @@ class GameActionFightLeaveMessage(GameActionFightDeathMessage, Message):
     def __init__(self):
         super().__init__()
 
-    def init(
-        self, actionId: int = 0, sourceId: float = 0, targetId: float = 0
-    ) -> "GameActionFightLeaveMessage":
+    def init(self, actionId: int = 0, sourceId: float = 0, targetId: float = 0) -> "GameActionFightLeaveMessage":
         super().init(actionId, sourceId, targetId)
         return self

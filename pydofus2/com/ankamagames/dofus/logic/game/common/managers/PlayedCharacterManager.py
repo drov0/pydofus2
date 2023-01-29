@@ -46,8 +46,6 @@ from pydofus2.com.ankamagames.jerakine.types.Callback import Callback
 from pydofus2.flash.geom.Point import Point
 from pydofus2.damageCalculation.tools.StatIds import StatIds
 
-logger = Logger("Dofus2")
-
 
 class PlayedCharacterManager(IDestroyable, metaclass=Singleton):
     def __init__(self):
@@ -216,8 +214,9 @@ class PlayedCharacterManager(IDestroyable, metaclass=Singleton):
     @property
     def isInFight(self) -> bool:
         from pydofus2.com.ankamagames.dofus.kernel.Kernel import Kernel
+
         return Kernel().worker.getFrame("FightContextFrame")
-    
+
     @property
     def isInKoli(self) -> bool:
         from pydofus2.com.ankamagames.dofus.logic.game.fight.frames.FightContextFrame import (
@@ -258,12 +257,12 @@ class PlayedCharacterManager(IDestroyable, metaclass=Singleton):
 
     @property
     def entity(self) -> "IEntity":
-        return DofusEntities.getEntity(self.id)
+        return DofusEntities().getEntity(self.id)
 
     @property
     def currentCellId(self) -> int:
         if self.entity is None:
-            logger.error("No player entity found")
+            Logger().error("No player entity found")
             return None
         return self.entity.position.cellId
 

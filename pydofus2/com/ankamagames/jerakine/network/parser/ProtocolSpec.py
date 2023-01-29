@@ -3,10 +3,8 @@ import os
 import pydofus2.com.ankamagames.dofus.Constants as Constants
 
 ROOTDIR = os.path.dirname(__file__)
-
 if not os.path.exists(Constants.PROTOCOL_SPEC_PATH):
     raise Exception(f"{Constants.PROTOCOL_SPEC_PATH} file not found")
-
 with open(Constants.PROTOCOL_SPEC_PATH, "r") as fp:
     D2PROTOCOL = json.load(fp)
 
@@ -33,7 +31,7 @@ class ProtocolSpec:
     @classmethod
     def getMsgNameById(cls, id):
         return cls.getClassSpecById(id)["name"]
-    
+
     @classmethod
     def getProtocolIdByName(cls, name):
         return cls.getClassSpecByName(name)["protocolId"]

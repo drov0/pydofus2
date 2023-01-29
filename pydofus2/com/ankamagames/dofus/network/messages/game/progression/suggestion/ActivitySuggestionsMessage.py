@@ -2,13 +2,11 @@ from pydofus2.com.ankamagames.jerakine.network.NetworkMessage import NetworkMess
 
 
 class ActivitySuggestionsMessage(NetworkMessage):
-    lockedActivitiesIds:list[int]
-    unlockedActivitiesIds:list[int]
-    
+    lockedActivitiesIds: list[int]
+    unlockedActivitiesIds: list[int]
 
-    def init(self, lockedActivitiesIds_:list[int], unlockedActivitiesIds_:list[int]):
+    def init(self, lockedActivitiesIds_: list[int], unlockedActivitiesIds_: list[int]):
         self.lockedActivitiesIds = lockedActivitiesIds_
         self.unlockedActivitiesIds = unlockedActivitiesIds_
-        
+
         super().__init__()
-    

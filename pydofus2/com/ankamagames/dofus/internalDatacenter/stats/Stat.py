@@ -4,8 +4,6 @@ from pydofus2.com.ankamagames.dofus.datacenter.characteristics.Characteristic im
 from pydofus2.com.ankamagames.jerakine.logger.Logger import Logger
 from pydofus2.damageCalculation.tools.StatIds import StatIds
 
-logger = Logger("Dofus2")
-
 
 class Stat:
 

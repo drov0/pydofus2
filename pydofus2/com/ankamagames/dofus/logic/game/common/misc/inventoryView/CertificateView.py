@@ -2,8 +2,6 @@ from pydofus2.com.ankamagames.dofus.internalDatacenter.items.ItemWrapper import 
 from pydofus2.com.ankamagames.dofus.logic.game.common.misc.IInventoryView import IInventoryView
 from pydofus2.com.ankamagames.jerakine.logger.Logger import Logger
 
-logger = Logger("Dofus2")
-
 
 class CertificateView(IInventoryView):
 
@@ -34,7 +32,7 @@ class CertificateView(IInventoryView):
 
     def removeItem(self, item: ItemWrapper, invisible: int) -> None:
         if item not in self.content:
-            logger.warn("L'item qui doit �tre supprim� n'est pas pr�sent dans la liste")
+            Logger().warn("L'item qui doit �tre supprim� n'est pas pr�sent dans la liste")
             return
         self.content.remove(item)
         self.updateView()

@@ -22,7 +22,6 @@ from pydofus2.com.hurlan.crypto.symmetric.PSAKey import RSACipher
 from pydofus2.com.hurlan.crypto.symmetric.SimpleIVMode import SimpleIVMode
 from Cryptodome.PublicKey import RSA
 
-logger = Logger("Dofus2")
 
 class AuthentificationManager(metaclass=Singleton):
     _verifyKey = AuthentificationManager__verifyKey.create()
@@ -40,7 +39,7 @@ class AuthentificationManager(metaclass=Singleton):
         self._certificate = None
         self._lva = None
         super().__init__()
-    
+
     @property
     def loginValidationAction(self) -> LoginValidationAction:
         return self._lva
@@ -50,7 +49,7 @@ class AuthentificationManager(metaclass=Singleton):
 
     def setSalt(self, salt: str) -> None:
         if len(salt) < 32:
-            logger.warn("Authentification salt size is lower than 32 ")
+            Logger().warn("Authentification salt size is lower than 32 ")
         while len(salt) < 32:
             salt += " "
         self._salt = salt
@@ -81,21 +80,21 @@ class AuthentificationManager(metaclass=Singleton):
     def getIdentificationMessage(self) -> IdentificationMessage:
         imsg = IdentificationMessage()
         imsg.init(
-            autoconnect_ = self._lva.autoSelectServer,
-            credentials_ = self.getAuthCredentials(),
-            failedAttempts_ = [],
-            lang_ = "fr",
-            serverId_ = self._lva.serverId,
-            sessionOptionalSalt_ = 0,
-            useCertificate_ = False,
-            useLoginToken_ = True,
-            version_ = Version.fromServerData(
-                build = BuildInfos.VERSION.build,
-                buildType = BuildInfos.VERSION.buildType,
-                code = BuildInfos.VERSION.code,
-                major = BuildInfos.VERSION.major,
-                minor = BuildInfos.VERSION.minor,
-            )
+            autoconnect_=self._lva.autoSelectServer,
+            credentials_=self.getAuthCredentials(),
+            failedAttempts_=[],
+            lang_="fr",
+            serverId_=self._lva.serverId,
+            sessionOptionalSalt_=0,
+            useCertificate_=False,
+            useLoginToken_=True,
+            version_=Version.fromServerData(
+                build=BuildInfos.VERSION.build,
+                buildType=BuildInfos.VERSION.buildType,
+                code=BuildInfos.VERSION.code,
+                major=BuildInfos.VERSION.major,
+                minor=BuildInfos.VERSION.minor,
+            ),
         )
         return imsg
 

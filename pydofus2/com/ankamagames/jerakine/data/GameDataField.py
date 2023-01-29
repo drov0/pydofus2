@@ -5,7 +5,6 @@ from pydofus2.com.ankamagames.jerakine.data.BinaryStream import BinaryStream
 
 if TYPE_CHECKING:
     from pydofus2.com.ankamagames.jerakine.data.ModuleReader import ModuleReader
-logger = Logger("Dofus2")
 
 
 class GameDataField:

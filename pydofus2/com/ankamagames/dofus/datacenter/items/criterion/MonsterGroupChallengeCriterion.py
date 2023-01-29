@@ -13,9 +13,7 @@ class MonsterGroupChallengeCriterion(ItemCriterion, IDataCenter):
     @property
     def text(self) -> str:
         readableCriterionValue: str = str(self._criterionValue + 1)
-        return I18n.getUiText(
-            "ui.breachReward.groupChallengCriterion", [readableCriterionValue]
-        )
+        return I18n.getUiText("ui.breachReward.groupChallengCriterion", [readableCriterionValue])
 
     def clone(self) -> IItemCriterion:
         return MonsterGroupChallengeCriterion(self.basicText)

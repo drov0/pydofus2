@@ -85,7 +85,6 @@ if TYPE_CHECKING:
         FightBattleFrame,
     )
     from pydofus2.com.ankamagames.jerakine.entities.interfaces.IMovable import IMovable
-logger = Logger("Dofus2")
 
 
 class FightTurnFrame(Frame):
@@ -160,7 +159,7 @@ class FightTurnFrame(Frame):
     @property
     def playerEntity(self) -> IEntity:
         self._currentFighterId = CurrentPlayedFighterManager().currentFighterId
-        return DofusEntities.getEntity(self._currentFighterId)
+        return DofusEntities().getEntity(self._currentFighterId)
 
     @property
     def myTurn(self) -> bool:
@@ -170,7 +169,7 @@ class FightTurnFrame(Frame):
     def myTurn(self, b: bool) -> None:
         self._finishingTurn = False
         self._currentFighterId = CurrentPlayedFighterManager().currentFighterId
-        self._playerEntity = DofusEntities.getEntity(self._currentFighterId)
+        self._playerEntity = DofusEntities().getEntity(self._currentFighterId)
         self._turnFinishingNoNeedToRedrawMovement = False
         self._myTurn = b
         if b:
@@ -262,7 +261,7 @@ class FightTurnFrame(Frame):
                 if basicTurnDuration + secondsToReport > 60:
                     secondsToReport = 60 - basicTurnDuration
                 if secondsToReport > 0:
-                    Logger.debug(
+                    Logger().debug(
                         I18n.getUiText("ui.fight.secondsAdded", [secondsToReport]),
                         "n",
                         secondsToReport <= 1,
@@ -270,7 +269,7 @@ class FightTurnFrame(Frame):
                     )
                 self._remainingDurationSeconds = 0
                 self._intervalTurn = 0
-            imE: "IMovable" = DofusEntities.getEntity(self._currentFighterId)
+            imE: "IMovable" = DofusEntities().getEntity(self._currentFighterId)
             if not imE:
                 return True
             if imE.isMoving:
@@ -304,18 +303,18 @@ class FightTurnFrame(Frame):
         return True
 
     def drawMovementArea(self) -> list[int]:
-        # logger.debug("drawing the movement area")
+        # Logger().debug("drawing the movement area")
         if not self.playerEntity or self.playerEntity.isMoving:
-            logger.debug(f"player {self.playerEntity} is moving {self.playerEntity.isMoving} or not found")
+            Logger().debug(f"player {self.playerEntity} is moving {self.playerEntity.isMoving} or not found")
             self.removeMovementArea()
             return []
         playerPosition: MapPoint = self.playerEntity.position
         stats: EntityStats = CurrentPlayedFighterManager().getStats()
         if not stats:
-            logger.debug("no stats")
+            Logger().debug("no stats")
             return
         movementPoints: int = stats.getStatTotalValue(StatIds.MOVEMENT_POINTS)
-        # logger.debug(f"movementPoints available {movementPoints}")
+        # Logger().debug(f"movementPoints available {movementPoints}")
         self._lastMP = movementPoints
         entitiesFrame: FightEntitiesFrame = FightEntitiesFrame.getCurrentInstance()
         playerInfos: GameFightFighterInformations = entitiesFrame.getEntityInfos(self.playerEntity.id)
@@ -349,20 +348,20 @@ class FightTurnFrame(Frame):
         self._cells = []
         self._cellsTackled = []
         self._cellsUnreachable = []
-        # logger.debug(f"Drawing the move path to {destCell}")
+        # Logger().debug(f"Drawing the move path to {destCell}")
         if Kernel().worker.contains("FightSpellCastFrame"):
             return
         fcf: "FightContextFrame" = Kernel().worker.getFrame("FightContextFrame")
         if self._isRequestingMovement:
-            logger.debug("Already requesting movement abort")
+            Logger().debug("Already requesting movement abort")
             return
         if not destCell:
             if fcf.currentCell == -1:
-                # logger.debug("No current cell hovered to draw path")
+                # Logger().debug("No current cell hovered to draw path")
                 return
             destCell = MapPoint.fromCellId(fcf.currentCell)
         if not self.playerEntity:
-            logger.debug("No player entity found")
+            Logger().debug("No player entity found")
             self.removePath()
             return
         stats: EntityStats = CurrentPlayedFighterManager().getStats()
@@ -370,21 +369,21 @@ class FightTurnFrame(Frame):
         apLost: int = 0
         movementPoints: int = stats.getStatTotalValue(StatIds.MOVEMENT_POINTS)
         actionPoints: int = stats.getStatTotalValue(StatIds.ACTION_POINTS)
-        logger.debug(f"MP : {movementPoints}, AP : {actionPoints}")
+        Logger().debug(f"MP : {movementPoints}, AP : {actionPoints}")
 
         if self.playerEntity.isMoving or self.currentPosition.distanceToCell(destCell) > movementPoints:
-            logger.debug(
+            Logger().debug(
                 f"Player is moving {self.playerEntity.isMoving} or dest is too far {self.currentPosition.distanceToCell(destCell)} from {movementPoints} abort"
             )
             self.removePath()
             return
-        path: MovementPath = Pathfinding.findPath(
+        path: MovementPath = Pathfinding().findPath(
             DataMapProvider(), self.currentPosition, destCell, False, False, True
         )
-        logger.debug(f"Found a path {path}")
+        Logger().debug(f"Found a path {path}")
         if len(DataMapProvider().obstaclesCells) > 0 and (len(path.path) == 0 or len(path.path) > movementPoints):
-            logger.debug("Path is empty because of obstacles or too long for the available move points")
-            path = Pathfinding.findPath(
+            Logger().debug("Path is empty because of obstacles or too long for the available move points")
+            path = Pathfinding().findPath(
                 DataMapProvider(),
                 self.playerEntity.position,
                 destCell,
@@ -392,7 +391,7 @@ class FightTurnFrame(Frame):
                 False,
                 False,
             )
-            logger.debug(f"Path found {path}")
+            Logger().debug(f"Path found {path}")
             if len(path.path) > 0:
                 pathLen = len(path.path)
                 for i in range(pathLen):
@@ -405,7 +404,7 @@ class FightTurnFrame(Frame):
                         path.path = path.path[:i]
                         break
         if len(path.path) == 0 or len(path.path) > movementPoints:
-            logger.debug(f"Path found empty {len(path.path)} or too long compared to mp {movementPoints}")
+            Logger().debug(f"Path found empty {len(path.path)} or too long compared to mp {movementPoints}")
             self.removePath()
             return
         self._lastPath = path
@@ -459,7 +458,7 @@ class FightTurnFrame(Frame):
         else:
             self._cellsUnreachable.append(path.end.cellId)
 
-        logger.debug(
+        Logger().debug(
             f"cells : {self._cells}, cellsTackled : {self._cellsTackled}, cellsUnreachable : {self._cellsUnreachable}"
         )
 
@@ -479,15 +478,15 @@ class FightTurnFrame(Frame):
 
     def askMoveTo(self, cells: list[int] = [], cellsTackled: list[int] = []) -> bool:
         if self._isRequestingMovement:
-            logger.warn("Already requesting movement")
+            Logger().warn("Already requesting movement")
             return False
         self._isRequestingMovement = True
         if not self.playerEntity:
-            logger.warn("The player tried to move before its character was added to the scene. Aborting.")
+            Logger().warn("The player tried to move before its character was added to the scene. Aborting.")
             self._isRequestingMovement = False
             return False
         if self.playerEntity.isMoving:
-            logger.warn("The player is already moving")
+            Logger().warn("The player is already moving")
             self._isRequestingMovement = False
             return False
         if cells:
@@ -497,7 +496,7 @@ class FightTurnFrame(Frame):
         if (self._cells is None or len(self._cells) == 0) and (
             self._cellsTackled is None or len(self._cellsTackled) == 0
         ):
-            logger.debug(f"No cells to move to {self._cells} {self._cellsTackled}")
+            Logger().debug(f"No cells to move to {self._cells} {self._cellsTackled}")
             self._isRequestingMovement = False
             return False
         path: MovementPath = MovementPath()
@@ -513,9 +512,9 @@ class FightTurnFrame(Frame):
             currMapId = PlayedCharacterManager().currentMap.mapId
             gmmrmsg.init(keyMovements, currMapId)
             ConnectionsHandler()._conn.send(gmmrmsg)
-            logger.debug(f"Sent movement request {keyMovements}")
+            Logger().debug(f"Sent movement request {keyMovements}")
         else:
-            logger.debug("Fight is not paused, and battle frame is running can't move")
+            Logger().debug("Fight is not paused, and battle frame is running can't move")
             self._isRequestingMovement = False
         self.removePath()
         return True

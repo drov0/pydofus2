@@ -6,11 +6,17 @@ from pydofus2.com.ankamagames.jerakine.messages.Message import Message
 from pydofus2.com.ankamagames.jerakine.messages.DiscardableMessage import DiscardableMessage
 from pydofus2.com.ankamagames.jerakine.messages.MessageHandler import MessageHandler
 
+"""This Class for handling messages and frames in a Dofus 2 game application. The worker class is a subclass of MessageHandler and
+provides methods for processing messages, adding and removing frames, checking if a frame is present, getting a frame, and terminating the worker. 
+The class uses the threading module for handling concurrency, and also uses several classes from the pydofus2 package, such as KernelEventsManager,
+Logger, Frame, and Message. There are also several class-level variables for enabling debug logging for frames, messages, and frame processing.
+"""
+
 
 class Worker(MessageHandler):
-    DEBUG_FRAMES: bool = True
-    DEBUG_MESSAGES: bool = True
-    DEBUG_FRAMES_PROCESSING: bool = True
+    DEBUG_FRAMES: bool = False
+    DEBUG_MESSAGES: bool = False
+    DEBUG_FRAMES_PROCESSING: bool = False
 
     def __init__(self):
         self._framesBeingDeleted = set[Frame]()
@@ -153,18 +159,12 @@ class Worker(MessageHandler):
             raise Exception(f"[WORKER] Discarded message: {msg.__class__.__name__}!")
 
     def processFramesInAndOut(self) -> None:
-        if self._framesToRemove:
-            for frameToRemove in self._framesToRemove:
-                if self._terminated.is_set():
-                    return
-                self.pullFrame(frameToRemove)
-            self._framesToRemove.clear()
-        if self._framesToAdd:
-            for frameToAdd in self._framesToAdd:
-                if self._terminated.is_set():
-                    return
-                self.pushFrame(frameToAdd)
-            self._framesToAdd.clear()
+        while self._framesToRemove and not self._terminated.is_set():
+            f = self._framesToRemove.pop()
+            self.pullFrame(f)
+        while self._framesToAdd and not self._terminated.is_set():
+            f = self._framesToAdd.pop()
+            self.pushFrame(f)
 
     def removeFrameByName(self, frameName: str) -> None:
         if not self.contains(frameName):

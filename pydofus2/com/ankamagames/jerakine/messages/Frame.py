@@ -5,11 +5,8 @@ from pydofus2.com.ankamagames.jerakine.utils.misc.Priotizable import Prioritizab
 
 
 class Frame(MessageHandler, Prioritizable):
-    @property
-    def priority() -> Priority:
-        raise NotImplementedError("This method must be overriden")
 
-    def process(msg: Message) -> bool:
+    def process(self, msg: Message) -> bool:
         raise NotImplementedError("This method must be overriden")
 
     def pushed(self) -> bool:

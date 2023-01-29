@@ -1,6 +1,7 @@
 from datetime import datetime
 from pydofus2.com.ankamagames.berilia.managers.KernelEventsManager import KernelEventsManager, KernelEvts
 from pydofus2.com.ankamagames.dofus.kernel.Kernel import Kernel
+from pydofus2.com.ankamagames.dofus.logic.common.frames.ChatFrame import ChatFrame
 from pydofus2.com.ankamagames.dofus.logic.common.frames.QuestFrame import QuestFrame
 from pydofus2.com.ankamagames.dofus.logic.game.common.frames.AveragePricesFrame import AveragePricesFrame
 from pydofus2.com.ankamagames.dofus.logic.game.common.frames.InventoryManagementFrame import InventoryManagementFrame
@@ -221,10 +222,8 @@ class GameServerApproachFrame(Frame):
             return False
 
         elif isinstance(msg, ServerConnectionFailedMessage):
-            scfMsg = ServerConnectionFailedMessage(msg)
             self.authenticationTicketAccepted = False
-            if scfMsg.failedConnection == connh.ConnectionsHandler().conn.getSubConnection(scfMsg):
-                PlayerManager().destroy()
+            PlayerManager().destroy()
             return True
 
         elif isinstance(msg, AlreadyConnectedMessage):
@@ -255,6 +254,7 @@ class GameServerApproachFrame(Frame):
             Kernel().worker.addFrame(SpellInventoryManagementFrame())
             Kernel().worker.addFrame(InventoryManagementFrame())
             Kernel().worker.addFrame(ContextChangeFrame())
+            Kernel().worker.addFrame(ChatFrame())
             Kernel().worker.addFrame(JobsFrame())
             Kernel().worker.addFrame(QuestFrame())
             Kernel().worker.addFrame(AveragePricesFrame())
@@ -292,9 +292,7 @@ class GameServerApproachFrame(Frame):
 
         elif isinstance(msg, BasicTimeMessage):
             btmsg = msg
-            TimeManager().serverTimeLag = (
-                btmsg.timestamp + btmsg.timezoneOffset * 60 * 1000 - datetime.now().timestamp()
-            )
+            TimeManager().serverTimeLag = float(btmsg.timestamp + btmsg.timezoneOffset * 60 * 1000 - datetime.now().timestamp())
             TimeManager().serverUtcTimeLag = btmsg.timestamp - datetime.now().timestamp()
             TimeManager().timezoneOffset = btmsg.timezoneOffset * 60 * 1000
             TimeManager().dofusTimeYearLag = -1370

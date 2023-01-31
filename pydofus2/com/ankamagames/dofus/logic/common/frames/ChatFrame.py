@@ -7,24 +7,25 @@ from pydofus2.com.ankamagames.jerakine.logger.Logger import Logger
 from pydofus2.com.ankamagames.jerakine.messages.Frame import Frame
 from pydofus2.com.ankamagames.jerakine.types.enums.Priority import Priority
 
+
 class ChatFrame(Frame):
-    CHAT_FAIL_TEXTS_IDS = [5259,5359,5338,5373]
-    
+    CHAT_FAIL_TEXTS_IDS = [5259, 5359, 5338, 5373]
+
     def __init__(self) -> None:
         super().__init__()
-        
+
     @property
     def priority(self) -> int:
         return Priority.NORMAL
-    
+
     def pushed(self) -> bool:
         return True
-    
+
     def pulled(self) -> bool:
         return True
-    
+
     def process(self, msg):
-        
+
         if isinstance(msg, TextInformationMessage):
             timsg = msg
             param = []
@@ -55,5 +56,5 @@ class ChatFrame(Frame):
             else:
                 Logger().error(f"There's no message for id {timsg.msgType * 10000 + timsg.msgId}")
             return True
-        
+
         return False

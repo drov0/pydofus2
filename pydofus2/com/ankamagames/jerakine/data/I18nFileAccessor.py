@@ -1,3 +1,4 @@
+import threading
 from time import perf_counter
 from pydofus2.com.ankamagames.dofus import Constants
 from pydofus2.com.ankamagames.jerakine.logger.Logger import Logger
@@ -6,11 +7,23 @@ from pydofus2.com.ankamagames.jerakine.data.BinaryStream import BinaryStream
 
 
 class I18nFileAccessor(metaclass=ThreadSharedSingleton):
+    
+    _initialized = threading.Event()
+    _initializing = threading.Event()
+    
     def __init__(self) -> None:
         self.directBuffer = None
         self.init()
 
     def init(self):
+        if self._initialized.is_set():
+            Logger().info("I18n file already loaded.")
+            return
+        if self._initializing.is_set():
+            Logger().info("I18n file is already loading.")
+            self._initialized.wait()
+            return
+        self._initializing.set()
         Logger().info("Loading I18n file...")
         s = perf_counter()
         nativeFile = Constants.LANG_FILE_PATH
@@ -59,6 +72,8 @@ class I18nFileAccessor(metaclass=ThreadSharedSingleton):
         textKeys: list = []
         for textKey in self.textIndexes:
             textKeys.append(textKey)
+        self._initializing.clear()
+        self._initialized.set()
         Logger().info(f"Loaded {keyCount} keys and {self.textCount} texts. in {perf_counter() - s}s")
 
     def logInit() -> None:

@@ -42,10 +42,10 @@ class Worker(MessageHandler):
             Logger().warning(f"Can't add frame {frame} because the worker is terminated")
             return
 
-        if frame in self._currentFrameTypesCache:
+        if str(frame) in self._currentFrameTypesCache:
             if frame in self._framesToAdd and frame not in self._framesToRemove:
                 raise Exception(
-                    f"Can't add the frame '{frame}' because it's already in the to-add list and the worker is busy."
+                    f"Can't add the frame '{frame}' because it's already in the to-add list."
                 )
         if self._processingMessage.is_set():
             if frame in self._framesToAdd:

@@ -120,6 +120,7 @@ class DofusClient(threading.Thread):
             self.worker.process(LoginAction.create(self._serverId != 0, self._serverId))
             while not self._killSig.is_set():
                 msg = ConnectionsHandler().receive()
+                # Logger().debug(f"[DofusClient] Received message: {msg}")
                 self.worker.process(msg)
         except:
             Logger().error(f"[DofusClient] Error in main loop.", exc_info=True)

@@ -1,38 +1,40 @@
+from time import perf_counter
+from pydofus2.com.ankamagames.dofus import Constants
 from pydofus2.com.ankamagames.dofus.modules.utils.pathFinding.world.Edge import Edge
 from pydofus2.com.ankamagames.dofus.modules.utils.pathFinding.world.Vertex import Vertex
+from pydofus2.com.ankamagames.jerakine.logger.Logger import Logger
+from pydofus2.com.ankamagames.jerakine.metaclasses.ThreadSharedSingleton import ThreadSharedSingleton
 from pydofus2.com.ankamagames.jerakine.network.CustomDataWrapper import ByteArray
 
 
-class WorldGraph:
+class WorldGraph(metaclass=ThreadSharedSingleton):
 
-    _vertices: dict[int, dict[int, Vertex]]
-
-    _edges: dict[float, Edge]
-
-    _outgoingEdges: dict
-
-    _vertexUid: float = 0
-
-    def __init__(self, data: ByteArray):
-        self._vertices = dict()
-        self._edges = dict()
-        self._outgoingEdges = dict()
-        edgeCount: int = data.readInt()
-        for i in range(edgeCount):
-            src = self.addVertex(data.readDouble(), data.readInt())
-            dest = self.addVertex(data.readDouble(), data.readInt())
-            edge = self.addEdge(src, dest)
-            transitionCount = data.readInt()
-            for j in range(transitionCount):
-                edge.addTransition(
-                    data.readByte(),
-                    data.readByte(),
-                    data.readInt(),
-                    data.readUTFBytes(data.readInt()),
-                    data.readDouble(),
-                    data.readInt(),
-                    data.readDouble(),
-                )
+    def __init__(self):
+        self._vertices = dict[int, dict[int, Vertex]]()
+        self._edges = dict[float, Edge]()
+        self._outgoingEdges = dict[float, list[Edge]]()
+        self._vertexUid: float = 0
+        s = perf_counter()
+        with open(Constants.WORLDGRAPH_PATH, "rb") as binaries:
+            data = ByteArray(binaries.read())
+            edgeCount: int = data.readInt()
+            for _ in range(edgeCount):
+                src = self.addVertex(data.readDouble(), data.readInt())
+                dest = self.addVertex(data.readDouble(), data.readInt())
+                edge = self.addEdge(src, dest)
+                transitionCount = data.readInt()
+                for _ in range(transitionCount):
+                    edge.addTransition(
+                        data.readByte(),
+                        data.readByte(),
+                        data.readInt(),
+                        data.readUTFBytes(data.readInt()),
+                        data.readDouble(),
+                        data.readInt(),
+                        data.readDouble(),
+                    )
+            del data
+        Logger().debug("WorldGraph loaded in %s seconds", perf_counter() - s)
 
     def getEdges(self) -> dict:
         return self._edges
@@ -67,16 +69,16 @@ class WorldGraph:
 
     def addEdge(self, src: Vertex, dest: Vertex) -> Edge:
         edge: Edge = self.getEdge(src, dest)
-        if edge != None:
+        if edge:
             return edge
         if not self.doesVertexExist(src) or not self.doesVertexExist(dest):
             return None
         edge = Edge(src, dest)
-        if self._edges.get(src.UID) == None:
+        if self._edges.get(src.UID) is None:
             self._edges[src.UID] = dict()
         self._edges[src.UID][dest.UID] = edge
-        outgoing: list[Edge] = self._outgoingEdges.get(src.UID)
-        if outgoing == None:
+        outgoing = self._outgoingEdges.get(src.UID)
+        if outgoing is None:
             outgoing = list[Edge]()
             self._outgoingEdges[src.UID] = outgoing
         outgoing.append(edge)

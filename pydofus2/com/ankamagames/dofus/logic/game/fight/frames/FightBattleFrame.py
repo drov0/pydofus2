@@ -263,7 +263,6 @@ class FightBattleFrame(Frame):
         self._playingSlaveEntity = False
         self._sequenceFrames = []
         DataMapProvider().isInFight = True
-        Logger().debug(f"FightBattleFrame pushed, dataMapProvider.isInFight = {DataMapProvider().isInFight}")
         krnl.Kernel().worker.addFrame(self._turnFrame)
         self._destroyed = False
         self._neverSynchronizedBefore = True
@@ -275,7 +274,7 @@ class FightBattleFrame(Frame):
             gftmsg = msg
             if self._executingSequence or self._currentSequenceFrame:
                 Logger().warn(
-                    "There was a turns list update during self sequence... Let's wait its finish before doing it."
+                    "There was a turns list update during self sequence... Let's wait it to finish before doing it."
                 )
                 self._refreshTurnsList = True
                 self._newTurnsList = gftmsg.ids
@@ -341,11 +340,9 @@ class FightBattleFrame(Frame):
             self._currentPlayerId = gftsmsg.id
             if not self._lastPlayerId:
                 self._lastPlayerId = self._currentPlayerId
-            # Logger().info("*" * 50 + f"   Start turn for entityId {self._currentPlayerId}    " + "*" * 50)
             if self._currentPlayerId == playerId:
                 self._slaveId = 0
             self._playingSlaveEntity = gftsmsg.id == self._slaveId
-            # Logger().debug("Playing slave entity: " + str(self._playingSlaveEntity))
             self._turnFrame.turnDuration = gftsmsg.waitTime * 0.1
             isResumeMessage = isinstance(msg, GameFightTurnResumeMessage)
             if not isResumeMessage:
@@ -378,7 +375,6 @@ class FightBattleFrame(Frame):
             ):
                 CurrentPlayedFighterManager().currentFighterId = gftsmsg.id
                 spellwrapper.SpellWrapper.refreshAllPlayerSpellHolder(gftsmsg.id)
-                # Logger().debug("Finaly turn for entityId: " + str(self._currentPlayerId) + " set to true")
                 self._turnFrame.myTurn = True
             else:
                 self._turnFrame.myTurn = False
@@ -395,7 +391,6 @@ class FightBattleFrame(Frame):
                 fighterInfos: "GameFightFighterInformations" = fightEntitesFrame.getEntityInfos(entityId)
                 if fighterInfos and fighterInfos.stats.summoner == gftsmsg.id:
                     self.removeSavedPosition(entityId)
-            krnl.Kernel().worker.getFrame("FightContextFrame")
             return False
 
         elif isinstance(msg, GameFightTurnEndMessage):
@@ -415,10 +410,8 @@ class FightBattleFrame(Frame):
             return True
 
         elif isinstance(msg, SequenceStartMessage):
-            # Logger().debug(f"[SEQ DEBUG] =================>> Received Sequence start author {msg.authorId}")
             self._autoEndTurn = False
             if not self._sequenceFrameSwitcher:
-                # Logger().debug(f"[SEQ DEBUG] Switcher is not set, creating new one")
                 self._sequenceFrameSwitcher = FightSequenceSwitcherFrame()
                 krnl.Kernel().worker.addFrame(self._sequenceFrameSwitcher)
             self._currentSequenceFrame = fseqf.FightSequenceFrame(self, self._currentSequenceFrame)
@@ -426,7 +419,6 @@ class FightBattleFrame(Frame):
             return False
 
         elif isinstance(msg, SequenceEndMessage):
-            # self.logState()
             semsg = msg
             if not self._currentSequenceFrame:
                 Logger().warn("Wow wow wow, I've got a Sequence End but no Sequence Start? What the hell?")
@@ -434,22 +426,13 @@ class FightBattleFrame(Frame):
             self._currentSequenceFrame.mustAck = semsg.authorId == int(CurrentPlayedFighterManager().currentFighterId)
             self._currentSequenceFrame.ackIdent = semsg.actionId
             self._sequenceFrameSwitcher.currentFrame = None
-            # Logger().debug(
-            #     f"================>> Received sequence #{self._currentSequenceFrame._instanceId} end with id: {semsg.actionId} and author id: {semsg.authorId}"
-            # )
             if not self._currentSequenceFrame.parent:
-                # Logger().debug(
-                #     f"Sequence {self._currentSequenceFrame._instanceId} is root, removing it and executing next sequence"
-                # )
                 krnl.Kernel().worker.removeFrame(self._sequenceFrameSwitcher)
                 self._sequenceFrameSwitcher = None
                 self._sequenceFrames.append(self._currentSequenceFrame)
                 self._currentSequenceFrame = None
                 self.executeNextSequence()
             else:
-                # Logger().debug(
-                #     f"Sequence #{self._currentSequenceFrame._instanceId} is not the last one, so we will wait for the end of the parent sequence"
-                # )
                 self._currentSequenceFrame.execute()
                 self._sequenceFrameSwitcher.currentFrame = self._currentSequenceFrame.parent
                 self._currentSequenceFrame = self._currentSequenceFrame.parent
@@ -526,12 +509,9 @@ class FightBattleFrame(Frame):
         fsf: fseqf.FightSequenceFrame = None
         self.applyDelayedStats()
         DataMapProvider().isInFight = False
-        if krnl.Kernel().worker.contains("FightTurnFrame"):
-            krnl.Kernel().worker.removeFrame(self._turnFrame)
+        krnl.Kernel().worker.removeFrameByName("FightTurnFrame")
         bffm.BuffManager.clear()
-        if self._executingSequence or krnl.Kernel().worker.contains("FightSequenceFrame"):
-            fsf = krnl.Kernel().worker.getFrame("FightSequenceFrame")
-            krnl.Kernel().worker.removeFrame(fsf)
+        krnl.Kernel().worker.removeFrameByName("FightSequenceFrame")
         self._currentSequenceFrame = None
         self._sequenceFrameSwitcher = None
         self._turnFrame = None
@@ -640,7 +620,6 @@ class FightBattleFrame(Frame):
             return False
         if self._sequenceFrames:
             nextSequenceFrame: fseqf.FightSequenceFrame = self._sequenceFrames.pop(0)
-            # Logger().debug(f"Executing next sequence #{nextSequenceFrame._instanceId}")
             self._executingSequence = True
             nextSequenceFrame.execute(self.finishSequence(nextSequenceFrame))
             return False
@@ -663,13 +642,9 @@ class FightBattleFrame(Frame):
         if self._sequenceFrameCached == None:
             return
         ack: GameActionAcknowledgementMessage = GameActionAcknowledgementMessage()
-        # Logger().debug(f"Sending acknowledgement for sequence #{self._sequenceFrameCached._instanceId}")
         ack.init(True, self._sequenceFrameCached.ackIdent)
         self._sequenceFrameCached = None
-        try:
-            ConnectionsHandler().conn.send(ack)
-        except Exception as e:
-            pass
+        ConnectionsHandler().conn.send(ack)
 
     def finishSequence(self, sequenceFrame: fseqf.FightSequenceFrame) -> FunctionType:
         def function() -> None:
@@ -679,7 +654,6 @@ class FightBattleFrame(Frame):
                 self._sequenceFrameCached = sequenceFrame
                 if not self.isFightAboutToEnd:
                     self.sendAcknowledgement()
-            fevth.FightEventsHelper().sendAllFightEvent(True)
             self._executingSequence = False
             if self._refreshTurnsList:
                 Logger().warn("There was a turns list refresh delayed, what about updating it now?")
@@ -709,7 +683,6 @@ class FightBattleFrame(Frame):
                 return
             if self._confirmTurnEnd and not self.isFightAboutToEnd:
                 self.confirmDelayedTurnEnd()
-
         return function
 
     def confirmDelayedTurnEnd(self) -> None:
@@ -749,7 +722,6 @@ class FightBattleFrame(Frame):
         turnEnd: GameFightTurnReadyMessage = GameFightTurnReadyMessage()
         turnEnd.init(True)
         ConnectionsHandler().conn.send(turnEnd)
-        # Logger().debug("Turn end confirmed.")
 
     def endBattle(self, fightEnd: GameFightEndMessage) -> None:
         self._holder: FightEntitiesHolder = FightEntitiesHolder()

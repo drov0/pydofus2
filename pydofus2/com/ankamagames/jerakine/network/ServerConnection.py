@@ -77,7 +77,6 @@ class ServerConnection(mp.Thread):
         self.__lagometer = LagometerAck()
         self.__rawParser = MessageReceiver()
         self.__socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-
         self.__connectionTimeout = None
 
     @property
@@ -255,7 +254,6 @@ class ServerConnection(mp.Thread):
             self.__lagometer.stop()
         self.__socket.close()
         self._connected.clear()
-        self._connecting.clear()
         from pydofus2.com.ankamagames.jerakine.network.ServerConnectionClosedMessage import (
             ServerConnectionClosedMessage,
         )

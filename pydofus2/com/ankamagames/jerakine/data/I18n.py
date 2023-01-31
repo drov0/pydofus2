@@ -4,6 +4,7 @@ from pydofus2.com.ankamagames.jerakine.logger.Logger import Logger
 
 
 class I18n(AbstractDataManager):
+    
     def __init__(self):
         super().__init__()
 

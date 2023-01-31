@@ -39,7 +39,6 @@ class TimeDebug:
 
 if __name__ == "__main__":
     from time import sleep
-
     TimeDebug.reset()
     sleep(1)
     print(TimeDebug.getElapsedTime())

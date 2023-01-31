@@ -49,7 +49,7 @@ class WorldPointWrapper(WorldPoint):
             self._bottomNeighbourId = dmc.dataMap.bottomNeighbourId
             self._leftNeighbourId = dmc.dataMap.leftNeighbourId
             self._rightNeighbourId = dmc.dataMap.rightNeighbourId
-        mapScrollaction: MapScrollAction = MapScrollAction.getMapScrollActionById(mapid)
+        mapScrollaction: MapScrollAction = MapScrollAction.getMapScrollActionById(float(mapid))
         if mapScrollaction:
             if mapScrollaction.topExists:
                 self._topNeighbourId = mapScrollaction.topMapId

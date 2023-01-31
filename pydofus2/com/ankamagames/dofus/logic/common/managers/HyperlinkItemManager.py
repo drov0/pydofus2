@@ -1,6 +1,7 @@
 from pydofus2.com.ankamagames.dofus.internalDatacenter.items.ItemWrapper import ItemWrapper
 from pydofus2.com.ankamagames.dofus.datacenter.items.Item import Item
 
+
 class HyperlinkItemManager:
     _itemId = 0
     _itemList = []

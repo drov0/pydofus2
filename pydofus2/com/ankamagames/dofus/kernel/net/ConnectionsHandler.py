@@ -78,27 +78,20 @@ class ConnectionsHandler(metaclass=Singleton):
         self._wantedSocketLostReason = reason
         self._wantedSocketLost = True
         self._disconnectMessage = message
-        if Kernel().worker.contains("HandshakeFrame"):
-            Kernel().worker.removeFrame(Kernel().worker.getFrame("HandshakeFrame"))
-        if self.conn.open:
+        Kernel().worker.removeFrameByName("HandshakeFrame")
+        if self._conn.open:
             self._conn.close()
+            self._conn.join()
         self._currentConnectionType = ConnectionType.DISCONNECTED
 
-    def pause(self) -> None:
-        Logger().info("Pause connection")
-        self._conn.pause()
-
-    def resume(self) -> None:
-        Logger().info("Resume connection")
-        if self._conn:
-            self._conn.resume()
-        Kernel().worker.process(ConnectionResumedMessage())
-
     def etablishConnection(self, host: str, port: int, id: str) -> None:
-        self._conn = ServerConnection(id)
+        self._conn = ServerConnection(id, self._receivedMsgsQueue)
         Kernel().worker.addFrame(HandshakeFrame())
         self._conn.start()
         self._conn.connect(host, port)
 
     def receive(self) -> INetworkMessage:
-        return self._conn.receive()
+        return self._receivedMsgsQueue.get()
+
+    def putMessage(self, msg: INetworkMessage) -> None:
+        self._receivedMsgsQueue.put(msg)

@@ -133,7 +133,7 @@ class DisconnectionHandlerFrame(Frame):
 
     def reconnect(self) -> None:
         Logger().debug("Reconnecting...")
-        KernelEventsManager().send(KernelEvts.RECONNECT)
+        KernelEventsManager().send(KernelEvts.RECONNECT, message="Reconnecting")
 
     def pulled(self) -> bool:
         return True

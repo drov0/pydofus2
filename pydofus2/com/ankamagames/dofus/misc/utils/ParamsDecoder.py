@@ -9,8 +9,6 @@ from pydofus2.com.ankamagames.jerakine.logger.Logger import Logger
 
 
 class ParamsDecoder:
-    
-    
     @classmethod
     def applyParams(cls, txt: str, params: list, replace: str = "%") -> str:
         c = None
@@ -62,7 +60,7 @@ class ParamsDecoder:
                 s += c
         return s
 
-    def processReplace(type:str, id:str, params:list) -> str:
+    def processReplace(type: str, id: str, params: list) -> str:
         newString = ""
         if id[1:] == "" and len(params) == 0:
             return ""
@@ -73,17 +71,17 @@ class ParamsDecoder:
             if type == "$item":
                 item = Item.getItemById(params[nid])
                 if item:
-                    itemw = ItemWrapper.create(0,0,params[nid],0,None,False)
+                    itemw = ItemWrapper.create(0, 0, params[nid], 0, None, False)
                     newString = HyperlinkItemManager.newChatItem(itemw)
                 else:
-                    Logger().error(f'{type} {params[nid]} introuvable')
+                    Logger().error(f"{type} {params[nid]} introuvable")
                     newString = ""
             elif type == "$itemType":
                 itemType = ItemType.getItemTypeById(params[nid])
                 if itemType:
                     newString = itemType.name
                 else:
-                    Logger().error(f'{type} {params[nid]} introuvable')
+                    Logger().error(f"{type} {params[nid]} introuvable")
                     newString = ""
             elif type == "$quantity":
                 newString = str(int(params[nid]))
@@ -92,35 +90,35 @@ class ParamsDecoder:
                 if job:
                     newString = job.name
                 else:
-                    Logger().error(f'{type} {params[nid]} introuvable')
+                    Logger().error(f"{type} {params[nid]} introuvable")
                     newString = ""
             elif type == "$quest":
                 quest = Quest.getQuestById(params[nid])
                 if quest:
                     newString = HyperlinkShowQuestManager.addQuest(quest.id)
                 else:
-                    Logger().error(f'{type} {params[nid]} introuvable')
+                    Logger().error(f"{type} {params[nid]} introuvable")
                     newString = ""
             elif type == "$achievement":
                 achievement = Achievement.getAchievementById(params[nid])
                 if achievement:
                     newString = HyperlinkShowAchievementManager.addAchievement(achievement.id)
                 else:
-                    Logger().error(f'{type} {params[nid]} introuvable')
+                    Logger().error(f"{type} {params[nid]} introuvable")
                     newString = ""
             elif type == "$title":
                 title = Title.getTitleById(params[nid])
                 if title:
                     newString = HyperlinkShowTitleManager.addTitle(title.id)
                 else:
-                    Logger().error(f'{type} {params[nid]} introuvable')
+                    Logger().error(f"{type} {params[nid]} introuvable")
                     newString = ""
             elif type == "$ornament":
                 ornament = Ornament.getOrnamentById(params[nid])
                 if ornament:
                     newString = HyperlinkShowOrnamentManager.addOrnament(ornament.id)
                 else:
-                    Logger().error(f'{type} {params[nid]} introuvable')
+                    Logger().error(f"{type} {params[nid]} introuvable")
                     newString = ""
             if type == "$spell":
                 spell = Spell.getSpellById(params[nid])
@@ -163,7 +161,7 @@ class ParamsDecoder:
                     if map.name:
                         newString = map.name
                     else:
-                        newString = HyperlinkMapPosition.getLink(int(map.posX),int(map.posY),int(map.worldMap))
+                        newString = HyperlinkMapPosition.getLink(int(map.posX), int(map.posY), int(map.worldMap))
                 else:
                     Logger().error(type + " " + params[nid] + " introuvable")
                     newString = ""
@@ -231,7 +229,11 @@ class ParamsDecoder:
                     time_to_display = 0
                 newString = TimeManager.getInstance().getDuration(time_to_display, False, True)
             elif type == "$date":
-                newString = TimeManager.getInstance().formatDateIRL(params[nid] * 1000, True, False) + " " + TimeManager.getInstance().formatClock(params[nid] * 1000, False, True)
+                newString = (
+                    TimeManager.getInstance().formatDateIRL(params[nid] * 1000, True, False)
+                    + " "
+                    + TimeManager.getInstance().formatClock(params[nid] * 1000, False, True)
+                )
             elif type in ["$companion", "$sideKick"]:
                 companion = Companion.getCompanionById(params[nid])
                 if companion:
@@ -240,5 +242,9 @@ class ParamsDecoder:
                     print(f"{type} {params[nid]} not found")
                     newString = ""
             elif type == "$breach":
-                newString = I18n.getUiText("ui.breach.roomNumber", [params[nid].room]) + ", " + I18n.getUiText("ui.breach.floor", [params[nid].floor])
+                newString = (
+                    I18n.getUiText("ui.breach.roomNumber", [params[nid].room])
+                    + ", "
+                    + I18n.getUiText("ui.breach.floor", [params[nid].floor])
+                )
         return newString

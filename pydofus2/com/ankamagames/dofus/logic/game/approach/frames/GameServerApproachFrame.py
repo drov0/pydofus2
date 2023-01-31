@@ -17,7 +17,7 @@ from pydofus2.com.ankamagames.dofus.internalDatacenter.connection.BasicCharacter
     BasicCharacterWrapper,
 )
 from pydofus2.com.ankamagames.dofus.internalDatacenter.items.ItemWrapper import ItemWrapper
-import pydofus2.com.ankamagames.dofus.kernel.net.ConnectionsHandler as connh
+from pydofus2.com.ankamagames.dofus.kernel.net.ConnectionsHandler import ConnectionsHandler
 from pydofus2.com.ankamagames.dofus.logic.connection.managers.AuthentificationManager import (
     AuthentificationManager,
 )
@@ -162,12 +162,12 @@ class GameServerApproachFrame(Frame):
             self.authenticationTicketAccepted = False
             atmsg = AuthenticationTicketMessage()
             atmsg.init("fr", AuthentificationManager().gameServerTicket)
-            connh.ConnectionsHandler().conn.send(atmsg)
+            ConnectionsHandler().conn.send(atmsg)
             return True
 
         elif isinstance(msg, AuthenticationTicketAcceptedMessage):
-            BenchmarkTimer(0.5, self.requestCharactersList).start()
             self.authenticationTicketAccepted = True
+            self.requestCharactersList()
             return True
 
         elif isinstance(msg, AuthenticationTicketRefusedMessage):
@@ -261,19 +261,19 @@ class GameServerApproachFrame(Frame):
             KernelEventsManager().send(KernelEvts.CHARACTER_SELECTION_SUCCESS, return_value=cssmsg.infos)
             if Kernel().beingInReconection and not self._reconnectMsgSend:
                 self._reconnectMsgSend = True
-                connh.ConnectionsHandler().conn.send(CharacterSelectedForceReadyMessage())
+                ConnectionsHandler().conn.send(CharacterSelectedForceReadyMessage())
             if InterClientManager.flashKey and (
                 not PlayerManager() or PlayerManager().server.id != 129 and PlayerManager().server.id != 130
             ):
                 flashKeyMsg = ClientKeyMessage()
                 flashKeyMsg.init(InterClientManager.flashKey)
-                connh.ConnectionsHandler().conn.send(flashKeyMsg)
+                ConnectionsHandler().conn.send(flashKeyMsg)
             self._cssmsg = cssmsg
             PlayedCharacterManager().infos = self._cssmsg.infos
             DataStoreType.CHARACTER_ID = str(self._cssmsg.infos.id)
             Kernel().worker.removeFrame(self)
             gccrmsg = GameContextCreateRequestMessage()
-            connh.ConnectionsHandler().conn.send(gccrmsg)
+            ConnectionsHandler().conn.send(gccrmsg)
             now = time.perf_counter()
             delta = now - self._loadingStart
             if delta > self.LOADING_TIMEOUT:
@@ -288,11 +288,13 @@ class GameServerApproachFrame(Frame):
                 Kernel().beingInReconection = True
                 self.characterId = msg.id
                 self._reconnectMsgSend = True
-                connh.ConnectionsHandler().conn.send(CharacterSelectedForceReadyMessage())
+                ConnectionsHandler().conn.send(CharacterSelectedForceReadyMessage())
 
         elif isinstance(msg, BasicTimeMessage):
             btmsg = msg
-            TimeManager().serverTimeLag = float(btmsg.timestamp + btmsg.timezoneOffset * 60 * 1000 - datetime.now().timestamp())
+            TimeManager().serverTimeLag = float(
+                btmsg.timestamp + btmsg.timezoneOffset * 60 * 1000 - datetime.now().timestamp()
+            )
             TimeManager().serverUtcTimeLag = btmsg.timestamp - datetime.now().timestamp()
             TimeManager().timezoneOffset = btmsg.timezoneOffset * 60 * 1000
             TimeManager().dofusTimeYearLag = -1370
@@ -328,7 +330,7 @@ class GameServerApproachFrame(Frame):
 
         elif isinstance(msg, PopupWarningCloseRequestAction):
             pwcrmsg = PopupWarningCloseRequestMessage()
-            connh.ConnectionsHandler().conn.send(pwcrmsg)
+            ConnectionsHandler().conn.send(pwcrmsg)
             return True
 
         elif isinstance(msg, CharacterSelectionAction):
@@ -337,7 +339,7 @@ class GameServerApproachFrame(Frame):
             self._requestedToRemodelCharacterId = 0
             csmsg = CharacterSelectionMessage()
             csmsg.init(id_=characterId)
-            connh.ConnectionsHandler().conn.send(csmsg)
+            ConnectionsHandler().conn.send(csmsg)
             return True
 
         return False
@@ -350,5 +352,5 @@ class GameServerApproachFrame(Frame):
 
     def requestCharactersList(self) -> None:
         clrmsg: CharactersListRequestMessage = CharactersListRequestMessage()
-        if connh.ConnectionsHandler().conn:
-            connh.ConnectionsHandler().conn.send(clrmsg)
+        if ConnectionsHandler().conn:
+            ConnectionsHandler().conn.send(clrmsg)

@@ -46,25 +46,15 @@ from pydofus2.com.ankamagames.jerakine.types.enums.Priority import Priority
 
 class ServerSelectionFrame(Frame):
 
-    _serversList: list[GameServerInformations] = []
-
-    _serversUsedList: list[GameServerInformations] = []
-
-    _serversTypeAvailableSlots: dict
-
-    _selectedServer: SelectedServerDataMessage
-
-    _worker: Worker
-
-    _alreadyConnectedToServerId: int = 0
-
-    _serverSelectionAction: ServerSelectionAction = None
-
-    _connexionPorts: list
-
-    _waitingServerOnline = False
-
     def __init__(self):
+        self._serversList: list[GameServerInformations] = []
+        self._serversUsedList: list[GameServerInformations] = []
+        self._selectedServer: SelectedServerDataMessage = None
+        self._worker: Worker = None
+        self._alreadyConnectedToServerId: int = 0
+        self._serverSelectionAction: ServerSelectionAction = None
+        self._connexionPorts: list = []
+        self._waitingServerOnline = False
         self._serversTypeAvailableSlots = dict()
         super().__init__()
 
@@ -84,6 +74,10 @@ class ServerSelectionFrame(Frame):
     def availableSlotsByServerType(self) -> list:
         return self._serversTypeAvailableSlots
 
+    @property
+    def worker(self) -> Worker:
+        return self._worker
+    
     def pushed(self) -> bool:
         self._worker = krnl.Kernel().worker
         return True
@@ -96,7 +90,7 @@ class ServerSelectionFrame(Frame):
             self._serversList = slmsg.servers
             self._serversList.sort(key=lambda x: x.date)
             self.broadcastServersListUpdate()
-            krnl.Kernel().worker.process(ServerSelectionAction.create(AuthentificationManager()._lva.serverId))
+            self.worker.process(ServerSelectionAction.create(AuthentificationManager()._lva.serverId))
             return False
 
         elif isinstance(msg, ServerStatusUpdateMessage):
@@ -126,7 +120,7 @@ class ServerSelectionFrame(Frame):
                     self._waitingServerOnline = False
                     ssmsg = ServerSelectionMessage()
                     ssmsg.init(AuthentificationManager()._lva.serverId)
-                    krnl.Kernel().worker.process(ssmsg)
+                    self.worker.process(ssmsg)
                     Logger().debug(
                         f"Sending ServerSelectionMessage to server {AuthentificationManager()._lva.serverId}."
                     )
@@ -159,7 +153,7 @@ class ServerSelectionFrame(Frame):
                         Logger().debug(
                             f"Server {server.id} not online but has status {ServerStatusEnum(server.status).name}."
                         )
-                        BenchmarkTimer(60, lambda: krnl.Kernel().worker.process(msg)).start()
+                        BenchmarkTimer(60, lambda: self.worker.process(msg)).start()
                         return True
             return True
 
@@ -173,7 +167,6 @@ class ServerSelectionFrame(Frame):
             from pydofus2.com.ankamagames.dofus.logic.game.approach.frames.GameServerApproachFrame import (
                 GameServerApproachFrame,
             )
-
             escmsg = msg
             if escmsg.reason != DisconnectionReasonEnum.SWITCHING_TO_GAME_SERVER:
                 self._worker.process(
@@ -199,7 +192,6 @@ class ServerSelectionFrame(Frame):
     def pulled(self) -> bool:
         self._serversList = None
         self._serversUsedList = None
-        self._selectedServer = None
         self._worker = None
         return True
 

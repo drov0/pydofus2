@@ -56,7 +56,6 @@ class SynchronisationFrame(Frame):
         if isinstance(msg, CurrentMapMessage):
             rplmvf: "RoleplayMovementFrame" = Kernel().worker.getFrame("RoleplayMovementFrame")
             if rplmvf and rplmvf._changeMapTimeout:
-                Logger().debug("Cancel change map timeout")
                 rplmvf._changeMapTimeout.cancel()
                 rplmvf._wantToChangeMap = None
                 rplmvf._changeMapFails = 0

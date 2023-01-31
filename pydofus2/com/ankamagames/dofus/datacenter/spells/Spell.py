@@ -82,7 +82,7 @@ class Spell(IDataCenter):
         return self._spellVariant
 
     def getSpellLevel(self, level: int):
-        self.spellLevelsInfo
+        _ = self.spellLevelsInfo
         index: int = 0
         if len(self.spellLevels) >= level and level > 0:
             index = level - 1
@@ -92,11 +92,8 @@ class Spell(IDataCenter):
     def spellLevelsInfo(self) -> list:
         from pydofus2.com.ankamagames.dofus.datacenter.spells.SpellLevel import SpellLevel
 
-        if not self._spellLevels or len(self._spellLevels) != len(self.spellLevels):
-            levelCount = len(self.spellLevels)
-            self._spellLevels = [None] * levelCount
-            for i in range(levelCount):
-                self._spellLevels[i] = SpellLevel.getLevelById(self.spellLevels[i])
+        if self._spellLevels is None or len(self._spellLevels) != len(self.spellLevels):
+            self._spellLevels = [SpellLevel.getLevelById(spellLvl) for spellLvl in self.spellLevels]
         return self._spellLevels
 
     def getScriptId(self, critical: bool = False) -> int:

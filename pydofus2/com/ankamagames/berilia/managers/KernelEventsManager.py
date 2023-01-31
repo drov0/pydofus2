@@ -1,7 +1,6 @@
-import threading
 from pydofus2.com.ankamagames.berilia.managers.EventsHandler import EventsHandler
+from pydofus2.com.ankamagames.jerakine.logger.Logger import Logger
 from pydofus2.com.ankamagames.jerakine.metaclasses.Singleton import Singleton
-from whistle import Event, EventDispatcher
 from enum import Enum
 
 
@@ -41,7 +40,7 @@ class KernelEventsManager(EventsHandler, metaclass=Singleton):
                 self.remove_listener(KernelEvts.FRAME_PUSHED, onEvt)
                 callback(*args)
         self.on(KernelEvts.FRAME_PUSHED, onEvt)
-
+        
     def send(self, event_id: KernelEvts, *args, **kwargs):
         if event_id == KernelEvts.CRASH:
             self._crashMessage = kwargs.get("message", None)

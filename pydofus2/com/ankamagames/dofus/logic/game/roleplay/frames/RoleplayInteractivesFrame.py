@@ -1,5 +1,4 @@
 from typing import TYPE_CHECKING
-
 from pydofus2.com.ankamagames.atouin.managers.MapDisplayManager import MapDisplayManager
 from pydofus2.com.ankamagames.dofus.datacenter.interactives.Interactive import Interactive
 from pydofus2.com.ankamagames.dofus.datacenter.jobs.Skill import Skill
@@ -47,12 +46,10 @@ from pydofus2.com.ankamagames.jerakine.messages.Frame import Frame
 from pydofus2.com.ankamagames.jerakine.messages.Message import Message
 from pydofus2.com.ankamagames.jerakine.types.enums.Priority import Priority
 from pydofus2.com.ankamagames.jerakine.types.positions.MapPoint import MapPoint
-
 if TYPE_CHECKING:
     from pydofus2.com.ankamagames.dofus.logic.game.roleplay.frames.RoleplayEntitiesFrame import RoleplayEntitiesFrame
     from pydofus2.com.ankamagames.dofus.logic.game.roleplay.frames.RoleplayMovementFrame import RoleplayMovementFrame
     from pydofus2.com.ankamagames.dofus.logic.game.roleplay.frames.RoleplayWorldFrame import RoleplayWorldFrame
-
 
 class CollectableElement:
     def __init__(self, id: int, interactiveSkill: InteractiveElementSkill, enabled: bool):
@@ -76,8 +73,7 @@ class InteractiveElementData:
         self.element = element
         self.position = position
         self.skillUID = skillUID
-
-
+        
 class RoleplayInteractivesFrame(Frame):
 
     COLLECTABLE_COLLECTING_STATE_ID: int = 2
@@ -86,40 +82,18 @@ class RoleplayInteractivesFrame(Frame):
 
     ACTION_COLLECTABLE_RESOURCES: int = 1
 
-    _ie: dict[int, InteractiveElementData]
-
-    _currentUsages: list
-
-    _entities: dict
-
-    _usingInteractive: bool = False
-
-    _nextInteractiveUsed: object = None
-
-    _interactiveActionTimers: dict
-
-    _enableWorldInteraction: bool = True
-
-    _collectableSpritesToBeStopped: dict
-
-    _currentRequestedElementId: int = -1
-
-    _currentUsedElementId: int = -1
-
-    _collectableIe = dict[int, dict]()
-
-    dirmov: int = 666
-
     REVIVE_SKILL_ID = 211
 
     def __init__(self):
+        self._usingInteractive: bool = False
         self._ie = dict[int, InteractiveElementData]()
         self._collectableIe = dict[int, CollectableElement]()
         self._currentUsages = list()
         self._entities = dict()
         self._interactiveActionTimers = dict()
-        self._collectableSpritesToBeStopped = dict()
         self._statedElementsTargetAnimation = dict()
+        self._currentRequestedElementId: int = -1
+        self._currentUsedElementId: int = -1
         super().__init__()
 
     @property
@@ -151,18 +125,6 @@ class RoleplayInteractivesFrame(Frame):
         self._usingInteractive = pUsing
 
     @property
-    def nextInteractiveUsed(self) -> object:
-        return self._nextInteractiveUsed
-
-    @nextInteractiveUsed.setter
-    def nextInteractiveUsed(self, object: object) -> None:
-        self._nextInteractiveUsed = object
-
-    @property
-    def worldInteractionIsEnable(self) -> bool:
-        return self._enableWorldInteraction
-
-    @property
     def interactives(self) -> dict[int, InteractiveElementData]:
         return self._ie
 
@@ -171,7 +133,6 @@ class RoleplayInteractivesFrame(Frame):
         return self._collectableIe
 
     def pushed(self) -> bool:
-        # Logger().debug("InteractiveElement pushed")
         return True
 
     def process(self, msg: Message) -> bool:
@@ -204,7 +165,7 @@ class RoleplayInteractivesFrame(Frame):
 
         if isinstance(msg, InteractiveUsedMessage):
             iumsg = msg
-            if PlayedCharacterManager().id == iumsg.entityId and iumsg.duration > 0:
+            if float(PlayedCharacterManager().id) == float(iumsg.entityId) and iumsg.duration > 0:
                 self._currentUsedElementId = iumsg.elemId
             if self._currentRequestedElementId == iumsg.elemId:
                 self._currentRequestedElementId = -1
@@ -254,7 +215,7 @@ class RoleplayInteractivesFrame(Frame):
 
         if isinstance(msg, InteractiveUseEndedMessage):
             iuemsg = msg
-            self.interactiveUsageFinished(self._entities[iuemsg.elemId], iuemsg.elemId, iuemsg.skillId)
+            self.interactiveUsageFinished(self._entities[iuemsg.elemId])
             del self._entities[iuemsg.elemId]
             del self._collectableIe[iuemsg.elemId]
             return False
@@ -268,14 +229,9 @@ class RoleplayInteractivesFrame(Frame):
         self._entities.clear()
         self._ie.clear()
         self._currentUsages.clear()
-        self._nextInteractiveUsed = None
         self._interactiveActionTimers.clear()
         self._collectableIe.clear()
-        # Logger().debug("InteractiveElement pulled")
         return True
-
-    def enableWorldInteraction(self, pEnable: bool) -> None:
-        self._enableWorldInteraction = pEnable
 
     def clear(self) -> None:
         self._ie.clear()
@@ -339,20 +295,6 @@ class RoleplayInteractivesFrame(Frame):
                         ie.skillUID = skill.skillInstanceUid
                         return ie
 
-    def getNearestIeToPosition(self, position: MapPoint, skillId: int) -> InteractiveElementData:
-        minDist = float("inf")
-        target = None
-        for ie in self._ie.values():
-            if ie.element.enabledSkills:
-                for skill in ie.element.enabledSkills:
-                    if skill.skillId == skillId:
-                        dist = position.distanceTo(ie.position)
-                        if dist < minDist:
-                            dist = minDist
-                            target = ie
-                            target.skillUID = skill.skillInstanceUid
-        return target
-
     def updateStatedElement(self, se: StatedElement, globalv: bool = False) -> None:
         if se.elementId == self._currentUsedElementId:
             self._usingInteractive = True
@@ -370,17 +312,9 @@ class RoleplayInteractivesFrame(Frame):
         )
         Kernel().worker.process(msg)
 
-    def interactiveUsageFinished(self, entityId: float, elementId: int, skillId: int) -> None:
+    def interactiveUsageFinished(self, entityId: float) -> None:
         if entityId == PlayedCharacterManager().id:
             if self.roleplayWorldFrame:
                 self.roleplayWorldFrame.cellClickEnabled = True
             self._usingInteractive = False
             self._currentUsedElementId = -1
-            if self._nextInteractiveUsed:
-                ieamsg = InteractiveElementActivationMessage(
-                    self._nextInteractiveUsed.ie,
-                    self._nextInteractiveUsed.position,
-                    self._nextInteractiveUsed.skillInstanceId,
-                )
-                self._nextInteractiveUsed = None
-                Kernel().worker.process(ieamsg)

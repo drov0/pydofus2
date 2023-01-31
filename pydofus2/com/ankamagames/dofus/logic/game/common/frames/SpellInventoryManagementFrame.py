@@ -316,7 +316,7 @@ class SpellInventoryManagementFrame(Frame, metaclass=Singleton):
     def pulled(self) -> bool:
         return True
 
-    def getFullSpellListByOwnerId(self, ownerId: float) -> list:
+    def getFullSpellListByOwnerId(self, ownerId: float) -> list['SpellWrapper']:
         return self._fullSpellList[ownerId]
 
     def addSpellGlobalCoolDownInfo(self, pEntityId: float, pGameFightSpellCooldown: GameFightSpellCooldown) -> None:

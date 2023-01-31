@@ -19,30 +19,21 @@ if TYPE_CHECKING:
 
 class SpellCastInFightManager:
 
-    _spells: dict[int, SpellManager]
-
-    _storedSpellCooldowns: list[GameFightSpellCooldown]
-
-    currentTurn: int = 1
-
-    entityId: float
-
-    needCooldownUpdate: bool = False
-
     def __init__(self, entityId: float):
-        self._spells = dict()
-        super().__init__()
+        self._spells = dict[int, SpellManager]()
         self.entityId = entityId
+        self._storedSpellCooldowns: list[GameFightSpellCooldown]
+        self.currentTurn: int = 1
+        self.needCooldownUpdate: bool = False
 
     def nextTurn(self) -> None:
-        spell: SpellManager = None
         self.currentTurn += 1
         for spell in self._spells.values():
             spell.newTurn()
 
     def resetInitialCooldown(self, hasBeenSummoned: bool = False) -> None:
         spim: "SpellInventoryManagementFrame" = Kernel().worker.getFrame("SpellInventoryManagementFrame")
-        spellList: list = spim.getFullSpellListByOwnerId(self.entityId)
+        spellList = spim.getFullSpellListByOwnerId(self.entityId)
         for spellWrapper in spellList:
             if spellWrapper.spellLevelInfos.initialCooldown != 0:
                 if hasBeenSummoned and spellWrapper.actualCooldown > spellWrapper.spellLevelInfos.initialCooldown:

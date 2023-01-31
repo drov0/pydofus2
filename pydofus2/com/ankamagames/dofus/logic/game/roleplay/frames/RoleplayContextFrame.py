@@ -102,7 +102,6 @@ class RoleplayContextFrame(Frame):
             return False
 
         elif isinstance(msg, MapLoadedMessage):
-            Logger().debug("[RoleplayContext] Map loaded will push other roleplay frames")
             Kernel().worker.addFrame(self._entitiesFrame)
             Kernel().worker.addFrame(self._worldFrame)
             Kernel().worker.addFrame(self.movementFrame)

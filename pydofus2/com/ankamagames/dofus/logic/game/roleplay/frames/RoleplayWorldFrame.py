@@ -244,7 +244,6 @@ class RoleplayWorldFrame(Frame):
                     if not forbiddenCellsIds:
                         forbiddenCellsIds = []
                     forbiddenCellsIds.append(mp.cellId)
-        # Logger().debug("Forbidden cells: %s", forbiddenCellsIds)
         ieCellData = cells[iePos.cellId]
 
         if ie:
@@ -264,7 +263,6 @@ class RoleplayWorldFrame(Frame):
             nearestCell = PlayedCharacterManager().entity.position
         else:
             orientationToCell = iePos.advancedOrientationTo(PlayedCharacterManager().entity.position)
-            # Logger().debug("Orientation to cell: %s", DirectionsEnum(orientationToCell).name)
             nearestCell = iePos.getNearestFreeCellInDirection(
                 orientationToCell,
                 DataMapProvider(),
@@ -273,7 +271,6 @@ class RoleplayWorldFrame(Frame):
                 False,
                 forbiddenCellsIds,
             )
-            # Logger().debug("Nearest cell: %s", nearestCell)
             if minimalRange > 1:
                 for _ in range(minimalRange - 1):
                     forbiddenCellsIds.append(nearestCell.cellId)

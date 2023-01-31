@@ -188,15 +188,12 @@ class RoleplayEntitiesFrame(AbstractEntitiesFrame, Frame):
         self._monstersIds = list[float]()
         self._entitiesVisibleNumber = 0
         self.mcidm_processessed = False
-        Logger().debug("pushing RoleplayEntitiesFrame")
         if MapDisplayManager()._currentMapRendered:
-            Logger().debug("Map already rendered, sending MapInformationsRequestMessage")
             mirmsg = MapInformationsRequestMessage()
             mirmsg.init(mapId_=MapDisplayManager().currentMapPoint.mapId)
             ConnectionsHandler().conn.send(mirmsg)
             self._waitForMap = False
         else:
-            Logger().debug("Map not rendered, waiting for MapLoadedMessage")
             self._waitForMap = True
         self._interactiveElements = list[InteractiveElement]()
         return super().pushed()
@@ -389,18 +386,15 @@ class RoleplayEntitiesFrame(AbstractEntitiesFrame, Frame):
 
             elif PlayedCharacterManager().isInAnomaly:
                 PlayedCharacterManager().isInAnomaly = False
-
-            Logger().debug("MapComplementaryInformationsDataMessage processed")
+                
             KernelEventsManager().send(KernelEvts.MAPPROCESSED)
             self.mcidm_processessed = True
             return False
 
         if isinstance(msg, CharacterMovementStoppedMessage):
-            # TODO: notify bot here that he stopped moving for some usecases
             return True
 
         if isinstance(msg, GameRolePlayShowActorMessage):
-            KernelEventsManager().send(KernelEvts.ACTORSHOWED, msg.informations)
             if int(msg.informations.contextualId) == int(PlayedCharacterManager().id):
                 humi: HumanInformations = msg.informations.humanoidInfo
                 PlayedCharacterManager().restrictions = humi.restrictions
@@ -412,6 +406,8 @@ class RoleplayEntitiesFrame(AbstractEntitiesFrame, Frame):
             if isinstance(msg.informations, GameRolePlayMerchantInformations):
                 self._merchantsList.append(msg.informations)
                 self._merchantsList.sort(key=lambda e: e.name)
+            if not isinstance(msg.informations, GameRolePlayGroupMonsterInformations):
+                KernelEventsManager().send(KernelEvts.ACTORSHOWED, msg.informations)
             return True
 
         if isinstance(msg, GameRolePlayShowMultipleActorsMessage):

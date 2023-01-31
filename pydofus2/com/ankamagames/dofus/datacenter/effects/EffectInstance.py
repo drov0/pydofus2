@@ -73,11 +73,11 @@ class EffectInstance(IDataCenter):
 
         self.dispellable: int = 1
 
-        self.zoneSize: object = None
+        self.zoneSize: int = None
 
         self.zoneShape: int = None
 
-        self.zoneMinSize: object = None
+        self.zoneMinSize: int = None
 
         self.zoneEfficiencyPercent: object = None
 

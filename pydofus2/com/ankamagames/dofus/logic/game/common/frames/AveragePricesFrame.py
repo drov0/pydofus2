@@ -74,9 +74,10 @@ class AveragePricesFrame(Frame):
             oapm = pMsg
             self.updatePricesData(oapm.ids, oapm.avgPrices)
             return True
+        
         if isinstance(pMsg, ObjectAveragePricesErrorMessage):
-            Logger().error("Error while getting average prices!")
             return True
+        
         else:
             return False
 

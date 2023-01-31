@@ -115,7 +115,7 @@ if TYPE_CHECKING:
 
 class RoleplayMovementFrame(Frame):
     CONSECUTIVE_MOVEMENT_DELAY: int = 0.25
-    VERBOSE = True
+    VERBOSE = False
     CHANGEMAP_TIMEOUT = 10
     ATTACKMOSTERS_TIMEOUT = 10
     JOINFIGHT_TIMEOUT = 10
@@ -226,7 +226,6 @@ class RoleplayMovementFrame(Frame):
         self._joinFightTimer = BenchmarkTimer(self.JOINFIGHT_TIMEOUT, self.joinFight, [fighterId, fightId])
         self._joinFightTimer.start()
         self._joinFightFails += 1
-        Logger().debug("[RolePlayMovement] Join fight timer started")
 
     def process(self, msg: Message) -> bool:
         if Kernel().worker.contains("FightContextFrame"):
@@ -294,8 +293,6 @@ class RoleplayMovementFrame(Frame):
             if float(gmmmsg.actorId) == float(PlayedCharacterManager().id):
                 if self._moveRequestTimer:
                     self._moveRequestTimer.cancel()
-                if self._isRequestingMovement:
-                    Logger().debug("[RolePlayMovement] Move request accepted")
             movedEntity = DofusEntities().getEntity(gmmmsg.actorId)
             clientMovePath = MapMovementAdapter.getClientMovement(gmmmsg.keyMovements)
             if movedEntity is not None:
@@ -329,12 +326,11 @@ class RoleplayMovementFrame(Frame):
                     pathDuration = max(1, 1 * clientMovePath.getCrossingDuration(True))
                 if self._movementAnimTimer:
                     self._movementAnimTimer.cancel()
-                timer_uuid = uuid.uuid4().hex
                 self._movementAnimTimer = BenchmarkTimer(
-                    pathDuration + 0.3, self.onMovementAnimEnd, [movedEntity, timer_uuid]
+                    pathDuration + 0.3, self.onMovementAnimEnd, [movedEntity]
                 )
                 self._movementAnimTimer.start()
-                Logger().debug(f"[MapMovement] timer - {timer_uuid} : Movement anim started")
+                Logger().debug(f"[MapMovement] Movement anim started")
             return True
 
         elif isinstance(msg, EntityMovementCompleteMessage):
@@ -517,12 +513,11 @@ class RoleplayMovementFrame(Frame):
         self._joinFightTimer = None
         return True
 
-    def onMovementAnimEnd(self, movedEntity: IEntity, timer_uuid) -> None:
-        Logger().debug(f"[RolePlayMovement] timer - {timer_uuid} : Movement animation ended")
+    def onMovementAnimEnd(self, movedEntity: IEntity) -> None:
+        Logger().debug(f"[RolePlayMovement] Movement animation ended")
         if self._movementAnimTimer:
             self._movementAnimTimer.cancel()
         self._isMoving = False
-        KernelEventsManager().send(KernelEvts.MOVEMENT_STOPPED)
         Kernel().worker.process(EntityMovementCompleteMessage(movedEntity))
 
     def setNextMoveMapChange(self, mapId: float, autoTrip: bool = False) -> None:
@@ -550,13 +545,12 @@ class RoleplayMovementFrame(Frame):
         playerEntity: AnimatedCharacter = DofusEntities().getEntity(PlayedCharacterManager().id)
         playerRpZone = PlayedCharacterManager().currentZoneRp
         dstCellRpZone = MapDisplayManager().dataMap.cells[cell.cellId].linkedZoneRP
-        Logger().debug(f"[RolePlayMovement] Dst cellRpZone is {dstCellRpZone} and playerRpZone is {playerRpZone}")
         if playerRpZone != dstCellRpZone:
             Logger().warning("[RolePlayMovement] Dst cell and curent player cell are not in the same rp zone")
         if playerEntity.position.cellId == cell.cellId:
             Logger().debug("[RolePlayMovement] Already on the cell")
         Logger().debug(
-            f"[RolePlayMovement] Asking move from cell {playerEntity.position.cellId} to cell {cell}, can Move {self._canMove}"
+            f"[RolePlayMovement] Asking move from cell {playerEntity.position.cellId} to cell {cell.cellId}"
         )
         if not self._canMove or PlayedCharacterManager().state == PlayerLifeStatusEnum.STATUS_TOMBSTONE:
             Logger().debug("[RolePlayMovement] Can't move or dead, aborting")

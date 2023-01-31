@@ -7,11 +7,7 @@ class I18n(AbstractDataManager):
     
     def __init__(self):
         super().__init__()
-
-    @classmethod
-    def addOverride(cls, id: int, newId: int) -> None:
-        I18nFileAccessor().overrideId(id, newId)
-
+        
     @classmethod
     def getText(cls, id: int, params: list = None, replace: str = "%") -> str:
         if not id:

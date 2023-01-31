@@ -138,16 +138,12 @@ class SpellLevel(ICellZoneProvider, IDataCenter):
     @property
     def spellZoneEffects(self) -> list[IZoneShape]:
         if not self._spellZoneEffects:
-            self._spellZoneEffects = list[IZoneShape]()
-            numEffects = len(self.effects)
-            for i in range(numEffects):
-                zone = ZoneEffect(int(self.effects[i].zoneSize), self.effects[i].zoneShape)
-                self._spellZoneEffects.append(zone)
+            self._spellZoneEffects = [ZoneEffect(int(e.zoneSize), e.zoneShape) for e in self.effects]
         return self._spellZoneEffects
 
     def hasZoneShape(self, zoneShape: int) -> bool:
-        for i in range(len(self.spellZoneEffects)):
-            if self._spellZoneEffects[i].zoneShape == zoneShape:
+        for spze in self.spellZoneEffects:
+            if spze.zoneShape == zoneShape:
                 return True
         return False
 
@@ -175,9 +171,6 @@ class SpellLevel(ICellZoneProvider, IDataCenter):
 
     @property
     def canBomb(self) -> bool:
-        effect: EffectInstanceDice = None
-        summonId: int = 0
-        monsterS: Monster = None
         for effect in self.effects:
             if effect.effectId == ActionIds.ACTION_SUMMON_BOMB:
                 return True
@@ -194,7 +187,6 @@ class SpellLevel(ICellZoneProvider, IDataCenter):
 
     @property
     def canThrowPlayer(self) -> bool:
-        effect: "EffectInstanceDice" = None
         for effect in self.effects:
             if effect.effectId == ActionIds.ACTION_THROW_CARRIED_CHARACTER:
                 return True

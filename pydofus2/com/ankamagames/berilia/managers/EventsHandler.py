@@ -1,11 +1,14 @@
 import threading
 from whistle import Event, EventDispatcher
+from pydofus2.com.ankamagames.jerakine.logger.Logger import Logger
 
-
+lock = threading.Lock()
 class EventsHandler(EventDispatcher):
 
     def __init__(self):
         super().__init__()
+        self._listeners = {}
+        self._sorted = {}
         self.__waiting_evts = list[threading.Event]()
         self._crashMessage = None
 
@@ -24,22 +27,32 @@ class EventsHandler(EventDispatcher):
             raise Exception(self._crashMessage)
         return ret[0]
 
-    def on(self, event, callback):
-        self.add_listener(event, callback)
+    def on(self, event_id, listener, priority=0):
+        with lock:
+            if event_id not in self._listeners:
+                self._listeners[event_id] = {}
+                
+            if priority not in self._listeners[event_id]:
+                self._listeners[event_id][priority] = []
+            self._listeners[event_id][priority].append(listener)
+            
+            if event_id in self._sorted:
+                del self._sorted[event_id]
         
     def once(self, event, callback):
         def onEvt(e, *args, **kwargs):
             self.remove_listener(event, onEvt)
             callback(e, *args, **kwargs)
-        self.add_listener(event, onEvt)
+        self.on(event, onEvt)
 
     def send(self, event_id, *args, **kwargs):
         event = Event()
         event.sender = self
         event.name = event_id
-        if event_id not in self._listeners:
+        if not self._listeners.get(event_id):
             return event
-        for listener in self.get_listeners(event_id):
+        event_listeners = self.get_listeners(event_id)
+        for listener in event_listeners:
             listener(event, *args, **kwargs)
             if event.propagation_stopped:
                 break

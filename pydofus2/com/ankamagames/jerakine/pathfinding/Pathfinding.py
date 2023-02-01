@@ -1,5 +1,5 @@
 import heapq
-import math
+from pydofus2.com.ankamagames.jerakine.logger.Logger import Logger
 from pydofus2.com.ankamagames.jerakine.metaclasses.Singleton import Singleton
 import pydofus2.mapTools.MapTools as MapTools
 from pydofus2.com.ankamagames.jerakine.map.IDataMapProvider import IDataMapProvider
@@ -211,8 +211,6 @@ class Pathfinding(metaclass=Singleton):
                     totalCost = heuristic + moveCost
                     heapq.heappush(open_list, (totalCost, cellId))
         movPath = self.buildPath()
-        if self.VERBOSE:
-            logger.debug(f"[CellPathFinding] Path found: {movPath}")
         return movPath
 
     def getMapPointWeight(self, x, y):

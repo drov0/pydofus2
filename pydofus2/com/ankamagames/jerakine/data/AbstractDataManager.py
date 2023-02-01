@@ -1,6 +1,4 @@
-from pydofus2.com.ankamagames.jerakine.logger.Logger import Logger
 import math
-from pydofus2.com.ankamagames.jerakine.logger.Logger import Logger
 from pydofus2.com.ankamagames.jerakine import JerakineConstants
 from pydofus2.com.ankamagames.jerakine.managers.StoreDataManager import StoreDataManager
 from pydofus2.com.ankamagames.jerakine.newCache.ICache import ICache

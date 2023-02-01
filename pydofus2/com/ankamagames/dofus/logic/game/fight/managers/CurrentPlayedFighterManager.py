@@ -14,7 +14,6 @@ if TYPE_CHECKING:
     from pydofus2.com.ankamagames.dofus.internalDatacenter.spells.SpellWrapper import (
         SpellWrapper,
     )
-import pydofus2.com.ankamagames.dofus.kernel.Kernel as knl
 from pydofus2.com.ankamagames.dofus.logic.game.common.misc.DofusEntities import DofusEntities
 import pydofus2.com.ankamagames.dofus.logic.game.fight.managers.SpellCastInFightManager as scifm
 from pydofus2.com.ankamagames.dofus.logic.game.fight.types.castSpellManager.SpellManager import (

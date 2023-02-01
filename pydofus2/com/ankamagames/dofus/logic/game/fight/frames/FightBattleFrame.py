@@ -112,76 +112,73 @@ class FightBattleFrame(Frame):
 
     FIGHT_SEQUENCER_NAME: str = "FightBattleSequencer"
 
-    isFightAboutToEnd: bool = False
-
-    _sequenceFrameSwitcher: FightSequenceSwitcherFrame = None
-
-    _turnFrame: FightTurnFrame = None
-
-    _currentSequenceFrame: fseqf.FightSequenceFrame = None
-
-    _sequenceFrames: list[fseqf.FightSequenceFrame] = []
-
-    _executingSequence: bool = False
-
-    _confirmTurnEnd: bool = None
-
-    _endBattle: bool = False
-
-    _battleResults: GameFightEndMessage = None
-
-    _refreshTurnsList: bool = None
-
-    _newTurnsList: list[float] = None
-
-    _newDeadTurnsList: list[float] = []
-
-    _turnsList: list[float] = None
-
-    _deadTurnsList: list[float] = []
-
-    _playerTargetedEntitiesList: list[float] = None
-
-    _fightIsPaused: bool = False
-
-    _deathPlayingNumber: int = 0
-
-    _synchroniseFighters: list[GameFightFighterInformations] = None
-
-    _synchroniseFightersInstanceId: int = 4.294967295e9
-
-    _neverSynchronizedBefore: bool = True
-
-    _delayCslmsg: CharacterStatsListMessage = None
-
-    _playerNewTurn: AnimatedCharacter = None
-
-    _turnsCount: int = 0
-
-    _destroyed: bool = False
-
-    _playingSlaveEntity: bool = False
-
-    _lastPlayerId: float = None
-
-    _nextLastPlayerId: float = None
-
-    _currentPlayerId: float = None
-
-    _masterId: float = None
-
-    _slaveId: float = None
-
-    _autoEndTurn: bool = False
-
-    _newWave: bool = False
-
-    _newWaveId: int = 0
-
-    _sequenceFrameCached: fseqf.FightSequenceFrame = None
-
     def __init__(self):
         self._playerTargetedEntitiesList = list[float]()
+
+        self.isFightAboutToEnd: bool = False
+
+        self._sequenceFrameSwitcher: FightSequenceSwitcherFrame = None
+
+        self._turnFrame: FightTurnFrame = None
+
+        self._currentSequenceFrame: fseqf.FightSequenceFrame = None
+
+        self._sequenceFrames: list[fseqf.FightSequenceFrame] = []
+
+        self._executingSequence: bool = False
+
+        self._confirmTurnEnd: bool = None
+
+        self._endBattle: bool = False
+
+        self._battleResults: GameFightEndMessage = None
+
+        self._refreshTurnsList: bool = None
+
+        self._newTurnsList: list[float] = None
+
+        self._newDeadTurnsList: list[float] = []
+
+        self._turnsList: list[float] = None
+
+        self._deadTurnsList: list[float] = []
+
+        self._fightIsPaused: bool = False
+
+        self._deathPlayingNumber: int = 0
+
+        self._synchroniseFighters: list[GameFightFighterInformations] = None
+
+        self._synchroniseFightersInstanceId: int = 4.294967295e9
+
+        self._neverSynchronizedBefore: bool = True
+
+        self._delayCslmsg: CharacterStatsListMessage = None
+
+        self._playerNewTurn: AnimatedCharacter = None
+
+        self._turnsCount: int = 0
+
+        self._destroyed: bool = False
+
+        self._playingSlaveEntity: bool = False
+
+        self._lastPlayerId: float = None
+
+        self._nextLastPlayerId: float = None
+
+        self._currentPlayerId: float = None
+
+        self._masterId: float = None
+
+        self._slaveId: float = None
+
+        self._autoEndTurn: bool = False
+
+        self._newWaveId: int = 0
+
+        self._newWave = False
+        self._sequenceFrameCached: fseqf.FightSequenceFrame = None
         super().__init__()
 
     @property
@@ -571,7 +568,6 @@ class FightBattleFrame(Frame):
                 return
             CurrentPlayedFighterManager().currentFighterId = nextCharacterId
             if nextCharacterId == self._masterId:
-                # FightApi.slaveContext = False
                 CurrentPlayedFighterManager().resetPlayerSpellList()
                 SpellInventoryManagementFrame().applySpellGlobalCoolDownInfo(self._masterId)
             elif nextCharacterId == self._slaveId:
@@ -633,7 +629,7 @@ class FightBattleFrame(Frame):
             self.confirmDelayedTurnEnd()
 
     def sendAcknowledgement(self) -> None:
-        if self._sequenceFrameCached == None:
+        if self._sequenceFrameCached is None:
             return
         ack: GameActionAcknowledgementMessage = GameActionAcknowledgementMessage()
         ack.init(True, self._sequenceFrameCached.ackIdent)

@@ -6,7 +6,6 @@ from pydofus2.com.ankamagames.dofus.kernel.net.DisconnectionReasonEnum import Di
 from pydofus2.com.ankamagames.dofus.logic.common.managers.PlayerManager import PlayerManager
 from pydofus2.com.ankamagames.dofus.logic.connection.frames.HandshakeFrame import HandshakeFrame
 from pydofus2.com.ankamagames.jerakine.logger.Logger import Logger
-from pydofus2.com.ankamagames.jerakine.messages.ConnectionResumedMessage import ConnectionResumedMessage
 from pydofus2.com.ankamagames.jerakine.metaclasses.Singleton import Singleton
 from pydofus2.com.ankamagames.jerakine.network.INetworkMessage import INetworkMessage
 from pydofus2.com.ankamagames.jerakine.network.ServerConnection import ServerConnection

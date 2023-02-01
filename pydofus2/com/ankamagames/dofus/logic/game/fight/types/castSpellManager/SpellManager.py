@@ -14,7 +14,6 @@ if TYPE_CHECKING:
 from pydofus2.com.ankamagames.dofus.network.enums.CharacterSpellModificationTypeEnum import (
     CharacterSpellModificationTypeEnum,
 )
-from pydofus2.com.ankamagames.jerakine.logger.Logger import Logger
 
 
 class SpellManager:

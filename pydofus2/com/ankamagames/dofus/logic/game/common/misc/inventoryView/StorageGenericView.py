@@ -7,7 +7,6 @@ from pydofus2.com.ankamagames.dofus.logic.game.common.frames.AveragePricesFrame 
 )
 import pydofus2.com.ankamagames.dofus.logic.game.common.managers.StorageOptionManager as storageoptmgr
 from pydofus2.com.ankamagames.dofus.logic.game.common.misc.IStorageView import IStorageView
-from pydofus2.com.ankamagames.jerakine.logger.Logger import Logger
 
 
 class StorageGenericView(IStorageView):

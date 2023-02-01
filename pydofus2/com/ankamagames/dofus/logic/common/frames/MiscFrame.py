@@ -21,7 +21,6 @@ from pydofus2.com.ankamagames.dofus.network.types.game.approach.ServerSessionCon
 from pydofus2.com.ankamagames.dofus.network.types.game.approach.ServerSessionConstantString import (
     ServerSessionConstantString,
 )
-from pydofus2.com.ankamagames.jerakine.logger.Logger import Logger
 from pydofus2.com.ankamagames.jerakine.messages.Frame import Frame
 from pydofus2.com.ankamagames.jerakine.messages.Message import Message
 from pydofus2.com.ankamagames.jerakine.metaclasses.Singleton import Singleton

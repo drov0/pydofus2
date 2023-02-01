@@ -1,6 +1,5 @@
 import importlib
 import os
-import sys
 from pydofus2.com.ankamagames.jerakine.logger.Logger import Logger
 from pydofus2.com.ankamagames.jerakine.network.CustomDataWrapper import ByteArray
 import pydofus2.com.ankamagames.jerakine.network.NetworkMessage as bnm

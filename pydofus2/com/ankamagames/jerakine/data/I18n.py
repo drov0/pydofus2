@@ -1,6 +1,5 @@
 from pydofus2.com.ankamagames.jerakine.data.I18nFileAccessor import I18nFileAccessor
 from pydofus2.com.ankamagames.jerakine.data.AbstractDataManager import AbstractDataManager
-from pydofus2.com.ankamagames.jerakine.logger.Logger import Logger
 
 
 class I18n(AbstractDataManager):

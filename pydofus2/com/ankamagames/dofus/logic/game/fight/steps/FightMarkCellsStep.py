@@ -85,15 +85,15 @@ class FightMarkCellsStep(AbstractSequencable, IFightStep):
         )
         mi: MarkInstance = MarkedCellsManager().getMarkDatas(self._markId)
         if mi:
-            evt = FightEventEnum.UNKNOWN_FIGHT_EVENT
+            FightEventEnum.UNKNOWN_FIGHT_EVENT
             if mi.markType == GameActionMarkTypeEnum.GLYPH:
-                evt = FightEventEnum.GLYPH_APPEARED
+                FightEventEnum.GLYPH_APPEARED
             if mi.markType == GameActionMarkTypeEnum.TRAP:
-                evt = FightEventEnum.TRAP_APPEARED
+                FightEventEnum.TRAP_APPEARED
             if mi.markType == GameActionMarkTypeEnum.PORTAL:
-                evt = FightEventEnum.PORTAL_APPEARED
+                FightEventEnum.PORTAL_APPEARED
             if mi.markType == GameActionMarkTypeEnum.RUNE:
-                evt = FightEventEnum.RUNE_APPEARED
+                FightEventEnum.RUNE_APPEARED
             else:
                 Logger().warn(f"Unknown mark type ({mi.markType}).")
         self.executeCallbacks()

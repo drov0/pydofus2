@@ -66,7 +66,6 @@ from pydofus2.com.ankamagames.dofus.network.ProtocolConstantsEnum import Protoco
 from pydofus2.com.ankamagames.dofus.network.enums.CharacterInventoryPositionEnum import (
     CharacterInventoryPositionEnum,
 )
-from pydofus2.com.ankamagames.jerakine.logger.Logger import Logger
 from pydofus2.com.ankamagames.jerakine.metaclasses.Singleton import Singleton
 from typing import TYPE_CHECKING
 

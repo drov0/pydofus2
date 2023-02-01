@@ -1,5 +1,4 @@
 import threading
-from pydofus2.com.ankamagames.jerakine.logger.Logger import Logger
 
 
 class Singleton(type):

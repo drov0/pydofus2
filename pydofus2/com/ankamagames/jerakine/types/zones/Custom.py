@@ -1,4 +1,3 @@
-from pydofus2.com.ankamagames.jerakine.logger.Logger import Logger
 from pydofus2.com.ankamagames.jerakine.types.zones.IZone import IZone
 
 

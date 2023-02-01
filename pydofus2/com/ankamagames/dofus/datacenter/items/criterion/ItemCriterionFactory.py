@@ -49,7 +49,6 @@ from pydofus2.com.ankamagames.dofus.datacenter.items.criterion.SubscribeItemCrit
     SubscribeItemCriterion,
 )
 from pydofus2.com.ankamagames.dofus.datacenter.items.criterion.WeightItemCriterion import WeightItemCriterion
-from pydofus2.com.ankamagames.jerakine.logger.Logger import Logger
 from pydofus2.com.ankamagames.dofus.datacenter.items.criterion.IItemCriterion import (
     IItemCriterion,
 )

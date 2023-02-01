@@ -8,7 +8,6 @@ from pydofus2.com.ankamagames.dofus.network.enums.CharacterSpellModificationType
 from pydofus2.com.ankamagames.dofus.network.types.game.context.fight.GameFightSpellCooldown import (
     GameFightSpellCooldown,
 )
-from pydofus2.com.ankamagames.jerakine.logger.Logger import Logger
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:

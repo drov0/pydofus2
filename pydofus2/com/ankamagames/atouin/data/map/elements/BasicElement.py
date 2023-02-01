@@ -1,6 +1,5 @@
 from pydofus2.com.ankamagames.atouin.data.map.Cell import Cell
 from pydofus2.com.ankamagames.atouin.enums.ElementTypesEnum import ElementTypesEnum
-from pydofus2.com.ankamagames.jerakine.logger.Logger import Logger
 from pydofus2.com.ankamagames.jerakine.network.CustomDataWrapper import ByteArray
 
 

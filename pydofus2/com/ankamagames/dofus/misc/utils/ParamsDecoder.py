@@ -61,9 +61,9 @@ class ParamsDecoder:
         return s
 
     def processReplace(type: str, id: str, params: list) -> str:
-        newString = ""
-        if id[1:] == "" and len(params) == 0:
-            return ""
+        newString = ''
+        if id[1:] == '' and len(params) == 0:
+            return ''
         nid = int(float(id[1:])) - 1
         if type == "":
             newString = params[nid]

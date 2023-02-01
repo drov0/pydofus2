@@ -55,6 +55,6 @@ class ChatFrame(Frame):
                 Logger().info(f"text info : {msgContent}")
             else:
                 Logger().error(f"There's no message for id {timsg.msgType * 10000 + timsg.msgId}")
-            return True
+            return False
 
         return False

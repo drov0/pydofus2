@@ -2,7 +2,6 @@ import sys
 from whistle import EventDispatcher
 from pydofus2.com.ankamagames.jerakine.events.SequencerEvent import SequencerEvent
 from pydofus2.com.ankamagames.jerakine.logger.Logger import Logger
-from pydofus2.com.ankamagames.jerakine.network.messages.Worker import Worker
 from pydofus2.com.ankamagames.jerakine.sequencer.IPausableSequencable import IPausableSequencable
 from pydofus2.com.ankamagames.jerakine.sequencer.ISequencable import ISequencable
 from pydofus2.com.ankamagames.jerakine.sequencer.ISequencer import ISequencer

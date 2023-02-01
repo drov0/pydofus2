@@ -12,7 +12,6 @@ from pydofus2.com.ankamagames.dofus.network.messages.connection.IdentificationMe
 from pydofus2.com.ankamagames.jerakine.logger.Logger import Logger
 from pydofus2.com.ankamagames.jerakine.metaclasses.Singleton import Singleton
 from pydofus2.com.ankamagames.jerakine.network.CustomDataWrapper import ByteArray
-from pydofus2.com.ankamagames.jerakine.network.NetworkMessage import NetworkMessage
 from pydofus2.com.ankamagames.jerakine.types.Version import Version
 from pydofus2.com.hurlan.crypto.symmetric.AESKey import AESKey
 from pydofus2.com.hurlan.crypto.symmetric.CBCMode import CBCMode

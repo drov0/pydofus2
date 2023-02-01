@@ -1,5 +1,5 @@
+from functools import lru_cache
 import math
-from pydofus2.com.ankamagames.jerakine.logger.Logger import Logger
 from pydofus2.com.ankamagames.jerakine.types.positions.MapPoint import MapPoint, Point
 from pydofus2.mapTools.MapDirection import MapDirection
 
@@ -17,63 +17,56 @@ COEFF_FOR_REBASE_ON_CLOSEST_8_DIRECTION: float = math.tan(math.pi / 8)
 COORDINATES_DIRECTION: list = ""
 
 
-def getCellsIdBetween(param1: int, param2: int) -> list:
-    mp1 = MapPoint.fromCellId(param1)
-    mp2 = MapPoint.fromCellId(param2)
-    # Logger().debug(f"getCellsIdBetween({mp1}, {mp2})")
-    if param1 == param2:
+def getCellsIdBetween(cell1Id: int, cell2Id: int) -> list:
+    precision = 0.0001
+    mp1 = MapPoint.fromCellId(cell1Id)
+    mp2 = MapPoint.fromCellId(cell2Id)
+    if cell1Id == cell2Id or not (isValidCellId(cell1Id) and isValidCellId(cell2Id)):
         return []
-    if not isValidCellId(param1) or not isValidCellId(param2):
-        return []
+    
     mp1X = mp1.x
     mp1Y = mp1.y
     mp2X = mp2.x
     mp2Y = mp2.y
+    
     xDiff = mp2X - mp1X
     yDiff = mp2Y - mp1Y
-    squareDist: float = float(math.sqrt(xDiff * xDiff + yDiff * yDiff))
-    nxDiff: float = xDiff / squareDist
-    nyDiff: float = yDiff / squareDist
-    xnStep: float = float(abs(1 / nxDiff)) if nxDiff != 0 else float("inf")
-    ynStep: float = float(abs(1 / nyDiff)) if nyDiff != 0 else float("inf")
-    dx: int = -1 if nxDiff < 0 else 1
-    dy: int = -1 if nyDiff < 0 else 1
-    halfXSTep: float = 0.5 * xnStep
-    halfYStep: float = 0.5 * ynStep
-    result: list = []
+    squareDist = math.sqrt(xDiff * xDiff + yDiff * yDiff)
+    
+    nxDiff = xDiff / squareDist    
+    x_step = abs(1 / nxDiff) if nxDiff != 0 else float("inf")
+    x_dir = -1 if nxDiff < 0 else 1
+    curr_x = 0.5 * x_step
+    
+    nyDiff = yDiff / squareDist
+    y_step = abs(1 / nyDiff) if nyDiff != 0 else float("inf")
+    y_dir = -1 if nyDiff < 0 else 1
+    curr_y = 0.5 * y_step
+    
+    result = []
     while mp1X != mp2X or mp1Y != mp2Y:
-        if floatAlmostEquals(halfXSTep, halfYStep):
-            halfXSTep += xnStep
-            halfYStep += ynStep
-            mp1X += dx
-            mp1Y += dy
+        
+        if abs(curr_x - curr_y) < precision:
+            curr_x += x_step
+            curr_y += y_step
+            mp1X += x_dir
+            mp1Y += y_dir
 
-        elif halfXSTep < halfYStep:
-            halfXSTep += xnStep
-            mp1X += dx
+        elif curr_x < curr_y:
+            curr_x += x_step
+            mp1X += x_dir
 
         else:
-            halfYStep += ynStep
-            mp1Y += dy
-        result.append(int(getCellIdByCoord(mp1X, mp1Y)))
+            curr_y += y_step
+            mp1Y += y_dir
+        result.append(getCellIdByCoord(mp1X, mp1Y))
     return result
 
 
 def isValidCellId(param1: int) -> bool:
-    # if not isInit:
-    #     raise  Exception("MapTools must be initiliazed with method .initForDofus2 or .initForDofus3")
     if param1 >= 0:
         return param1 < mapCountCell
     return False
-
-
-def floatAlmostEquals(param1: float, param2: float) -> bool:
-    if param1 != param2:
-        if param1 == float("inf") or param2 == float("inf"):
-            return False
-        return float(abs(param1 - param2)) < 0.0001
-    return True
-
 
 def getCellIdByCoord(param1: int, param2: int) -> int:
     if not isValidCoord(param1, param2):
@@ -102,16 +95,18 @@ def isValidCoord(param1: int, param2: int) -> bool:
     return False
 
 
-def getCellCoordById(param1: int) -> Point:
-    if not isValidCellId(param1):
+def getCellCoordById(cell_id: int) -> Point:
+    if not isValidCellId(cell_id):
         return None
-    _loc2_: int = math.floor(param1 / MAP_GRID_WIDTH)
-    _loc3_: int = math.floor((_loc2_ + 1) / 2)
-    _loc4_ = _loc2_ - _loc3_
-    _loc5_ = param1 - _loc2_ * MAP_GRID_WIDTH
-    return Point(_loc3_ + _loc5_, _loc5_ - _loc4_)
+    
+    row = math.floor(cell_id / MAP_GRID_WIDTH)
+    row_half = math.floor((row + 1) / 2)
+    row_offset = row - row_half
+    col = cell_id - row * MAP_GRID_WIDTH
+    
+    return Point(row_half + col, col - row_offset)
 
-
+@lru_cache(maxsize=5000)
 def getCellsCoordBetween(param1: int, param2: int) -> list[MapPoint]:
     cellsIds = getCellsIdBetween(param1, param2)
     return [MapPoint.fromCellId(cellid) for cellid in cellsIds]
@@ -120,26 +115,16 @@ def getCellsCoordBetween(param1: int, param2: int) -> list[MapPoint]:
 def getDistance(param1: int, param2: int) -> int:
     if not isValidCellId(param1) or not isValidCellId(param2):
         return -1
-    _loc3_: int = math.floor(param1 / MAP_GRID_WIDTH)
-    _loc4_: int = math.floor((_loc3_ + 1) / 2)
-    _loc5_ = param1 - _loc3_ * MAP_GRID_WIDTH
-    _loc6_ = _loc4_ + _loc5_
-    _loc7_: int = math.floor(param1 / MAP_GRID_WIDTH)
-    _loc8_: int = math.floor((_loc7_ + 1) / 2)
-    _loc9_ = _loc7_ - _loc8_
-    _loc10_ = param1 - _loc7_ * MAP_GRID_WIDTH
-    _loc11_ = _loc10_ - _loc9_
-    _loc12_: int = math.floor(param2 / MAP_GRID_WIDTH)
-    _loc13_: int = math.floor((_loc12_ + 1) / 2)
-    _loc14_ = param2 - _loc12_ * MAP_GRID_WIDTH
-    _loc15_ = _loc13_ + _loc14_
-    _loc16_: int = math.floor(param2 / MAP_GRID_WIDTH)
-    _loc17_: int = math.floor((_loc16_ + 1) / 2)
-    _loc18_ = _loc16_ - _loc17_
-    _loc19_ = param2 - _loc16_ * MAP_GRID_WIDTH
-    _loc20_ = _loc19_ - _loc18_
-    return math.floor(abs(_loc15_ - _loc6_) + abs(_loc20_ - _loc11_))
 
+    x1 = param1 % MAP_GRID_WIDTH
+    y1 = (param1 // MAP_GRID_WIDTH + 1) // 2 + x1
+    y2 = param1 // MAP_GRID_WIDTH - x1
+    
+    x2 = param2 % MAP_GRID_WIDTH
+    y3 = (param2 // MAP_GRID_WIDTH + 1) // 2 + x2
+    y4 = param2 // MAP_GRID_WIDTH - x2
+    
+    return math.floor(abs(y3 - y1) + abs(y4 - y2))
 
 def getLookDirection8Exact(param1: int, param2: int) -> int:
     _loc3_: int = math.floor(param1 / MAP_GRID_WIDTH)
@@ -180,7 +165,6 @@ def getLookDirection4ExactByCoord(param1: int, param2: int, param3: int, param4:
             return 3
         return 7
     return -1
-
 
 def getLookDirection4DiagExactByCoord(param1: int, param2: int, param3: int, param4: int) -> int:
     if not isValidCoord(param1, param2) or not isValidCoord(param3, param4):

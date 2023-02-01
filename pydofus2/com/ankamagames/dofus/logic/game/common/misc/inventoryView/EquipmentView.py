@@ -6,7 +6,6 @@ from pydofus2.com.ankamagames.dofus.logic.game.common.misc.IInventoryView import
 from pydofus2.com.ankamagames.dofus.network.enums.CharacterInventoryPositionEnum import (
     CharacterInventoryPositionEnum,
 )
-from pydofus2.com.ankamagames.jerakine.logger.Logger import Logger
 
 
 class EquipmentView(IInventoryView):

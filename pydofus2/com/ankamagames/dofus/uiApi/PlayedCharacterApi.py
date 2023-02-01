@@ -87,7 +87,6 @@ from pydofus2.com.ankamagames.dofus.network.types.game.data.items.ForgettableSpe
 from pydofus2.com.ankamagames.dofus.network.types.game.guild.application.GuildApplicationInformation import (
     GuildApplicationInformation,
 )
-from pydofus2.com.ankamagames.jerakine.logger.Logger import Logger
 
 
 class PlayedCharacterInfo(object):

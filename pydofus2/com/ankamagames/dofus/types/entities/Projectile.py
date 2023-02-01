@@ -9,7 +9,6 @@ from pydofus2.com.ankamagames.jerakine.entities.interfaces.IDisplayable import I
 from pydofus2.com.ankamagames.jerakine.entities.interfaces.IEntity import IEntity
 from pydofus2.com.ankamagames.jerakine.entities.interfaces.IMovable import IMovable
 from pydofus2.com.ankamagames.jerakine.interfaces.IRectangle import IRectangle
-from pydofus2.com.ankamagames.jerakine.logger.Logger import Logger
 from pydofus2.com.ankamagames.jerakine.types.positions.MapPoint import MapPoint
 from pydofus2.com.ankamagames.jerakine.types.positions.MovementPath import MovementPath
 

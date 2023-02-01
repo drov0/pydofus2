@@ -1,6 +1,5 @@
 import threading
 from whistle import Event, EventDispatcher
-from pydofus2.com.ankamagames.jerakine.logger.Logger import Logger
 
 lock = threading.Lock()
 

@@ -1,4 +1,3 @@
-import base64
 import hashlib
 import random
 from pydofus2.com.ankamagames.berilia.managers.KernelEventsManager import KernelEventsManager, KernelEvent

@@ -3,7 +3,6 @@ from pydofus2.com.ankamagames.dofus.logic.game.fight.types.CastingSpell import C
 from pydofus2.com.ankamagames.dofus.network.types.game.actions.fight.FightTemporarySpellBoostEffect import (
     FightTemporarySpellBoostEffect,
 )
-from pydofus2.com.ankamagames.jerakine.logger.Logger import Logger
 
 
 class SpellBuff(BasicBuff):

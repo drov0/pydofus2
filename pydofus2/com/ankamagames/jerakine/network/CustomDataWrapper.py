@@ -3,6 +3,8 @@ import math
 from zlib import decompress
 import struct
 
+from pydofus2.com.ankamagames.jerakine.logger.Logger import Logger
+
 
 class ByteArray(bytearray):
     INT_SIZE: int = 32
@@ -99,7 +101,10 @@ class ByteArray(bytearray):
         return int.from_bytes(self.read(1), "big", signed=True)
 
     def writeByte(self, b, signed=True):
-        self += b.to_bytes(1, "big", signed=signed)
+        try:
+            self += b.to_bytes(1, "big", signed=signed)
+        except OverflowError:
+            self += b.to_bytes(1, "big", signed=not signed)
 
     def readByteArray(self):
         lon = self.readVarInt()

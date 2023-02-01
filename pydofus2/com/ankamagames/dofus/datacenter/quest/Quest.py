@@ -9,7 +9,6 @@ from pydofus2.com.ankamagames.jerakine.data.GameData import GameData
 
 from pydofus2.com.ankamagames.jerakine.data.I18n import I18n
 from pydofus2.com.ankamagames.jerakine.interfaces.IDataCenter import IDataCenter
-from pydofus2.com.ankamagames.jerakine.logger.Logger import Logger
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:

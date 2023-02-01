@@ -51,14 +51,12 @@ class FightChangeVisibilityStep(AbstractSequencable, IFightStep):
     def start(self) -> None:
         if self._visibilityState == GameActionFightInvisibilityStateEnum.VISIBLE:
             invisibleEntity = self.respawnEntity()
-            invisibleEntity.alpha = 1
 
             if isinstance(invisibleEntity, AnimatedCharacter):
                 invisibleEntityPos = invisibleEntity.position
                 entitiesFrame: FightEntitiesFrame = Kernel().worker.getFrame("FightEntitiesFrame")
-                fightEntities = entitiesFrame.entities
-                for entityId in fightEntities:
-                    entityInfos = entitiesFrame.getEntityInfos(entityId)
+                for entityId in entitiesFrame.entities:
+                    entityInfos: GameFightFighterInformations = entitiesFrame.getEntityInfos(entityId)
                     if (
                         entitiesFrame.entityIsIllusion(entityId)
                         and entityInfos.stats.summoner == self._entityId
@@ -79,7 +77,6 @@ class FightChangeVisibilityStep(AbstractSequencable, IFightStep):
                 invisibleEntity.canSeeThrough = True
                 invisibleEntity.canWalkThrough = False
                 invisibleEntity.canWalkTo = False
-            invisibleEntity.alpha = 0.5
 
         elif self._visibilityState == GameActionFightInvisibilityStateEnum.INVISIBLE:
             self.unspawnEntity()
@@ -107,7 +104,7 @@ class FightChangeVisibilityStep(AbstractSequencable, IFightStep):
 
     def respawnEntity(self) -> IEntity:
         tiphonSprite = DofusEntities().getEntity(self._entityId)
-        if tiphonSprite and tiphonSprite.parentSprite:
+        if tiphonSprite:
             fightEntitiesFrame: "FightEntitiesFrame" = Kernel().worker.getFrame("FightEntitiesFrame")
             if fightEntitiesFrame:
                 fightEntitiesFrame.addOrUpdateActor(fightEntitiesFrame.getEntityInfos(self._entityId))

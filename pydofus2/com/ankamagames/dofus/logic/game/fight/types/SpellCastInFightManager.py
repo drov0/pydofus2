@@ -22,7 +22,6 @@ if TYPE_CHECKING:
     from pydofus2.com.ankamagames.dofus.logic.game.common.frames.SpellInventoryManagementFrame import (
         SpellInventoryManagementFrame,
     )
-from pydofus2.com.ankamagames.jerakine.logger.Logger import Logger
 
 
 class SpellCastInFightManager:

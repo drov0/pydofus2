@@ -58,7 +58,6 @@ from pydofus2.com.ankamagames.dofus.logic.game.fight.types.CastingSpell import C
 from pydofus2.com.ankamagames.dofus.network.enums.CharacterSpellModificationTypeEnum import (
     CharacterSpellModificationTypeEnum,
 )
-from pydofus2.com.ankamagames.dofus.network.enums.FightEventEnum import FightEventEnum
 from pydofus2.com.ankamagames.dofus.network.enums.FightOutcomeEnum import FightOutcomeEnum
 from pydofus2.com.ankamagames.dofus.network.enums.FightTypeEnum import FightTypeEnum
 from pydofus2.com.ankamagames.dofus.network.enums.MapObstacleStateEnum import (

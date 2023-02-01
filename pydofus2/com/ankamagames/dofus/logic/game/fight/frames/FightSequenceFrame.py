@@ -307,22 +307,17 @@ from pydofus2.com.ankamagames.jerakine.types.positions.MovementPath import Movem
 
 
 class FightSequenceFrame(Frame, ISpellCastProvider):
+    FIGHT_SEQUENCERS_CATEGORY: str = "FightSequencer"
 
     _lastCastingSpell: CastingSpell
 
     _currentInstanceId: int = 0
-
-    FIGHT_SEQUENCERS_CATEGORY: str = "FightSequencer"
 
     _castingSpell: CastingSpell
 
     _castingSpells: list[CastingSpell]
 
     _stepsBuffer: list[ISequencable]
-
-    mustAck: bool
-
-    ackIdent: int
 
     _sequenceEndCallback: FunctionType
 
@@ -336,9 +331,7 @@ class FightSequenceFrame(Frame, ISpellCastProvider):
 
     _fightBattleFrame: "FightBattleFrame"
 
-    _fightEntitiesFrame: FightEntitiesFrame = None
-
-    _instanceId: int = 0
+    _instanceId: int
 
     _teleportThroughPortal: bool
 
@@ -352,6 +345,7 @@ class FightSequenceFrame(Frame, ISpellCastProvider):
         super().__init__()
         self._instanceId = FightSequenceFrame._currentInstanceId
         FightSequenceFrame._currentInstanceId += 1
+        self._fightEntitiesFrame: FightEntitiesFrame = None
         self._fightBattleFrame = pFightBattleFrame
         self._parent = parent
         self._sequencer = None
@@ -364,6 +358,8 @@ class FightSequenceFrame(Frame, ISpellCastProvider):
         self._updateMovementAreaAtSequenceEnd = False
         self._scriptInit = True
         self._activeSubSequenceCount = 0
+        self.ackIdent: int = None
+        self.mustAck: bool = None
 
     @property
     def lastCastingSpell(self) -> CastingSpell:
@@ -404,6 +400,7 @@ class FightSequenceFrame(Frame, ISpellCastProvider):
         return True
 
     def pulled(self) -> bool:
+        FightSequenceFrame._currentInstanceId = 0
         self._stepsBuffer = None
         self._castingSpell = None
         self._castingSpells = None

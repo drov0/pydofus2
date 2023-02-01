@@ -58,7 +58,6 @@ from pydofus2.com.ankamagames.dofus.network.types.game.data.items.effects.Object
 from pydofus2.com.ankamagames.dofus.network.types.game.data.items.effects.ObjectEffectString import (
     ObjectEffectString,
 )
-from pydofus2.com.ankamagames.jerakine.logger.Logger import Logger
 
 
 class ObjectEffectAdapter:

@@ -7,7 +7,6 @@ from pydofus2.com.ankamagames.atouin.messages.MapContainerRollOutMessage import 
     MapContainerRollOutMessage,
 )
 from pydofus2.com.ankamagames.atouin.types.Selection import Selection
-from pydofus2.com.ankamagames.atouin.utils.DataMapProvider import DataMapProvider
 from pydofus2.com.ankamagames.dofus.internalDatacenter.stats.EntityStats import EntityStats
 from pydofus2.com.ankamagames.dofus.kernel.Kernel import Kernel
 from pydofus2.com.ankamagames.dofus.kernel.net.ConnectionsHandler import ConnectionsHandler
@@ -29,9 +28,7 @@ from pydofus2.com.ankamagames.dofus.network.messages.game.context.GameMapMovemen
 
 
 if TYPE_CHECKING:
-    from pydofus2.com.ankamagames.dofus.logic.game.fight.frames.FightContextFrame import (
-        FightContextFrame,
-    )
+    pass
 from pydofus2.com.ankamagames.dofus.logic.game.fight.managers.CurrentPlayedFighterManager import (
     CurrentPlayedFighterManager,
 )
@@ -39,20 +36,11 @@ from pydofus2.com.ankamagames.dofus.logic.game.fight.miscs.FightReachableCellsMa
     FightReachableCellsMaker,
 )
 from pydofus2.com.ankamagames.dofus.logic.game.fight.miscs.TackleUtil import TackleUtil
-from pydofus2.com.ankamagames.dofus.network.enums.ChatActivableChannelsEnum import (
-    ChatActivableChannelsEnum,
-)
-from pydofus2.com.ankamagames.dofus.network.messages.game.chat.ChatClientMultiMessage import (
-    ChatClientMultiMessage,
-)
 from pydofus2.com.ankamagames.dofus.network.messages.game.context.GameMapMovementRequestMessage import (
     GameMapMovementRequestMessage,
 )
 from pydofus2.com.ankamagames.dofus.network.messages.game.context.GameMapNoMovementMessage import (
     GameMapNoMovementMessage,
-)
-from pydofus2.com.ankamagames.dofus.network.messages.game.context.ShowCellRequestMessage import (
-    ShowCellRequestMessage,
 )
 from pydofus2.com.ankamagames.dofus.network.messages.game.context.fight.GameFightTurnFinishMessage import (
     GameFightTurnFinishMessage,
@@ -68,11 +56,9 @@ from pydofus2.com.ankamagames.jerakine.entities.interfaces.IEntity import IEntit
 from pydofus2.com.ankamagames.jerakine.logger.Logger import Logger
 from pydofus2.com.ankamagames.jerakine.messages.Frame import Frame
 from pydofus2.com.ankamagames.jerakine.messages.Message import Message
-from pydofus2.com.ankamagames.jerakine.pathfinding.Pathfinding import Pathfinding
 from pydofus2.com.ankamagames.jerakine.types.enums.Priority import Priority
 from pydofus2.com.ankamagames.jerakine.types.positions.MapPoint import MapPoint
 from pydofus2.com.ankamagames.jerakine.types.positions.MovementPath import MovementPath
-from pydofus2.com.ankamagames.jerakine.types.positions.PathElement import PathElement
 from pydofus2.damageCalculation.tools.StatIds import StatIds
 from typing import TYPE_CHECKING
 from pydofus2.com.ankamagames.dofus.logic.game.fight.frames.FightEntitiesFrame import (
@@ -196,7 +182,6 @@ class FightTurnFrame(Frame):
     def process(self, msg: Message) -> bool:
 
         if isinstance(msg, GameFightSpellCastAction):
-            gfsca = msg
             self.removePath()
             if self._myTurn:
                 self.startRemindTurn()

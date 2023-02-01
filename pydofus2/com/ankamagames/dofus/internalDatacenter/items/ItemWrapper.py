@@ -27,7 +27,6 @@ from pydofus2.com.ankamagames.jerakine.data.I18n import I18n
 from pydofus2.com.ankamagames.jerakine.interfaces.IDataCenter import IDataCenter
 from pydofus2.com.ankamagames.jerakine.interfaces.ISlotData import ISlotData
 from pydofus2.com.ankamagames.jerakine.interfaces.ISlotDataHolder import ISlotDataHolder
-from pydofus2.com.ankamagames.jerakine.logger.Logger import Logger
 from pydofus2.com.ankamagames.jerakine.utils.display.spellZone.ICellZoneProvider import (
     ICellZoneProvider,
 )

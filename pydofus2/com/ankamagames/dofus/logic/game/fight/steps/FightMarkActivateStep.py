@@ -1,5 +1,3 @@
-from pydofus2.com.ankamagames.dofus.kernel.Kernel import Kernel
-from pydofus2.com.ankamagames.dofus.logic.game.fight.frames.FightTurnFrame import FightTurnFrame
 from pydofus2.com.ankamagames.dofus.logic.game.fight.managers.MarkedCellsManager import (
     MarkedCellsManager,
 )

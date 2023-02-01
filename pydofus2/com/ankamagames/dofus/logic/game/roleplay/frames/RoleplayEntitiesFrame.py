@@ -114,7 +114,7 @@ from pydofus2.com.ankamagames.berilia.managers.KernelEventsManager import Kernel
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
-    from pydofus2.com.ankamagames.dofus.logic.game.common.frames.ContextChangeFrame import ContextChangeFrame
+    pass
 
 
 class RoleplayEntitiesFrame(AbstractEntitiesFrame, Frame):

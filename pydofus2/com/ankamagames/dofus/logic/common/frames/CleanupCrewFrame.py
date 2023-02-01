@@ -37,7 +37,6 @@ from pydofus2.com.ankamagames.dofus.network.messages.game.initialization.OnConne
 from pydofus2.com.ankamagames.dofus.network.messages.game.inventory.items.ObjectJobAddedMessage import (
     ObjectJobAddedMessage,
 )
-from pydofus2.com.ankamagames.jerakine.logger.Logger import Logger
 from pydofus2.com.ankamagames.jerakine.messages.ConnectionResumedMessage import (
     ConnectionResumedMessage,
 )

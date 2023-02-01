@@ -6,7 +6,6 @@ from pydofus2.com.ankamagames.dofus.logic.game.fight.steps.abstract.AbstractStat
     AbstractStatContextualStep,
 )
 from pydofus2.com.ankamagames.dofus.network.enums.GameContextEnum import GameContextEnum
-from pydofus2.com.ankamagames.jerakine.logger.Logger import Logger
 
 
 class FightMovementPointsVariationStep(AbstractStatContextualStep, IFightStep):

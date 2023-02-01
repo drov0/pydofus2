@@ -1,5 +1,4 @@
 from pydofus2.com.ankamagames.jerakine import JerakineConstants
-from pydofus2.com.ankamagames.jerakine.logger.Logger import Logger
 import pydofus2.com.ankamagames.jerakine.pools.Pool as pool
 
 

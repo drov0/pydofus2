@@ -1,8 +1,6 @@
 from pydofus2.com.ankamagames.dofus.datacenter.characteristics.Characteristic import (
     Characteristic,
 )
-from pydofus2.com.ankamagames.jerakine.logger.Logger import Logger
-from pydofus2.damageCalculation.tools.StatIds import StatIds
 
 
 class Stat:

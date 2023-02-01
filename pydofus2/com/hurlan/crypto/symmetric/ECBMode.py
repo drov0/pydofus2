@@ -1,4 +1,3 @@
-from pydofus2.com.ankamagames.jerakine.logger.Logger import Logger
 from pydofus2.com.ankamagames.jerakine.network.CustomDataWrapper import ByteArray
 from pydofus2.com.hurlan.crypto.symmetric.ICipher import ICipher
 from pydofus2.com.hurlan.crypto.symmetric.IMode import IMode

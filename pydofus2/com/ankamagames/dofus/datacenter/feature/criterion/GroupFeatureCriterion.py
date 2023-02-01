@@ -5,7 +5,6 @@ from pydofus2.com.ankamagames.dofus.datacenter.items.criterion.IItemCriterion im
     IItemCriterion,
 )
 from pydofus2.com.ankamagames.dofus.datacenter.items.criterion.ItemCriterion import ItemCriterion
-from pydofus2.com.ankamagames.jerakine.logger.Logger import Logger
 
 
 class GroupFeatureCriterion(GroupItemCriterion):

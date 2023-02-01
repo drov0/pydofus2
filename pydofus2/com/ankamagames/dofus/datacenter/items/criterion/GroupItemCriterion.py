@@ -2,7 +2,6 @@ from pydofus2.com.ankamagames.dofus.datacenter.items.criterion.ItemCriterion imp
 from pydofus2.com.ankamagames.dofus.logic.game.common.managers.PlayedCharacterManager import (
     PlayedCharacterManager,
 )
-from pydofus2.com.ankamagames.jerakine.logger.Logger import Logger
 from pydofus2.com.ankamagames.dofus.datacenter.items.criterion.IItemCriterion import (
     IItemCriterion,
 )

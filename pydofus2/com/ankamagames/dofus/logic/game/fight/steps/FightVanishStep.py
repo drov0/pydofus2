@@ -9,14 +9,11 @@ from pydofus2.com.ankamagames.jerakine.entities.interfaces.IEntity import IEntit
 from pydofus2.com.ankamagames.jerakine.sequencer.AbstractSequencable import AbstractSequencable
 from pydofus2.com.ankamagames.jerakine.sequencer.ISequencer import ISequencer
 
-
 class FightVanishStep(AbstractSequencable, IFightStep):
 
     _entityId: float
 
     _sourceId: float
-
-    _vanishSubSequence: ISequencer
 
     def __init__(self, entityId: float, sourceId: float):
         super().__init__()
@@ -44,8 +41,6 @@ class FightVanishStep(AbstractSequencable, IFightStep):
         self.executeCallbacks()
 
     def clear(self) -> None:
-        if self._vanishSubSequence:
-            self._vanishSubSequence.clear()
         super().clear()
 
     @property

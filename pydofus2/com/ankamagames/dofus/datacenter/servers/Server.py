@@ -1,7 +1,6 @@
 from pydofus2.com.ankamagames.dofus.datacenter.servers.ServerCommunity import ServerCommunity
 from pydofus2.com.ankamagames.dofus.datacenter.servers.ServerGameType import ServerGameType
 from pydofus2.com.ankamagames.dofus.datacenter.servers.ServerPopulation import ServerPopulation
-from pydofus2.com.ankamagames.jerakine.logger.Logger import Logger
 from pydofus2.com.ankamagames.jerakine.data.I18n import I18n
 from pydofus2.com.ankamagames.dofus.types.IdAccessors import IdAccessors
 from pydofus2.com.ankamagames.jerakine.data.GameData import GameData

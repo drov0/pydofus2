@@ -1,7 +1,6 @@
 from pydofus2.com.ankamagames.jerakine.benchmark.BenchmarkTimer import BenchmarkTimer
 from time import perf_counter, sleep
 from typing import TYPE_CHECKING
-import uuid
 from pydofus2.com.ankamagames.berilia.managers.KernelEventsManager import KernelEventsManager, KernelEvent
 import pydofus2.com.ankamagames.dofus.kernel.net.ConnectionsHandler as connh
 from pydofus2.com.ankamagames.atouin.managers.MapDisplayManager import MapDisplayManager
@@ -697,8 +696,7 @@ class RoleplayMovementFrame(Frame):
         else:
             Logger().warning(f"[RolePlayMovement] Actor {actorId} is not on current map.")
 
-    def onMapChangeFailed(self, timer_uuid) -> None:
-        Logger().debug(f"[RolePlayMovement] timer '{timer_uuid}' - Map change to {self._wantToChangeMap} failed!")
+    def onMapChangeFailed(self) -> None:
         if self._changeMapTimeout is not None:
             self._changeMapTimeout.cancel()
         self._changeMapFails += 1

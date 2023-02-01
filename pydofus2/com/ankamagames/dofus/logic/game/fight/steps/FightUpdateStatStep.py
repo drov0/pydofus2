@@ -3,7 +3,6 @@ from pydofus2.com.ankamagames.dofus.logic.game.fight.steps.IFightStep import IFi
 from pydofus2.com.ankamagames.dofus.network.types.game.character.characteristic.CharacterCharacteristic import (
     CharacterCharacteristic,
 )
-from pydofus2.com.ankamagames.jerakine.logger.Logger import Logger
 from pydofus2.com.ankamagames.jerakine.sequencer.AbstractSequencable import AbstractSequencable
 
 

@@ -10,7 +10,6 @@ from pydofus2.com.ankamagames.dofus.logic.game.fight.managers.CurrentPlayedFight
 from pydofus2.com.ankamagames.dofus.logic.game.fight.miscs.FightEntitiesHolder import (
     FightEntitiesHolder,
 )
-from pydofus2.com.ankamagames.dofus.logic.game.fight.types.FightEventEnum import FightEventEnum
 from pydofus2.com.ankamagames.dofus.network.enums.GameActionFightInvisibilityStateEnum import (
     GameActionFightInvisibilityStateEnum,
 )

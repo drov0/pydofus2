@@ -6,7 +6,6 @@ from pydofus2.com.ankamagames.dofus.network.enums.CharacterInventoryPositionEnum
 from pydofus2.com.ankamagames.dofus.network.types.game.presets.ItemForPreset import ItemForPreset
 from pydofus2.com.ankamagames.jerakine.interfaces.IDataCenter import IDataCenter
 from pydofus2.com.ankamagames.jerakine.interfaces.ISlotDataHolder import ISlotDataHolder
-from pydofus2.com.ankamagames.jerakine.logger.Logger import Logger
 
 
 class PresetWrapper(ItemWrapper, IDataCenter):

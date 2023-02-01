@@ -1,4 +1,3 @@
-from pydofus2.com.ankamagames.dofus.datacenter.spells.SpellState import SpellState
 from pydofus2.com.ankamagames.dofus.logic.game.fight.steps.IFightStep import IFightStep
 from pydofus2.com.ankamagames.dofus.logic.game.fight.types.BasicBuff import BasicBuff
 from pydofus2.com.ankamagames.dofus.logic.game.fight.types.StateBuff import StateBuff

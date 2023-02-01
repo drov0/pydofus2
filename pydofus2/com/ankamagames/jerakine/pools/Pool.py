@@ -1,4 +1,3 @@
-from pydofus2.com.ankamagames.jerakine.logger.Logger import Logger
 from pydofus2.com.ankamagames.jerakine.pools.Poolable import Poolable
 from pydofus2.com.ankamagames.jerakine.pools.PoolableLinkedListNode import PoolableLinkedListNode
 from pydofus2.mx.utils.LinkedList import LinkedList

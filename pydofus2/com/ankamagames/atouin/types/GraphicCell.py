@@ -2,7 +2,6 @@ from types import FunctionType
 from pydofus2.com.ankamagames.jerakine.interfaces.ICustomUnicNameGetter import (
     ICustomUnicNameGetter,
 )
-from pydofus2.com.ankamagames.jerakine.logger.Logger import Logger
 
 
 class GraphicCell(ICustomUnicNameGetter):

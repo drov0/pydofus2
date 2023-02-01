@@ -2,7 +2,6 @@ from pydofus2.com.ankamagames.dofus.logic.game.fight.steps.IFightStep import IFi
 from pydofus2.com.ankamagames.dofus.logic.game.fight.steps.abstract.AbstractDodgePointLossStep import (
     AbstractDodgePointLossStep,
 )
-from pydofus2.com.ankamagames.dofus.logic.game.fight.types.FightEventEnum import FightEventEnum
 
 
 class FightActionPointsLossDodgeStep(AbstractDodgePointLossStep, IFightStep):

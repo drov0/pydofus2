@@ -1,5 +1,5 @@
-from pydofus2.com.ankamagames.jerakine.logger.Logger import Logger
-from pydofus2.com.ankamagames.jerakine.map.IDataMapProvider import IDataMapProvider
+from pydofus2.com.ankamagames.jerakine.map.IDataMapProvider import \
+    IDataMapProvider
 from pydofus2.com.ankamagames.jerakine.map.ILosDetector import ILosDetector
 from pydofus2.com.ankamagames.jerakine.types.positions.MapPoint import MapPoint
 from pydofus2.mapTools import MapTools
@@ -31,7 +31,7 @@ class LosDetector(ILosDetector):
         return los
 
     @classmethod
-    def getCell(cls, mapProvider: IDataMapProvider, spellrange: list[int], refPosition: int) -> set[int]:
+    def getCells(cls, mapProvider: IDataMapProvider, spellrange: list[int], refPosition: int) -> set[int]:
         refPosition = MapPoint.fromCellId(refPosition)
         orderedCell: list = list()
         for cellId in spellrange:

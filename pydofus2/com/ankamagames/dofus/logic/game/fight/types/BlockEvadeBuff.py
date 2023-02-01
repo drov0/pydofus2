@@ -1,16 +1,9 @@
-from pydofus2.com.ankamagames.dofus.kernel.Kernel import Kernel
-from pydofus2.com.ankamagames.dofus.logic.game.fight.managers.CurrentPlayedFighterManager import (
-    CurrentPlayedFighterManager,
-)
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
     from pydofus2.com.ankamagames.dofus.logic.game.fight.types.CastingSpell import CastingSpell
     from pydofus2.com.ankamagames.dofus.network.types.game.actions.fight.FightTemporaryBoostEffect import (
         FightTemporaryBoostEffect,
-    )
-    from pydofus2.com.ankamagames.dofus.logic.game.fight.frames.FightTurnFrame import (
-        FightTurnFrame,
     )
 from pydofus2.com.ankamagames.dofus.logic.game.fight.types.StatBuff import StatBuff
 

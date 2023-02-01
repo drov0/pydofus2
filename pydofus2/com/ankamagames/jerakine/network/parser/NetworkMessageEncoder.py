@@ -45,7 +45,7 @@ class NetworkMessageEncoder:
             try:
                 dataWrite[spec["type"]][1](data, inst)
             except:
-                Logger().error(f"Error while encoding {TypeEnum(typeId)} {inst}")
+                Logger().error(f"Error while encoding {spec['type']}, value {inst}")
                 raise
             return data
 
@@ -78,7 +78,7 @@ class NetworkMessageEncoder:
                 try:
                     cls._encode(field, getattr(inst, field["name"]), data)
                 except:
-                    Logger().error("Error while writing %s", field)
+                    Logger().error(f"Error while writing field {field} of instance {inst.__class__.__name__}")
                     raise
 
         if hasattr(inst, "hash_function"):

@@ -1,5 +1,4 @@
 from pydofus2.com.ankamagames.dofus.types.entities.AnimatedCharacter import AnimatedCharacter
-from pydofus2.com.ankamagames.jerakine.logger.Logger import Logger
 from pydofus2.com.ankamagames.atouin.AtouinConstants import AtouinConstants
 from typing import TYPE_CHECKING
 

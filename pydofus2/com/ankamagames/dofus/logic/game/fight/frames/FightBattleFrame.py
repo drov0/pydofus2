@@ -5,7 +5,6 @@ from typing import TYPE_CHECKING
 import pydofus2.com.ankamagames.dofus.internalDatacenter.spells.SpellWrapper as spellwrapper
 import pydofus2.com.ankamagames.dofus.kernel.Kernel as krnl
 import pydofus2.com.ankamagames.dofus.logic.game.common.frames.PlayedCharacterUpdatesFrame as pcuF
-import pydofus2.com.ankamagames.dofus.logic.game.fight.fightEvents.FightEventsHelper as fevth
 import pydofus2.com.ankamagames.dofus.logic.game.fight.frames.FightEntitiesFrame as fenf
 import pydofus2.com.ankamagames.dofus.logic.game.fight.frames.FightSequenceFrame as fseqf
 import pydofus2.com.ankamagames.dofus.logic.game.fight.managers.BuffManager as bffm
@@ -99,7 +98,6 @@ from pydofus2.com.ankamagames.dofus.network.types.game.context.fight.GameFightFi
     GameFightFighterInformations,
 )
 from pydofus2.com.ankamagames.dofus.types.entities.AnimatedCharacter import AnimatedCharacter
-from pydofus2.com.ankamagames.jerakine.benchmark.BenchmarkTimer import BenchmarkTimer
 from pydofus2.com.ankamagames.jerakine.handlers.messages.Action import Action
 from pydofus2.com.ankamagames.jerakine.logger.Logger import Logger
 from pydofus2.com.ankamagames.jerakine.messages.Frame import Frame
@@ -169,8 +167,6 @@ class FightBattleFrame(Frame):
     _nextLastPlayerId: float = None
 
     _currentPlayerId: float = None
-
-    _skipTurnTimer: BenchmarkTimer = None
 
     _masterId: float = None
 
@@ -378,8 +374,6 @@ class FightBattleFrame(Frame):
                 self._turnFrame.myTurn = True
             else:
                 self._turnFrame.myTurn = False
-            if self._skipTurnTimer:
-                self._skipTurnTimer.cancel()
             if gftsmsg.id == playerId or self._playingSlaveEntity:
                 alivePlayers = 0
                 for en in fightEntitesFrame.entities.values():

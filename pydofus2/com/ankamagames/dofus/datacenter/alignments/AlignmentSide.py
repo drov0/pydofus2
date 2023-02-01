@@ -1,4 +1,5 @@
 from pydofus2.com.ankamagames.jerakine.data.GameData import GameData
+
 from pydofus2.com.ankamagames.dofus.types.IdAccessors import IdAccessors
 
 
@@ -11,10 +12,10 @@ class AlignmentSide:
 
     @classmethod
     def getAlignmentSides(cls) -> list["AlignmentSide"]:
-        return GameData.getObjects(cls.MODULE)
+        return GameData().getObjects(cls.MODULE)
 
     @classmethod
     def getAlignmentSideById(cls, id) -> "AlignmentSide":
-        return GameData.getObject(cls.MODULE, id)
+        return GameData().getObject(cls.MODULE, id)
 
     idAccessors = IdAccessors(getAlignmentSideById, getAlignmentSides)

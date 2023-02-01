@@ -74,7 +74,6 @@ from pydofus2.com.ankamagames.jerakine.types.positions.MapPoint import MapPoint
 from pydofus2.com.ankamagames.jerakine.types.positions.MovementPath import MovementPath
 from pydofus2.com.ankamagames.jerakine.types.positions.PathElement import PathElement
 from pydofus2.damageCalculation.tools.StatIds import StatIds
-from pydofus2.com.ankamagames.jerakine.benchmark.BenchmarkTimer import BenchmarkTimer
 from typing import TYPE_CHECKING
 from pydofus2.com.ankamagames.dofus.logic.game.fight.frames.FightEntitiesFrame import (
     FightEntitiesFrame,
@@ -115,11 +114,7 @@ class FightTurnFrame(Frame):
 
     _isRequestingMovement: bool = None
 
-    _spellCastFrame: Frame = None
-
     _finishingTurn: bool = None
-
-    _remindTurnTimeoutId: BenchmarkTimer = None
 
     _myTurn: bool = None
 
@@ -136,9 +131,7 @@ class FightTurnFrame(Frame):
     _cellsUnreachable: list[int] = None
 
     _lastPath: MovementPath = None
-
-    _intervalTurn: BenchmarkTimer = None
-
+    
     _playerEntity: IEntity = None
 
     _currentFighterId: float = None
@@ -176,8 +169,6 @@ class FightTurnFrame(Frame):
             pass
         else:
             self._isRequestingMovement = False
-            if self._remindTurnTimeoutId is not None:
-                self._remindTurnTimeoutId.cancel()
 
     @property
     def turnDuration(self) -> int:
@@ -187,9 +178,6 @@ class FightTurnFrame(Frame):
     def turnDuration(self, v: int) -> None:
         self._turnDuration = v
         self._remainingDurationSeconds = math.floor(v)
-        if self._intervalTurn:
-            self._intervalTurn.cancel()
-        self._intervalTurn = BenchmarkTimer(10, self.onSecondTick)
 
     @property
     def lastPath(self) -> MovementPath:
@@ -209,8 +197,6 @@ class FightTurnFrame(Frame):
 
         if isinstance(msg, GameFightSpellCastAction):
             gfsca = msg
-            if self._spellCastFrame is not None:
-                Kernel().worker.removeFrame(self._spellCastFrame)
             self.removePath()
             if self._myTurn:
                 self.startRemindTurn()
@@ -218,11 +204,6 @@ class FightTurnFrame(Frame):
             playerInformation: "GameFightFighterInformations" = FightEntitiesFrame.getCurrentInstance().getEntityInfos(
                 self._currentFighterId
             )
-            if bf and bf.turnsCount <= 1 or playerInformation and playerInformation.spawnInfo.alive:
-                import pydofus2.com.ankamagames.dofus.logic.game.fight.frames.FightSpellCastFrame as fscf
-
-                self._spellCastFrame = fscf.FightSpellCastFrame(gfsca.spellId)
-                Kernel().worker.addFrame(self._spellCastFrame)
             return True
 
         elif isinstance(msg, CellClickMessage):
@@ -293,17 +274,11 @@ class FightTurnFrame(Frame):
             return False
 
     def pulled(self) -> bool:
-        if self._remindTurnTimeoutId:
-            self._remindTurnTimeoutId.cancel()
-        if self._intervalTurn:
-            self._intervalTurn.cancel()
         self.removePath()
         self.removeMovementArea()
-        Kernel().worker.removeFrame(self._spellCastFrame)
         return True
 
     def drawMovementArea(self) -> list[int]:
-        # Logger().debug("drawing the movement area")
         if not self.playerEntity or self.playerEntity.isMoving:
             Logger().debug(f"player {self.playerEntity} is moving {self.playerEntity.isMoving} or not found")
             self.removeMovementArea()
@@ -342,128 +317,6 @@ class FightTurnFrame(Frame):
         )
         currentMp = MapPoint.fromCellId(playerInfos.disposition.cellId)
         return currentMp
-
-    def drawPath(self, destCell: MapPoint = None) -> None:
-        firstObstacle: PathElement = None
-        self._cells = []
-        self._cellsTackled = []
-        self._cellsUnreachable = []
-        # Logger().debug(f"Drawing the move path to {destCell}")
-        if Kernel().worker.contains("FightSpellCastFrame"):
-            return
-        fcf: "FightContextFrame" = Kernel().worker.getFrame("FightContextFrame")
-        if self._isRequestingMovement:
-            Logger().debug("Already requesting movement abort")
-            return
-        if not destCell:
-            if fcf.currentCell == -1:
-                # Logger().debug("No current cell hovered to draw path")
-                return
-            destCell = MapPoint.fromCellId(fcf.currentCell)
-        if not self.playerEntity:
-            Logger().debug("No player entity found")
-            self.removePath()
-            return
-        stats: EntityStats = CurrentPlayedFighterManager().getStats()
-        mpLost: int = 0
-        apLost: int = 0
-        movementPoints: int = stats.getStatTotalValue(StatIds.MOVEMENT_POINTS)
-        actionPoints: int = stats.getStatTotalValue(StatIds.ACTION_POINTS)
-        Logger().debug(f"MP : {movementPoints}, AP : {actionPoints}")
-
-        if self.playerEntity.isMoving or self.currentPosition.distanceToCell(destCell) > movementPoints:
-            Logger().debug(
-                f"Player is moving {self.playerEntity.isMoving} or dest is too far {self.currentPosition.distanceToCell(destCell)} from {movementPoints} abort"
-            )
-            self.removePath()
-            return
-        path: MovementPath = Pathfinding().findPath(
-            DataMapProvider(), self.currentPosition, destCell, False, False, True
-        )
-        Logger().debug(f"Found a path {path}")
-        if len(DataMapProvider().obstaclesCells) > 0 and (len(path.path) == 0 or len(path.path) > movementPoints):
-            Logger().debug("Path is empty because of obstacles or too long for the available move points")
-            path = Pathfinding().findPath(
-                DataMapProvider(),
-                self.playerEntity.position,
-                destCell,
-                False,
-                False,
-                False,
-            )
-            Logger().debug(f"Path found {path}")
-            if len(path.path) > 0:
-                pathLen = len(path.path)
-                for i in range(pathLen):
-                    if path.path[i].cellId in DataMapProvider().obstaclesCells:
-                        firstObstacle = path.path[i]
-                        for j in range(pathLen):
-                            self._cellsUnreachable.append(path.path[j].cellId)
-                        self._cellsUnreachable.append(path.end.cellId)
-                        path.end = firstObstacle.step
-                        path.path = path.path[:i]
-                        break
-        if len(path.path) == 0 or len(path.path) > movementPoints:
-            Logger().debug(f"Path found empty {len(path.path)} or too long compared to mp {movementPoints}")
-            self.removePath()
-            return
-        self._lastPath = path
-        isFirst: bool = True
-        mpCount: int = 0
-        apLost = 0
-        lastPe: PathElement = None
-        entitiesFrame: "FightEntitiesFrame" = Kernel().worker.getFrame("FightEntitiesFrame")
-        playerInfos: GameFightFighterInformations = entitiesFrame.getEntityInfos(self.playerEntity.id)
-        for pe in path.path:
-            if isFirst:
-                isFirst = False
-            else:
-                tackle = TackleUtil.getTackle(playerInfos, lastPe.step)
-                mpLost += int((movementPoints - mpCount) * (1 - tackle) + 0.5)
-                if mpLost < 0:
-                    mpLost = 0
-                apLost += int(actionPoints * (1 - tackle) + 0.5)
-                if apLost < 0:
-                    apLost = 0
-                movementPoints = stats.getStatTotalValue(StatIds.MOVEMENT_POINTS) - mpLost
-                actionPoints = stats.getStatTotalValue(StatIds.ACTION_POINTS) - apLost
-                if mpCount < movementPoints:
-                    if mpLost > 0:
-                        self._cellsTackled.append(pe.step.cellId)
-                    else:
-                        self._cells.append(pe.step.cellId)
-                    mpCount += 1
-                else:
-                    self._cellsUnreachable.append(pe.step.cellId)
-            lastPe = pe
-
-        tackle = TackleUtil.getTackle(playerInfos, lastPe.step)
-        mpLost += int((movementPoints - mpCount) * (1 - tackle) + 0.5)
-        if mpLost < 0:
-            mpLost = 0
-        apLost += int(actionPoints * (1 - tackle) + 0.5)
-        if apLost < 0:
-            apLost = 0
-        movementPoints = stats.getStatTotalValue(StatIds.MOVEMENT_POINTS) - mpLost
-        if mpCount < movementPoints:
-            if firstObstacle:
-                movementPoints = len(path.path)
-            if mpLost > 0:
-                self._cellsTackled.append(path.end.cellId)
-            else:
-                self._cells.append(path.end.cellId)
-        elif firstObstacle:
-            self._cellsUnreachable.insert(0, path.end.cellId)
-            movementPoints = len(path.path) - 1
-        else:
-            self._cellsUnreachable.append(path.end.cellId)
-
-        Logger().debug(
-            f"cells : {self._cells}, cellsTackled : {self._cellsTackled}, cellsUnreachable : {self._cellsUnreachable}"
-        )
-
-    def updatePath(self) -> None:
-        self.drawPath(self._lastCell)
 
     def removePath(self) -> None:
         self._movementSelection = None
@@ -531,21 +384,3 @@ class FightTurnFrame(Frame):
             self._remainingDurationSeconds -= 1
         else:
             self._intervalTurn.cancel()
-
-    def showCell(self, cellId: MapPoint) -> None:
-        if not Kernel().worker.contains("FightSpellCastFrame"):
-            if DataMapProvider().pointMov(
-                MapPoint.fromCellId(cellId).x,
-                MapPoint.fromCellId(cellId).y,
-                True,
-            ):
-                scrmsg = ShowCellRequestMessage()
-                scrmsg.init(cellId)
-                ConnectionsHandler().conn.send(scrmsg)
-                text = I18n.getUiText(
-                    "ui.fightAutomsg.cell",
-                    ["{cell," + str(cellId) + "::" + str(cellId) + "}"],
-                )
-                ccmmsg = ChatClientMultiMessage()
-                ccmmsg.init(content_=text, channel_=ChatActivableChannelsEnum.CHANNEL_TEAM)
-                ConnectionsHandler().conn.send(ccmmsg)

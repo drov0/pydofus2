@@ -92,8 +92,6 @@ class CurrentPlayedFighterManager(metaclass=Singleton):
         if playerManager.spellsInventory != playerManager.playerSpellList:
             Logger().info("Remise à jour de la liste des sorts du joueur")
             playerManager.spellsInventory = playerManager.playerSpellList
-            if knl.Kernel().worker.contains("FightSpellCastFrame"):
-                knl.Kernel().worker.removeFrame(knl.Kernel().worker.getFrame("FightSpellCastFrame"))
 
     def setCharacteristicsInformations(self, id: float, characteristics: CharacterCharacteristicsInformations) -> None:
         self._characteristicsInformationsList[id] = characteristics

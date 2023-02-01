@@ -1,5 +1,6 @@
 from pydofus2.com.ankamagames.dofus.types.IdAccessors import IdAccessors
 from pydofus2.com.ankamagames.jerakine.data.GameData import GameData
+
 from pydofus2.com.ankamagames.jerakine.data.I18n import I18n
 from pydofus2.com.ankamagames.jerakine.interfaces.IDataCenter import IDataCenter
 from pydofus2.com.ankamagames.jerakine.logger.Logger import Logger
@@ -34,11 +35,11 @@ class Characteristic(IDataCenter):
 
     @classmethod
     def getCharacteristicById(cls, id: int) -> "Characteristic":
-        return GameData.getObject(cls.MODULE, id)
+        return GameData().getObject(cls.MODULE, id)
 
     @classmethod
     def getCharacteristics(cls) -> list["Characteristic"]:
-        return GameData.getObjects(cls.MODULE)
+        return GameData().getObjects(cls.MODULE)
 
     idAccessors: IdAccessors = IdAccessors(getCharacteristicById, getCharacteristics)
 

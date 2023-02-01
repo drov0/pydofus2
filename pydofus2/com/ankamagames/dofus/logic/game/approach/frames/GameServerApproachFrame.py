@@ -1,5 +1,5 @@
 from datetime import datetime
-from pydofus2.com.ankamagames.berilia.managers.KernelEventsManager import KernelEventsManager, KernelEvts
+from pydofus2.com.ankamagames.berilia.managers.KernelEventsManager import KernelEventsManager, KernelEvent
 from pydofus2.com.ankamagames.dofus.kernel.Kernel import Kernel
 from pydofus2.com.ankamagames.dofus.logic.common.frames.ChatFrame import ChatFrame
 from pydofus2.com.ankamagames.dofus.logic.common.frames.QuestFrame import QuestFrame
@@ -11,7 +11,6 @@ from pydofus2.com.ankamagames.dofus.logic.game.common.frames.SpellInventoryManag
 )
 from pydofus2.com.ankamagames.dofus.logic.game.common.managers.FeatureManager import FeatureManager
 from pydofus2.com.ankamagames.dofus.network.enums.GameServerTypeEnum import GameServerTypeEnum
-from pydofus2.com.ankamagames.jerakine.benchmark.BenchmarkTimer import BenchmarkTimer
 import time
 from pydofus2.com.ankamagames.dofus.internalDatacenter.connection.BasicCharacterWrapper import (
     BasicCharacterWrapper,
@@ -215,7 +214,7 @@ class GameServerApproachFrame(Frame):
                         cbi.id, cbi.name, cbi.level, cbi.entityLook, cbi.breed, cbi.sex, 0, 0, 0, bonusXp, False
                     )
                     PlayerManager().charactersList.append(o)
-            KernelEventsManager().send(KernelEvts.CHARACTERS_LIST, return_value=PlayerManager().charactersList)
+            KernelEventsManager().send(KernelEvent.CHARACTERS_LIST, return_value=PlayerManager().charactersList)
             if PlayerManager().allowAutoConnectCharacter:
                 characterId = PlayerManager().autoConnectOfASpecificCharacterId
                 Kernel().worker.process(CharacterSelectionAction.create(characterId, False))
@@ -258,7 +257,7 @@ class GameServerApproachFrame(Frame):
             Kernel().worker.addFrame(JobsFrame())
             Kernel().worker.addFrame(QuestFrame())
             Kernel().worker.addFrame(AveragePricesFrame())
-            KernelEventsManager().send(KernelEvts.CHARACTER_SELECTION_SUCCESS, return_value=cssmsg.infos)
+            KernelEventsManager().send(KernelEvent.CHARACTER_SELECTION_SUCCESS, return_value=cssmsg.infos)
             if Kernel().beingInReconection and not self._reconnectMsgSend:
                 self._reconnectMsgSend = True
                 ConnectionsHandler().conn.send(CharacterSelectedForceReadyMessage())

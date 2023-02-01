@@ -5,6 +5,7 @@ from pydofus2.com.ankamagames.jerakine.logger.Logger import Logger
 from pydofus2.com.ankamagames.dofus.types.IdAccessors import IdAccessors
 from pydofus2.com.ankamagames.jerakine.data.I18n import I18n
 from pydofus2.com.ankamagames.jerakine.data.GameData import GameData
+
 from pydofus2.com.ankamagames.jerakine.interfaces.IDataCenter import IDataCenter
 
 
@@ -83,11 +84,11 @@ class Breed(IDataCenter):
 
     @staticmethod
     def getBreedById(id: int) -> "Breed":
-        return GameData.getObject(Breed.MODULE, id)
+        return GameData().getObject(Breed.MODULE, id)
 
     @staticmethod
     def getBreeds() -> list["Breed"]:
-        return GameData.getObjects(Breed.MODULE)
+        return GameData().getObjects(Breed.MODULE)
 
     def getBreedFromSkin(self, skin: int) -> "Breed":
         skinKnown = None
@@ -107,7 +108,7 @@ class Breed(IDataCenter):
         for skinKnown in self._skinsForBreed:
             if skinKnown == str(skin):
                 id = self._skinsForBreed[skinKnown]
-        return GameData.getObject(self.MODULE, id)
+        return GameData().getObject(self.MODULE, id)
 
     @property
     def name(self) -> str:

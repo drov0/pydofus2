@@ -5,6 +5,7 @@ from pydofus2.com.ankamagames.jerakine.logger.Logger import Logger
 from pydofus2.com.ankamagames.jerakine.data.I18n import I18n
 from pydofus2.com.ankamagames.dofus.types.IdAccessors import IdAccessors
 from pydofus2.com.ankamagames.jerakine.data.GameData import GameData
+
 from pydofus2.com.ankamagames.jerakine.interfaces.IDataCenter import IDataCenter
 
 
@@ -47,11 +48,11 @@ class Server(IDataCenter):
 
     @staticmethod
     def getServerById(id: int) -> "Server":
-        return GameData.getObject(Server.MODULE, id)
+        return GameData().getObject(Server.MODULE, id)
 
     @staticmethod
     def getServers(self) -> list:
-        return GameData.getObjects(Server.MODULE)
+        return GameData().getObjects(Server.MODULE)
 
     idAccessors: IdAccessors = IdAccessors(getServerById, getServers)
 

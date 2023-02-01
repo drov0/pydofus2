@@ -1,5 +1,5 @@
 from types import FunctionType
-from pydofus2.com.ankamagames.berilia.managers.KernelEventsManager import KernelEventsManager, KernelEvts
+from pydofus2.com.ankamagames.berilia.managers.KernelEventsManager import KernelEventsManager, KernelEvent
 from pydofus2.com.ankamagames.dofus.datacenter.servers.Server import Server
 import pydofus2.com.ankamagames.dofus.kernel.Kernel as krnl
 from pydofus2.com.ankamagames.dofus.kernel.net.ConnectionsHandler import ConnectionsHandler
@@ -216,7 +216,7 @@ class ServerSelectionFrame(Frame):
                 self._serversUsedList.append(server)
                 PlayerManager().serversList.append(server.id)
         KernelEventsManager().send(
-            KernelEvts.SERVERS_LIST,
+            KernelEvent.SERVERS_LIST,
             return_value={
                 "all": self._serversList,
                 "used": self._serversUsedList,

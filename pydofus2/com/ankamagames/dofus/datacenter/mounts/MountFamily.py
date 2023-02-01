@@ -1,5 +1,6 @@
 from pydofus2.com.ankamagames.dofus.types.IdAccessors import IdAccessors
 from pydofus2.com.ankamagames.jerakine.data.GameData import GameData
+
 from pydofus2.com.ankamagames.jerakine.data.I18n import I18n
 from pydofus2.com.ankamagames.jerakine.interfaces.IDataCenter import IDataCenter
 
@@ -21,11 +22,11 @@ class MountFamily(IDataCenter):
 
     @classmethod
     def getMountFamilyById(cls, id: int) -> "MountFamily":
-        return GameData.getObject(cls.MODULE, id)
+        return GameData().getObject(cls.MODULE, id)
 
     @classmethod
     def getMountFamilies(cls) -> list["MountFamily"]:
-        return GameData.getobjects(cls.MODULE)
+        return GameData().getObjects(cls.MODULE)
 
     idAccessors: IdAccessors = IdAccessors(getMountFamilyById, getMountFamilies)
 

@@ -8,7 +8,6 @@ from pydofus2.com.ankamagames.dofus.network.messages.game.context.roleplay.fight
     GameRolePlayShowChallengeMessage,
 )
 from pydofus2.com.ankamagames.dofus.network.types.game.context.fight.FightTeamInformations import FightTeamInformations
-from pydofus2.com.ankamagames.jerakine.benchmark.BenchmarkTimer import BenchmarkTimer
 from pydofus2.com.ankamagames.atouin.managers.EntitiesManager import EntitiesManager
 from pydofus2.com.ankamagames.atouin.managers.MapDisplayManager import MapDisplayManager
 from pydofus2.com.ankamagames.atouin.messages.MapLoadedMessage import MapLoadedMessage
@@ -111,7 +110,7 @@ from pydofus2.com.ankamagames.jerakine.logger.Logger import Logger
 from pydofus2.com.ankamagames.jerakine.messages.Frame import Frame
 from pydofus2.com.ankamagames.jerakine.messages.Message import Message
 from pydofus2.com.ankamagames.dofus.logic.game.roleplay.types.FightTeam import FightTeam
-from pydofus2.com.ankamagames.berilia.managers.KernelEventsManager import KernelEventsManager, KernelEvts
+from pydofus2.com.ankamagames.berilia.managers.KernelEventsManager import KernelEventsManager, KernelEvent
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
@@ -156,15 +155,11 @@ class RoleplayEntitiesFrame(AbstractEntitiesFrame, Frame):
 
         self._waitingEmotesAnims = dict()
 
-        self._auraCycleTimer: BenchmarkTimer = None
-
         self._auraCycleIndex: int = None
 
         self._lastEntityWithAura: AnimatedCharacter = None
 
         self._dispatchPlayerNewLook: bool = None
-
-        # self._aggressions = list[Aggression]()
 
         self._aggroTimeoutIdsMonsterAssoc = dict()
 
@@ -386,9 +381,9 @@ class RoleplayEntitiesFrame(AbstractEntitiesFrame, Frame):
 
             elif PlayedCharacterManager().isInAnomaly:
                 PlayedCharacterManager().isInAnomaly = False
-                
-            KernelEventsManager().send(KernelEvts.MAPPROCESSED)
+
             self.mcidm_processessed = True
+            KernelEventsManager().send(KernelEvent.MAPPROCESSED)
             return False
 
         if isinstance(msg, CharacterMovementStoppedMessage):
@@ -406,8 +401,8 @@ class RoleplayEntitiesFrame(AbstractEntitiesFrame, Frame):
             if isinstance(msg.informations, GameRolePlayMerchantInformations):
                 self._merchantsList.append(msg.informations)
                 self._merchantsList.sort(key=lambda e: e.name)
-            if not isinstance(msg.informations, GameRolePlayGroupMonsterInformations):
-                KernelEventsManager().send(KernelEvts.ACTORSHOWED, msg.informations)
+            if isinstance(msg.informations, GameRolePlayHumanoidInformations):
+                KernelEventsManager().send(KernelEvent.ACTORSHOWED, msg.informations)
             return True
 
         if isinstance(msg, GameRolePlayShowMultipleActorsMessage):

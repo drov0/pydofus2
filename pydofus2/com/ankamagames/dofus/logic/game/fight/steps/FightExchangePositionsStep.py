@@ -1,21 +1,11 @@
 from pydofus2.com.ankamagames.dofus.logic.game.fight.steps.IFightStep import IFightStep
-from pydofus2.com.ankamagames.dofus.network.enums.FightEventEnum import FightEventEnum
-from pydofus2.com.ankamagames.jerakine.logger.Logger import Logger
-from pydofus2.com.ankamagames.dofus.logic.game.fight.fightEvents.FightEventsHelper import (
-    FightEventsHelper,
-)
 from pydofus2.com.ankamagames.dofus.logic.game.fight.frames.FightEntitiesFrame import (
     FightEntitiesFrame,
 )
-from pydofus2.com.ankamagames.dofus.logic.game.fight.frames.FightSpellCastFrame import (
-    FightSpellCastFrame,
-)
-
 from pydofus2.com.ankamagames.dofus.network.types.game.context.fight.GameFightFighterInformations import (
     GameFightFighterInformations,
 )
 from pydofus2.com.ankamagames.jerakine.sequencer.AbstractSequencable import AbstractSequencable
-
 
 class FightExchangePositionsStep(AbstractSequencable, IFightStep):
 
@@ -62,13 +52,6 @@ class FightExchangePositionsStep(AbstractSequencable, IFightStep):
         )
         fighterInfosOne.disposition.cellId = self._fighterOneNewCell
         fighterInfosTwo.disposition.cellId = self._fighterTwoNewCell
-        FightEventsHelper().sendFightEvent(
-            FightEventEnum.FIGHTERS_POSITION_EXCHANGE,
-            [self._fighterOne, self._fighterTwo],
-            0,
-            self.castingSpellId,
-        )
-        FightSpellCastFrame.updateRangeAndTarget()
         self.executeCallbacks()
 
     @property

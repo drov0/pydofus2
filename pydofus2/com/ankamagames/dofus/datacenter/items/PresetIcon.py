@@ -1,4 +1,5 @@
 from pydofus2.com.ankamagames.jerakine.data.GameData import GameData
+
 from pydofus2.com.ankamagames.jerakine.interfaces.IDataCenter import IDataCenter
 
 
@@ -15,8 +16,8 @@ class PresetIcon(IDataCenter):
 
     @classmethod
     def getPresetIconById(cls, id: int) -> "PresetIcon":
-        return GameData.getObject(cls.MODULE, id)
+        return GameData().getObject(cls.MODULE, id)
 
     @classmethod
     def getPresetIcons(cls) -> list:
-        return GameData.getObjects(cls.MODULE)
+        return GameData().getObjects(cls.MODULE)

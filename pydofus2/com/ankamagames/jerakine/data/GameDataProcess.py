@@ -42,7 +42,7 @@ class GameDataProcess:
         readFct = self.getReadFunctionType(type)
         itemCount = self._searchFieldCount[fieldName]
         self._stream.position(self._searchFieldIndex[fieldName])
-        if readFct == None:
+        if readFct is None:
             return None
         for i in range(itemCount):
             if match(readFct()):
@@ -63,11 +63,9 @@ class GameDataProcess:
         if not iterable:
             value = [value]
         itemCount: int = self._searchFieldCount[fieldName]
-        # print("items count ", itemCount)
         self._stream.seek(self._searchFieldIndex[fieldName])
         ftype: int = self._searchFieldType[fieldName]
         readFct: FunctionType = self.getReadFunctionType(ftype)
-        # print("read func ", readFct.__name__)
         if readFct is None:
             return None
         valueIndex: int = 0
@@ -75,7 +73,6 @@ class GameDataProcess:
         currentValue = value[0]
         for _ in range(itemCount):
             readValue = readFct()
-            # print("read value ", readValue)
             while readValue > currentValue:
                 valueIndex += 1
                 if valueIndex == len(value):
@@ -178,7 +175,6 @@ class GameDataProcess:
             readFct = self.readI18n
             if not isinstance(self._stream, BinaryStream):
                 directBuffer = BinaryStream()
-                # FIXME: Somethis is wrong here
                 directBuffer.position = 0
                 self._stream = directBuffer
                 self._currentStream = self._stream

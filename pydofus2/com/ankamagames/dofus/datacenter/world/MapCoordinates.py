@@ -1,6 +1,7 @@
 import sys
 from pydofus2.com.ankamagames.dofus.datacenter.world.MapPosition import MapPosition
 from pydofus2.com.ankamagames.jerakine.data.GameData import GameData
+
 from pydofus2.com.ankamagames.jerakine.interfaces.IDataCenter import IDataCenter
 from pydofus2.com.ankamagames.jerakine.logger.Logger import Logger
 
@@ -26,7 +27,7 @@ class MapCoordinates(IDataCenter):
 
     @classmethod
     def getMapCoordinatesByCompressedCoords(cls, compressedCoords: int) -> "MapCoordinates":
-        return GameData.getObject(cls.MODULE, compressedCoords)
+        return GameData().getObject(cls.MODULE, compressedCoords)
 
     @classmethod
     def getMapCoordinatesByCoords(cls, x: int, y: int) -> "MapCoordinates":

@@ -1,6 +1,3 @@
-from pydofus2.com.ankamagames.dofus.logic.game.fight.fightEvents.FightEventsHelper import (
-    FightEventsHelper,
-)
 from pydofus2.com.ankamagames.dofus.logic.game.fight.steps.IFightStep import IFightStep
 from pydofus2.com.ankamagames.dofus.logic.game.fight.types.FightEventEnum import FightEventEnum
 from pydofus2.com.ankamagames.dofus.network.enums.FightSpellCastCriticalEnum import (
@@ -31,16 +28,6 @@ class FightCloseCombatStep(AbstractSequencable, IFightStep):
         return "closeCombat"
 
     def start(self) -> None:
-        if self._verboseCast:
-            FightEventsHelper().sendFightEvent(
-                FightEventEnum.FIGHTER_CLOSE_COMBAT,
-                [self._fighterId, self._weaponId, self._critical],
-                self._fighterId,
-                self.castingSpellId,
-                True,
-            )
-        if self._critical == FightSpellCastCriticalEnum.CRITICAL_HIT:
-            pass
         self.executeCallbacks()
 
     @property

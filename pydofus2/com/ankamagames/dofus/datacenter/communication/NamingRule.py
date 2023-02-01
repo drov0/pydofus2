@@ -1,5 +1,6 @@
 from pydofus2.com.ankamagames.dofus.types.IdAccessors import IdAccessors
 from pydofus2.com.ankamagames.jerakine.data.GameData import GameData
+
 from pydofus2.com.ankamagames.jerakine.interfaces.IDataCenter import IDataCenter
 from pydofus2.com.ankamagames.jerakine.logger.Logger import Logger
 
@@ -21,10 +22,10 @@ class NamingRule(IDataCenter):
 
     @classmethod
     def getNamingRuleById(cls, id: int) -> "NamingRule":
-        return GameData.getObject(cls.MODULE, id)
+        return GameData().getObject(cls.MODULE, id)
 
     @classmethod
     def getNamingRules(cls) -> list["NamingRule"]:
-        return GameData.getObjects(cls.MODULE)
+        return GameData().getObjects(cls.MODULE)
 
     idAccessors: IdAccessors = IdAccessors(getNamingRuleById, getNamingRules)

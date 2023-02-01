@@ -160,8 +160,6 @@ class AbstractEntitiesFrame(Frame):
                 pcm.PlayedCharacterManager().restrictions = humanoid.humanoidInfo.restrictions
         if infos.disposition.cellId != -1:
             characterEntity.position = MapPoint.fromCellId(infos.disposition.cellId)
-        # Logger().debug(f"addOrUpdateActor new actor added {infos.contextualId} position is {characterEntity.position}")
-
         return characterEntity
 
     def updateActorDisposition(self, actorId: float, newDisposition: EntityDispositionInformations) -> None:

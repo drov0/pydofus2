@@ -1,5 +1,6 @@
 from pydofus2.com.ankamagames.dofus.types.IdAccessors import IdAccessors
 from pydofus2.com.ankamagames.jerakine.data.GameData import GameData
+
 from pydofus2.com.ankamagames.jerakine.interfaces.IDataCenter import IDataCenter
 
 
@@ -24,11 +25,11 @@ class CustomModeBreedSpell(IDataCenter):
 
     @classmethod
     def getCustomModeBreedSpellById(cls, id: int) -> "CustomModeBreedSpell":
-        return GameData.getObject(cls.MODULE, id)
+        return GameData().getObject(cls.MODULE, id)
 
     @classmethod
     def getCustomModeBreedSpells(cls) -> list["CustomModeBreedSpell"]:
-        return GameData.getObjects(cls.MODULE)
+        return GameData().getObjects(cls.MODULE)
 
     idAccessors: IdAccessors = IdAccessors(getCustomModeBreedSpellById, getCustomModeBreedSpells)
 

@@ -10,11 +10,6 @@ from pydofus2.com.ankamagames.jerakine.sequencer.AbstractSequencable import (
 from pydofus2.com.ankamagames.dofus.logic.game.fight.frames.FightEntitiesFrame import (
     FightEntitiesFrame,
 )
-
-from pydofus2.com.ankamagames.dofus.logic.game.fight.frames.FightSpellCastFrame import (
-    FightSpellCastFrame,
-)
-
 if TYPE_CHECKING:
     from pydofus2.com.ankamagames.dofus.logic.game.fight.frames.FightContextFrame import (
         FightContextFrame,
@@ -77,5 +72,4 @@ class FightEntityMovementStep(AbstractSequencable, IFightStep):
 
     def movementEnd(self) -> None:
         self.updateCarriedEntitiesPosition()
-        FightSpellCastFrame.updateRangeAndTarget()
         self.executeCallbacks()

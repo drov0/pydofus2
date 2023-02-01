@@ -7,6 +7,7 @@ from pydofus2.com.ankamagames.jerakine.data.I18n import I18n
 from pydofus2.com.ankamagames.jerakine.data.GameData import GameData
 
 
+
 class MonsterRace:
 
     MODULE: str = "MonsterRaces"
@@ -31,11 +32,11 @@ class MonsterRace:
 
     @staticmethod
     def getMonsterRaceById(id: int) -> "MonsterGrade":
-        return GameData.getObject(MonsterRace.MODULE, id)
+        return GameData().getObject(MonsterRace.MODULE, id)
 
     @staticmethod
     def getMonsterRaces() -> list:
-        return GameData.getObjects(MonsterRace.MODULE)
+        return GameData().getObjects(MonsterRace.MODULE)
 
     idAccessors: IdAccessors = IdAccessors(getMonsterRaceById, getMonsterRaces)
 

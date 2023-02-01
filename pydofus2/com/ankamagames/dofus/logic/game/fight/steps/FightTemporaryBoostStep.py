@@ -1,9 +1,5 @@
-from pydofus2.com.ankamagames.dofus.logic.game.fight.fightEvents.FightEventsHelper import (
-    FightEventsHelper,
-)
 from pydofus2.com.ankamagames.dofus.logic.game.fight.steps.IFightStep import IFightStep
 from pydofus2.com.ankamagames.dofus.logic.game.fight.types.BasicBuff import BasicBuff
-from pydofus2.com.ankamagames.dofus.logic.game.fight.types.FightEventEnum import FightEventEnum
 from pydofus2.com.ankamagames.jerakine.sequencer.AbstractSequencable import AbstractSequencable
 
 
@@ -43,22 +39,6 @@ class FightTemporaryBoostStep(AbstractSequencable, IFightStep):
         return "temporaryBoost"
 
     def start(self) -> None:
-        FightEventsHelper().sendFightEvent(
-            FightEventEnum.FIGHTER_TEMPORARY_BOOSTED,
-            [
-                self._fighterId,
-                self._statName,
-                self._duration,
-                self._durationText,
-                self._visibleInLog,
-            ],
-            self._fighterId,
-            self.castingSpellId,
-            False,
-            2,
-            1,
-            self._buff,
-        )
         self.executeCallbacks()
 
     @property

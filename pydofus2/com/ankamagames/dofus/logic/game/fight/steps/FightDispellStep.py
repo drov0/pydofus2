@@ -1,6 +1,3 @@
-from pydofus2.com.ankamagames.dofus.logic.game.fight.fightEvents.FightEventsHelper import (
-    FightEventsHelper,
-)
 from pydofus2.com.ankamagames.dofus.logic.game.fight.managers.BuffManager import BuffManager
 from pydofus2.com.ankamagames.dofus.logic.game.fight.steps.IFightStep import IFightStep
 from pydofus2.com.ankamagames.dofus.logic.game.fight.types.FightEventEnum import FightEventEnum
@@ -21,12 +18,6 @@ class FightDispellStep(AbstractSequencable, IFightStep):
 
     def start(self) -> None:
         BuffManager().dispell(self._fighterId)
-        FightEventsHelper().sendFightEvent(
-            FightEventEnum.FIGHTER_GOT_DISPELLED,
-            [self._fighterId],
-            self._fighterId,
-            self.castingSpellId,
-        )
         self.executeCallbacks()
 
     @property

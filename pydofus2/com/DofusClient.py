@@ -1,5 +1,5 @@
 import threading
-from pydofus2.com.ankamagames.berilia.managers.KernelEventsManager import KernelEventsManager, KernelEvts
+from pydofus2.com.ankamagames.berilia.managers.KernelEventsManager import KernelEventsManager, KernelEvent
 from pydofus2.com.ankamagames.dofus.kernel.net.DisconnectionReason import DisconnectionReason
 from pydofus2.com.ankamagames.dofus.logic.common.managers.PlayerManager import PlayerManager
 from time import perf_counter, sleep
@@ -43,11 +43,11 @@ class DofusClient(threading.Thread):
         Kernel().init()
         I18nFileAccessor()
         DataMapProvider()
-        KernelEventsManager().once(KernelEvts.CHARACTER_SELECTION_SUCCESS, self._onCharacterSelectionSuccess)
-        KernelEventsManager().once(KernelEvts.CRASH, self._onCrash)
-        KernelEventsManager().once(KernelEvts.SHUTDOWN, self._onShutdown)
-        KernelEventsManager().once(KernelEvts.RESTART, self._onRestart)
-        KernelEventsManager().once(KernelEvts.RECONNECT, self._onReconnect)
+        KernelEventsManager().once(KernelEvent.CHARACTER_SELECTION_SUCCESS, self._onCharacterSelectionSuccess)
+        KernelEventsManager().once(KernelEvent.CRASH, self._onCrash)
+        KernelEventsManager().once(KernelEvent.SHUTDOWN, self._onShutdown)
+        KernelEventsManager().once(KernelEvent.RESTART, self._onRestart)
+        KernelEventsManager().once(KernelEvent.RECONNECT, self._onReconnect)
         AuthentificationManager().setToken(self._loginToken)
         if self._characterId:
             PlayerManager().allowAutoConnectCharacter = True
@@ -120,7 +120,6 @@ class DofusClient(threading.Thread):
             self.worker.process(LoginAction.create(self._serverId != 0, self._serverId))
             while not self._killSig.is_set():
                 msg = ConnectionsHandler().receive()
-                # Logger().debug(f"[DofusClient] Received message: {msg}")
                 self.worker.process(msg)
         except:
             Logger().error(f"[DofusClient] Error in main loop.", exc_info=True)

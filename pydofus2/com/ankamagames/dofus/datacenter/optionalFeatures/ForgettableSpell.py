@@ -1,5 +1,6 @@
 from pydofus2.com.ankamagames.dofus.types.IdAccessors import IdAccessors
 from pydofus2.com.ankamagames.jerakine.data.GameData import GameData
+
 from pydofus2.com.ankamagames.jerakine.interfaces.IDataCenter import IDataCenter
 
 
@@ -15,11 +16,11 @@ class ForgettableSpell(IDataCenter):
 
     @classmethod
     def getForgettableSpells(cls) -> list["ForgettableSpell"]:
-        return GameData.getObjects(cls.MODULE)
+        return GameData().getObjects(cls.MODULE)
 
     @classmethod
     def getForgettableSpellById(cls, id: int) -> "ForgettableSpell":
-        return GameData.getObject(cls.MODULE, id)
+        return GameData().getObject(cls.MODULE, id)
 
     idAccessors: IdAccessors = IdAccessors(getForgettableSpellById, getForgettableSpells)
 

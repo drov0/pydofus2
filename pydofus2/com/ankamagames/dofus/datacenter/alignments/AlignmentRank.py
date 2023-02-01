@@ -1,4 +1,5 @@
 from pydofus2.com.ankamagames.jerakine.data.GameData import GameData
+
 from pydofus2.com.ankamagames.dofus.types.IdAccessors import IdAccessors
 
 
@@ -19,10 +20,10 @@ class AlignmentRank:
 
     @classmethod
     def getAlignmentRanks(cls) -> list["AlignmentRank"]:
-        return GameData.getObjects(cls.MODULE)
+        return GameData().getObjects(cls.MODULE)
 
     @classmethod
     def getAlignmentRankById(cls, id) -> "AlignmentRank":
-        return GameData.getObject(cls.MODULE, id)
+        return GameData().getObject(cls.MODULE, id)
 
     idAccessors = IdAccessors(getAlignmentRankById, getAlignmentRanks)

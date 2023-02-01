@@ -3,6 +3,7 @@ from pydofus2.com.ankamagames.dofus.datacenter.feature.criterion.GroupFeatureCri
 )
 from pydofus2.com.ankamagames.dofus.types.IdAccessors import IdAccessors
 from pydofus2.com.ankamagames.jerakine.data.GameData import GameData
+
 from pydofus2.com.ankamagames.jerakine.interfaces.IDataCenter import IDataCenter
 
 
@@ -31,7 +32,7 @@ class OptionalFeature(IDataCenter):
 
     @classmethod
     def getOptionalFeatureById(cls, id: int) -> "OptionalFeature":
-        return GameData.getObject(cls.MODULE, id)
+        return GameData().getObject(cls.MODULE, id)
 
     @classmethod
     def getOptionalFeatureByKeyword(cls, key: str) -> "OptionalFeature":
@@ -44,7 +45,7 @@ class OptionalFeature(IDataCenter):
 
     @classmethod
     def getAllOptionalFeatures(cls) -> list["OptionalFeature"]:
-        return GameData.getObjects(cls.MODULE)
+        return GameData().getObjects(cls.MODULE)
 
     @property
     def canBeEnabled(self) -> bool:

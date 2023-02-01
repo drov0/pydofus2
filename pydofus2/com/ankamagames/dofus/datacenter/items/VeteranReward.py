@@ -16,7 +16,7 @@ class VeteranReward(IDataCenter):
         super().__init__()
 
     def getAllVeteranRewards(self) -> list:
-        return GameData.getObjects(MODULE)
+        return GameDataFileAccessor().getObjects(MODULE)
 
     @property
     def item(self) -> ItemWrapper:

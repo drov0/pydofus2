@@ -3,6 +3,7 @@ from pydofus2.com.ankamagames.dofus.datacenter.spells.SpellPair import SpellPair
 from pydofus2.com.ankamagames.dofus.misc.utils.GameDataQuery import GameDataQuery
 from pydofus2.com.ankamagames.dofus.types.IdAccessors import IdAccessors
 from pydofus2.com.ankamagames.jerakine.data.GameData import GameData
+
 from pydofus2.com.ankamagames.jerakine.interfaces.IDataCenter import IDataCenter
 
 
@@ -49,11 +50,11 @@ class Idol(IDataCenter):
 
     @classmethod
     def getIdolById(cls, id: int) -> "Idol":
-        return GameData.getObject(cls.MODULE, id)
+        return GameData().getObject(cls.MODULE, id)
 
     @classmethod
     def getIdols(cls) -> list["Idol"]:
-        return GameData.getObjects(cls.MODULE)
+        return GameData().getObjects(cls.MODULE)
 
     @property
     def item(self) -> Item:

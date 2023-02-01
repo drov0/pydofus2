@@ -1,13 +1,6 @@
 from pydofus2.com.ankamagames.dofus.kernel.Kernel import Kernel
 from pydofus2.com.ankamagames.dofus.logic.game.common.misc.DofusEntities import DofusEntities
-from pydofus2.com.ankamagames.dofus.logic.game.fight.fightEvents.FightEventsHelper import (
-    FightEventsHelper,
-)
 from typing import TYPE_CHECKING
-from pydofus2.com.ankamagames.dofus.logic.game.fight.frames.FightSpellCastFrame import (
-    FightSpellCastFrame,
-)
-
 if TYPE_CHECKING:
     from pydofus2.com.ankamagames.dofus.logic.game.fight.frames.FightContextFrame import (
         FightContextFrame,
@@ -66,12 +59,6 @@ class FightEntitySlideStep(AbstractSequencable, IFightStep):
                 )
             fighterInfos = FightEntitiesFrame.getCurrentInstance().getEntityInfos(self._fighterId)
             fighterInfos.disposition.cellId = self._endCell.cellId
-            # TODO : Uncomment this and sleep for path dyration if the server rejects the simulated behavio
-            # path = MovementPath()
-            # path.start = self._entity.position
-            # path.end = self._endCell
-            # path.addPoint(PathElement(self._entity.position, path.start.orientationTo(path.end)))
-            # path.fill()
         else:
             Logger().warn("Unable to slide unexisting fighter " + self._fighterId + ".")
         self.slideFinished()
@@ -81,11 +68,4 @@ class FightEntitySlideStep(AbstractSequencable, IFightStep):
         return [self._fighterId]
 
     def slideFinished(self) -> None:
-        FightSpellCastFrame.updateRangeAndTarget()
-        FightEventsHelper().sendFightEvent(
-            FightEventEnum.FIGHTER_SLIDE,
-            [self._fighterId],
-            self._fighterId,
-            self.castingSpellId,
-        )
         self.executeCallbacks()

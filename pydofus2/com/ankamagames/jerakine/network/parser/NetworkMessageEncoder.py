@@ -45,7 +45,7 @@ class NetworkMessageEncoder:
             try:
                 dataWrite[spec["type"]][1](data, inst)
             except:
-                Logger().error("Error while writing %s", inst)
+                Logger().error(f"Error while encoding {TypeEnum(typeId)} {inst}")
                 raise
             return data
 

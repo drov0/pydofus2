@@ -2,17 +2,18 @@ from pydofus2.com.ankamagames.dofus.types.IdAccessors import IdAccessors
 from pydofus2.com.ankamagames.jerakine.data.GameData import GameData
 
 
+
 class MonsterMiniBoss:
 
     MODULE: str = "MonsterMiniBoss"
 
     @staticmethod
     def getMonsterById(id: int) -> "MonsterMiniBoss":
-        return GameData.getObject(MonsterMiniBoss.MODULE, id)
+        return GameData().getObject(MonsterMiniBoss.MODULE, id)
 
     @staticmethod
     def getMonsters() -> list:
-        return GameData.getObjects(MonsterMiniBoss.MODULE)
+        return GameData().getObjects(MonsterMiniBoss.MODULE)
 
     idAccessors: IdAccessors = IdAccessors(getMonsterById, getMonsters)
 

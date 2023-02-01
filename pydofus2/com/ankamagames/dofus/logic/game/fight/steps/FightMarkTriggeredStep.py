@@ -1,6 +1,3 @@
-from pydofus2.com.ankamagames.dofus.logic.game.fight.fightEvents.FightEventsHelper import (
-    FightEventsHelper,
-)
 from pydofus2.com.ankamagames.dofus.logic.game.fight.managers.MarkedCellsManager import (
     MarkedCellsManager,
 )
@@ -38,21 +35,6 @@ class FightMarkTriggeredStep(AbstractSequencable, IFightStep):
             Logger().error(f"Trying to trigger an unknown mark ({self._markId}). Aborting.")
             self.executeCallbacks()
             return
-        evt: str = FightEventEnum.UNKNOWN_FIGHT_EVENT
-        if mi.markType == GameActionMarkTypeEnum.GLYPH:
-            evt = FightEventEnum.FIGHTER_TRIGGERED_GLYPH
-        if mi.markType == GameActionMarkTypeEnum.TRAP:
-            evt = FightEventEnum.FIGHTER_TRIGGERED_TRAP
-        if mi.markType == GameActionMarkTypeEnum.PORTAL:
-            evt = FightEventEnum.FIGHTER_TRIGGERED_PORTAL
-        else:
-            Logger().warn("Unknown mark type triggered (" + str(mi.markType) + ").")
-        FightEventsHelper().sendFightEvent(
-            evt,
-            [self._fighterId, self._casterId, mi.associatedSpell.id],
-            0,
-            self.castingSpellId,
-        )
         self.executeCallbacks()
 
     @property

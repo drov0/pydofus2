@@ -15,7 +15,8 @@ from pydofus2.com.ankamagames.dofus.types.enums.ItemCategoryEnum import ItemCate
 from pydofus2.com.ankamagames.jerakine.data.IPostInit import IPostInit
 from pydofus2.com.ankamagames.jerakine.data.I18n import I18n
 from pydofus2.com.ankamagames.jerakine.data.GameData import GameData
-from pydofus2.com.ankamagames.jerakine.data.GameDataFileAccessor import GameDataFileAccessor
+
+from pydofus2.com.ankamagames.jerakine.data.GameData import GameData
 from pydofus2.com.ankamagames.jerakine.interfaces.IDataCenter import IDataCenter
 from pydofus2.com.ankamagames.jerakine.logger.Logger import Logger
 
@@ -275,15 +276,15 @@ class Item(IPostInit, IDataCenter):
     def getItemById(cls, id: int, returnDefaultItemIfNull: bool = True) -> "Item":
         if type(id) is not int:
             raise TypeError("id must be an int")
-        item: Item = GameData.getObject(cls.MODULE, id)
+        item: Item = GameData().getObject(cls.MODULE, id)
         if item or not returnDefaultItemIfNull:
             return item
         Logger().error(f"Impossible de trouver l'objet {id}, remplacement par l'objet 666")
-        return GameData.getObject(cls.MODULE, 666)
+        return GameData().getObject(cls.MODULE, 666)
 
     @staticmethod
     def getItems(cls) -> list:
-        return GameData.getObjects(cls.MODULE)
+        return GameData().getObjects(cls.MODULE)
 
     idAccessors: IdAccessors = IdAccessors(getItemById, getItems)
 
@@ -292,7 +293,7 @@ class Item(IPostInit, IDataCenter):
         item = None
         items: list[Item] = list[Item]()
         for id in ids:
-            item = GameDataFileAccessor().getObject(cls.MODULE, id)
+            item = GameData().getObject(cls.MODULE, id)
             if item:
                 items.append(item)
         return items

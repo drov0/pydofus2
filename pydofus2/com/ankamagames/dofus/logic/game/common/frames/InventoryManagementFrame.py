@@ -54,8 +54,6 @@ from pydofus2.com.ankamagames.dofus.network.messages.game.inventory.items.Object
 from pydofus2.com.ankamagames.dofus.network.messages.game.inventory.items.WatchInventoryContentMessage import (
     WatchInventoryContentMessage,
 )
-from pydofus2.com.ankamagames.jerakine.benchmark.BenchmarkTimer import BenchmarkTimer
-from pydofus2.com.ankamagames.jerakine.logger.Logger import Logger
 from pydofus2.com.ankamagames.jerakine.messages.Frame import Frame
 from pydofus2.com.ankamagames.jerakine.messages.Message import Message
 from pydofus2.com.ankamagames.jerakine.types.DataStoreType import DataStoreType
@@ -93,8 +91,6 @@ class InventoryManagementFrame(Frame):
     _objectPositionModification: bool
 
     _presetTypeIdByPresetId: dict
-
-    _waitTimer: BenchmarkTimer
 
     _chatText: str
 

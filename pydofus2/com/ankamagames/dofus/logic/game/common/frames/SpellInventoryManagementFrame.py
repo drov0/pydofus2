@@ -247,10 +247,6 @@ class SpellInventoryManagementFrame(Frame, metaclass=Singleton):
                                 spellWrapper.id, True, spellWrapper.spellLevel
                             )
                             spellManager.resetInitialCooldown(spellCastManager.currentTurn)
-            if Kernel().worker.contains("FightSpellCastFrame"):
-                Kernel().worker.removeFrame(Kernel().worker.getFrame("FightSpellCastFrame"))
-            # imf = Kernel().worker.getFrame("InventoryManagementFrame")
-            # InventoryManager().shortcutBarSpells = imf.getWrappersFromShortcuts(sscmsg.shortcuts)
             return False
 
         elif isinstance(msg, SpellVariantActivationRequestAction):

@@ -3,6 +3,7 @@ from pydofus2.com.ankamagames.dofus.internalDatacenter.DataEnum import DataEnum
 from pydofus2.com.ankamagames.dofus.types.IdAccessors import IdAccessors
 from pydofus2.com.ankamagames.dofus.types.enums.HintPriorityEnum import HintPriorityEnum
 from pydofus2.com.ankamagames.jerakine.data.GameData import GameData
+
 from pydofus2.com.ankamagames.jerakine.data.I18n import I18n
 from pydofus2.com.ankamagames.jerakine.data.IPostInit import IPostInit
 from pydofus2.com.ankamagames.jerakine.interfaces.IDataCenter import IDataCenter
@@ -51,12 +52,12 @@ class Hint(IDataCenter, IPostInit):
 
     @classmethod
     def getHintById(cls, id: int) -> "Hint":
-        return GameData.getObject(cls.MODULE, id)
+        return GameData().getObject(cls.MODULE, id)
 
     @classmethod
     def getHints(cls) -> list["Hint"]:
         if not cls._allHints:
-            cls._allHints = GameData.getObjects(cls.MODULE)
+            cls._allHints = GameData().getObjects(cls.MODULE)
         return cls._allHints
 
     @property

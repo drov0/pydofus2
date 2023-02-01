@@ -40,7 +40,6 @@ from pydofus2.com.ankamagames.dofus.network.types.game.interactive.InteractiveEl
     InteractiveElementSkill,
 )
 from pydofus2.com.ankamagames.dofus.network.types.game.interactive.StatedElement import StatedElement
-from pydofus2.com.ankamagames.jerakine.benchmark.BenchmarkTimer import BenchmarkTimer
 from pydofus2.com.ankamagames.jerakine.logger.Logger import Logger
 from pydofus2.com.ankamagames.jerakine.messages.Frame import Frame
 from pydofus2.com.ankamagames.jerakine.messages.Message import Message
@@ -240,9 +239,6 @@ class RoleplayInteractivesFrame(Frame):
     def getInteractiveElementsCells(self) -> list[int]:
         cells = [cellObj.position.cellId for cellObj in self._ie.values() if cellObj is not None]
         return cells
-
-    def getInteractiveActionTimer(self, pUser) -> BenchmarkTimer:
-        return self._interactiveActionTimers[pUser]
 
     def getInteractiveElement(self, elementId: int, skillId=None) -> InteractiveElementData:
         ie = self._ie.get(elementId)

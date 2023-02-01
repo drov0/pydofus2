@@ -1,5 +1,5 @@
 import threading
-from pydofus2.com.ankamagames.berilia.managers.KernelEventsManager import KernelEventsManager, KernelEvts
+from pydofus2.com.ankamagames.berilia.managers.KernelEventsManager import KernelEventsManager, KernelEvent
 from pydofus2.com.ankamagames.jerakine.logger.Logger import Logger
 from pydofus2.com.ankamagames.jerakine.messages.Frame import Frame
 from pydofus2.com.ankamagames.jerakine.messages.Message import Message
@@ -112,7 +112,7 @@ class Worker(MessageHandler):
                 Logger().debug(
                     f"[WORKER] >> Frames list after push: {[(str(f), f.priority.value) for f in self._framesList]}"
                 )
-            KernelEventsManager().send(KernelEvts.FRAME_PUSHED, frame)
+            KernelEventsManager().send(KernelEvent.FRAME_PUSHED, frame)
         else:
             Logger().warn(f"[WORKER] Frame '{frame}' refused to be pushed.")
 
@@ -135,7 +135,7 @@ class Worker(MessageHandler):
                 self._framesBeingDeleted.remove(frame)
             if self.DEBUG_FRAMES:
                 Logger().debug(f"[WORKER] << Frame {frame} pulled.")
-            KernelEventsManager().send(KernelEvts.FRAME_PULLED, frame)
+            KernelEventsManager().send(KernelEvent.FRAME_PULLED, frame)
         else:
             Logger().warn(f"[WORKER] Frame {frame} refused to be pulled.")
 

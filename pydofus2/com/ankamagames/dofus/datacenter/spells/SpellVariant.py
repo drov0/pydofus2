@@ -1,4 +1,5 @@
 from pydofus2.com.ankamagames.jerakine.data.GameData import GameData
+
 from pydofus2.com.ankamagames.jerakine.interfaces.IDataCenter import IDataCenter
 from pydofus2.com.ankamagames.jerakine.logger.Logger import Logger
 from typing import TYPE_CHECKING
@@ -19,11 +20,11 @@ class SpellVariant(IDataCenter):
 
     @classmethod
     def getSpellVariantById(cls, id: int) -> "SpellVariant":
-        return GameData.getObject(cls.MODULE, id)
+        return GameData().getObject(cls.MODULE, id)
 
     @classmethod
     def getSpellVariants(cls) -> list["SpellVariant"]:
-        return GameData.getObjects(cls.MODULE)
+        return GameData().getObjects(cls.MODULE)
 
     @property
     def spells(self) -> list["Spell"]:

@@ -3,6 +3,7 @@ from pydofus2.com.ankamagames.dofus.datacenter.items.criterion.GroupItemCriterio
 )
 from pydofus2.com.ankamagames.dofus.types.IdAccessors import IdAccessors
 from pydofus2.com.ankamagames.jerakine.data.GameData import GameData
+
 from pydofus2.com.ankamagames.jerakine.data.I18n import I18n
 from pydofus2.com.ankamagames.jerakine.interfaces.IDataCenter import IDataCenter
 
@@ -42,11 +43,11 @@ class Companion(IDataCenter):
 
     @classmethod
     def getCompanionById(cls, id: int) -> "Companion":
-        return GameData.getObject(cls.MODULE, id)
+        return GameData().getObject(cls.MODULE, id)
 
     @classmethod
     def getCompanions(cls) -> list["Companion"]:
-        return GameData.getObjects(cls.MODULE)
+        return GameData().getObjects(cls.MODULE)
 
     idAccessors: IdAccessors = IdAccessors(getCompanionById, getCompanions)
 

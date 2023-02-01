@@ -1,5 +1,5 @@
 import math
-from pydofus2.com.ankamagames.jerakine.benchmark.BenchmarkTimer import BenchmarkTimer
+from pydofus2.com.ankamagames.berilia.managers.KernelEventsManager import KernelEvent, KernelEventsManager
 from pydofus2.com.ankamagames.atouin.managers.EntitiesManager import EntitiesManager
 import pydofus2.com.ankamagames.atouin.managers.MapDisplayManager as mdm
 from pydofus2.com.ankamagames.atouin.messages.MapLoadedMessage import MapLoadedMessage
@@ -38,7 +38,6 @@ from pydofus2.com.ankamagames.dofus.logic.game.fight.actions.ChallengeTargetsLis
 from pydofus2.com.ankamagames.dofus.logic.game.fight.actions.UpdateSpellModifierAction import (
     UpdateSpellModifierAction,
 )
-import pydofus2.com.ankamagames.dofus.logic.game.fight.fightEvents.FightEventsHelper as fevth
 from pydofus2.com.ankamagames.dofus.logic.game.fight.frames.FightBattleFrame import (
     FightBattleFrame,
 )
@@ -177,7 +176,6 @@ from pydofus2.com.ankamagames.dofus.network.types.game.context.roleplay.party.Na
     NamedPartyTeam,
 )
 from pydofus2.com.ankamagames.dofus.network.types.game.idol.Idol import Idol
-from pydofus2.com.ankamagames.jerakine.benchmark.BenchmarkTimer import BenchmarkTimer
 from pydofus2.com.ankamagames.jerakine.data.I18n import I18n
 from pydofus2.com.ankamagames.jerakine.logger.Logger import Logger
 from pydofus2.com.ankamagames.jerakine.messages.Frame import Frame
@@ -217,10 +215,6 @@ class FightContextFrame(Frame):
     _battleFrame: FightBattleFrame
 
     _lastEffectEntity: WeakReference
-
-    _timerFighterInfo: BenchmarkTimer = None
-
-    _timerMovementRange: BenchmarkTimer = None
 
     _currentFighterInfo: GameFightFighterInformations
 
@@ -408,7 +402,6 @@ class FightContextFrame(Frame):
 
         if isinstance(msg, GameFightStartingMessage):
             gfsmsg = msg
-            fevth.FightEventsHelper().reset()
             self.fightType = gfsmsg.fightType
             self._fightAttackerId = gfsmsg.attackerId
             PlayedCharacterManager().fightId = gfsmsg.fightId
@@ -439,12 +432,14 @@ class FightContextFrame(Frame):
             return False
 
         elif isinstance(msg, MapLoadedMessage):
+            Logger().debug(f"[FightContext] Fight map Loaded")
             gcrmsg = GameContextReadyMessage()
             gcrmsg.init(mdm.MapDisplayManager().currentMapPoint.mapId)
             ConnectionsHandler().conn.send(gcrmsg)
             return True
 
         elif isinstance(msg, GameFightResumeMessage):
+            Logger().debug(f"[FightContext] Fight resumed after disconnect")
             gfrmsg = msg
             playerId = PlayedCharacterManager().id
             CurrentPlayedFighterManager().setCurrentSummonedCreature(gfrmsg.summonCount, playerId)
@@ -484,6 +479,7 @@ class FightContextFrame(Frame):
                     durationPool[buff.effect.spellId] = castingSpell
                 buffTmp = BuffManager.makeBuffFromEffect(buff.effect, castingSpell, buff.actionId)
                 BuffManager().addBuff(buffTmp)
+            KernelEventsManager().send(KernelEvent.FIGHT_RESUMED)
             return True
 
         elif isinstance(msg, GameFightUpdateTeamMessage):
@@ -538,7 +534,6 @@ class FightContextFrame(Frame):
             gfemsg = msg
             hardcoreLoots = None
             CurrentPlayedFighterManager().resetPlayerSpellList()
-            fevth.FightEventsHelper().sendAllFightEvent(True)
             PlayedCharacterManager().isFighting = False
             PlayedCharacterManager().fightId = -1
             SpellWrapper.removeAllSpellWrapperBut(PlayedCharacterManager().id, None)
@@ -640,9 +635,6 @@ class FightContextFrame(Frame):
                     resultsRecap["budget"] = gfemsg.budget
                 idols = [fi.id for fi in self._fightIdols]
                 resultsRecap["idols"] = idols
-                resultsKey = self.saveResults(resultsRecap)
-                if not PlayedCharacterManager().isSpectator:
-                    fevth.FightEventsHelper().sendFightEvent(FightEventEnum.FIGHT_END, [resultsKey], 0, -1, True)
                 if PlayerManager().kisServerPort > 0:
                     pass
             Kernel().worker.removeFrame(self)
@@ -711,10 +703,6 @@ class FightContextFrame(Frame):
         if self._preparationFrame:
             Kernel().worker.removeFrame(self._preparationFrame)
         self._lastEffectEntity = None
-        if self._timerFighterInfo:
-            self._timerFighterInfo.cancel()
-        if self._timerMovementRange:
-            self._timerMovementRange.cancel()
         self._currentFighterInfo = None
         simf: "SpellInventoryManagementFrame" = Kernel().worker.getFrame("SpellInventoryManagementFrame")
         if simf:
@@ -772,6 +760,3 @@ class FightContextFrame(Frame):
 
     def stopReconnection(self, *args) -> None:
         Kernel().beingInReconection = False
-
-    def sendFightEvents(self) -> None:
-        fevth.FightEventsHelper().sendAllFightEvent()

@@ -1,13 +1,7 @@
 from pydofus2.com.ankamagames.dofus.kernel.Kernel import Kernel
 from pydofus2.com.ankamagames.dofus.logic.game.common.misc.DofusEntities import DofusEntities
-from pydofus2.com.ankamagames.dofus.logic.game.fight.fightEvents.FightEventsHelper import (
-    FightEventsHelper,
-)
 from pydofus2.com.ankamagames.dofus.logic.game.fight.frames.FightEntitiesFrame import (
     FightEntitiesFrame,
-)
-from pydofus2.com.ankamagames.dofus.logic.game.fight.frames.FightSpellCastFrame import (
-    FightSpellCastFrame,
 )
 from pydofus2.com.ankamagames.dofus.logic.game.fight.steps.IFightStep import IFightStep
 from pydofus2.com.ankamagames.dofus.logic.game.fight.types.FightEventEnum import FightEventEnum
@@ -115,13 +109,6 @@ class FightCarryCharacterStep(AbstractSequencable, IFightStep):
         carriedAnimatedEntity: AnimatedCharacter = None
         carriedEntity: IEntity = DofusEntities().getEntity(self._carriedId)
         carryingEntity = DofusEntities().getEntity(self._fighterId)
-        FightEventsHelper().sendFightEvent(
-            FightEventEnum.FIGHTER_CARRY,
-            [self._fighterId, self._carriedId],
-            0,
-            self.castingSpellId,
-        )
-        FightSpellCastFrame.updateRangeAndTarget()
         fightEntitiesFrame: FightEntitiesFrame = Kernel().worker.getFrame("FightEntitiesFrame")
         if fightEntitiesFrame is not None:
             carrierAnimatedEntity = carryingEntity

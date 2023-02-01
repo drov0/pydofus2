@@ -1,5 +1,6 @@
 from pydofus2.com.ankamagames.dofus.datacenter.items.RandomDropItem import RandomDropItem
 from pydofus2.com.ankamagames.jerakine.data.GameData import GameData
+
 from pydofus2.com.ankamagames.jerakine.interfaces.IDataCenter import IDataCenter
 
 
@@ -26,11 +27,11 @@ class RandomDropGroup(IDataCenter):
 
     @classmethod
     def getRandomDropGroupById(cls, id: int) -> "RandomDropGroup":
-        return GameData.getObject(cls.MODULE, id)
+        return GameData().getObject(cls.MODULE, id)
 
     @classmethod
     def getAllRandomDropGroup(cls) -> list:
-        return GameData.getObjects(cls.MODULE)
+        return GameData().getObjects(cls.MODULE)
 
     @property
     def groupWeight(self) -> int:

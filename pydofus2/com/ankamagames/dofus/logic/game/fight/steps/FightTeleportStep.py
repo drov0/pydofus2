@@ -1,20 +1,8 @@
 from pydofus2.com.ankamagames.dofus.logic.game.fight.steps.IFightStep import IFightStep
-from pydofus2.com.ankamagames.dofus.kernel.Kernel import Kernel
-from pydofus2.com.ankamagames.dofus.logic.game.common.managers.PlayedCharacterManager import (
-    PlayedCharacterManager,
-)
 from pydofus2.com.ankamagames.dofus.logic.game.common.misc.DofusEntities import DofusEntities
-from pydofus2.com.ankamagames.dofus.logic.game.fight.fightEvents.FightEventsHelper import (
-    FightEventsHelper,
-)
 from pydofus2.com.ankamagames.dofus.logic.game.fight.frames.FightEntitiesFrame import (
     FightEntitiesFrame,
 )
-from pydofus2.com.ankamagames.dofus.logic.game.fight.frames.FightSpellCastFrame import (
-    FightSpellCastFrame,
-)
-from pydofus2.com.ankamagames.dofus.logic.game.fight.frames.FightTurnFrame import FightTurnFrame
-from pydofus2.com.ankamagames.dofus.logic.game.fight.types.FightEventEnum import FightEventEnum
 from pydofus2.com.ankamagames.dofus.network.types.game.context.fight.GameFightFighterInformations import (
     GameFightFighterInformations,
 )
@@ -53,14 +41,6 @@ class FightTeleportStep(AbstractSequencable, IFightStep):
         if carriedEntity:
             carriedEntityInfos = FightEntitiesFrame.getCurrentInstance().getEntityInfos(carriedEntity.id)
             carriedEntityInfos.disposition.cellId = infos.disposition.cellId
-        if self._fighterId == PlayedCharacterManager().id:
-            fightTurnFrame: "FightTurnFrame" = Kernel().worker.getFrame("FightTurnFrame")
-            if fightTurnFrame and fightTurnFrame.myTurn:
-                fightTurnFrame.drawPath()
-        FightSpellCastFrame.updateRangeAndTarget()
-        FightEventsHelper().sendFightEvent(
-            FightEventEnum.FIGHTER_TELEPORTED, [self._fighterId], 0, self.castingSpellId
-        )
         self.executeCallbacks()
 
     @property

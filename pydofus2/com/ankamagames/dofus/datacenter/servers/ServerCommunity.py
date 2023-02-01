@@ -1,6 +1,7 @@
 from pydofus2.com.ankamagames.dofus.datacenter.communication.NamingRule import NamingRule
 from pydofus2.com.ankamagames.dofus.types.IdAccessors import IdAccessors
 from pydofus2.com.ankamagames.jerakine.data.GameData import GameData
+
 from pydofus2.com.ankamagames.jerakine.data.I18n import I18n
 from pydofus2.com.ankamagames.jerakine.interfaces.IDataCenter import IDataCenter
 from pydofus2.com.ankamagames.jerakine.logger.Logger import Logger
@@ -67,11 +68,11 @@ class ServerCommunity(IDataCenter):
 
     @classmethod
     def getServerCommunityById(cls, id: int) -> "ServerCommunity":
-        return GameData.getObject(cls.MODULE, id)
+        return GameData().getObject(cls.MODULE, id)
 
     @classmethod
     def getServerCommunities(cls) -> list["ServerCommunity"]:
-        return GameData.getObjects(cls.MODULE)
+        return GameData().getObjects(cls.MODULE)
 
     idAccessors: IdAccessors = IdAccessors(getServerCommunityById, getServerCommunities)
 

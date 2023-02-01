@@ -1,11 +1,8 @@
 from typing import TYPE_CHECKING
-from pydofus2.com.ankamagames.jerakine.logger.Logger import Logger
 from pydofus2.com.ankamagames.jerakine.enum.GameDataTypeEnum import GameDataTypeEnum
 from pydofus2.com.ankamagames.jerakine.data.BinaryStream import BinaryStream
-
 if TYPE_CHECKING:
     from pydofus2.com.ankamagames.jerakine.data.ModuleReader import ModuleReader
-
 
 class GameDataField:
 
@@ -23,7 +20,6 @@ class GameDataField:
         self.readData = self.getReadMethod(typeId, stream)
 
     def getReadMethod(self, typeId, stream: BinaryStream):
-
         if typeId == GameDataTypeEnum.INT:
             return self.readInteger
 

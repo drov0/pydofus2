@@ -51,7 +51,6 @@ class FightDeathStep(AbstractSequencable, IFightStep):
     def start(self) -> None:
         dyingEntity: IEntity = DofusEntities().getEntity(self._entityId)
         if not dyingEntity:
-            Logger().warn("Unable to play death of an unexisting fighter " + self._entityId + ".")
             return
         fightEntitites = FightEntitiesFrame.getCurrentInstance()
         fighterInfos: GameFightFighterInformations = fightEntitites.getEntityInfos(self._entityId)

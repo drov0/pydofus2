@@ -4,8 +4,9 @@ from typing import Any
 from collections.abc import Iterable
 from pydofus2.com.ankamagames.dofus.misc.lists.GameDataList import GameDataList
 from pydofus2.com.ankamagames.jerakine.data.GameData import GameData
+
 from pydofus2.com.ankamagames.jerakine.data.GameDataField import GameDataField
-from pydofus2.com.ankamagames.jerakine.data.GameDataFileAccessor import GameDataFileAccessor
+from pydofus2.com.ankamagames.jerakine.data.GameData import GameData
 from pydofus2.com.ankamagames.jerakine.data.I18nFileAccessor import I18nFileAccessor
 from pydofus2.com.ankamagames.jerakine.enum.GameDataTypeEnum import GameDataTypeEnum
 from pydofus2.com.ankamagames.jerakine.logger.Logger import Logger
@@ -15,7 +16,7 @@ from pydofus2.com.ankamagames.jerakine.utils.misc.StringUtils import StringUtils
 class GameDataQuery:
     def getQueryableFields(cls, target: object) -> list[str]:
         target = cls.checkPackage(target)
-        return GameDataFileAccessor().getDataProcessor(target["MODULE"]).getQueryableField()
+        return GameData().getDataProcessor(target["MODULE"]).getQueryableField()
 
     def union(cls, *idsVectors) -> list[int]:
         result: list[int] = list[int]()
@@ -55,7 +56,7 @@ class GameDataQuery:
         fieldName = cls.checkField(target, fieldName)
         if not fieldName:
             return list[int]()
-        result = GameDataFileAccessor().getDataProcessor(getattr(target, "MODULE")).queryEquals(fieldName, value)
+        result = GameData().getDataProcessor(getattr(target, "MODULE")).queryEquals(fieldName, value)
         if isinstance(value, Iterable):
             return cls.union(result)
         return result
@@ -69,7 +70,7 @@ class GameDataQuery:
         if not value:
             raise cls.ArgumentError("value arg cannot be None")
         return (
-            GameDataFileAccessor()
+            GameData()
             .getDataProcessor(target["MODULE"])
             .query(
                 fieldName,
@@ -83,7 +84,7 @@ class GameDataQuery:
         fieldName = cls.checkField(target, fieldName)
         if not fieldName:
             return list[int]()
-        return GameDataFileAccessor().getDataProcessor(target["MODULE"]).query(fieldName, cls.getGreaterThanFct(value))
+        return GameData().getDataProcessor(target["MODULE"]).query(fieldName, cls.getGreaterThanFct(value))
 
     @classmethod
     def querySmallerThan(cls, target: object, fieldName: str, value) -> list[int]:
@@ -91,7 +92,7 @@ class GameDataQuery:
         fieldName = cls.checkField(target, fieldName)
         if not fieldName:
             return list[int]()
-        return GameDataFileAccessor().getDataProcessor(target["MODULE"]).query(fieldName, cls.getSmallerThanFct(value))
+        return GameData().getDataProcessor(target["MODULE"]).query(fieldName, cls.getSmallerThanFct(value))
 
     @classmethod
     def returnInstance(cls, target: object, ids: list[int]) -> list[object]:
@@ -100,7 +101,7 @@ class GameDataQuery:
         result: list[object] = list[object]()
         module: str = target["MODULE"]
         for i in range(len(ids)):
-            instance = GameData.getObject(module, ids[i])
+            instance = GameData().getObject(module, ids[i])
             if instance != None:
                 result.append(instance)
         return result
@@ -122,7 +123,7 @@ class GameDataQuery:
             fieldNames = cls.checkField(target, fieldNames)
         if not fieldNames or len(fieldNames) == 0:
             return list[int]()
-        return GameDataFileAccessor().getDataProcessor(target["MODULE"]).sort(fieldNames, ids, ascending)
+        return GameData().getDataProcessor(target["MODULE"]).sort(fieldNames, ids, ascending)
 
     @classmethod
     def sortI18n(cls, datas, fields, ascending) -> Any:
@@ -179,9 +180,9 @@ class GameDataQuery:
     @classmethod
     def checkField(cls, target: object, name: str) -> str:
         module = getattr(target, "MODULE")
-        fields = GameDataFileAccessor().getDataProcessor(module).getQueryableField()
+        fields = GameData().getDataProcessor(module).getQueryableField()
         if name not in fields:
-            fieldType = GameDataFileAccessor().getDataProcessor(module).getFieldType(name + "Id")
+            fieldType = GameData().getDataProcessor(module).getFieldType(name + "Id")
             if name + "Id" not in fields or GameDataTypeEnum(fieldType) != GameDataTypeEnum.I18N:
                 Logger().error("Field " + name + " not found in " + target.__name__)
                 return None

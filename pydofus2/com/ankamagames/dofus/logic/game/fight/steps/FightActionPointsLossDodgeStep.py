@@ -1,6 +1,3 @@
-from pydofus2.com.ankamagames.dofus.logic.game.fight.fightEvents.FightEventsHelper import (
-    FightEventsHelper,
-)
 from pydofus2.com.ankamagames.dofus.logic.game.fight.steps.IFightStep import IFightStep
 from pydofus2.com.ankamagames.dofus.logic.game.fight.steps.abstract.AbstractDodgePointLossStep import (
     AbstractDodgePointLossStep,
@@ -17,10 +14,4 @@ class FightActionPointsLossDodgeStep(AbstractDodgePointLossStep, IFightStep):
         return "actionPointsLossDodge"
 
     def start(self) -> None:
-        FightEventsHelper().sendFightEvent(
-            FightEventEnum.FIGHTER_AP_LOSS_DODGED,
-            [self._fighterId, self._amount],
-            self._fighterId,
-            self.castingSpellId,
-        )
         self.executeCallbacks()

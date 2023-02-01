@@ -1,7 +1,7 @@
 import base64
 import hashlib
 import random
-from pydofus2.com.ankamagames.berilia.managers.KernelEventsManager import KernelEventsManager, KernelEvts
+from pydofus2.com.ankamagames.berilia.managers.KernelEventsManager import KernelEventsManager, KernelEvent
 from pydofus2.com.ankamagames.dofus.kernel.Kernel import Kernel
 from pydofus2.com.ankamagames.dofus.kernel.net.ConnectionsHandler import ConnectionsHandler
 from pydofus2.com.ankamagames.dofus.kernel.net.DisconnectionReasonEnum import (
@@ -97,7 +97,7 @@ class AuthentificationFrame(Frame):
                 flashKeyMsg = ClientKeyMessage()
                 flashKeyMsg.key = InterClientManager.flashKey
                 ConnectionsHandler().conn.send(flashKeyMsg)
-            KernelEventsManager().send(KernelEvts.IN_GAME, msg)
+            KernelEventsManager().send(KernelEvent.IN_GAME, msg)
             return True
 
         elif isinstance(msg, IdentificationSuccessMessage):
@@ -116,7 +116,7 @@ class AuthentificationFrame(Frame):
             PlayerManager().accountCreation = ismsg.accountCreation
             PlayerManager().wasAlreadyConnected = ismsg.wasAlreadyConnected
             DataStoreType.ACCOUNT_ID = str(ismsg.accountId)
-            KernelEventsManager().send(KernelEvts.LOGGED_IN, ismsg)
+            KernelEventsManager().send(KernelEvent.LOGGED_IN, ismsg)
             Kernel().worker.removeFrame(self)
             Kernel().worker.addFrame(ssfrm.ServerSelectionFrame())
             return True

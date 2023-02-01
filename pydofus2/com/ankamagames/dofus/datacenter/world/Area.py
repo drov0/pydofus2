@@ -2,6 +2,7 @@ from pydofus2.com.ankamagames.dofus.datacenter.world.SuperArea import SuperArea
 from pydofus2.com.ankamagames.dofus.datacenter.world.WorldMap import WorldMap
 from pydofus2.com.ankamagames.dofus.types.IdAccessors import IdAccessors
 from pydofus2.com.ankamagames.jerakine.data.GameData import GameData
+
 from pydofus2.com.ankamagames.jerakine.data.GameDataField import GameDataField
 from pydofus2.com.ankamagames.jerakine.data.I18n import I18n
 from pydofus2.com.ankamagames.jerakine.interfaces.IDataCenter import IDataCenter
@@ -50,7 +51,7 @@ class Area(IDataCenter):
 
     @classmethod
     def getAreaById(cls, id: int) -> "Area":
-        area: Area = GameData.getObject(cls.MODULE, id)
+        area: Area = GameData().getObject(cls.MODULE, id)
         if not area or not area.superArea or not area.hasVisibleSubAreas:
             return None
         return area

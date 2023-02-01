@@ -1,5 +1,6 @@
 from pydofus2.com.ankamagames.dofus.types.IdAccessors import IdAccessors
 from pydofus2.com.ankamagames.jerakine.data.GameData import GameData
+
 from pydofus2.com.ankamagames.jerakine.data.I18n import I18n
 from pydofus2.com.ankamagames.jerakine.interfaces.IDataCenter import IDataCenter
 
@@ -23,7 +24,7 @@ class SpellType(IDataCenter):
 
     @classmethod
     def getSpellTypeById(cls, id: int) -> "SpellType":
-        return GameData.getObject(cls.MODULE, id)
+        return GameData().getObject(cls.MODULE, id)
 
     idAccessors: IdAccessors = IdAccessors(getSpellTypeById, None)
 

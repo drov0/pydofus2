@@ -1,5 +1,6 @@
 from pydofus2.com.ankamagames.dofus.types.IdAccessors import IdAccessors
 from pydofus2.com.ankamagames.jerakine.data.GameData import GameData
+
 from pydofus2.com.ankamagames.jerakine.data.I18n import I18n
 from pydofus2.com.ankamagames.jerakine.interfaces.IDataCenter import IDataCenter
 from pydofus2.com.ankamagames.jerakine.logger.Logger import Logger
@@ -20,7 +21,7 @@ class TaxCollectorFirstname(IDataCenter):
 
     @classmethod
     def getTaxCollectorFirstnameById(cls, id: int) -> "TaxCollectorFirstname":
-        return GameData.getObject(cls.MODULE, id)
+        return GameData().getObject(cls.MODULE, id)
 
     idAccessors: IdAccessors = IdAccessors(getTaxCollectorFirstnameById, None)
 

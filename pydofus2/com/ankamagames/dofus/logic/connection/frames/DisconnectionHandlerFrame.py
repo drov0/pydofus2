@@ -1,4 +1,4 @@
-from pydofus2.com.ankamagames.berilia.managers.KernelEventsManager import KernelEventsManager, KernelEvts
+from pydofus2.com.ankamagames.berilia.managers.KernelEventsManager import KernelEventsManager, KernelEvent
 from pydofus2.com.ankamagames.jerakine.benchmark.BenchmarkTimer import BenchmarkTimer
 from time import perf_counter
 from pydofus2.com.ankamagames.dofus.kernel.Kernel import Kernel
@@ -92,15 +92,15 @@ class DisconnectionHandlerFrame(Frame):
                             or reason.reason == Reason.EXCEPTION_THROWN
                         ):
                             if reason.reason == Reason.EXCEPTION_THROWN:
-                                KernelEventsManager().send(KernelEvts.CRASH, message=reason.message)
+                                KernelEventsManager().send(KernelEvent.CRASH, message=reason.message)
                             else:
-                                KernelEventsManager().send(KernelEvts.SHUTDOWN, message=reason.message)
+                                KernelEventsManager().send(KernelEvent.SHUTDOWN, message=reason.message)
                         elif (
                             reason.reason == Reason.RESTARTING
                             or reason.reason == Reason.DISCONNECTED_BY_POPUP
                             or reason.reason == Reason.CONNECTION_LOST
                         ):
-                            KernelEventsManager().send(KernelEvts.RESTART, message=reason.message)
+                            KernelEventsManager().send(KernelEvent.RESTART, message=reason.message)
                         else:
                             Kernel().worker.process(ExpectedSocketClosureMessage(reason.reason))
             else:
@@ -123,7 +123,7 @@ class DisconnectionHandlerFrame(Frame):
         elif isinstance(msg, UnexpectedSocketClosureMessage):
             Logger().debug("got hook UnexpectedSocketClosure")
             gsaF.GameServerApproachFrame.authenticationTicketAccepted = False
-            KernelEventsManager().send(KernelEvts.CRASH, message="Unexpected socket closure")
+            KernelEventsManager().send(KernelEvent.CRASH, message="Unexpected socket closure")
             return True
 
         elif isinstance(msg, ConnectionProcessCrashedMessage):
@@ -133,7 +133,7 @@ class DisconnectionHandlerFrame(Frame):
 
     def reconnect(self) -> None:
         Logger().debug("Reconnecting...")
-        KernelEventsManager().send(KernelEvts.RECONNECT, message="Reconnecting")
+        KernelEventsManager().send(KernelEvent.RECONNECT, message="Reconnecting")
 
     def pulled(self) -> bool:
         return True

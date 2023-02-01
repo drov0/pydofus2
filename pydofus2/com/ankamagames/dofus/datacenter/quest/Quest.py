@@ -6,6 +6,7 @@ from pydofus2.com.ankamagames.dofus.network.types.game.context.roleplay.quest.Ga
 )
 from pydofus2.com.ankamagames.dofus.types.IdAccessors import IdAccessors
 from pydofus2.com.ankamagames.jerakine.data.GameData import GameData
+
 from pydofus2.com.ankamagames.jerakine.data.I18n import I18n
 from pydofus2.com.ankamagames.jerakine.interfaces.IDataCenter import IDataCenter
 from pydofus2.com.ankamagames.jerakine.logger.Logger import Logger
@@ -77,11 +78,11 @@ class Quest(IDataCenter):
 
     @classmethod
     def getQuestById(cls, id: int) -> "Quest":
-        return GameData.getObject(cls.MODULE, id)
+        return GameData().getObject(cls.MODULE, id)
 
     @classmethod
     def getQuests(cls) -> list["Quest"]:
-        return GameData.getObjects(cls.MODULE)
+        return GameData().getObjects(cls.MODULE)
 
     @property
     def name(self) -> str:

@@ -27,7 +27,6 @@ class FightEnteringStateStep(AbstractSequencable, IFightStep):
         return "enteringState"
 
     def start(self) -> None:
-        spell: SpellState = SpellState.getSpellStateById(self._stateId)
         self.executeCallbacks()
 
     @property

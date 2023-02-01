@@ -1,4 +1,5 @@
 from pydofus2.com.ankamagames.jerakine.data.GameData import GameData
+
 from pydofus2.com.ankamagames.jerakine.interfaces.IDataCenter import IDataCenter
 from pydofus2.com.ankamagames.dofus.types.IdAccessors import IdAccessors
 
@@ -46,10 +47,10 @@ class SpellState(IDataCenter):
 
     @staticmethod
     def getSpellStateById(id: int) -> "SpellState":
-        return GameData.getObject(SpellState.MODULE, id)
+        return GameData().getObject(SpellState.MODULE, id)
 
     @staticmethod
     def getSpellStates() -> list["SpellState"]:
-        return GameData.getObjects(SpellState.MODULE)
+        return GameData().getObjects(SpellState.MODULE)
 
     idAccessors: IdAccessors = IdAccessors(getSpellStateById, getSpellStates)

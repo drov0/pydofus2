@@ -1,9 +1,5 @@
 from pydofus2.com.ankamagames.dofus.logic.game.common.misc.DofusEntities import DofusEntities
-from pydofus2.com.ankamagames.dofus.logic.game.fight.fightEvents.FightEventsHelper import (
-    FightEventsHelper,
-)
 from pydofus2.com.ankamagames.dofus.logic.game.fight.steps.IFightStep import IFightStep
-from pydofus2.com.ankamagames.dofus.logic.game.fight.types.FightEventEnum import FightEventEnum
 from pydofus2.com.ankamagames.jerakine.entities.interfaces.IEntity import IEntity
 from pydofus2.com.ankamagames.jerakine.logger.Logger import Logger
 from pydofus2.com.ankamagames.jerakine.sequencer.AbstractSequencable import AbstractSequencable
@@ -32,12 +28,6 @@ class FightTackledStep(AbstractSequencable, IFightStep, ISequencableListener):
         self.stepFinished(self)
 
     def stepFinished(self, step: ISequencable, withTimout: bool = False) -> None:
-        FightEventsHelper().sendFightEvent(
-            FightEventEnum.FIGHTER_GOT_TACKLED,
-            [self._fighterId],
-            0,
-            self.castingSpellId,
-        )
         self.executeCallbacks()
 
     @property

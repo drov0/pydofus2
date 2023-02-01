@@ -1,4 +1,4 @@
-from pydofus2.com.ankamagames.berilia.managers.KernelEventsManager import KernelEventsManager, KernelEvts
+from pydofus2.com.ankamagames.berilia.managers.KernelEventsManager import KernelEventsManager, KernelEvent
 import pydofus2.com.ankamagames.dofus.logic.game.roleplay.frames.RoleplayEntitiesFrame as ref
 import pydofus2.com.ankamagames.dofus.logic.game.roleplay.frames.RoleplayInteractivesFrame as rif
 import pydofus2.com.ankamagames.dofus.logic.game.roleplay.frames.RoleplayWorldFrame as rplWF
@@ -106,12 +106,11 @@ class RoleplayContextFrame(Frame):
             Kernel().worker.addFrame(self._worldFrame)
             Kernel().worker.addFrame(self.movementFrame)
             Kernel().worker.addFrame(self._interactivesFrame)
-            KernelEventsManager().send(KernelEvts.MAPLOADED, msg.id)
+            KernelEventsManager().send(KernelEvent.MAPLOADED, msg.id)
             self._listMapNpcsMsg = None
             return True
 
         elif isinstance(msg, GameContextDestroyMessage):
-            Logger().debug("RoleplayContextFrame: will be retrieved from kernel because we are switching to fight")
             Kernel().worker.removeFrame(self)
 
             return False
@@ -124,11 +123,9 @@ class RoleplayContextFrame(Frame):
     def pulled(self) -> bool:
         self._interactivesFrame.clear()
         Kernel().worker.removeFrame(self._entitiesFrame)
-        # Kernel().worker.removeFrame(self._delayedActionFrame)
         Kernel().worker.removeFrame(self._worldFrame)
         Kernel().worker.removeFrame(self.movementFrame)
         Kernel().worker.removeFrame(self._interactivesFrame)
-        # Logger().debug("RoleplayContextFrame pulled")
         # TODO : Don't forget to uncomment this when those frames are implemented dumpass
         # Kernel().worker.removeFrame(self._spectatorManagementFrame)
         # Kernel().worker.removeFrame(self._npcDialogFrame)

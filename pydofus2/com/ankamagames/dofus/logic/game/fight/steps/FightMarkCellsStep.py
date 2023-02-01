@@ -1,9 +1,5 @@
 from pydofus2.com.ankamagames.dofus.datacenter.spells.Spell import Spell
 from pydofus2.com.ankamagames.dofus.datacenter.spells.SpellLevel import SpellLevel
-from pydofus2.com.ankamagames.dofus.kernel.Kernel import Kernel
-from pydofus2.com.ankamagames.dofus.logic.game.fight.fightEvents.FightEventsHelper import (
-    FightEventsHelper,
-)
 from pydofus2.com.ankamagames.dofus.logic.game.fight.frames.FightTurnFrame import FightTurnFrame
 from pydofus2.com.ankamagames.dofus.logic.game.fight.managers.MarkedCellsManager import (
     MarkedCellsManager,
@@ -100,14 +96,6 @@ class FightMarkCellsStep(AbstractSequencable, IFightStep):
                 evt = FightEventEnum.RUNE_APPEARED
             else:
                 Logger().warn(f"Unknown mark type ({mi.markType}).")
-            FightEventsHelper().sendFightEvent(evt, [mi.associatedSpell.id], 0, self.castingSpellId)
-            ftf = Kernel().worker.getFrame("FightTurnFrame")
-            if ftf and ftf.myTurn and ftf.lastPath:
-                for pe in ftf.lastPath.path:
-                    if pe.cellId not in mi.cells:
-                        updatePath = True
-                if updatePath:
-                    ftf.updatePath()
         self.executeCallbacks()
 
     @property

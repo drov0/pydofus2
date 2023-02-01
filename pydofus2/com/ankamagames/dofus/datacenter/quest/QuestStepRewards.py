@@ -2,6 +2,7 @@ from pydofus2.com.ankamagames.dofus.datacenter.quest.QuestStep import QuestStep
 from pydofus2.com.ankamagames.dofus.logic.game.common.managers.PlayedCharacterManager import PlayedCharacterManager
 from pydofus2.com.ankamagames.dofus.types.IdAccessors import IdAccessors
 from pydofus2.com.ankamagames.jerakine.data.GameData import GameData
+
 from pydofus2.com.ankamagames.jerakine.interfaces.IDataCenter import IDataCenter
 
 
@@ -40,11 +41,11 @@ class QuestStepRewards(IDataCenter):
 
     @classmethod
     def getQuestStepRewardsById(cls, id: int) -> "QuestStepRewards":
-        return GameData.getObject(cls.MODULE, id)
+        return GameData().getObject(cls.MODULE, id)
 
     @classmethod
     def getQuestStepRewards(cls) -> list["QuestStepRewards"]:
-        return GameData.getObjects(cls.MODULE)
+        return GameData().getObjects(cls.MODULE)
 
     @property
     def questStep(self) -> QuestStep:

@@ -29,7 +29,6 @@ class DLM:
         if header != 77:
             raise Exception("Unknown file format.")
         map_version = dlm_raw.readByte()
-        Logger().debug(f"Map version: {map_version}")
         id = dlm_raw.readUnsignedInt()
 
         if map_version >= 7:

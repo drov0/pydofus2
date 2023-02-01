@@ -4,7 +4,6 @@ from pydofus2.com.ankamagames.dofus.datacenter.spells.SpellLevel import SpellLev
 from pydofus2.com.ankamagames.dofus.enums.ActionIds import ActionIds
 from pydofus2.com.ankamagames.dofus.internalDatacenter.spells.SpellWrapper import SpellWrapper
 from pydofus2.com.ankamagames.dofus.kernel.Kernel import Kernel
-import pydofus2.com.ankamagames.dofus.logic.game.fight.fightEvents.FightEventsHelper as fevth
 import pydofus2.com.ankamagames.dofus.logic.game.fight.frames.FightEntitiesFrame as fenf
 from pydofus2.com.ankamagames.dofus.logic.game.fight.managers.CurrentPlayedFighterManager import (
     CurrentPlayedFighterManager,
@@ -220,7 +219,6 @@ class BuffManager(metaclass=Singleton):
                         newBuffs[buffItem.targetId] = []
                     newBuffs[buffItem.targetId].append(buffItem)
         self._buffs = newBuffs
-        fevth.FightEventsHelper().sendAllFightEvent(True)
 
     def markFinishingBuffs(self, targetId: float, currentTurnIsEnding: bool = True) -> None:
         fightBattleFrame: "FightBattleFrame" = Kernel().worker.getFrame("FightBattleFrame")

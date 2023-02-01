@@ -1,26 +1,14 @@
 from pydofus2.com.ankamagames.dofus.datacenter.spells.SpellState import SpellState
 from pydofus2.com.ankamagames.dofus.internalDatacenter.spells.SpellWrapper import SpellWrapper
-from pydofus2.com.ankamagames.dofus.kernel.Kernel import Kernel
-from pydofus2.com.ankamagames.dofus.logic.game.fight.fightEvents.FightEventsHelper import (
-    FightEventsHelper,
-)
-from typing import TYPE_CHECKING
-
-if TYPE_CHECKING:
-    from pydofus2.com.ankamagames.dofus.logic.game.fight.frames.FightBattleFrame import (
-        FightBattleFrame,
-    )
 from pydofus2.com.ankamagames.dofus.logic.game.fight.managers.FightersStateManager import (
     FightersStateManager,
 )
 from pydofus2.com.ankamagames.dofus.logic.game.fight.miscs.ActionIdHelper import ActionIdHelper
 from pydofus2.com.ankamagames.dofus.logic.game.fight.types.BasicBuff import BasicBuff
 from pydofus2.com.ankamagames.dofus.logic.game.fight.types.CastingSpell import CastingSpell
-from pydofus2.com.ankamagames.dofus.network.enums.FightEventEnum import FightEventEnum
 from pydofus2.com.ankamagames.dofus.network.types.game.actions.fight.FightTemporaryBoostStateEffect import (
     FightTemporaryBoostStateEffect,
 )
-from pydofus2.com.ankamagames.jerakine.logger.Logger import Logger
 
 
 class StateBuff(BasicBuff):
@@ -106,31 +94,4 @@ class StateBuff(BasicBuff):
         FightersStateManager().addStateOnTarget(self.targetId, self.stateId, self.delta)
 
     def removeBuffState(self) -> None:
-        statePreviouslyActivated: bool = FightersStateManager().hasState(self.targetId, self.stateId)
         FightersStateManager().removeStateOnTarget(self.targetId, self.stateId, self.delta)
-        stateActivated: bool = FightersStateManager().hasState(self.targetId, self.stateId)
-        chatLog: bool = False
-        fbf: "FightBattleFrame" = Kernel().worker.getFrame("FightBattleFrame")
-        if fbf and not fbf.executingSequence and fbf.deadFightersList.find(self.targetId) == -1 and not self.isSilent:
-            chatLog = True
-        if not stateActivated:
-            self.removeStateIcon()
-            if statePreviouslyActivated and chatLog and self._isVisibleInFightLog:
-                FightEventsHelper().sendFightEvent(
-                    FightEventEnum.FIGHTER_LEAVING_STATE,
-                    [self.targetId, self.stateId],
-                    self.targetId,
-                    -1,
-                    False,
-                    2,
-                )
-        elif not statePreviouslyActivated and stateActivated:
-            if chatLog and self._isVisibleInFightLog:
-                FightEventsHelper().sendFightEvent(
-                    FightEventEnum.FIGHTER_ENTERING_STATE,
-                    [self.targetId, self.stateId],
-                    self.targetId,
-                    -1,
-                    False,
-                    2,
-                )

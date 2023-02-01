@@ -14,6 +14,7 @@ from pydofus2.com.ankamagames.dofus.datacenter.quest.QuestObjective import Quest
 from pydofus2.com.ankamagames.dofus.misc.utils.GameDataQuery import GameDataQuery
 from pydofus2.com.ankamagames.dofus.types.IdAccessors import IdAccessors
 from pydofus2.com.ankamagames.jerakine.data.GameData import GameData
+
 from pydofus2.com.ankamagames.jerakine.data.I18n import I18n
 from pydofus2.com.ankamagames.jerakine.interfaces.IDataCenter import IDataCenter
 
@@ -65,11 +66,11 @@ class Achievement(IDataCenter):
 
     @classmethod
     def getAchievementById(cls, id: int) -> "Achievement":
-        return GameData.getObject(cls.MODULE, id)
+        return GameData().getObject(cls.MODULE, id)
 
     @classmethod
     def getAchievements(cls) -> list["Achievement"]:
-        return GameData.getObjects(cls.MODULE)
+        return GameData().getObjects(cls.MODULE)
 
     def getTotalAchievementPoints(self) -> float:
         achievements: list["Achievement"] = None

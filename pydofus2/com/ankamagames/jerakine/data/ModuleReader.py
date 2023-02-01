@@ -71,7 +71,6 @@ class ModuleReader:
                 classId = self._stream.readInt()
                 instance = self._classes[classId].from_stream(self._stream)
                 objects.append(instance)
-            self.getObjects.cache_clear()
             BenchmarkTimer(60, self.clearObjectsCache).start()
             return objects
 
@@ -100,7 +99,6 @@ class ModuleReader:
                 return None
             self._stream.seek(pointer)
             classId: int = self._stream.readInt()
-            BenchmarkTimer(60, self.getObject.cache_clear).start()
             return self._classes[classId].from_stream(self._stream)
 
     def close(self) -> None:

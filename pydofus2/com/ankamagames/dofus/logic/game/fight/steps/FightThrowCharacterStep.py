@@ -3,12 +3,6 @@ from pydofus2.com.ankamagames.jerakine.logger.Logger import Logger
 from whistle import Event
 from pydofus2.com.ankamagames.dofus.kernel.Kernel import Kernel
 from pydofus2.com.ankamagames.dofus.logic.game.common.misc.DofusEntities import DofusEntities
-from pydofus2.com.ankamagames.dofus.logic.game.fight.fightEvents.FightEventsHelper import (
-    FightEventsHelper,
-)
-from pydofus2.com.ankamagames.dofus.logic.game.fight.frames.FightSpellCastFrame import (
-    FightSpellCastFrame,
-)
 from pydofus2.com.ankamagames.dofus.logic.game.fight.frames.FightTurnFrame import FightTurnFrame
 from pydofus2.com.ankamagames.dofus.logic.game.fight.managers.CurrentPlayedFighterManager import (
     CurrentPlayedFighterManager,
@@ -100,13 +94,6 @@ class FightThrowCharacterStep(AbstractSequencable, IFightStep):
         return [self._carriedId]
 
     def throwFinished(self, e: Event = None) -> None:
-        FightEventsHelper().sendFightEvent(
-            FightEventEnum.FIGHTER_THROW,
-            [self._fighterId, self._carriedId, self._cellId],
-            0,
-            self.castingSpellId,
-        )
-        FightSpellCastFrame.updateRangeAndTarget()
         self.executeCallbacks()
 
     def __str__(self) -> str:

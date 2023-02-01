@@ -1,6 +1,7 @@
 from pydofus2.com.ankamagames.dofus.datacenter.world.WorldMap import WorldMap
 from pydofus2.com.ankamagames.dofus.types.IdAccessors import IdAccessors
 from pydofus2.com.ankamagames.jerakine.data.GameData import GameData
+
 from pydofus2.com.ankamagames.jerakine.data.I18n import I18n
 from pydofus2.com.ankamagames.jerakine.interfaces.IDataCenter import IDataCenter
 
@@ -22,7 +23,7 @@ class SuperArea(IDataCenter):
 
     @staticmethod
     def getSuperAreaById(id: int) -> "SuperArea":
-        superArea: SuperArea = GameData.getObject(SuperArea.MODULE, id)
+        superArea: SuperArea = GameData().getObject(SuperArea.MODULE, id)
         if not superArea:
             return None
         return superArea
@@ -31,7 +32,7 @@ class SuperArea(IDataCenter):
     def getAllSuperArea() -> list:
         if SuperArea._allSuperAreas:
             return SuperArea._allSuperAreas
-        _allSuperAreas = GameData.getobjects(SuperArea.MODULE)
+        _allSuperAreas = GameData().getObjects(SuperArea.MODULE)
         return _allSuperAreas
 
     idAccessors: IdAccessors = IdAccessors(getSuperAreaById, getAllSuperArea)

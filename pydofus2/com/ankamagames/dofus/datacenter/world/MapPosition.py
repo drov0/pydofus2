@@ -1,5 +1,6 @@
 from pydofus2.com.ankamagames.dofus.types.IdAccessors import IdAccessors
 from pydofus2.com.ankamagames.jerakine.data.GameData import GameData
+
 from pydofus2.com.ankamagames.jerakine.data.I18n import I18n
 from pydofus2.com.ankamagames.jerakine.interfaces.IDataCenter import IDataCenter
 from pydofus2.com.ankamagames.jerakine.logger.Logger import Logger
@@ -101,11 +102,11 @@ class MapPosition(IDataCenter):
 
     @staticmethod
     def getMapPositionById(id: float) -> "MapPosition":
-        return GameData.getObject(MapPosition.MODULE, id)
+        return GameData().getObject(MapPosition.MODULE, id)
 
     @staticmethod
     def getMapPositions() -> list:
-        return GameData.getObjects(MapPosition.MODULE)
+        return GameData().getObjects(MapPosition.MODULE)
 
     @staticmethod
     def getMapIdByCoord(x: int, y: int) -> list[float]:

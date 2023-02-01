@@ -1,6 +1,3 @@
-from pydofus2.com.ankamagames.dofus.logic.game.fight.fightEvents.FightEventsHelper import (
-    FightEventsHelper,
-)
 from pydofus2.com.ankamagames.dofus.logic.game.fight.managers.MarkedCellsManager import (
     MarkedCellsManager,
 )
@@ -33,20 +30,6 @@ class FightUnmarkCellsStep(AbstractSequencable, IFightStep):
             self.executeCallbacks()
             return
         MarkedCellsManager().removeGlyph(self._markId)
-        evt: str = FightEventEnum.UNKNOWN_FIGHT_EVENT
-        if mi.markType == GameActionMarkTypeEnum.GLYPH:
-            evt = FightEventEnum.GLYPH_DISAPPEARED
-        elif mi.markType == GameActionMarkTypeEnum.TRAP:
-            evt = FightEventEnum.TRAP_DISAPPEARED
-        elif mi.markType == GameActionMarkTypeEnum.PORTAL:
-            evt = FightEventEnum.PORTAL_DISAPPEARED
-        elif mi.markType == GameActionMarkTypeEnum.RUNE:
-            evt = FightEventEnum.RUNE_DISAPPEARED
-        elif mi.markType == GameActionMarkTypeEnum.WALL:
-            pass
-        else:
-            Logger().warn("Unknown mark type (" + mi.markType + ").")
-        FightEventsHelper().sendFightEvent(evt, [mi.associatedSpell.id], 0, self.castingSpellId)
         MarkedCellsManager().removeMark(self._markId)
         self.executeCallbacks()
 

@@ -5,6 +5,7 @@ from pydofus2.com.ankamagames.dofus.datacenter.quest.objectives.QuestObjectivePa
 )
 from pydofus2.com.ankamagames.dofus.types.IdAccessors import IdAccessors
 from pydofus2.com.ankamagames.jerakine.data.GameData import GameData
+
 from pydofus2.com.ankamagames.jerakine.interfaces.IDataCenter import IDataCenter
 from pydofus2.com.ankamagames.jerakine.logger.Logger import Logger
 from pydofus2.flash.geom.Point import Point
@@ -45,11 +46,11 @@ class QuestObjective(IDataCenter):
 
     @classmethod
     def getQuestObjectiveById(cls, id: int) -> "QuestObjective":
-        return GameData.getObject(cls.MODULE, id)
+        return GameData().getObject(cls.MODULE, id)
 
     @classmethod
     def getQuestObjectives(cls) -> list["QuestObjective"]:
-        return GameData.getObjects(cls.MODULE)
+        return GameData().getObjects(cls.MODULE)
 
     @property
     def step(self) -> "QuestStep":

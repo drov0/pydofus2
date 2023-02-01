@@ -8,9 +8,6 @@ from pydofus2.com.ankamagames.dofus.logic.game.common.managers.PlayedCharacterMa
     PlayedCharacterManager,
 )
 from pydofus2.com.ankamagames.dofus.logic.game.common.misc.DofusEntities import DofusEntities
-from pydofus2.com.ankamagames.dofus.logic.game.fight.fightEvents.FightEventsHelper import (
-    FightEventsHelper,
-)
 from pydofus2.com.ankamagames.dofus.logic.game.fight.frames.FightEntitiesFrame import (
     FightEntitiesFrame,
 )
@@ -19,7 +16,6 @@ from pydofus2.com.ankamagames.dofus.logic.game.fight.managers.CurrentPlayedFight
     CurrentPlayedFighterManager,
 )
 from pydofus2.com.ankamagames.dofus.logic.game.fight.steps.IFightStep import IFightStep
-from pydofus2.com.ankamagames.dofus.logic.game.fight.types.FightEventEnum import FightEventEnum
 from pydofus2.com.ankamagames.dofus.logic.game.fight.types.StateBuff import StateBuff
 from pydofus2.com.ankamagames.dofus.network.messages.game.context.fight.character.GameFightShowFighterMessage import (
     GameFightShowFighterMessage,
@@ -110,12 +106,6 @@ class FightSummonStep(AbstractSequencable, IFightStep):
                     / 2,
                 )
             )
-        FightEventsHelper().sendFightEvent(
-            FightEventEnum.FIGHTER_SUMMONED,
-            [self._summonerId, self._summonInfos.contextualId],
-            self._summonInfos.contextualId,
-            self.castingSpellId,
-        )
         self.executeCallbacks()
 
     @property

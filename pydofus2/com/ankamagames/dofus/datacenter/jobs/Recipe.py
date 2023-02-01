@@ -5,6 +5,7 @@ from pydofus2.com.ankamagames.dofus.internalDatacenter.items.ItemWrapper import 
 from pydofus2.com.ankamagames.dofus.misc.utils.GameDataQuery import GameDataQuery
 from pydofus2.com.ankamagames.dofus.types.IdAccessors import IdAccessors
 from pydofus2.com.ankamagames.jerakine.data.GameData import GameData
+
 from pydofus2.com.ankamagames.jerakine.data.I18n import I18n
 from pydofus2.com.ankamagames.jerakine.data.I18nFileAccessor import I18nFileAccessor
 from pydofus2.com.ankamagames.jerakine.interfaces.IDataCenter import IDataCenter
@@ -53,7 +54,7 @@ class Recipe(IDataCenter):
 
     @classmethod
     def getRecipeByResultId(cls, resultId: int) -> "Recipe":
-        return GameData.getObject(cls.MODULE, resultId)
+        return GameData().getObject(cls.MODULE, resultId)
 
     @classmethod
     def getAllRecipesForSkillId(cls, pSkillId: int, jobLevel: int) -> list["Recipe"]:
@@ -68,7 +69,7 @@ class Recipe(IDataCenter):
 
     @classmethod
     def getAllRecipes(cls) -> list["Recipe"]:
-        return GameData.getObjects(cls.MODULE)
+        return GameData().getObjects(cls.MODULE)
 
     idAccessors: IdAccessors = IdAccessors(None, getAllRecipes)
 
@@ -83,7 +84,7 @@ class Recipe(IDataCenter):
         results: list = list()
         recipeIds: list[int] = GameDataQuery.queryEquals(Recipe, "jobId", jobId)
         for recipeId in recipeIds:
-            results.append(GameData.getObject(cls.MODULE, recipeId))
+            results.append(GameData().getObject(cls.MODULE, recipeId))
         cls._jobRecipes[jobId] = results
         return results
 

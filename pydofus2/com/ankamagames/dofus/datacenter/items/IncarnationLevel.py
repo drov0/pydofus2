@@ -1,5 +1,6 @@
 from pydofus2.com.ankamagames.dofus.datacenter.items.Incarnation import Incarnation
 from pydofus2.com.ankamagames.jerakine.data.GameData import GameData
+
 from pydofus2.com.ankamagames.jerakine.interfaces.IDataCenter import IDataCenter
 
 
@@ -20,7 +21,7 @@ class IncarnationLevel(IDataCenter):
 
     @classmethod
     def getIncarnationLevelById(cls, id: int) -> "IncarnationLevel":
-        return GameData.getObject(cls.MODULE, id)
+        return GameData().getObject(cls.MODULE, id)
 
     def getIncarnationLevelByIdAndLevel(self, incarnationId: int, level: int) -> "IncarnationLevel":
         id: int = incarnationId * 100 + level

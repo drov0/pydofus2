@@ -3,6 +3,7 @@ from pydofus2.com.ankamagames.dofus.datacenter.world.MapPosition import MapPosit
 from pydofus2.com.ankamagames.dofus.datacenter.world.WorldMap import WorldMap
 from pydofus2.com.ankamagames.dofus.types.IdAccessors import IdAccessors
 from pydofus2.com.ankamagames.jerakine.data.GameData import GameData
+
 from pydofus2.com.ankamagames.jerakine.data.I18n import I18n
 from pydofus2.com.ankamagames.jerakine.data.IPostInit import IPostInit
 from pydofus2.com.ankamagames.jerakine.interfaces.IDataCenter import IDataCenter
@@ -76,7 +77,7 @@ class SubArea(IDataCenter, IPostInit):
 
     @staticmethod
     def getSubAreaById(id: int) -> "SubArea":
-        subArea: SubArea = GameData.getObject(SubArea.MODULE, id)
+        subArea: SubArea = GameData().getObject(SubArea.MODULE, id)
         if not subArea or not subArea.area:
             return None
         return subArea
@@ -92,7 +93,7 @@ class SubArea(IDataCenter, IPostInit):
     def getAllSubArea(cls) -> list:
         if cls._allSubAreas:
             return cls._allSubAreas
-        _allSubAreas = GameData.getobjects(cls.MODULE)
+        _allSubAreas = GameData().getObjects(cls.MODULE)
         return _allSubAreas
 
     idAccessors: IdAccessors = IdAccessors(getSubAreaById, getAllSubArea)

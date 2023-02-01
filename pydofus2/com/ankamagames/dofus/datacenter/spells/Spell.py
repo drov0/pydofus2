@@ -4,6 +4,7 @@ from pydofus2.com.ankamagames.dofus.datacenter.spells.SpellType import SpellType
 from pydofus2.com.ankamagames.dofus.datacenter.spells.SpellVariant import SpellVariant
 from pydofus2.com.ankamagames.dofus.types.IdAccessors import IdAccessors
 from pydofus2.com.ankamagames.jerakine.data.GameData import GameData
+
 from pydofus2.com.ankamagames.jerakine.data.I18n import I18n
 from pydofus2.com.ankamagames.jerakine.interfaces.IDataCenter import IDataCenter
 from pydofus2.com.ankamagames.jerakine.logger.Logger import Logger
@@ -45,11 +46,11 @@ class Spell(IDataCenter):
 
     @classmethod
     def getSpellById(cls, id: int) -> "Spell":
-        return GameData.getObject(cls.MODULE, id)
+        return GameData().getObject(cls.MODULE, id)
 
     @classmethod
     def getSpells(cls) -> list["Spell"]:
-        return GameData.getObjects(cls.MODULE)
+        return GameData().getObjects(cls.MODULE)
 
     idAccessors: IdAccessors = IdAccessors(getSpellById, getSpells)
 

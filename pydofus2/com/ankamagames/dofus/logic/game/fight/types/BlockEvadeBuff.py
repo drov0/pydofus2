@@ -26,13 +26,6 @@ class BlockEvadeBuff(StatBuff):
 
     def onApplied(self) -> None:
         super().onApplied()
-        self.updateMovementPath()
 
     def onRemoved(self) -> None:
         super().onRemoved()
-        self.updateMovementPath()
-
-    def updateMovementPath(self) -> None:
-        ftf: "FightTurnFrame" = Kernel().worker.getFrame("FightTurnFrame")
-        if self.targetId == CurrentPlayedFighterManager().currentFighterId and ftf and ftf.myTurn and ftf.lastPath:
-            ftf.updatePath()

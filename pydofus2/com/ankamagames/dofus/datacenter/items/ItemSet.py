@@ -1,4 +1,5 @@
 from pydofus2.com.ankamagames.jerakine.data.GameData import GameData
+
 from pydofus2.com.ankamagames.jerakine.data.I18n import I18n
 from pydofus2.com.ankamagames.jerakine.interfaces.IDataCenter import IDataCenter
 from pydofus2.com.ankamagames.dofus.datacenter.effects.EffectInstance import EffectInstance
@@ -25,10 +26,10 @@ class ItemSet(IDataCenter):
 
     @staticmethod
     def getItemSetById(id: int) -> "ItemSet":
-        return GameData.getObject(ItemSet.MODULE, id)
+        return GameData().getObject(ItemSet.MODULE, id)
 
     def getItemSets(self) -> list:
-        return GameData.getObjects(ItemSet.MODULE)
+        return GameData().getObjects(ItemSet.MODULE)
 
     @property
     def name(self) -> str:

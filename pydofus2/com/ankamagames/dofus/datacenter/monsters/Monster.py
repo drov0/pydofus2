@@ -9,6 +9,7 @@ if TYPE_CHECKING:
     from pydofus2.com.ankamagames.dofus.datacenter.monsters.MonsterGrade import MonsterGrade
     from pydofus2.com.ankamagames.dofus.datacenter.monsters.MonsterRace import MonsterRace
 from pydofus2.com.ankamagames.jerakine.data.GameData import GameData
+
 from pydofus2.com.ankamagames.dofus.types.IdAccessors import IdAccessors
 
 
@@ -18,11 +19,11 @@ class Monster:
 
     @classmethod
     def getMonsterById(cls, id: int) -> "Monster":
-        return GameData.getObject(cls.MODULE, id)
+        return GameData().getObject(cls.MODULE, id)
 
     @classmethod
     def getMonsters(cls) -> list:
-        return GameData.getObjects(cls.MODULE)
+        return GameData().getObjects(cls.MODULE)
 
     idAccessors: IdAccessors = IdAccessors(getMonsterById, getMonsters)
 

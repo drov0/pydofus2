@@ -2,9 +2,6 @@ from pydofus2.com.ankamagames.dofus.internalDatacenter.stats.EntityStats import 
 from pydofus2.com.ankamagames.dofus.internalDatacenter.stats.Stat import Stat
 from pydofus2.com.ankamagames.dofus.logic.common.managers.StatsManager import StatsManager
 from pydofus2.com.ankamagames.dofus.logic.game.common.misc.DofusEntities import DofusEntities
-from pydofus2.com.ankamagames.dofus.logic.game.fight.fightEvents.FightEventsHelper import (
-    FightEventsHelper,
-)
 from pydofus2.com.ankamagames.dofus.logic.game.fight.frames.FightEntitiesFrame import (
     FightEntitiesFrame,
 )
@@ -12,7 +9,6 @@ from pydofus2.com.ankamagames.dofus.logic.game.fight.steps.IFightStep import IFi
 from pydofus2.com.ankamagames.dofus.logic.game.fight.steps.abstract.AbstractStatContextualStep import (
     AbstractStatContextualStep,
 )
-from pydofus2.com.ankamagames.dofus.logic.game.fight.types.FightEventEnum import FightEventEnum
 from pydofus2.com.ankamagames.dofus.network.enums.GameContextEnum import GameContextEnum
 from pydofus2.com.ankamagames.dofus.network.types.game.context.fight.GameFightFighterInformations import (
     GameFightFighterInformations,
@@ -73,20 +69,6 @@ class FightShieldPointsVariationStep(AbstractStatContextualStep, IFightStep):
         self.apply()
 
     def apply(self) -> None:
-        if self._intValue < 0:
-            FightEventsHelper().sendFightEvent(
-                FightEventEnum.FIGHTER_SHIELD_LOSS,
-                [self._targetId, abs(self._intValue), self._elementId],
-                self._targetId,
-                self.castingSpellId,
-            )
-        elif self._intValue == 0:
-            FightEventsHelper().sendFightEvent(
-                FightEventEnum.FIGHTER_NO_CHANGE,
-                [self._targetId],
-                self._targetId,
-                self.castingSpellId,
-            )
         super().start()
 
     def onAnimationEnd(self, pEvent) -> None:

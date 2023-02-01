@@ -1,9 +1,4 @@
 from pydofus2.com.ankamagames.dofus.logic.game.fight.steps.IFightStep import IFightStep
-from pydofus2.com.ankamagames.dofus.datacenter.spells.Spell import Spell
-from pydofus2.com.ankamagames.dofus.logic.game.fight.fightEvents.FightEventsHelper import (
-    FightEventsHelper,
-)
-from pydofus2.com.ankamagames.dofus.logic.game.fight.types.FightEventEnum import FightEventEnum
 from pydofus2.com.ankamagames.jerakine.sequencer.AbstractSequencable import AbstractSequencable
 
 
@@ -49,21 +44,6 @@ class FightSpellCastStep(AbstractSequencable, IFightStep):
         return "spellCast"
 
     def start(self) -> None:
-        if Spell.getSpellById(self._spellId).verbose_cast and self._verboseCast:
-            FightEventsHelper().sendFightEvent(
-                FightEventEnum.FIGHTER_CASTED_SPELL,
-                [
-                    self._fighterId,
-                    self._cellId,
-                    self._sourceCellId,
-                    self._spellId,
-                    self._spellRank,
-                    self._critical,
-                ],
-                0,
-                self.castingSpellId,
-                False,
-            )
         self.executeCallbacks()
 
     @property

@@ -5,9 +5,7 @@ from pydofus2.com.ankamagames.dofus.types.IdAccessors import IdAccessors
 from pydofus2.com.ankamagames.jerakine.data.GameData import GameData
 from pydofus2.com.ankamagames.jerakine.data.I18n import I18n
 from pydofus2.com.ankamagames.jerakine.interfaces.IDataCenter import IDataCenter
-from pydofus2.com.ankamagames.jerakine.logger.Logger import Logger
 from typing import TYPE_CHECKING
-
 if TYPE_CHECKING:
     from pydofus2.com.ankamagames.dofus.datacenter.quest.QuestObjective import QuestObjective
 
@@ -49,11 +47,11 @@ class QuestStep(IDataCenter):
 
     @classmethod
     def getQuestStepById(cls, id: int) -> "QuestStep":
-        return GameData.getObject(cls.MODULE, id)
+        return GameData().getObject(cls.MODULE, id)
 
     @classmethod
     def getQuestSteps(cls) -> list["QuestStep"]:
-        return GameData.getObjects(cls.MODULE)
+        return GameData().getObjects(cls.MODULE)
 
     @property
     def kamasReward(self) -> float:

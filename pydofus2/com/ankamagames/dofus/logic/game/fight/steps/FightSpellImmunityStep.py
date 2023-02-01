@@ -1,8 +1,4 @@
-from pydofus2.com.ankamagames.dofus.logic.game.fight.fightEvents.FightEventsHelper import (
-    FightEventsHelper,
-)
 from pydofus2.com.ankamagames.dofus.logic.game.fight.steps.IFightStep import IFightStep
-from pydofus2.com.ankamagames.dofus.logic.game.fight.types.FightEventEnum import FightEventEnum
 from pydofus2.com.ankamagames.jerakine.sequencer.AbstractSequencable import AbstractSequencable
 
 
@@ -19,12 +15,6 @@ class FightSpellImmunityStep(AbstractSequencable, IFightStep):
         return "spellImmunity"
 
     def start(self) -> None:
-        FightEventsHelper().sendFightEvent(
-            FightEventEnum.FIGHTER_SPELL_IMMUNITY,
-            [self._fighterId],
-            0,
-            self.castingSpellId,
-        )
         self.executeCallbacks()
 
     @property

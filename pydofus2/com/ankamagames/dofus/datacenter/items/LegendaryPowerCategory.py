@@ -1,6 +1,7 @@
 from logging import Logger
 from pydofus2.com.ankamagames.dofus.types.IdAccessors import IdAccessors
 from pydofus2.com.ankamagames.jerakine.data.GameData import GameData
+
 from pydofus2.com.ankamagames.jerakine.interfaces.IDataCenter import IDataCenter
 
 
@@ -20,9 +21,9 @@ class LegendaryPowerCategory(IDataCenter):
         super().__init__()
 
     def getLegendaryPowerCategoryById(cls, id: int) -> "LegendaryPowerCategory":
-        return GameData.getObject(cls.MODULE, id)
+        return GameData().getObject(cls.MODULE, id)
 
     def getLegendaryPowersCategories(cls) -> list:
-        return GameData.getObjects(cls.MODULE)
+        return GameData().getObjects(cls.MODULE)
 
     idAccessors: IdAccessors = IdAccessors(getLegendaryPowerCategoryById, getLegendaryPowersCategories)

@@ -4,7 +4,6 @@ from typing import TYPE_CHECKING
 from pydofus2.com.ankamagames.dofus.enums.ElementEnum import ElementEnum
 from pydofus2.com.ankamagames.dofus.internalDatacenter.spells.SpellWrapper import SpellWrapper
 from pydofus2.com.ankamagames.dofus.logic.game.common.misc.ISpellCastProvider import ISpellCastProvider
-from pydofus2.com.ankamagames.dofus.logic.game.fight.frames.FightSpellCastFrame import FightSpellCastFrame
 from pydofus2.com.ankamagames.dofus.logic.game.fight.frames.FightTurnFrame import FightTurnFrame
 from pydofus2.com.ankamagames.dofus.logic.game.fight.managers.MarkedCellsManager import MarkedCellsManager
 from pydofus2.com.ankamagames.dofus.logic.game.fight.messages.GameActionFightLeaveMessage import (
@@ -1283,9 +1282,6 @@ class FightSequenceFrame(Frame, ISpellCastProvider):
             while carriedEntity:
                 fightContextFrame.saveFighterPosition(carriedEntity.id, mpcell)
                 carriedEntity = carriedEntity.carriedEntity
-        fscf: "FightSpellCastFrame" = Kernel().worker.getFrame("FightSpellCastFrame")
-        if fscf:
-            fscf.entityMovement(gmmmsg.actorId)
         self.pushStep(FightEntityMovementStep(gmmmsg.actorId, movementPath))
 
     def fighterHasTriggeredGlyphOrTrap(self, gaftgtmsg: GameActionFightTriggerGlyphTrapMessage) -> None:

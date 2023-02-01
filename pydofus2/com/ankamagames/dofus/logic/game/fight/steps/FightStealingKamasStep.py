@@ -1,8 +1,4 @@
-from pydofus2.com.ankamagames.dofus.logic.game.fight.fightEvents.FightEventsHelper import (
-    FightEventsHelper,
-)
 from pydofus2.com.ankamagames.dofus.logic.game.fight.steps.IFightStep import IFightStep
-from pydofus2.com.ankamagames.dofus.logic.game.fight.types.FightEventEnum import FightEventEnum
 from pydofus2.com.ankamagames.jerakine.sequencer.AbstractSequencable import AbstractSequencable
 
 
@@ -25,15 +21,6 @@ class FightStealingKamasStep(AbstractSequencable, IFightStep):
         return "stealingKamas"
 
     def start(self) -> None:
-        FightEventsHelper().sendFightEvent(
-            FightEventEnum.FIGHTER_STEALING_KAMAS,
-            [self._robberId, self._victimId, self._amount],
-            self._victimId,
-            self.castingSpellId,
-            False,
-            3,
-            2,
-        )
         self.executeCallbacks()
 
     @property

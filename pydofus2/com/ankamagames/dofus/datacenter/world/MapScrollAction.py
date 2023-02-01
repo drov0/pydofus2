@@ -1,5 +1,6 @@
 from pydofus2.com.ankamagames.dofus.types.IdAccessors import IdAccessors
 from pydofus2.com.ankamagames.jerakine.data.GameData import GameData
+
 from pydofus2.com.ankamagames.jerakine.interfaces.IDataCenter import IDataCenter
 
 
@@ -30,10 +31,10 @@ class MapScrollAction(IDataCenter):
 
     @staticmethod
     def getMapScrollActionById(id: float) -> "MapScrollAction":
-        return GameData.getObject(MapScrollAction.MODULE, id)
+        return GameData().getObject(MapScrollAction.MODULE, id)
 
     @staticmethod
     def getMapScrollActions() -> list:
-        return GameData.getObjects(MapScrollAction.MODULE)
+        return GameData().getObjects(MapScrollAction.MODULE)
 
     idAccessors: IdAccessors = IdAccessors(getMapScrollActionById, getMapScrollActions)

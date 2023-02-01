@@ -9,6 +9,7 @@ import pydofus2.com.ankamagames.dofus.datacenter.spells.Spell as spellmod
 from pydofus2.com.ankamagames.dofus.enums.ActionIds import ActionIds
 from pydofus2.com.ankamagames.dofus.types.IdAccessors import IdAccessors
 from pydofus2.com.ankamagames.jerakine.data.GameData import GameData
+
 from pydofus2.com.ankamagames.jerakine.interfaces.IDataCenter import IDataCenter
 from pydofus2.com.ankamagames.jerakine.logger.Logger import Logger
 from pydofus2.com.ankamagames.jerakine.utils.display.spellZone.ICellZoneProvider import (
@@ -93,7 +94,7 @@ class SpellLevel(ICellZoneProvider, IDataCenter):
 
     @classmethod
     def getLevelById(cls, id: int) -> "SpellLevel":
-        return GameData.getObject(cls.MODULE, id)
+        return GameData().getObject(cls.MODULE, id)
 
     idAccessors: IdAccessors = IdAccessors(getLevelById, None)
 

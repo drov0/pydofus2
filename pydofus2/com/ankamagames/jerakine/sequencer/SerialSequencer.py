@@ -98,7 +98,7 @@ class SerialSequencer(ISequencer, EventDispatcher):
 
     def start(self) -> None:
         if not self._running:
-            self._running = (len(self._aStep) != 0)
+            self._running = len(self._aStep) != 0
             if self._running:
                 while len(self._aStep) > 0 and self._running:
                     self.execute()
@@ -165,7 +165,7 @@ class SerialSequencer(ISequencer, EventDispatcher):
                     SequencerEvent.SEQUENCE_STEP_FINISH,
                     SequencerEvent(self, self._currentStep),
                 )
-            self._running = (len(self._aStep) != 0)
+            self._running = len(self._aStep) != 0
             if not self._running:
                 if not self._activeSubSequenceCount:
                     self.dispatch(SequencerEvent.SEQUENCE_END, SequencerEvent(self))

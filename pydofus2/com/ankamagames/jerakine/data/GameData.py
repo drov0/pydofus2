@@ -3,6 +3,7 @@ from time import perf_counter_ns
 from typing import TYPE_CHECKING, Any
 from pydofus2.com.ankamagames.dofus import Constants
 from pydofus2.com.ankamagames.jerakine.logger.Logger import Logger
+
 if TYPE_CHECKING:
     from pydofus2.com.ankamagames.jerakine.data.GameDataClassDefinition import GameDataClassDefinition
     from pydofus2.com.ankamagames.jerakine.data.GameDataProcess import GameDataProcess

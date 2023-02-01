@@ -3,8 +3,9 @@ from whistle import Event, EventDispatcher
 from pydofus2.com.ankamagames.jerakine.logger.Logger import Logger
 
 lock = threading.Lock()
-class EventsHandler(EventDispatcher):
 
+
+class EventsHandler(EventDispatcher):
     def __init__(self):
         super().__init__()
         self._listeners = {}
@@ -15,9 +16,11 @@ class EventsHandler(EventDispatcher):
     def wait(self, event, timeout: float = None):
         received = threading.Event()
         ret = [None]
+
         def onReceived(e, *args, **kwargs):
             received.set()
             ret[0] = kwargs.get("return_value", None)
+
         self.once(event, onReceived)
         self.__waiting_evts.append(received)
         received.wait(timeout)
@@ -31,18 +34,19 @@ class EventsHandler(EventDispatcher):
         with lock:
             if event_id not in self._listeners:
                 self._listeners[event_id] = {}
-                
+
             if priority not in self._listeners[event_id]:
                 self._listeners[event_id][priority] = []
             self._listeners[event_id][priority].append(listener)
-            
+
             if event_id in self._sorted:
                 del self._sorted[event_id]
-        
+
     def once(self, event, callback):
         def onEvt(e, *args, **kwargs):
             self.remove_listener(event, onEvt)
             callback(e, *args, **kwargs)
+
         self.on(event, onEvt)
 
     def send(self, event_id, *args, **kwargs):

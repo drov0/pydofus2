@@ -1,6 +1,7 @@
 from pydofus2.com.ankamagames.dofus.kernel.Kernel import Kernel
 from pydofus2.com.ankamagames.dofus.logic.game.common.misc.DofusEntities import DofusEntities
 from typing import TYPE_CHECKING
+
 if TYPE_CHECKING:
     from pydofus2.com.ankamagames.dofus.logic.game.fight.frames.FightContextFrame import (
         FightContextFrame,

@@ -62,7 +62,7 @@ class GameDataList:
         AlignmentSide,
         AlignmentTitle,
         ItemType,
-        EvolutiveItemType
+        EvolutiveItemType,
     ]
 
     def __init__(self):

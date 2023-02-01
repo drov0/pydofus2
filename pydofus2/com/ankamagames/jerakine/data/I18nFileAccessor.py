@@ -7,10 +7,10 @@ from pydofus2.com.ankamagames.jerakine.data.BinaryStream import BinaryStream
 
 
 class I18nFileAccessor(metaclass=ThreadSharedSingleton):
-    
+
     _initialized = threading.Event()
     _initializing = threading.Event()
-    
+
     def __init__(self) -> None:
         self.directBuffer = None
         self.init()

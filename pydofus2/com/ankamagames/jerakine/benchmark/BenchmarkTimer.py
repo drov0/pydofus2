@@ -5,12 +5,12 @@ import threading
 
 lock = threading.Lock()
 
-        
+
 class BenchmarkTimer(threading.Thread):
     _createdTimers = dict[str, list["BenchmarkTimer"]]()
     _timers_count = 0
     _started_timers_count = 0
-    
+
     def __init__(self, interval: int, function: FunctionType, args=None, kwargs=None):
         super().__init__()
         self.interval = interval
@@ -35,8 +35,8 @@ class BenchmarkTimer(threading.Thread):
     def start(self) -> None:
         BenchmarkTimer._started_timers_count += 1
         super().start()
-        sumAllTimers = sum([len(timers) for timers in BenchmarkTimer._createdTimers.values()])
-        Logger().info(f"{self.callerName} in timer  Total Timers in all threads: {sumAllTimers}")
+        # sumAllTimers = sum([len(timers) for timers in BenchmarkTimer._createdTimers.values()])
+        # Logger().info(f"{self.callerName} in timer  Total Timers in all threads: {sumAllTimers}")
 
     def cancel(self) -> None:
         self.finished.set()
@@ -48,14 +48,13 @@ class BenchmarkTimer(threading.Thread):
             timer = cls._createdTimers[thname].pop()
             if timer:
                 timer.cancel()
-                
+
     def run(self):
         self.finished.wait(self.interval)
         if not self.finished.is_set():
             self.function(*self.args, **self.kwargs)
-        self.finished.set()        
+        self.finished.set()
         if self in BenchmarkTimer._createdTimers[self.parent.name]:
             BenchmarkTimer._createdTimers[self.parent.name].remove(self)
         BenchmarkTimer._started_timers_count -= 1
         BenchmarkTimer._timers_count -= 1
-        

@@ -677,6 +677,7 @@ class FightBattleFrame(Frame):
                 return
             if self._confirmTurnEnd and not self.isFightAboutToEnd:
                 self.confirmDelayedTurnEnd()
+
         return function
 
     def confirmDelayedTurnEnd(self) -> None:

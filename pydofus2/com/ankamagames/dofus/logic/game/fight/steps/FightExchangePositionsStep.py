@@ -7,6 +7,7 @@ from pydofus2.com.ankamagames.dofus.network.types.game.context.fight.GameFightFi
 )
 from pydofus2.com.ankamagames.jerakine.sequencer.AbstractSequencable import AbstractSequencable
 
+
 class FightExchangePositionsStep(AbstractSequencable, IFightStep):
 
     _fighterOne: float

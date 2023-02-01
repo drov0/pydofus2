@@ -5,8 +5,6 @@ from pydofus2.com.ankamagames.jerakine.sequencer.ISequencableListener import ISe
 class AbstractSequencable(IPausableSequencable):
 
     DEFAULT_TIMEOUT: int = 2
-    
-
 
     def __init__(self):
         self._stepListeners = set()
@@ -33,7 +31,6 @@ class AbstractSequencable(IPausableSequencable):
 
     def resume(self) -> None:
         self._paused = False
-
 
     def start(self) -> None:
         pass
@@ -68,4 +65,3 @@ class AbstractSequencable(IPausableSequencable):
     @castingSpellId.setter
     def castingSpellId(self, val: int) -> None:
         self._castingSpellId = val
-

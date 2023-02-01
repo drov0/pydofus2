@@ -45,7 +45,6 @@ from pydofus2.com.ankamagames.jerakine.types.enums.Priority import Priority
 
 
 class ServerSelectionFrame(Frame):
-
     def __init__(self):
         self._serversList: list[GameServerInformations] = []
         self._serversUsedList: list[GameServerInformations] = []
@@ -77,7 +76,7 @@ class ServerSelectionFrame(Frame):
     @property
     def worker(self) -> Worker:
         return self._worker
-    
+
     def pushed(self) -> bool:
         self._worker = krnl.Kernel().worker
         return True
@@ -167,6 +166,7 @@ class ServerSelectionFrame(Frame):
             from pydofus2.com.ankamagames.dofus.logic.game.approach.frames.GameServerApproachFrame import (
                 GameServerApproachFrame,
             )
+
             escmsg = msg
             if escmsg.reason != DisconnectionReasonEnum.SWITCHING_TO_GAME_SERVER:
                 self._worker.process(

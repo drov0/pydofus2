@@ -7,7 +7,6 @@ from pydofus2.com.ankamagames.jerakine.data.I18n import I18n
 from pydofus2.com.ankamagames.jerakine.data.GameData import GameData
 
 
-
 class MonsterRace:
 
     MODULE: str = "MonsterRaces"

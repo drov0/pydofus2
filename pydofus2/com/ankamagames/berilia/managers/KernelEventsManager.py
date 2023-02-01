@@ -23,8 +23,8 @@ class KernelEvent(Enum):
     RECONNECT = 16
     FIGHT_RESUMED = 17
 
-class KernelEventsManager(EventsHandler, metaclass=Singleton):
 
+class KernelEventsManager(EventsHandler, metaclass=Singleton):
     def __init__(self):
         super().__init__()
 
@@ -32,15 +32,17 @@ class KernelEventsManager(EventsHandler, metaclass=Singleton):
         def onEvt(e, frame):
             if str(frame) == frameName:
                 callback(*args)
+
         self.on(KernelEvent.FRAME_PUSHED, onEvt)
-    
+
     def onceFramePushed(self, frameName, callback, args=[]):
         def onEvt(e, frame):
             if str(frame) == frameName:
                 self.remove_listener(KernelEvent.FRAME_PUSHED, onEvt)
                 callback(*args)
+
         self.on(KernelEvent.FRAME_PUSHED, onEvt)
-        
+
     def send(self, event_id: KernelEvent, *args, **kwargs):
         if event_id == KernelEvent.CRASH:
             self._crashMessage = kwargs.get("message", None)

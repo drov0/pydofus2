@@ -13,7 +13,6 @@ from pydofus2.com.ankamagames.jerakine.metaclasses.Singleton import Singleton
 
 
 class WorldPathFinder(metaclass=Singleton):
-
     def __init__(self):
         self.callback: FunctionType = None
         self.src: Vertex = None

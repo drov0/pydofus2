@@ -18,7 +18,6 @@ if TYPE_CHECKING:
 
 
 class SpellCastInFightManager:
-
     def __init__(self, entityId: float):
         self._spells = dict[int, SpellManager]()
         self.entityId = entityId

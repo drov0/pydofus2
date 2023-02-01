@@ -326,9 +326,7 @@ class RoleplayMovementFrame(Frame):
                     pathDuration = max(1, 1 * clientMovePath.getCrossingDuration(True))
                 if self._movementAnimTimer:
                     self._movementAnimTimer.cancel()
-                self._movementAnimTimer = BenchmarkTimer(
-                    pathDuration + 0.3, self.onMovementAnimEnd, [movedEntity]
-                )
+                self._movementAnimTimer = BenchmarkTimer(pathDuration + 0.3, self.onMovementAnimEnd, [movedEntity])
                 self._movementAnimTimer.start()
                 Logger().debug(f"[MapMovement] Movement anim started")
             return True

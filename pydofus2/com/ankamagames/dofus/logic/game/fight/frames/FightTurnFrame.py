@@ -131,7 +131,7 @@ class FightTurnFrame(Frame):
     _cellsUnreachable: list[int] = None
 
     _lastPath: MovementPath = None
-    
+
     _playerEntity: IEntity = None
 
     _currentFighterId: float = None

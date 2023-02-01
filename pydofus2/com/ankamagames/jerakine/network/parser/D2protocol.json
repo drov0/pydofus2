@@ -29122,23 +29122,23 @@
         }
     }, 
     "primitives": [
-        "VarUhShort", 
-        "Double", 
-        "VarShort", 
-        "UnsignedInt", 
-        "Float", 
-        "VarUhLong", 
-        "Boolean", 
         "Byte", 
-        "VarUhInt", 
-        "VarInt", 
-        "ByteArray", 
-        "UnsignedByte", 
+        "VarShort", 
+        "Int", 
         "UTF", 
         "UnsignedShort", 
-        "Int", 
+        "Float", 
         "VarLong", 
-        "Short"
+        "VarUhShort", 
+        "Double", 
+        "Short", 
+        "UnsignedInt", 
+        "UnsignedByte", 
+        "ByteArray", 
+        "VarInt", 
+        "Boolean", 
+        "VarUhInt", 
+        "VarUhLong"
     ], 
     "type": {
         "AbstractCharacterInformation": {

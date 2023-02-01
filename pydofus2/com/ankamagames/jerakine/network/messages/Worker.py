@@ -44,9 +44,7 @@ class Worker(MessageHandler):
 
         if str(frame) in self._currentFrameTypesCache:
             if frame in self._framesToAdd and frame not in self._framesToRemove:
-                raise Exception(
-                    f"Can't add the frame '{frame}' because it's already in the to-add list."
-                )
+                raise Exception(f"Can't add the frame '{frame}' because it's already in the to-add list.")
         if self._processingMessage.is_set():
             if frame in self._framesToAdd:
                 raise Exception(f"[WORKER] Tried to queue Frame '{frame}' but it's already in the queue!")

@@ -45,10 +45,12 @@ from pydofus2.com.ankamagames.jerakine.messages.Frame import Frame
 from pydofus2.com.ankamagames.jerakine.messages.Message import Message
 from pydofus2.com.ankamagames.jerakine.types.enums.Priority import Priority
 from pydofus2.com.ankamagames.jerakine.types.positions.MapPoint import MapPoint
+
 if TYPE_CHECKING:
     from pydofus2.com.ankamagames.dofus.logic.game.roleplay.frames.RoleplayEntitiesFrame import RoleplayEntitiesFrame
     from pydofus2.com.ankamagames.dofus.logic.game.roleplay.frames.RoleplayMovementFrame import RoleplayMovementFrame
     from pydofus2.com.ankamagames.dofus.logic.game.roleplay.frames.RoleplayWorldFrame import RoleplayWorldFrame
+
 
 class CollectableElement:
     def __init__(self, id: int, interactiveSkill: InteractiveElementSkill, enabled: bool):
@@ -72,7 +74,8 @@ class InteractiveElementData:
         self.element = element
         self.position = position
         self.skillUID = skillUID
-        
+
+
 class RoleplayInteractivesFrame(Frame):
 
     COLLECTABLE_COLLECTING_STATE_ID: int = 2

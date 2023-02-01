@@ -10,6 +10,7 @@ from pydofus2.com.ankamagames.jerakine.sequencer.AbstractSequencable import (
 from pydofus2.com.ankamagames.dofus.logic.game.fight.frames.FightEntitiesFrame import (
     FightEntitiesFrame,
 )
+
 if TYPE_CHECKING:
     from pydofus2.com.ankamagames.dofus.logic.game.fight.frames.FightContextFrame import (
         FightContextFrame,

@@ -1,2 +1,2 @@
 class IDataCenter:
-    pass
+    MODULE: str = None

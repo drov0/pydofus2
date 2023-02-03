@@ -22,6 +22,7 @@ from pydofus2.com.ankamagames.dofus.network.types.game.context.roleplay.GameRole
 from pydofus2.com.ankamagames.dofus.network.types.game.interactive.InteractiveElement import InteractiveElement
 from pydofus2.com.ankamagames.dofus.types.entities.AnimatedCharacter import AnimatedCharacter
 from pydofus2.com.ankamagames.jerakine.logger.Logger import Logger
+from pydofus2.com.ankamagames.jerakine.logger.MemoryProfiler import MemoryProfiler
 from pydofus2.com.ankamagames.jerakine.messages.Frame import Frame
 from pydofus2.com.ankamagames.jerakine.messages.Message import Message
 from pydofus2.com.ankamagames.jerakine.types.enums.Priority import Priority
@@ -29,52 +30,27 @@ from pydofus2.com.ankamagames.jerakine.types.positions.MapPoint import MapPoint
 
 
 class AbstractEntitiesFrame(Frame):
+    
     def __init__(self):
         self._entities = dict()
-
         self._entitiesTotal: int = 0
-
-        self._creaturesMode: bool = False
-
-        self._creaturesLimit: int = -1
-
         self._entitiesVisibleNumber: int = 0
-
-        self._untargetableEntities: bool = False
-
         self._interactiveElements = list[InteractiveElement]()
-
-        self._currentSubAreaId: int = None
-
-        self._worldPoint: WorldPointWrapper = None
-
-        self._creaturesFightMode: bool = False
-
-        self._justSwitchingCreaturesFightMode: bool = False
-
-        self._entitiesIconsCounts = dict()
-
-        self._entitiesIconsNames = dict()
-
         self._entitiesIcons = dict()
-
-        self._entitiesIconsOffsets = dict()
-
         self._carriedEntities = dict()
-
         self._pendingCarriedEntities = dict()
-
-        self._updateAllIcons: bool = None
-
-        self._showIcons: bool = True
-
-        self._isShowIconsChanged: bool = False
 
         super().__init__()
 
     def pulled(self) -> bool:
-        self._entities = None
-        self._entitiesTotal = 0
+        self._entities = dict()
+        self._entitiesTotal: int = 0
+        self._entitiesVisibleNumber: int = 0
+        self._interactiveElements = list[InteractiveElement]()
+        self._entitiesIcons = dict()
+        self._carriedEntities = dict()
+        self._pendingCarriedEntities = dict()
+        EntitiesManager().clearEntities()
         return True
 
     @property
@@ -88,6 +64,7 @@ class AbstractEntitiesFrame(Frame):
     def pushed(self) -> bool:
         self._entities = dict()
         self._entitiesTotal = 0
+        self._interactiveElements = list[InteractiveElement]()
         return True
 
     @property
@@ -100,15 +77,7 @@ class AbstractEntitiesFrame(Frame):
     def getEntityInfos(self, entityId: float) -> GameContextActorInformations:
         if entityId == 0 or entityId is None:
             return None
-        entityId = float(entityId)
-        if not self._entities or not self._entitiesTotal:
-            return None
-        if self._entities.get(entityId) is None:
-            # Logger().error(f"Entity {entityId} is unknown. Available actor Ids are {list(self._entities.keys())}")
-            if entityId <= EntitiesManager.RANDOM_ENTITIES_ID_START:
-                return None
-            return None
-        return self._entities.get(entityId)
+        return self._entities.get(float(entityId))
 
     def updateEntityCellId(self, entityId, cellId) -> None:
         entityId = float(entityId)
@@ -122,7 +91,7 @@ class AbstractEntitiesFrame(Frame):
         return entitiesList
 
     def hasEntity(self, entityId: float) -> bool:
-        return self._entities is not None and self._entitiesTotal > 0 and entityId in self._entities
+        return self._entities is not None and entityId in self._entities
 
     def registerActor(self, infos: GameContextActorInformations) -> None:
         self.registerActorWithId(infos, infos.contextualId)
@@ -131,9 +100,9 @@ class AbstractEntitiesFrame(Frame):
         actorId = float(actorId)
         if self._entities is None:
             self._entities = dict[int, GameContextActorInformations]()
-        if not self._entities.get(actorId):
+        if actorId not in self._entities:
             self._entitiesTotal += 1
-        self._entities[actorId] = infos
+            self._entities[actorId] = infos
         if isinstance(infos, GameFightFighterInformations):
             StatsManager().addRawStats(actorId, infos.stats.characteristics.characteristics)
 
@@ -144,6 +113,7 @@ class AbstractEntitiesFrame(Frame):
             del self._entities[actorId]
         StatsManager().deleteStats(actorId)
 
+    @MemoryProfiler.track_memory("Entities.addOrUpdateActor")
     def addOrUpdateActor(self, infos: GameContextActorInformations) -> AnimatedCharacter:
         characterEntity: AnimatedCharacter = DofusEntities().getEntity(infos.contextualId)
         self.registerActor(infos)
@@ -153,7 +123,7 @@ class AbstractEntitiesFrame(Frame):
             characterEntity = AnimatedCharacter(infos.contextualId)
             if isinstance(infos, GameFightMonsterInformations):
                 characterEntity.speedAdjust = Monster.getMonsterById(infos.creatureGenericId).speedAdjust
-            EntitiesManager().addAnimatedEntity(float(infos.contextualId), characterEntity)
+            EntitiesManager().addAnimatedEntity(infos.contextualId, characterEntity)
         if isinstance(infos, GameRolePlayHumanoidInformations):
             humanoid = infos
             if int(infos.contextualId) == int(pcm.PlayedCharacterManager().id):

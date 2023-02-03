@@ -2,7 +2,7 @@ import threading
 from pydofus2.com.ankamagames.berilia.managers.KernelEventsManager import KernelEventsManager, KernelEvent
 from pydofus2.com.ankamagames.dofus.kernel.net.DisconnectionReason import DisconnectionReason
 from pydofus2.com.ankamagames.dofus.logic.common.managers.PlayerManager import PlayerManager
-from time import perf_counter, sleep
+from time import perf_counter
 from pydofus2.com.ankamagames.dofus.kernel.Kernel import Kernel
 from pydofus2.com.ankamagames.dofus.kernel.net.DisconnectionReasonEnum import (
     DisconnectionReasonEnum,
@@ -33,6 +33,7 @@ class DofusClient(threading.Thread):
         self._stopReason: DisconnectionReason = None
         self._lastLoginTime = None
         self._minLoginInterval = 10
+        self._lock = None
 
     @property
     def worker(self):
@@ -77,12 +78,12 @@ class DofusClient(threading.Thread):
             self.worker.addFrame(frame())
 
     def _onCrash(self, event, message):
-        self._killSig.set()
         Logger().debug(f"[DofusClient] Crashed for reason: {message}")
+        self.shutdown()
 
     def _onShutdown(self, event, message):
-        self._killSig.set()
         Logger().debug(f"[DofusClient] Shutdown requested for reason: {message}")
+        self.shutdown()
 
     def _onRestart(self, event, message):
         Logger().debug(f"[DofusClient] Restart requested for reason: {message}")
@@ -92,9 +93,9 @@ class DofusClient(threading.Thread):
         self.worker.process(LoginAction.create(self._serverId != 0, self._serverId))
 
     def shutdown(self, reason=DisconnectionReasonEnum.WANTED_SHUTDOWN, msg=""):
-        Logger().info("Shuting down ...")
-        ConnectionsHandler().closeConnection(reason, msg)
-
+        Logger().info("[DofusClient] Shuting down ...")
+        Kernel().reset()
+        
     def relogin(self):
         self.login(self._loginToken, self._serverId, self._characterId)
 
@@ -111,17 +112,15 @@ class DofusClient(threading.Thread):
         return self._registredGameStartFrames
 
     def run(self):
-        self.init()
         try:
+            self.init()
             if self._lastLoginTime is not None and perf_counter() - self._lastLoginTime < self._minLoginInterval:
                 Logger().info("[DofusClient] Login request too soon, will wait some time")
-                sleep(self._minLoginInterval - (perf_counter() - self._lastLoginTime))
+                self._killSig.wait(self._minLoginInterval - (perf_counter() - self._lastLoginTime))
             self._lastLoginTime = perf_counter()
             self.worker.process(LoginAction.create(self._serverId != 0, self._serverId))
-            while not self._killSig.is_set():
-                msg = ConnectionsHandler().receive()
-                self.worker.process(msg)
+            self.worker.run()
         except:
-            Logger().error(f"[DofusClient] Error in main loop.", exc_info=True)
-        Kernel().reset()
+            Logger().error(f"[DofusClient] Error in main:", exc_info=True)
+        self.shutdown()
         Logger().info("[DofusClient] Stopped")

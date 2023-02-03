@@ -1,23 +1,18 @@
 from pydofus2.com.ankamagames.dofus.datacenter.monsters.Monster import Monster
-from pydofus2.com.ankamagames.dofus.kernel.net.ConnectionsHandler import ConnectionsHandler
-from pydofus2.com.ankamagames.dofus.logic.game.common.actions.roleplay.AnomalySubareaInformationRequestAction import (
-    AnomalySubareaInformationRequestAction,
-)
-from pydofus2.com.ankamagames.dofus.network.messages.game.context.GameRefreshMonsterBoostsMessage import (
-    GameRefreshMonsterBoostsMessage,
-)
-from pydofus2.com.ankamagames.dofus.network.messages.game.context.roleplay.AnomalySubareaInformationRequestMessage import (
-    AnomalySubareaInformationRequestMessage,
-)
-from pydofus2.com.ankamagames.dofus.network.messages.game.context.roleplay.AnomalySubareaInformationResponseMessage import (
-    AnomalySubareaInformationResponseMessage,
-)
-from pydofus2.com.ankamagames.dofus.network.messages.game.modificator.AreaFightModificatorUpdateMessage import (
-    AreaFightModificatorUpdateMessage,
-)
-from pydofus2.com.ankamagames.dofus.network.types.game.context.roleplay.MonsterBoosts import (
-    MonsterBoosts,
-)
+from pydofus2.com.ankamagames.dofus.kernel.net.ConnectionsHandler import \
+    ConnectionsHandler
+from pydofus2.com.ankamagames.dofus.logic.game.common.actions.roleplay.AnomalySubareaInformationRequestAction import \
+    AnomalySubareaInformationRequestAction
+from pydofus2.com.ankamagames.dofus.network.messages.game.context.GameRefreshMonsterBoostsMessage import \
+    GameRefreshMonsterBoostsMessage
+from pydofus2.com.ankamagames.dofus.network.messages.game.context.roleplay.AnomalySubareaInformationRequestMessage import \
+    AnomalySubareaInformationRequestMessage
+from pydofus2.com.ankamagames.dofus.network.messages.game.context.roleplay.AnomalySubareaInformationResponseMessage import \
+    AnomalySubareaInformationResponseMessage
+from pydofus2.com.ankamagames.dofus.network.messages.game.modificator.AreaFightModificatorUpdateMessage import \
+    AreaFightModificatorUpdateMessage
+from pydofus2.com.ankamagames.dofus.network.types.game.context.roleplay.MonsterBoosts import \
+    MonsterBoosts
 from pydofus2.com.ankamagames.jerakine.messages.Frame import Frame
 from pydofus2.com.ankamagames.jerakine.messages.Message import Message
 from pydofus2.com.ankamagames.jerakine.types.enums.Priority import Priority
@@ -66,7 +61,7 @@ class WorldFrame(Frame):
 
         elif isinstance(msg, AnomalySubareaInformationRequestAction):
             sireqmsg = AnomalySubareaInformationRequestMessage()
-            ConnectionsHandler().conn.send(sireqmsg)
+            ConnectionsHandler().send(sireqmsg)
             return True
 
         elif isinstance(msg, AnomalySubareaInformationResponseMessage):

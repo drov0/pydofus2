@@ -1,4 +1,5 @@
 import queue
+import threading
 from pydofus2.com.ankamagames.dofus.kernel.Kernel import Kernel
 from pydofus2.com.ankamagames.dofus.kernel.net.ConnectionType import ConnectionType
 from pydofus2.com.ankamagames.dofus.kernel.net.DisconnectionReason import DisconnectionReason
@@ -25,7 +26,9 @@ class ConnectionsHandler(metaclass=Singleton):
         self._hasReceivedMsg: bool = False
         self._hasReceivedNetworkMsg: bool = False
         self._disconnectMessage = ""
-        self._receivedMsgsQueue = queue.Queue()
+        self._receivedMsgsQueue = Kernel().worker._queue
+        self.paused = threading.Event()
+        self.resumed = threading.Event()
 
     @property
     def connectionType(self) -> str:
@@ -63,6 +66,14 @@ class ConnectionsHandler(metaclass=Singleton):
     def restart(self) -> None:
         self.closeConnection(DisconnectionReasonEnum.RESTARTING)
 
+    def pause(self) -> None:
+        self.paused.set()
+        self.resumed.clear()
+    
+    def resume(self) -> None:
+        self.paused.clear()
+        self.resumed.set()
+        
     def handleDisconnection(self) -> DisconnectionReason:
         reason: DisconnectionReason = DisconnectionReason(
             self._wantedSocketLost, self._wantedSocketLostReason, self._disconnectMessage
@@ -89,8 +100,5 @@ class ConnectionsHandler(metaclass=Singleton):
         self._conn.start()
         self._conn.connect(host, port)
 
-    def receive(self) -> INetworkMessage:
-        return self._receivedMsgsQueue.get()
-
-    def putMessage(self, msg: INetworkMessage) -> None:
-        self._receivedMsgsQueue.put(msg)
+    def send(self, msg: INetworkMessage) -> None:
+        self._conn.send(msg)

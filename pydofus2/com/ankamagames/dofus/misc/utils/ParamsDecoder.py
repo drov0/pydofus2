@@ -9,6 +9,7 @@ from pydofus2.com.ankamagames.jerakine.logger.Logger import Logger
 
 
 class ParamsDecoder:
+    
     @classmethod
     def applyParams(cls, txt: str, params: list, replace: str = "%") -> str:
         c = None
@@ -66,7 +67,10 @@ class ParamsDecoder:
             return ''
         nid = int(float(id[1:])) - 1
         if type == "":
-            newString = params[nid]
+            try:
+                newString = params[nid]
+            except IndexError:
+                return ''
         else:
             if type == "$item":
                 item = Item.getItemById(params[nid])

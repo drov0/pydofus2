@@ -85,7 +85,6 @@ class DataMapProvider(IDataMapProvider, metaclass=Singleton):
                 ):
                     mov = False
             if not bAllowTroughEntity:
-                # Logger().debug(f"avoiding through entity {list(EntitiesManager().entities.keys())}")
                 for e in EntitiesManager().entities.values():
                     if isinstance(e, IObstacle) and e.position and e.position.cellId == cellId:
                         if not (endCellId == cellId and e.canWalkTo):

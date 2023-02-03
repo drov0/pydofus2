@@ -125,7 +125,7 @@ class FightEntitiesFrame(AbstractEntitiesFrame, Frame):
 
     _ie: dict
 
-    _tempFighterList: list[GameContextActorInformations] = []
+    _tempFighterList: list[GameContextActorInformations]
 
     _illusionEntities: dict
 
@@ -138,19 +138,14 @@ class FightEntitiesFrame(AbstractEntitiesFrame, Frame):
     _realFightersLooks: dict = {}
 
     _mountsVisible: bool
-
-    _numCreatureSwitchingEntities: int
-
-    _entitiesIconsToUpdate: list[float]
-
+    
     lastKilledChallengers: list[GameFightFighterInformations]
 
     lastKilledDefenders: list[GameFightFighterInformations]
 
     def __init__(self):
         self._ie = dict()
-        self._tempFighterList = []
-        self._entitiesIconsToUpdate = list[float]()
+        self._tempFighterList = list[GameContextActorInformations]()
         self.lastKilledChallengers = list[GameFightFighterInformations]()
         self.lastKilledDefenders = list[GameFightFighterInformations]()
         super().__init__()
@@ -374,12 +369,9 @@ class FightEntitiesFrame(AbstractEntitiesFrame, Frame):
     def showCreaturesInFight(self, activated: bool = False) -> None:
         self._creaturesFightMode = activated
         self._justSwitchingCreaturesFightMode = True
-        self._numCreatureSwitchingEntities = 0
         for ent in self._entities.values():
             self.updateFighter(ent)
         self._justSwitchingCreaturesFightMode = False
-        if self._numCreatureSwitchingEntities == 0:
-            self.onCreatureSwitchEnd(None)
 
     def entityIsIllusion(self, id: float) -> bool:
         return self._illusionEntities.get(id, False)

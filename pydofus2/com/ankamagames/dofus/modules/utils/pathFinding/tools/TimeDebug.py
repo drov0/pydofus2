@@ -35,11 +35,3 @@ class TimeDebug:
                 onEnd(duration)
             return duration
         return -1
-
-
-if __name__ == "__main__":
-    from time import sleep
-
-    TimeDebug.reset()
-    sleep(1)
-    print(TimeDebug.getElapsedTime())

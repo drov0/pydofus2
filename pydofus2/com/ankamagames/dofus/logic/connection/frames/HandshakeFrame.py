@@ -1,21 +1,24 @@
-from build.lib.pydofus2.com.ankamagames.berilia.managers.KernelEventsManager import KernelEvts
-from pydofus2.com.ankamagames.berilia.managers.KernelEventsManager import KernelEventsManager
-from pydofus2.com.ankamagames.jerakine.benchmark.BenchmarkTimer import BenchmarkTimer
+from build.lib.pydofus2.com.ankamagames.berilia.managers.KernelEventsManager import \
+    KernelEvts
+
 import pydofus2.com.ankamagames.dofus.kernel.Kernel as krnl
 import pydofus2.com.ankamagames.dofus.kernel.net.ConnectionsHandler as connh
+from pydofus2.com.ankamagames.berilia.managers.KernelEventsManager import \
+    KernelEventsManager
+from pydofus2.com.ankamagames.dofus.network.messages.common.basic.BasicPingMessage import \
+    BasicPingMessage
+from pydofus2.com.ankamagames.dofus.network.messages.handshake.ProtocolRequired import \
+    ProtocolRequired
 from pydofus2.com.ankamagames.dofus.network.Metadata import Metadata
-from pydofus2.com.ankamagames.dofus.network.messages.common.basic.BasicPingMessage import (
-    BasicPingMessage,
-)
-from pydofus2.com.ankamagames.dofus.network.messages.handshake.ProtocolRequired import (
-    ProtocolRequired,
-)
-from pydofus2.com.ankamagames.jerakine.benchmark.BenchmarkTimer import BenchmarkTimer
+from pydofus2.com.ankamagames.jerakine.benchmark.BenchmarkTimer import \
+    BenchmarkTimer
 from pydofus2.com.ankamagames.jerakine.logger.Logger import Logger
-from pydofus2.com.ankamagames.jerakine.messages.ConnectedMessage import ConnectedMessage
+from pydofus2.com.ankamagames.jerakine.messages.ConnectedMessage import \
+    ConnectedMessage
 from pydofus2.com.ankamagames.jerakine.messages.Frame import Frame
 from pydofus2.com.ankamagames.jerakine.messages.Message import Message
-from pydofus2.com.ankamagames.jerakine.network.INetworkMessage import INetworkMessage
+from pydofus2.com.ankamagames.jerakine.network.INetworkMessage import \
+    INetworkMessage
 from pydofus2.com.ankamagames.jerakine.types.enums.Priority import Priority
 
 
@@ -95,7 +98,7 @@ class HandshakeFrame(Frame):
 
     def onTimeout(self) -> None:
         pingMsg: BasicPingMessage = BasicPingMessage(quiet_=True)
-        connh.ConnectionsHandler().conn.send(pingMsg)
+        connh.ConnectionsHandler().send(pingMsg)
 
     def pulled(self) -> bool:
         if self._timeoutTimer is not None:

@@ -1,15 +1,19 @@
+import threading
 from collections import OrderedDict
 from functools import lru_cache
-from pydofus2.com.ankamagames.jerakine.benchmark.BenchmarkTimer import BenchmarkTimer
-from pydofus2.com.ankamagames.jerakine.logger.Logger import Logger
 from typing import Any
-from pydofus2.com.ankamagames.jerakine.data.GameDataProcess import GameDataProcess
-from pydofus2.com.hurlan.crypto.Signature import Signature
+
+from pydofus2.com.ankamagames.jerakine.benchmark.BenchmarkTimer import \
+    BenchmarkTimer
 from pydofus2.com.ankamagames.jerakine.data.BinaryStream import BinaryStream
-from pydofus2.com.ankamagames.jerakine.data.GameDataClassDefinition import (
-    GameDataClassDefinition,
-)
-import threading
+from pydofus2.com.ankamagames.jerakine.data.GameDataClassDefinition import \
+    GameDataClassDefinition
+from pydofus2.com.ankamagames.jerakine.data.GameDataProcess import \
+    GameDataProcess
+from pydofus2.com.ankamagames.jerakine.logger.Logger import Logger
+from pydofus2.com.ankamagames.jerakine.logger.MemoryProfiler import \
+    MemoryProfiler
+from pydofus2.com.hurlan.crypto.Signature import Signature
 
 lock = threading.Lock()
 
@@ -19,58 +23,67 @@ class InvalidD2OFile(Exception):
 
 
 class ModuleReader:
-    def __init__(self, stream: BinaryStream, name: str) -> None:
-        if not isinstance(stream, BinaryStream):
-            stream = BinaryStream(stream, True)
-        self._name = name
-        self._stream = stream
-        self._streamStartIndex = 7
-        self._classes = dict[str, GameDataClassDefinition]()
-        self._counter = 0
-        stream.seek(0)
-        string_header = stream.readBytes(3)
-        contentOffset = 0
-        if string_header != b"D2O":
-            if string_header != Signature.ANKAMA_SIGNED_FILE_HEADER:
-                raise InvalidD2OFile("Malformated game data file.")
-            stream.readShort()
-            contentOffset = stream.readInt()
-            self._stream.seek(contentOffset, 1)
-            self._streamStartIndex = self._stream.position + 7
+
+    def __init__(self, filepath: str, name: str) -> None:
+        self.filepath = filepath
+        self.name = name
+        self.initModuleReader()
+        
+    @MemoryProfiler.track_memory("ModuleReader.init")
+    def initModuleReader(self):
+        with open(self.filepath, "rb") as f:
+            stream = BinaryStream(f, True)
+            self._streamStartIndex = 7
+            self._classes = dict[str, GameDataClassDefinition]()
+            self._counter = 0
+            stream.seek(0)
             string_header = stream.readBytes(3)
+            contentOffset = 0
             if string_header != b"D2O":
-                raise InvalidD2OFile("Malformated game data file.")
-        indexesPointer = stream.readInt()
-        self._stream.seek(contentOffset + indexesPointer)
-        indexesLength = stream.readInt()
-        self._indexes = OrderedDict()
-        for _ in range(indexesLength // 8):
-            key = stream.readInt()
-            pointer = stream.readInt()
-            self._indexes[key] = contentOffset + pointer
-            self._counter += 1
-        classesCount = stream.readInt()
-        for _ in range(classesCount):
-            classId = stream.readInt()
-            self.__readClassDefinition(classId, stream)
-        if stream.remaining():
-            self._gameDataProcessor = GameDataProcess(stream)
-
+                if string_header != Signature.ANKAMA_SIGNED_FILE_HEADER:
+                    raise InvalidD2OFile("Malformated game data file.")
+                stream.readShort()
+                contentOffset = stream.readInt()
+                stream.seek(contentOffset, 1)
+                self._streamStartIndex = stream.position + 7
+                string_header = stream.readBytes(3)
+                if string_header != b"D2O":
+                    raise InvalidD2OFile("Malformated game data file.")
+            indexesPointer = stream.readInt()
+            stream.position = contentOffset + indexesPointer
+            indexesLength = stream.readInt()
+            self._indexes = OrderedDict()
+            for _ in range(indexesLength // 8):
+                key = stream.readInt()
+                pointer = stream.readInt()
+                self._indexes[key] = contentOffset + pointer
+                self._counter += 1
+            classesCount = stream.readInt()
+            for _ in range(classesCount):
+                classId = stream.readInt()
+                self.__readClassDefinition(classId, stream)
+            if stream.remaining():
+                self._gameDataProcessor = GameDataProcess(stream, self.filepath)
+            
     def clearObjectsCache(self):
-        Logger().info(f"[Modulee {self._name}] Clearing objects cache.")
+        Logger().info(f"[Modulee {self.name}] Clearing objects cache.")
         self.getObjects.cache_clear()
+        
 
-    @lru_cache(maxsize=32, typed=False)
+    @lru_cache(maxsize=32, typed=False)    
+    @MemoryProfiler.track_memory('ModuleReader.getObjects')
     def getObjects(self):
         with lock:
             if not self._counter:
                 return None
-            self._stream.seek(self._streamStartIndex)
-            objects = list()
-            for _ in range(self._counter):
-                classId = self._stream.readInt()
-                instance = self._classes[classId].from_stream(self._stream)
-                objects.append(instance)
+            with open(self.filepath, "rb") as f:
+                stream = BinaryStream(f, True)
+                stream.seek(self._streamStartIndex)
+                objects = list()
+                for _ in range(self._counter):
+                    classId = stream.readInt()
+                    instance = self._classes[classId].from_stream(stream)
+                    objects.append(instance)
             BenchmarkTimer(60, self.clearObjectsCache).start()
             return objects
 
@@ -87,19 +100,21 @@ class ModuleReader:
     def getClassDefinition(self, object_id: int) -> GameDataClassDefinition:
         return self._classes[object_id]
 
-    @lru_cache(maxsize=200, typed=False)
+    @lru_cache(maxsize=32, typed=False)    
+    @MemoryProfiler.track_memory("ModuleReader.getObject")
     def getObject(self, objectId: int) -> Any:
         with lock:
             if not self._indexes:
-                Logger().warning(f"[Module {self._name}] No indexes found in the D2O file")
+                Logger().warning(f"[Module {self.name}] No indexes found in the D2O file")
                 return None
             pointer = self._indexes.get(objectId)
             if pointer is None:
-                Logger().warning(f"[Module {self._name}] No object found with id {objectId}")
                 return None
-            self._stream.seek(pointer)
-            classId: int = self._stream.readInt()
-            return self._classes[classId].from_stream(self._stream)
+            with open(self.filepath, "rb") as f:
+                stream = BinaryStream(f, True)
+                stream.seek(pointer)
+                classId: int = stream.readInt()
+                return self._classes[classId].from_stream(stream)
 
     def close(self) -> None:
         for stream in self._streams:

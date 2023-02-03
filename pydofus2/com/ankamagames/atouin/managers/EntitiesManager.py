@@ -1,5 +1,6 @@
 from pydofus2.com.ankamagames.jerakine.logger.Logger import Logger
 from pydofus2.com.ankamagames.jerakine.entities.interfaces.IEntity import IEntity
+from pydofus2.com.ankamagames.jerakine.logger.MemoryProfiler import MemoryProfiler
 from pydofus2.com.ankamagames.jerakine.metaclasses.Singleton import Singleton
 
 
@@ -12,11 +13,10 @@ class EntitiesManager(metaclass=Singleton):
         self._currentRandomEntity: float = self.RANDOM_ENTITIES_ID_START
 
     def addAnimatedEntity(self, entityId: float, entity: "IEntity", strata: int = 0) -> None:
-        if not isinstance(entity, IEntity):
-            raise Exception("entity must be an IEntity, not a " + str(type(entity)))
-        if self._entities.get(float(entityId)) is not None:
+        entityId = float(entityId)
+        if entityId in self._entities:
             Logger().warn(f"Entity overwriting! Entity {float(entityId)} has been replaced.")
-        self._entities[float(entityId)] = entity
+        self._entities[entityId] = entity
 
     def getEntity(self, entityId: float) -> "IEntity":
         return self._entities.get(float(entityId))
@@ -28,10 +28,11 @@ class EntitiesManager(metaclass=Singleton):
         return 0
 
     def removeEntity(self, entityId: float) -> None:
-        if self._entities.get(float(entityId)):
-            del self._entities[float(entityId)]
-            if self._entitiesScheduledForDestruction.get(float(entityId)):
-                del self._entitiesScheduledForDestruction[float(entityId)]
+        entityId = float(entityId)
+        if entityId in self._entities:
+            del self._entities[entityId]
+        if entityId in self._entitiesScheduledForDestruction:
+            del self._entitiesScheduledForDestruction[entityId]
 
     def clearEntities(self) -> None:
         entityBuffer: list = []
@@ -39,7 +40,7 @@ class EntitiesManager(metaclass=Singleton):
             entityBuffer.append(id)
         for entityId in entityBuffer:
             self.removeEntity(entityId)
-        self._entities = {}
+        self._entities.clear()
 
     def setEntitiesVisibility(self, visible: bool) -> None:
         entityBuffer: list = []

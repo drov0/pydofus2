@@ -19,17 +19,13 @@ class GameData(metaclass=ThreadSharedSingleton):
     def __init__(self) -> None:
         self._modules = dict[str, ModuleReader]()
 
-    def __addModule(self, file: str) -> None:
-        nativeFile = Path(file)
-        moduleName: str = nativeFile.name.split(".d2o")[0]
-        s = perf_counter_ns()
-        self._modules[moduleName] = ModuleReader(nativeFile.open("rb"), name=moduleName)
-        Logger().info(f"[GameData] Loaded '{nativeFile.name}' module in {(perf_counter_ns() - s)/10e9:.4f}s")
+    def addModule(self, file: str, name: str) -> None:
+        self._modules[name] = ModuleReader(file, name=name)
 
-    def __addModuleByName(self, moduleName: str) -> None:
+    def addModuleByName(self, moduleName: str) -> None:
         if moduleName not in self._modules:
-            modle_file_path = Constants.DOFUS_COMMON_DIR / f"{moduleName}.d2o"
-            self.__addModule(modle_file_path)
+            file_path = Constants.DOFUS_COMMON_DIR / f"{moduleName}.d2o"
+            self.addModule(file_path, moduleName)
 
     def initFromBinaryStream(self, modulename: str, moduleBinaries: BinaryStream):
         self._modules[modulename] = ModuleReader(moduleBinaries)
@@ -37,7 +33,7 @@ class GameData(metaclass=ThreadSharedSingleton):
     def getModule(self, moduleName: str) -> ModuleReader:
         if moduleName not in self._modules:
             with lock:
-                self.__addModuleByName(moduleName)
+                self.addModuleByName(moduleName)
         return self._modules.get(moduleName)
 
     def getDataProcessor(self, moduleName: str) -> "GameDataProcess":

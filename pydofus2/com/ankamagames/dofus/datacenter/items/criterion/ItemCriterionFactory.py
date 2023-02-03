@@ -13,10 +13,12 @@ from pydofus2.com.ankamagames.dofus.datacenter.items.criterion.ArenaTeamRankCrit
 from pydofus2.com.ankamagames.dofus.datacenter.items.criterion.BonesItemCriterion import BonesItemCriterion
 from pydofus2.com.ankamagames.dofus.datacenter.items.criterion.BonusSetItemCriterion import BonusSetItemCriterion
 from pydofus2.com.ankamagames.dofus.datacenter.items.criterion.BreedItemCriterion import BreedItemCriterion
+from pydofus2.com.ankamagames.dofus.datacenter.items.criterion.DayItemCriterion import DayItemCriterion
 from pydofus2.com.ankamagames.dofus.datacenter.items.criterion.GiftItemCriterion import GiftItemCriterion
 from pydofus2.com.ankamagames.dofus.datacenter.items.criterion.GuildItemCriterion import GuildItemCriterion
 from pydofus2.com.ankamagames.dofus.datacenter.items.criterion.ItemCriterion import ItemCriterion
 from pydofus2.com.ankamagames.dofus.datacenter.items.criterion.JobItemCriterion import JobItemCriterion
+from pydofus2.com.ankamagames.dofus.datacenter.items.criterion.KamaItemCriterion import KamaItemCriterion
 from pydofus2.com.ankamagames.dofus.datacenter.items.criterion.MapCharactersItemCriterion import (
     MapCharactersItemCriterion,
 )
@@ -38,6 +40,8 @@ from pydofus2.com.ankamagames.dofus.datacenter.items.criterion.QuestObjectiveIte
 from pydofus2.com.ankamagames.dofus.datacenter.items.criterion.RuneByBreakingItemCriterion import (
     RuneByBreakingItemCriterion,
 )
+from pydofus2.com.ankamagames.dofus.datacenter.items.criterion.ServerTypeItemCriterion import ServerTypeItemCriterion
+from pydofus2.com.ankamagames.dofus.datacenter.items.criterion.SkillItemCriterion import SkillItemCriterion
 from pydofus2.com.ankamagames.dofus.datacenter.items.criterion.SpecializationItemCriterion import (
     SpecializationItemCriterion,
 )

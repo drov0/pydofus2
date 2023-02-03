@@ -21,6 +21,7 @@ from pydofus2.com.ankamagames.jerakine.logger.Logger import Logger
 class AStar(metaclass=Singleton):
     DEBUG = False
     _forbiddenSubareaIds = list[int]()
+    _forbidenEdges = list[Edge]()
     HEURISTIC_SCALE: int = 1
     INDOOR_WEIGHT: int = 0
     MAX_ITERATION: int = 10000
@@ -34,6 +35,9 @@ class AStar(metaclass=Singleton):
         self.dst: Vertex = None
         self.callback: FunctionType = None
 
+    def addForbidenEdge(self, edge: Edge) -> None:
+        self._forbidenEdges.append(edge)
+        
     def search(
         self, worldGraph: WorldGraph, src: Vertex, dst: Vertex, callback: FunctionType, onFrame=True
     ) -> list["Edge"]:
@@ -48,7 +52,7 @@ class AStar(metaclass=Singleton):
         self.dst = dst
         self.dstMap = MapPosition.getMapPositionById(self.dst.mapId)
         self.callback = callback
-        self.openList = list[tuple[int, Node]]()
+        self.openList = list[tuple[int, int, Node, MapPoint]]()
         self.openDic = dict[Vertex, Node]()
         self.iterations = 0
         node = Node(self, src)
@@ -65,6 +69,8 @@ class AStar(metaclass=Singleton):
     def compute(self, e: Event = None) -> None:
         s = perf_counter()
         while self.openList:
+            if self.iterations > self.MAX_ITERATION:
+                raise Exception("Too many iterations")
             self.iterations += 1
             _, _, current = heapq.heappop(self.openList)
             if current.closed:
@@ -77,7 +83,7 @@ class AStar(metaclass=Singleton):
                 return result
             edges = self.worldGraph.getOutgoingEdgesFromVertex(current.vertex)
             for edge in edges:
-                if self.hasValidTransition(edge) and self.hasValidDestinationSubarea(edge):
+                if edge not in self._forbidenEdges and self.hasValidTransition(edge) and self.hasValidDestinationSubarea(edge):
                     existing = self.openDic.get(edge.dst)
                     if existing is None or current.moveCost + 1 < existing.moveCost:
                         node = Node(self, edge.dst, current)
@@ -87,6 +93,17 @@ class AStar(metaclass=Singleton):
         self.callbackWithResult(None)
         return None
 
+    def findDstCell(self, edge: Edge, mp: MapPoint) -> int:
+        for reverse_edge in self.worldGraph.getOutgoingEdgesFromVertex(edge.dst):
+            if reverse_edge.dst == edge.src:
+                for tr in reverse_edge.transitions:
+                    if tr.cell:
+                        candidate = MapPoint.fromCellId(tr.cell)
+                        movePath = Pathfinding().findPath(DataMapProvider(), mp, candidate)
+                        if movePath.end.distanceTo(candidate) <= 2:
+                            return candidate
+        return None
+    
     @staticmethod
     def hasValidTransition(edge: Edge) -> bool:
         from pydofus2.com.ankamagames.dofus.datacenter.items.criterion.GroupItemCriterion import (
@@ -105,20 +122,9 @@ class AStar(metaclass=Singleton):
             "Qs",
             "Sv",
         ]
-        valid: bool = False
-        canUseTr = True
+        valid = False
         for transition in edge.transitions:
-            canUseTr = True
-            if (
-                edge.src.mapId == PlayedCharacterManager().currentMap.mapId
-                and TransitionTypeEnum(transition.type) == TransitionTypeEnum.SCROLL
-            ):
-                srcCell = PlayedCharacterManager().entity.position
-                dstCell = MapPoint.fromCellId(transition.cell)
-                movePath = Pathfinding().findPath(DataMapProvider(), srcCell, dstCell)
-                if movePath.end.cellId != dstCell.cellId:
-                    canUseTr = False
-            if len(transition.criterion) != 0:
+            if transition.criterion:
                 if (
                     "&" not in transition.criterion
                     and "|" not in transition.criterion
@@ -126,11 +132,8 @@ class AStar(metaclass=Singleton):
                 ):
                     return False
                 criterion = GroupItemCriterion(transition.criterion)
-                if not criterion.isRespected:
-                    return False
-                elif canUseTr:
-                    return True
-            valid = canUseTr
+                return criterion.isRespected
+            valid = True
         return valid
 
     def hasValidDestinationSubarea(self, edge: Edge) -> bool:

@@ -1,113 +1,98 @@
-from datetime import datetime
-from pydofus2.com.ankamagames.berilia.managers.KernelEventsManager import KernelEventsManager, KernelEvent
-from pydofus2.com.ankamagames.dofus.kernel.Kernel import Kernel
-from pydofus2.com.ankamagames.dofus.logic.common.frames.ChatFrame import ChatFrame
-from pydofus2.com.ankamagames.dofus.logic.common.frames.QuestFrame import QuestFrame
-from pydofus2.com.ankamagames.dofus.logic.game.common.frames.AveragePricesFrame import AveragePricesFrame
-from pydofus2.com.ankamagames.dofus.logic.game.common.frames.InventoryManagementFrame import InventoryManagementFrame
-from pydofus2.com.ankamagames.dofus.logic.game.common.frames.JobsFrame import JobsFrame
-from pydofus2.com.ankamagames.dofus.logic.game.common.frames.SpellInventoryManagementFrame import (
-    SpellInventoryManagementFrame,
-)
-from pydofus2.com.ankamagames.dofus.logic.game.common.managers.FeatureManager import FeatureManager
-from pydofus2.com.ankamagames.dofus.network.enums.GameServerTypeEnum import GameServerTypeEnum
 import time
-from pydofus2.com.ankamagames.dofus.internalDatacenter.connection.BasicCharacterWrapper import (
-    BasicCharacterWrapper,
-)
-from pydofus2.com.ankamagames.dofus.internalDatacenter.items.ItemWrapper import ItemWrapper
-from pydofus2.com.ankamagames.dofus.kernel.net.ConnectionsHandler import ConnectionsHandler
-from pydofus2.com.ankamagames.dofus.logic.connection.managers.AuthentificationManager import (
-    AuthentificationManager,
-)
-from pydofus2.com.ankamagames.dofus.logic.common.managers.InterClientManager import (
-    InterClientManager,
-)
-from pydofus2.com.ankamagames.dofus.logic.common.managers.PlayerManager import PlayerManager
-from pydofus2.com.ankamagames.dofus.logic.game.approach.actions.CharacterSelectionAction import (
-    CharacterSelectionAction,
-)
-from pydofus2.com.ankamagames.dofus.logic.game.common.actions.chat.PopupWarningCloseRequestAction import (
-    PopupWarningCloseRequestAction,
-)
-from pydofus2.com.ankamagames.dofus.logic.game.common.frames.ContextChangeFrame import (
-    ContextChangeFrame,
-)
-from pydofus2.com.ankamagames.dofus.logic.game.common.frames.SynchronisationFrame import (
-    SynchronisationFrame,
-)
-from pydofus2.com.ankamagames.dofus.logic.game.common.frames.WorldFrame import WorldFrame
-from pydofus2.com.ankamagames.dofus.logic.game.common.managers.PlayedCharacterManager import (
-    PlayedCharacterManager,
-)
-from pydofus2.com.ankamagames.dofus.logic.game.common.managers.TimerManager import TimeManager
-from pydofus2.com.ankamagames.dofus.network.messages.game.approach.AccountCapabilitiesMessage import (
-    AccountCapabilitiesMessage,
-)
-from pydofus2.com.ankamagames.dofus.network.messages.game.approach.AlreadyConnectedMessage import (
-    AlreadyConnectedMessage,
-)
-from pydofus2.com.ankamagames.dofus.network.messages.game.approach.AuthenticationTicketAcceptedMessage import (
-    AuthenticationTicketAcceptedMessage,
-)
-from pydofus2.com.ankamagames.dofus.network.messages.game.approach.AuthenticationTicketMessage import (
-    AuthenticationTicketMessage,
-)
-from pydofus2.com.ankamagames.dofus.network.messages.game.approach.AuthenticationTicketRefusedMessage import (
-    AuthenticationTicketRefusedMessage,
-)
-from pydofus2.com.ankamagames.dofus.network.messages.game.approach.HelloGameMessage import (
-    HelloGameMessage,
-)
-from pydofus2.com.ankamagames.dofus.network.messages.game.basic.BasicTimeMessage import (
-    BasicTimeMessage,
-)
-from pydofus2.com.ankamagames.dofus.network.messages.game.character.choice.CharacterSelectedForceMessage import (
-    CharacterSelectedForceMessage,
-)
-from pydofus2.com.ankamagames.dofus.network.messages.game.character.choice.CharacterSelectedForceReadyMessage import (
-    CharacterSelectedForceReadyMessage,
-)
-from pydofus2.com.ankamagames.dofus.network.messages.game.character.choice.CharacterSelectedSuccessMessage import (
-    CharacterSelectedSuccessMessage,
-)
-from pydofus2.com.ankamagames.dofus.network.messages.game.character.choice.CharacterSelectionMessage import (
-    CharacterSelectionMessage,
-)
-from pydofus2.com.ankamagames.dofus.network.messages.game.character.choice.CharactersListErrorMessage import (
-    CharactersListErrorMessage,
-)
-from pydofus2.com.ankamagames.dofus.network.messages.game.character.choice.CharactersListMessage import (
-    CharactersListMessage,
-)
-from pydofus2.com.ankamagames.dofus.network.messages.game.character.choice.CharactersListRequestMessage import (
-    CharactersListRequestMessage,
-)
-from pydofus2.com.ankamagames.dofus.network.messages.game.context.GameContextCreateRequestMessage import (
-    GameContextCreateRequestMessage,
-)
-from pydofus2.com.ankamagames.dofus.network.messages.game.moderation.PopupWarningCloseRequestMessage import (
-    PopupWarningCloseRequestMessage,
-)
-from pydofus2.com.ankamagames.dofus.network.messages.game.moderation.PopupWarningClosedMessage import (
-    PopupWarningClosedMessage,
-)
-from pydofus2.com.ankamagames.dofus.network.messages.game.startup.StartupActionsListMessage import (
-    StartupActionsListMessage,
-)
-from pydofus2.com.ankamagames.dofus.network.messages.security.ClientKeyMessage import (
-    ClientKeyMessage,
-)
+from datetime import datetime
+
+from pydofus2.com.ankamagames.berilia.managers.KernelEventsManager import (
+    KernelEvent, KernelEventsManager)
+from pydofus2.com.ankamagames.dofus.internalDatacenter.connection.BasicCharacterWrapper import \
+    BasicCharacterWrapper
+from pydofus2.com.ankamagames.dofus.internalDatacenter.items.ItemWrapper import \
+    ItemWrapper
+from pydofus2.com.ankamagames.dofus.kernel.Kernel import Kernel
+from pydofus2.com.ankamagames.dofus.kernel.net.ConnectionsHandler import \
+    ConnectionsHandler
+from pydofus2.com.ankamagames.dofus.logic.common.frames.ChatFrame import \
+    ChatFrame
+from pydofus2.com.ankamagames.dofus.logic.common.frames.QuestFrame import \
+    QuestFrame
+from pydofus2.com.ankamagames.dofus.logic.common.managers.InterClientManager import \
+    InterClientManager
+from pydofus2.com.ankamagames.dofus.logic.common.managers.PlayerManager import \
+    PlayerManager
+from pydofus2.com.ankamagames.dofus.logic.connection.managers.AuthentificationManager import \
+    AuthentificationManager
+from pydofus2.com.ankamagames.dofus.logic.game.approach.actions.CharacterSelectionAction import \
+    CharacterSelectionAction
+from pydofus2.com.ankamagames.dofus.logic.game.common.actions.chat.PopupWarningCloseRequestAction import \
+    PopupWarningCloseRequestAction
+from pydofus2.com.ankamagames.dofus.logic.game.common.frames.AveragePricesFrame import \
+    AveragePricesFrame
+from pydofus2.com.ankamagames.dofus.logic.game.common.frames.ContextChangeFrame import \
+    ContextChangeFrame
+from pydofus2.com.ankamagames.dofus.logic.game.common.frames.InventoryManagementFrame import \
+    InventoryManagementFrame
+from pydofus2.com.ankamagames.dofus.logic.game.common.frames.JobsFrame import \
+    JobsFrame
+from pydofus2.com.ankamagames.dofus.logic.game.common.frames.SpellInventoryManagementFrame import \
+    SpellInventoryManagementFrame
+from pydofus2.com.ankamagames.dofus.logic.game.common.frames.SynchronisationFrame import \
+    SynchronisationFrame
+from pydofus2.com.ankamagames.dofus.logic.game.common.frames.WorldFrame import \
+    WorldFrame
+from pydofus2.com.ankamagames.dofus.logic.game.common.managers.FeatureManager import \
+    FeatureManager
+from pydofus2.com.ankamagames.dofus.logic.game.common.managers.PlayedCharacterManager import \
+    PlayedCharacterManager
+from pydofus2.com.ankamagames.dofus.logic.game.common.managers.TimeManager import \
+    TimeManager
+from pydofus2.com.ankamagames.dofus.network.enums.GameServerTypeEnum import \
+    GameServerTypeEnum
+from pydofus2.com.ankamagames.dofus.network.messages.game.approach.AccountCapabilitiesMessage import \
+    AccountCapabilitiesMessage
+from pydofus2.com.ankamagames.dofus.network.messages.game.approach.AlreadyConnectedMessage import \
+    AlreadyConnectedMessage
+from pydofus2.com.ankamagames.dofus.network.messages.game.approach.AuthenticationTicketAcceptedMessage import \
+    AuthenticationTicketAcceptedMessage
+from pydofus2.com.ankamagames.dofus.network.messages.game.approach.AuthenticationTicketMessage import \
+    AuthenticationTicketMessage
+from pydofus2.com.ankamagames.dofus.network.messages.game.approach.AuthenticationTicketRefusedMessage import \
+    AuthenticationTicketRefusedMessage
+from pydofus2.com.ankamagames.dofus.network.messages.game.approach.HelloGameMessage import \
+    HelloGameMessage
+from pydofus2.com.ankamagames.dofus.network.messages.game.basic.BasicTimeMessage import \
+    BasicTimeMessage
+from pydofus2.com.ankamagames.dofus.network.messages.game.character.choice.CharacterSelectedForceMessage import \
+    CharacterSelectedForceMessage
+from pydofus2.com.ankamagames.dofus.network.messages.game.character.choice.CharacterSelectedForceReadyMessage import \
+    CharacterSelectedForceReadyMessage
+from pydofus2.com.ankamagames.dofus.network.messages.game.character.choice.CharacterSelectedSuccessMessage import \
+    CharacterSelectedSuccessMessage
+from pydofus2.com.ankamagames.dofus.network.messages.game.character.choice.CharacterSelectionMessage import \
+    CharacterSelectionMessage
+from pydofus2.com.ankamagames.dofus.network.messages.game.character.choice.CharactersListErrorMessage import \
+    CharactersListErrorMessage
+from pydofus2.com.ankamagames.dofus.network.messages.game.character.choice.CharactersListMessage import \
+    CharactersListMessage
+from pydofus2.com.ankamagames.dofus.network.messages.game.character.choice.CharactersListRequestMessage import \
+    CharactersListRequestMessage
+from pydofus2.com.ankamagames.dofus.network.messages.game.context.GameContextCreateRequestMessage import \
+    GameContextCreateRequestMessage
+from pydofus2.com.ankamagames.dofus.network.messages.game.moderation.PopupWarningClosedMessage import \
+    PopupWarningClosedMessage
+from pydofus2.com.ankamagames.dofus.network.messages.game.moderation.PopupWarningCloseRequestMessage import \
+    PopupWarningCloseRequestMessage
+from pydofus2.com.ankamagames.dofus.network.messages.game.startup.StartupActionsListMessage import \
+    StartupActionsListMessage
+from pydofus2.com.ankamagames.dofus.network.messages.security.ClientKeyMessage import \
+    ClientKeyMessage
 from pydofus2.com.ankamagames.jerakine.logger.Logger import Logger
-from pydofus2.com.ankamagames.jerakine.messages.ConnectionResumedMessage import (
-    ConnectionResumedMessage,
-)
+from pydofus2.com.ankamagames.jerakine.messages.ConnectionResumedMessage import \
+    ConnectionResumedMessage
 from pydofus2.com.ankamagames.jerakine.messages.Frame import Frame
 from pydofus2.com.ankamagames.jerakine.messages.Message import Message
-from pydofus2.com.ankamagames.jerakine.network.NetworkMessage import NetworkMessage
-from pydofus2.com.ankamagames.jerakine.network.messages.ServerConnectionFailedMessage import (
-    ServerConnectionFailedMessage,
-)
+from pydofus2.com.ankamagames.jerakine.network.messages.ServerConnectionFailedMessage import \
+    ServerConnectionFailedMessage
+from pydofus2.com.ankamagames.jerakine.network.NetworkMessage import \
+    NetworkMessage
 from pydofus2.com.ankamagames.jerakine.types.DataStoreType import DataStoreType
 from pydofus2.com.ankamagames.jerakine.types.enums.Priority import Priority
 
@@ -161,7 +146,7 @@ class GameServerApproachFrame(Frame):
             self.authenticationTicketAccepted = False
             atmsg = AuthenticationTicketMessage()
             atmsg.init("fr", AuthentificationManager().gameServerTicket)
-            ConnectionsHandler().conn.send(atmsg)
+            ConnectionsHandler().send(atmsg)
             return True
 
         elif isinstance(msg, AuthenticationTicketAcceptedMessage):
@@ -260,19 +245,19 @@ class GameServerApproachFrame(Frame):
             KernelEventsManager().send(KernelEvent.CHARACTER_SELECTION_SUCCESS, return_value=cssmsg.infos)
             if Kernel().beingInReconection and not self._reconnectMsgSend:
                 self._reconnectMsgSend = True
-                ConnectionsHandler().conn.send(CharacterSelectedForceReadyMessage())
+                ConnectionsHandler().send(CharacterSelectedForceReadyMessage())
             if InterClientManager.flashKey and (
                 not PlayerManager() or PlayerManager().server.id != 129 and PlayerManager().server.id != 130
             ):
                 flashKeyMsg = ClientKeyMessage()
                 flashKeyMsg.init(InterClientManager.flashKey)
-                ConnectionsHandler().conn.send(flashKeyMsg)
+                ConnectionsHandler().send(flashKeyMsg)
             self._cssmsg = cssmsg
             PlayedCharacterManager().infos = self._cssmsg.infos
             DataStoreType.CHARACTER_ID = str(self._cssmsg.infos.id)
             Kernel().worker.removeFrame(self)
             gccrmsg = GameContextCreateRequestMessage()
-            ConnectionsHandler().conn.send(gccrmsg)
+            ConnectionsHandler().send(gccrmsg)
             now = time.perf_counter()
             delta = now - self._loadingStart
             if delta > self.LOADING_TIMEOUT:
@@ -287,7 +272,7 @@ class GameServerApproachFrame(Frame):
                 Kernel().beingInReconection = True
                 self.characterId = msg.id
                 self._reconnectMsgSend = True
-                ConnectionsHandler().conn.send(CharacterSelectedForceReadyMessage())
+                ConnectionsHandler().send(CharacterSelectedForceReadyMessage())
 
         elif isinstance(msg, BasicTimeMessage):
             btmsg = msg
@@ -329,7 +314,7 @@ class GameServerApproachFrame(Frame):
 
         elif isinstance(msg, PopupWarningCloseRequestAction):
             pwcrmsg = PopupWarningCloseRequestMessage()
-            ConnectionsHandler().conn.send(pwcrmsg)
+            ConnectionsHandler().send(pwcrmsg)
             return True
 
         elif isinstance(msg, CharacterSelectionAction):
@@ -338,7 +323,7 @@ class GameServerApproachFrame(Frame):
             self._requestedToRemodelCharacterId = 0
             csmsg = CharacterSelectionMessage()
             csmsg.init(id_=characterId)
-            ConnectionsHandler().conn.send(csmsg)
+            ConnectionsHandler().send(csmsg)
             return True
 
         return False
@@ -352,4 +337,4 @@ class GameServerApproachFrame(Frame):
     def requestCharactersList(self) -> None:
         clrmsg: CharactersListRequestMessage = CharactersListRequestMessage()
         if ConnectionsHandler().conn:
-            ConnectionsHandler().conn.send(clrmsg)
+            ConnectionsHandler().send(clrmsg)

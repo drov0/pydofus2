@@ -1,6 +1,9 @@
-from functools import lru_cache
 import math
-from pydofus2.com.ankamagames.jerakine.types.positions.MapPoint import MapPoint, Point
+from functools import lru_cache
+from pydofus2.com.ankamagames.jerakine.logger.MemoryProfiler import MemoryProfiler
+
+from pydofus2.com.ankamagames.jerakine.types.positions.MapPoint import (
+    MapPoint, Point)
 from pydofus2.mapTools.MapDirection import MapDirection
 
 MAP_GRID_WIDTH: int = 14
@@ -10,7 +13,7 @@ MAX_X_COORD: int = 33
 MIN_Y_COORD: int = -19
 MAX_Y_COORD: int = 13
 EVERY_CELL_ID: list
-mapCountCell: int = 560
+CELLCOUNT: int = 560
 INVALID_CELL_ID: int = None
 PSEUDO_INFINITE: int = 63
 COEFF_FOR_REBASE_ON_CLOSEST_8_DIRECTION: float = math.tan(math.pi / 8)
@@ -64,9 +67,7 @@ def getCellsIdBetween(cell1Id: int, cell2Id: int) -> list:
 
 
 def isValidCellId(param1: int) -> bool:
-    if param1 >= 0:
-        return param1 < mapCountCell
-    return False
+    return 0 <= param1 < CELLCOUNT
 
 def getCellIdByCoord(param1: int, param2: int) -> int:
     if not isValidCoord(param1, param2):
@@ -106,11 +107,11 @@ def getCellCoordById(cell_id: int) -> Point:
     
     return Point(row_half + col, col - row_offset)
 
+@MemoryProfiler.track_memory("MapTools.getCellsCoordBetween")
 @lru_cache(maxsize=5000)
-def getCellsCoordBetween(param1: int, param2: int) -> list[MapPoint]:
-    cellsIds = getCellsIdBetween(param1, param2)
+def getCellsCoordBetween(cellid1: int, cellid2: int) -> list[MapPoint]:
+    cellsIds = getCellsIdBetween(cellid1, cellid2)
     return [MapPoint.fromCellId(cellid) for cellid in cellsIds]
-
 
 def getDistance(param1: int, param2: int) -> int:
     if not isValidCellId(param1) or not isValidCellId(param2):

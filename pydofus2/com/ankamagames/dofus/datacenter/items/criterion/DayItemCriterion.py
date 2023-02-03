@@ -1,8 +1,14 @@
-from pydofus2.com.ankamagames.dofus.datacenter.items.criterion import ItemCriterion
-from pydofus2.com.ankamagames.jerakine.interfaces import IDataCenter
-from pydofus2.com.ankamagames.jerakine.utils.pattern import PatternDecoder
-from pydofus2.com.ankamagames.jerakine.data import I18n
-from pydofus2.com.ankamagames.dofus.datacenter.items.criterion import IItemCriterion
+from datetime import datetime
+from pydofus2.com.ankamagames.dofus.datacenter.items.criterion.IItemCriterion import \
+    IItemCriterion
+from pydofus2.com.ankamagames.dofus.datacenter.items.criterion.ItemCriterion import \
+    ItemCriterion
+from pydofus2.com.ankamagames.dofus.logic.game.common.managers.TimeManager import \
+    TimeManager
+from pydofus2.com.ankamagames.jerakine.data.I18n import I18n
+from pydofus2.com.ankamagames.jerakine.interfaces.IDataCenter import IDataCenter
+from pydofus2.com.ankamagames.jerakine.utils.pattern.PatternDecoder import \
+    PatternDecoder
 
 
 class DayItemCriterion(ItemCriterion, IDataCenter):
@@ -19,5 +25,5 @@ class DayItemCriterion(ItemCriterion, IDataCenter):
         return DayItemCriterion(self.basicText)
 
     def getCriterion(self) -> int:
-        date: Date = Date()
-        return TimeManager().getDateFromTime(date.getTime())[2]
+        date = datetime.now()
+        return TimeManager().getDateFromTime(int(date.timestamp()))[2]

@@ -80,6 +80,7 @@ from pydofus2.com.ankamagames.dofus.logic.game.fight.types.StateBuff import Stat
 from pydofus2.com.ankamagames.dofus.network.enums.GameActionMarkTypeEnum import GameActionMarkTypeEnum
 from pydofus2.com.ankamagames.jerakine.entities.interfaces.IMovable import IMovable
 from pydofus2.com.ankamagames.jerakine.logger.Logger import Logger
+from pydofus2.com.ankamagames.jerakine.logger.MemoryProfiler import MemoryProfiler
 from pydofus2.com.ankamagames.jerakine.sequencer.ParallelStartSequenceStep import ParallelStartSequenceStep
 from pydofus2.com.ankamagames.jerakine.types.events.SequencerEvent import SequencerEvent
 from pydofus2.com.ankamagames.jerakine.utils.display.spellZone.SpellShapeEnum import SpellShapeEnum
@@ -341,10 +342,11 @@ class FightSequenceFrame(Frame, ISpellCastProvider):
 
     _spellScriptTemporaryBuffer: SpellScriptBuffer
 
+    @MemoryProfiler.track_memory("FightSequenceFrame.init")
     def __init__(self, pFightBattleFrame: "FightBattleFrame", parent: "FightSequenceFrame" = None):
         super().__init__()
         self._instanceId = FightSequenceFrame._currentInstanceId
-        FightSequenceFrame._currentInstanceId += 1
+        FightSequenceFrame._currentInstanceId = (1 + FightSequenceFrame._currentInstanceId) % 2000
         self._fightEntitiesFrame: FightEntitiesFrame = None
         self._fightBattleFrame = pFightBattleFrame
         self._parent = parent
@@ -999,17 +1001,10 @@ class FightSequenceFrame(Frame, ISpellCastProvider):
             return False
 
     def execute(self, callback: FunctionType = None) -> None:
-        # Logger().debug(f"[SEQ DEBUG] Executing sequence #{self._instanceId}")
         self._sequencer = SerialSequencer(self.FIGHT_SEQUENCERS_CATEGORY)
         self._sequencer.add_listener(SequencerEvent.SEQUENCE_STEP_FINISH, self.onStepEnd)
         if self._parent:
-            # Logger().info(
-            #     f"Adding sequence #{self._instanceId} sequencer to parent #{self._parent.instanceId} subsequences"
-            # )
             self._parent.addSubSequence(self._sequencer)
-        else:
-            # Logger().info(f"Executing the sequence #{self._instanceId} right the way")
-            pass
         self.executeBuffer(callback)
 
     def fighterHasBeenKilled(self, gafdmsg: GameActionFightDeathMessage) -> None:

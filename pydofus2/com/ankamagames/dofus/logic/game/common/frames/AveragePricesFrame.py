@@ -1,22 +1,22 @@
-from datetime import datetime
 import json
 import os
+from datetime import datetime
+
 from pydofus2.com.ankamagames.dofus import Constants
-from pydofus2.com.ankamagames.dofus.kernel.net.ConnectionsHandler import ConnectionsHandler
-from pydofus2.com.ankamagames.dofus.logic.common.managers.PlayerManager import PlayerManager
-from pydofus2.com.ankamagames.dofus.network.enums.GameContextEnum import GameContextEnum
-from pydofus2.com.ankamagames.dofus.network.messages.game.context.GameContextCreateMessage import (
-    GameContextCreateMessage,
-)
-from pydofus2.com.ankamagames.dofus.network.messages.game.inventory.ObjectAveragePricesErrorMessage import (
-    ObjectAveragePricesErrorMessage,
-)
-from pydofus2.com.ankamagames.dofus.network.messages.game.inventory.ObjectAveragePricesGetMessage import (
-    ObjectAveragePricesGetMessage,
-)
-from pydofus2.com.ankamagames.dofus.network.messages.game.inventory.ObjectAveragePricesMessage import (
-    ObjectAveragePricesMessage,
-)
+from pydofus2.com.ankamagames.dofus.kernel.net.ConnectionsHandler import \
+    ConnectionsHandler
+from pydofus2.com.ankamagames.dofus.logic.common.managers.PlayerManager import \
+    PlayerManager
+from pydofus2.com.ankamagames.dofus.network.enums.GameContextEnum import \
+    GameContextEnum
+from pydofus2.com.ankamagames.dofus.network.messages.game.context.GameContextCreateMessage import \
+    GameContextCreateMessage
+from pydofus2.com.ankamagames.dofus.network.messages.game.inventory.ObjectAveragePricesErrorMessage import \
+    ObjectAveragePricesErrorMessage
+from pydofus2.com.ankamagames.dofus.network.messages.game.inventory.ObjectAveragePricesGetMessage import \
+    ObjectAveragePricesGetMessage
+from pydofus2.com.ankamagames.dofus.network.messages.game.inventory.ObjectAveragePricesMessage import \
+    ObjectAveragePricesMessage
 from pydofus2.com.ankamagames.jerakine.messages.Frame import Frame
 from pydofus2.com.ankamagames.jerakine.messages.Message import Message
 from pydofus2.com.ankamagames.jerakine.types.enums.Priority import Priority
@@ -101,4 +101,4 @@ class AveragePricesFrame(Frame):
     def askPricesData(self) -> None:
         oapgm: ObjectAveragePricesGetMessage = ObjectAveragePricesGetMessage()
         oapgm.init()
-        ConnectionsHandler().conn.send(oapgm)
+        ConnectionsHandler().send(oapgm)

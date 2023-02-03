@@ -112,6 +112,7 @@ class FightReachableCellsMaker:
         movementPointsValue: float = float(movementPoints.totalValue) if movementPoints is not None else float(0)
         self._reachableCells = list[int]()
         self._unreachableCells = list[int]()
+        
         if movementPoint > -1:
             self._mp = movementPoint
 

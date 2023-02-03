@@ -26,16 +26,18 @@ if TYPE_CHECKING:
         ActorRestrictionsInformations,
     )
     from pydofus2.com.ankamagames.atouin.data.map.Cell import Cell
-
+    from pydofus2.com.ankamagames.dofus.internalDatacenter.spells.SpellWrapper import SpellWrapper
+    from pydofus2.com.ankamagames.dofus.internalDatacenter.items.ItemWrapper import ItemWrapper
+    from pydofus2.com.ankamagames.dofus.network.types.game.havenbag.HavenBagRoomPreviewInformation import (
+        HavenBagRoomPreviewInformation,
+    )
 from pydofus2.com.ankamagames.dofus.network.enums.CharacterInventoryPositionEnum import (
     CharacterInventoryPositionEnum,
 )
 from pydofus2.com.ankamagames.dofus.network.enums.PlayerLifeStatusEnum import (
     PlayerLifeStatusEnum,
 )
-from pydofus2.com.ankamagames.dofus.network.types.game.havenbag.HavenBagRoomPreviewInformation import (
-    HavenBagRoomPreviewInformation,
-)
+
 from pydofus2.com.ankamagames.jerakine.logger.Logger import Logger
 from pydofus2.com.ankamagames.dofus.internalDatacenter.DataEnum import DataEnum
 from pydofus2.com.ankamagames.dofus.logic.common.managers.StatsManager import StatsManager
@@ -69,7 +71,7 @@ class PlayedCharacterManager(IDestroyable, metaclass=Singleton):
         self.isIndoor = False
         self.isInHisHavenbag = False
         self.isInHavenbag = False
-        self.currentHavenbagRooms = list[HavenBagRoomPreviewInformation]()
+        self.currentHavenbagRooms = list["HavenBagRoomPreviewInformation"]()
         self.isInBreach = False
         self.isInAnomaly = False
         self.restrictions: "ActorRestrictionsInformations" = None

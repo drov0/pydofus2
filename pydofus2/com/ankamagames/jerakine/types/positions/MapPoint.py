@@ -198,31 +198,32 @@ class MapPoint:
             if mp:
                 return mp
 
-    def vicinity(self, fourDir) -> list["MapPoint"]:
+    def vicinity(self) -> list["MapPoint"]:
         res = []
         for i in range(8):
             if i % 2 == 1:
                 mp = self.getNearestCellInDirection(i)
                 if mp is not None:
-                    res.append(mp)
+                    yield mp
         return res
 
     def getNearestCellInDirection(self, orientation: int) -> "MapPoint":
-        if orientation == 0:
+        orientation = DirectionsEnum(orientation)
+        if orientation == DirectionsEnum.RIGHT:
             mp = MapPoint.fromCoords(self._nX + 1, self._nY + 1)
-        elif orientation == 1:
+        elif orientation == DirectionsEnum.DOWN_RIGHT:
             mp = MapPoint.fromCoords(self._nX + 1, self._nY)
-        elif orientation == 2:
+        elif orientation == DirectionsEnum.DOWN:
             mp = MapPoint.fromCoords(self._nX + 1, self._nY - 1)
-        elif orientation == 3:
+        elif orientation == DirectionsEnum.DOWN_LEFT:
             mp = MapPoint.fromCoords(self._nX, self._nY - 1)
-        elif orientation == 4:
+        elif orientation == DirectionsEnum.LEFT:
             mp = MapPoint.fromCoords(self._nX - 1, self._nY - 1)
-        elif orientation == 5:
+        elif orientation == DirectionsEnum.UP_LEFT:
             mp = MapPoint.fromCoords(self._nX - 1, self._nY)
-        elif orientation == 6:
+        elif orientation == DirectionsEnum.UP:
             mp = MapPoint.fromCoords(self._nX - 1, self._nY + 1)
-        elif orientation == 7:
+        elif orientation == DirectionsEnum.UP_RIGHT:
             mp = MapPoint.fromCoords(self._nX, self._nY + 1)
         if MapPoint.isInMap(mp._nX, mp._nY):
             return mp

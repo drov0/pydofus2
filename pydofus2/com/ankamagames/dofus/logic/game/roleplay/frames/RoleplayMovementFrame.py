@@ -1,115 +1,116 @@
-from pydofus2.com.ankamagames.jerakine.benchmark.BenchmarkTimer import BenchmarkTimer
-from time import perf_counter, sleep
+from time import perf_counter
 from typing import TYPE_CHECKING
-from pydofus2.com.ankamagames.berilia.managers.KernelEventsManager import KernelEventsManager, KernelEvent
+
 import pydofus2.com.ankamagames.dofus.kernel.net.ConnectionsHandler as connh
-from pydofus2.com.ankamagames.atouin.managers.MapDisplayManager import MapDisplayManager
-from pydofus2.com.ankamagames.atouin.messages.EntityMovementCompleteMessage import EntityMovementCompleteMessage
-from pydofus2.com.ankamagames.atouin.messages.EntityMovementStoppedMessage import EntityMovementStoppedMessage
-from pydofus2.com.ankamagames.atouin.utils.DataMapProvider import DataMapProvider
+from pydofus2.com.ankamagames.atouin.managers.MapDisplayManager import \
+    MapDisplayManager
+from pydofus2.com.ankamagames.atouin.messages.EntityMovementCompleteMessage import \
+    EntityMovementCompleteMessage
+from pydofus2.com.ankamagames.atouin.messages.EntityMovementStoppedMessage import \
+    EntityMovementStoppedMessage
+from pydofus2.com.ankamagames.atouin.utils.DataMapProvider import \
+    DataMapProvider
+from pydofus2.com.ankamagames.berilia.managers.KernelEventsManager import (
+    KernelEvent, KernelEventsManager)
 from pydofus2.com.ankamagames.dofus.kernel.Kernel import Kernel
-from pydofus2.com.ankamagames.dofus.kernel.net.ConnectionsHandler import ConnectionsHandler
-from pydofus2.com.ankamagames.dofus.logic.game.common.managers.MapMovementAdapter import MapMovementAdapter
-from pydofus2.com.ankamagames.dofus.logic.game.common.managers.PlayedCharacterManager import PlayedCharacterManager
-from pydofus2.com.ankamagames.dofus.logic.game.common.misc.DofusEntities import DofusEntities
-from pydofus2.com.ankamagames.dofus.logic.game.fight.messages.FightRequestFailed import FightRequestFailed
-from pydofus2.com.ankamagames.dofus.logic.game.fight.messages.MapMoveFailed import MapMoveFailed
-from pydofus2.com.ankamagames.dofus.logic.game.roleplay.actions.PlayerFightRequestAction import (
-    PlayerFightRequestAction,
-)
-from pydofus2.com.ankamagames.dofus.logic.game.roleplay.messages.CharacterMovementStoppedMessage import (
-    CharacterMovementStoppedMessage,
-)
-from pydofus2.com.ankamagames.dofus.logic.game.roleplay.messages.MovementRequestTimeoutMessage import (
-    MovementRequestTimeoutMessage,
-)
-from pydofus2.com.ankamagames.dofus.modules.utils.pathFinding.world.TransitionTypeEnum import TransitionTypeEnum
-from pydofus2.com.ankamagames.dofus.network.enums.PlayerLifeStatusEnum import PlayerLifeStatusEnum
-from pydofus2.com.ankamagames.dofus.network.messages.game.context.GameMapMovementCancelMessage import (
-    GameMapMovementCancelMessage,
-)
-from pydofus2.com.ankamagames.dofus.network.messages.game.context.GameMapMovementConfirmMessage import (
-    GameMapMovementConfirmMessage,
-)
-from pydofus2.com.ankamagames.dofus.network.messages.game.context.GameMapMovementMessage import GameMapMovementMessage
-from pydofus2.com.ankamagames.dofus.network.messages.game.context.GameMapMovementRequestMessage import (
-    GameMapMovementRequestMessage,
-)
-from pydofus2.com.ankamagames.dofus.network.messages.game.context.GameMapNoMovementMessage import (
-    GameMapNoMovementMessage,
-)
-from pydofus2.com.ankamagames.dofus.network.messages.game.context.fight.GameFightJoinRequestMessage import (
-    GameFightJoinRequestMessage,
-)
-from pydofus2.com.ankamagames.dofus.network.messages.game.context.roleplay.ChangeMapMessage import ChangeMapMessage
-from pydofus2.com.ankamagames.dofus.network.messages.game.context.roleplay.MapComplementaryInformationsDataMessage import (
-    MapComplementaryInformationsDataMessage,
-)
-from pydofus2.com.ankamagames.dofus.network.messages.game.context.roleplay.delay.GameRolePlayDelayedActionFinishedMessage import (
-    GameRolePlayDelayedActionFinishedMessage,
-)
-from pydofus2.com.ankamagames.dofus.network.messages.game.context.roleplay.fight.GameRolePlayAttackMonsterRequestMessage import (
-    GameRolePlayAttackMonsterRequestMessage,
-)
-from pydofus2.com.ankamagames.dofus.network.messages.game.context.roleplay.fight.GameRolePlayFightRequestCanceledMessage import (
-    GameRolePlayFightRequestCanceledMessage,
-)
-from pydofus2.com.ankamagames.dofus.network.messages.game.context.roleplay.havenbag.EditHavenBagFinishedMessage import (
-    EditHavenBagFinishedMessage,
-)
-from pydofus2.com.ankamagames.dofus.network.messages.game.context.roleplay.MapChangeFailedMessage import (
-    MapChangeFailedMessage,
-)
-from pydofus2.com.ankamagames.dofus.network.messages.game.context.roleplay.TeleportOnSameMapMessage import (
-    TeleportOnSameMapMessage,
-)
-from pydofus2.com.ankamagames.dofus.network.messages.game.dialog.LeaveDialogMessage import LeaveDialogMessage
-from pydofus2.com.ankamagames.dofus.network.messages.game.guild.tax.GuildFightPlayersHelpersLeaveMessage import (
-    GuildFightPlayersHelpersLeaveMessage,
-)
-from pydofus2.com.ankamagames.dofus.network.messages.game.interactive.InteractiveUsedMessage import (
-    InteractiveUsedMessage,
-)
-from pydofus2.com.ankamagames.dofus.network.messages.game.interactive.InteractiveUseEndedMessage import (
-    InteractiveUseEndedMessage,
-)
-from pydofus2.com.ankamagames.dofus.network.messages.game.interactive.InteractiveUseErrorMessage import (
-    InteractiveUseErrorMessage,
-)
-from pydofus2.com.ankamagames.dofus.network.messages.game.interactive.InteractiveUseRequestMessage import (
-    InteractiveUseRequestMessage,
-)
-from pydofus2.com.ankamagames.dofus.network.messages.game.interactive.skill.InteractiveUseWithParamRequestMessage import (
-    InteractiveUseWithParamRequestMessage,
-)
-from pydofus2.com.ankamagames.dofus.network.messages.game.inventory.exchanges.ExchangeLeaveMessage import (
-    ExchangeLeaveMessage,
-)
-from pydofus2.com.ankamagames.dofus.network.messages.game.prism.PrismFightDefenderLeaveMessage import (
-    PrismFightDefenderLeaveMessage,
-)
-from pydofus2.com.ankamagames.dofus.network.types.game.context.roleplay.GameRolePlayGroupMonsterInformations import (
-    GameRolePlayGroupMonsterInformations,
-)
-from pydofus2.com.ankamagames.dofus.types.entities.AnimatedCharacter import AnimatedCharacter
-from pydofus2.com.ankamagames.jerakine.entities.interfaces.IEntity import IEntity
-from pydofus2.com.ankamagames.jerakine.entities.interfaces.IMovable import IMovable
+from pydofus2.com.ankamagames.dofus.kernel.net.ConnectionsHandler import \
+    ConnectionsHandler
+from pydofus2.com.ankamagames.dofus.logic.game.common.managers.MapMovementAdapter import \
+    MapMovementAdapter
+from pydofus2.com.ankamagames.dofus.logic.game.common.managers.PlayedCharacterManager import \
+    PlayedCharacterManager
+from pydofus2.com.ankamagames.dofus.logic.game.common.misc.DofusEntities import \
+    DofusEntities
+from pydofus2.com.ankamagames.dofus.logic.game.fight.messages.FightRequestFailed import \
+    FightRequestFailed
+from pydofus2.com.ankamagames.dofus.logic.game.fight.messages.MapMoveFailed import \
+    MapMoveFailed
+from pydofus2.com.ankamagames.dofus.logic.game.roleplay.actions.PlayerFightRequestAction import \
+    PlayerFightRequestAction
+from pydofus2.com.ankamagames.dofus.logic.game.roleplay.messages.CharacterMovementStoppedMessage import \
+    CharacterMovementStoppedMessage
+from pydofus2.com.ankamagames.dofus.logic.game.roleplay.messages.MovementRequestTimeoutMessage import \
+    MovementRequestTimeoutMessage
+from pydofus2.com.ankamagames.dofus.modules.utils.pathFinding.world.TransitionTypeEnum import \
+    TransitionTypeEnum
+from pydofus2.com.ankamagames.dofus.network.enums.PlayerLifeStatusEnum import \
+    PlayerLifeStatusEnum
+from pydofus2.com.ankamagames.dofus.network.messages.game.context.fight.GameFightJoinRequestMessage import \
+    GameFightJoinRequestMessage
+from pydofus2.com.ankamagames.dofus.network.messages.game.context.GameMapMovementCancelMessage import \
+    GameMapMovementCancelMessage
+from pydofus2.com.ankamagames.dofus.network.messages.game.context.GameMapMovementConfirmMessage import \
+    GameMapMovementConfirmMessage
+from pydofus2.com.ankamagames.dofus.network.messages.game.context.GameMapMovementMessage import \
+    GameMapMovementMessage
+from pydofus2.com.ankamagames.dofus.network.messages.game.context.GameMapMovementRequestMessage import \
+    GameMapMovementRequestMessage
+from pydofus2.com.ankamagames.dofus.network.messages.game.context.GameMapNoMovementMessage import \
+    GameMapNoMovementMessage
+from pydofus2.com.ankamagames.dofus.network.messages.game.context.roleplay.ChangeMapMessage import \
+    ChangeMapMessage
+from pydofus2.com.ankamagames.dofus.network.messages.game.context.roleplay.delay.GameRolePlayDelayedActionFinishedMessage import \
+    GameRolePlayDelayedActionFinishedMessage
+from pydofus2.com.ankamagames.dofus.network.messages.game.context.roleplay.fight.GameRolePlayAttackMonsterRequestMessage import \
+    GameRolePlayAttackMonsterRequestMessage
+from pydofus2.com.ankamagames.dofus.network.messages.game.context.roleplay.fight.GameRolePlayFightRequestCanceledMessage import \
+    GameRolePlayFightRequestCanceledMessage
+from pydofus2.com.ankamagames.dofus.network.messages.game.context.roleplay.fight.GameRolePlayShowChallengeMessage import \
+    GameRolePlayShowChallengeMessage
+from pydofus2.com.ankamagames.dofus.network.messages.game.context.roleplay.havenbag.EditHavenBagFinishedMessage import \
+    EditHavenBagFinishedMessage
+from pydofus2.com.ankamagames.dofus.network.messages.game.context.roleplay.MapChangeFailedMessage import \
+    MapChangeFailedMessage
+from pydofus2.com.ankamagames.dofus.network.messages.game.context.roleplay.MapComplementaryInformationsDataMessage import \
+    MapComplementaryInformationsDataMessage
+from pydofus2.com.ankamagames.dofus.network.messages.game.context.roleplay.TeleportOnSameMapMessage import \
+    TeleportOnSameMapMessage
+from pydofus2.com.ankamagames.dofus.network.messages.game.dialog.LeaveDialogMessage import \
+    LeaveDialogMessage
+from pydofus2.com.ankamagames.dofus.network.messages.game.guild.tax.GuildFightPlayersHelpersLeaveMessage import \
+    GuildFightPlayersHelpersLeaveMessage
+from pydofus2.com.ankamagames.dofus.network.messages.game.interactive.InteractiveUsedMessage import \
+    InteractiveUsedMessage
+from pydofus2.com.ankamagames.dofus.network.messages.game.interactive.InteractiveUseEndedMessage import \
+    InteractiveUseEndedMessage
+from pydofus2.com.ankamagames.dofus.network.messages.game.interactive.InteractiveUseErrorMessage import \
+    InteractiveUseErrorMessage
+from pydofus2.com.ankamagames.dofus.network.messages.game.interactive.InteractiveUseRequestMessage import \
+    InteractiveUseRequestMessage
+from pydofus2.com.ankamagames.dofus.network.messages.game.interactive.skill.InteractiveUseWithParamRequestMessage import \
+    InteractiveUseWithParamRequestMessage
+from pydofus2.com.ankamagames.dofus.network.messages.game.inventory.exchanges.ExchangeLeaveMessage import \
+    ExchangeLeaveMessage
+from pydofus2.com.ankamagames.dofus.network.messages.game.prism.PrismFightDefenderLeaveMessage import \
+    PrismFightDefenderLeaveMessage
+from pydofus2.com.ankamagames.dofus.network.types.game.context.roleplay.GameRolePlayGroupMonsterInformations import \
+    GameRolePlayGroupMonsterInformations
+from pydofus2.com.ankamagames.dofus.types.entities.AnimatedCharacter import \
+    AnimatedCharacter
+from pydofus2.com.ankamagames.jerakine.benchmark.BenchmarkTimer import \
+    BenchmarkTimer
+from pydofus2.com.ankamagames.jerakine.entities.interfaces.IEntity import \
+    IEntity
+from pydofus2.com.ankamagames.jerakine.entities.interfaces.IMovable import \
+    IMovable
 from pydofus2.com.ankamagames.jerakine.handlers.messages.Action import Action
 from pydofus2.com.ankamagames.jerakine.logger.Logger import Logger
 from pydofus2.com.ankamagames.jerakine.messages.Frame import Frame
 from pydofus2.com.ankamagames.jerakine.messages.Message import Message
-from pydofus2.com.ankamagames.jerakine.network.INetworkMessage import INetworkMessage
-from pydofus2.com.ankamagames.jerakine.pathfinding.Pathfinding import Pathfinding
+from pydofus2.com.ankamagames.jerakine.network.INetworkMessage import \
+    INetworkMessage
+from pydofus2.com.ankamagames.jerakine.pathfinding.Pathfinding import \
+    Pathfinding
 from pydofus2.com.ankamagames.jerakine.types.enums.Priority import Priority
 from pydofus2.com.ankamagames.jerakine.types.positions.MapPoint import MapPoint
-from pydofus2.com.ankamagames.jerakine.types.positions.MovementPath import MovementPath
-from pydofus2.com.ankamagames.berilia.managers.KernelEventsManager import KernelEvent
+from pydofus2.com.ankamagames.jerakine.types.positions.MovementPath import \
+    MovementPath
 
 if TYPE_CHECKING:
-    from pydofus2.com.ankamagames.dofus.logic.game.roleplay.frames.RoleplayEntitiesFrame import RoleplayEntitiesFrame
-    from pydofus2.com.ankamagames.dofus.logic.game.roleplay.frames.RoleplayInteractivesFrame import (
-        RoleplayInteractivesFrame,
-    )
+    from pydofus2.com.ankamagames.dofus.logic.game.roleplay.frames.RoleplayEntitiesFrame import \
+        RoleplayEntitiesFrame
+    from pydofus2.com.ankamagames.dofus.logic.game.roleplay.frames.RoleplayInteractivesFrame import \
+        RoleplayInteractivesFrame
 
 
 class RoleplayMovementFrame(Frame):
@@ -121,47 +122,7 @@ class RoleplayMovementFrame(Frame):
     MOVEMENT_REQUEST_TIMEOUT = 3
     MAX_MOVEMENT_REQUEST_FAILS = 3
 
-    _wantToChangeMap: float = None
-
-    _changeMapByAutoTrip: bool = False
-
-    _followingMove: MapPoint
-
-    _followingIe: object
-
-    _followingMonsterGroup: GameRolePlayGroupMonsterInformations
-
-    _followingMessage = None
-
-    _isRequestingMovement: bool
-
-    _latestMovementRequest: int
-
-    _destinationPoint: int
-
-    _lastPlayerValidatedPosition: MapPoint
-
-    _lastMoveEndCellId: int
-
-    _canMove: bool = True
-
-    _mapHasAggressiveMonsters: bool = False
-
-    _isMoving = False
-
-    _followingActorId = None
-
-    _movementAnimTimer: BenchmarkTimer = None
-
-    _moveRequestTimer: BenchmarkTimer = None
-
-    _joinFightTimer: BenchmarkTimer = None
-
-    _walkToMapChangeCellFails = 0
-
     def __init__(self):
-        self._wantToChangeMap = None
-        self._changeMapByAutoTrip = False
         self._followingIe = None
         self._followingMonsterGroup = None
         self._followingMove = None
@@ -174,6 +135,16 @@ class RoleplayMovementFrame(Frame):
         self._requestFighFails = 0
         self._moveRequestFails = 0
         self._isMoving = False
+        self._canMove: bool = True
+        self._mapHasAggressiveMonsters: bool = False
+        self._followingActorId = None
+        self._movementAnimTimer: BenchmarkTimer = None
+        self._moveRequestTimer: BenchmarkTimer = None
+        self._joinFightTimer: BenchmarkTimer = None
+        self._walkToMapChangeCellFails = 0
+        self._wantToChangeMap: float = None
+        self._changeMapByAutoTrip: bool = False
+        self._destinationPoint = None
         super().__init__()
 
     @property
@@ -219,7 +190,7 @@ class RoleplayMovementFrame(Frame):
             return
         gfjrmsg = GameFightJoinRequestMessage()
         gfjrmsg.init(fighterId, fightId)
-        ConnectionsHandler().conn.send(gfjrmsg)
+        ConnectionsHandler().send(gfjrmsg)
         if self._joinFightTimer is not None:
             self._joinFightTimer.cancel()
         self._joinFightTimer = BenchmarkTimer(self.JOINFIGHT_TIMEOUT, self.joinFight, [fighterId, fightId])
@@ -227,10 +198,7 @@ class RoleplayMovementFrame(Frame):
         self._joinFightFails += 1
 
     def process(self, msg: Message) -> bool:
-        if Kernel().worker.contains("FightContextFrame"):
-            Logger().error("[RolePlayMovement] Trying to perform a roleplay action while the player is fighting")
-            connh.ConnectionsHandler().conn.close()
-
+        
         if isinstance(msg, GameMapNoMovementMessage):
             gmnmm = msg
             newPos = MapPoint.fromCoords(gmnmm.cellX, gmnmm.cellY)
@@ -342,9 +310,8 @@ class RoleplayMovementFrame(Frame):
                         f"[RolePlayMovement] Mouvement complete, arrived at '{emcmsg.entity.position.cellId}' and the requested destination was '{self._destinationPoint}'"
                     )
                 gmmcmsg = GameMapMovementConfirmMessage()
-                ConnectionsHandler().conn.send(gmmcmsg)
+                ConnectionsHandler().send(gmmcmsg)
                 if self._wantToChangeMap is not None:
-                    Logger().debug(f"[RolePlayMovement] Wants to change map to '{self._wantToChangeMap}'")
                     self._isRequestingMovement = False
                     if emcmsg.entity.position.cellId != self._destinationPoint:
                         if self.VERBOSE:
@@ -387,10 +354,15 @@ class RoleplayMovementFrame(Frame):
                             f"[RolePlayMovement] Wants to attack monster group {self._followingMonsterGroup.contextualId}"
                         )
                     self._isRequestingMovement = False
+                    monsterGroupId = self._followingMonsterGroup.contextualId
                     self._followingMonsterGroup = self.entitiesFrame.getEntityInfos(
                         self._followingMonsterGroup.contextualId
                     )
-                    freshMonstersPosition = self._followingMonsterGroup.disposition
+                    try:
+                        freshMonstersPosition = self._followingMonsterGroup.disposition
+                    except AttributeError:
+                        Kernel().worker.process(FightRequestFailed(monsterGroupId))
+                        return True
                     if freshMonstersPosition.cellId == emcmsg.entity.position.cellId:
                         self.requestMonsterFight(self._followingMonsterGroup.contextualId)
                     else:
@@ -409,17 +381,11 @@ class RoleplayMovementFrame(Frame):
             if emsmsg.entity.id == PlayedCharacterManager().id:
                 canceledMoveMessage = GameMapMovementCancelMessage()
                 canceledMoveMessage.init(emsmsg.entity.position.cellId)
-                ConnectionsHandler().conn.send(canceledMoveMessage)
+                ConnectionsHandler().send(canceledMoveMessage)
                 self._isRequestingMovement = False
                 if self._followingMove and self._canMove:
                     self.askMoveTo(self._followingMove)
                     self._followingMove = None
-                if self._followingMessage:
-                    if isinstance(self._followingMessage, PlayerFightRequestAction):
-                        Kernel().worker.process(self._followingMessage)
-                    else:
-                        ConnectionsHandler().conn.send(self._followingMessage)
-                    self._followingMessage = None
             return True
 
         elif isinstance(msg, TeleportOnSameMapMessage):
@@ -485,7 +451,11 @@ class RoleplayMovementFrame(Frame):
             self._mapHasAggressiveMonsters = msg.hasAggressiveMonsters
             self._isRequestingMovement = False
             return False
-
+        
+        elif isinstance(msg, GameRolePlayShowChallengeMessage):
+            if self._followingMonsterGroup and self._followingMonsterGroup.contextualId == msg.commonsInfos.fightId:
+                self._followingMonsterGroup = None
+                
         else:
             return False
 
@@ -532,10 +502,6 @@ class RoleplayMovementFrame(Frame):
     def setFollowingMonsterFight(self, monsterGroup: object) -> None:
         self._followingMonsterGroup = monsterGroup
 
-    def setFollowingMessage(self, message) -> None:
-        if not isinstance(message, (INetworkMessage, Action)):
-            raise Exception("The message is neither INetworkMessage or Action")
-        self._followingMessage = message
 
     def askMoveTo(self, cell: MapPoint, cmType=None) -> bool:
         playerEntity: AnimatedCharacter = DofusEntities().getEntity(PlayedCharacterManager().id)
@@ -557,7 +523,7 @@ class RoleplayMovementFrame(Frame):
         now: int = perf_counter()
         nexPossibleMovementTime = self._latestMovementRequest + self.CONSECUTIVE_MOVEMENT_DELAY
         if now < nexPossibleMovementTime:
-            sleep(self.CONSECUTIVE_MOVEMENT_DELAY)
+            Kernel().worker.terminated.wait(self.CONSECUTIVE_MOVEMENT_DELAY)
         self._isRequestingMovement = True
         if playerEntity is None:
             Logger().warn(
@@ -575,7 +541,7 @@ class RoleplayMovementFrame(Frame):
             if self._wantToChangeMap is not None and cmType != TransitionTypeEnum.INTERACTIVE:
                 Logger().warning(
                     f"[RolePlayMovement] Player is trying to change map through the cell {cell.cellId}, but he is on cell"
-                    + "'{playerEntity.position.cellId}' and the path '{movePath.start.cellId} -> {movePath.end.cellId}' doesn't lead to the wanted cell"
+                    + f"'{playerEntity.position.cellId}' and the path '{movePath.start.cellId} -> {movePath.end.cellId}' doesn't lead to the wanted cell"
                 )
                 self._isRequestingMovement = False
                 cmfm: MapChangeFailedMessage = MapChangeFailedMessage()
@@ -623,7 +589,7 @@ class RoleplayMovementFrame(Frame):
         gmmrmsg.init(keymoves, MapDisplayManager().currentMapPoint.mapId)
         if self.VERBOSE:
             Logger().debug(f"[RolePlayMovement] Sending movement request with keymoves {keymoves}")
-        ConnectionsHandler().conn.send(gmmrmsg)
+        ConnectionsHandler().send(gmmrmsg)
         if self.VERBOSE:
             Logger().debug(f"[RolePlayMovement] Movement request sent to server.")
         if self._moveRequestTimer:
@@ -640,7 +606,7 @@ class RoleplayMovementFrame(Frame):
             Kernel().worker.process(MovementRequestTimeoutMessage(gmmrmsg))
 
         else:
-            ConnectionsHandler().conn.send(gmmrmsg)
+            ConnectionsHandler().send(gmmrmsg)
             if self._moveRequestTimer:
                 self._moveRequestTimer.cancel()
             self._moveRequestTimer = BenchmarkTimer(
@@ -667,7 +633,7 @@ class RoleplayMovementFrame(Frame):
         Logger().debug(f"[RolePlayMovement] Asking for a map change to {self._wantToChangeMap}")
         cmmsg: ChangeMapMessage = ChangeMapMessage()
         cmmsg.init(int(self._wantToChangeMap), False)
-        ConnectionsHandler().conn.send(cmmsg)
+        ConnectionsHandler().send(cmmsg)
         if self._changeMapTimeout:
             self._changeMapTimeout.cancel()
         self._changeMapTimeout = BenchmarkTimer(self.CHANGEMAP_TIMEOUT, self.onMapChangeFailed, [])
@@ -679,6 +645,8 @@ class RoleplayMovementFrame(Frame):
             Logger().warn("[RolePlayMovement] Already following a monster group, aborting")
             return
         entityInfo = self.entitiesFrame.getEntityInfos(contextualId)
+        if not entityInfo:
+            Logger().warn(f"[RolePlayMovement] Can't find entity {contextualId}, maybe someone else is fighting it?")
         Logger().debug("[RolePlayMovement] Asking for a fight against monsters " + str(entityInfo.contextualId))
         if PlayedCharacterManager().currentCellId == entityInfo.disposition.cellId:
             self.requestMonsterFight(contextualId)
@@ -696,6 +664,11 @@ class RoleplayMovementFrame(Frame):
         else:
             Logger().warning(f"[RolePlayMovement] Actor {actorId} is not on current map.")
 
+    def onAttackMonsterGroupTimeout(self, monsterGroupId) -> None:
+        if self._requestFightTimeout:
+            self._requestFightTimeout.cancel()
+        Kernel().worker.process(FightRequestFailed(monsterGroupId))
+    
     def onMapChangeFailed(self) -> None:
         if self._changeMapTimeout is not None:
             self._changeMapTimeout.cancel()
@@ -726,27 +699,19 @@ class RoleplayMovementFrame(Frame):
             if additionalParam == 0:
                 iurmsg = InteractiveUseRequestMessage()
                 iurmsg.init(int(elementId), int(skillInstanceId))
-                ConnectionsHandler().conn.send(iurmsg)
+                ConnectionsHandler().send(iurmsg)
             else:
                 iuwprmsg = InteractiveUseWithParamRequestMessage()
                 iuwprmsg.init(int(elementId), int(skillInstanceId), int(additionalParam))
-                ConnectionsHandler().conn.send(iuwprmsg)
+                ConnectionsHandler().send(iuwprmsg)
             self._canMove = False
 
     def requestMonsterFight(self, monsterGroupId: int) -> None:
-        if self._requestFighFails > 2:
-            Logger().warning(
-                f"[RolePlayMovement]  Server rejected monster fight request for the {self._requestFighFails} time!"
-            )
-            self._requestFighFails = 0
-            nopmsg = FightRequestFailed(monsterGroupId)
-            Kernel().worker.process(nopmsg)
-            return False
         self._followingMonsterGroup = None
         grpamrmsg: GameRolePlayAttackMonsterRequestMessage = GameRolePlayAttackMonsterRequestMessage()
         grpamrmsg.init(monsterGroupId)
-        ConnectionsHandler().conn.send(grpamrmsg)
-        self._requestFightTimeout = BenchmarkTimer(10, self.attackMonsters, (monsterGroupId,))
+        ConnectionsHandler().send(grpamrmsg)
+        self._requestFightTimeout = BenchmarkTimer(10, self.onAttackMonsterGroupTimeout, (monsterGroupId,))
         self._requestFightTimeout.start()
         self._requestFighFails += 1
 
@@ -760,7 +725,7 @@ class RoleplayMovementFrame(Frame):
         cmmsg = GameMapMovementCancelMessage()
         cmmsg.init(self._destinationPoint)
         Kernel().worker.process(cmmsg)
-        ConnectionsHandler().conn.send(cmmsg)
+        ConnectionsHandler().send(cmmsg)
 
     def cancelFollowingActor(self):
         self._isRequestingMovement = False
@@ -774,4 +739,4 @@ class RoleplayMovementFrame(Frame):
         cmmsg = GameMapMovementCancelMessage()
         cmmsg.init(self._destinationPoint)
         Kernel().worker.process(cmmsg)
-        ConnectionsHandler().conn.send(cmmsg)
+        ConnectionsHandler().send(cmmsg)

@@ -9,6 +9,7 @@ from pydofus2.com.ankamagames.jerakine.data.GameDataField import GameDataField
 from pydofus2.com.ankamagames.jerakine.data.GameData import GameData
 from pydofus2.com.ankamagames.jerakine.data.I18nFileAccessor import I18nFileAccessor
 from pydofus2.com.ankamagames.jerakine.enum.GameDataTypeEnum import GameDataTypeEnum
+from pydofus2.com.ankamagames.jerakine.interfaces.IDataCenter import IDataCenter
 from pydofus2.com.ankamagames.jerakine.logger.Logger import Logger
 from pydofus2.com.ankamagames.jerakine.utils.misc.StringUtils import StringUtils
 
@@ -51,12 +52,12 @@ class GameDataQuery:
         return result
 
     @classmethod
-    def queryEquals(cls, target, fieldName: str, value) -> list[int]:
+    def queryEquals(cls, target: IDataCenter, fieldName: str, value) -> list[int]:
         target = cls.checkPackage(target)
         fieldName = cls.checkField(target, fieldName)
         if not fieldName:
             return list[int]()
-        result = GameData().getDataProcessor(getattr(target, "MODULE")).queryEquals(fieldName, value)
+        result = GameData().getDataProcessor(target.MODULE).queryEquals(fieldName, value)
         if isinstance(value, Iterable):
             return cls.union(result)
         return result

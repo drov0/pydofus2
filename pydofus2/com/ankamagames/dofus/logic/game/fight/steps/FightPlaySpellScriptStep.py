@@ -41,8 +41,12 @@ class FightPlaySpellScriptStep(AbstractSequencable, IFightStep):
         self._spellRank = spellRank
         self._spellCastProvider = spellCastProvider
         self._fighterId = fighterId
-        if self._fxScriptId == 0:
-            return
+
+    @property
+    def stepType(self) -> str:
+        return "spellCast"
+
+    def start(self) -> None:
         s: Spell = Spell.getSpellById(self._spellId)
         if not s:
             return
@@ -50,19 +54,7 @@ class FightPlaySpellScriptStep(AbstractSequencable, IFightStep):
         if not sl or not sl.playAnimation:
             return
         if self._spellCastProvider.castingSpell.spell:
-            Logger().info(
-                "Executing Spell "
-                + self._spellCastProvider.castingSpell.spell.name
-                + "' ("
-                + str(self._spellCastProvider.castingSpell.spell.id)
-                + ")"
-            )
-
-    @property
-    def stepType(self) -> str:
-        return "spellCast"
-
-    def start(self) -> None:
+            Logger().info(f"Fighter {self._fighterId} Casting Spell '{self._spellCastProvider.castingSpell.spell.name}' ({self._spellCastProvider.castingSpell.spell.id})")
         self.executeCallbacks()
 
     @property

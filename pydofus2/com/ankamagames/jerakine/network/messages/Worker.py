@@ -1,16 +1,25 @@
+import queue
 import threading
-from pydofus2.com.ankamagames.berilia.managers.KernelEventsManager import KernelEventsManager, KernelEvent
+
+from pydofus2.com.ankamagames.berilia.managers.KernelEventsManager import (
+    KernelEvent, KernelEventsManager)
 from pydofus2.com.ankamagames.jerakine.logger.Logger import Logger
+from pydofus2.com.ankamagames.jerakine.logger.MemoryProfiler import MemoryProfiler
+from pydofus2.com.ankamagames.jerakine.messages.DiscardableMessage import \
+    DiscardableMessage
 from pydofus2.com.ankamagames.jerakine.messages.Frame import Frame
 from pydofus2.com.ankamagames.jerakine.messages.Message import Message
-from pydofus2.com.ankamagames.jerakine.messages.DiscardableMessage import DiscardableMessage
-from pydofus2.com.ankamagames.jerakine.messages.MessageHandler import MessageHandler
+from pydofus2.com.ankamagames.jerakine.messages.MessageHandler import \
+    MessageHandler
 
-"""This Class for handling messages and frames in a Dofus 2 game application. The worker class is a subclass of MessageHandler and
+"""
+This Class for handling messages and frames in a Dofus 2 game application. The worker class is a subclass of MessageHandler and
 provides methods for processing messages, adding and removing frames, checking if a frame is present, getting a frame, and terminating the worker. 
 The class uses the threading module for handling concurrency, and also uses several classes from the pydofus2 package, such as KernelEventsManager,
 Logger, Frame, and Message. There are also several class-level variables for enabling debug logging for frames, messages, and frame processing.
 """
+
+
 
 
 class Worker(MessageHandler):
@@ -27,15 +36,22 @@ class Worker(MessageHandler):
         self._terminated = threading.Event()
         self._terminating = threading.Event()
         self._currentFrameTypesCache = dict[str, Frame]()
-        super().__init__()
+        self._queue = queue.Queue()
 
+    @property
+    def terminated(self) -> threading.Event:
+        return self._terminated
+    
+    def run(self) -> None:
+        while not self._terminating.is_set():
+            msg = self._queue.get()
+            self.processFramesInAndOut()
+            self.processMessage(msg)
+    
     def process(self, msg: Message) -> bool:
         if self._terminated.is_set():
-            Logger().warning(f"[WORKER] Can't process message {msg} because the worker is terminated")
-            return False
-        self.processFramesInAndOut()
-        self.processMessage(msg)
-        return True
+            return
+        self._queue.put(msg)
 
     def addFrame(self, frame: Frame) -> None:
         if self._terminated.is_set() or frame is None:
@@ -45,12 +61,14 @@ class Worker(MessageHandler):
         if str(frame) in self._currentFrameTypesCache:
             if frame in self._framesToAdd and frame not in self._framesToRemove:
                 raise Exception(f"Can't add the frame '{frame}' because it's already in the to-add list.")
+            
         if self._processingMessage.is_set():
             if frame in self._framesToAdd:
                 raise Exception(f"[WORKER] Tried to queue Frame '{frame}' but it's already in the queue!")
             if self.DEBUG_FRAMES:
                 Logger().debug(f"[WORKER] >>> Queuing Frame {frame} for addition...")
             self._framesToAdd.add(frame)
+            
         else:
             self.pushFrame(frame)
 
@@ -77,14 +95,11 @@ class Worker(MessageHandler):
 
     def terminate(self) -> None:
         self._terminating.set()
-        self.clear()
+        self.reset()
         self._terminating.clear()
         self._terminated.set()
 
-    def clear(self) -> None:
-        frame: Frame = None
-        if self.DEBUG_FRAMES:
-            Logger().debug("[WORKER] Clearing worker (no more frames or messages in queue)")
+    def reset(self) -> None:
         nonPulledFrameList = [f for f in self._framesList if not f.pulled()]
         self._framesList.clear()
         self._framesToAdd.clear()
@@ -93,7 +108,6 @@ class Worker(MessageHandler):
         self._processingMessage.clear()
         for frame in nonPulledFrameList:
             raise Exception(f"[WORKER] Frame '{frame}' was not pulled!")
-        self._paused = False
 
     def pushFrame(self, frame: Frame) -> None:
         if self.DEBUG_FRAMES:
@@ -137,6 +151,7 @@ class Worker(MessageHandler):
         else:
             Logger().warn(f"[WORKER] Frame {frame} refused to be pulled.")
 
+    @MemoryProfiler.track_memory("Worker.processMessage")
     def processMessage(self, msg: Message) -> None:
         processed: bool = False
         self._processingMessage.set()
@@ -155,7 +170,8 @@ class Worker(MessageHandler):
             Logger().debug(f"[WORKER] Message: {msg.__class__.__name__} processed.")
         if not processed and not isinstance(msg, DiscardableMessage):
             raise Exception(f"[WORKER] Discarded message: {msg.__class__.__name__}!")
-
+        
+    @MemoryProfiler.track_memory("Worker.processFrames")
     def processFramesInAndOut(self) -> None:
         while self._framesToRemove and not self._terminated.is_set():
             f = self._framesToRemove.pop()
@@ -165,6 +181,6 @@ class Worker(MessageHandler):
             self.pushFrame(f)
 
     def removeFrameByName(self, frameName: str) -> None:
-        if not self.contains(frameName):
+        if not self.getFrame(frameName):
             return
         self.removeFrame(self.getFrame(frameName))

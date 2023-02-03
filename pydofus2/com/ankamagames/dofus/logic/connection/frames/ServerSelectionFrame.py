@@ -1,45 +1,42 @@
 from types import FunctionType
-from pydofus2.com.ankamagames.berilia.managers.KernelEventsManager import KernelEventsManager, KernelEvent
-from pydofus2.com.ankamagames.dofus.datacenter.servers.Server import Server
+
 import pydofus2.com.ankamagames.dofus.kernel.Kernel as krnl
-from pydofus2.com.ankamagames.dofus.kernel.net.ConnectionsHandler import ConnectionsHandler
-from pydofus2.com.ankamagames.dofus.kernel.net.DisconnectionReasonEnum import (
-    DisconnectionReasonEnum,
-)
-from pydofus2.com.ankamagames.dofus.logic.common.managers.PlayerManager import PlayerManager
-from pydofus2.com.ankamagames.dofus.logic.connection.actions.ServerSelectionAction import (
-    ServerSelectionAction,
-)
-from pydofus2.com.ankamagames.dofus.logic.connection.managers.AuthentificationManager import (
-    AuthentificationManager,
-)
-from pydofus2.com.ankamagames.dofus.network.enums.ServerStatusEnum import ServerStatusEnum
-from pydofus2.com.ankamagames.dofus.network.messages.connection.SelectedServerDataExtendedMessage import (
-    SelectedServerDataExtendedMessage,
-)
-from pydofus2.com.ankamagames.dofus.network.messages.connection.SelectedServerDataMessage import (
-    SelectedServerDataMessage,
-)
-from pydofus2.com.ankamagames.dofus.network.messages.connection.ServerSelectionMessage import ServerSelectionMessage
-from pydofus2.com.ankamagames.dofus.network.messages.connection.ServerStatusUpdateMessage import (
-    ServerStatusUpdateMessage,
-)
-from pydofus2.com.ankamagames.dofus.network.messages.connection.ServersListMessage import (
-    ServersListMessage,
-)
-from pydofus2.com.ankamagames.dofus.network.types.connection.GameServerInformations import (
-    GameServerInformations,
-)
-from pydofus2.com.ankamagames.jerakine.benchmark.BenchmarkTimer import BenchmarkTimer
+from pydofus2.com.ankamagames.berilia.managers.KernelEventsManager import (
+    KernelEvent, KernelEventsManager)
+from pydofus2.com.ankamagames.dofus.datacenter.servers.Server import Server
+from pydofus2.com.ankamagames.dofus.kernel.net.ConnectionsHandler import \
+    ConnectionsHandler
+from pydofus2.com.ankamagames.dofus.kernel.net.DisconnectionReasonEnum import \
+    DisconnectionReasonEnum
+from pydofus2.com.ankamagames.dofus.logic.common.managers.PlayerManager import \
+    PlayerManager
+from pydofus2.com.ankamagames.dofus.logic.connection.actions.ServerSelectionAction import \
+    ServerSelectionAction
+from pydofus2.com.ankamagames.dofus.logic.connection.managers.AuthentificationManager import \
+    AuthentificationManager
+from pydofus2.com.ankamagames.dofus.network.enums.ServerStatusEnum import \
+    ServerStatusEnum
+from pydofus2.com.ankamagames.dofus.network.messages.connection.SelectedServerDataExtendedMessage import \
+    SelectedServerDataExtendedMessage
+from pydofus2.com.ankamagames.dofus.network.messages.connection.SelectedServerDataMessage import \
+    SelectedServerDataMessage
+from pydofus2.com.ankamagames.dofus.network.messages.connection.ServerSelectionMessage import \
+    ServerSelectionMessage
+from pydofus2.com.ankamagames.dofus.network.messages.connection.ServersListMessage import \
+    ServersListMessage
+from pydofus2.com.ankamagames.dofus.network.messages.connection.ServerStatusUpdateMessage import \
+    ServerStatusUpdateMessage
+from pydofus2.com.ankamagames.dofus.network.types.connection.GameServerInformations import \
+    GameServerInformations
+from pydofus2.com.ankamagames.jerakine.benchmark.BenchmarkTimer import \
+    BenchmarkTimer
 from pydofus2.com.ankamagames.jerakine.logger.Logger import Logger
 from pydofus2.com.ankamagames.jerakine.messages.Frame import Frame
 from pydofus2.com.ankamagames.jerakine.messages.Message import Message
-from pydofus2.com.ankamagames.jerakine.messages.WrongSocketClosureReasonMessage import (
-    WrongSocketClosureReasonMessage,
-)
-from pydofus2.com.ankamagames.jerakine.network.messages.ExpectedSocketClosureMessage import (
-    ExpectedSocketClosureMessage,
-)
+from pydofus2.com.ankamagames.jerakine.messages.WrongSocketClosureReasonMessage import \
+    WrongSocketClosureReasonMessage
+from pydofus2.com.ankamagames.jerakine.network.messages.ExpectedSocketClosureMessage import \
+    ExpectedSocketClosureMessage
 from pydofus2.com.ankamagames.jerakine.network.messages.Worker import Worker
 from pydofus2.com.ankamagames.jerakine.types.enums.Priority import Priority
 
@@ -146,7 +143,7 @@ class ServerSelectionFrame(Frame):
                     ):
                         ssmsg = ServerSelectionMessage()
                         ssmsg.init(ssaction.serverId)
-                        ConnectionsHandler().conn.send(ssmsg)
+                        ConnectionsHandler().send(ssmsg)
                         return True
                     else:
                         Logger().debug(
@@ -163,9 +160,8 @@ class ServerSelectionFrame(Frame):
             self.broadcastServersListUpdate(True)
 
         elif isinstance(msg, ExpectedSocketClosureMessage):
-            from pydofus2.com.ankamagames.dofus.logic.game.approach.frames.GameServerApproachFrame import (
-                GameServerApproachFrame,
-            )
+            from pydofus2.com.ankamagames.dofus.logic.game.approach.frames.GameServerApproachFrame import \
+                GameServerApproachFrame
 
             escmsg = msg
             if escmsg.reason != DisconnectionReasonEnum.SWITCHING_TO_GAME_SERVER:

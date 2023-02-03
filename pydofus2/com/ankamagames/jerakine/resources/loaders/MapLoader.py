@@ -2,6 +2,7 @@ from functools import lru_cache
 from pathlib import Path
 from pydofus2.com.ankamagames.dofus import Constants
 from pydofus2.com.ankamagames.jerakine.data.XmlConfig import XmlConfig
+from pydofus2.com.ankamagames.jerakine.logger.MemoryProfiler import MemoryProfiler
 from pydofus2.dataAdapter.dlm import DLM
 import threading
 
@@ -11,9 +12,11 @@ lock = threading.Lock()
 class MapLoader:
     DLM_KEY = XmlConfig().getEntry("config.maps.encryptionKey")
     reader = DLM(DLM_KEY)
-
+    
+    
     @classmethod
     @lru_cache(maxsize=5)
+    @MemoryProfiler.track_memory("MapLoader.load")
     def load(cls, mapId, key=None):
         with lock:
             if key is not None:

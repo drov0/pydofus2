@@ -1,23 +1,25 @@
+from typing import TYPE_CHECKING
+
 from pydofus2.com.ankamagames.dofus.kernel.Kernel import Kernel
-from pydofus2.com.ankamagames.dofus.kernel.net.ConnectionsHandler import ConnectionsHandler
-from pydofus2.com.ankamagames.dofus.network.enums.GameContextEnum import GameContextEnum
-from pydofus2.com.ankamagames.dofus.network.messages.game.basic.SequenceNumberMessage import (
-    SequenceNumberMessage,
-)
-from pydofus2.com.ankamagames.dofus.network.messages.game.context.GameContextCreateMessage import (
-    GameContextCreateMessage,
-)
-from pydofus2.com.ankamagames.dofus.network.messages.game.context.roleplay.CurrentMapMessage import CurrentMapMessage
+from pydofus2.com.ankamagames.dofus.kernel.net.ConnectionsHandler import \
+    ConnectionsHandler
+from pydofus2.com.ankamagames.dofus.network.enums.GameContextEnum import \
+    GameContextEnum
+from pydofus2.com.ankamagames.dofus.network.messages.game.basic.SequenceNumberMessage import \
+    SequenceNumberMessage
+from pydofus2.com.ankamagames.dofus.network.messages.game.basic.SequenceNumberRequestMessage import \
+    SequenceNumberRequestMessage
+from pydofus2.com.ankamagames.dofus.network.messages.game.context.GameContextCreateMessage import \
+    GameContextCreateMessage
+from pydofus2.com.ankamagames.dofus.network.messages.game.context.roleplay.CurrentMapMessage import \
+    CurrentMapMessage
 from pydofus2.com.ankamagames.jerakine.messages.Frame import Frame
 from pydofus2.com.ankamagames.jerakine.messages.Message import Message
 from pydofus2.com.ankamagames.jerakine.types.enums.Priority import Priority
-from pydofus2.com.ankamagames.dofus.network.messages.game.basic.SequenceNumberRequestMessage import (
-    SequenceNumberRequestMessage,
-)
-from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
-    from pydofus2.com.ankamagames.dofus.logic.game.roleplay.frames.RoleplayMovementFrame import RoleplayMovementFrame
+    from pydofus2.com.ankamagames.dofus.logic.game.roleplay.frames.RoleplayMovementFrame import \
+        RoleplayMovementFrame
 
 
 class SynchronisationFrame(Frame):
@@ -49,7 +51,7 @@ class SynchronisationFrame(Frame):
             self._synchroStepByServer[snrMsg.sourceConnection] += 1
             snMsg = SequenceNumberMessage()
             snMsg.init(number_=self._synchroStepByServer[snrMsg.sourceConnection])
-            ConnectionsHandler().conn.send(snMsg)
+            ConnectionsHandler().send(snMsg)
             return True
 
         if isinstance(msg, CurrentMapMessage):

@@ -3,6 +3,7 @@ from pydofus2.com.ankamagames.dofus.logic.game.common.misc.IEntityLocalizer impo
     IEntityLocalizer,
 )
 from pydofus2.com.ankamagames.jerakine.entities.interfaces.IEntity import IEntity
+from pydofus2.com.ankamagames.jerakine.logger.MemoryProfiler import MemoryProfiler
 from pydofus2.com.ankamagames.jerakine.metaclasses.ThreadSharedSingleton import ThreadSharedSingleton
 import threading
 
@@ -10,6 +11,7 @@ lock = threading.Lock()
 
 
 class FightEntitiesHolder(IEntityLocalizer, metaclass=ThreadSharedSingleton):
+    
     def __init__(self):
         self._holdedEntities = dict()
         DofusEntities().registerLocalizer(self)
@@ -18,6 +20,7 @@ class FightEntitiesHolder(IEntityLocalizer, metaclass=ThreadSharedSingleton):
     def getEntity(self, entityId: float) -> IEntity:
         return self._holdedEntities.get(entityId)
 
+    @MemoryProfiler.track_memory("FightEntitiesHolder.holdEntity")
     def holdEntity(self, entity: IEntity) -> None:
         with lock:
             if entity.id not in self._holdedEntities:

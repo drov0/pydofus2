@@ -52,7 +52,7 @@ class ChatFrame(Frame):
             msgContent = I18n.getText(textId)
             if msgContent:
                 msgContent = ParamsDecoder.applyParams(msgContent, params)
-                Logger().info(f"text info : {msgContent}")
+                Logger().info(f"text info for id {textId}: {msgContent}")
             else:
                 Logger().error(f"There's no message for id {timsg.msgType * 10000 + timsg.msgId}")
             return False

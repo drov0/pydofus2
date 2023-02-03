@@ -1,4 +1,5 @@
 from pydofus2.com.ankamagames.berilia.managers.KernelEventsManager import KernelEventsManager, KernelEvent
+from pydofus2.com.ankamagames.dofus.kernel.net.ConnectionsHandler import ConnectionsHandler
 import pydofus2.com.ankamagames.dofus.logic.game.roleplay.frames.RoleplayEntitiesFrame as ref
 import pydofus2.com.ankamagames.dofus.logic.game.roleplay.frames.RoleplayInteractivesFrame as rif
 import pydofus2.com.ankamagames.dofus.logic.game.roleplay.frames.RoleplayWorldFrame as rplWF
@@ -78,6 +79,7 @@ class RoleplayContextFrame(Frame):
             else:
                 MapDisplayManager().mapInstanceId = 0
             wp = None
+            ConnectionsHandler().pause()
             if self._entitiesFrame:
                 Kernel().worker.removeFrame(self._entitiesFrame)
             if self._worldFrame:
@@ -106,6 +108,7 @@ class RoleplayContextFrame(Frame):
             Kernel().worker.addFrame(self._worldFrame)
             Kernel().worker.addFrame(self.movementFrame)
             Kernel().worker.addFrame(self._interactivesFrame)
+            ConnectionsHandler().resume()
             KernelEventsManager().send(KernelEvent.MAPLOADED, msg.id)
             self._listMapNpcsMsg = None
             return True

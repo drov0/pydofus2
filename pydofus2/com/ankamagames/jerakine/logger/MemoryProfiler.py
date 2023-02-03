@@ -1,63 +1,69 @@
-import linecache
+import functools
+import objgraph
 import os
+import sys
+import threading
 from time import perf_counter
+import traceback
 import tracemalloc
+import psutil
 
+from pydofus2.com.ankamagames.jerakine.metaclasses.ThreadSharedSingleton import ThreadSharedSingleton
 
-class MemoryProfiler:
-    LOGRATE = 5
-    LAST_LOGGED = 0
-    SAVED_PROFILES = dict()
+class MemoryProfiler(threading.Thread, metaclass=ThreadSharedSingleton):
     SHOW_LIMIT = 100
-    SAVE_LIMIT = 100
-    LOG_FILE = "./memory_usage.log"
     KEY_TYPE = "lineno"
-
+    _process = psutil.Process(os.getpid())
+    _memory_usage = {}
+    
+    def __init__(self, threshold=1024*1024*3, file_name='memory_usage_h.txt'):
+        super().__init__(name='MemoryProfiler')
+        self.threshold = threshold
+        self.file_name = file_name
+        self.stop_event = threading.Event()
+        
     @classmethod
-    def logMemoryUsage(cls, snapshot):
-        now = perf_counter()
-        if now - cls.LAST_LOGGED < 1 / cls.LOGRATE:
-            return
-        cls.LAST_LOGGED = now
-        with open(cls.LOG_FILE, "a") as fp:
-            format_row = "{:<7} {:<50} {:<80} {:>10}"
-            fp.write("# " + "*" * 100 + "\n")
-            fp.write(format_row.format(*["index", "file", "line", "usage (mb)"]) + "\n")
-            snapshot = snapshot.filter_traces(
-                (
-                    tracemalloc.Filter(False, "<frozen importlib._bootstrap>"),
-                    tracemalloc.Filter(False, "<unknown>"),
-                    tracemalloc.Filter(False, "<frozen importlib._bootstrap_external>"),
-                    tracemalloc.Filter(False, "<linecache.py>", 137),
-                )
-            )
-            top_stats = snapshot.statistics(cls.KEY_TYPE)
-            for index, stat in enumerate(top_stats[: cls.SAVE_LIMIT], 1):
-                frame = stat.traceback[0]
-                filename = os.sep.join(frame.filename.split(os.sep)[-2:])
-                line = linecache.getline(frame.filename, frame.lineno).strip()
-                fileLine = filename + ":" + str(frame.lineno)
-                usage = round(stat.size / (1024 * 1024), 2)
-                if fileLine not in cls.SAVED_PROFILES:
-                    cls.SAVED_PROFILES[fileLine] = []
-                cls.SAVED_PROFILES[fileLine].append(usage)
-                if index < cls.SHOW_LIMIT:
-                    fp.write(format_row.format(*[index, fileLine, line, str(usage)]) + "\n")
-            other = top_stats[cls.SAVE_LIMIT :]
-            if other:
-                if "other" not in cls.SAVED_PROFILES:
-                    cls.SAVED_PROFILES["other"] = []
-                size = round(sum(stat.size for stat in other) / (1024 * 1024), 2)
-                cls.SAVED_PROFILES["other"].append(size)
-                fp.write("%s other: %.1f MB" % (len(other), size) + "\n")
-            total = round(sum(stat.size for stat in top_stats) / (1024 * 1024), 2)
-            fp.write("Total allocated size: %.1f NB" % (total) + "\n")
+    def track_memory(cls, name):
+        def actual_wrapper(func):
+            @functools.wraps(func)
+            def wrapper(*args, **kwargs):
+                memory_before = cls._process.memory_info().rss
+                result = func(*args, **kwargs)
+                memory_after = cls._process.memory_info().rss
+                memory_delta = memory_after - memory_before
+                cls._memory_usage[name] = { 
+                    "usage": cls._memory_usage.get(name, {}).get("usage", 0) + memory_delta,
+                    "count": cls._memory_usage.get(name, {}).get("count", 0) + 1
+                }
+                return result
+            return wrapper
+        return actual_wrapper
+    
+    def run(self):
+        try:
+            format_row = "{:<40} {:>20} {:>20}\n"
+            row_delimiter = "-" * 83 + "\n"
+            headears = format_row.format("function", "usage", "count")
+            while not self.stop_event.is_set():
+                with open(self.file_name, 'w') as fp:
+                    fp.write("Tracked Functions memory usage:\n")
+                    fp.write(headears)
+                    fp.write(row_delimiter)
+                    for key, value in self._memory_usage.items():
+                        fmt_usage = tracemalloc._format_size(value["usage"], False)
+                        fp.write(format_row.format(key, fmt_usage, value["count"]))
+                    fp.write(row_delimiter)
+                    total = tracemalloc._format_size(self._process.memory_info().rss, False)
+                    fp.write(f"Total memory usage: {total}\n")
+                    fp.write(row_delimiter)
+                    objgraph.show_growth(file=fp)
+                self.stop_event.wait(10)
+        except Exception as e:
+            with open(self.file_name, 'a') as fp:
+                exc_type, exc_value, exc_traceback = sys.exc_info()
+                traceback_in_var = traceback.format_tb(exc_traceback)
+                error_trace = str(e) + '\n' + str(exc_type) + "\n" + str(exc_value) + "\n" + "\n".join(traceback_in_var)
+                fp.write(error_trace)
 
-    @classmethod
-    def saveCollectedData(cls):
-        import json
-        import datetime
-
-        now = datetime.datetime.now()
-        with open(f"./MemoryStats-{now.strftime('%Y-%m-%d')}.json", "w") as fp:
-            json.dump(cls.SAVED_PROFILES, fp, indent=4)
+    def stop(self):
+        self.stop_event.set()

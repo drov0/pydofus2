@@ -6,6 +6,8 @@ from pydofus2.mapTools import MapTools
 
 
 class LosDetector(ILosDetector):
+    _tested = dict[MapPoint, dict[MapPoint, bool]]()
+    
     @classmethod
     def losBetween(
         cls, mapProvider: IDataMapProvider, refPos: MapPoint, targetPos: MapPoint, tested: dict[str, bool] = {}
@@ -38,11 +40,12 @@ class LosDetector(ILosDetector):
             mp = MapPoint.fromCellId(cellId)
             orderedCell.append({"p": mp, "dist": refPosition.distanceToCell(mp)})
         orderedCell.sort(key=lambda x: x["dist"], reverse=True)
-        tested = dict[MapPoint, bool]()
+        if refPosition not in cls._tested:
+            cls._tested[refPosition] = dict[MapPoint, bool]()
         result = set[int]()
         for i in range(len(orderedCell)):
             p: MapPoint = orderedCell[i]["p"]
-            if p not in tested:
+            if p not in cls._tested[refPosition]:
                 line = MapTools.getCellsCoordBetween(refPosition.cellId, p.cellId)
                 if len(line) == 0:
                     result.add(p.cellId)
@@ -52,14 +55,18 @@ class LosDetector(ILosDetector):
                         if MapPoint.isInMap(line[j].x, line[j].y):
                             if j > 0 and mapProvider.hasEntity(line[j - 1].x, line[j - 1].y, False):
                                 los = False
-                            elif line[j] not in tested:
+                            elif line[j] not in cls._tested[refPosition]:
                                 los = los and mapProvider.pointLos(line[j].x, line[j].y, False)
                             else:
-                                los = los and tested[line[j]]
+                                los = los and cls._tested[refPosition][line[j]]
                         if not los:
                             break
-                    tested[p] = los
+                    cls._tested[refPosition][p] = los
         for i in spellrange:
             mp = MapPoint.fromCellId(i)
-            result = {mp.cellId for mp in tested if tested[mp]}
+            result = {mp.cellId for mp in cls._tested[refPosition] if cls._tested[refPosition][mp]}
         return result
+    
+    @classmethod
+    def clearCache(cls):
+        cls._tested.clear()

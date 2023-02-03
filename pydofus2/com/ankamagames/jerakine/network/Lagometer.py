@@ -1,10 +1,10 @@
 from pydofus2.com.ankamagames.jerakine.benchmark.BenchmarkTimer import BenchmarkTimer
+from pydofus2.com.ankamagames.jerakine.logger.Logger import Logger
 from pydofus2.com.ankamagames.jerakine.network.ILagometer import ILagometer
 from pydofus2.com.ankamagames.jerakine.network.INetworkMessage import INetworkMessage
 
 
 class Lagometer(ILagometer):
-
     SHOW_LAG_DELAY: int = 2
 
     def __init__(self):
@@ -30,11 +30,8 @@ class Lagometer(ILagometer):
 
     def startLag(self) -> None:
         self._lagging = True
-        self.updateUi()
-
-    def updateUi(self) -> None:
-        pass
+        Logger().debug("Lagometer: lagging as duck :(")
 
     def stopLag(self) -> None:
         self._lagging = False
-        self.updateUi()
+        Logger().debug("Lagometer: not lagging :)")

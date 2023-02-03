@@ -69,11 +69,11 @@ class ConnectionsHandler(metaclass=Singleton):
     def pause(self) -> None:
         self.paused.set()
         self.resumed.clear()
-    
+
     def resume(self) -> None:
         self.paused.clear()
         self.resumed.set()
-        
+
     def handleDisconnection(self) -> DisconnectionReason:
         reason: DisconnectionReason = DisconnectionReason(
             self._wantedSocketLost, self._wantedSocketLostReason, self._disconnectMessage

@@ -9,6 +9,7 @@ from pydofus2.com.ankamagames.jerakine.entities.interfaces.IEntity import IEntit
 from pydofus2.com.ankamagames.jerakine.sequencer.AbstractSequencable import AbstractSequencable
 from pydofus2.com.ankamagames.jerakine.sequencer.ISequencer import ISequencer
 
+
 class FightVanishStep(AbstractSequencable, IFightStep):
 
     _entityId: float

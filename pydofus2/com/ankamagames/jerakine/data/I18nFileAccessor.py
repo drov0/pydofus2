@@ -23,7 +23,7 @@ class I18nFileAccessor(metaclass=ThreadSharedSingleton):
             I18nFileAccessor._initialized.wait()
             return
         self.initI18n()
-        
+
     @MemoryProfiler.track_memory("I18nFileAccessor.init")
     def initI18n(self):
         self._initializing.set()
@@ -99,12 +99,12 @@ class I18nFileAccessor(metaclass=ThreadSharedSingleton):
             return None
         if self.directBuffer is None:
             with open(Constants.LANG_FILE_PATH, "rb") as fp:
-                stream = BinaryStream(fp, big_endian=True)        
+                stream = BinaryStream(fp, big_endian=True)
                 stream.position = pointer
                 return stream.readUTF()
         self.directBuffer.position = pointer
         return self.directBuffer.readUTF()
-    
+
     @lru_cache(maxsize=128)
     def getUnDiacriticalText(self, key: int) -> str:
         if not self.unDiacriticalIndex:

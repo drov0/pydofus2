@@ -10,18 +10,19 @@ import psutil
 
 from pydofus2.com.ankamagames.jerakine.metaclasses.ThreadSharedSingleton import ThreadSharedSingleton
 
+
 class MemoryProfiler(threading.Thread, metaclass=ThreadSharedSingleton):
     SHOW_LIMIT = 100
     KEY_TYPE = "lineno"
     _process = psutil.Process(os.getpid())
     _memory_usage = {}
-    
-    def __init__(self, threshold=1024*1024*3, file_name='memory_usage_h.txt'):
-        super().__init__(name='MemoryProfiler')
+
+    def __init__(self, threshold=1024 * 1024 * 3, file_name="memory_usage_h.txt"):
+        super().__init__(name="MemoryProfiler")
         self.threshold = threshold
         self.file_name = file_name
         self.stop_event = threading.Event()
-        
+
     @classmethod
     def track_memory(cls, name):
         def actual_wrapper(func):
@@ -31,21 +32,23 @@ class MemoryProfiler(threading.Thread, metaclass=ThreadSharedSingleton):
                 result = func(*args, **kwargs)
                 memory_after = cls._process.memory_info().rss
                 memory_delta = memory_after - memory_before
-                cls._memory_usage[name] = { 
+                cls._memory_usage[name] = {
                     "usage": cls._memory_usage.get(name, {}).get("usage", 0) + memory_delta,
-                    "count": cls._memory_usage.get(name, {}).get("count", 0) + 1
+                    "count": cls._memory_usage.get(name, {}).get("count", 0) + 1,
                 }
                 return result
+
             return wrapper
+
         return actual_wrapper
-    
+
     def run(self):
         try:
             format_row = "{:<40} {:>20} {:>20}\n"
             row_delimiter = "-" * 83 + "\n"
             headears = format_row.format("function", "usage", "count")
             while not self.stop_event.is_set():
-                with open(self.file_name, 'w') as fp:
+                with open(self.file_name, "w") as fp:
                     fp.write("Tracked Functions memory usage:\n")
                     fp.write(headears)
                     fp.write(row_delimiter)
@@ -59,10 +62,12 @@ class MemoryProfiler(threading.Thread, metaclass=ThreadSharedSingleton):
                     objgraph.show_growth(file=fp)
                 self.stop_event.wait(10)
         except Exception as e:
-            with open(self.file_name, 'a') as fp:
+            with open(self.file_name, "a") as fp:
                 exc_type, exc_value, exc_traceback = sys.exc_info()
                 traceback_in_var = traceback.format_tb(exc_traceback)
-                error_trace = str(e) + '\n' + str(exc_type) + "\n" + str(exc_value) + "\n" + "\n".join(traceback_in_var)
+                error_trace = (
+                    str(e) + "\n" + str(exc_type) + "\n" + str(exc_value) + "\n" + "\n".join(traceback_in_var)
+                )
                 fp.write(error_trace)
 
     def stop(self):

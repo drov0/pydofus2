@@ -54,7 +54,9 @@ class FightPlaySpellScriptStep(AbstractSequencable, IFightStep):
         if not sl or not sl.playAnimation:
             return
         if self._spellCastProvider.castingSpell.spell:
-            Logger().info(f"Fighter {self._fighterId} Casting Spell '{self._spellCastProvider.castingSpell.spell.name}' ({self._spellCastProvider.castingSpell.spell.id})")
+            Logger().info(
+                f"Fighter {self._fighterId} Casting Spell '{self._spellCastProvider.castingSpell.spell.name}' ({self._spellCastProvider.castingSpell.spell.id})"
+            )
         self.executeCallbacks()
 
     @property

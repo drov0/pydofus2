@@ -62,7 +62,7 @@ _messages_to_discard: set = {
     "ChallengeResultMessage",
     "ChallengeTargetsListMessage",
     "GameFightSpectateMessage",
-    "GameFightSpectatorJoinMessage"
+    "GameFightSpectatorJoinMessage",
 }
 
 _messagesTypes = dict[int, type[NetworkMessage]]()
@@ -75,8 +75,9 @@ for cls_name, cls_infos in msgShuffle.items():
             clsModule = importlib.import_module(modulePath)
         cls = getattr(clsModule, cls_name)
         _messagesTypes[cls_infos["id"]] = cls
-class MessageReceiver(RawDataParser, metaclass=ThreadSharedSingleton):
 
+
+class MessageReceiver(RawDataParser, metaclass=ThreadSharedSingleton):
     def __init__(self):
         super().__init__()
 

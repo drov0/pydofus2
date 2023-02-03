@@ -95,7 +95,7 @@ class DofusClient(threading.Thread):
     def shutdown(self, reason=DisconnectionReasonEnum.WANTED_SHUTDOWN, msg=""):
         Logger().info("[DofusClient] Shuting down ...")
         Kernel().reset()
-        
+
     def relogin(self):
         self.login(self._loginToken, self._serverId, self._characterId)
 

@@ -10,7 +10,6 @@ from pydofus2.com.ankamagames.jerakine.network.CustomDataWrapper import ByteArra
 
 
 class WorldGraph(metaclass=ThreadSharedSingleton):
-    
     def __init__(self):
         self._vertices = dict[int, dict[int, Vertex]]()
         self._edges = dict[float, Edge]()
@@ -50,7 +49,7 @@ class WorldGraph(metaclass=ThreadSharedSingleton):
         self._clearGraphFromMemoryTimer = BenchmarkTimer(30, self.reset)
         self._clearGraphFromMemoryTimer.start()
         self._initalized.set()
-        
+
     def getEdges(self) -> dict:
         if not self._initalized.is_set():
             self.init()

@@ -11,7 +11,6 @@ lock = threading.Lock()
 
 
 class FightEntitiesHolder(IEntityLocalizer, metaclass=ThreadSharedSingleton):
-    
     def __init__(self):
         self._holdedEntities = dict()
         DofusEntities().registerLocalizer(self)

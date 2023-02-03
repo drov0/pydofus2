@@ -47,10 +47,13 @@ class LagometerAck(Lagometer):
                 if self._msgTimeStack:
                     if self._timer:
                         self._timer.cancel()
-                    self._timer = BenchmarkTimer(max(
-                        0,
-                        self.SHOW_LAG_DELAY - (perf_counter() - self._msgTimeStack[0]),
-                    ), self.onTimerComplete)
+                    self._timer = BenchmarkTimer(
+                        max(
+                            0,
+                            self.SHOW_LAG_DELAY - (perf_counter() - self._msgTimeStack[0]),
+                        ),
+                        self.onTimerComplete,
+                    )
                     self._timer.start()
                 else:
                     self._timer.cancel()

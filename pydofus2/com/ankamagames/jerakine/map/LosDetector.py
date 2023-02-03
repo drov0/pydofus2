@@ -1,5 +1,4 @@
-from pydofus2.com.ankamagames.jerakine.map.IDataMapProvider import \
-    IDataMapProvider
+from pydofus2.com.ankamagames.jerakine.map.IDataMapProvider import IDataMapProvider
 from pydofus2.com.ankamagames.jerakine.map.ILosDetector import ILosDetector
 from pydofus2.com.ankamagames.jerakine.types.positions.MapPoint import MapPoint
 from pydofus2.mapTools import MapTools
@@ -7,7 +6,7 @@ from pydofus2.mapTools import MapTools
 
 class LosDetector(ILosDetector):
     _tested = dict[MapPoint, dict[MapPoint, bool]]()
-    
+
     @classmethod
     def losBetween(
         cls, mapProvider: IDataMapProvider, refPos: MapPoint, targetPos: MapPoint, tested: dict[str, bool] = {}
@@ -66,7 +65,7 @@ class LosDetector(ILosDetector):
             mp = MapPoint.fromCellId(i)
             result = {mp.cellId for mp in cls._tested[refPosition] if cls._tested[refPosition][mp]}
         return result
-    
+
     @classmethod
     def clearCache(cls):
         cls._tested.clear()

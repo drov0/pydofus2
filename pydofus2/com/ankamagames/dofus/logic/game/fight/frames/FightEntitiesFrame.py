@@ -138,7 +138,7 @@ class FightEntitiesFrame(AbstractEntitiesFrame, Frame):
     _realFightersLooks: dict = {}
 
     _mountsVisible: bool
-    
+
     lastKilledChallengers: list[GameFightFighterInformations]
 
     lastKilledDefenders: list[GameFightFighterInformations]

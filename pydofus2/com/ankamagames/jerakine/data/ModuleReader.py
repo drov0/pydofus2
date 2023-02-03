@@ -3,16 +3,12 @@ from collections import OrderedDict
 from functools import lru_cache
 from typing import Any
 
-from pydofus2.com.ankamagames.jerakine.benchmark.BenchmarkTimer import \
-    BenchmarkTimer
+from pydofus2.com.ankamagames.jerakine.benchmark.BenchmarkTimer import BenchmarkTimer
 from pydofus2.com.ankamagames.jerakine.data.BinaryStream import BinaryStream
-from pydofus2.com.ankamagames.jerakine.data.GameDataClassDefinition import \
-    GameDataClassDefinition
-from pydofus2.com.ankamagames.jerakine.data.GameDataProcess import \
-    GameDataProcess
+from pydofus2.com.ankamagames.jerakine.data.GameDataClassDefinition import GameDataClassDefinition
+from pydofus2.com.ankamagames.jerakine.data.GameDataProcess import GameDataProcess
 from pydofus2.com.ankamagames.jerakine.logger.Logger import Logger
-from pydofus2.com.ankamagames.jerakine.logger.MemoryProfiler import \
-    MemoryProfiler
+from pydofus2.com.ankamagames.jerakine.logger.MemoryProfiler import MemoryProfiler
 from pydofus2.com.hurlan.crypto.Signature import Signature
 
 lock = threading.Lock()
@@ -23,12 +19,11 @@ class InvalidD2OFile(Exception):
 
 
 class ModuleReader:
-
     def __init__(self, filepath: str, name: str) -> None:
         self.filepath = filepath
         self.name = name
         self.initModuleReader()
-        
+
     @MemoryProfiler.track_memory("ModuleReader.init")
     def initModuleReader(self):
         with open(self.filepath, "rb") as f:
@@ -64,14 +59,13 @@ class ModuleReader:
                 self.__readClassDefinition(classId, stream)
             if stream.remaining():
                 self._gameDataProcessor = GameDataProcess(stream, self.filepath)
-            
+
     def clearObjectsCache(self):
         Logger().info(f"[Modulee {self.name}] Clearing objects cache.")
         self.getObjects.cache_clear()
-        
 
-    @lru_cache(maxsize=32, typed=False)    
-    @MemoryProfiler.track_memory('ModuleReader.getObjects')
+    @lru_cache(maxsize=32, typed=False)
+    @MemoryProfiler.track_memory("ModuleReader.getObjects")
     def getObjects(self):
         with lock:
             if not self._counter:
@@ -100,7 +94,7 @@ class ModuleReader:
     def getClassDefinition(self, object_id: int) -> GameDataClassDefinition:
         return self._classes[object_id]
 
-    @lru_cache(maxsize=32, typed=False)    
+    @lru_cache(maxsize=32, typed=False)
     @MemoryProfiler.track_memory("ModuleReader.getObject")
     def getObject(self, objectId: int) -> Any:
         with lock:

@@ -12,8 +12,7 @@ lock = threading.Lock()
 class MapLoader:
     DLM_KEY = XmlConfig().getEntry("config.maps.encryptionKey")
     reader = DLM(DLM_KEY)
-    
-    
+
     @classmethod
     @lru_cache(maxsize=5)
     @MemoryProfiler.track_memory("MapLoader.load")

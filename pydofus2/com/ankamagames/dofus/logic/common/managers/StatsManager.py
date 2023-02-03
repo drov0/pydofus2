@@ -1,23 +1,23 @@
 from types import FunctionType
 
-from pydofus2.com.ankamagames.dofus.internalDatacenter.stats.DetailedStats import \
-    DetailedStat
-from pydofus2.com.ankamagames.dofus.internalDatacenter.stats.EntityStats import \
-    EntityStats
+from pydofus2.com.ankamagames.dofus.internalDatacenter.stats.DetailedStats import DetailedStat
+from pydofus2.com.ankamagames.dofus.internalDatacenter.stats.EntityStats import EntityStats
 from pydofus2.com.ankamagames.dofus.internalDatacenter.stats.Stat import Stat
-from pydofus2.com.ankamagames.dofus.internalDatacenter.stats.UsableStat import \
-    UsableStat
-from pydofus2.com.ankamagames.dofus.network.types.game.character.characteristic.CharacterCharacteristic import \
-    CharacterCharacteristic
-from pydofus2.com.ankamagames.dofus.network.types.game.character.characteristic.CharacterCharacteristicDetailed import \
-    CharacterCharacteristicDetailed
-from pydofus2.com.ankamagames.dofus.network.types.game.character.characteristic.CharacterCharacteristicValue import \
-    CharacterCharacteristicValue
-from pydofus2.com.ankamagames.dofus.network.types.game.character.characteristic.CharacterUsableCharacteristicDetailed import \
-    CharacterUsableCharacteristicDetailed
+from pydofus2.com.ankamagames.dofus.internalDatacenter.stats.UsableStat import UsableStat
+from pydofus2.com.ankamagames.dofus.network.types.game.character.characteristic.CharacterCharacteristic import (
+    CharacterCharacteristic,
+)
+from pydofus2.com.ankamagames.dofus.network.types.game.character.characteristic.CharacterCharacteristicDetailed import (
+    CharacterCharacteristicDetailed,
+)
+from pydofus2.com.ankamagames.dofus.network.types.game.character.characteristic.CharacterCharacteristicValue import (
+    CharacterCharacteristicValue,
+)
+from pydofus2.com.ankamagames.dofus.network.types.game.character.characteristic.CharacterUsableCharacteristicDetailed import (
+    CharacterUsableCharacteristicDetailed,
+)
 from pydofus2.com.ankamagames.jerakine.logger.Logger import Logger
-from pydofus2.com.ankamagames.jerakine.logger.MemoryProfiler import \
-    MemoryProfiler
+from pydofus2.com.ankamagames.jerakine.logger.MemoryProfiler import MemoryProfiler
 from pydofus2.com.ankamagames.jerakine.metaclasses.Singleton import Singleton
 
 
@@ -44,7 +44,7 @@ class StatsManager(metaclass=Singleton):
     def getStats(self, entityId: float) -> EntityStats:
         key = str(float(entityId))
         return self._entityStats.get(key)
-    
+
     @MemoryProfiler.track_memory("StatsManager.addRawStats")
     def addRawStats(self, entityId: float, rawStats: list[CharacterCharacteristic]) -> None:
         entityKey = str(float(entityId))
@@ -84,12 +84,15 @@ class StatsManager(metaclass=Singleton):
             entityStats.setStat(entityStat, False)
 
     def reset(self) -> None:
-        from pydofus2.com.ankamagames.dofus.logic.game.common.managers.PlayedCharacterManager import PlayedCharacterManager
+        from pydofus2.com.ankamagames.dofus.logic.game.common.managers.PlayedCharacterManager import (
+            PlayedCharacterManager,
+        )
+
         keys = list(self._entityStats.keys())
         for ctxid in keys:
             if ctxid != PlayedCharacterManager().id:
                 del self._entityStats[ctxid]
-        
+
     def deleteStats(self, entityId: float) -> bool:
         entityKey = str(float(entityId))
         if entityKey not in self._entityStats:

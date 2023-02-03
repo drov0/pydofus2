@@ -37,7 +37,7 @@ class AStar(metaclass=Singleton):
 
     def addForbidenEdge(self, edge: Edge) -> None:
         self._forbidenEdges.append(edge)
-        
+
     def search(
         self, worldGraph: WorldGraph, src: Vertex, dst: Vertex, callback: FunctionType, onFrame=True
     ) -> list["Edge"]:
@@ -83,7 +83,11 @@ class AStar(metaclass=Singleton):
                 return result
             edges = self.worldGraph.getOutgoingEdgesFromVertex(current.vertex)
             for edge in edges:
-                if edge not in self._forbidenEdges and self.hasValidTransition(edge) and self.hasValidDestinationSubarea(edge):
+                if (
+                    edge not in self._forbidenEdges
+                    and self.hasValidTransition(edge)
+                    and self.hasValidDestinationSubarea(edge)
+                ):
                     existing = self.openDic.get(edge.dst)
                     if existing is None or current.moveCost + 1 < existing.moveCost:
                         node = Node(self, edge.dst, current)
@@ -103,7 +107,7 @@ class AStar(metaclass=Singleton):
                         if movePath.end.distanceTo(candidate) <= 2:
                             return candidate
         return None
-    
+
     @staticmethod
     def hasValidTransition(edge: Edge) -> bool:
         from pydofus2.com.ankamagames.dofus.datacenter.items.criterion.GroupItemCriterion import (

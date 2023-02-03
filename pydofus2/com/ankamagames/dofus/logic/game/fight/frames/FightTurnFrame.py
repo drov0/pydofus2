@@ -1,70 +1,58 @@
 import math
 from typing import TYPE_CHECKING
 
-from pydofus2.com.ankamagames.atouin.messages.CellClickMessage import \
-    CellClickMessage
-from pydofus2.com.ankamagames.atouin.messages.EntityMovementCompleteMessage import \
-    EntityMovementCompleteMessage
-from pydofus2.com.ankamagames.atouin.messages.MapContainerRollOutMessage import \
-    MapContainerRollOutMessage
+from pydofus2.com.ankamagames.atouin.messages.CellClickMessage import CellClickMessage
+from pydofus2.com.ankamagames.atouin.messages.EntityMovementCompleteMessage import EntityMovementCompleteMessage
+from pydofus2.com.ankamagames.atouin.messages.MapContainerRollOutMessage import MapContainerRollOutMessage
 from pydofus2.com.ankamagames.atouin.types.Selection import Selection
-from pydofus2.com.ankamagames.dofus.internalDatacenter.stats.EntityStats import \
-    EntityStats
+from pydofus2.com.ankamagames.dofus.internalDatacenter.stats.EntityStats import EntityStats
 from pydofus2.com.ankamagames.dofus.kernel.Kernel import Kernel
-from pydofus2.com.ankamagames.dofus.kernel.net.ConnectionsHandler import \
-    ConnectionsHandler
-from pydofus2.com.ankamagames.dofus.logic.game.common.managers.MapMovementAdapter import \
-    MapMovementAdapter
-from pydofus2.com.ankamagames.dofus.logic.game.common.managers.PlayedCharacterManager import \
-    PlayedCharacterManager
-from pydofus2.com.ankamagames.dofus.logic.game.common.misc.DofusEntities import \
-    DofusEntities
-from pydofus2.com.ankamagames.dofus.logic.game.fight.actions.GameFightSpellCastAction import \
-    GameFightSpellCastAction
-from pydofus2.com.ankamagames.dofus.logic.game.fight.actions.GameFightTurnFinishAction import \
-    GameFightTurnFinishAction
-from pydofus2.com.ankamagames.dofus.network.messages.game.context.GameMapMovementMessage import \
-    GameMapMovementMessage
+from pydofus2.com.ankamagames.dofus.kernel.net.ConnectionsHandler import ConnectionsHandler
+from pydofus2.com.ankamagames.dofus.logic.game.common.managers.MapMovementAdapter import MapMovementAdapter
+from pydofus2.com.ankamagames.dofus.logic.game.common.managers.PlayedCharacterManager import PlayedCharacterManager
+from pydofus2.com.ankamagames.dofus.logic.game.common.misc.DofusEntities import DofusEntities
+from pydofus2.com.ankamagames.dofus.logic.game.fight.actions.GameFightSpellCastAction import GameFightSpellCastAction
+from pydofus2.com.ankamagames.dofus.logic.game.fight.actions.GameFightTurnFinishAction import GameFightTurnFinishAction
+from pydofus2.com.ankamagames.dofus.network.messages.game.context.GameMapMovementMessage import GameMapMovementMessage
 
 if TYPE_CHECKING:
     pass
 from typing import TYPE_CHECKING
 
-from pydofus2.com.ankamagames.dofus.logic.game.fight.frames.FightEntitiesFrame import \
-    FightEntitiesFrame
-from pydofus2.com.ankamagames.dofus.logic.game.fight.managers.CurrentPlayedFighterManager import \
-    CurrentPlayedFighterManager
-from pydofus2.com.ankamagames.dofus.logic.game.fight.miscs.FightReachableCellsMaker import \
-    FightReachableCellsMaker
-from pydofus2.com.ankamagames.dofus.logic.game.fight.miscs.TackleUtil import \
-    TackleUtil
-from pydofus2.com.ankamagames.dofus.network.messages.game.context.fight.GameFightTurnFinishMessage import \
-    GameFightTurnFinishMessage
-from pydofus2.com.ankamagames.dofus.network.messages.game.context.fight.GameFightTurnReadyRequestMessage import \
-    GameFightTurnReadyRequestMessage
-from pydofus2.com.ankamagames.dofus.network.messages.game.context.GameMapMovementRequestMessage import \
-    GameMapMovementRequestMessage
-from pydofus2.com.ankamagames.dofus.network.messages.game.context.GameMapNoMovementMessage import \
-    GameMapNoMovementMessage
-from pydofus2.com.ankamagames.dofus.network.types.game.context.fight.GameFightFighterInformations import \
-    GameFightFighterInformations
+from pydofus2.com.ankamagames.dofus.logic.game.fight.frames.FightEntitiesFrame import FightEntitiesFrame
+from pydofus2.com.ankamagames.dofus.logic.game.fight.managers.CurrentPlayedFighterManager import (
+    CurrentPlayedFighterManager,
+)
+from pydofus2.com.ankamagames.dofus.logic.game.fight.miscs.FightReachableCellsMaker import FightReachableCellsMaker
+from pydofus2.com.ankamagames.dofus.logic.game.fight.miscs.TackleUtil import TackleUtil
+from pydofus2.com.ankamagames.dofus.network.messages.game.context.fight.GameFightTurnFinishMessage import (
+    GameFightTurnFinishMessage,
+)
+from pydofus2.com.ankamagames.dofus.network.messages.game.context.fight.GameFightTurnReadyRequestMessage import (
+    GameFightTurnReadyRequestMessage,
+)
+from pydofus2.com.ankamagames.dofus.network.messages.game.context.GameMapMovementRequestMessage import (
+    GameMapMovementRequestMessage,
+)
+from pydofus2.com.ankamagames.dofus.network.messages.game.context.GameMapNoMovementMessage import (
+    GameMapNoMovementMessage,
+)
+from pydofus2.com.ankamagames.dofus.network.types.game.context.fight.GameFightFighterInformations import (
+    GameFightFighterInformations,
+)
 from pydofus2.com.ankamagames.jerakine.data.I18n import I18n
-from pydofus2.com.ankamagames.jerakine.entities.interfaces.IEntity import \
-    IEntity
+from pydofus2.com.ankamagames.jerakine.entities.interfaces.IEntity import IEntity
 from pydofus2.com.ankamagames.jerakine.logger.Logger import Logger
 from pydofus2.com.ankamagames.jerakine.messages.Frame import Frame
 from pydofus2.com.ankamagames.jerakine.messages.Message import Message
 from pydofus2.com.ankamagames.jerakine.types.enums.Priority import Priority
 from pydofus2.com.ankamagames.jerakine.types.positions.MapPoint import MapPoint
-from pydofus2.com.ankamagames.jerakine.types.positions.MovementPath import \
-    MovementPath
+from pydofus2.com.ankamagames.jerakine.types.positions.MovementPath import MovementPath
 from pydofus2.damageCalculation.tools.StatIds import StatIds
 
 if TYPE_CHECKING:
-    from pydofus2.com.ankamagames.dofus.logic.game.fight.frames.FightBattleFrame import \
-        FightBattleFrame
-    from pydofus2.com.ankamagames.jerakine.entities.interfaces.IMovable import \
-        IMovable
+    from pydofus2.com.ankamagames.dofus.logic.game.fight.frames.FightBattleFrame import FightBattleFrame
+    from pydofus2.com.ankamagames.jerakine.entities.interfaces.IMovable import IMovable
 
 
 class FightTurnFrame(Frame):

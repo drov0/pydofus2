@@ -27,9 +27,6 @@ class GameData(metaclass=ThreadSharedSingleton):
             file_path = Constants.DOFUS_COMMON_DIR / f"{moduleName}.d2o"
             self.addModule(file_path, moduleName)
 
-    def initFromBinaryStream(self, modulename: str, moduleBinaries: BinaryStream):
-        self._modules[modulename] = ModuleReader(moduleBinaries)
-
     def getModule(self, moduleName: str) -> ModuleReader:
         if moduleName not in self._modules:
             with lock:

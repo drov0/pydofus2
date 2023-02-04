@@ -1,14 +1,21 @@
-from pydofus2.com.ankamagames.atouin.data.map.Layer import Layer
-from pydofus2.com.ankamagames.atouin.enums.ElementTypesEnum import ElementTypesEnum
-from pydofus2.com.ankamagames.atouin.messages.MapLoadedMessage import MapLoadedMessage
-from pydofus2.com.ankamagames.dofus.logic.common.managers.StatsManager import StatsManager
-from pydofus2.com.ankamagames.jerakine.logger.Logger import Logger
 from time import perf_counter
+
 import pydofus2.com.ankamagames.atouin.utils.DataMapProvider as dmpm
+from pydofus2.com.ankamagames.atouin.data.map.Layer import Layer
+from pydofus2.com.ankamagames.atouin.enums.ElementTypesEnum import \
+    ElementTypesEnum
+from pydofus2.com.ankamagames.atouin.messages.MapLoadedMessage import \
+    MapLoadedMessage
+from pydofus2.com.ankamagames.dofus.logic.common.managers.StatsManager import \
+    StatsManager
+from pydofus2.com.ankamagames.dofus.network.messages.game.character.stats.CharacterLevelUpMessage import CharacterLevelUpMessage
+from pydofus2.com.ankamagames.jerakine.logger.Logger import Logger
 from pydofus2.com.ankamagames.jerakine.metaclasses.Singleton import Singleton
-from pydofus2.com.ankamagames.jerakine.resources.loaders.MapLoader import MapLoader
+from pydofus2.com.ankamagames.jerakine.resources.loaders.MapLoader import \
+    MapLoader
 from pydofus2.com.ankamagames.jerakine.types.positions.MapPoint import MapPoint
-from pydofus2.com.ankamagames.jerakine.types.positions.WorldPoint import WorldPoint
+from pydofus2.com.ankamagames.jerakine.types.positions.WorldPoint import \
+    WorldPoint
 
 
 class MapDisplayManager(metaclass=Singleton):
@@ -74,10 +81,10 @@ class MapDisplayManager(metaclass=Singleton):
         map = MapLoader.load(mapId, key=decryptionKey)
         self._currentMapRendered = True
         self._nMapLoadEnd = perf_counter()
-        Logger().debug(f"Map {map.id} loaded")
+        Logger().separator(f"Map {map.id} loaded", "#")
         dmpm.DataMapProvider().resetUpdatedCell()
         dmpm.DataMapProvider().resetSpecialEffects()
-        StatsManager().reset()
+        StatsManager().purgeNonPlayersStats()
         self.currentDataMap = map
         self._currentMap = WorldPoint.fromMapId(map.id)
         msg = MapLoadedMessage()

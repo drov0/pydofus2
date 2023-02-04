@@ -63,6 +63,16 @@ _messages_to_discard: set = {
     "ChallengeTargetsListMessage",
     "GameFightSpectateMessage",
     "GameFightSpectatorJoinMessage",
+    "EmotePlayMessage",
+    "GameFightOptionStateUpdateMessage",
+    "PartyFollowStatusUpdateMessage",
+    "PartyUpdateLightMessage",
+    "PartyRestrictedMessage",
+    "PartyLeaderUpdateMessage",
+    "LifePointsRegenBeginMessage",
+    "MapFightCountMessage",
+    "PartyUpdateMessage",
+    "LifePointsRegenEndMessage"
 }
 
 _messagesTypes = dict[int, type[NetworkMessage]]()

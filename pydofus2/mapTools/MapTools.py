@@ -114,7 +114,8 @@ def getCellsCoordBetween(cellid1: int, cellid2: int) -> list[MapPoint]:
     cellsIds = getCellsIdBetween(cellid1, cellid2)
     return [MapPoint.fromCellId(cellid) for cellid in cellsIds]
 
-
+@MemoryProfiler.track_memory("MapTools.getDistance")
+@lru_cache(maxsize=5000)
 def getDistance(param1: int, param2: int) -> int:
     if not isValidCellId(param1) or not isValidCellId(param2):
         return -1

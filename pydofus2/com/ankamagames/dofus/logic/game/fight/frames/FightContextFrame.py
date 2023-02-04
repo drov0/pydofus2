@@ -459,7 +459,6 @@ class FightContextFrame(Frame):
             SpellWrapper.removeAllSpellWrapperBut(PlayedCharacterManager().id, None)
             SpellWrapper.resetAllCoolDown(PlayedCharacterManager().id, None)
             SpellModifiersManager.clear()
-            SerialSequencer.SEQUENCERS.clear()
             Kernel().worker.removeFrame(self)
             return False
 
@@ -527,7 +526,6 @@ class FightContextFrame(Frame):
         simf: "SpellInventoryManagementFrame" = Kernel().worker.getFrame("SpellInventoryManagementFrame")
         if simf:
             simf.deleteSpellsGlobalCoolDownsData()
-        SerialSequencer.clearByType(FightSequenceFrame.FIGHT_SEQUENCERS_CATEGORY)
         PlayedCharacterManager().isSpectator = False
         EntitiesManager().clearEntities()
         return True

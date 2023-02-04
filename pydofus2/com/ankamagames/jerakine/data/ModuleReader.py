@@ -94,7 +94,7 @@ class ModuleReader:
     def getClassDefinition(self, object_id: int) -> GameDataClassDefinition:
         return self._classes[object_id]
 
-    @lru_cache(maxsize=32, typed=False)
+    @lru_cache(maxsize=256, typed=False)
     @MemoryProfiler.track_memory("ModuleReader.getObject")
     def getObject(self, objectId: int) -> Any:
         with lock:

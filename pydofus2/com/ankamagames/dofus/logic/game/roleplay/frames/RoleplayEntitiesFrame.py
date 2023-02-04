@@ -111,6 +111,7 @@ if TYPE_CHECKING:
 
 
 class RoleplayEntitiesFrame(AbstractEntitiesFrame, Frame):
+    
     def __init__(self):
         self._fights = dict[int, Fight]()
         self._objects = dict()
@@ -123,7 +124,6 @@ class RoleplayEntitiesFrame(AbstractEntitiesFrame, Frame):
         self._waitForMap: bool = False
         self._monstersIds = list[float]()
         self.mcidm_processessed: bool = False
-
         super().__init__()
 
     def pulled(self) -> bool:
@@ -269,9 +269,8 @@ class RoleplayEntitiesFrame(AbstractEntitiesFrame, Frame):
                                 duration = hosu.skillEndTime - TimeManager().getUtcTimestamp()
                                 duration /= 100
                                 if duration > 0:
-                                    iumsg = InteractiveUsedMessage.init(
-                                        character.contextualId, hosu.elementId, hosu.skillId, duration
-                                    )
+                                    iumsg = InteractiveUsedMessage()
+                                    iumsg.init(character.contextualId, hosu.elementId, hosu.skillId, duration, True)
                                     Kernel().worker.process(iumsg)
                 if mapWithNoMonsters:
                     if isinstance(actor1, GameRolePlayGroupMonsterInformations):

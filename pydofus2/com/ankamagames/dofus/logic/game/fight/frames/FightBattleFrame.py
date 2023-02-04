@@ -113,69 +113,37 @@ class FightBattleFrame(Frame):
 
     def __init__(self):
         self._playerTargetedEntitiesList = list[float]()
-
         self.isFightAboutToEnd: bool = False
-
         self._sequenceFrameSwitcher: FightSequenceSwitcherFrame = None
-
         self._turnFrame: FightTurnFrame = None
-
         self._currentSequenceFrame: fseqf.FightSequenceFrame = None
-
         self._sequenceFrames: list[fseqf.FightSequenceFrame] = []
-
         self._executingSequence: bool = False
-
         self._confirmTurnEnd: bool = None
-
         self._endBattle: bool = False
-
         self._battleResults: GameFightEndMessage = None
-
         self._refreshTurnsList: bool = None
-
         self._newTurnsList: list[float] = None
-
         self._newDeadTurnsList: list[float] = []
-
         self._turnsList: list[float] = None
-
         self._deadTurnsList: list[float] = []
-
         self._fightIsPaused: bool = False
-
         self._deathPlayingNumber: int = 0
-
         self._synchroniseFighters: list[GameFightFighterInformations] = None
-
         self._synchroniseFightersInstanceId: int = 4.294967295e9
-
         self._neverSynchronizedBefore: bool = True
-
         self._delayCslmsg: CharacterStatsListMessage = None
-
         self._playerNewTurn: AnimatedCharacter = None
-
         self._turnsCount: int = 0
-
         self._destroyed: bool = False
-
         self._playingSlaveEntity: bool = False
-
         self._lastPlayerId: float = None
-
         self._nextLastPlayerId: float = None
-
         self._currentPlayerId: float = None
-
         self._masterId: float = None
-
         self._slaveId: float = None
-
         self._autoEndTurn: bool = False
-
         self._newWaveId: int = 0
-
         self._newWave = False
         self._sequenceFrameCached: fseqf.FightSequenceFrame = None
         super().__init__()
@@ -442,7 +410,6 @@ class FightBattleFrame(Frame):
             gfnrmsg = msg
             self._turnsCount = gfnrmsg.roundNumber
             CurrentPlayedFighterManager().getSpellCastManager().currentTurn = self._turnsCount
-            Logger().debug(f"[BUFFS DEBUG] Fight turn {self._turnsCount} started!")
             bffm.BuffManager().spellBuffsToIgnore = []
             return True
 

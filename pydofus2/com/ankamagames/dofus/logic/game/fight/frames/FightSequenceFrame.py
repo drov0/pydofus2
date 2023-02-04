@@ -247,9 +247,6 @@ from pydofus2.com.ankamagames.dofus.network.messages.game.context.fight.characte
 from pydofus2.com.ankamagames.dofus.network.messages.game.context.fight.character.GameFightShowFighterRandomStaticPoseMessage import (
     GameFightShowFighterRandomStaticPoseMessage,
 )
-from pydofus2.com.ankamagames.dofus.network.messages.game.context.fight.GameFightSynchronizeMessage import (
-    GameFightSynchronizeMessage,
-)
 from pydofus2.com.ankamagames.dofus.network.messages.game.context.fight.GameFightTurnListMessage import (
     GameFightTurnListMessage,
 )
@@ -440,6 +437,7 @@ class FightSequenceFrame(Frame, ISpellCastProvider):
                 gafscmsg = msg
                 if forceDetailedLogs:
                     gafscmsg.verboseCast = True
+                    
             else:
                 gafccmsg = msg
                 closeCombatWeaponId = gafccmsg.weaponGenericId
@@ -989,9 +987,6 @@ class FightSequenceFrame(Frame, ISpellCastProvider):
             gftmsg = msg
             self.pushStep(FightTurnListStep(gftmsg.ids, gftmsg.deadsIds))
             return True
-
-        if isinstance(msg, GameFightSynchronizeMessage):
-            return False
 
         if isinstance(msg, AbstractGameActionMessage):
             Logger().error("Unsupported game action " + msg + " ! This action was discarded.")

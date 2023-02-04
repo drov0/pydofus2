@@ -639,7 +639,6 @@ class RoleplayMovementFrame(Frame):
             self._changeMapTimeout.cancel()
         self._changeMapTimeout = BenchmarkTimer(self.CHANGEMAP_TIMEOUT, self.onMapChangeFailed, [])
         self._changeMapTimeout.start()
-        Logger().debug(f"[RolePlayMovement] Change map timer started.")
 
     def attackMonsters(self, contextualId: int) -> None:
         if self._followingMonsterGroup:

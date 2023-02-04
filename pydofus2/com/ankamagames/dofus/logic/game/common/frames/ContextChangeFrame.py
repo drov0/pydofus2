@@ -37,7 +37,6 @@ class ContextChangeFrame(Frame):
                 Kernel().worker.addFrame(rplCF.RoleplayContextFrame())
 
             elif self.currentContext == GameContextEnum.FIGHT:
-                Logger().debug("Fight context started")
                 import pydofus2.com.ankamagames.dofus.logic.game.fight.frames.FightContextFrame as fcf
 
                 Kernel().worker.addFrame(fcf.FightContextFrame())

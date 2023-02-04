@@ -120,7 +120,7 @@ class DofusClient(threading.Thread):
             self._lastLoginTime = perf_counter()
             self.worker.process(LoginAction.create(self._serverId != 0, self._serverId))
             self.worker.run()
-        except:
-            Logger().error(f"[DofusClient] Error in main:", exc_info=True)
+        except Exception as e:
+            Logger().error(f"[DofusClient] Error in main: {e}", exc_info=True)
         self.shutdown()
         Logger().info("[DofusClient] Stopped")

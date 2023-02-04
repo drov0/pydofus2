@@ -41,7 +41,6 @@ class AStar(metaclass=Singleton):
     def search(
         self, worldGraph: WorldGraph, src: Vertex, dst: Vertex, callback: FunctionType, onFrame=True
     ) -> list["Edge"]:
-        Logger().info(f"Searching path from {src} to {dst} ...")
         if self.callback != None:
             raise Exception("Pathfinding already in progress")
         if src == dst:

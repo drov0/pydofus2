@@ -15,7 +15,8 @@ provides methods for processing messages, adding and removing frames, checking i
 The class uses the threading module for handling concurrency, and also uses several classes from the pydofus2 package, such as KernelEventsManager,
 Logger, Frame, and Message. There are also several class-level variables for enabling debug logging for frames, messages, and frame processing.
 """
-
+from typing import Optional, Type, TypeVar, cast
+T = TypeVar("T", bound="Frame")
 
 class Worker(MessageHandler):
     DEBUG_FRAMES: bool = False
@@ -72,12 +73,11 @@ class Worker(MessageHandler):
             return
 
         if self._processingMessage.is_set():
-            if frame in self._framesToRemove:
-                Logger().warning(f"[WORKER] Asked to remove Frame '{frame}' but its already in the to remove list!")
-            else:
+            if frame not in self._framesToRemove:
                 self._framesToRemove.add(frame)
                 if self.DEBUG_FRAMES:
                     Logger().debug(f"[WORKER] >>> Frame {frame} remove queued...")
+                    
         elif frame not in self._framesBeingDeleted:
             self._framesBeingDeleted.add(frame)
             self.pullFrame(frame)
@@ -85,7 +85,11 @@ class Worker(MessageHandler):
     def contains(self, frameClassName: str) -> bool:
         return self.getFrame(frameClassName) is not None
 
-    def getFrame(self, frameClassName: str) -> Frame:
+    def getFrameByType(self, frameType: Type[T]) -> Optional[T]:
+        frameClassName = frameType.__name__
+        return self._currentFrameTypesCache.get(frameClassName)
+    
+    def getFrame(self, frameClassName: str) -> Optional[Frame]:
         return self._currentFrameTypesCache.get(frameClassName)
 
     def terminate(self) -> None:

@@ -269,7 +269,6 @@ class PlayedCharacterUpdatesFrame(Frame):
                     for option in entityInfos.humanoidInfo.options:
                         if isinstance(option, HumanOptionOrnament):
                             option.level = clumsg.newLevel
-
             return False
 
         if isinstance(msg, CharacterExperienceGainMessage):

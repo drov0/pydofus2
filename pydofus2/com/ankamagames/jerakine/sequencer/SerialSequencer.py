@@ -15,38 +15,17 @@ class SerialSequencer(ISequencer, EventDispatcher):
 
     DEFAULT_SEQUENCER_NAME: str = "SerialSequencerDefault"
 
-    SEQUENCERS: dict = dict()
-
-    _aStep: list[ISequencable]
-
-    _currentStep: ISequencable = None
-
-    _lastStep: ISequencable = None
-
-    _running: bool = False
-
-    _type: str = None
-
-    _activeSubSequenceCount: int
-
-    _paused: bool = None
-
     _defaultStepTimeout: int = -2147483648
 
     def __init__(self, type: str = "SerialSequencerDefault"):
-        self._aStep = list()
+        self._aStep = list[ISequencable]()
         self._activeSubSequenceCount = 0
+        self._currentStep: ISequencable = None
+        self._lastStep: ISequencable = None
+        self._paused: bool = None
+        self._running: bool = False
+        self._type: str = None
         super().__init__()
-        if not self.SEQUENCERS.get(type):
-            self.SEQUENCERS[type] = dict()
-        self.SEQUENCERS[type][self] = True
-
-    @classmethod
-    def clearByType(cls, type: str) -> None:
-        seq = None
-        for seq in cls.SEQUENCERS[type]:
-            SerialSequencer(seq).clear()
-        del cls.SEQUENCERS[type]
 
     @property
     def currentStep(self) -> ISequencable:

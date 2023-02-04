@@ -38,7 +38,7 @@ class AbstractEntitiesFrame(Frame):
         self._entitiesIcons = dict()
         self._carriedEntities = dict()
         self._pendingCarriedEntities = dict()
-
+        self._currentSubAreaId = None
         super().__init__()
 
     def pulled(self) -> bool:

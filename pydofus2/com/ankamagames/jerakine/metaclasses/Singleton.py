@@ -1,5 +1,7 @@
 import threading
+from typing import List, Type, TypeVar
 
+T = TypeVar("T")
 
 class Singleton(type):
     THREAD_REGISTER = 0
@@ -33,10 +35,13 @@ class Singleton(type):
         if cls in cls._instances[cls.threadName()]:
             del cls._instances[cls.threadName()][cls]
 
-    def getThreadInstance(cls, thrid: int) -> dict[type, object]:
+    def getThreadInstance(cls: Type[T], thrid: int) -> T:
         if thrid in cls._instances:
             return cls._instances[thrid].get(cls)
 
+    def getInstances(cls: Type[T]) -> List[T]:
+        return [cls._instances[thd][cls] for thd in cls._instances if cls in cls._instances[thd]]
+    
     def onceThreadRegister(cls, thname: str, listener: object, *args, **kwargs):
         if cls.THREAD_REGISTER not in cls._listeners:
             cls._listeners[cls.THREAD_REGISTER] = dict()

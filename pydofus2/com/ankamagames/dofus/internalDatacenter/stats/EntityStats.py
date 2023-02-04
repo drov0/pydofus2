@@ -6,13 +6,10 @@ from pydofus2.damageCalculation.tools.StatIds import StatIds
 
 
 class EntityStats:
-    _entityId: float = None
-    _stats: dict[str, Stat] = {}
 
     def __init__(self, entityId: float):
-        super().__init__()
         self._entityId = entityId
-        self._stats = dict()
+        self._stats = dict[float, Stat]()
 
     @property
     def entityId(self) -> float:
@@ -23,109 +20,73 @@ class EntityStats:
         return self._stats
 
     def getFormattedMessage(self, message: str) -> str:
-        return self.__class__.__name__ + " (Entity ID: " + str(self._entityId) + "): " + message
+        return f"[EntityStats] (Entity ID: {self._entityId}): {message}"
 
     def setStat(self, stat: Stat, isBulkUpdate: bool = True) -> None:
-        # Logger().debug(f"Set stat {stat} for entity {self._entityId}")
         stat.entityId = float(self._entityId)
-        self._stats[str(stat.id)] = stat
+        self._stats[float(stat.id)] = stat
 
     def getStat(self, statId: float) -> Stat:
-        statKey = str(statId)
-        if statKey not in self._stats:
-            Logger().error(self.getFormattedMessage("Stat ID " + statKey + " not found in stats"))
-            return None
-        return self._stats[statKey]
+        statId = float(statId)
+        if statId not in self._stats:
+            Logger().error(self.getFormattedMessage(f"Stat ID {statId} not found in stats"))
+            return
+        return self._stats[statId]
 
     def deleteStat(self, statId: float) -> None:
-        statKey: str = str(statId)
-        if statKey not in self._stats:
+        statId = float(statId)
+        if statId not in self._stats:
             return
-        stat: Stat = self._stats[statKey]
-        stat.reset()
-        del self._stats[statKey]
+        self._stats[statId].reset()
+        del self._stats[statId]
 
     def resetStats(self) -> None:
         for stat in self._stats.values():
             stat.reset()
-        self._stats = dict()
+        self._stats.clear()
 
     def getStatsNumber(self) -> float:
-        counter: float = 0
-        for _ in self._stats:
-            counter += 1
-        return counter
+        return len(self._stats)
 
     def hasStat(self, statId: float) -> bool:
-        return str(statId) in self._stats
+        return float(statId) in self._stats
 
     def getStatTotalValue(self, statId: float) -> float:
-        key: str = str(statId)
-        if key not in self._stats:
-            return 0
-        stat: Stat = self._stats.get(key)
-        return float(stat.totalValue) if stat is not None else float(0)
+        stat = self._stats.get(float(statId))
+        return float(stat.totalValue) if stat else 0
 
-    def getStatBaseValue(self, statId: float) -> float:
-        key: str = str(statId)
-        if key not in self._stats:
-            return 0
-        stat: Stat = self._stats[key]
-        if isinstance(stat, DetailedStat):
-            return stat.baseValue
+    def getDetailedStatValue(self, statId: float, attrib: str) -> float:
+        stat = self._stats.get(float(statId))
+        if stat and isinstance(stat, DetailedStat):
+            return getattr(stat, attrib)
         return 0
+    
+    def getStatBaseValue(self, statId: float) -> float:
+        return self.getDetailedStatValue(statId, "baseValue")
 
     def getStatAdditionalValue(self, statId: float) -> float:
-        key: str = str(statId)
-        if key not in self._stats:
-            return 0
-        stat: Stat = self._stats[key]
-        if isinstance(stat, DetailedStat):
-            return stat.additionalValue
-        return 0
+        return self.getDetailedStatValue(statId, "additionalValue")
 
     def getStatObjectsAndMountBonusValue(self, statId: float) -> float:
-        key: str = str(statId)
-        if key not in self._stats:
-            return 0
-        stat: Stat = self._stats[key]
-        if isinstance(stat, DetailedStat):
-            return stat.objectsAndMountBonusValue
-        return 0
+        return self.getDetailedStatValue(statId, "objectsAndMountBonusValue")
 
     def getStatAlignGiftBonusValue(self, statId: float) -> float:
-        key: str = str(statId)
-        if key not in self._stats:
-            return 0
-        stat: Stat = self._stats[key]
-        if isinstance(stat, DetailedStat):
-            return stat.alignGiftBonusValue
-        return 0
+        return self.getDetailedStatValue(statId, "alignGiftBonusValue")
 
     def getStatContextModifValue(self, statId: float) -> float:
-        key: str = str(statId)
-        if key not in self._stats:
-            return 0
-        stat: Stat = self._stats[key]
-        if isinstance(stat, DetailedStat):
-            return stat.contextModifValue
-        return 0
-
+        return self.getDetailedStatValue(statId, "contextModifValue")
+    
     def getStatUsedValue(self, statId: float) -> float:
-        key: str = str(statId)
-        if key not in self._stats:
-            return 0
-        stat: Stat = self._stats[key]
-        if isinstance(stat, UsableStat):
+        stat = self._stats[float(statId)]
+        if stat and isinstance(stat, UsableStat):
             return stat.usedValue
         return 0
 
     def __str__(self) -> str:
-        statsDump: str = ""
+        statsDump = ""
         for stat in self._stats.values():
             statsDump += "\n\t" + str(stat)
         if not statsDump:
-            Logger().debug(self._stats)
             statsDump = "\n\tNo stats to display."
         return self.getFormattedMessage(statsDump)
 

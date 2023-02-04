@@ -28,9 +28,6 @@ from pydofus2.com.ankamagames.dofus.logic.game.fight.miscs.TackleUtil import Tac
 from pydofus2.com.ankamagames.dofus.network.messages.game.context.fight.GameFightTurnFinishMessage import (
     GameFightTurnFinishMessage,
 )
-from pydofus2.com.ankamagames.dofus.network.messages.game.context.fight.GameFightTurnReadyRequestMessage import (
-    GameFightTurnReadyRequestMessage,
-)
 from pydofus2.com.ankamagames.dofus.network.messages.game.context.GameMapMovementRequestMessage import (
     GameMapMovementRequestMessage,
 )
@@ -107,8 +104,6 @@ class FightTurnFrame(Frame):
 
     _tackleByCellId: dict = None
 
-    _turnFinishingNoNeedToRedrawMovement: bool = False
-
     _lastMP: int = 0
 
     def __init__(self):
@@ -132,7 +127,6 @@ class FightTurnFrame(Frame):
         self._finishingTurn = False
         self._currentFighterId = CurrentPlayedFighterManager().currentFighterId
         self._playerEntity = DofusEntities().getEntity(self._currentFighterId)
-        self._turnFinishingNoNeedToRedrawMovement = False
         self._myTurn = b
         if b:
             pass
@@ -201,7 +195,6 @@ class FightTurnFrame(Frame):
         if isinstance(msg, GameFightTurnFinishAction):
             if not self.myTurn:
                 return False
-            self._turnFinishingNoNeedToRedrawMovement = True
             entitiesFrame: "FightEntitiesFrame" = Kernel().worker.getFrame("FightEntitiesFrame")
             playerInfos: "GameFightFighterInformations" = entitiesFrame.getEntityInfos(self._currentFighterId)
             if self._remainingDurationSeconds > 0 and not playerInfos.stats.summoned:
@@ -230,11 +223,7 @@ class FightTurnFrame(Frame):
         if isinstance(msg, MapContainerRollOutMessage):
             self.removePath()
             return True
-
-        if isinstance(msg, GameFightTurnReadyRequestMessage):
-            self._turnFinishingNoNeedToRedrawMovement = True
-            return False
-
+        
         if isinstance(msg, GameMapMovementMessage):
             self._isRequestingMovement = False
             return False

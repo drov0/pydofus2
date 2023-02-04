@@ -1,27 +1,29 @@
+import threading
 from types import FunctionType
 
-from pydofus2.com.ankamagames.dofus.internalDatacenter.stats.DetailedStats import DetailedStat
-from pydofus2.com.ankamagames.dofus.internalDatacenter.stats.EntityStats import EntityStats
+from pydofus2.com.ankamagames.dofus.internalDatacenter.stats.DetailedStats import \
+    DetailedStat
+from pydofus2.com.ankamagames.dofus.internalDatacenter.stats.EntityStats import \
+    EntityStats
 from pydofus2.com.ankamagames.dofus.internalDatacenter.stats.Stat import Stat
-from pydofus2.com.ankamagames.dofus.internalDatacenter.stats.UsableStat import UsableStat
-from pydofus2.com.ankamagames.dofus.network.types.game.character.characteristic.CharacterCharacteristic import (
-    CharacterCharacteristic,
-)
-from pydofus2.com.ankamagames.dofus.network.types.game.character.characteristic.CharacterCharacteristicDetailed import (
-    CharacterCharacteristicDetailed,
-)
-from pydofus2.com.ankamagames.dofus.network.types.game.character.characteristic.CharacterCharacteristicValue import (
-    CharacterCharacteristicValue,
-)
-from pydofus2.com.ankamagames.dofus.network.types.game.character.characteristic.CharacterUsableCharacteristicDetailed import (
-    CharacterUsableCharacteristicDetailed,
-)
+from pydofus2.com.ankamagames.dofus.internalDatacenter.stats.UsableStat import \
+    UsableStat
+from pydofus2.com.ankamagames.dofus.network.types.game.character.characteristic.CharacterCharacteristic import \
+    CharacterCharacteristic
+from pydofus2.com.ankamagames.dofus.network.types.game.character.characteristic.CharacterCharacteristicDetailed import \
+    CharacterCharacteristicDetailed
+from pydofus2.com.ankamagames.dofus.network.types.game.character.characteristic.CharacterCharacteristicValue import \
+    CharacterCharacteristicValue
+from pydofus2.com.ankamagames.dofus.network.types.game.character.characteristic.CharacterUsableCharacteristicDetailed import \
+    CharacterUsableCharacteristicDetailed
 from pydofus2.com.ankamagames.jerakine.logger.Logger import Logger
-from pydofus2.com.ankamagames.jerakine.logger.MemoryProfiler import MemoryProfiler
-from pydofus2.com.ankamagames.jerakine.metaclasses.Singleton import Singleton
+from pydofus2.com.ankamagames.jerakine.logger.MemoryProfiler import \
+    MemoryProfiler
+from pydofus2.com.ankamagames.jerakine.metaclasses.ThreadSharedSingleton import \
+    ThreadSharedSingleton
 
 
-class StatsManager(metaclass=Singleton):
+class StatsManager(metaclass=ThreadSharedSingleton):
     DEFAULT_IS_VERBOSE = True
     DATA_STORE_CATEGORY = "ComputerModule_statsManager"
     DATA_STORE_KEY_IS_VERBOSE = "statsManagerIsVerbose"
@@ -29,73 +31,74 @@ class StatsManager(metaclass=Singleton):
     def __init__(self):
         self._entityStats = dict()
         self._isVerbose = self.DEFAULT_IS_VERBOSE
-        Logger().info("Instantiating stats manager")
-        self._isVerbose = self.DEFAULT_IS_VERBOSE
+        self._lock = threading.RLock()
 
-    @MemoryProfiler.track_memory("StatsManager.setStats")
     def setStats(self, stats: EntityStats) -> bool:
-        if stats is None:
-            Logger().error("Tried to set None stats. Aborting")
-            return False
-        key = str(float(stats.entityId))
-        self._entityStats[key] = stats
+        key = float(stats.entityId)
+        with self._lock:
+            self._entityStats[key] = stats
         return True
 
     def getStats(self, entityId: float) -> EntityStats:
-        key = str(float(entityId))
-        return self._entityStats.get(key)
-
+        stats = self._entityStats.get(float(entityId))
+        return stats
+    
     @MemoryProfiler.track_memory("StatsManager.addRawStats")
     def addRawStats(self, entityId: float, rawStats: list[CharacterCharacteristic]) -> None:
-        entityKey = str(float(entityId))
-        entityStats: EntityStats = self._entityStats.get(entityKey)
-
-        if entityStats is None:
-            entityStats = EntityStats(float(entityId))
-            self.setStats(entityStats)
-
-        for rawStat in rawStats:
-            if isinstance(rawStat, CharacterUsableCharacteristicDetailed):
-                rawUsableStat = rawStat
-                entityStat = UsableStat(
-                    id=rawUsableStat.characteristicId,
-                    baseValue=rawUsableStat.base,
-                    additionalValue=rawUsableStat.additional,
-                    objectsAndMountBonusValue=rawUsableStat.objectsAndMountBonus,
-                    alignGiftBonusValue=rawUsableStat.alignGiftBonus,
-                    contextModifValue=rawUsableStat.contextModif,
-                    usedValue=rawUsableStat.used,
-                )
-            elif isinstance(rawStat, CharacterCharacteristicDetailed):
-                rawDetailedStat: CharacterCharacteristicDetailed = rawStat
-                entityStat = DetailedStat(
-                    id=rawDetailedStat.characteristicId,
-                    baseValue=rawDetailedStat.base,
-                    additionalValue=rawDetailedStat.additional,
-                    objectsAndMountBonusValue=rawDetailedStat.objectsAndMountBonus,
-                    alignGiftBonusValue=rawDetailedStat.alignGiftBonus,
-                    contextModifValue=rawDetailedStat.contextModif,
-                )
-            else:
-                if not isinstance(rawStat, CharacterCharacteristicValue):
-                    continue
-                else:
+        entityId = float(entityId)
+        with self._lock:
+            entityStats = self.getStats(entityId)
+            if not entityStats:
+                entityStats = EntityStats(entityId)
+                self.setStats(entityStats)
+            for rawStat in rawStats:
+                if isinstance(rawStat, CharacterUsableCharacteristicDetailed):
+                    entityStat = UsableStat(
+                        id=rawStat.characteristicId,
+                        baseValue=rawStat.base,
+                        additionalValue=rawStat.additional,
+                        objectsAndMountBonusValue=rawStat.objectsAndMountBonus,
+                        alignGiftBonusValue=rawStat.alignGiftBonus,
+                        contextModifValue=rawStat.contextModif,
+                        usedValue=rawStat.used,
+                    )
+                elif isinstance(rawStat, CharacterCharacteristicDetailed):
+                    entityStat = DetailedStat(
+                        id=rawStat.characteristicId,
+                        baseValue=rawStat.base,
+                        additionalValue=rawStat.additional,
+                        objectsAndMountBonusValue=rawStat.objectsAndMountBonus,
+                        alignGiftBonusValue=rawStat.alignGiftBonus,
+                        contextModifValue=rawStat.contextModif,
+                    )
+                elif isinstance(rawStat, CharacterCharacteristicValue):
                     entityStat = Stat(rawStat.characteristicId, rawStat.total)
-            entityStats.setStat(entityStat, False)
+                else:
+                    Logger().error(f"[StatsManager] Unknown raw stat type: {type(rawStat).__name__}")
+                    continue
+                entityStats.setStat(entityStat, False)
 
-    def reset(self) -> None:
-        from pydofus2.com.ankamagames.dofus.logic.game.common.managers.PlayedCharacterManager import (
-            PlayedCharacterManager,
-        )
-
-        keys = list(self._entityStats.keys())
-        for ctxid in keys:
-            if ctxid != PlayedCharacterManager().id:
-                del self._entityStats[ctxid]
+    def purgeNonPlayersStats(self) -> None:
+        with self._lock:
+            from pydofus2.com.ankamagames.dofus.logic.game.common.managers.PlayedCharacterManager import \
+                PlayedCharacterManager
+            keys = list(self._entityStats.keys())
+            players: list[PlayedCharacterManager] = PlayedCharacterManager.getInstances()
+            playersIDs = [float(player.id) for player in players]
+            for ctxid in keys:
+                if ctxid not in playersIDs:
+                    Logger().debug(f"[StatsManager] Purge stats of non player {ctxid}")
+                    del self._entityStats[ctxid]
 
     def deleteStats(self, entityId: float) -> bool:
-        entityKey = str(float(entityId))
-        if entityKey not in self._entityStats:
-            return False
-        del self._entityStats[entityKey]
-        return True
+        from pydofus2.com.ankamagames.dofus.logic.game.common.managers.PlayedCharacterManager import \
+                PlayedCharacterManager
+        with self._lock:
+            playersIDs = [float(player.id) for player in PlayedCharacterManager.getInstances()]
+            entityId = float(entityId)
+            if entityId in playersIDs:
+                return
+            if entityId not in self._entityStats:
+                return False
+            del self._entityStats[entityId]
+            return True

@@ -43,7 +43,6 @@ class StatsManager(metaclass=ThreadSharedSingleton):
         stats = self._entityStats.get(float(entityId))
         return stats
     
-    @MemoryProfiler.track_memory("StatsManager.addRawStats")
     def addRawStats(self, entityId: float, rawStats: list[CharacterCharacteristic]) -> None:
         entityId = float(entityId)
         with self._lock:

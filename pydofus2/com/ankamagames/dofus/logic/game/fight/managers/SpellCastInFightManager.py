@@ -17,6 +17,7 @@ if TYPE_CHECKING:
 
 
 class SpellCastInFightManager:
+    
     def __init__(self, entityId: float):
         self._spells = dict[int, SpellManager]()
         self.entityId = entityId
@@ -30,7 +31,7 @@ class SpellCastInFightManager:
             spell.newTurn()
 
     def resetInitialCooldown(self, hasBeenSummoned: bool = False) -> None:
-        spim: "SpellInventoryManagementFrame" = Kernel().worker.getFrame("SpellInventoryManagementFrame")
+        spim: "SpellInventoryManagementFrame" = Kernel().worker.getFrameByName("SpellInventoryManagementFrame")
         spellList = spim.getFullSpellListByOwnerId(self.entityId)
         for spellWrapper in spellList:
             if spellWrapper.spellLevelInfos.initialCooldown != 0:

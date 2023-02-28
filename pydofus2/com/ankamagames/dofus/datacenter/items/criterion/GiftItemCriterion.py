@@ -27,7 +27,7 @@ class GiftItemCriterion(ItemCriterion, IDataCenter):
     @property
     def isRespected(self) -> bool:
         rgI: int = 0
-        rank: int = Kernel().worker.getFrame("AlignmentFrame")
+        rank: int = Kernel().worker.getFrameByName("AlignmentFrame")
         rankGift: AlignmentRankJntGift = AlignmentRankJntGift.getAlignmentRankJntGiftById(rank)
         if rankGift and rankGift.gifts:
             for rgI in range(len(rankGift.gifts)):

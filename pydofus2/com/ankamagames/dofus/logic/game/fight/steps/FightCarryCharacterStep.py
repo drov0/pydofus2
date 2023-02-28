@@ -46,7 +46,7 @@ class FightCarryCharacterStep(AbstractSequencable, IFightStep):
         self._carriedId = carriedId
         self._cellId = cellId
         self._noAnimation = noAnimation
-        self._isCreature = Kernel().worker.getFrame("FightEntitiesFrame")
+        self._isCreature = Kernel().worker.getFrameByName("FightEntitiesFrame")
 
     @property
     def stepType(self) -> str:
@@ -79,7 +79,7 @@ class FightCarryCharacterStep(AbstractSequencable, IFightStep):
         if targetPosition:
             carriedEntityDirection = position.advancedOrientationTo(targetPosition)
             self.updateCarriedEntityPosition(carryingEntity, carriedEntity)
-            entitiesFrame = Kernel().worker.getFrame("FightEntitiesFrame")
+            entitiesFrame = Kernel().worker.getFrameByName("FightEntitiesFrame")
             carriedAC = carriedEntity
             while carriedAC:
                 carriedEntityInfos = entitiesFrame.getEntityInfos(carriedAC.id)
@@ -108,7 +108,7 @@ class FightCarryCharacterStep(AbstractSequencable, IFightStep):
         carriedAnimatedEntity: AnimatedCharacter = None
         carriedEntity: IEntity = DofusEntities().getEntity(self._carriedId)
         carryingEntity = DofusEntities().getEntity(self._fighterId)
-        fightEntitiesFrame: FightEntitiesFrame = Kernel().worker.getFrame("FightEntitiesFrame")
+        fightEntitiesFrame: FightEntitiesFrame = Kernel().worker.getFrameByName("FightEntitiesFrame")
         if fightEntitiesFrame is not None:
             carrierAnimatedEntity = carryingEntity
             carriedAnimatedEntity = carriedEntity

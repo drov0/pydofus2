@@ -277,7 +277,7 @@ class StorageOptionManager(metaclass=Singleton):
         craftFrame: CraftFrame = None
         self.disableSmithMagicFilter()
         if not skill:
-            craftFrame = Kernel().worker.getFrame("CraftFrame")
+            craftFrame = Kernel().worker.getFrameByName("CraftFrame")
             if not craftFrame:
                 Logger().error("Activation des filtres de forgemagie alors que la craftFrame n'est pas active")
                 return
@@ -294,7 +294,7 @@ class StorageOptionManager(metaclass=Singleton):
         craftFrame: CraftFrame = None
         self.disableCraftFilter()
         if not skill:
-            craftFrame = Kernel().worker.getFrame("CraftFrame")
+            craftFrame = Kernel().worker.getFrameByName("CraftFrame")
             if not craftFrame:
                 Logger().error("Activation des filtres de forgemagie alors que la craftFrame n'est pas active")
                 return

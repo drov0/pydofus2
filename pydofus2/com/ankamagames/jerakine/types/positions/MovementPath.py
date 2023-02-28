@@ -181,3 +181,36 @@ class MovementPath:
                 else:
                     duration += self.DIAGONAL_RUN_DURATION
         return duration / 1000.0
+    
+    def keyMoves(self) -> list[int]:
+        self.compress()
+        movement: list[int] = list[int]()
+        for pe in self.path:
+            lastOrientation = pe.orientation
+            value = (int(lastOrientation) & 7) << 12 | pe.step.cellId & 4095
+            movement.append(value)
+        lastValue = (int(lastOrientation) & 7) << 12 | self.end.cellId & 4095
+        movement.append(lastValue)
+        return movement
+
+    @classmethod
+    def fromClientMovement(cls, path: list[int]) -> "MovementPath":
+        mp: MovementPath = MovementPath()
+        moveCount: int = 0
+        previousElement = None
+        for movement in path:
+            destination = MapPoint.fromCellId(movement & 4095)
+            pe = PathElement()
+            pe.step = destination
+            if moveCount == 0:
+                mp.start = destination
+            else:
+                previousElement.orientation = previousElement.step.orientationTo(pe.step)
+            if moveCount == len(path) - 1:
+                mp.end = destination
+                break
+            mp.addPoint(pe)
+            previousElement = pe
+            moveCount += 1
+        mp.fill()
+        return mp

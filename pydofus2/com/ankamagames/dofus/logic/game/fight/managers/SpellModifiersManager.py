@@ -4,10 +4,10 @@ from pydofus2.com.ankamagames.dofus.network.types.game.character.characteristic.
     CharacterSpellModification,
 )
 from pydofus2.com.ankamagames.jerakine.logger.Logger import Logger
-from pydofus2.com.ankamagames.jerakine.metaclasses.Singleton import Singleton
+from pydofus2.com.ankamagames.jerakine.metaclasses.ThreadSharedSingleton import ThreadSharedSingleton
 
 
-class SpellModifiersManager(metaclass=Singleton):
+class SpellModifiersManager(metaclass=ThreadSharedSingleton):
 
     DATA_STORE_CATEGORY: str = "ComputerModule_spellModifiersManager"
 
@@ -29,39 +29,28 @@ class SpellModifiersManager(metaclass=Singleton):
         if self._isVerbose == isVerbose:
             return
         self._isVerbose = isVerbose
-        verboseAction: str = "enabled" if self._isVerbose else "disabled"
-        Logger().info("Verbose mode has been " + verboseAction)
-
-    def reset(self) -> None:
-        Logger().info("Singleton instance has been destroyed")
+        verboseAction = "enabled" if self._isVerbose else "disabled"
+        Logger().info(f"Verbose mode has been {verboseAction}")
 
     def setSpellModifiers(self, spellModifiers: SpellModifiers) -> bool:
         if spellModifiers is None:
             return False
-        entityKey = str(spellModifiers.entityId)
-        spellKey = str(spellModifiers.spellId)
-        if entityKey not in self._entitiesMap:
-            self._entitiesMap[entityKey] = dict[str, SpellModifiers]()
-        self._entitiesMap[entityKey][spellKey] = spellModifiers
+        entityId = float(spellModifiers.entityId)
+        spellId = float(spellModifiers.spellId)
+        if entityId not in self._entitiesMap:
+            self._entitiesMap[entityId] = dict[str, SpellModifiers]()
+        self._entitiesMap[entityId][spellId] = spellModifiers
         return True
 
     def getSpellModifiers(self, entityId: float, spellId: float) -> SpellModifiers:
-        entityKey = str(entityId)
-        spellKey = str(spellId)
-        spellsModifierStats = self._entitiesMap.get(entityKey)
-        if spellsModifierStats is None or spellKey not in spellsModifierStats:
-            return None
-        return spellsModifierStats[spellKey]
-
+        return self._entitiesMap.get(float(entityId), {}).get(float(spellId), None)
+    
     def getSpellModifier(self, entityId: float, spellId: float, modifierId: float) -> SpellModifier:
-        spellModifiers: SpellModifiers = self.getSpellModifiers(entityId, spellId)
-        if spellModifiers is not None:
-            return spellModifiers.getModifier(modifierId)
-        return None
+        spellModifiers = self.getSpellModifiers(entityId, spellId)
+        return spellModifiers.getModifier(modifierId) if spellModifiers else None
 
     def setRawSpellsModifiers(self, entityId: float, rawSpellsModifiers: list[CharacterSpellModification]) -> None:
-        entityKey: str = str(entityId)
-        self._entitiesMap[entityKey] = dict()
+        self._entitiesMap[float(entityId)] = dict()
         if rawSpellsModifiers is not None and len(rawSpellsModifiers) > 0:
             for rawSpellModifier in rawSpellsModifiers:
                 spellModifiers = SpellModifiers(entityId, rawSpellModifier.spellId)
@@ -79,15 +68,15 @@ class SpellModifiersManager(metaclass=Singleton):
     def setRawSpellModifier(self, entityId: float, rawSpellModifier: CharacterSpellModification) -> None:
         if rawSpellModifier is None:
             return
-        entityKey: str = str(entityId)
-        spellsModifierStats: dict = self._entitiesMap.get(entityKey)
+        entityId = float(entityId)
+        spellsModifierStats = self._entitiesMap.get(entityId)
         if spellsModifierStats is None:
-            spellsModifierStats = self._entitiesMap[entityKey] = dict()
-        spellKey: str = str(rawSpellModifier.spellId)
-        spellModifiers: SpellModifiers = spellsModifierStats.get(spellKey)
+            spellsModifierStats = self._entitiesMap[entityId] = dict()
+        spellId = float(rawSpellModifier.spellId)
+        spellModifiers = spellsModifierStats.get(spellId)
         if spellModifiers is None:
-            spellModifiers = spellsModifierStats[spellKey] = SpellModifiers(entityId, rawSpellModifier.spellId)
-        spellModifier: SpellModifier = SpellModifier(
+            spellModifiers = spellsModifierStats[spellId] = SpellModifiers(entityId, rawSpellModifier.spellId)
+        spellModifier = SpellModifier(
             rawSpellModifier.modificationType,
             rawSpellModifier.value.base,
             rawSpellModifier.value.additional,
@@ -98,38 +87,34 @@ class SpellModifiersManager(metaclass=Singleton):
         spellModifiers.setModifier(spellModifier)
 
     def deleteSpellsModifiers(self, entityId: float) -> bool:
-        key: str = str(entityId)
-        if key not in self._entitiesMap:
+        entityId = float(entityId)
+        if entityId not in self._entitiesMap:
             Logger().error(
-                "Tried to del spells modifier stats for entity with ID " + key + ", but none were found. Aborting"
+                f"Tried to del spells modifier stats for entity with ID {entityId}, but none were found. Aborting"
             )
             return False
-        del self._entitiesMap[key]
-        Logger().info("Spells modifiers for entity with ID " + key + " deleted")
+        del self._entitiesMap[entityId]
+        Logger().info(f"Spells modifiers for entity with ID {entityId} deleted")
         return True
 
     def deleteSpellModifiers(self, entityId: float, spellId: float) -> bool:
-        entityKey: str = str(entityId)
-        spellKey: str = str(spellId)
+        entityKey = float(entityId)
+        spellKey = float(spellId)
         if entityKey not in self._entitiesMap:
             Logger().error(
-                "Tried to del spell "
-                + spellKey
-                + " modifiers for entity with ID "
-                + entityKey
+                f"Tried to del spell {spellKey}"
+                + f" modifiers for entity with ID {entityKey}"
                 + ", but no spells modifier stats were found. Aborting"
             )
             return False
-        spellModifiers: SpellModifiers = self._entitiesMap[entityKey]
+        spellModifiers = self._entitiesMap[entityKey]
         if not spellModifiers or spellKey not in spellModifiers:
             Logger().error(
-                "Tried to del spell "
-                + spellKey
-                + " modifiers for entity with ID "
-                + entityKey
+                f"Tried to del spell {spellKey}"
+                + f" modifiers for entity with ID {entityKey}"
                 + ", but none were found. Aborting"
             )
             return False
         del spellModifiers[spellKey]
-        Logger().info("Spell " + spellKey + " modifiers for entity with ID " + entityKey + " deleted")
+        Logger().info(f"Spell {spellKey} modifiers for entity with ID {entityKey} deleted")
         return True

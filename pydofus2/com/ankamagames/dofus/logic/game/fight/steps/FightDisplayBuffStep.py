@@ -49,7 +49,7 @@ class FightDisplayBuffStep(AbstractSequencable, IFightStep, ISequencableListener
             BuffManager().addBuff(self._buff)
         self.executeCallbacks()
 
-    def stepFinished(self, step: ISequencable, withTimout: bool = False) -> None:
+    def stepFinished(self, step: ISequencable) -> None:
         self._virtualStep.removeListener(self)
         self.executeCallbacks()
 

@@ -56,15 +56,10 @@ if TYPE_CHECKING:
 class BuffManager(metaclass=Singleton):
 
     INCREMENT_MODE_SOURCE: int = 1
-
     INCREMENT_MODE_TARGET: int = 2
 
-    _buffs: dict[int, list[basicBuff.BasicBuff]]
-
-    spellBuffsToIgnore: list["CastingSpell"]
-
     def __init__(self):
-        self._buffs = dict()
+        self._buffs = dict[int, list[basicBuff.BasicBuff]]()
         self.spellBuffsToIgnore = list["CastingSpell"]()
         super().__init__()
 
@@ -221,17 +216,15 @@ class BuffManager(metaclass=Singleton):
         self._buffs = newBuffs
 
     def markFinishingBuffs(self, targetId: float, currentTurnIsEnding: bool = True) -> None:
-        fightBattleFrame: "FightBattleFrame" = Kernel().worker.getFrame("FightBattleFrame")
+        fightBattleFrame: "FightBattleFrame" = Kernel().worker.getFrameByName("FightBattleFrame")
         fightersCount = 0
-        if fightBattleFrame is None:
-            return
-        currentFighterId: float = fightBattleFrame.currentPlayerId
+        currentFighterId: float = CurrentPlayedFighterManager().currentFighterId
         if GameDebugManager().buffsDebugActivated:
             Logger().debug(
                 f"[BUFFS DEBUG] Looking for buffs of {targetId}"
                 + " that will finish during the turn  (current fighter "
                 + str(currentFighterId)
-                + ")    currentTurnIsEnding "
+                + ") currentTurnIsEnding "
                 + str(currentTurnIsEnding)
             )
         if targetId not in self._buffs:
@@ -456,9 +449,8 @@ class BuffManager(metaclass=Singleton):
 
     def removeLinkedBuff(self, sourceId: float, forceUndispellable: bool = False, dying: bool = False) -> list:
         impactedTarget: list = []
-        entitiesFrame = Kernel().worker.getFrame("FightEntitiesFrame")
-        fightBattleFrame: "FightBattleFrame" = Kernel().worker.getFrame("FightBattleFrame")
-        infos: GameFightFighterInformations = entitiesFrame.getEntityInfos(sourceId)
+        entitiesFrame: "fenf.FightEntitiesFrame" = Kernel().worker.getFrameByName("FightEntitiesFrame")
+        infos = entitiesFrame.getEntityInfos(sourceId)
         if GameDebugManager().buffsDebugActivated:
             Logger().debug(f"[BUFFS DEBUG] Retrieving all the buffs casted by {sourceId}")
         for buffList in self._buffs.values():
@@ -466,18 +458,19 @@ class BuffManager(metaclass=Singleton):
             for buff in buffListCopy:
                 if buff.source == sourceId:
                     if GameDebugManager().buffsDebugActivated:
-                        Logger().debug("[BUFFS DEBUG]      Buff " + str(buff.uid) + " must be retrieved")
+                        Logger().debug(f"[BUFFS DEBUG] Buff {buff.uid} must be retrieved")
                     self.dispellUniqueBuff(buff.targetId, buff.id, forceUndispellable, dying, False)
                     if buff.targetId not in impactedTarget:
                         impactedTarget.append(buff.targetId)
-                    if dying and infos.stats.summoned and infos.stats.summoner != fightBattleFrame.currentPlayerId:
+                    if (
+                        dying
+                        and infos.stats.summoned
+                        and infos.stats.summoner != CurrentPlayedFighterManager().currentFighterId
+                    ):
                         buff.aliveSource = infos.stats.summoner
                         if GameDebugManager().buffsDebugActivated:
                             Logger().debug(
-                                "[BUFFS DEBUG]      Buff "
-                                + buff.uid
-                                + " must be reaffected to the summoner "
-                                + infos.stats.summoner
+                                f"[BUFFS DEBUG] Buff {buff.uid} must be reaffected to the summoner {infos.stats.summoner}"
                             )
         return impactedTarget
 
@@ -487,25 +480,21 @@ class BuffManager(metaclass=Singleton):
             next = self.getNextFighter(sourceId)
             if GameDebugManager().buffsDebugActivated:
                 Logger().debug(
-                    "[BUFFS DEBUG] R�affectation des buffs lanc�s par "
-                    + sourceId
-                    + ", le nouveau 'lanceur' sera "
-                    + next
+                    f"[BUFFS DEBUG] Reaffecting buffs casted by {sourceId}, the next caster is {next}"
                 )
-            frame: "FightBattleFrame" = Kernel().worker.getFrame("FightBattleFrame")
             dontDecrementBuffThisTurn = False
-            if frame.currentPlayerId == sourceId:
+            if CurrentPlayedFighterManager().currentFighterId == sourceId:
                 dontDecrementBuffThisTurn = True
             for buffList in self._buffs.values():
                 for buff in buffList:
                     if buff.aliveSource == sourceId:
                         if GameDebugManager().buffsDebugActivated:
-                            Logger().debug("[BUFFS DEBUG]      Buff " + buff.uid + " doit �tre reaffect�")
+                            Logger().debug(f"[BUFFS DEBUG] Buff {buff.uid} must be reaffected")
                         buff.aliveSource = next
                         buff.sourceJustReaffected = dontDecrementBuffThisTurn
 
     def getNextFighter(self, sourceId: float) -> float:
-        frame: "FightBattleFrame" = Kernel().worker.getFrame("FightBattleFrame")
+        frame: "FightBattleFrame" = Kernel().worker.getFrameByName("FightBattleFrame")
         if frame is None:
             return 0
         found: bool = False
@@ -554,7 +543,7 @@ class BuffManager(metaclass=Singleton):
 
     @property
     def fightEntitiesFrame(self) -> fenf.FightEntitiesFrame:
-        return Kernel().worker.getFrame("FightEntitiesFrame")
+        return Kernel().worker.getFrameByName("FightEntitiesFrame")
 
     def getBuffIndex(self, targetId: float, buffId: int) -> int:
         for i, sbuff in enumerate(self._buffs.get(targetId, [])):

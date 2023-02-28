@@ -26,8 +26,8 @@ class Singleton(type):
                 and thrid in cls._listeners[cls.THREAD_REGISTER]
                 and cls in cls._listeners[cls.THREAD_REGISTER][thrid]
             ):
-                for listener in cls._listeners[cls.THREAD_REGISTER][thrid][cls]:
-                    listener()
+                for listener, args, kwargs in cls._listeners[cls.THREAD_REGISTER][thrid][cls]:
+                    listener(*args, **kwargs)
                 del cls._listeners[cls.THREAD_REGISTER][thrid][cls]
         return cls._instances[thrid][cls]
 
@@ -35,7 +35,7 @@ class Singleton(type):
         if cls in cls._instances[cls.threadName()]:
             del cls._instances[cls.threadName()][cls]
 
-    def getThreadInstance(cls: Type[T], thrid: int) -> T:
+    def getInstance(cls: Type[T], thrid: int) -> T:
         if thrid in cls._instances:
             return cls._instances[thrid].get(cls)
 
@@ -47,7 +47,7 @@ class Singleton(type):
             cls._listeners[cls.THREAD_REGISTER] = dict()
         if thname not in cls._listeners[cls.THREAD_REGISTER]:
             cls._listeners[cls.THREAD_REGISTER][thname] = {cls: []}
-        cls._listeners[cls.THREAD_REGISTER][thname][cls].append(listener)
+        cls._listeners[cls.THREAD_REGISTER][thname][cls].append((listener, args, kwargs))
 
     def removeListener(cls, thname: str, listener: object):
         if cls.THREAD_REGISTER in cls._listeners and thname in cls._listeners[cls.THREAD_REGISTER]:

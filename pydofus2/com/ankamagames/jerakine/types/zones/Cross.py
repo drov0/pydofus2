@@ -98,26 +98,25 @@ class Cross(IZone):
         origin: MapPoint = MapPoint.fromCellId(cellId)
         x: int = origin.x
         y: int = origin.y
-        for r in range(self._radius, 0, -1):
-            if r >= self._minRadius:
-                if not self._diagonal:
-                    if MapPoint.isInMap(x + r, y) and DirectionsEnum.DOWN_RIGHT not in self.disabledDirection:
-                        self.addCell(x + r, y, aCells)
-                    if MapPoint.isInMap(x - r, y) and DirectionsEnum.UP_LEFT not in self.disabledDirection:
-                        self.addCell(x - r, y, aCells)
-                    if MapPoint.isInMap(x, y + r) and DirectionsEnum.UP_RIGHT not in self.disabledDirection:
-                        self.addCell(x, y + r, aCells)
-                    if MapPoint.isInMap(x, y - r) and DirectionsEnum.DOWN_LEFT not in self.disabledDirection:
-                        self.addCell(x, y - r, aCells)
-                if self._diagonal or self._allDirections:
-                    if MapPoint.isInMap(x + r, y - r) and DirectionsEnum.DOWN not in self.disabledDirection:
-                        self.addCell(x + r, y - r, aCells)
-                    if MapPoint.isInMap(x - r, y + r) and DirectionsEnum.UP not in self.disabledDirection:
-                        self.addCell(x - r, y + r, aCells)
-                    if MapPoint.isInMap(x + r, y + r) and DirectionsEnum.RIGHT not in self.disabledDirection:
-                        self.addCell(x + r, y + r, aCells)
-                    if MapPoint.isInMap(x - r, y - r) and DirectionsEnum.LEFT not in self.disabledDirection:
-                        self.addCell(x - r, y - r, aCells)
+        for r in range(self._radius, self._minRadius, -1):
+            if not self._diagonal:
+                if MapPoint.isInMap(x + r, y) and DirectionsEnum.DOWN_RIGHT not in self.disabledDirection:
+                    self.addCell(x + r, y, aCells)
+                if MapPoint.isInMap(x - r, y) and DirectionsEnum.UP_LEFT not in self.disabledDirection:
+                    self.addCell(x - r, y, aCells)
+                if MapPoint.isInMap(x, y + r) and DirectionsEnum.UP_RIGHT not in self.disabledDirection:
+                    self.addCell(x, y + r, aCells)
+                if MapPoint.isInMap(x, y - r) and DirectionsEnum.DOWN_LEFT not in self.disabledDirection:
+                    self.addCell(x, y - r, aCells)
+            if self._diagonal or self._allDirections:
+                if MapPoint.isInMap(x + r, y - r) and DirectionsEnum.DOWN not in self.disabledDirection:
+                    self.addCell(x + r, y - r, aCells)
+                if MapPoint.isInMap(x - r, y + r) and DirectionsEnum.UP not in self.disabledDirection:
+                    self.addCell(x - r, y + r, aCells)
+                if MapPoint.isInMap(x + r, y + r) and DirectionsEnum.RIGHT not in self.disabledDirection:
+                    self.addCell(x + r, y + r, aCells)
+                if MapPoint.isInMap(x - r, y - r) and DirectionsEnum.LEFT not in self.disabledDirection:
+                    self.addCell(x - r, y - r, aCells)
         return aCells
 
     def addCell(self, x: int, y: int, cellMap: list[int]) -> None:

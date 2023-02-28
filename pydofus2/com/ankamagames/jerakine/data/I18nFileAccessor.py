@@ -24,7 +24,6 @@ class I18nFileAccessor(metaclass=ThreadSharedSingleton):
             return
         self.initI18n()
 
-    @MemoryProfiler.track_memory("I18nFileAccessor.init")
     def initI18n(self):
         self._initializing.set()
         Logger().info("Loading I18n file...")

@@ -1,5 +1,4 @@
-import queue
-
+from pydofus2.com.ankamagames.dofus.logic.common.frames.ChatFrame import ChatFrame
 from pydofus2.com.ankamagames.dofus.network.Metadata import Metadata
 from pydofus2.com.ankamagames.jerakine.logger.Logger import Logger
 from pydofus2.com.ankamagames.jerakine.metaclasses.Singleton import Singleton
@@ -11,6 +10,7 @@ class Kernel(metaclass=Singleton):
         self._worker: Worker = Worker()
         self.beingInReconection: bool = False
         self._reseted = True
+        self._mule = False
 
     @property
     def worker(self) -> Worker:
@@ -74,12 +74,13 @@ class Kernel(metaclass=Singleton):
             ConnectionsHandler().conn.join()
         ConnectionsHandler.clear()
         SpellModifiersManager.clear()
-        self._worker.terminate()
-        self._worker.reset()
-        if reloadData:
-            self.addInitialFrames()
         self.beingInReconection = False
-        self._reseted = True
+        if reloadData:
+            self._worker.reset()
+            self.addInitialFrames()
+        else:
+            self._worker.terminate()
+            self._reseted = True
         Logger().debug("[KERNEL] Reseted")
 
     def addInitialFrames(self) -> None:
@@ -97,4 +98,5 @@ class Kernel(metaclass=Singleton):
         self._worker.addFrame(QueueFrame())
         self._worker.addFrame(DisconnectionHandlerFrame())
         self._worker.addFrame(CleanupCrewFrame())
+        Kernel().worker.addFrame(ChatFrame())
         Logger().debug("[KERNEL] Initial frames added.")

@@ -104,11 +104,11 @@ class RoleplayInteractivesFrame(Frame):
 
     @property
     def roleplayWorldFrame(self) -> "RoleplayWorldFrame":
-        return Kernel().worker.getFrame("RoleplayWorldFrame")
+        return Kernel().worker.getFrameByName("RoleplayWorldFrame")
 
     @property
     def movementFrame(self) -> "RoleplayMovementFrame":
-        return Kernel().worker.getFrame("RoleplayMovementFrame")
+        return Kernel().worker.getFrameByName("RoleplayMovementFrame")
 
     @property
     def currentRequestedElementId(self) -> int:
@@ -254,7 +254,7 @@ class RoleplayInteractivesFrame(Frame):
     def registerInteractive(self, ie: InteractiveElement, firstSkill: int) -> None:
         if not MapDisplayManager().isIdentifiedElement(ie.elementId):
             return
-        entitiesFrame: "RoleplayEntitiesFrame" = Kernel().worker.getFrame("RoleplayEntitiesFrame")
+        entitiesFrame: "RoleplayEntitiesFrame" = Kernel().worker.getFrameByName("RoleplayEntitiesFrame")
         if entitiesFrame:
             found = False
             for s, cie in enumerate(entitiesFrame.interactiveElements):

@@ -1,5 +1,6 @@
 import importlib
 import json
+from pydofus2.com.ankamagames.dofus.kernel.Kernel import Kernel
 from pydofus2.com.ankamagames.jerakine.metaclasses.ThreadSharedSingleton import ThreadSharedSingleton
 from pydofus2.com.ankamagames.jerakine.network.CustomDataWrapper import ByteArray
 from pydofus2.com.ankamagames.jerakine.network.INetworkMessage import INetworkMessage
@@ -10,7 +11,7 @@ import pydofus2.com.ankamagames.dofus.Constants as Constants
 with open(Constants.PROTOCOL_MSG_SHUFFLE_PATH, "r") as fp:
     msgShuffle: dict = json.load(fp)
 
-_messages_to_discard: set = {
+_messages_to_discard = {
     "SetCharacterRestrictionsMessage",
     "GameContextRefreshEntityLookMessage",
     "ChatServerMessage",
@@ -64,7 +65,6 @@ _messages_to_discard: set = {
     "GameFightSpectateMessage",
     "GameFightSpectatorJoinMessage",
     "EmotePlayMessage",
-    "GameFightOptionStateUpdateMessage",
     "PartyFollowStatusUpdateMessage",
     "PartyUpdateLightMessage",
     "PartyRestrictedMessage",
@@ -72,7 +72,45 @@ _messages_to_discard: set = {
     "LifePointsRegenBeginMessage",
     "MapFightCountMessage",
     "PartyUpdateMessage",
-    "LifePointsRegenEndMessage"
+    "LifePointsRegenEndMessage",
+    "CredentialsAcknowledgementMessage",
+    "IdolFightPreparationUpdateMessage",
+}
+
+_mule_fight_messages_to_discard = {
+    "GameActionFightDispellableEffectMessage",
+    "GameActionUpdateEffectTriggerCountMessage",
+    "GameEntitiesDispositionMessage",
+    "GameFightPlacementPossiblePositionsMessage",
+    "GameFightTurnListMessage",
+    "SequenceEndMessage",
+    "GameFightJoinMessage",
+    "GameFightTurnStartMessage",
+    "GameFightOptionStateUpdateMessage",
+    "GameFightTurnEndMessage",
+    "GameActionFightLifePointsLostMessage",
+    "GameFightHumanReadyStateMessage",
+    "GameFightNewRoundMessage",
+    "CharacterStatsListMessage",
+    "SequenceStartMessage",
+    "GameFightStartMessage",
+    "GameActionFightDeathMessage",
+    "RefreshCharacterStatsMessage",
+    "GameFightShowFighterMessage",
+    "GameFightSynchronizeMessage",
+    "GameActionFightPointsVariationMessage",
+    "GameActionFightSpellCastMessage",
+    "GameFightUpdateTeamMessage",
+    "GameMapMovementMessage",
+    "GameFightPlacementPossiblePositionsMessage",
+    "GameFightShowFighterMessage",
+    "CharacterStatsListMessage",
+    "MapComplementaryInformationsDataMessage",
+    "GameActionFightInvisibilityMessage",
+    "GameFightRefreshFighterMessage",
+    "GameActionFightDodgePointLossMessage",
+    "GameActionFightLifePointsLostMessage",
+    "ChatSmileyMessage"
 }
 
 _messagesTypes = dict[int, type[NetworkMessage]]()
@@ -89,11 +127,21 @@ for cls_name, cls_infos in msgShuffle.items():
 
 class MessageReceiver(RawDataParser, metaclass=ThreadSharedSingleton):
     def __init__(self):
+        self.infight = False
         super().__init__()
 
     def parse(self, input: ByteArray, messageId: int, messageLength: int) -> INetworkMessage:
         messageType = _messagesTypes.get(messageId)
-        if not messageType:
+        if messageType:
+            if messageType.__name__ == "GameFightJoinMessage":
+                self.infight = True
+            elif messageType.__name__ == "GameFightEndMessage":
+                self.infight = False
+        if not messageType or (
+            Kernel()._mule
+            and self.infight
+            and messageType.__name__ in _mule_fight_messages_to_discard
+        ):
             message = NetworkMessage()
             message.unpacked = False
             input.position += messageLength

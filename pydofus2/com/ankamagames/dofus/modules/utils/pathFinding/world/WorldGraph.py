@@ -1,14 +1,11 @@
-import struct
 import threading
 from time import perf_counter
 from pydofus2.com.ankamagames.dofus import Constants
 from pydofus2.com.ankamagames.dofus.modules.utils.pathFinding.world.Edge import Edge
 from pydofus2.com.ankamagames.dofus.modules.utils.pathFinding.world.Vertex import Vertex
-from pydofus2.com.ankamagames.jerakine.benchmark.BenchmarkTimer import BenchmarkTimer
 from pydofus2.com.ankamagames.jerakine.logger.Logger import Logger
 from pydofus2.com.ankamagames.jerakine.metaclasses.ThreadSharedSingleton import ThreadSharedSingleton
 from pydofus2.com.ankamagames.jerakine.network.CustomDataWrapper import ByteArray
-lock = threading.Lock()
 
 class WorldGraph(metaclass=ThreadSharedSingleton):
     
@@ -17,18 +14,10 @@ class WorldGraph(metaclass=ThreadSharedSingleton):
         self._edges = dict[float, Edge]()
         self._outgoingEdges = dict[float, list[Edge]]()
         self._vertexUid: float = 0
-        self._initalized = threading.Event()
-        self._initalizing = threading.Event()
-        self._clearGraphFromMemoryTimer = None
+        self.init()
 
     def init(self):
         s = perf_counter()
-        if self._initalizing.is_set():
-            Logger().debug("WorldGraph is already initalizing")
-            self._initalized.wait()
-            Logger().debug("WorldGraph loaded in %s seconds", perf_counter() - s)
-            return
-        self._initalizing.set()
         with open(Constants.WORLDGRAPH_PATH, "rb") as binaries:
             data = ByteArray(binaries.read())
             edgeCount: int = data.readInt()
@@ -49,11 +38,7 @@ class WorldGraph(metaclass=ThreadSharedSingleton):
                     )
             del data
         Logger().debug("WorldGraph loaded in %s seconds", perf_counter() - s)
-        self._initalizing.clear()
-        self._clearGraphFromMemoryTimer = BenchmarkTimer(60, self.reset)
-        self._clearGraphFromMemoryTimer.start()
-        self._initalized.set()
-        
+
     def addEdge(self, src: Vertex, dest: Vertex) -> Edge:
         edge: Edge = self._edges.get(src.UID, {}).get(dest.UID)
         if edge:
@@ -85,54 +70,24 @@ class WorldGraph(metaclass=ThreadSharedSingleton):
         return v.mapId in self._vertices and v.zoneId in self._vertices[v.mapId]
     
     def getEdges(self) -> dict:
-        if not self._initalized.is_set():
-            self.init()
-        else:
-            self.resetTimer()
         return self._edges
 
     def getVertex(self, mapId: float, mapRpZone: int) -> Vertex:
-        if not self._initalized.is_set():
-            self.init()
-        else:
-            self.resetTimer()
         mapId = float(mapId)
         mapRpZone = int(mapRpZone)
         return self._vertices.get(mapId, {}).get(mapRpZone)
 
     def getVertices(self, mapId) -> dict[int, Vertex]:
-        if not self._initalized.is_set():
-            self.init()
-        else:
-            self.resetTimer()
         return self._vertices.get(mapId)
 
     def getOutgoingEdgesFromVertex(self, src: Vertex) -> list[Edge]:
-        if not self._initalized.is_set():
-            self.init()
-        else:
-            self.resetTimer()
         return self._outgoingEdges.get(src.UID, [])
 
     def getEdge(self, src: Vertex, dest: Vertex) -> Edge:
-        if not self._initalized.is_set():
-            self.init()
-        else:
-            self.resetTimer()
         return self._edges.get(src.UID, {}).get(dest.UID)
-    
-    def resetTimer(self):
-        if self._clearGraphFromMemoryTimer:
-            self._clearGraphFromMemoryTimer.cancel()
-        self._clearGraphFromMemoryTimer = BenchmarkTimer(60, self.reset)
-        self._clearGraphFromMemoryTimer.start()
         
     def reset(self):
         self._vertices.clear()
         self._edges.clear()
         self._outgoingEdges.clear()
         self._vertexUid: float = 0
-        self._initalized.clear()
-        self._initalizing.clear()
-        if self._clearGraphFromMemoryTimer:
-            self._clearGraphFromMemoryTimer.cancel()

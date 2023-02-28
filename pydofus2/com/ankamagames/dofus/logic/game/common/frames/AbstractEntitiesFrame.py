@@ -112,7 +112,6 @@ class AbstractEntitiesFrame(Frame):
             del self._entities[actorId]
         StatsManager().deleteStats(actorId)
 
-    @MemoryProfiler.track_memory("Entities.addOrUpdateActor")
     def addOrUpdateActor(self, infos: GameContextActorInformations) -> AnimatedCharacter:
         characterEntity: AnimatedCharacter = DofusEntities().getEntity(infos.contextualId)
         self.registerActor(infos)

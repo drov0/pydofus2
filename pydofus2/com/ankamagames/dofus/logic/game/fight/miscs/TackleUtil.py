@@ -44,7 +44,7 @@ class TackleUtil:
         position: MapPoint,
     ) -> float:
         stats: EntityStats = StatsManager().getStats(playerInfos.contextualId)
-        entitiesFrame: "FightEntitiesFrame" = Kernel().worker.getFrame("FightEntitiesFrame")
+        entitiesFrame: "FightEntitiesFrame" = Kernel().worker.getFrameByName("FightEntitiesFrame")
         if Constants.DETERMINIST_TACKLE:
             if not cls.canBeTackled(playerInfos, position):
                 return 1
@@ -114,7 +114,7 @@ class TackleUtil:
     def getTacklerOnCell(cls, cellId: int) -> IEntity:
         entity: "AnimatedCharacter" = None
         infos: "GameFightFighterInformations" = None
-        entitiesFrame: "FightEntitiesFrame" = Kernel().worker.getFrame("FightEntitiesFrame")
+        entitiesFrame: "FightEntitiesFrame" = Kernel().worker.getFrameByName("FightEntitiesFrame")
         entities: list[IEntity] = EntitiesManager().getEntitiesOnCell(cellId, AnimatedCharacter)
         for entity in entities:
             infos: "GameFightFighterInformations" = entitiesFrame.getEntityInfos(entity.id)
@@ -156,7 +156,7 @@ class TackleUtil:
             or FightersStateManager().getStatus(fighter.contextualId).cantTackle
         ):
             return False
-        entitiesFrame: "FightEntitiesFrame" = Kernel().worker.getFrame("FightEntitiesFrame")
+        entitiesFrame: "FightEntitiesFrame" = Kernel().worker.getFrameByName("FightEntitiesFrame")
         infos: "GameFightFighterInformations" = entitiesFrame.getEntityInfos(fighter.contextualId)
         if infos and infos.spawnInfo.teamId == target.spawnInfo.teamId:
             return False

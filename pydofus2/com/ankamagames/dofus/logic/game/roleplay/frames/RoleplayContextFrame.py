@@ -63,7 +63,6 @@ class RoleplayContextFrame(Frame):
         self._worldFrame = rplWF.RoleplayWorldFrame()
         self._entitiesFrame = ref.RoleplayEntitiesFrame()
         self._interactivesFrame = rif.RoleplayInteractivesFrame()
-        Logger().debug("RoleplayContextFrame pushed")
         return True
 
     def process(self, msg: Message) -> bool:

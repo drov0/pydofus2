@@ -51,10 +51,10 @@ class FightPlaySpellScriptStep(AbstractSequencable, IFightStep):
         if not s:
             return
         sl: SpellLevel = s.getSpellLevel(self._spellRank)
-        if not sl or not sl.playAnimation:
+        if not sl:
             return
         if self._spellCastProvider.castingSpell.spell:
-            Logger().info(
+            Logger().debug(
                 f"Fighter {self._fighterId} Casting Spell '{self._spellCastProvider.castingSpell.spell.name}' ({self._spellCastProvider.castingSpell.spell.id})"
             )
         self.executeCallbacks()

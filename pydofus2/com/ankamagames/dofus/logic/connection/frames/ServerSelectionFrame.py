@@ -1,6 +1,6 @@
 from types import FunctionType
 
-import pydofus2.com.ankamagames.dofus.kernel.Kernel as krnl
+from pydofus2.com.ankamagames.dofus.kernel.Kernel import Kernel
 from pydofus2.com.ankamagames.berilia.managers.KernelEventsManager import KernelEvent, KernelEventsManager
 from pydofus2.com.ankamagames.dofus.datacenter.servers.Server import Server
 from pydofus2.com.ankamagames.dofus.kernel.net.ConnectionsHandler import ConnectionsHandler
@@ -62,12 +62,7 @@ class ServerSelectionFrame(Frame):
     def availableSlotsByServerType(self) -> list:
         return self._serversTypeAvailableSlots
 
-    @property
-    def worker(self) -> Worker:
-        return self._worker
-
     def pushed(self) -> bool:
-        self._worker = krnl.Kernel().worker
         return True
 
     def process(self, msg: Message) -> bool:
@@ -78,7 +73,7 @@ class ServerSelectionFrame(Frame):
             self._serversList = slmsg.servers
             self._serversList.sort(key=lambda x: x.date)
             self.broadcastServersListUpdate()
-            self.worker.process(ServerSelectionAction.create(AuthentificationManager()._lva.serverId))
+            Kernel().worker.process(ServerSelectionAction.create(AuthentificationManager()._lva.serverId))
             return False
 
         elif isinstance(msg, ServerStatusUpdateMessage):
@@ -108,7 +103,7 @@ class ServerSelectionFrame(Frame):
                     self._waitingServerOnline = False
                     ssmsg = ServerSelectionMessage()
                     ssmsg.init(AuthentificationManager()._lva.serverId)
-                    self.worker.process(ssmsg)
+                    Kernel().worker.process(ssmsg)
                     Logger().debug(
                         f"Sending ServerSelectionMessage to server {AuthentificationManager()._lva.serverId}."
                     )
@@ -141,7 +136,7 @@ class ServerSelectionFrame(Frame):
                         Logger().debug(
                             f"Server {server.id} not online but has status {ServerStatusEnum(server.status).name}."
                         )
-                        BenchmarkTimer(60, lambda: self.worker.process(msg)).start()
+                        BenchmarkTimer(60, lambda: Kernel().worker.process(msg)).start()
                         return True
             return True
 
@@ -158,11 +153,11 @@ class ServerSelectionFrame(Frame):
 
             escmsg = msg
             if escmsg.reason != DisconnectionReasonEnum.SWITCHING_TO_GAME_SERVER:
-                self._worker.process(
+                Kernel().worker.process(
                     WrongSocketClosureReasonMessage(DisconnectionReasonEnum.SWITCHING_TO_GAME_SERVER, escmsg.reason)
                 )
                 return True
-            self._worker.addFrame(GameServerApproachFrame())
+            Kernel().worker.addFrame(GameServerApproachFrame())
             ConnectionsHandler().connectToGameServer(self._selectedServer.address, self._selectedServer.ports[0])
             return True
 

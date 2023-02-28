@@ -134,7 +134,7 @@ class PlayedCharacterApi(IApi):
 
     @classmethod
     def getSpells(cls, returnBreedSpells: bool) -> list:
-        spim: "SpellInventoryManagementFrame" = Kernel().worker.getFrame("SpellInventoryManagementFrame")
+        spim: "SpellInventoryManagementFrame" = Kernel().worker.getFrameByName("SpellInventoryManagementFrame")
         if returnBreedSpells:
             return spim.getBreedSpellsInVariantslist()
         return spim.getCommonSpellsInVariantslist()
@@ -204,29 +204,29 @@ class PlayedCharacterApi(IApi):
 
     @classmethod
     def getKnownTitles(cls) -> list[int]:
-        return Kernel().worker.getFrame("TinselFrame").knownTitles
+        return Kernel().worker.getFrameByName("TinselFrame").knownTitles
 
     @classmethod
     def getKnownOrnaments(cls) -> list[int]:
-        return Kernel().worker.getFrame("TinselFrame").knownOrnaments
+        return Kernel().worker.getFrameByName("TinselFrame").knownOrnaments
 
     @classmethod
     def titlesOrnamentsAskedBefore(cls) -> bool:
-        return Kernel().worker.getFrame("TinselFrame").titlesOrnamentsAskedBefore
+        return Kernel().worker.getFrameByName("TinselFrame").titlesOrnamentsAskedBefore
 
     @classmethod
     def getEntityInfos(cls) -> GameRolePlayCharacterInformations:
         entitiesFrame: AbstractEntitiesFrame = None
         if cls.isInFight():
-            entitiesFrame = Kernel().worker.getFrame("FightEntitiesFrame")
-            entitiesFrame = Kernel().worker.getFrame("RoleplayEntitiesFrame")
+            entitiesFrame = Kernel().worker.getFrameByName("FightEntitiesFrame")
+            entitiesFrame = Kernel().worker.getFrameByName("RoleplayEntitiesFrame")
         if not entitiesFrame:
             return None
         return entitiesFrame.getEntityInfos(PlayedCharacterManager().id)
 
     @classmethod
     def getKamasMaxLimit(cls) -> float:
-        playedCharacterFrame: pcuF.PlayedCharacterUpdatesFrame = Kernel().worker.getFrame(
+        playedCharacterFrame: pcuF.PlayedCharacterUpdatesFrame = Kernel().worker.getFrameByName(
             "PlayedCharacterUpdatesFrame"
         )
         if playedCharacterFrame:
@@ -307,7 +307,7 @@ class PlayedCharacterApi(IApi):
 
     @classmethod
     def isMutant(cls) -> bool:
-        rcf: RoleplayContextFrame = Kernel().worker.getFrame("RoleplayContextFrame")
+        rcf: RoleplayContextFrame = Kernel().worker.getFrameByName("RoleplayContextFrame")
         infos: GameRolePlayActorInformations = rcf.entitiesFrame.getEntityInfos(PlayedCharacterManager().id)
         return infos is GameRolePlayMutantInformations
 
@@ -413,7 +413,7 @@ class PlayedCharacterApi(IApi):
 
     @classmethod
     def getPlayerSet(cls, objectGID: int) -> PlayerSetInfo:
-        return pcuF.PlayedCharacterUpdatesFrame(Kernel().worker.getFrame("PlayedCharacterUpdatesFrame")).getPlayerSet(
+        return pcuF.PlayedCharacterUpdatesFrame(Kernel().worker.getFrameByName("PlayedCharacterUpdatesFrame")).getPlayerSet(
             objectGID
         )
 
@@ -469,7 +469,7 @@ class PlayedCharacterApi(IApi):
 
     @classmethod
     def havenbagSharePermissions(cls) -> int:
-        hbFrame: HavenbagFrame = Kernel().worker.getFrame("HavenbagFrame")
+        hbFrame: HavenbagFrame = Kernel().worker.getFrameByName("HavenbagFrame")
         return hbFrame.sharePermissions
 
     @classmethod

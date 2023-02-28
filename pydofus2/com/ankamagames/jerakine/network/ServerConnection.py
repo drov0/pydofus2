@@ -26,10 +26,10 @@ def sendTrace(func):
     def wrapped(self: "ServerConnection", *args, **kwargs):
         try:
             return func(self, *args, **kwargs)
-        except:
+        except Exception as e:
             exc_type, exc_value, exc_traceback = sys.exc_info()
             traceback_in_var = traceback.format_tb(exc_traceback)
-            error_trace = str(exc_type) + "\n" + str(exc_value) + "\n" + "\n".join(traceback_in_var)
+            error_trace = str(e) + '\n' + str(exc_type) + "\n" + str(exc_value) + "\n" + "\n".join(traceback_in_var)
             self._put(ConnectionProcessCrashedMessage(error_trace))
 
     return wrapped
@@ -124,8 +124,6 @@ class ServerConnection(mp.Thread):
         return self._paused.is_set()
 
     def _put(self, msg):
-        if self.DEBUG_DATA:
-            Logger().debug(f"[{self.id}] [RCV] {msg}")
         if not self._paused.is_set():
             self.__receptionQueue.put(msg)
         else:
@@ -147,8 +145,7 @@ class ServerConnection(mp.Thread):
             if self.connecting:
                 self.__sendingQueue.append(msg)
             return
-        if self.DEBUG_DATA:
-            Logger().debug(f"[{self.id}] [SND] > {msg}")
+        Logger().debug(f"[{self.id}] [SND] > {msg}")
         self.__socket.send(msg.pack())
         self._latestSent = perf_counter()
         self._lastSent = perf_counter()
@@ -297,7 +294,13 @@ class ServerConnection(mp.Thread):
                 elif e.errno == errno.WSAECONNABORTED:
                     Logger().debug(f"[{self.id}] Connection aborted by user.")
                     self._closing.set()
+                # elif e.errno == errno.WSAECONNRESET:
+                #     Logger().debug(f"[{self.id}] Connection reset by peer.")
+                #     self.connect(self._remoteSrvHost, self._remoteSrvPort)
+                # elif e.errno == errno.WSAETIMEDOUT:
+                #     Logger().debug(f"[{self.id}] Connection timed out.")
                 else:
+                    Logger().debug(f"{e.errno}, {errno.errorcode[e.errno]} OS error received")
                     err = e
                     self._closing.set()
         self.__onClose(err)

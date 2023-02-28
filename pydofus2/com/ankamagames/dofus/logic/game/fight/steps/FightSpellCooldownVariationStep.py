@@ -53,7 +53,7 @@ class FightSpellCooldownVariationStep(AbstractSequencable, IFightStep):
             or self._fighterId == PlayedCharacterManager().id
         ):
             spellCastManager = CurrentPlayedFighterManager().getSpellCastManagerById(self._fighterId)
-            simf: "SpellInventoryManagementFrame" = Kernel().worker.getFrame("SpellInventoryManagementFrame")
+            simf: "SpellInventoryManagementFrame" = Kernel().worker.getFrameByName("SpellInventoryManagementFrame")
             spellList = simf.getFullSpellListByOwnerId(self._fighterId)
             for spellKnown in spellList:
                 if spellKnown.id == self._spellId:

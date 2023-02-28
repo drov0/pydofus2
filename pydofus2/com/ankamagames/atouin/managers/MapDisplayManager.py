@@ -73,7 +73,6 @@ class MapDisplayManager(metaclass=Singleton):
 
     def loadMap(self, mapId: int, forceReloadWithoutCache: bool = False, decryptionKey=None) -> None:
         from pydofus2.com.ankamagames.dofus.kernel.Kernel import Kernel
-
         self.currentDataMap = None
         self._forceReloadWithoutCache = forceReloadWithoutCache
         self._currentMapRendered = False
@@ -91,8 +90,8 @@ class MapDisplayManager(metaclass=Singleton):
         msg.id = self._currentMap.mapId
         self.initIdentifiedElements()
         if Kernel().worker.contains("RoleplayContextFrame"):
-            Kernel().worker.getFrame("RoleplayContextFrame").process(msg)
+            Kernel().worker.getFrameByName("RoleplayContextFrame").process(msg)
         elif Kernel().worker.contains("FightContextFrame"):
-            Kernel().worker.getFrame("FightContextFrame").process(msg)
+            Kernel().worker.getFrameByName("FightContextFrame").process(msg)
         else:
             Logger().warning("No context frame found!")

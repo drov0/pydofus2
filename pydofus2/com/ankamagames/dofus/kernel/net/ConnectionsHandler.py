@@ -1,11 +1,9 @@
-import queue
 import threading
 from pydofus2.com.ankamagames.dofus.kernel.Kernel import Kernel
 from pydofus2.com.ankamagames.dofus.kernel.net.ConnectionType import ConnectionType
 from pydofus2.com.ankamagames.dofus.kernel.net.DisconnectionReason import DisconnectionReason
 from pydofus2.com.ankamagames.dofus.kernel.net.DisconnectionReasonEnum import DisconnectionReasonEnum
 from pydofus2.com.ankamagames.dofus.logic.common.managers.PlayerManager import PlayerManager
-from pydofus2.com.ankamagames.dofus.logic.connection.frames.HandshakeFrame import HandshakeFrame
 from pydofus2.com.ankamagames.jerakine.logger.Logger import Logger
 from pydofus2.com.ankamagames.jerakine.metaclasses.Singleton import Singleton
 from pydofus2.com.ankamagames.jerakine.network.INetworkMessage import INetworkMessage
@@ -23,8 +21,8 @@ class ConnectionsHandler(metaclass=Singleton):
         self._currentConnectionType: str = None
         self._wantedSocketLost: bool = False
         self._wantedSocketLostReason: int = 0
-        self._hasReceivedMsg: bool = False
-        self._hasReceivedNetworkMsg: bool = False
+        self.hasReceivedMsg: bool = False
+        self.hasReceivedNetworkMsg: bool = False
         self._disconnectMessage = ""
         self._receivedMsgsQueue = Kernel().worker._queue
         self.paused = threading.Event()
@@ -33,22 +31,6 @@ class ConnectionsHandler(metaclass=Singleton):
     @property
     def connectionType(self) -> str:
         return self._currentConnectionType
-
-    @property
-    def hasReceivedMsg(self) -> bool:
-        return self._hasReceivedMsg
-
-    @hasReceivedMsg.setter
-    def hasReceivedMsg(self, value: bool) -> None:
-        self._hasReceivedMsg = value
-
-    @property
-    def hasReceivedNetworkMsg(self) -> bool:
-        return self._hasReceivedNetworkMsg
-
-    @hasReceivedNetworkMsg.setter
-    def hasReceivedNetworkMsg(self, value: bool) -> None:
-        self._hasReceivedNetworkMsg = value
 
     @property
     def conn(self) -> ServerConnection:
@@ -95,6 +77,7 @@ class ConnectionsHandler(metaclass=Singleton):
         self._currentConnectionType = ConnectionType.DISCONNECTED
 
     def etablishConnection(self, host: str, port: int, id: str) -> None:
+        from pydofus2.com.ankamagames.dofus.logic.connection.frames.HandshakeFrame import HandshakeFrame
         self._conn = ServerConnection(id, self._receivedMsgsQueue)
         Kernel().worker.addFrame(HandshakeFrame())
         self._conn.start()

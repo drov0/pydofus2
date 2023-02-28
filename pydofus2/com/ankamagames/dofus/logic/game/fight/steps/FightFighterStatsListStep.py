@@ -40,7 +40,7 @@ class FightFighterStatsListStep(AbstractSequencable, IFightStep):
         self._playerId = PlayedCharacterManager().id
         isRealPlayer: bool = CurrentPlayedFighterManager().isRealPlayer()
         CurrentPlayedFighterManager().setCharacteristicsInformations(self._playerId, self._stats)
-        characterFrame: "PlayedCharacterUpdatesFrame" = Kernel().worker.getFrame("PlayedCharacterUpdatesFrame")
+        characterFrame: "PlayedCharacterUpdatesFrame" = Kernel().worker.getFrameByName("PlayedCharacterUpdatesFrame")
         if characterFrame and isRealPlayer:
             characterFrame.updateCharacterStatsList(self._stats)
         SpellWrapper.refreshAllPlayerSpellHolder(self._playerId)

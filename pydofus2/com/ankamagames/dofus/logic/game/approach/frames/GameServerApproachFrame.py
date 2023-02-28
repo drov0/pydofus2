@@ -108,7 +108,6 @@ class GameServerApproachFrame(Frame):
         self._requestedCharacterId = None
         self._loadingStart = False
         self._reconnectMsgSend = False
-
         super().__init__()
 
     @property
@@ -224,7 +223,7 @@ class GameServerApproachFrame(Frame):
 
             cssmsg = msg
             self._loadingStart = time.perf_counter()
-            if Kernel().worker.getFrame("ServerSelectionFrame"):
+            if Kernel().worker.getFrameByName("ServerSelectionFrame"):
                 Kernel().worker.removeFrameByName("ServerSelectionFrame")
             PlayedCharacterManager().infos = cssmsg.infos
             DataStoreType.CHARACTER_ID = str(cssmsg.infos.id)
@@ -234,7 +233,6 @@ class GameServerApproachFrame(Frame):
             Kernel().worker.addFrame(SpellInventoryManagementFrame())
             Kernel().worker.addFrame(InventoryManagementFrame())
             Kernel().worker.addFrame(ContextChangeFrame())
-            Kernel().worker.addFrame(ChatFrame())
             Kernel().worker.addFrame(JobsFrame())
             Kernel().worker.addFrame(QuestFrame())
             Kernel().worker.addFrame(AveragePricesFrame())

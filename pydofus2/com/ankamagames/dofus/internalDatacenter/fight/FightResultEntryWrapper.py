@@ -212,7 +212,7 @@ class FightResultEntryWrapper(IDataCenter):
                 monsterInfos = infos
                 monster = Monster.getMonsterById(monsterInfos.creatureGenericId)
                 self.name = monster.name
-                breachFrame = Kernel().worker.getFrame("BreachFrame")
+                breachFrame = Kernel().worker.getFrameByName("BreachFrame")
                 if PlayedCharacterManager().isInBreach and breachFrame and not isSpectator:
                     self.level = breachFrame.floor
                 else:

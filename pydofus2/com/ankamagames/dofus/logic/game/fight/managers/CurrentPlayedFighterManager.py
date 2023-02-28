@@ -2,18 +2,19 @@ from typing import TYPE_CHECKING
 from pydofus2.com.ankamagames.dofus.datacenter.items.Item import Item
 from pydofus2.com.ankamagames.dofus.datacenter.items.criterion.GroupItemCriterion import GroupItemCriterion
 from pydofus2.com.ankamagames.dofus.datacenter.items.criterion.ItemCriterionOperator import ItemCriterionOperator
+from pydofus2.com.ankamagames.dofus.datacenter.items.criterion.StateCriterion import StateCriterion
 from pydofus2.com.ankamagames.dofus.logic.game.fight.managers.SpellModifiersManager import SpellModifiersManager
 from pydofus2.com.ankamagames.dofus.network.ProtocolConstantsEnum import ProtocolConstantsEnum
 from pydofus2.com.ankamagames.dofus.network.enums.CharacterSpellModificationTypeEnum import (
     CharacterSpellModificationTypeEnum,
 )
 from pydofus2.com.ankamagames.jerakine.data.I18n import I18n
-
 if TYPE_CHECKING:
     from pydofus2.com.ankamagames.dofus.datacenter.spells.SpellLevel import SpellLevel
     from pydofus2.com.ankamagames.dofus.internalDatacenter.spells.SpellWrapper import (
         SpellWrapper,
     )
+    from pydofus2.com.ankamagames.dofus.types.entities.AnimatedCharacter import AnimatedCharacter
 from pydofus2.com.ankamagames.dofus.logic.game.common.misc.DofusEntities import DofusEntities
 import pydofus2.com.ankamagames.dofus.logic.game.fight.managers.SpellCastInFightManager as scifm
 from pydofus2.com.ankamagames.dofus.logic.game.fight.types.castSpellManager.SpellManager import (
@@ -23,8 +24,6 @@ from pydofus2.com.ankamagames.dofus.network.types.game.character.characteristic.
     CharacterCharacteristicsInformations,
 )
 from pydofus2.com.ankamagames.jerakine.logger.Logger import Logger
-
-# from pydofus2.com.ankamagames.dofus.datacenter.items.criterion.Item import Item
 from pydofus2.com.ankamagames.dofus.datacenter.spells.SpellState import SpellState
 from pydofus2.com.ankamagames.dofus.internalDatacenter.DataEnum import DataEnum
 from pydofus2.com.ankamagames.dofus.internalDatacenter.stats.EntityStats import EntityStats
@@ -35,13 +34,10 @@ from pydofus2.com.ankamagames.dofus.logic.game.fight.managers.FightersStateManag
 import pydofus2.com.ankamagames.dofus.logic.game.common.managers.PlayedCharacterManager as pcm
 from pydofus2.com.ankamagames.jerakine.metaclasses.Singleton import Singleton
 from pydofus2.damageCalculation.tools.StatIds import StatIds
-from typing import TYPE_CHECKING
-
-if TYPE_CHECKING:
-    from pydofus2.com.ankamagames.dofus.types.entities.AnimatedCharacter import AnimatedCharacter
-
+from pydofus2.com.ankamagames.dofus.kernel.net.ConnectionsHandler import ConnectionsHandler
 
 class CurrentPlayedFighterManager(metaclass=Singleton):
+    
     def __init__(self):
         self._characteristicsInformationsList = dict()
         self._spellCastInFightManagerList = dict()
@@ -49,19 +45,23 @@ class CurrentPlayedFighterManager(metaclass=Singleton):
         self._currentSummonedBomb = dict()
         self._currentFighterIsRealPlayer: bool = True
         self._currentFighterId: float = 0
+        self.playerManager = pcm.PlayedCharacterManager()
+        self.conn = ConnectionsHandler()
         super().__init__()
 
     @property
     def currentFighterId(self) -> float:
         return self._currentFighterId
 
-    @currentFighterId.setter
-    def currentFighterId(self, id: float) -> None:
+    def setCurrentFighterId(self, id: float, playerManager: pcm.PlayedCharacterManager=None) -> None:
         if id == self._currentFighterId:
             return
-        lastFighterId: float = self._currentFighterId
+        lastFighterId = self._currentFighterId
         self._currentFighterId = id
-        playerManager = pcm.PlayedCharacterManager()
+        if not playerManager:
+            playerManager = self.playerManager
+        else:
+            self.playerManager = playerManager
         self._currentFighterIsRealPlayer = self._currentFighterId == playerManager.id
         lastFighterEntity: "AnimatedCharacter" = DofusEntities().getEntity(lastFighterId)
         if lastFighterEntity:
@@ -73,12 +73,13 @@ class CurrentPlayedFighterManager(metaclass=Singleton):
             currentFighterEntity.canSeeThrough = True
             currentFighterEntity.canWalkThrough = True
             currentFighterEntity.canWalkTo = True
-        if playerManager.isFighting:
-            if playerManager.id != id or lastFighterId:
-                pass
+            
+    @currentFighterId.setter
+    def currentFighterId(self, id: float) -> None:
+        self.setCurrentFighterId(id)
 
     def checkPlayableEntity(self, id: float) -> bool:
-        if id == pcm.PlayedCharacterManager().id:
+        if id == self.playerManager.id:
             return True
         return self._characteristicsInformationsList.get(id) != None
 
@@ -86,17 +87,16 @@ class CurrentPlayedFighterManager(metaclass=Singleton):
         return self._currentFighterIsRealPlayer
 
     def resetPlayerSpellList(self) -> None:
-        playerManager = pcm.PlayedCharacterManager()
-        # inventoryManager:InventoryManager = InventoryManager()
-        if playerManager.spellsInventory != playerManager.playerSpellList:
-            Logger().info("Remise à jour de la liste des sorts du joueur")
-            playerManager.spellsInventory = playerManager.playerSpellList
+        if self.playerManager:
+            if self.playerManager.spellsInventory != self.playerManager.playerSpellList:
+                Logger().info(f"Update the player list of spells.")
+                self.playerManager.spellsInventory = self.playerManager.playerSpellList
 
     def setCharacteristicsInformations(self, id: float, characteristics: CharacterCharacteristicsInformations) -> None:
         self._characteristicsInformationsList[id] = characteristics
 
     def getCharacteristicsInformations(self, id: float = 0) -> CharacterCharacteristicsInformations:
-        player = pcm.PlayedCharacterManager()
+        player = self.playerManager
         if id:
             if id == player.id:
                 return player.characteristics
@@ -130,7 +130,7 @@ class CurrentPlayedFighterManager(metaclass=Singleton):
         return totalTurnDurationInSeconds
 
     def getSpellById(self, spellId: int) -> "SpellWrapper":
-        player = pcm.PlayedCharacterManager()
+        player = self.playerManager
         for spellKnown in player.spellsInventory:
             if spellKnown.id == spellId:
                 return spellKnown
@@ -160,7 +160,7 @@ class CurrentPlayedFighterManager(metaclass=Singleton):
             if result:
                 result[0] = I18n.getUiText("ui.fightAutomsg.spellcast.noSpell", [spellName])
             return False
-        player = pcm.PlayedCharacterManager()
+        player = self.playerManager
         if self._currentFighterIsRealPlayer:
             if spellId == 0:
                 if player.currentWeapon:
@@ -212,7 +212,7 @@ class CurrentPlayedFighterManager(metaclass=Singleton):
             if result:
                 result[0] = I18n.getUiText("ui.fightAutomsg.spellcast.needAP", [spellName, apCost])
             return False
-        states: list = FightersStateManager().getStates(self._currentFighterId)
+        states: list = FightersStateManager().getStates(self.currentFighterId)
         if not states:
             states = list()
         for state in states:
@@ -302,15 +302,14 @@ class CurrentPlayedFighterManager(metaclass=Singleton):
         return True
 
     def endFight(self) -> None:
-        if pcm.PlayedCharacterManager().id != self._currentFighterId:
-            self.currentFighterId = pcm.PlayedCharacterManager().id
+        if self.playerManager.id != self.currentFighterId:
+            self.currentFighterId = self.playerManager.id
             self.resetPlayerSpellList()
-            # self.updatePortrait(DofusEntities().getEntity(self._currentFighterId))
         self._currentFighterId = 0
-        self._characteristicsInformationsList = dict()
-        self._spellCastInFightManagerList = dict()
-        self._currentSummonedCreature = dict()
-        self._currentSummonedBomb = dict()
+        self._characteristicsInformationsList.clear()
+        self._spellCastInFightManagerList.clear()
+        self._currentSummonedCreature.clear()
+        self._currentSummonedBomb.clear()
 
     def getCurrentSummonedCreature(self, id: float = None) -> int:
         if id is None:

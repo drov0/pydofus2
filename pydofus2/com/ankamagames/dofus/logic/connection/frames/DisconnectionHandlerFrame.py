@@ -2,7 +2,7 @@ from pydofus2.com.ankamagames.berilia.managers.KernelEventsManager import Kernel
 from pydofus2.com.ankamagames.jerakine.benchmark.BenchmarkTimer import BenchmarkTimer
 from time import perf_counter
 from pydofus2.com.ankamagames.dofus.kernel.Kernel import Kernel
-import pydofus2.com.ankamagames.dofus.kernel.net.ConnectionsHandler as connh
+from pydofus2.com.ankamagames.dofus.kernel.net.ConnectionsHandler import ConnectionsHandler
 from pydofus2.com.ankamagames.dofus.kernel.net.DisconnectionReasonEnum import (
     DisconnectionReasonEnum as Reason,
 )
@@ -45,41 +45,32 @@ class DisconnectionHandlerFrame(Frame):
         self._conxTries = 0
 
     def pushed(self) -> bool:
-        Logger().debug("DisconnectionHandlerFrame pushed")
         return True
 
     def handleUnexpectedNoMsgReceived(self):
         self._conxTries += 1
-        Logger().warn(
+        Logger().error(
             f"The connection was closed unexpectedly. Reconnection attempt {self._conxTries}/{self.MAX_TRIES} will start in 4s."
         )
         self._connectionUnexpectedFailureTimes.append(perf_counter())
         self._timer = BenchmarkTimer(4, self.reconnect)
         self._timer.start()
 
-    @property
-    def connection(self):
-        return self.connHandle.conn
-
-    @property
-    def connHandle(self):
-        return connh.ConnectionsHandler()
-
     def process(self, msg: Message) -> bool:
 
         if isinstance(msg, ServerConnectionClosedMessage):
             gsaF.GameServerApproachFrame.authenticationTicketAccepted = False
-            reason = self.connHandle.handleDisconnection()
-            if self.connHandle.hasReceivedMsg:
+            reason = ConnectionsHandler().handleDisconnection()
+            if ConnectionsHandler().hasReceivedMsg:
                 if (
                     not reason.expected
-                    and not self.connHandle.hasReceivedNetworkMsg
+                    and not ConnectionsHandler().hasReceivedNetworkMsg
                     and self._conxTries < self.MAX_TRIES
                 ):
                     self.handleUnexpectedNoMsgReceived()
                 else:
                     if not reason.expected:
-                        Logger().debug(f"The connection was closed unexpectedly. Reseting.")
+                        Logger().debug(f"[DisconnectionHandler] The connection was closed unexpectedly. Reseting.")
                         self._connectionUnexpectedFailureTimes.append(perf_counter())
                         if self._timer:
                             self._timer.cancel()
@@ -132,7 +123,7 @@ class DisconnectionHandlerFrame(Frame):
             raise Exception(msg.err)
 
     def reconnect(self) -> None:
-        Logger().debug("Reconnecting...")
+        Logger().debug("Reconnecting ...")
         KernelEventsManager().send(KernelEvent.RECONNECT, message="Reconnecting")
 
     def pulled(self) -> bool:

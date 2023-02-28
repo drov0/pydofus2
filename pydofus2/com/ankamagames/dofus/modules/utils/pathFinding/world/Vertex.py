@@ -23,6 +23,12 @@ class Vertex:
     def UID(self) -> float:
         return self._uid
 
+    def __hash__(self) -> int:
+        return self.UID
+    
+    def __eq__(self, o: 'Vertex') -> bool:
+        return self.UID == o.UID
+    
     def __str__(self) -> str:
         return f"Vertex(mapId={self._mapId}, zoneId={self._zoneId}, uid={self._uid})"
 

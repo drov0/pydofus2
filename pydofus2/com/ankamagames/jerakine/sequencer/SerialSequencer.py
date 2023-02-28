@@ -18,13 +18,13 @@ class SerialSequencer(ISequencer, EventDispatcher):
     _defaultStepTimeout: int = -2147483648
 
     def __init__(self, type: str = "SerialSequencerDefault"):
-        self._aStep = list[ISequencable]()
+        self._steps = list[ISequencable]()
         self._activeSubSequenceCount = 0
         self._currentStep: ISequencable = None
         self._lastStep: ISequencable = None
         self._paused: bool = None
         self._running: bool = False
-        self._type: str = None
+        self._type: str = type
         super().__init__()
 
     @property
@@ -37,7 +37,7 @@ class SerialSequencer(ISequencer, EventDispatcher):
 
     @property
     def length(self) -> int:
-        return len(self._aStep)
+        return len(self._steps)
 
     @property
     def running(self) -> bool:
@@ -45,15 +45,7 @@ class SerialSequencer(ISequencer, EventDispatcher):
 
     @property
     def steps(self) -> list:
-        return self._aStep
-
-    @property
-    def defaultStepTimeout(self) -> int:
-        return self._defaultStepTimeout
-
-    @defaultStepTimeout.setter
-    def defaultStepTimeout(self, v: int) -> None:
-        self._defaultStepTimeout = v
+        return self._steps
 
     def pause(self) -> None:
         self._paused = True
@@ -68,17 +60,15 @@ class SerialSequencer(ISequencer, EventDispatcher):
     def add(self, item: ISequencable) -> None:
         if item:
             self.addStep(item)
-        else:
-            Logger().error("Tried to add a null step to the LUA script sequence, self step will be ignored")
 
     def addStep(self, item: ISequencable) -> None:
-        self._aStep.append(item)
+        self._steps.append(item)
 
     def start(self) -> None:
         if not self._running:
-            self._running = len(self._aStep) != 0
+            self._running = len(self._steps) != 0
             if self._running:
-                while len(self._aStep) > 0 and self._running:
+                while self._steps and self._running:
                     self.execute()
                     if (
                         self._currentStep
@@ -86,31 +76,30 @@ class SerialSequencer(ISequencer, EventDispatcher):
                         and not self._currentStep.finished
                     ):
                         self._running = False
-            else:
-                Logger().debug("[Sequencer] start asked but already running")
-                self.dispatch(SequencerEvent.SEQUENCE_END, SequencerEvent(self))
+                if not self._running:
+                    self._running = False
+                    self.dispatch(SequencerEvent.SEQUENCE_END, SequencerEvent(self))
 
     def clear(self) -> None:
-        step: ISequencable = None
         self._lastStep = None
         if self._currentStep:
             self._currentStep.clear()
             self._currentStep = None
-        for step in self._aStep:
+        for step in self._steps:
             if step:
                 step.clear()
-        self._aStep = list()
+        self._steps.clear()
         self._running = False
 
     def __str__(self) -> str:
         res: str = ""
-        for step in self._aStep:
+        for step in self._steps:
             res += str(step) + "\n"
         return res
 
     def execute(self) -> None:
         self._lastStep = self._currentStep
-        self._currentStep = self._aStep.pop(0)
+        self._currentStep = self._steps.pop(0)
         if not self._currentStep:
             return
         self._currentStep.addListener(self)
@@ -118,7 +107,7 @@ class SerialSequencer(ISequencer, EventDispatcher):
             if isinstance(self._currentStep, ISubSequenceSequencable):
                 self._activeSubSequenceCount += 1
                 self._currentStep.add_listener(SequencerEvent.SEQUENCE_END, self.onSubSequenceEnd)
-            if self._defaultStepTimeout != -sys.maxsize + 1 and self._currentStep.hasDefaultTimeout:
+            if self._defaultStepTimeout != -sys.maxsize - 1 and self._currentStep.hasDefaultTimeout:
                 self._currentStep.timeout = self._defaultStepTimeout
             if self.has_listeners(SequencerEvent.SEQUENCE_STEP_START):
                 self.dispatch(
@@ -135,7 +124,7 @@ class SerialSequencer(ISequencer, EventDispatcher):
                 self._currentStep.finished = True
             self.stepFinished(self._currentStep)
 
-    def stepFinished(self, step: ISequencable, withTimout: bool = False) -> None:
+    def stepFinished(self, step: ISequencable) -> None:
         step.removeListener(self)
         if self._running:
             if self.has_listeners(SequencerEvent.SEQUENCE_STEP_FINISH):
@@ -143,9 +132,9 @@ class SerialSequencer(ISequencer, EventDispatcher):
                     SequencerEvent.SEQUENCE_STEP_FINISH,
                     SequencerEvent(self, self._currentStep),
                 )
-            self._running = len(self._aStep) != 0
+            self._running = len(self._steps) != 0
             if not self._running:
-                if not self._activeSubSequenceCount:
+                if self._activeSubSequenceCount < 1:
                     self.dispatch(SequencerEvent.SEQUENCE_END, SequencerEvent(self))
                 else:
                     self._running = True
@@ -156,6 +145,6 @@ class SerialSequencer(ISequencer, EventDispatcher):
 
     def onSubSequenceEnd(self, e: SequencerEvent) -> None:
         self._activeSubSequenceCount -= 1
-        if not self._activeSubSequenceCount and len(self._aStep) <= 0:
+        if not self._activeSubSequenceCount and len(self._steps) == 0:
             self._running = False
             self.dispatch(SequencerEvent.SEQUENCE_END, SequencerEvent(self))

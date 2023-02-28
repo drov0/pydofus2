@@ -52,7 +52,7 @@ class SynchronisationFrame(Frame):
             return True
 
         if isinstance(msg, CurrentMapMessage):
-            rplmvf: "RoleplayMovementFrame" = Kernel().worker.getFrame("RoleplayMovementFrame")
+            rplmvf: "RoleplayMovementFrame" = Kernel().worker.getFrameByName("RoleplayMovementFrame")
             if rplmvf and rplmvf._changeMapTimeout:
                 rplmvf._changeMapTimeout.cancel()
                 rplmvf._wantToChangeMap = None
@@ -61,7 +61,7 @@ class SynchronisationFrame(Frame):
 
         if isinstance(msg, GameContextCreateMessage):
             if msg.context == GameContextEnum.FIGHT:
-                rplmvf: "RoleplayMovementFrame" = Kernel().worker.getFrame("RoleplayMovementFrame")
+                rplmvf: "RoleplayMovementFrame" = Kernel().worker.getFrameByName("RoleplayMovementFrame")
                 if rplmvf and rplmvf._requestFightTimeout:
                     rplmvf._requestFightTimeout.cancel()
                     rplmvf._requestFighFails = 0

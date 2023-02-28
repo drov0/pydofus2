@@ -1,8 +1,6 @@
-from build.lib.pydofus2.com.ankamagames.berilia.managers.KernelEventsManager import KernelEvts
-
-import pydofus2.com.ankamagames.dofus.kernel.Kernel as krnl
-import pydofus2.com.ankamagames.dofus.kernel.net.ConnectionsHandler as connh
-from pydofus2.com.ankamagames.berilia.managers.KernelEventsManager import KernelEventsManager
+from pydofus2.com.ankamagames.dofus.kernel.Kernel import Kernel
+from pydofus2.com.ankamagames.dofus.kernel.net.ConnectionsHandler import ConnectionsHandler
+from pydofus2.com.ankamagames.berilia.managers.KernelEventsManager import KernelEventsManager, KernelEvent
 from pydofus2.com.ankamagames.dofus.network.messages.common.basic.BasicPingMessage import BasicPingMessage
 from pydofus2.com.ankamagames.dofus.network.messages.handshake.ProtocolRequired import ProtocolRequired
 from pydofus2.com.ankamagames.dofus.network.Metadata import Metadata
@@ -14,11 +12,9 @@ from pydofus2.com.ankamagames.jerakine.messages.Message import Message
 from pydofus2.com.ankamagames.jerakine.network.INetworkMessage import INetworkMessage
 from pydofus2.com.ankamagames.jerakine.types.enums.Priority import Priority
 
-
 class HandshakeFrame(Frame):
-
+    
     TIMEOUT_DELAY: int = 20
-
     TIMEOUT_REPEAT_COUNT: int = 1
 
     def __init__(self):
@@ -31,25 +27,25 @@ class HandshakeFrame(Frame):
         )
         if not serverVersion or not Metadata.PROTOCOL_BUILD:
             KernelEventsManager().send(
-                KernelEvts.CRASH, "MALFORMED_PROTOCOL: A protocol version is empty or None. What happened?"
+                KernelEvent.CRASH, "MALFORMED_PROTOCOL: A protocol version is empty or None. What happened ?"
             )
             return
         clientHash: str = self.extractHashFromProtocolVersion(Metadata.PROTOCOL_BUILD)
         if not clientHash:
-            logger.fatal("[HandShake] The client protocol version is malformed: " + Metadata.PROTOCOL_BUILD)
+            Logger().debug(f"[HandShake] The client protocol version is malformed: {Metadata.PROTOCOL_BUILD}")
             KernelEventsManager().send(
-                KernelEvts.CRASH, "MALFORMED_PROTOCOL: The client protocol version is malformed"
+                KernelEvent.CRASH, "MALFORMED_PROTOCOL: The client protocol version is malformed"
             )
             return
         serverHash: str = self.extractHashFromProtocolVersion(serverVersion)
         if not serverHash:
             KernelEventsManager().send(
-                KernelEvts.CRASH, "MALFORMED_PROTOCOL: The server protocol version is malformed"
+                KernelEvent.CRASH, "MALFORMED_PROTOCOL: The server protocol version is malformed"
             )
             return
         if clientHash != serverHash:
             KernelEventsManager().send(
-                KernelEvts.CRASH, "PROTOCOL_MISMATCH: The server protocol is different from the client protocol"
+                KernelEvent.CRASH, "PROTOCOL_MISMATCH: The server protocol is different from the client protocol"
             )
             return
 
@@ -66,20 +62,21 @@ class HandshakeFrame(Frame):
         return Priority.HIGHEST
 
     def pushed(self) -> bool:
-        connh.ConnectionsHandler().hasReceivedNetworkMsg = False
+        ConnectionsHandler().hasReceivedNetworkMsg = False
         return True
 
     def process(self, msg: Message) -> bool:
-        connh.ConnectionsHandler().hasReceivedMsg = True
+        ConnectionsHandler().hasReceivedMsg = True
 
         if isinstance(msg, INetworkMessage):
+            ConnectionsHandler().hasReceivedNetworkMsg = True
             if self._timeoutTimer:
                 self._timeoutTimer.cancel()
 
         if isinstance(msg, ProtocolRequired):
             prmsg = msg
             self.checkProtocolVersions(prmsg.version)
-            krnl.Kernel().worker.removeFrame(self)
+            Kernel().worker.removeFrame(self)
             return True
 
         elif isinstance(msg, ConnectedMessage):
@@ -91,7 +88,7 @@ class HandshakeFrame(Frame):
 
     def onTimeout(self) -> None:
         pingMsg: BasicPingMessage = BasicPingMessage(quiet_=True)
-        connh.ConnectionsHandler().send(pingMsg)
+        ConnectionsHandler().send(pingMsg)
 
     def pulled(self) -> bool:
         if self._timeoutTimer is not None:

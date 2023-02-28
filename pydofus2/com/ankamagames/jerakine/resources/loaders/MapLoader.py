@@ -15,11 +15,10 @@ class MapLoader:
 
     @classmethod
     @lru_cache(maxsize=5)
-    @MemoryProfiler.track_memory("MapLoader.load")
     def load(cls, mapId, key=None):
         with lock:
             if key is not None:
-                cls._reader.setKey(key)
+                cls.reader.setKey(key)
             map_p = Path(Constants.MAPS_PATH) / MapLoader.getMapURI(mapId)
             if not map_p.exists():
                 raise Exception(f"Map {mapId} not found in path {map_p}")

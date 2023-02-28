@@ -33,16 +33,12 @@ class ContextChangeFrame(Frame):
             self.currentContext = msg.context
             if self.currentContext == GameContextEnum.ROLE_PLAY:
                 import pydofus2.com.ankamagames.dofus.logic.game.roleplay.frames.RoleplayContextFrame as rplCF
-
                 Kernel().worker.addFrame(rplCF.RoleplayContextFrame())
 
             elif self.currentContext == GameContextEnum.FIGHT:
                 import pydofus2.com.ankamagames.dofus.logic.game.fight.frames.FightContextFrame as fcf
-
-                Kernel().worker.addFrame(fcf.FightContextFrame())
-
-            else:
-                Kernel().panic(PanicMessages.WRONG_CONTEXT_CREATED, [self.currentContext])
+                if not Kernel()._mule:
+                    Kernel().worker.addFrame(fcf.FightContextFrame())
 
             return False
 

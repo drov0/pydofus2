@@ -170,9 +170,7 @@ class AuthentificationFrame(Frame):
             return True
 
     def pushed(self) -> bool:
-        Logger().debug("[Auth] LoginFrame started")
         return True
 
     def pulled(self) -> bool:
-        Logger().debug("[Auth] LoginFrame finished")
         return True

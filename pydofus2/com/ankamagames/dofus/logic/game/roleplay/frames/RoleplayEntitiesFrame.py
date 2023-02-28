@@ -220,7 +220,7 @@ class RoleplayEntitiesFrame(AbstractEntitiesFrame, Frame):
             else:
                 self._worldPoint = WorldPointWrapper(int(mcidmsg.mapId))
 
-            roleplayContextFrame: rcf.RoleplayContextFrame = Kernel().worker.getFrame("RoleplayContextFrame")
+            roleplayContextFrame: rcf.RoleplayContextFrame = Kernel().worker.getFrameByName("RoleplayContextFrame")
             previousMap = PlayedCharacterManager().currentMap
             if (
                 roleplayContextFrame.newCurrentMapIsReceived
@@ -313,7 +313,7 @@ class RoleplayEntitiesFrame(AbstractEntitiesFrame, Frame):
                         mo.state == MapObstacleStateEnum.OBSTACLE_OPENED,
                     )
 
-            rpIntFrame: rif.RoleplayInteractivesFrame = Kernel().worker.getFrame("RoleplayInteractivesFrame")
+            rpIntFrame: rif.RoleplayInteractivesFrame = Kernel().worker.getFrameByName("RoleplayInteractivesFrame")
             if rpIntFrame:
                 imumsg = InteractiveMapUpdateMessage()
                 imumsg.init(mcidmsg.interactiveElements)
@@ -390,7 +390,7 @@ class RoleplayEntitiesFrame(AbstractEntitiesFrame, Frame):
                 del self._merchantsList[merchant_index]
 
             if msg.id in self._monstersIds:
-                rpmf: "RoleplayMovementFrame" = Kernel().worker.getFrame("RolePlayMovementFrame")
+                rpmf: "RoleplayMovementFrame" = Kernel().worker.getFrameByName("RolePlayMovementFrame")
                 if rpmf and rpmf._followingMonsterGroup == msg.id:
                     rpmf.onAttackMonsterGroupTimeout(msg.id)
                 self._monstersIds.remove(msg.id)

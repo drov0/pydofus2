@@ -1,3 +1,5 @@
+from pydofus2.com.ankamagames.berilia.managers.KernelEventsManager import KernelEvent
+from pydofus2.com.ankamagames.berilia.managers.KernelEventsManager import KernelEventsManager
 from pydofus2.com.ankamagames.dofus.logic.game.fight.steps.IFightStep import IFightStep
 from pydofus2.com.ankamagames.dofus.kernel.Kernel import Kernel
 from pydofus2.com.ankamagames.dofus.logic.game.common.misc.DofusEntities import DofusEntities
@@ -39,7 +41,7 @@ class FightEntityMovementStep(AbstractSequencable, IFightStep):
         self._entityId = entityId
         self._path = path
         self.timeout = len(path)
-        self._fightContextFrame: "FightContextFrame" = Kernel().worker.getFrame("FightContextFrame")
+        self._fightContextFrame: "FightContextFrame" = Kernel().worker.getFrameByName("FightContextFrame")
 
     @property
     def stepType(self) -> str:
@@ -49,7 +51,7 @@ class FightEntityMovementStep(AbstractSequencable, IFightStep):
         self._entity = DofusEntities().getEntity(self._entityId)
         if self._entity:
             fighterInfos = FightEntitiesFrame.getCurrentInstance().getEntityInfos(self._entityId)
-            ftf: "FightTurnFrame" = Kernel().worker.getFrame("FightTurnFrame")
+            ftf: "FightTurnFrame" = Kernel().worker.getFrameByName("FightTurnFrame")
             if ftf._playerEntity:
                 ftf._playerEntity.position.cellId = self._path.end.cellId
             self._entity.position.cellId = self._path.end.cellId
@@ -57,13 +59,14 @@ class FightEntityMovementStep(AbstractSequencable, IFightStep):
         else:
             Logger().warn(f"Unable to move unknown entity {self._entityId}.")
         self.movementEnd()
+        KernelEventsManager().send(KernelEvent.FIGHTER_MOVEMENT_APPLIED, self._entityId)
 
     @property
     def targets(self) -> list[float]:
         return [self._entityId]
 
     def updateCarriedEntitiesPosition(self) -> None:
-        entitiesFrame: "FightEntitiesFrame" = Kernel().worker.getFrame("FightEntitiesFrame")
+        entitiesFrame: "FightEntitiesFrame" = Kernel().worker.getFrameByName("FightEntitiesFrame")
         carriedEntity: "AnimatedCharacter" = self._entity.carriedEntity
         while carriedEntity:
             infos = entitiesFrame.getEntityInfos(carriedEntity.id)

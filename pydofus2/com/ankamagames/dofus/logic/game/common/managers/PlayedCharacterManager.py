@@ -217,7 +217,7 @@ class PlayedCharacterManager(IDestroyable, metaclass=Singleton):
     def isInFight(self) -> bool:
         from pydofus2.com.ankamagames.dofus.kernel.Kernel import Kernel
 
-        return Kernel().worker.getFrame("FightContextFrame")
+        return Kernel().worker.getFrameByName("FightContextFrame")
 
     @property
     def isInKoli(self) -> bool:
@@ -226,7 +226,7 @@ class PlayedCharacterManager(IDestroyable, metaclass=Singleton):
         )
         from pydofus2.com.ankamagames.dofus.kernel.Kernel import Kernel
 
-        fightContextFrame: FightContextFrame = Kernel().worker.getFrame("FightContextFrame")
+        fightContextFrame: FightContextFrame = Kernel().worker.getFrameByName("FightContextFrame")
         return fightContextFrame and fightContextFrame.isKolossium
 
     @property
@@ -438,3 +438,8 @@ class PlayedCharacterManager(IDestroyable, metaclass=Singleton):
             if not (job.jobLevel != 1 and onlyLevelOne):
                 length += 1
         return length
+
+    def getSpellById(self, spellId: int) -> "SpellWrapper":
+        for spellw in self.playerSpellList:
+            if spellw.id == spellId:
+                return spellw

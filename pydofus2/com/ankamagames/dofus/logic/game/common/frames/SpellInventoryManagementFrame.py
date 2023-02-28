@@ -50,20 +50,21 @@ from pydofus2.com.ankamagames.dofus.uiApi.PlayedCharacterApi import PlayedCharac
 from pydofus2.com.ankamagames.jerakine.logger.Logger import Logger
 from pydofus2.com.ankamagames.jerakine.messages.Frame import Frame
 from pydofus2.com.ankamagames.jerakine.messages.Message import Message
-from pydofus2.com.ankamagames.jerakine.metaclasses.Singleton import Singleton
+from pydofus2.com.ankamagames.jerakine.metaclasses.ThreadSharedSingleton import ThreadSharedSingleton
 from pydofus2.com.ankamagames.jerakine.types.enums.Priority import Priority
 
 
-class SpellInventoryManagementFrame(Frame, metaclass=Singleton):
+class SpellInventoryManagementFrame(Frame, metaclass=ThreadSharedSingleton):
+    
     def __init__(self):
         self._fullSpellList = dict[int, list[SpellWrapper]]()
         self._spellsGlobalCooldowns = dict[int, list[GameFightSpellCooldown]]()
         super().__init__()
 
     def generateCurrentCustomModeBreedSpells(self) -> list:
-        customSpells: list = []
-        playerBreed: int = PlayedCharacterApi.getPlayedCharacterInfo().breed
-        spellsInventory: list[SpellWrapper] = PlayedCharacterApi.getSpellInventory()
+        customSpells = []
+        playerBreed = PlayedCharacterApi.getPlayedCharacterInfo().breed
+        spellsInventory = PlayedCharacterApi.getSpellInventory()
         allSpellIds: list = PlayedCharacterApi.getCustomModeSpellIds()
         for spellWrapper in spellsInventory:
             spellId = spellWrapper.spell.id
@@ -81,6 +82,7 @@ class SpellInventoryManagementFrame(Frame, metaclass=Singleton):
         return True
 
     def process(self, msg: Message) -> bool:
+        
         if isinstance(msg, SpellListMessage):
             slmsg = msg
             alternativeBreedSpells = FeatureManager().isFeatureWithKeywordEnabled("character.spell.breed.alternative")
@@ -89,8 +91,8 @@ class SpellInventoryManagementFrame(Frame, metaclass=Singleton):
             idsList = list()
             for spell in slmsg.spells:
                 spellData = Spell.getSpellById(spell.spellId)
-                if spellData == None:
-                    raise Exception("Unknown spell with id " + str(spell.spellId))
+                if spellData is None:
+                    raise Exception(f"Spell with id {spell.spellId} not found")
                 elif not spellData.spellVariant:
                     self._fullSpellList[playerId].append(
                         SpellWrapper.create(

@@ -172,7 +172,7 @@ class FightContextFrame(Frame):
     def __init__(self):
         self.preFightIsActive: bool = True
         self._hiddenEntites = []
-        self._fightersPositionsHistory = dict()
+        self._fightersPositionsHistory = dict[int, list]()
         self._fightersRoundStartPosition = dict()
         self.onlyTheOtherTeamCanPlace: bool = False
         self.currentCell: int = -1
@@ -354,14 +354,14 @@ class FightContextFrame(Frame):
             return False
 
         elif isinstance(msg, MapLoadedMessage):
-            Logger().debug(f"[FightContext] Fight map Loaded")
+            Logger().info(f"[FightContext] Fight map Loaded")
             gcrmsg = GameContextReadyMessage()
-            gcrmsg.init(mdm.MapDisplayManager().currentMapPoint.mapId)
+            gcrmsg.init(int(mdm.MapDisplayManager().currentMapPoint.mapId))
             ConnectionsHandler().send(gcrmsg)
             return True
 
         elif isinstance(msg, GameFightResumeMessage):
-            Logger().debug(f"[FightContext] Fight resumed after disconnect")
+            Logger().info(f"[FightContext] Fight resumed after disconnect")
             gfrmsg = msg
             playerId = PlayedCharacterManager().id
             CurrentPlayedFighterManager().setCurrentSummonedCreature(gfrmsg.summonCount, playerId)
@@ -383,9 +383,9 @@ class FightContextFrame(Frame):
                 spellCastManager.currentTurn = gfrmsg.gameTurn
                 spellCastManager.updateCooldowns(cd.spellCooldowns)
                 if cd.slaveId != playerId:
-                    CurrentPlayedFighterManager().setCurrentSummonedCreature(cd.summonCount, cd.slaveId)
-                    CurrentPlayedFighterManager().setCurrentSummonedBomb(cd.bombCount, cd.slaveId)
-            castingSpellPool = dict()
+                    playedFighterManager.setCurrentSummonedCreature(cd.summonCount, cd.slaveId)
+                    playedFighterManager.setCurrentSummonedBomb(cd.bombCount, cd.slaveId)
+            castingSpellPool = dict[int, dict[int, dict[int, CastingSpell]]]()
             for buff in gfrmsg.effects:
                 if not castingSpellPool.get(buff.effect.targetId):
                     castingSpellPool[buff.effect.targetId] = {}
@@ -517,13 +517,15 @@ class FightContextFrame(Frame):
         return False
 
     def pulled(self) -> bool:
+        self._fightersRoundStartPosition.clear()
+        self._fightersPositionsHistory.clear()
         if self._battleFrame:
             Kernel().worker.removeFrame(self._battleFrame)
         if self._entitiesFrame:
             Kernel().worker.removeFrame(self._entitiesFrame)
         if self._preparationFrame:
             Kernel().worker.removeFrame(self._preparationFrame)
-        simf: "SpellInventoryManagementFrame" = Kernel().worker.getFrame("SpellInventoryManagementFrame")
+        simf: "SpellInventoryManagementFrame" = Kernel().worker.getFrameByName("SpellInventoryManagementFrame")
         if simf:
             simf.deleteSpellsGlobalCoolDownsData()
         PlayedCharacterManager().isSpectator = False
@@ -567,12 +569,6 @@ class FightContextFrame(Frame):
     def setFighterRoundStartPosition(self, pFighterId: float, cellId: int) -> int:
         self._fightersRoundStartPosition[pFighterId] = cellId
         return cellId
-
-    def refreshTimelineOverEntityInfos(self) -> None:
-        if self._timelineOverEntity and self._timelineOverEntityId:
-            entity = DofusEntities().getEntity(self._timelineOverEntityId)
-            if entity and entity.position:
-                FightContextFrame.currentCell = entity.position.cellId
 
     def getFighterInfos(self, fighterId: float) -> GameFightFighterInformations:
         return self.entitiesFrame.getEntityInfos(fighterId)

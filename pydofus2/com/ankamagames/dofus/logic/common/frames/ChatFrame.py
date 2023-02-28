@@ -2,6 +2,7 @@ from pydofus2.com.ankamagames.dofus.datacenter.communication.InfoMessage import 
 from pydofus2.com.ankamagames.dofus.misc.utils.ParamsDecoder import ParamsDecoder
 from pydofus2.com.ankamagames.dofus.network.enums.TextInformationTypeEnum import TextInformationTypeEnum
 from pydofus2.com.ankamagames.dofus.network.messages.game.basic.TextInformationMessage import TextInformationMessage
+from pydofus2.com.ankamagames.dofus.network.messages.server.basic.SystemMessageDisplayMessage import SystemMessageDisplayMessage
 from pydofus2.com.ankamagames.jerakine.data.I18n import I18n
 from pydofus2.com.ankamagames.jerakine.logger.Logger import Logger
 from pydofus2.com.ankamagames.jerakine.messages.Frame import Frame
@@ -25,7 +26,11 @@ class ChatFrame(Frame):
         return True
 
     def process(self, msg):
-
+        
+        if isinstance(msg, SystemMessageDisplayMessage):
+            self.systemMessageDisplay(msg)
+            return True
+        
         if isinstance(msg, TextInformationMessage):
             timsg = msg
             param = []
@@ -58,3 +63,17 @@ class ChatFrame(Frame):
             return False
 
         return False
+
+    def systemMessageDisplay(self, msg : SystemMessageDisplayMessage):
+        a = msg.parameters
+        if InfoMessage.getInfoMessageById(40000 + msg.msgId) and InfoMessage.getInfoMessageById(40000 + msg.msgId).textId:
+            textId = InfoMessage.getInfoMessageById(40000 + msg.msgId).textId
+        else:
+            Logger().error("Information message " + str(40000 + msg.msgId) + " cannot be found.")
+            textId = InfoMessage.getInfoMessageById(207).textId
+            a = [msg.msgId]
+        msgContent = I18n.getText(textId);
+        if msgContent:
+            msgContent = ParamsDecoder.applyParams(msgContent, a)
+            Logger().warn(f"[{I18n.getUiText('ui.popup.warning')}] | {msgContent}")
+            return

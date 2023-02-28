@@ -38,11 +38,11 @@ class FightDispellSpellStep(AbstractSequencable, IFightStep):
                 refreshEntityLook = True
         BuffManager().dispellSpell(self._fighterId, self._spellId, True)
         if refreshEntityLook:
-            entitiesFrame: "FightEntitiesFrame" = Kernel().worker.getFrame("FightEntitiesFrame")
+            entitiesFrame: "FightEntitiesFrame" = Kernel().worker.getFrameByName("FightEntitiesFrame")
             fighterInfos = entitiesFrame.getEntityInfos(self._fighterId)
             gcrelmsg = GameContextRefreshEntityLookMessage()
             gcrelmsg.init(self._fighterId, fighterInfos.look)
-            Kernel().worker.getFrame("FightEntitiesFrame").process(gcrelmsg)
+            Kernel().worker.getFrameByName("FightEntitiesFrame").process(gcrelmsg)
         self.executeCallbacks()
 
     @property

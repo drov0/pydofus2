@@ -57,7 +57,7 @@ class FightTeam(GameContextActorInformations):
         partyMember: PartyMemberWrapper = None
         fightTeamMember: FightTeamMemberInformations = None
         teamHasGroupMember: bool = False
-        pmf: PartyManagementFrame = Kernel().worker.getFrame("PartyManagementFrame")
+        pmf: PartyManagementFrame = Kernel().worker.getFrameByName("PartyManagementFrame")
         partyMemberNames: list[str] = list[str]()
         for partyMember in pmf.partyMembers:
             partyMemberNames.append(partyMember.name)

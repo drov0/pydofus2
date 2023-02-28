@@ -1,5 +1,6 @@
 from types import FunctionType
 from typing import TYPE_CHECKING
+from pydofus2.com.ankamagames.berilia.managers.KernelEventsManager import KernelEvent, KernelEventsManager
 
 import pydofus2.com.ankamagames.dofus.internalDatacenter.spells.SpellWrapper as spellwrapper
 import pydofus2.com.ankamagames.dofus.logic.game.common.frames.PlayedCharacterUpdatesFrame as pcuF
@@ -8,7 +9,6 @@ import pydofus2.com.ankamagames.dofus.logic.game.fight.frames.FightSequenceFrame
 import pydofus2.com.ankamagames.dofus.logic.game.fight.managers.BuffManager as bffm
 from pydofus2.com.ankamagames.atouin.utils.DataMapProvider import DataMapProvider
 from pydofus2.com.ankamagames.dofus.kernel.Kernel import Kernel
-from pydofus2.com.ankamagames.dofus.kernel.net.ConnectionsHandler import ConnectionsHandler
 from pydofus2.com.ankamagames.dofus.logic.game.common.frames.SpellInventoryManagementFrame import (
     SpellInventoryManagementFrame,
 )
@@ -28,6 +28,7 @@ from pydofus2.com.ankamagames.dofus.logic.game.fight.managers.SpellModifiersMana
 from pydofus2.com.ankamagames.dofus.logic.game.fight.miscs.FightEntitiesHolder import FightEntitiesHolder
 from pydofus2.com.ankamagames.dofus.logic.game.fight.types.StatBuff import StatBuff
 from pydofus2.com.ankamagames.dofus.logic.game.fight.types.TriggeredBuff import TriggeredBuff
+from pydofus2.com.ankamagames.dofus.misc.utils.GameDebugManager import GameDebugManager
 from pydofus2.com.ankamagames.dofus.network.messages.game.actions.fight.GameActionFightDeathMessage import (
     GameActionFightDeathMessage,
 )
@@ -112,15 +113,12 @@ class FightBattleFrame(Frame):
     FIGHT_SEQUENCER_NAME: str = "FightBattleSequencer"
 
     def __init__(self):
-        self._playerTargetedEntitiesList = list[float]()
-        self.isFightAboutToEnd: bool = False
         self._sequenceFrameSwitcher: FightSequenceSwitcherFrame = None
         self._turnFrame: FightTurnFrame = None
         self._currentSequenceFrame: fseqf.FightSequenceFrame = None
         self._sequenceFrames: list[fseqf.FightSequenceFrame] = []
         self._executingSequence: bool = False
         self._confirmTurnEnd: bool = None
-        self._endBattle: bool = False
         self._battleResults: GameFightEndMessage = None
         self._refreshTurnsList: bool = None
         self._newTurnsList: list[float] = None
@@ -128,18 +126,14 @@ class FightBattleFrame(Frame):
         self._turnsList: list[float] = None
         self._deadTurnsList: list[float] = []
         self._fightIsPaused: bool = False
-        self._deathPlayingNumber: int = 0
         self._synchroniseFighters: list[GameFightFighterInformations] = None
         self._synchroniseFightersInstanceId: int = 4.294967295e9
         self._neverSynchronizedBefore: bool = True
         self._delayCslmsg: CharacterStatsListMessage = None
-        self._playerNewTurn: AnimatedCharacter = None
         self._turnsCount: int = 0
         self._destroyed: bool = False
-        self._playingSlaveEntity: bool = False
         self._lastPlayerId: float = None
         self._nextLastPlayerId: float = None
-        self._currentPlayerId: float = None
         self._masterId: float = None
         self._slaveId: float = None
         self._autoEndTurn: bool = False
@@ -173,22 +167,12 @@ class FightBattleFrame(Frame):
         self._deadTurnsList = deadTurnList
 
     @property
-    def targetedEntities(self) -> list[float]:
-        return self._playerTargetedEntitiesList
-
-    @property
     def turnsCount(self) -> int:
         return self._turnsCount
 
     @turnsCount.setter
     def turnsCount(self, turn: int) -> None:
         self._turnsCount = turn
-
-    @property
-    def currentPlayerId(self) -> float:
-        if self._currentPlayerId is None:
-            return PlayedCharacterManager().id
-        return self._currentPlayerId
 
     @property
     def executingSequence(self) -> bool:
@@ -199,10 +183,6 @@ class FightBattleFrame(Frame):
         return self._currentSequenceFrame
 
     @property
-    def playingSlaveEntity(self) -> bool:
-        return self._playingSlaveEntity
-
-    @property
     def slaveId(self) -> float:
         return self._slaveId
 
@@ -210,17 +190,8 @@ class FightBattleFrame(Frame):
     def masterId(self) -> float:
         return self._masterId
 
-    @property
-    def deathPlayingNumber(self) -> int:
-        return self._deathPlayingNumber
-
-    @deathPlayingNumber.setter
-    def deathPlayingNumber(self, n: int) -> None:
-        self._deathPlayingNumber = n
-
     def pushed(self) -> bool:
         self._turnFrame = FightTurnFrame()
-        self._playingSlaveEntity = False
         self._sequenceFrames = []
         DataMapProvider().isInFight = True
         Kernel().worker.addFrame(self._turnFrame)
@@ -233,9 +204,6 @@ class FightBattleFrame(Frame):
         if isinstance(msg, GameFightTurnListMessage):
             gftmsg = msg
             if self._executingSequence or self._currentSequenceFrame:
-                Logger().warn(
-                    "There was a turns list update during self sequence... Let's wait it to finish before doing it."
-                )
                 self._refreshTurnsList = True
                 self._newTurnsList = gftmsg.ids
                 self._newDeadTurnsList = gftmsg.deadsIds
@@ -258,7 +226,7 @@ class FightBattleFrame(Frame):
                 self._synchroniseFightersInstanceId = fseqf.FightSequenceFrame.currentInstanceId
             else:
                 self.gameFightSynchronize(gftcimsg.fighters)
-            return False
+            return True
 
         elif isinstance(msg, GameActionUpdateEffectTriggerCountMessage):
             gauetcmsg = msg
@@ -271,101 +239,14 @@ class FightBattleFrame(Frame):
                         buffTriggered.triggerCount = effectTrigger.count
             return True
 
-        elif isinstance(msg, SlaveSwitchContextMessage):
-            sscmsg = msg
-            playerId = PlayedCharacterManager().id
-            if sscmsg.masterId == playerId:
-                self._masterId = sscmsg.masterId
-                self._slaveId = sscmsg.slaveId
-                if not self._currentPlayerId and self._turnsList.index(self._masterId) > self._turnsList.index(
-                    self._slaveId
-                ):
-                    self.prepareNextPlayableCharacter(self._masterId)
-            return False
-
         elif isinstance(msg, SlaveNoLongerControledMessage):
             snlcmsg = msg
             playerId = PlayedCharacterManager().id
             if snlcmsg.masterId != playerId and self._slaveId == snlcmsg.slaveId:
                 self._masterId = playerId
                 self._slaveId = self._masterId
-                self.prepareNextPlayableCharacter(playerId)
                 self._slaveId = 0
             return False
-
-        elif isinstance(msg, GameFightTurnStartMessage):
-            fightEntitesFrame: "fenf.FightEntitiesFrame" = Kernel().worker.getFrame("FightEntitiesFrame")
-            gftsmsg = msg
-            playerId = PlayedCharacterManager().id
-            self._currentPlayerId = gftsmsg.id
-            if not self._lastPlayerId:
-                self._lastPlayerId = self._currentPlayerId
-            if self._currentPlayerId == playerId:
-                self._slaveId = 0
-            self._playingSlaveEntity = gftsmsg.id == self._slaveId
-            self._turnFrame.turnDuration = gftsmsg.waitTime * 0.1
-            isResumeMessage = isinstance(msg, GameFightTurnResumeMessage)
-            if not isResumeMessage:
-                bffm.BuffManager().decrementDuration(gftsmsg.id)
-                bffm.BuffManager().resetTriggerCount(gftsmsg.id)
-            else:
-                currentPlayedFighterId = CurrentPlayedFighterManager().currentFighterId
-                nextPlayable = self.getNextPlayableCharacterId()
-                if (
-                    self._slaveId
-                    and self._currentPlayerId != currentPlayedFighterId
-                    and (self._slaveId == self._currentPlayerId or nextPlayable == self._slaveId)
-                ):
-                    Logger().debug(f"Slave {self._slaveId} is now controlling the fight.")
-                    self.prepareNextPlayableCharacter(self._masterId)
-            if gftsmsg.id > 0 or self._playingSlaveEntity:
-                entityInfo = fightEntitesFrame.getEntityInfos(gftsmsg.id)
-                if (
-                    entityInfo
-                    and entityInfo.disposition.cellId != -1
-                    and not FightEntitiesHolder().getEntity(gftsmsg.id)
-                ):
-                    entity: AnimatedCharacter = DofusEntities().getEntity(gftsmsg.id)
-                    self._playerNewTurn = entity
-            deadEntityInfo: GameFightFighterInformations = fightEntitesFrame.getEntityInfos(gftsmsg.id)
-            if (
-                (gftsmsg.id == playerId or self._playingSlaveEntity)
-                and deadEntityInfo
-                and deadEntityInfo.spawnInfo.alive
-            ):
-                CurrentPlayedFighterManager().currentFighterId = gftsmsg.id
-                spellwrapper.SpellWrapper.refreshAllPlayerSpellHolder(gftsmsg.id)
-                self._turnFrame.myTurn = True
-            else:
-                self._turnFrame.myTurn = False
-            if gftsmsg.id == playerId or self._playingSlaveEntity:
-                alivePlayers = 0
-                for en in fightEntitesFrame.entities.values():
-                    if isinstance(en, GameFightCharacterInformations) and en.spawnInfo.alive and en.contextualId > 0:
-                        alivePlayers += 1
-            self.removeSavedPosition(gftsmsg.id)
-            entitiesIds = fightEntitesFrame.getEntitiesIdsList()
-            for entityId in entitiesIds:
-                fighterInfos: "GameFightFighterInformations" = fightEntitesFrame.getEntityInfos(entityId)
-                if fighterInfos and fighterInfos.stats.summoner == gftsmsg.id:
-                    self.removeSavedPosition(entityId)
-            return False
-
-        elif isinstance(msg, GameFightTurnEndMessage):
-            gftemsg = msg
-            if not self._confirmTurnEnd:
-                self._lastPlayerId = gftemsg.id
-            else:
-                self._nextLastPlayerId = gftemsg.id
-            entityInfos = fenf.FightEntitiesFrame.getCurrentInstance().getEntityInfos(gftemsg.id)
-            if isinstance(entityInfos, GameFightFighterInformations) and not entityInfos:
-                bffm.BuffManager().markFinishingBuffs(gftemsg.id)
-                if gftemsg.id == CurrentPlayedFighterManager().currentFighterId:
-                    CurrentPlayedFighterManager().getSpellCastManager().nextTurn()
-                    spellwrapper.SpellWrapper.refreshAllPlayerSpellHolder(gftemsg.id)
-            if gftemsg.id == CurrentPlayedFighterManager().currentFighterId:
-                self._turnFrame.myTurn = False
-            return True
 
         elif isinstance(msg, SequenceStartMessage):
             self._autoEndTurn = False
@@ -379,7 +260,7 @@ class FightBattleFrame(Frame):
         elif isinstance(msg, SequenceEndMessage):
             semsg = msg
             if not self._currentSequenceFrame:
-                Logger().warn("Wow wow wow, I've got a Sequence End but no Sequence Start? What the hell?")
+                Logger().warn("Wow wow wow, I got a Sequence End but no Sequence Start? What the hell?")
                 return True
             self._currentSequenceFrame.mustAck = semsg.authorId == int(CurrentPlayedFighterManager().currentFighterId)
             self._currentSequenceFrame.ackIdent = semsg.actionId
@@ -396,10 +277,6 @@ class FightBattleFrame(Frame):
                 self._currentSequenceFrame = self._currentSequenceFrame.parent
             return False
 
-        elif isinstance(msg, GameFightTurnReadyRequestMessage):
-            self.confirmTurnEnd()
-            return False
-
         elif isinstance(msg, GameFightNewWaveMessage):
             gfnwmsg = msg
             self._newWaveId = gfnwmsg.id
@@ -410,6 +287,8 @@ class FightBattleFrame(Frame):
             gfnrmsg = msg
             self._turnsCount = gfnrmsg.roundNumber
             CurrentPlayedFighterManager().getSpellCastManager().currentTurn = self._turnsCount
+            if GameDebugManager().buffsDebugActivated:
+                Logger().info(f"[BUFFS DEBUG] Début du tour de jeu {self._turnsCount} !");
             bffm.BuffManager().spellBuffsToIgnore = []
             return True
 
@@ -463,12 +342,13 @@ class FightBattleFrame(Frame):
             return False
 
     def pulled(self) -> bool:
-        fsf: fseqf.FightSequenceFrame = None
         self.applyDelayedStats()
         DataMapProvider().isInFight = False
-        Kernel().worker.removeFrameByName("FightTurnFrame")
+        if Kernel().worker.contains("FightTurnFrFame"):
+            Kernel().worker.removeFrameByName("FightTurnFrame")
+        if Kernel().worker.contains("FightSequenceFrame"):
+            Kernel().worker.removeFrameByName("FightSequenceFrame")
         bffm.BuffManager.clear()
-        Kernel().worker.removeFrameByName("FightSequenceFrame")
         self._currentSequenceFrame = None
         self._sequenceFrameSwitcher = None
         self._turnFrame = None
@@ -478,10 +358,8 @@ class FightBattleFrame(Frame):
         self._turnsList = None
         self._deadTurnsList = None
         self._sequenceFrames = None
-        self._playingSlaveEntity = False
         self._masterId = 0
         self._slaveId = 0
-        self._playerNewTurn = None
         self._skipTurnTimer = None
         self._destroyed = True
         return True
@@ -495,9 +373,7 @@ class FightBattleFrame(Frame):
         return res
 
     def logState(self):
-        Logger().debug(
-            "****************************************************************** Current Sequences state ***********************************************************"
-        )
+        Logger().separator("Current Sequences state")
         Logger().debug(f"Executing a sequence : {self._executingSequence}")
         Logger().debug(
             f"Sequence cached : #{self._sequenceFrameCached._instanceId if self._sequenceFrameCached else 'None'}"
@@ -512,95 +388,35 @@ class FightBattleFrame(Frame):
             for step in seq._stepsBuffer:
                 Logger().debug(f"{padd}\t|---> {step.__class__.__name__}")
             padd += "\t"
-        Logger().debug(
-            "****************************************************************************************************************************************************************"
-        )
 
     def delayCharacterStatsList(self, msg: CharacterStatsListMessage) -> None:
         self._delayCslmsg = msg
-
-    def prepareNextPlayableCharacter(self, currentCharacterId: float = 0) -> None:
-        nextCharacterEntity: GameFightFighterInformations = None
-        nextCharacterId: float = None
-        if self._slaveId:
-            if currentCharacterId:
-                nextCharacterId = (
-                    float(self._masterId) if currentCharacterId == self._slaveId else float(self._slaveId)
-                )
-            else:
-                nextCharacterId = self.getNextPlayableCharacterId()
-            nextCharacterEntity = fenf.FightEntitiesFrame.getCurrentInstance().getEntityInfos(nextCharacterId)
-            if not nextCharacterEntity or not nextCharacterEntity.spawnInfo.alive:
-                return
-            CurrentPlayedFighterManager().currentFighterId = nextCharacterId
-            if nextCharacterId == self._masterId:
-                CurrentPlayedFighterManager().resetPlayerSpellList()
-                SpellInventoryManagementFrame().applySpellGlobalCoolDownInfo(self._masterId)
-            elif nextCharacterId == self._slaveId:
-                pass
-
-    def getNextPlayableCharacterId(self) -> float:
-        masterIdx: int = 0
-        slaveIdx: int = 0
-        currentCharacterIdx: int = 0
-        currentPlayedCharacterId: float = CurrentPlayedFighterManager().currentFighterId
-        if not self._slaveId or not self._turnsList:
-            return currentPlayedCharacterId
-        for i in range(len(self._turnsList)):
-            if self._turnsList[i] == self._masterId:
-                masterIdx = i
-            elif self._turnsList[i] == self._slaveId:
-                slaveIdx = i
-            if self._turnsList[i] == self._currentPlayerId:
-                currentCharacterIdx = i
-        if masterIdx == currentCharacterIdx:
-            return self._slaveId
-        if slaveIdx == currentCharacterIdx:
-            return self._masterId
-        if masterIdx < currentCharacterIdx and slaveIdx > currentCharacterIdx:
-            return self._slaveId
-        if masterIdx > currentCharacterIdx and slaveIdx < currentCharacterIdx:
-            return self._masterId
-        if masterIdx > slaveIdx and masterIdx < currentCharacterIdx:
-            return self._slaveId
-        if masterIdx < slaveIdx and masterIdx < currentCharacterIdx:
-            return self._masterId
-        if masterIdx > slaveIdx and masterIdx > currentCharacterIdx:
-            return self._slaveId
-        if masterIdx < slaveIdx and masterIdx > currentCharacterIdx:
-            return self._masterId
-        return 0
 
     def executeNextSequence(self) -> bool:
         if self._executingSequence:
             return False
         if self._sequenceFrames:
-            nextSequenceFrame: fseqf.FightSequenceFrame = self._sequenceFrames.pop(0)
+            nextSequenceFrame = self._sequenceFrames.pop(0)
             self._executingSequence = True
             nextSequenceFrame.execute(self.finishSequence(nextSequenceFrame))
-            return False
+            return True
         return False
 
     def applyDelayedStats(self) -> None:
         if not self._delayCslmsg:
             return
-        characterFrame: pcuF.PlayedCharacterUpdatesFrame = Kernel().worker.getFrame("PlayedCharacterUpdatesFrame")
+        characterFrame: pcuF.PlayedCharacterUpdatesFrame = Kernel().worker.getFrameByName("PlayedCharacterUpdatesFrame")
         if characterFrame:
             characterFrame.updateCharacterStatsList(self._delayCslmsg.stats)
         self._delayCslmsg = None
-
-    def onLastAnimationFinished(self, tiphonEvent=None) -> None:
-        self.sendAcknowledgement()
-        if self._confirmTurnEnd:
-            self.confirmDelayedTurnEnd()
 
     def sendAcknowledgement(self) -> None:
         if self._sequenceFrameCached is None:
             return
         ack: GameActionAcknowledgementMessage = GameActionAcknowledgementMessage()
         ack.init(True, self._sequenceFrameCached.ackIdent)
+        CurrentPlayedFighterManager().conn.send(ack)
         self._sequenceFrameCached = None
-        ConnectionsHandler().send(ack)
 
     def finishSequence(self, sequenceFrame: fseqf.FightSequenceFrame) -> FunctionType:
         def function() -> None:
@@ -608,18 +424,10 @@ class FightBattleFrame(Frame):
                 return
             if sequenceFrame.mustAck:
                 self._sequenceFrameCached = sequenceFrame
-                if not self.isFightAboutToEnd:
-                    self.sendAcknowledgement()
+                self.sendAcknowledgement()
             self._executingSequence = False
-            if self._refreshTurnsList:
-                Logger().warn("There was a turns list refresh delayed, what about updating it now?")
-                self._refreshTurnsList = False
-                self.updateTurnsList(self._newTurnsList, self._newDeadTurnsList)
-                self._newTurnsList = None
-                self._newDeadTurnsList = None
             if (
-                not self._executingSequence
-                and len(self._sequenceFrames)
+                self._sequenceFrames
                 and self._sequenceFrames[0].instanceId >= self._synchroniseFightersInstanceId
             ):
                 self.gameFightSynchronize(self._synchroniseFighters)
@@ -631,24 +439,8 @@ class FightBattleFrame(Frame):
                 self.gameFightSynchronize(self._synchroniseFighters)
                 self._synchroniseFighters = None
             self.applyDelayedStats()
-            if self._endBattle:
-                Logger().warn("This fight must end ! Finishing things now.")
-                self._endBattle = False
-                self.endBattle(self._battleResults)
-                self._battleResults = None
-                return
-            if self._confirmTurnEnd and not self.isFightAboutToEnd:
-                self.confirmDelayedTurnEnd()
-
+            KernelEventsManager().send(KernelEvent.SEQUENCE_EXEC_FINISHED)
         return function
-
-    def confirmDelayedTurnEnd(self) -> None:
-        Logger().warn("There was a turn end delayed, dispatching now.")
-        self._confirmTurnEnd = False
-        if self._nextLastPlayerId is not None:
-            self._lastPlayerId = self._nextLastPlayerId
-        self._nextLastPlayerId = None
-        self.confirmTurnEnd()
 
     def sendAutoEndTurn(self, e) -> None:
         action: Action = None
@@ -661,31 +453,12 @@ class FightBattleFrame(Frame):
         self._turnsList = turnsList
         self._deadTurnsList = deadTurnsList
 
-    def confirmTurnEnd(self) -> None:
-        fighterInfos: GameFightFighterInformations = fenf.FightEntitiesFrame.getCurrentInstance().getEntityInfos(
-            self._lastPlayerId
-        )
-        if fighterInfos:
-            bffm.BuffManager().markFinishingBuffs(self._lastPlayerId)
-            if self._lastPlayerId == CurrentPlayedFighterManager().currentFighterId:
-                spellwrapper.SpellWrapper.refreshAllPlayerSpellHolder(self._lastPlayerId)
-                self._playerTargetedEntitiesList = []
-                self.prepareNextPlayableCharacter(self._lastPlayerId)
-        spellCastManager: SpellCastInFightManager = CurrentPlayedFighterManager().getSpellCastManagerById(
-            self._lastPlayerId
-        )
-        if spellCastManager is not None:
-            spellCastManager.nextTurn()
-        turnEnd: GameFightTurnReadyMessage = GameFightTurnReadyMessage()
-        turnEnd.init(True)
-        ConnectionsHandler().send(turnEnd)
-
     def endBattle(self, fightEnd: GameFightEndMessage) -> None:
         self._holder: FightEntitiesHolder = FightEntitiesHolder()
         self._holder.reset()
         self._synchroniseFighters = None
         Kernel().worker.removeFrame(self)
-        fightContextFrame = Kernel().worker.getFrame("FightContextFrame")
+        fightContextFrame = Kernel().worker.getFrameByName("FightContextFrame")
         fightContextFrame.process(fightEnd)
 
     def onSkipTurnTimeOut(self, event) -> None:
@@ -694,7 +467,7 @@ class FightBattleFrame(Frame):
     def gameFightSynchronize(self, fighters: list[GameFightFighterInformations]) -> None:
         newWaveAppeared: bool = False
         newWaveMonster: bool = False
-        entitiesFrame: fenf.FightEntitiesFrame = Kernel().worker.getFrame("FightEntitiesFrame")
+        entitiesFrame: fenf.FightEntitiesFrame = Kernel().worker.getFrameByName("FightEntitiesFrame")
         newWaveMonsterIndex: int = 0
         bffm.BuffManager().synchronize()
         for fighterInfos in fighters:
@@ -724,7 +497,7 @@ class FightBattleFrame(Frame):
             self._neverSynchronizedBefore = False
 
     def removeSavedPosition(self, pEntityId: float) -> None:
-        fightContextFrame: "FightContextFrame" = Kernel().worker.getFrame("FightContextFrame")
+        fightContextFrame: "FightContextFrame" = Kernel().worker.getFrameByName("FightContextFrame")
         savedPositions: list = fightContextFrame.fightersPositionsHistory.get(pEntityId)
         if savedPositions:
             nbPos = len(savedPositions)

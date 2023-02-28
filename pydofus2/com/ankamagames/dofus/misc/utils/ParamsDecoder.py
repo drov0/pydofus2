@@ -72,9 +72,9 @@ class ParamsDecoder:
                 return ""
         else:
             if type == "$item":
-                item = Item.getItemById(params[nid])
+                item = Item.getItemById(int(params[nid]))
                 if item:
-                    itemw = ItemWrapper.create(0, 0, params[nid], 0, None, False)
+                    itemw = ItemWrapper.create(0, 0, int(params[nid]), 0, None, False)
                     newString = HyperlinkItemManager.newChatItem(itemw)
                 else:
                     Logger().error(f"{type} {params[nid]} introuvable")

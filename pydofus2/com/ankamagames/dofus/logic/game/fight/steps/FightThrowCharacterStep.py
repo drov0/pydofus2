@@ -1,3 +1,4 @@
+from pydofus2.com.ankamagames.dofus.logic.game.fight.frames.FightEntitiesFrame import FightEntitiesFrame
 from pydofus2.com.ankamagames.dofus.logic.game.fight.steps.IFightStep import IFightStep
 from pydofus2.com.ankamagames.jerakine.logger.Logger import Logger
 from whistle import Event
@@ -49,7 +50,7 @@ class FightThrowCharacterStep(AbstractSequencable, IFightStep):
         return "throwCharacter"
 
     def start(self) -> None:
-        entitiesFrame: FightEntitiesFrame = Kernel().worker.getFrame(FightEntitiesFrame)
+        entitiesFrame: FightEntitiesFrame = Kernel().worker.getFrameByName("FightEntitiesFrame")
         carryingEntity = DofusEntities().getEntity(self._fighterId)
         carryingEntityInfos: GameFightFighterInformations = entitiesFrame.getEntityInfos(self._fighterId)
         carriedEntity: IEntity = DofusEntities().getEntity(self._carriedId)
@@ -70,7 +71,7 @@ class FightThrowCharacterStep(AbstractSequencable, IFightStep):
         if self._cellId != -1:
             fighterInfos.disposition.cellId = self._cellId
         if self._carriedId == CurrentPlayedFighterManager().currentFighterId:
-            fightTurnFrame: "FightTurnFrame" = Kernel().worker.getFrame("FightTurnFrame")
+            fightTurnFrame: "FightTurnFrame" = Kernel().worker.getFrameByName("FightTurnFrame")
             if fightTurnFrame:
                 fightTurnFrame.freePlayer()
         invisibility: bool = False

@@ -27,7 +27,7 @@ class FightTackledStep(AbstractSequencable, IFightStep, ISequencableListener):
             Logger().warn("Unable to play tackle of an unexisting fighter " + str(self._fighterId) + ".")
         self.stepFinished(self)
 
-    def stepFinished(self, step: ISequencable, withTimout: bool = False) -> None:
+    def stepFinished(self, step: ISequencable) -> None:
         self.executeCallbacks()
 
     @property

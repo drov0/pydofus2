@@ -47,7 +47,7 @@ class FightDispellEffectStep(AbstractSequencable, IFightStep, ISequencableListen
             self._virtualStep.addListener(self)
             self._virtualStep.start()
 
-    def stepFinished(self, step: ISequencable, withTimout: bool = False) -> None:
+    def stepFinished(self, step: ISequencable) -> None:
         self._virtualStep.removeListener(self)
         self.executeCallbacks()
 

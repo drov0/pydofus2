@@ -1,5 +1,4 @@
 from datetime import datetime
-from logging import Logger
 from time import perf_counter
 from typing import TYPE_CHECKING
 
@@ -101,6 +100,8 @@ from pydofus2.com.ankamagames.dofus.network.types.game.character.characteristic.
 from pydofus2.com.ankamagames.dofus.network.types.game.context.roleplay.HumanOptionAlliance import HumanOptionAlliance
 from pydofus2.com.ankamagames.dofus.network.types.game.context.roleplay.HumanOptionOrnament import HumanOptionOrnament
 from pydofus2.com.ankamagames.dofus.types.data.PlayerSetInfo import PlayerSetInfo
+from pydofus2.com.ankamagames.jerakine.data.I18n import I18n
+from pydofus2.com.ankamagames.jerakine.logger.Logger import Logger
 from pydofus2.com.ankamagames.jerakine.messages.Frame import Frame
 from pydofus2.com.ankamagames.jerakine.messages.Message import Message
 from pydofus2.com.ankamagames.jerakine.types.enums.Priority import Priority
@@ -137,7 +138,7 @@ class PlayedCharacterUpdatesFrame(Frame):
 
     @property
     def roleplayContextFrame(self) -> rplCF.RoleplayContextFrame:
-        return krnl.Kernel().worker.getFrame("RoleplayContextFrame")
+        return krnl.Kernel().worker.getFrameByName("RoleplayContextFrame")
 
     @property
     def kamasLimit(self) -> float:
@@ -154,7 +155,7 @@ class PlayedCharacterUpdatesFrame(Frame):
             scrmsg = msg
             if scrmsg.actorId == pcm.PlayedCharacterManager().id:
                 pcm.PlayedCharacterManager().restrictions = scrmsg.restrictions
-            rpEntitiesFrame: "RoleplayEntitiesFrame" = krnl.Kernel().worker.getFrame("RoleplayEntitiesFrame")
+            rpEntitiesFrame: "RoleplayEntitiesFrame" = krnl.Kernel().worker.getFrameByName("RoleplayEntitiesFrame")
             if rpEntitiesFrame:
                 infos: "GameRolePlayHumanoidInformations" = rpEntitiesFrame.getEntityInfos(scrmsg.actorId)
                 if infos and infos.humanoidInfo:
@@ -168,7 +169,7 @@ class PlayedCharacterUpdatesFrame(Frame):
 
         if isinstance(msg, CharacterStatsListMessage):
             cslmsg = msg
-            fightBattleFrame: "FightBattleFrame" = krnl.Kernel().worker.getFrame("FightBattleFrame")
+            fightBattleFrame: "FightBattleFrame" = krnl.Kernel().worker.getFrameByName("FightBattleFrame")
             if fightBattleFrame is not None and fightBattleFrame.executingSequence:
                 fightBattleFrame.delayCharacterStatsList(cslmsg)
             else:
@@ -177,9 +178,9 @@ class PlayedCharacterUpdatesFrame(Frame):
                 playerInfos = self.roleplayContextFrame.entitiesFrame.getEntityInfos(pcm.PlayedCharacterManager().id)
                 if playerInfos:
                     playerInfos.alignmentInfos = cslmsg.stats.alignmentInfos
-            if krnl.Kernel().worker.getFrame("QuestFrame"):
-                if krnl.Kernel().worker.getFrame("QuestFrame").achievmentsListProcessed == False:
-                    krnl.Kernel().worker.getFrame("QuestFrame")
+            if krnl.Kernel().worker.getFrameByName("QuestFrame"):
+                if krnl.Kernel().worker.getFrameByName("QuestFrame").achievmentsListProcessed == False:
+                    krnl.Kernel().worker.getFrameByName("QuestFrame")
             return False
 
         if isinstance(msg, MapComplementaryInformationsDataMessage):
@@ -226,17 +227,23 @@ class PlayedCharacterUpdatesFrame(Frame):
         #    ConnectionsHandler().send(rcsrmsg)
         #    return True
 
-        # if isinstance(msg, StatsUpgradeRequestAction):
-        #    sura = msg
-        #    surqmsg = StatsUpgradeRequestMessage()
-        #    surqmsg.initStatsUpgradeRequestMessage(sura.useAdditionnal,sura.statId,sura.boostPoint)
-        #    ConnectionsHandler().send(surqmsg)
-        #    return True
-
         if isinstance(msg, StatsUpgradeResultMessage):
             surmsg = msg
+            statUpgradeErrorText = None
             if surmsg.result == StatsUpgradeResultEnum.SUCCESS:
-                pass
+                Logger().info(f"Upgraded characteristics by {surmsg.nbCharacBoost} points")
+            elif surmsg.result == StatsUpgradeResultEnum.NONE:
+                statUpgradeErrorText = "ui.popup.statboostFailed.text"
+            elif surmsg.result == StatsUpgradeResultEnum.GUEST:
+                statUpgradeErrorText = "ui.fight.guestAccount"
+            elif surmsg.result == StatsUpgradeResultEnum.RESTRICTED:
+                statUpgradeErrorText = "ui.charSel.deletionErrorUnsecureMode"
+            elif surmsg.result == StatsUpgradeResultEnum.IN_FIGHT:
+                statUpgradeErrorText = "ui.error.cantDoInFight"
+            elif surmsg.result == StatsUpgradeResultEnum.NOT_ENOUGH_POINT:
+                statUpgradeErrorText = "ui.popup.statboostFailed.notEnoughPoint"
+            if statUpgradeErrorText:
+                Logger().info(I18n.getUiText(statUpgradeErrorText))
             return True
 
         if isinstance(msg, CharacterLevelUpMessage):
@@ -278,7 +285,7 @@ class PlayedCharacterUpdatesFrame(Frame):
             grplsmsg = msg
             state = PlayerLifeStatusEnum(grplsmsg.state)
             pcm.PlayedCharacterManager().state = state
-            Logger().debug(f"Player state is {state.name}")
+            Logger().debug(f"[PlayerUpdates] Player state is {state.name}")
             return False
 
         if isinstance(msg, GameRolePlayGameOverMessage):
@@ -475,11 +482,7 @@ class PlayedCharacterUpdatesFrame(Frame):
             InventoryManager().inventory.kamas = stats.kamas
         pcm.PlayedCharacterManager().characteristics = stats
         if pcm.PlayedCharacterManager().isFighting:
-            if CurrentPlayedFighterManager().isRealPlayer():
-                pass
             swmod.SpellWrapper.refreshAllPlayerSpellHolder(pcm.PlayedCharacterManager().id)
-        else:
-            pass
 
     def updateSpellModifier(self, targetId: float, spellId: float, statId: float) -> None:
         playerId: float = pcm.PlayedCharacterManager().id

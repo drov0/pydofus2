@@ -24,7 +24,6 @@ class ModuleReader:
         self.name = name
         self.initModuleReader()
 
-    @MemoryProfiler.track_memory("ModuleReader.init")
     def initModuleReader(self):
         with open(self.filepath, "rb") as f:
             stream = BinaryStream(f, True)
@@ -65,7 +64,6 @@ class ModuleReader:
         self.getObjects.cache_clear()
 
     @lru_cache(maxsize=32, typed=False)
-    @MemoryProfiler.track_memory("ModuleReader.getObjects")
     def getObjects(self):
         with lock:
             if not self._counter:
@@ -95,7 +93,6 @@ class ModuleReader:
         return self._classes[object_id]
 
     @lru_cache(maxsize=256, typed=False)
-    @MemoryProfiler.track_memory("ModuleReader.getObject")
     def getObject(self, objectId: int) -> Any:
         with lock:
             if not self._indexes:

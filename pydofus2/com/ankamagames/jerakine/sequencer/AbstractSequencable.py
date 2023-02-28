@@ -45,7 +45,7 @@ class AbstractSequencable(IPausableSequencable):
         if self._stepListeners:
             for listener in self._stepListeners.copy():
                 if listener:
-                    listener.stepFinished(self, False)
+                    listener.stepFinished(self)
 
     def removeListener(self, listener: ISequencableListener) -> None:
         if not self._stepListeners:

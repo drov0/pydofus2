@@ -28,7 +28,7 @@ class ArenaDuelRankCriterion(ItemCriterion, IDataCenter):
     def getCriterion(self) -> int:
         from pydofus2.com.ankamagames.dofus.kernel.Kernel import Kernel
 
-        frame: PartyManagementFrame = Kernel().worker.getFrame("PartyManagementFrame")
+        frame: PartyManagementFrame = Kernel().worker.getFrameByName("PartyManagementFrame")
         rank: int = 0
         if frame.arenaRankDuelInfos and frame.arenaRankDuelInfos.rank > rank:
             rank = frame.arenaRankDuelInfos.rank

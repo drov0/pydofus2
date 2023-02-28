@@ -1,4 +1,5 @@
 import threading
+from pydofus2.com.ankamagames.atouin.Haapi import Haapi
 from pydofus2.com.ankamagames.berilia.managers.KernelEventsManager import KernelEventsManager, KernelEvent
 from pydofus2.com.ankamagames.dofus.kernel.net.DisconnectionReason import DisconnectionReason
 from pydofus2.com.ankamagames.dofus.logic.common.managers.PlayerManager import PlayerManager
@@ -34,6 +35,12 @@ class DofusClient(threading.Thread):
         self._lastLoginTime = None
         self._minLoginInterval = 10
         self._lock = None
+        self._certId = None
+        self._apiKey = None
+        self._certHash = None
+        self._serverId = None
+        self._characterId = None
+        self.mule = False
 
     @property
     def worker(self):
@@ -42,6 +49,7 @@ class DofusClient(threading.Thread):
     def init(self):
         Logger().info("[DofusClient] initializing")
         Kernel().init()
+        Kernel()._mule = self.mule
         I18nFileAccessor()
         DataMapProvider()
         KernelEventsManager().once(KernelEvent.CHARACTER_SELECTION_SUCCESS, self._onCharacterSelectionSuccess)
@@ -49,7 +57,6 @@ class DofusClient(threading.Thread):
         KernelEventsManager().once(KernelEvent.SHUTDOWN, self._onShutdown)
         KernelEventsManager().once(KernelEvent.RESTART, self._onRestart)
         KernelEventsManager().once(KernelEvent.RECONNECT, self._onReconnect)
-        AuthentificationManager().setToken(self._loginToken)
         if self._characterId:
             PlayerManager().allowAutoConnectCharacter = True
             PlayedCharacterManager().id = self._characterId
@@ -57,16 +64,7 @@ class DofusClient(threading.Thread):
         for frame in self._registredInitFrames:
             self.worker.addFrame(frame())
         Logger().info("[DofusClient] initialized")
-
-    def setCreds(self, loginToken, serverId=0, characterId=None):
-        self._serverId = serverId
-        self._characterId = characterId
-        self._loginToken = loginToken
-
-    def login(self, loginToken, serverId=0, characterId=None):
-        self.setCreds(loginToken, serverId, characterId)
-        self.start()
-
+        
     def registerInitFrame(self, frame):
         self._registredInitFrames.append(frame)
 
@@ -86,10 +84,13 @@ class DofusClient(threading.Thread):
         self.shutdown()
 
     def _onRestart(self, event, message):
-        Logger().debug(f"[DofusClient] Restart requested for reason: {message}")
+        self._onReconnect(event, message)
 
     def _onReconnect(self, event, message):
         Logger().debug(f"[DofusClient] Reconnect requested for reason: {message}")
+        Kernel().reset(reloadData=True)
+        token = Haapi().getLoginToken(self._certId, self._certHash, apiKey=self._apiKey)
+        AuthentificationManager().setToken(token)
         self.worker.process(LoginAction.create(self._serverId != 0, self._serverId))
 
     def shutdown(self, reason=DisconnectionReasonEnum.WANTED_SHUTDOWN, msg=""):
@@ -118,6 +119,10 @@ class DofusClient(threading.Thread):
                 Logger().info("[DofusClient] Login request too soon, will wait some time")
                 self._killSig.wait(self._minLoginInterval - (perf_counter() - self._lastLoginTime))
             self._lastLoginTime = perf_counter()
+            if not self._apiKey:
+                raise Exception("No API key provided")
+            token = Haapi().getLoginToken(self._certId, self._certHash, apiKey=self._apiKey)
+            AuthentificationManager().setToken(token)
             self.worker.process(LoginAction.create(self._serverId != 0, self._serverId))
             self.worker.run()
         except Exception as e:

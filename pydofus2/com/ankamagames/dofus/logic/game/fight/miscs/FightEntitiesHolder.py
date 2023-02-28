@@ -19,7 +19,6 @@ class FightEntitiesHolder(IEntityLocalizer, metaclass=ThreadSharedSingleton):
     def getEntity(self, entityId: float) -> IEntity:
         return self._holdedEntities.get(entityId)
 
-    @MemoryProfiler.track_memory("FightEntitiesHolder.holdEntity")
     def holdEntity(self, entity: IEntity) -> None:
         with lock:
             if entity.id not in self._holdedEntities:

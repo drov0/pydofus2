@@ -2,5 +2,5 @@ from pydofus2.com.ankamagames.jerakine.sequencer.ISequencable import ISequencabl
 
 
 class ISequencableListener:
-    def stepFinished(self, param1: ISequencable, param2: bool = False) -> None:
-        pass
+    def stepFinished(self, param1: ISequencable) -> None:
+        raise NotImplementedError("Not implemented yet")

@@ -237,7 +237,7 @@ class StorageGenericView(IStorageView):
         return self.compareFunction(a, b, sortDepth + 1)
 
     def getItemAveragePrice(self, pItemGID: int) -> float:
-        avgPricesFrame: AveragePricesFrame = Kernel().worker.getFrame("AveragePricesFrame")
+        avgPricesFrame: AveragePricesFrame = Kernel().worker.getFrameByName("AveragePricesFrame")
         return (
             float(avgPricesFrame.pricesData.items[pItemGID])
             if avgPricesFrame.pricesData.items.get(pItemGID) is not None

@@ -62,11 +62,13 @@ class AveragePricesFrame(Frame):
         return True
 
     def process(self, pMsg: Message) -> bool:
+        
         if isinstance(pMsg, GameContextCreateMessage):
-            gccm = pMsg
-            if gccm.context == GameContextEnum.ROLE_PLAY and self.updateAllowed():
-                self.askPricesData()
+            # gccm = pMsg
+            # if gccm.context == GameContextEnum.ROLE_PLAY and self.updateAllowed():
+            #     self.askPricesData()
             return False
+        
         if isinstance(pMsg, ObjectAveragePricesMessage):
             if self.askDataTimer:
                 self.askDataTimer.cancel()

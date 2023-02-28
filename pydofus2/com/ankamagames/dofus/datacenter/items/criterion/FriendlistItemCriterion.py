@@ -26,4 +26,4 @@ class FriendlistItemCriterion(ItemCriterion, IDataCenter):
         return FriendlistItemCriterion(self.basicText)
 
     def getCriterion(self) -> int:
-        return Kernel().worker.getFrame("SocialFrame")
+        return Kernel().worker.getFrameByName("SocialFrame")

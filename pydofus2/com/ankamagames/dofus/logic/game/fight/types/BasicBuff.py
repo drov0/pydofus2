@@ -13,12 +13,15 @@ from pydofus2.com.ankamagames.dofus.logic.game.common.managers.PlayedCharacterMa
     PlayedCharacterManager,
 )
 from typing import TYPE_CHECKING
+from pydofus2.com.ankamagames.dofus.logic.game.fight.managers.CurrentPlayedFighterManager import CurrentPlayedFighterManager
 
 if TYPE_CHECKING:
     from pydofus2.com.ankamagames.dofus.logic.game.fight.frames.FightBattleFrame import (
         FightBattleFrame,
     )
     from pydofus2.com.ankamagames.dofus.logic.game.fight.types.StateBuff import StateBuff
+    from pydofus2.com.ankamagames.dofus.logic.game.fight.frames.FightEntitiesFrame import FightEntitiesFrame
+
 from pydofus2.com.ankamagames.dofus.logic.game.fight.types.CastingSpell import CastingSpell
 from pydofus2.com.ankamagames.dofus.misc.utils.GameDebugManager import GameDebugManager
 from pydofus2.com.ankamagames.dofus.network.enums.FightDispellableEnum import (
@@ -90,18 +93,17 @@ class BasicBuff:
         self.dispelable = effect.dispelable
         self.source = castingSpell.casterId
         self.dataUid = effect.effectId
-        fightBattleFrame: "FightBattleFrame" = Kernel().worker.getFrame("FightBattleFrame")
-        currentPlayerId: float = fightBattleFrame.currentPlayerId
+        currentPlayerId: float = CurrentPlayedFighterManager().currentFighterId
         isPlayerId = currentPlayerId != 0
         fighterInfo: GameFightFighterInformations = None
         if isPlayerId:
-            entitiesFrame = Kernel().worker.getFrame("FightEntitiesFrame")
-            if entitiesFrame is not None:
+            entitiesFrame: "FightEntitiesFrame" = Kernel().worker.getFrameByName("FightEntitiesFrame")
+            if entitiesFrame:
                 fighterInfo = entitiesFrame.getEntityInfos(currentPlayerId)
         if (
             Kernel().beingInReconection
             or not isPlayerId
-            or fighterInfo is not None
+            or fighterInfo
             and not fighterInfo.spawnInfo.alive
         ):
             self.aliveSource = self.source
@@ -168,7 +170,7 @@ class BasicBuff:
     def getUnuableNextTurn(self) -> bool:
         if self.duration > 1 or self.duration < 0:
             return False
-        frame: "FightBattleFrame" = Kernel().worker.getFrame("FightBattleFrame")
+        frame: "FightBattleFrame" = Kernel().worker.getFrameByName("FightBattleFrame")
         if frame:
             currentPlayerId = frame.currentPlayerId
             playerId = PlayedCharacterManager().id

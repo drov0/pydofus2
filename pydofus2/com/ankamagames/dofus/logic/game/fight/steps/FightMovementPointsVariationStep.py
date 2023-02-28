@@ -56,4 +56,5 @@ class FightMovementPointsVariationStep(AbstractStatContextualStep, IFightStep):
             FightEntitiesFrame.getCurrentInstance().setLastKnownEntityMovementPoint(
                 self._targetId, -self._intValue, True
             )
-        super().start()
+        self.executeCallbacks()
+

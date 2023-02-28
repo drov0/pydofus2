@@ -33,7 +33,7 @@ class FightDeathStep(AbstractSequencable, IFightStep):
         super().__init__()
         self._entityId = entityId
         self._naturalDeath = naturalDeath
-        fightContexteFrame: "FightContextFrame" = Kernel().worker.getFrame("FightContextFrame")
+        fightContexteFrame: "FightContextFrame" = Kernel().worker.getFrameByName("FightContextFrame")
         if fightContexteFrame:
             self._targetName = fightContexteFrame.getFighterName(entityId)
         else:
@@ -54,7 +54,7 @@ class FightDeathStep(AbstractSequencable, IFightStep):
         fightEntitites = FightEntitiesFrame.getCurrentInstance()
         fighterInfos: GameFightFighterInformations = fightEntitites.getEntityInfos(self._entityId)
         fighterStats: EntityStats = StatsManager().getStats(fighterInfos.contextualId)
-        fightBattleFrame: "FightBattleFrame" = Kernel().worker.getFrame("FightBattleFrame")
+        fightBattleFrame: "FightBattleFrame" = Kernel().worker.getFrameByName("FightBattleFrame")
         if fightBattleFrame:
             fightBattleFrame.deadFightersList.append(self._entityId)
         self._needToWarn = True

@@ -1,7 +1,4 @@
 from typing import TYPE_CHECKING
-
-from pydofus2.com.ankamagames.atouin.managers.EntitiesManager import EntitiesManager
-from pydofus2.com.ankamagames.atouin.messages.CellClickMessage import CellClickMessage
 from pydofus2.com.ankamagames.atouin.utils.DataMapProvider import DataMapProvider
 from pydofus2.com.ankamagames.dofus.kernel.Kernel import Kernel
 from pydofus2.com.ankamagames.dofus.kernel.net.ConnectionsHandler import ConnectionsHandler
@@ -23,11 +20,12 @@ from pydofus2.com.ankamagames.dofus.logic.game.fight.actions.GameFightReadyActio
 from pydofus2.com.ankamagames.dofus.logic.game.fight.actions.RemoveEntityAction import RemoveEntityAction
 
 if TYPE_CHECKING:
+    from pydofus2.com.ankamagames.dofus.logic.game.fight.frames.FightEntitiesFrame import FightEntitiesFrame
+
     from pydofus2.com.ankamagames.dofus.logic.game.fight.frames.FightContextFrame import (
         FightContextFrame,
     )
 
-from pydofus2.com.ankamagames.dofus.logic.game.fight.frames.FightEntitiesFrame import FightEntitiesFrame
 from pydofus2.com.ankamagames.dofus.logic.game.fight.types.SwapPositionRequest import SwapPositionRequest
 from pydofus2.com.ankamagames.dofus.network.enums.TeamEnum import TeamEnum
 from pydofus2.com.ankamagames.dofus.network.messages.game.context.fight.GameFightEndMessage import GameFightEndMessage
@@ -61,9 +59,6 @@ from pydofus2.com.ankamagames.dofus.network.messages.game.context.fight.GameFigh
 from pydofus2.com.ankamagames.dofus.network.messages.game.context.fight.GameFightPlacementSwapPositionsRequestMessage import (
     GameFightPlacementSwapPositionsRequestMessage,
 )
-from pydofus2.com.ankamagames.dofus.network.messages.game.context.fight.GameFightReadyMessage import (
-    GameFightReadyMessage,
-)
 from pydofus2.com.ankamagames.dofus.network.messages.game.context.fight.GameFightRemoveTeamMemberMessage import (
     GameFightRemoveTeamMemberMessage,
 )
@@ -93,7 +88,6 @@ from pydofus2.com.ankamagames.jerakine.messages.Frame import Frame
 from pydofus2.com.ankamagames.jerakine.messages.Message import Message
 from pydofus2.com.ankamagames.jerakine.types.enums.Priority import Priority
 from pydofus2.com.ankamagames.jerakine.types.positions.MapPoint import MapPoint
-
 
 class FightPreparationFrame(Frame):
 
@@ -170,7 +164,7 @@ class FightPreparationFrame(Frame):
                 Kernel().worker.removeFrame(self)
                 gfemsg = GameFightEndMessage()
                 gfemsg.init()
-                fightContextFrame2: "FightContextFrame" = Kernel().worker.getFrame("FightContextFrame")
+                fightContextFrame2: "FightContextFrame" = Kernel().worker.getFrameByName("FightContextFrame")
                 if fightContextFrame2:
                     fightContextFrame2.process(gfemsg)
                 else:
@@ -184,31 +178,6 @@ class FightPreparationFrame(Frame):
         if isinstance(msg, GameFightPlacementPossiblePositionsMessage):
             gfpppmsg = msg
             self._playerTeam = gfpppmsg.teamNumber
-            return True
-
-        if isinstance(msg, CellClickMessage):
-            ccmsg = msg
-            for entity in EntitiesManager().getEntitiesOnCell(ccmsg.cellId):
-                if isinstance(entity, AnimatedCharacter) and not entity:
-                    cellEntity = entity
-            if cellEntity:
-                fighter = object()
-                fighter.name = self._fightContextFrame.getFighterName(cellEntity.id)
-                entitiesFrame: "FightEntitiesFrame" = Kernel().worker.getFrame("FightEntitiesFrame")
-                fighterInfos: GameFightFighterInformations = entitiesFrame.getEntityInfos(cellEntity.id)
-                playerInfos: GameFightFighterInformations = entitiesFrame.getEntityInfos(PlayedCharacterManager().id)
-                if not (
-                    fighterInfos.contextualId != playerInfos.contextualId
-                    and fighterInfos.spawnInfo.teamId == playerInfos.spawnInfo.teamId
-                ):
-                    return True
-            elif (
-                self.isValidPlacementCell(ccmsg.cellId, self._playerTeam)
-                and not self._fightContextFrame.onlyTheOtherTeamCanPlace
-            ):
-                gfpprmsg = GameFightPlacementPositionRequestMessage()
-                gfpprmsg.init(ccmsg.cellId)
-                ConnectionsHandler().send(gfpprmsg)
             return True
 
         if isinstance(msg, GameFightPlacementPositionRequestAction):
@@ -235,7 +204,7 @@ class FightPreparationFrame(Frame):
 
         if isinstance(msg, GameFightPlacementSwapPositionsOfferMessage):
             gfpspomsg = msg
-            entitiesFrame = Kernel().worker.getFrame("FightEntitiesFrame")
+            entitiesFrame = Kernel().worker.getFrameByName("FightEntitiesFrame")
             swapPositionRequest = SwapPositionRequest(
                 gfpspomsg.requestId, gfpspomsg.requesterId, gfpspomsg.requestedId
             )
@@ -271,7 +240,7 @@ class FightPreparationFrame(Frame):
                     swapPositionRequest.requesterId == PlayedCharacterManager().id
                     and gfpspcdmsg.cancellerId != PlayedCharacterManager().id
                 ):
-                    entitiesFrame = Kernel().worker.getFrame("FightEntitiesFrame")
+                    entitiesFrame = Kernel().worker.getFrameByName("FightEntitiesFrame")
                     entitiesFrame.getEntityInfos(gfpspcdmsg.cancellerId)
             return True
 
@@ -279,18 +248,11 @@ class FightPreparationFrame(Frame):
             Logger().error("Cette position n'est pas accessible.")
             return True
 
-        if isinstance(msg, GameFightReadyAction):
-            gfra = msg
-            gfrmsg = GameFightReadyMessage()
-            gfrmsg.init(gfra.isReady)
-            ConnectionsHandler().send(gfrmsg)
-            return True
-
         if isinstance(msg, EntityClickMessage):
             ecmsg = msg
             clickedEntity = ecmsg.entity
             if clickedEntity:
-                entitiesFrame = Kernel().worker.getFrame("FightEntitiesFrame")
+                entitiesFrame = Kernel().worker.getFrameByName("FightEntitiesFrame")
                 fighterInfos = entitiesFrame.getEntityInfos(clickedEntity.id)
                 playerInfos = entitiesFrame.getEntityInfos(PlayedCharacterManager().id)
                 if not (
@@ -333,7 +295,7 @@ class FightPreparationFrame(Frame):
         if isinstance(msg, GameContextDestroyMessage):
             gfemsg2 = GameFightEndMessage()
             gfemsg2.init()
-            fightContextFrame: "FightContextFrame" = Kernel().worker.getFrame("FightContextFrame")
+            fightContextFrame: "FightContextFrame" = Kernel().worker.getFrameByName("FightContextFrame")
             if fightContextFrame:
                 fightContextFrame.process(gfemsg2)
             else:

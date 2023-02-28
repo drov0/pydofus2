@@ -1,11 +1,14 @@
-from pydofus2.com.ankamagames.jerakine.map.IDataMapProvider import IDataMapProvider
+from pydofus2.com.ankamagames.dofus.logic.game.fight.frames.FightEntitiesFrame import \
+    FightEntitiesFrame
+from pydofus2.com.ankamagames.jerakine.map.IDataMapProvider import \
+    IDataMapProvider
 from pydofus2.com.ankamagames.jerakine.map.ILosDetector import ILosDetector
 from pydofus2.com.ankamagames.jerakine.types.positions.MapPoint import MapPoint
 from pydofus2.mapTools import MapTools
 
 
 class LosDetector(ILosDetector):
-    _tested = dict[MapPoint, dict[MapPoint, bool]]()
+    _losToMp = dict[MapPoint, dict[MapPoint, bool]]()
 
     @classmethod
     def losBetween(
@@ -13,14 +16,14 @@ class LosDetector(ILosDetector):
     ) -> bool:
         if targetPos in tested:
             return tested[targetPos]
-        line = MapTools.getCellsCoordBetween(refPos.cellId, targetPos.cellId)
+        line = MapTools.getMpLine(refPos.cellId, targetPos.cellId)
         if len(line) == 0:
             los = True
         else:
             los = True
             for j in range(len(line) - 1):
                 if MapPoint.isInMap(line[j].x, line[j].y):
-                    if j > 0 and mapProvider.hasEntity(line[j - 1].x, line[j - 1].y, False):
+                    if j > 0 and FightEntitiesFrame.getCurrentInstance().isEntityOnCell(line[j-1].cellId):
                         los = False
                     elif targetPos not in tested:
                         los = los and mapProvider.pointLos(line[j].x, line[j].y, False)
@@ -32,40 +35,26 @@ class LosDetector(ILosDetector):
         return los
 
     @classmethod
-    def getCells(cls, mapProvider: IDataMapProvider, spellrange: list[int], refPosition: int) -> set[int]:
-        refPosition = MapPoint.fromCellId(refPosition)
-        orderedCell: list = list()
-        for cellId in spellrange:
-            mp = MapPoint.fromCellId(cellId)
-            orderedCell.append({"p": mp, "dist": refPosition.distanceToCell(mp)})
-        orderedCell.sort(key=lambda x: x["dist"], reverse=True)
-        if refPosition not in cls._tested:
-            cls._tested[refPosition] = dict[MapPoint, bool]()
+    def getCells(cls, spellrange: list[int], refCellId: int) -> set[int]:
+        from pydofus2.com.ankamagames.atouin.utils.DataMapProvider import \
+            DataMapProvider
+
+        refMp = MapPoint.fromCellId(refCellId)
         result = set[int]()
-        for i in range(len(orderedCell)):
-            p: MapPoint = orderedCell[i]["p"]
-            if p not in cls._tested[refPosition]:
-                line = MapTools.getCellsCoordBetween(refPosition.cellId, p.cellId)
-                if len(line) == 0:
-                    result.add(p.cellId)
-                else:
-                    los = True
-                    for j in range(len(line) - 1):
-                        if MapPoint.isInMap(line[j].x, line[j].y):
-                            if j > 0 and mapProvider.hasEntity(line[j - 1].x, line[j - 1].y, False):
-                                los = False
-                            elif line[j] not in cls._tested[refPosition]:
-                                los = los and mapProvider.pointLos(line[j].x, line[j].y, False)
-                            else:
-                                los = los and cls._tested[refPosition][line[j]]
-                        if not los:
+        for cell in spellrange:
+            p = MapPoint.fromCellId(cell)
+            if p not in result:
+                line = MapTools.getMpLine(refMp.cellId, p.cellId)
+                los = True
+                if len(line) > 1:
+                    for mp in line[:-1]:
+                        if not DataMapProvider().pointLos(mp.x, mp.y, False):
+                            los = False
                             break
-                    cls._tested[refPosition][p] = los
-        for i in spellrange:
-            mp = MapPoint.fromCellId(i)
-            result = {mp.cellId for mp in cls._tested[refPosition] if cls._tested[refPosition][mp]}
+                if los:
+                    result.add(p.cellId)
         return result
 
     @classmethod
     def clearCache(cls):
-        cls._tested.clear()
+        cls._losToMp.clear()

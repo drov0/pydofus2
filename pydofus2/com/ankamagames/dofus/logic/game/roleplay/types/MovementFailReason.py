@@ -1,0 +1,13 @@
+from enum import Enum
+
+
+class MovementFailReason(Enum):
+    PLAYER_IS_DEAD = 1
+    CANT_REACH_DEST_CELL = 2
+    ALREADY_REQUESTING_MOVEMENT = 3
+    ALREADY_MOVING = 3
+    PLAYER_NOT_FOUND = 4
+    MAP_NOT_LOADED = 5
+    PLAYER_CANT_MOVE = 6
+    MOVE_REQUEST_TIMEOUT = 7
+    MOVE_REQUEST_REJECTED = 8

@@ -37,6 +37,7 @@ from pydofus2.mapTools import MapTools
 
 
 class TackleUtil:
+    
     @classmethod
     def getTackle(
         cls,
@@ -100,20 +101,18 @@ class TackleUtil:
             return 1
         if not cls.canBeTackler(tackler, tackled):
             return 1
-        tackledStats: EntityStats = StatsManager().getStats(tackled.contextualId)
-        evade: int = int(tackledStats.getStatTotalValue(StatIds.TACKLE_EVADE)) if tackledStats is not None else 0
+        tackledStats = StatsManager().getStats(tackled.contextualId)
+        evade = int(tackledStats.getStatTotalValue(StatIds.TACKLE_EVADE)) if tackledStats is not None else 0
         if evade < 0:
             evade = 0
-        tacklerStats: EntityStats = StatsManager().getStats(tackler.contextualId)
-        tackle: int = int(tacklerStats.getStatTotalValue(StatIds.TACKLE_BLOCK)) if tacklerStats is not None else 0
+        tacklerStats = StatsManager().getStats(tackler.contextualId)
+        tackle = int(tacklerStats.getStatTotalValue(StatIds.TACKLE_BLOCK)) if tacklerStats is not None else 0
         if tackle < 0:
             tackle = 0
         return (evade + 2) / (tackle + 2) / 2
 
     @classmethod
-    def getTacklerOnCell(cls, cellId: int) -> IEntity:
-        entity: "AnimatedCharacter" = None
-        infos: "GameFightFighterInformations" = None
+    def getTacklerOnCell(cls, cellId) -> IEntity:
         entitiesFrame: "FightEntitiesFrame" = Kernel().worker.getFrameByName("FightEntitiesFrame")
         entities: list[IEntity] = EntitiesManager().getEntitiesOnCell(cellId, AnimatedCharacter)
         for entity in entities:

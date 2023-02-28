@@ -1,28 +1,30 @@
 import pydofus2.com.ankamagames.dofus.logic.game.common.managers.PlayedCharacterManager as pcm
-from pydofus2.com.ankamagames.atouin.managers.EntitiesManager import EntitiesManager
+from pydofus2.com.ankamagames.atouin.managers.EntitiesManager import \
+    EntitiesManager
 from pydofus2.com.ankamagames.dofus.datacenter.monsters.Monster import Monster
-from pydofus2.com.ankamagames.dofus.internalDatacenter.world.WorldPointWrapper import WorldPointWrapper
-from pydofus2.com.ankamagames.dofus.logic.common.managers.StatsManager import StatsManager
-from pydofus2.com.ankamagames.dofus.logic.game.common.misc.DofusEntities import DofusEntities
-from pydofus2.com.ankamagames.dofus.network.messages.game.context.EntityDispositionInformations import (
-    EntityDispositionInformations,
-)
-from pydofus2.com.ankamagames.dofus.network.types.game.context.fight.GameFightFighterInformations import (
-    GameFightFighterInformations,
-)
-from pydofus2.com.ankamagames.dofus.network.types.game.context.fight.GameFightMonsterInformations import (
-    GameFightMonsterInformations,
-)
-from pydofus2.com.ankamagames.dofus.network.types.game.context.GameContextActorInformations import (
-    GameContextActorInformations,
-)
-from pydofus2.com.ankamagames.dofus.network.types.game.context.roleplay.GameRolePlayHumanoidInformations import (
-    GameRolePlayHumanoidInformations,
-)
-from pydofus2.com.ankamagames.dofus.network.types.game.interactive.InteractiveElement import InteractiveElement
-from pydofus2.com.ankamagames.dofus.types.entities.AnimatedCharacter import AnimatedCharacter
+from pydofus2.com.ankamagames.dofus.internalDatacenter.world.WorldPointWrapper import \
+    WorldPointWrapper
+from pydofus2.com.ankamagames.dofus.logic.common.managers.StatsManager import \
+    StatsManager
+from pydofus2.com.ankamagames.dofus.logic.game.common.misc.DofusEntities import \
+    DofusEntities
+from pydofus2.com.ankamagames.dofus.network.messages.game.context.EntityDispositionInformations import \
+    EntityDispositionInformations
+from pydofus2.com.ankamagames.dofus.network.types.game.context.fight.GameFightFighterInformations import \
+    GameFightFighterInformations
+from pydofus2.com.ankamagames.dofus.network.types.game.context.fight.GameFightMonsterInformations import \
+    GameFightMonsterInformations
+from pydofus2.com.ankamagames.dofus.network.types.game.context.GameContextActorInformations import \
+    GameContextActorInformations
+from pydofus2.com.ankamagames.dofus.network.types.game.context.roleplay.GameRolePlayHumanoidInformations import \
+    GameRolePlayHumanoidInformations
+from pydofus2.com.ankamagames.dofus.network.types.game.interactive.InteractiveElement import \
+    InteractiveElement
+from pydofus2.com.ankamagames.dofus.types.entities.AnimatedCharacter import \
+    AnimatedCharacter
 from pydofus2.com.ankamagames.jerakine.logger.Logger import Logger
-from pydofus2.com.ankamagames.jerakine.logger.MemoryProfiler import MemoryProfiler
+from pydofus2.com.ankamagames.jerakine.logger.MemoryProfiler import \
+    MemoryProfiler
 from pydofus2.com.ankamagames.jerakine.messages.Frame import Frame
 from pydofus2.com.ankamagames.jerakine.messages.Message import Message
 from pydofus2.com.ankamagames.jerakine.types.enums.Priority import Priority
@@ -31,7 +33,7 @@ from pydofus2.com.ankamagames.jerakine.types.positions.MapPoint import MapPoint
 
 class AbstractEntitiesFrame(Frame):
     def __init__(self):
-        self._entities = dict()
+        self._entities = dict[int, GameContextActorInformations]()
         self._entitiesTotal: int = 0
         self._entitiesVisibleNumber: int = 0
         self._interactiveElements = list[InteractiveElement]()
@@ -42,7 +44,7 @@ class AbstractEntitiesFrame(Frame):
         super().__init__()
 
     def pulled(self) -> bool:
-        self._entities = dict()
+        self._entities = dict[int, GameContextActorInformations]()
         self._entitiesTotal: int = 0
         self._entitiesVisibleNumber: int = 0
         self._interactiveElements = list[InteractiveElement]()
@@ -111,6 +113,7 @@ class AbstractEntitiesFrame(Frame):
             self._entitiesTotal -= 1
             del self._entities[actorId]
         StatsManager().deleteStats(actorId)
+        Logger().debug(f"[EntitiesManager] Unregistered actor {actorId}.")
 
     def addOrUpdateActor(self, infos: GameContextActorInformations) -> AnimatedCharacter:
         characterEntity: AnimatedCharacter = DofusEntities().getEntity(infos.contextualId)
@@ -121,7 +124,7 @@ class AbstractEntitiesFrame(Frame):
             characterEntity = AnimatedCharacter(infos.contextualId)
             if isinstance(infos, GameFightMonsterInformations):
                 characterEntity.speedAdjust = Monster.getMonsterById(infos.creatureGenericId).speedAdjust
-            EntitiesManager().addAnimatedEntity(infos.contextualId, characterEntity)
+            EntitiesManager().addEntity(infos.contextualId, characterEntity)
         if isinstance(infos, GameRolePlayHumanoidInformations):
             humanoid = infos
             if int(infos.contextualId) == int(pcm.PlayedCharacterManager().id):

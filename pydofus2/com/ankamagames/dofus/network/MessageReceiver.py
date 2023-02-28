@@ -1,12 +1,19 @@
 import importlib
 import json
-from pydofus2.com.ankamagames.dofus.kernel.Kernel import Kernel
-from pydofus2.com.ankamagames.jerakine.metaclasses.ThreadSharedSingleton import ThreadSharedSingleton
-from pydofus2.com.ankamagames.jerakine.network.CustomDataWrapper import ByteArray
-from pydofus2.com.ankamagames.jerakine.network.INetworkMessage import INetworkMessage
-from pydofus2.com.ankamagames.jerakine.network.NetworkMessage import NetworkMessage
-from pydofus2.com.ankamagames.jerakine.network.RawDataParser import RawDataParser
+
 import pydofus2.com.ankamagames.dofus.Constants as Constants
+from pydofus2.com.ankamagames.dofus.kernel.Kernel import Kernel
+from pydofus2.com.ankamagames.jerakine.logger.Logger import Logger
+from pydofus2.com.ankamagames.jerakine.metaclasses.ThreadSharedSingleton import \
+    ThreadSharedSingleton
+from pydofus2.com.ankamagames.jerakine.network.CustomDataWrapper import \
+    ByteArray
+from pydofus2.com.ankamagames.jerakine.network.INetworkMessage import \
+    INetworkMessage
+from pydofus2.com.ankamagames.jerakine.network.NetworkMessage import \
+    NetworkMessage
+from pydofus2.com.ankamagames.jerakine.network.RawDataParser import \
+    RawDataParser
 
 with open(Constants.PROTOCOL_MSG_SHUFFLE_PATH, "r") as fp:
     msgShuffle: dict = json.load(fp)
@@ -135,10 +142,12 @@ class MessageReceiver(RawDataParser, metaclass=ThreadSharedSingleton):
         if messageType:
             if messageType.__name__ == "GameFightJoinMessage":
                 self.infight = True
+                Logger().separator("Fight started", '+')
             elif messageType.__name__ == "GameFightEndMessage":
                 self.infight = False
+                Logger().separator("Fight ended", '-')
         if not messageType or (
-            Kernel()._mule
+            Kernel().isMule
             and self.infight
             and messageType.__name__ in _mule_fight_messages_to_discard
         ):

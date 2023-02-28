@@ -19,6 +19,7 @@ from pydofus2.com.ankamagames.jerakine.types.positions.WorldPoint import \
 
 
 class MapDisplayManager(metaclass=Singleton):
+    
     def __init__(self) -> None:
         self._currentMapRendered = True
         self._currentMap = None
@@ -68,24 +69,22 @@ class MapDisplayManager(metaclass=Singleton):
     def getIdentifiedElementPosition(self, identifier: int) -> MapPoint:
         return self._identifiedElementPosition.get(identifier)
 
-    def mapDisplayed(self) -> None:
-        pass
-
     def loadMap(self, mapId: int, forceReloadWithoutCache: bool = False, decryptionKey=None) -> None:
         from pydofus2.com.ankamagames.dofus.kernel.Kernel import Kernel
         self.currentDataMap = None
         self._forceReloadWithoutCache = forceReloadWithoutCache
         self._currentMapRendered = False
         self._nMapLoadStart = perf_counter()
-        map = MapLoader.load(mapId, key=decryptionKey)
+        self.currentDataMap = MapLoader.load(mapId, key=decryptionKey)
+        if self.currentDataMap is None:
+            raise Exception(f"Map {mapId} not loaded!")
         self._currentMapRendered = True
         self._nMapLoadEnd = perf_counter()
-        Logger().separator(f"Map {map.id} loaded", "#")
+        Logger().separator(f"Map {self.currentDataMap.id} loaded", "#")
         dmpm.DataMapProvider().resetUpdatedCell()
         dmpm.DataMapProvider().resetSpecialEffects()
         StatsManager().purgeNonPlayersStats()
-        self.currentDataMap = map
-        self._currentMap = WorldPoint.fromMapId(map.id)
+        self._currentMap = WorldPoint.fromMapId(self.currentDataMap.id)
         msg = MapLoadedMessage()
         msg.id = self._currentMap.mapId
         self.initIdentifiedElements()

@@ -1,13 +1,22 @@
 import threading
+import time
+from time import perf_counter
+
 from pydofus2.com.ankamagames.dofus.kernel.Kernel import Kernel
-from pydofus2.com.ankamagames.dofus.kernel.net.ConnectionType import ConnectionType
-from pydofus2.com.ankamagames.dofus.kernel.net.DisconnectionReason import DisconnectionReason
-from pydofus2.com.ankamagames.dofus.kernel.net.DisconnectionReasonEnum import DisconnectionReasonEnum
-from pydofus2.com.ankamagames.dofus.logic.common.managers.PlayerManager import PlayerManager
+from pydofus2.com.ankamagames.dofus.kernel.net.ConnectionType import \
+    ConnectionType
+from pydofus2.com.ankamagames.dofus.kernel.net.DisconnectionReason import \
+    DisconnectionReason
+from pydofus2.com.ankamagames.dofus.kernel.net.DisconnectionReasonEnum import \
+    DisconnectionReasonEnum
+from pydofus2.com.ankamagames.dofus.logic.common.managers.PlayerManager import \
+    PlayerManager
 from pydofus2.com.ankamagames.jerakine.logger.Logger import Logger
 from pydofus2.com.ankamagames.jerakine.metaclasses.Singleton import Singleton
-from pydofus2.com.ankamagames.jerakine.network.INetworkMessage import INetworkMessage
-from pydofus2.com.ankamagames.jerakine.network.ServerConnection import ServerConnection
+from pydofus2.com.ankamagames.jerakine.network.INetworkMessage import \
+    INetworkMessage
+from pydofus2.com.ankamagames.jerakine.network.ServerConnection import \
+    ServerConnection
 
 
 class ConnectionsHandler(metaclass=Singleton):
@@ -15,6 +24,7 @@ class ConnectionsHandler(metaclass=Singleton):
     GAME_SERVER: str = "game_server"
     KOLI_SERVER: str = "koli_server"
     CONNECTION_TIMEOUT: int = 3
+    MINTIME_BETWEEN_SENDS = 0.05
 
     def __init__(self):
         self._conn: ServerConnection = None
@@ -27,6 +37,7 @@ class ConnectionsHandler(metaclass=Singleton):
         self._receivedMsgsQueue = Kernel().worker._queue
         self.paused = threading.Event()
         self.resumed = threading.Event()
+        self.lastSendTime = None
 
     @property
     def connectionType(self) -> str:
@@ -77,11 +88,17 @@ class ConnectionsHandler(metaclass=Singleton):
         self._currentConnectionType = ConnectionType.DISCONNECTED
 
     def etablishConnection(self, host: str, port: int, id: str) -> None:
-        from pydofus2.com.ankamagames.dofus.logic.connection.frames.HandshakeFrame import HandshakeFrame
+        from pydofus2.com.ankamagames.dofus.logic.connection.frames.HandshakeFrame import \
+            HandshakeFrame
         self._conn = ServerConnection(id, self._receivedMsgsQueue)
         Kernel().worker.addFrame(HandshakeFrame())
         self._conn.start()
         self._conn.connect(host, port)
 
     def send(self, msg: INetworkMessage) -> None:
+        # if self.lastSendTime:
+        #     timeSinceLastSend = perf_counter() - self.lastSendTime
+        #     if timeSinceLastSend < self.MINTIME_BETWEEN_SENDS:
+        #         time.sleep(self.MINTIME_BETWEEN_SENDS - timeSinceLastSend)
+        # self.lastSendTime = perf_counter()
         self._conn.send(msg)

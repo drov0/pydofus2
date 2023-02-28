@@ -53,16 +53,12 @@ class CurrentPlayedFighterManager(metaclass=Singleton):
     def currentFighterId(self) -> float:
         return self._currentFighterId
 
-    def setCurrentFighterId(self, id: float, playerManager: pcm.PlayedCharacterManager=None) -> None:
+    def setCurrentFighterId(self, id: float) -> None:
         if id == self._currentFighterId:
             return
         lastFighterId = self._currentFighterId
         self._currentFighterId = id
-        if not playerManager:
-            playerManager = self.playerManager
-        else:
-            self.playerManager = playerManager
-        self._currentFighterIsRealPlayer = self._currentFighterId == playerManager.id
+        self._currentFighterIsRealPlayer = self._currentFighterId == self.playerManager.id
         lastFighterEntity: "AnimatedCharacter" = DofusEntities().getEntity(lastFighterId)
         if lastFighterEntity:
             lastFighterEntity.canSeeThrough = False
@@ -100,6 +96,7 @@ class CurrentPlayedFighterManager(metaclass=Singleton):
         if id:
             if id == player.id:
                 return player.characteristics
+            Logger().warn(f"Get characteristics informations for an entity that is not the player.")
             return self._characteristicsInformationsList[id]
         if self._currentFighterIsRealPlayer or not player.isFighting:
             return player.characteristics
@@ -154,9 +151,9 @@ class CurrentPlayedFighterManager(metaclass=Singleton):
         from pydofus2.com.ankamagames.dofus.datacenter.spells.Spell import Spell
 
         spellName = None
-        spell: Spell = Spell.getSpellById(spellId)
-        spellLevel: SpellLevel = spell.getSpellLevel(lvl)
-        if spellLevel == None:
+        spell = Spell.getSpellById(spellId)
+        spellLevel = spell.getSpellLevel(lvl)
+        if spellLevel is None:
             if result:
                 result[0] = I18n.getUiText("ui.fightAutomsg.spellcast.noSpell", [spellName])
             return False
@@ -168,7 +165,7 @@ class CurrentPlayedFighterManager(metaclass=Singleton):
                 else:
                     spellName = spell.name
             else:
-                spellName = "{spell," + str(spellId) + "," + str(lvl) + "}"
+                spellName = f"{spell,{spellId},{lvl}}"
             if spellLevel.minPlayerLevel > player.infos.level:
                 if result:
                     if player.infos.level > ProtocolConstantsEnum.MAX_LEVEL:

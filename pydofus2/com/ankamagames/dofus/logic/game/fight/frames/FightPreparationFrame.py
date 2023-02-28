@@ -78,11 +78,6 @@ from pydofus2.com.ankamagames.dofus.network.messages.game.context.GameEntityDisp
 from pydofus2.com.ankamagames.dofus.network.messages.game.idol.IdolFightPreparationUpdateMessage import (
     IdolFightPreparationUpdateMessage,
 )
-from pydofus2.com.ankamagames.dofus.network.types.game.context.fight.GameFightFighterInformations import (
-    GameFightFighterInformations,
-)
-from pydofus2.com.ankamagames.dofus.types.entities.AnimatedCharacter import AnimatedCharacter
-from pydofus2.com.ankamagames.jerakine.entities.messages.EntityClickMessage import EntityClickMessage
 from pydofus2.com.ankamagames.jerakine.logger.Logger import Logger
 from pydofus2.com.ankamagames.jerakine.messages.Frame import Frame
 from pydofus2.com.ankamagames.jerakine.messages.Message import Message
@@ -246,22 +241,6 @@ class FightPreparationFrame(Frame):
 
         if isinstance(msg, GameEntityDispositionErrorMessage):
             Logger().error("Cette position n'est pas accessible.")
-            return True
-
-        if isinstance(msg, EntityClickMessage):
-            ecmsg = msg
-            clickedEntity = ecmsg.entity
-            if clickedEntity:
-                entitiesFrame = Kernel().worker.getFrameByName("FightEntitiesFrame")
-                fighterInfos = entitiesFrame.getEntityInfos(clickedEntity.id)
-                playerInfos = entitiesFrame.getEntityInfos(PlayedCharacterManager().id)
-                if not (
-                    fighterInfos
-                    and playerInfos
-                    and fighterInfos.contextualId != playerInfos.contextualId
-                    and fighterInfos.spawnInfo.teamId == playerInfos.spawnInfo.teamId
-                ):
-                    return True
             return True
 
         if isinstance(msg, GameContextKickAction):

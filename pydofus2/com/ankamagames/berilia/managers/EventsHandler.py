@@ -1,13 +1,15 @@
 import threading
 from whistle import Event, EventDispatcher
 
+from pydofus2.com.ankamagames.jerakine.logger.Logger import Logger
+
 lock = threading.Lock()
 
 
 class EventsHandler(EventDispatcher):
     def __init__(self):
         super().__init__()
-        self._listeners = {}
+        self._listeners = dict[str, dict[int, list[callable]]]()
         self._sorted = {}
         self.__waiting_evts = list[threading.Event]()
         self._crashMessage = None
@@ -33,20 +35,18 @@ class EventsHandler(EventDispatcher):
         with lock:
             if event_id not in self._listeners:
                 self._listeners[event_id] = {}
-
             if priority not in self._listeners[event_id]:
                 self._listeners[event_id][priority] = []
             self._listeners[event_id][priority].append(listener)
-
             if event_id in self._sorted:
                 del self._sorted[event_id]
 
-    def once(self, event, callback):
-        def onEvt(e, *args, **kwargs):
-            self.remove_listener(event, onEvt)
-            callback(e, *args, **kwargs)
-
-        self.on(event, onEvt)
+    def once(self, event_id, callback, args=[], kwargs={}):
+        def onEvt(event, *args, **kwargs):
+            self.remove_listener(event_id, onEvt)
+            callback(event, *args, **kwargs)
+        self.on(event_id, onEvt)
+        return onEvt
 
     def send(self, event_id, *args, **kwargs):
         event = Event()
@@ -68,3 +68,12 @@ class EventsHandler(EventDispatcher):
         for evt in self.__waiting_evts:
             evt.set()
         self.__waiting_evts.clear()
+
+    def remove_listener(self, event_id, listener):
+        if event_id not in self._listeners:
+            return Logger().warning(f"Event {event_id} not found")
+        for listeners in self._listeners[event_id].values():
+            if listener in listeners:
+                listeners.remove(listener)
+        if event_id in self._sorted:
+            del self._sorted[event_id]

@@ -1,9 +1,15 @@
 from typing import TYPE_CHECKING
-from pydofus2.com.ankamagames.atouin.managers.MapDisplayManager import MapDisplayManager
-from pydofus2.com.ankamagames.dofus.datacenter.world.MapPosition import MapPosition
-from pydofus2.com.ankamagames.dofus.logic.game.common.misc.DofusEntities import DofusEntities
-from pydofus2.com.ankamagames.jerakine.entities.interfaces.IEntity import IEntity
 
+from pydofus2.com.ankamagames.atouin.managers.MapDisplayManager import \
+    MapDisplayManager
+from pydofus2.com.ankamagames.dofus.datacenter.world.MapPosition import \
+    MapPosition
+from pydofus2.com.ankamagames.dofus.logic.game.common.misc.DofusEntities import \
+    DofusEntities
+from pydofus2.com.ankamagames.dofus.modules.utils.pathFinding.world.Vertex import \
+    Vertex
+from pydofus2.com.ankamagames.jerakine.entities.interfaces.IEntity import \
+    IEntity
 
 if TYPE_CHECKING:
     from pydofus2.com.ankamagames.dofus.network.types.game.character.choice.CharacterBaseInformations import (
@@ -31,22 +37,23 @@ if TYPE_CHECKING:
     from pydofus2.com.ankamagames.dofus.network.types.game.havenbag.HavenBagRoomPreviewInformation import (
         HavenBagRoomPreviewInformation,
     )
-from pydofus2.com.ankamagames.dofus.network.enums.CharacterInventoryPositionEnum import (
-    CharacterInventoryPositionEnum,
-)
-from pydofus2.com.ankamagames.dofus.network.enums.PlayerLifeStatusEnum import (
-    PlayerLifeStatusEnum,
-)
 
-from pydofus2.com.ankamagames.jerakine.logger.Logger import Logger
 from pydofus2.com.ankamagames.dofus.internalDatacenter.DataEnum import DataEnum
-from pydofus2.com.ankamagames.dofus.logic.common.managers.StatsManager import StatsManager
-from pydofus2.com.ankamagames.dofus.network.ProtocolConstantsEnum import ProtocolConstantsEnum
-from pydofus2.com.ankamagames.jerakine.interfaces.IDestroyable import IDestroyable
+from pydofus2.com.ankamagames.dofus.logic.common.managers.StatsManager import \
+    StatsManager
+from pydofus2.com.ankamagames.dofus.network.enums.CharacterInventoryPositionEnum import \
+    CharacterInventoryPositionEnum
+from pydofus2.com.ankamagames.dofus.network.enums.PlayerLifeStatusEnum import \
+    PlayerLifeStatusEnum
+from pydofus2.com.ankamagames.dofus.network.ProtocolConstantsEnum import \
+    ProtocolConstantsEnum
+from pydofus2.com.ankamagames.jerakine.interfaces.IDestroyable import \
+    IDestroyable
+from pydofus2.com.ankamagames.jerakine.logger.Logger import Logger
 from pydofus2.com.ankamagames.jerakine.metaclasses.Singleton import Singleton
 from pydofus2.com.ankamagames.jerakine.types.Callback import Callback
-from pydofus2.flash.geom.Point import Point
 from pydofus2.damageCalculation.tools.StatIds import StatIds
+from pydofus2.flash.geom.Point import Point
 
 
 class PlayedCharacterManager(IDestroyable, metaclass=Singleton):
@@ -128,6 +135,14 @@ class PlayedCharacterManager(IDestroyable, metaclass=Singleton):
         self._infos = pInfos
         for callback in self._infosAvailableCallbacks:
             callback.exec()
+
+    @property
+    def currVertex(self) -> Vertex:
+        from pydofus2.com.ankamagames.dofus.modules.utils.pathFinding.world.WorldGraph import \
+    WorldGraph
+        if self.currentZoneRp is None or self.currentMap is None:
+            return None
+        return WorldGraph().getVertex(self.currentMap.mapId, self.currentZoneRp)
 
     @property
     def stats(self) -> "EntityStats":
@@ -221,10 +236,9 @@ class PlayedCharacterManager(IDestroyable, metaclass=Singleton):
 
     @property
     def isInKoli(self) -> bool:
-        from pydofus2.com.ankamagames.dofus.logic.game.fight.frames.FightContextFrame import (
-            FightContextFrame,
-        )
         from pydofus2.com.ankamagames.dofus.kernel.Kernel import Kernel
+        from pydofus2.com.ankamagames.dofus.logic.game.fight.frames.FightContextFrame import \
+            FightContextFrame
 
         fightContextFrame: FightContextFrame = Kernel().worker.getFrameByName("FightContextFrame")
         return fightContextFrame and fightContextFrame.isKolossium
@@ -270,13 +284,10 @@ class PlayedCharacterManager(IDestroyable, metaclass=Singleton):
 
     @property
     def isMutated(self) -> bool:
-        from pydofus2.com.ankamagames.dofus.logic.game.common.managers.InventoryManager import (
-            InventoryManager,
-        )
-
+        from pydofus2.com.ankamagames.dofus.logic.game.common.managers.InventoryManager import \
+            InventoryManager
         l: int = 0
         i: int = 0
-
         rpBuffs = InventoryManager().inventory.getView("roleplayBuff").content
         if rpBuffs:
             l = len(rpBuffs)

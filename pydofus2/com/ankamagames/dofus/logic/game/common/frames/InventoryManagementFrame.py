@@ -1,3 +1,4 @@
+from pydofus2.com.ankamagames.berilia.managers.KernelEventsManager import KernelEvent, KernelEventsManager
 from pydofus2.com.ankamagames.dofus.internalDatacenter.DataEnum import DataEnum
 from pydofus2.com.ankamagames.dofus.kernel.net.ConnectionsHandler import ConnectionsHandler
 from pydofus2.com.ankamagames.dofus.logic.game.common.managers.InventoryManager import InventoryManager
@@ -162,6 +163,8 @@ class InventoryManagementFrame(Frame):
             PlayedCharacterManager().inventoryWeight = iwmsg.inventoryWeight
             PlayedCharacterManager().shopWeight = iwmsg.shopWeight
             PlayedCharacterManager().inventoryWeightMax = iwmsg.weightMax
+            if iwmsg.inventoryWeight / iwmsg.weightMax > 0.95:
+                KernelEventsManager().send(KernelEvent.FULL_PODS)
             return False
 
         if isinstance(msg, ObjectMovementMessage):

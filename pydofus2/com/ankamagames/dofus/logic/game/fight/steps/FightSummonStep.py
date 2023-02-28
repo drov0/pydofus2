@@ -1,37 +1,42 @@
-from pydofus2.com.ankamagames.atouin.managers.EntitiesManager import EntitiesManager
-from pydofus2.com.ankamagames.dofus.internalDatacenter.spells.SpellWrapper import SpellWrapper
-from pydofus2.com.ankamagames.dofus.internalDatacenter.stats.EntityStats import EntityStats
+from typing import TYPE_CHECKING
+
+from pydofus2.com.ankamagames.atouin.managers.EntitiesManager import \
+    EntitiesManager
+from pydofus2.com.ankamagames.dofus.internalDatacenter.spells.SpellWrapper import \
+    SpellWrapper
+from pydofus2.com.ankamagames.dofus.internalDatacenter.stats.EntityStats import \
+    EntityStats
 from pydofus2.com.ankamagames.dofus.internalDatacenter.stats.Stat import Stat
 from pydofus2.com.ankamagames.dofus.kernel.Kernel import Kernel
-from pydofus2.com.ankamagames.dofus.logic.common.managers.StatsManager import StatsManager
-from pydofus2.com.ankamagames.dofus.logic.game.common.managers.PlayedCharacterManager import (
-    PlayedCharacterManager,
-)
-from pydofus2.com.ankamagames.dofus.logic.game.common.misc.DofusEntities import DofusEntities
-from pydofus2.com.ankamagames.dofus.logic.game.fight.frames.FightEntitiesFrame import (
-    FightEntitiesFrame,
-)
-from pydofus2.com.ankamagames.dofus.logic.game.fight.managers.BuffManager import BuffManager
-from pydofus2.com.ankamagames.dofus.logic.game.fight.managers.CurrentPlayedFighterManager import (
-    CurrentPlayedFighterManager,
-)
-from pydofus2.com.ankamagames.dofus.logic.game.fight.steps.IFightStep import IFightStep
-from pydofus2.com.ankamagames.dofus.logic.game.fight.types.StateBuff import StateBuff
-from pydofus2.com.ankamagames.dofus.network.messages.game.context.fight.character.GameFightShowFighterMessage import (
-    GameFightShowFighterMessage,
-)
-from pydofus2.com.ankamagames.dofus.network.types.game.context.fight.GameFightFighterInformations import (
-    GameFightFighterInformations,
-)
-from pydofus2.com.ankamagames.jerakine.sequencer.AbstractSequencable import AbstractSequencable
+from pydofus2.com.ankamagames.dofus.logic.common.managers.StatsManager import \
+    StatsManager
+from pydofus2.com.ankamagames.dofus.logic.game.common.managers.PlayedCharacterManager import \
+    PlayedCharacterManager
+from pydofus2.com.ankamagames.dofus.logic.game.common.misc.DofusEntities import \
+    DofusEntities
+from pydofus2.com.ankamagames.dofus.logic.game.fight.frames.FightEntitiesFrame import \
+    FightEntitiesFrame
+from pydofus2.com.ankamagames.dofus.logic.game.fight.managers.BuffManager import \
+    BuffManager
+from pydofus2.com.ankamagames.dofus.logic.game.fight.managers.CurrentPlayedFighterManager import \
+    CurrentPlayedFighterManager
+from pydofus2.com.ankamagames.dofus.logic.game.fight.steps.IFightStep import \
+    IFightStep
+from pydofus2.com.ankamagames.dofus.logic.game.fight.types.StateBuff import \
+    StateBuff
+from pydofus2.com.ankamagames.dofus.network.messages.game.context.fight.character.GameFightShowFighterMessage import \
+    GameFightShowFighterMessage
+from pydofus2.com.ankamagames.dofus.network.types.game.context.fight.GameFightFighterInformations import \
+    GameFightFighterInformations
+from pydofus2.com.ankamagames.jerakine.logger.Logger import Logger
+from pydofus2.com.ankamagames.jerakine.sequencer.AbstractSequencable import \
+    AbstractSequencable
 from pydofus2.damageCalculation.tools.StatIds import StatIds
-from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
 
-    from pydofus2.com.ankamagames.dofus.logic.game.fight.frames.FightBattleFrame import (
-        FightBattleFrame,
-    )
+    from pydofus2.com.ankamagames.dofus.logic.game.fight.frames.FightBattleFrame import \
+        FightBattleFrame
 
 
 class FightSummonStep(AbstractSequencable, IFightStep):
@@ -44,6 +49,7 @@ class FightSummonStep(AbstractSequencable, IFightStep):
         super().__init__()
         self._summonerId = summonerId
         self._summonInfos = summonInfos
+        Logger().info(f"Fighter ({self._summonerId}) summoned {self._summonInfos.contextualId} on cell {self._summonInfos.disposition.cellId}")
 
     @property
     def stepType(self) -> str:
@@ -67,10 +73,10 @@ class FightSummonStep(AbstractSequencable, IFightStep):
             for buff in buffs:
                 if isinstance(buff, StateBuff):
                     BuffManager().updateBuff(buff)
-        summonStats: EntityStats = StatsManager().getStats(self._summonInfos.contextualId)
-        summonLifePoints: float = summonStats.getHealthPoints()
+        summonStats = StatsManager().getStats(self._summonInfos.contextualId)
+        summonLifePoints = summonStats.getHealthPoints()
         if self._summonInfos.contextualId == PlayedCharacterManager().id:
-            fighterInfos: "GameFightFighterInformations" = FightEntitiesFrame.getCurrentInstance().getEntityInfos(
+            fighterInfos = FightEntitiesFrame.getCurrentInstance().getEntityInfos(
                 self._summonInfos.contextualId
             )
             stats = StatsManager().getStats(fighterInfos.contextualId)

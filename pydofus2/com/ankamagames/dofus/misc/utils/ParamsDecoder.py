@@ -2,8 +2,10 @@ from pydofus2.com.ankamagames.dofus.datacenter.items.Item import Item
 from pydofus2.com.ankamagames.dofus.datacenter.items.ItemType import ItemType
 from pydofus2.com.ankamagames.dofus.datacenter.jobs.Job import Job
 from pydofus2.com.ankamagames.dofus.datacenter.quest.Quest import Quest
-from pydofus2.com.ankamagames.dofus.internalDatacenter.items.ItemWrapper import ItemWrapper
-from pydofus2.com.ankamagames.dofus.logic.common.managers.HyperlinkItemManager import HyperlinkItemManager
+from pydofus2.com.ankamagames.dofus.internalDatacenter.items.ItemWrapper import \
+    ItemWrapper
+from pydofus2.com.ankamagames.dofus.logic.common.managers.HyperlinkItemManager import \
+    HyperlinkItemManager
 from pydofus2.com.ankamagames.jerakine.data.I18n import I18n
 from pydofus2.com.ankamagames.jerakine.logger.Logger import Logger
 
@@ -72,13 +74,14 @@ class ParamsDecoder:
                 return ""
         else:
             if type == "$item":
-                item = Item.getItemById(int(params[nid]))
-                if item:
-                    itemw = ItemWrapper.create(0, 0, int(params[nid]), 0, None, False)
-                    newString = HyperlinkItemManager.newChatItem(itemw)
-                else:
-                    Logger().error(f"{type} {params[nid]} introuvable")
-                    newString = ""
+                # item = Item.getItemById(int(params[nid]))
+                # if item:
+                #     itemw = ItemWrapper.create(0, 0, int(params[nid]), 0, [], False)
+                #     newString = HyperlinkItemManager.newChatItem(itemw)
+                # else:
+                #     Logger().error(f"{type} {params[nid]} introuvable")
+                #     newString = ""
+                newString = "item"
             elif type == "$itemType":
                 itemType = ItemType.getItemTypeById(params[nid])
                 if itemType:

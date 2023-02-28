@@ -1,13 +1,19 @@
+from pydofus2.com.ankamagames.berilia.managers.KernelEventsManager import (
+    KernelEvent, KernelEventsManager)
 from pydofus2.com.ankamagames.dofus.kernel.Kernel import Kernel
-from pydofus2.com.ankamagames.dofus.kernel.net.ConnectionsHandler import ConnectionsHandler
+from pydofus2.com.ankamagames.dofus.kernel.net.ConnectionsHandler import \
+    ConnectionsHandler
 from pydofus2.com.ankamagames.dofus.kernel.PanicMessages import PanicMessages
-from pydofus2.com.ankamagames.dofus.logic.game.common.actions.GameContextQuitAction import GameContextQuitAction
-from pydofus2.com.ankamagames.dofus.network.enums.GameContextEnum import GameContextEnum
-from pydofus2.com.ankamagames.dofus.network.messages.game.context.GameContextCreateMessage import (
-    GameContextCreateMessage,
-)
-from pydofus2.com.ankamagames.dofus.network.messages.game.context.GameContextQuitMessage import GameContextQuitMessage
-from pydofus2.com.ankamagames.dofus.network.messages.game.context.roleplay.CurrentMapMessage import CurrentMapMessage
+from pydofus2.com.ankamagames.dofus.logic.game.common.actions.GameContextQuitAction import \
+    GameContextQuitAction
+from pydofus2.com.ankamagames.dofus.network.enums.GameContextEnum import \
+    GameContextEnum
+from pydofus2.com.ankamagames.dofus.network.messages.game.context.GameContextCreateMessage import \
+    GameContextCreateMessage
+from pydofus2.com.ankamagames.dofus.network.messages.game.context.GameContextQuitMessage import \
+    GameContextQuitMessage
+from pydofus2.com.ankamagames.dofus.network.messages.game.context.roleplay.CurrentMapMessage import \
+    CurrentMapMessage
 from pydofus2.com.ankamagames.jerakine.logger.Logger import Logger
 from pydofus2.com.ankamagames.jerakine.messages.Frame import Frame
 from pydofus2.com.ankamagames.jerakine.messages.Message import Message
@@ -32,14 +38,16 @@ class ContextChangeFrame(Frame):
         if isinstance(msg, GameContextCreateMessage):
             self.currentContext = msg.context
             if self.currentContext == GameContextEnum.ROLE_PLAY:
-                import pydofus2.com.ankamagames.dofus.logic.game.roleplay.frames.RoleplayContextFrame as rplCF
-                Kernel().worker.addFrame(rplCF.RoleplayContextFrame())
+                from pydofus2.com.ankamagames.dofus.logic.game.roleplay.frames.RoleplayContextFrame import \
+                    RoleplayContextFrame
+                Kernel().worker.addFrame(RoleplayContextFrame())
 
             elif self.currentContext == GameContextEnum.FIGHT:
-                import pydofus2.com.ankamagames.dofus.logic.game.fight.frames.FightContextFrame as fcf
-                if not Kernel()._mule:
-                    Kernel().worker.addFrame(fcf.FightContextFrame())
-
+                from pydofus2.com.ankamagames.dofus.logic.game.fight.frames.FightContextFrame import \
+                    FightContextFrame
+                if not Kernel().isMule:
+                    Kernel().worker.addFrame(FightContextFrame())
+                KernelEventsManager().send(KernelEvent.FIGHT_STARTED)
             return False
 
         if isinstance(msg, GameContextQuitAction):

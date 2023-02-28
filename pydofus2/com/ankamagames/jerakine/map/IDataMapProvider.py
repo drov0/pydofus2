@@ -30,7 +30,7 @@ class IDataMapProvider:
     def pointWeight(self, param1: int, param2: int, param3: bool = True) -> float:
         pass
 
-    def hasEntity(self, param1: int, param2: int, param3: bool = False) -> bool:
+    def hasEntity(self, x: int, y: int, allowThroughtEntity: bool = False) -> bool:
         pass
 
     def updateCellMovLov(self, param1: int, param2: bool) -> None:

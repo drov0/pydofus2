@@ -1,4 +1,5 @@
 import heapq
+from pydofus2.com.ankamagames.atouin.utils.DataMapProvider import DataMapProvider
 from pydofus2.com.ankamagames.jerakine.logger.Logger import Logger
 from pydofus2.com.ankamagames.jerakine.metaclasses.Singleton import Singleton
 import pydofus2.mapTools.MapTools as MapTools
@@ -37,14 +38,14 @@ class Pathfinding(metaclass=Singleton):
         )
 
     def initAlgo(
-        self, mapData: IDataMapProvider, start: MapPoint, end: MapPoint, allowDiag, bAllowTroughEntity, avoidObstacles
+        self, start: MapPoint, end: MapPoint, allowDiag, bAllowTroughEntity, avoidObstacles
     ):
         self._allowDiag = allowDiag
         self._allowTroughEntity = bAllowTroughEntity
         self._avoidObstacles = avoidObstacles
         self._end = end
         self._start = start
-        self._mapData = mapData
+        self._mapData = DataMapProvider()
         self._parentOfCell = {}
         self._isCellClosed = set()
         self._isEntityOnCell = {}
@@ -52,7 +53,7 @@ class Pathfinding(metaclass=Singleton):
         self._costOfCell[self._start.cellId] = 0
         self._endCellAuxId = start.cellId
         self._distToEnd = self.distFromEnd(start.cellId)
-        mapData.fillEntityOnCellArray(self._isEntityOnCell, bAllowTroughEntity)
+        self._mapData.fillEntityOnCellArray(self._isEntityOnCell, bAllowTroughEntity)
 
     def distFromStart(self, cellId):
         return MapTools.getDistance(cellId, self._start.cellId)
@@ -181,14 +182,13 @@ class Pathfinding(metaclass=Singleton):
 
     def findPath(
         self,
-        mapData: IDataMapProvider,
         start: MapPoint,
         end: MapPoint,
         allowDiag: bool = True,
         bAllowTroughEntity: bool = True,
         avoidObstacles: bool = True,
     ) -> MovementPath:
-        self.initAlgo(mapData, start, end, allowDiag, bAllowTroughEntity, avoidObstacles)
+        self.initAlgo(start, end, allowDiag, bAllowTroughEntity, avoidObstacles)
         open_list = []
         heapq.heappush(open_list, (0, start.cellId))
         while open_list:

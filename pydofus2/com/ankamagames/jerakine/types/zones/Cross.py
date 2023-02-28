@@ -8,19 +8,12 @@ import pydofus2.mapTools.MapTools as MapTools
 class Cross(IZone):
 
     _radius: int = 0
-
     _minRadius: int = 0
-
     _dataMapProvider: IDataMapProvider
-
     _direction: int
-
     _diagonal: bool = False
-
     _allDirections: bool = False
-
     disabledDirection: list
-
     onlyPerpendicular: bool = False
 
     def __init__(self, nMinRadius: int, nMaxRadius: int, dataMapProvider: IDataMapProvider):

@@ -2,13 +2,17 @@ import queue
 import threading
 import time
 
-from pydofus2.com.ankamagames.berilia.managers.KernelEventsManager import KernelEvent, KernelEventsManager
+from pydofus2.com.ankamagames.berilia.managers.KernelEventsManager import (
+    KernelEvent, KernelEventsManager)
 from pydofus2.com.ankamagames.jerakine.logger.Logger import Logger
-from pydofus2.com.ankamagames.jerakine.logger.MemoryProfiler import MemoryProfiler
-from pydofus2.com.ankamagames.jerakine.messages.DiscardableMessage import DiscardableMessage
+from pydofus2.com.ankamagames.jerakine.logger.MemoryProfiler import \
+    MemoryProfiler
+from pydofus2.com.ankamagames.jerakine.messages.DiscardableMessage import \
+    DiscardableMessage
 from pydofus2.com.ankamagames.jerakine.messages.Frame import Frame
 from pydofus2.com.ankamagames.jerakine.messages.Message import Message
-from pydofus2.com.ankamagames.jerakine.messages.MessageHandler import MessageHandler
+from pydofus2.com.ankamagames.jerakine.messages.MessageHandler import \
+    MessageHandler
 
 """
 This Class for handling messages and frames in a Dofus 2 game application. The worker class is a subclass of MessageHandler and
@@ -17,6 +21,7 @@ The class uses the threading module for handling concurrency, and also uses seve
 Logger, Frame, and Message. There are also several class-level variables for enabling debug logging for frames, messages, and frame processing.
 """
 from typing import Optional, Type, TypeVar
+
 T = TypeVar("T", bound="Frame")
 class Worker(MessageHandler):
     DEBUG_FRAMES: bool = False
@@ -52,7 +57,7 @@ class Worker(MessageHandler):
             # with Worker.LOCK:
             #     Worker.LAST_TIME = current_time
             msg = self._queue.get()
-            Logger().debug(f"[Worker] [RCV] {msg}")
+            # Logger().debug(f"[Worker] [RCV] {msg}")
             self.processFramesInAndOut()
             self.processMessage(msg)
         self._terminated.set()
@@ -91,8 +96,6 @@ class Worker(MessageHandler):
                 self._framesToRemove.add(frame)
                 if self.DEBUG_FRAMES:
                     Logger().debug(f"[WORKER] >>> Frame {frame} remove queued...")
-            else:
-                Logger().error(f"[WORKER] Tried to queue Frame '{frame}' for removal but it's already in the queue!")
                     
         elif frame not in self._framesBeingDeleted:
             self._framesBeingDeleted.add(frame)
@@ -126,7 +129,7 @@ class Worker(MessageHandler):
 
     def pushFrame(self, frame: Frame) -> None:
         if str(frame) in [str(f) for f in self._framesList]:
-            Logger().error(f"[WORKER] Frame '{frame}' is already in the list.")
+            Logger().warn(f"[WORKER] Frame '{frame}' is already in the list.")
             return
         if frame.pushed():
             self._framesList.append(frame)

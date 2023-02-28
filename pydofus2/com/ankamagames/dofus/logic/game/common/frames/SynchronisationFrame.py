@@ -1,22 +1,25 @@
 from typing import TYPE_CHECKING
 
 from pydofus2.com.ankamagames.dofus.kernel.Kernel import Kernel
-from pydofus2.com.ankamagames.dofus.kernel.net.ConnectionsHandler import ConnectionsHandler
-from pydofus2.com.ankamagames.dofus.network.enums.GameContextEnum import GameContextEnum
-from pydofus2.com.ankamagames.dofus.network.messages.game.basic.SequenceNumberMessage import SequenceNumberMessage
-from pydofus2.com.ankamagames.dofus.network.messages.game.basic.SequenceNumberRequestMessage import (
-    SequenceNumberRequestMessage,
-)
-from pydofus2.com.ankamagames.dofus.network.messages.game.context.GameContextCreateMessage import (
-    GameContextCreateMessage,
-)
-from pydofus2.com.ankamagames.dofus.network.messages.game.context.roleplay.CurrentMapMessage import CurrentMapMessage
+from pydofus2.com.ankamagames.dofus.kernel.net.ConnectionsHandler import \
+    ConnectionsHandler
+from pydofus2.com.ankamagames.dofus.network.enums.GameContextEnum import \
+    GameContextEnum
+from pydofus2.com.ankamagames.dofus.network.messages.game.basic.SequenceNumberMessage import \
+    SequenceNumberMessage
+from pydofus2.com.ankamagames.dofus.network.messages.game.basic.SequenceNumberRequestMessage import \
+    SequenceNumberRequestMessage
+from pydofus2.com.ankamagames.dofus.network.messages.game.context.GameContextCreateMessage import \
+    GameContextCreateMessage
+from pydofus2.com.ankamagames.dofus.network.messages.game.context.roleplay.CurrentMapMessage import \
+    CurrentMapMessage
 from pydofus2.com.ankamagames.jerakine.messages.Frame import Frame
 from pydofus2.com.ankamagames.jerakine.messages.Message import Message
 from pydofus2.com.ankamagames.jerakine.types.enums.Priority import Priority
 
 if TYPE_CHECKING:
-    from pydofus2.com.ankamagames.dofus.logic.game.roleplay.frames.RoleplayMovementFrame import RoleplayMovementFrame
+    from pydofus2.com.ankamagames.dofus.logic.game.roleplay.frames.RoleplayMovementFrame import \
+        RoleplayMovementFrame
 
 
 class SynchronisationFrame(Frame):
@@ -53,23 +56,23 @@ class SynchronisationFrame(Frame):
 
         if isinstance(msg, CurrentMapMessage):
             rplmvf: "RoleplayMovementFrame" = Kernel().worker.getFrameByName("RoleplayMovementFrame")
-            if rplmvf and rplmvf._changeMapTimeout:
-                rplmvf._changeMapTimeout.cancel()
-                rplmvf._wantToChangeMap = None
+            if rplmvf and rplmvf.requestTimer:
+                rplmvf.requestTimer.cancel()
+                rplmvf.requestingMapChange = None
                 rplmvf._changeMapFails = 0
             return False
 
         if isinstance(msg, GameContextCreateMessage):
             if msg.context == GameContextEnum.FIGHT:
                 rplmvf: "RoleplayMovementFrame" = Kernel().worker.getFrameByName("RoleplayMovementFrame")
-                if rplmvf and rplmvf._requestFightTimeout:
-                    rplmvf._requestFightTimeout.cancel()
+                if rplmvf and rplmvf.requestTimer:
+                    rplmvf.requestTimer.cancel()
                     rplmvf._requestFighFails = 0
-                    rplmvf._followingMonsterGroup = None
+                    rplmvf.requestingAtackMonsters = None
                 if rplmvf and rplmvf._joinFightTimer:
                     rplmvf._joinFightTimer.cancel()
-                if rplmvf and rplmvf._movementAnimTimer:
-                    rplmvf._movementAnimTimer.cancel()
+                if rplmvf and rplmvf.movementAnimTimer:
+                    rplmvf.movementAnimTimer.cancel()
             return False
 
         else:

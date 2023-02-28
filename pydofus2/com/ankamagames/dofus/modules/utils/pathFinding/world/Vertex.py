@@ -27,6 +27,8 @@ class Vertex:
         return self.UID
     
     def __eq__(self, o: 'Vertex') -> bool:
+        if o is None:
+            return False
         return self.UID == o.UID
     
     def __str__(self) -> str:

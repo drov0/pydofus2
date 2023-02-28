@@ -254,6 +254,7 @@ class FightContextFrame(Frame):
         self._entitiesFrame = FightEntitiesFrame()
         self._preparationFrame = FightPreparationFrame(self)
         self._battleFrame = FightBattleFrame()
+        Logger().debug("FightContextFrame pushed")
         return True
 
     def getFighterName(self, fighterId: float) -> str:
@@ -342,7 +343,7 @@ class FightContextFrame(Frame):
 
         elif isinstance(msg, CurrentMapMessage):
             mcmsg = msg
-            Logger().debug(f"[FightContext] Loading the fight map {msg.mapId}...")
+            Logger().info(f"[FightContext] Loading fight map {msg.mapId}...")
             if isinstance(mcmsg, CurrentMapInstanceMessage):
                 mdm.MapDisplayManager().mapInstanceId = mcmsg.instantiatedMapId
             else:
@@ -419,11 +420,9 @@ class FightContextFrame(Frame):
             gfjmsg = msg
             preFightIsActive = not gfjmsg.isFightStarted
             self.fightType = gfjmsg.fightType
-            if not Kernel().worker.contains("FightEntitiesFrame"):
-                Kernel().worker.addFrame(self._entitiesFrame)
+            Kernel().worker.addFrame(self._entitiesFrame)
             if preFightIsActive:
-                if not Kernel().worker.contains("FightPreparationFrame"):
-                    Kernel().worker.addFrame(self._preparationFrame)
+                Kernel().worker.addFrame(self._preparationFrame)
                 self.onlyTheOtherTeamCanPlace = not gfjmsg.isTeamPhase
             else:
                 Kernel().worker.removeFrame(self._preparationFrame)
@@ -491,7 +490,6 @@ class FightContextFrame(Frame):
             return True
 
         elif isinstance(msg, GameActionFightNoSpellCastMessage):
-            Logger().debug(f"failed to cast spell {msg.to_json()}")
             return False
 
         elif isinstance(msg, UpdateSpellModifierAction):
@@ -530,6 +528,7 @@ class FightContextFrame(Frame):
             simf.deleteSpellsGlobalCoolDownsData()
         PlayedCharacterManager().isSpectator = False
         EntitiesManager().clearEntities()
+        Logger().debug("FightContextFrame pulled")
         return True
 
     def addToHiddenEntities(self, entityId: float) -> None:

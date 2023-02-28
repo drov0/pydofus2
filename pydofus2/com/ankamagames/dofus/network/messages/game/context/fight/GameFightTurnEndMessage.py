@@ -6,5 +6,4 @@ class GameFightTurnEndMessage(NetworkMessage):
 
     def init(self, id_: int):
         self.id = id_
-
         super().__init__()

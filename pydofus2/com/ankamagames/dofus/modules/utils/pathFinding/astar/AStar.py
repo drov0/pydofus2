@@ -33,24 +33,26 @@ class AStar(metaclass=Singleton):
         self.iterations: int = 0
         self.worldGraph: WorldGraph = None
         self.dst: Vertex = None
-        self.callback: FunctionType = None
+        self.running = None
 
     def addForbidenEdge(self, edge: Edge) -> None:
         self._forbidenEdges.append(edge)
+    
+    def resetForbinedEdges(self) -> None:
+        self._forbidenEdges.clear()
 
     def search(
-        self, worldGraph: WorldGraph, src: Vertex, dst: Vertex, callback: FunctionType, onFrame=True
+        self, worldGraph: WorldGraph, src: Vertex, dst: Vertex
     ) -> list["Edge"]:
-        if self.callback != None:
+        if self.running:
             raise Exception("Pathfinding already in progress")
         if src == dst:
-            callback(None)
-            return
+            return None
         self.initForbiddenSubareaList()
         self.worldGraph = worldGraph
         self.dst = dst
         self.dstMap = MapPosition.getMapPositionById(self.dst.mapId)
-        self.callback = callback
+        self.running = True
         self.openList = list[tuple[int, int, Node, MapPoint]]()
         self.openDic = dict[Vertex, Node]()
         self.iterations = 0
@@ -62,7 +64,7 @@ class AStar(metaclass=Singleton):
         self._forbiddenSubareaIds = GameDataQuery.queryEquals(SubArea, "mountAutoTripAllowed", False)
 
     def stopSearch(self) -> None:
-        if self.callback != None:
+        if self.running != None:
             self.callbackWithResult(None)
 
     def compute(self, e: Event = None) -> None:
@@ -78,7 +80,7 @@ class AStar(metaclass=Singleton):
             if current.vertex == self.dst:
                 Logger().info(f"Goal reached within {self.iterations} iterations and {perf_counter() - s} seconds")
                 result = self.buildResultPath(self.worldGraph, current)
-                self.callbackWithResult(result)
+                self.running = False
                 return result
             edges = self.worldGraph.getOutgoingEdgesFromVertex(current.vertex)
             for edge in edges:
@@ -93,7 +95,7 @@ class AStar(metaclass=Singleton):
                         self.openDic[edge.dst] = node
                         heapq.heappush(self.openList, (node.totalCost, id(node), node))
         Logger().info(f"Goal not reached within {self.iterations} iterations")
-        self.callbackWithResult(None)
+        self.running = False
         return None
 
     def findDstCell(self, edge: Edge, mp: MapPoint) -> int:
@@ -102,7 +104,7 @@ class AStar(metaclass=Singleton):
                 for tr in reverse_edge.transitions:
                     if tr.cell:
                         candidate = MapPoint.fromCellId(tr.cell)
-                        movePath = Pathfinding().findPath(DataMapProvider(), mp, candidate)
+                        movePath = Pathfinding().findPath(mp, candidate)
                         if movePath.end.distanceTo(candidate) <= 2:
                             return candidate
         return None
@@ -147,11 +149,6 @@ class AStar(metaclass=Singleton):
         if fromSubareaId == toSubareaId:
             return True
         return toSubareaId not in self._forbiddenSubareaIds
-
-    def callbackWithResult(self, result: list[Edge]) -> None:
-        cb: FunctionType = self.callback
-        self.callback = None
-        cb(result)
 
     def orderNodes(self, a: Node, b: Node) -> int:
         return 0 if a.heuristic == b.heuristic else (1 if a.heuristic > b.heuristic else -1)

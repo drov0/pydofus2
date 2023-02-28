@@ -72,12 +72,13 @@ class Haapi(metaclass=Singleton):
                         Logger().debug("[HAAPI] Error while calling HAAPI to get Login Token : %s" % response.content)
                         sleep(5)
                 else:
+                    Logger().debug(response.content.decode('UTF-8'))
                     from lxml import html
                     root = html.fromstring(response.content.decode('UTF-8'))
                     try:
-                        error = root.xpath('//div[@class="cf-error-description"]')[0].text
+                        error = root.xpath("//div[@class='cf-error-description']")[0].text
                         errorCode = root.xpath('//span[@class="cf-code-label"]//span')[0].text
-                        Logger().debug(f"[HAAPI] error - {errorCode} : Login Token creation for login {login} failed for reason: {error}")
+                        Logger().debug(f"[HAAPI] error - {errorCode} : APIKEY creation for {login} failed for reason: {error}")
                     except IndexError:
                         Logger().debug(response.content.decode('UTF-8'))
                     sleep(5)

@@ -6,10 +6,9 @@ import pydofus2.mapTools.MapTools as MapTools
 
 
 class Lozenge(IZone):
-    _radius: int = 0
-
-    _minRadius: int = 2
-
+    
+    _radius = 0
+    _minRadius = 2
     _dataMapProvider: IDataMapProvider
 
     def __init__(self, nMinRadius: int, nRadius: int, dataMapProvider: IDataMapProvider):

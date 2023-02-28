@@ -1,17 +1,13 @@
 from types import FunctionType
 from typing import TYPE_CHECKING
 from pydofus2.com.ankamagames.berilia.managers.KernelEventsManager import KernelEvent, KernelEventsManager
-
-import pydofus2.com.ankamagames.dofus.internalDatacenter.spells.SpellWrapper as spellwrapper
+from pydofus2.com.ankamagames.dofus.internalDatacenter.spells.SpellWrapper import SpellWrapper
 import pydofus2.com.ankamagames.dofus.logic.game.common.frames.PlayedCharacterUpdatesFrame as pcuF
 import pydofus2.com.ankamagames.dofus.logic.game.fight.frames.FightEntitiesFrame as fenf
 import pydofus2.com.ankamagames.dofus.logic.game.fight.frames.FightSequenceFrame as fseqf
 import pydofus2.com.ankamagames.dofus.logic.game.fight.managers.BuffManager as bffm
 from pydofus2.com.ankamagames.atouin.utils.DataMapProvider import DataMapProvider
 from pydofus2.com.ankamagames.dofus.kernel.Kernel import Kernel
-from pydofus2.com.ankamagames.dofus.logic.game.common.frames.SpellInventoryManagementFrame import (
-    SpellInventoryManagementFrame,
-)
 from pydofus2.com.ankamagames.dofus.logic.game.common.managers.PlayedCharacterManager import PlayedCharacterManager
 from pydofus2.com.ankamagames.dofus.logic.game.common.misc.DofusEntities import DofusEntities
 from pydofus2.com.ankamagames.dofus.logic.game.fight.actions.GameFightTurnFinishAction import GameFightTurnFinishAction
@@ -23,7 +19,6 @@ from pydofus2.com.ankamagames.dofus.logic.game.fight.managers.CurrentPlayedFight
     CurrentPlayedFighterManager,
 )
 from pydofus2.com.ankamagames.dofus.logic.game.fight.managers.FightersStateManager import FightersStateManager
-from pydofus2.com.ankamagames.dofus.logic.game.fight.managers.SpellCastInFightManager import SpellCastInFightManager
 from pydofus2.com.ankamagames.dofus.logic.game.fight.managers.SpellModifiersManager import SpellModifiersManager
 from pydofus2.com.ankamagames.dofus.logic.game.fight.miscs.FightEntitiesHolder import FightEntitiesHolder
 from pydofus2.com.ankamagames.dofus.logic.game.fight.types.StatBuff import StatBuff
@@ -64,40 +59,17 @@ from pydofus2.com.ankamagames.dofus.network.messages.game.context.fight.GameFigh
 from pydofus2.com.ankamagames.dofus.network.messages.game.context.fight.GameFightSynchronizeMessage import (
     GameFightSynchronizeMessage,
 )
-from pydofus2.com.ankamagames.dofus.network.messages.game.context.fight.GameFightTurnEndMessage import (
-    GameFightTurnEndMessage,
-)
-from pydofus2.com.ankamagames.dofus.network.messages.game.context.fight.GameFightTurnListMessage import (
-    GameFightTurnListMessage,
-)
-from pydofus2.com.ankamagames.dofus.network.messages.game.context.fight.GameFightTurnReadyMessage import (
-    GameFightTurnReadyMessage,
-)
-from pydofus2.com.ankamagames.dofus.network.messages.game.context.fight.GameFightTurnReadyRequestMessage import (
-    GameFightTurnReadyRequestMessage,
-)
-from pydofus2.com.ankamagames.dofus.network.messages.game.context.fight.GameFightTurnResumeMessage import (
-    GameFightTurnResumeMessage,
-)
-from pydofus2.com.ankamagames.dofus.network.messages.game.context.fight.GameFightTurnStartMessage import (
-    GameFightTurnStartMessage,
-)
+from pydofus2.com.ankamagames.dofus.network.messages.game.context.fight.GameFightTurnEndMessage import GameFightTurnEndMessage
+from pydofus2.com.ankamagames.dofus.network.messages.game.context.fight.GameFightTurnListMessage import GameFightTurnListMessage
 from pydofus2.com.ankamagames.dofus.network.messages.game.context.fight.SlaveNoLongerControledMessage import (
     SlaveNoLongerControledMessage,
-)
-from pydofus2.com.ankamagames.dofus.network.messages.game.context.fight.SlaveSwitchContextMessage import (
-    SlaveSwitchContextMessage,
 )
 from pydofus2.com.ankamagames.dofus.network.messages.game.context.GameContextDestroyMessage import (
     GameContextDestroyMessage,
 )
-from pydofus2.com.ankamagames.dofus.network.types.game.context.fight.GameFightCharacterInformations import (
-    GameFightCharacterInformations,
-)
 from pydofus2.com.ankamagames.dofus.network.types.game.context.fight.GameFightFighterInformations import (
     GameFightFighterInformations,
 )
-from pydofus2.com.ankamagames.dofus.types.entities.AnimatedCharacter import AnimatedCharacter
 from pydofus2.com.ankamagames.jerakine.handlers.messages.Action import Action
 from pydofus2.com.ankamagames.jerakine.logger.Logger import Logger
 from pydofus2.com.ankamagames.jerakine.messages.Frame import Frame
@@ -337,14 +309,30 @@ class FightBattleFrame(Frame):
             usmmsg = msg
             SpellModifiersManager().setRawSpellModifier(usmmsg.actorId, usmmsg.spellModifier)
             return True
-
+        
+        elif isinstance(msg, GameFightTurnEndMessage):
+            gftemsg = msg
+            if not self._confirmTurnEnd:
+                self._lastPlayerId = gftemsg.id
+            else:
+                self._nextLastPlayerId = gftemsg.id
+            entityInfos = fenf.FightEntitiesFrame.getCurrentInstance().getEntityInfos(gftemsg.id)
+            if isinstance(entityInfos, GameFightFighterInformations) and not entityInfos:
+                bffm.BuffManager().markFinishingBuffs(gftemsg.id)
+                if gftemsg.id == CurrentPlayedFighterManager().currentFighterId:
+                    CurrentPlayedFighterManager().getSpellCastManager().nextTurn()
+                    SpellWrapper.refreshAllPlayerSpellHolder(gftemsg.id)
+            if gftemsg.id == CurrentPlayedFighterManager().currentFighterId:
+                self._turnFrame.myTurn = False
+            return True
+        
         else:
             return False
 
     def pulled(self) -> bool:
         self.applyDelayedStats()
         DataMapProvider().isInFight = False
-        if Kernel().worker.contains("FightTurnFrFame"):
+        if Kernel().worker.contains("FightTurnFrame"):
             Kernel().worker.removeFrameByName("FightTurnFrame")
         if Kernel().worker.contains("FightSequenceFrame"):
             Kernel().worker.removeFrameByName("FightSequenceFrame")
@@ -362,6 +350,7 @@ class FightBattleFrame(Frame):
         self._slaveId = 0
         self._skipTurnTimer = None
         self._destroyed = True
+        KernelEventsManager().send(KernelEvent.FIGHT_ENDED)
         return True
 
     def getSequencesStack(self) -> list[fseqf.FightSequenceFrame]:

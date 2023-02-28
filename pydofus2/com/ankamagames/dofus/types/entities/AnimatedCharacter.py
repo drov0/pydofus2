@@ -1,6 +1,11 @@
-from pydofus2.com.ankamagames.jerakine.entities.interfaces.IDisplayable import IDisplayable
-from pydofus2.com.ankamagames.jerakine.entities.interfaces.IEntity import IEntity
-from pydofus2.com.ankamagames.jerakine.entities.interfaces.IMovable import IMovable
+from pydofus2.com.ankamagames.atouin.managers.EntitiesManager import \
+    EntitiesManager
+from pydofus2.com.ankamagames.jerakine.entities.interfaces.IDisplayable import \
+    IDisplayable
+from pydofus2.com.ankamagames.jerakine.entities.interfaces.IEntity import \
+    IEntity
+from pydofus2.com.ankamagames.jerakine.entities.interfaces.IMovable import \
+    IMovable
 from pydofus2.com.ankamagames.jerakine.interfaces.IObstacle import IObstacle
 from pydofus2.com.ankamagames.jerakine.types.positions.MapPoint import MapPoint
 
@@ -18,8 +23,6 @@ class AnimatedCharacter(IMovable, IEntity, IObstacle, IDisplayable):
         self.speedAdjust: float = 0.0
         self.cantWalk8Directions: bool = False
         self._carriedEntity = None
-        self._direction = None
-        self.parentSprite = None
         super().__init__()
 
     @property
@@ -86,10 +89,10 @@ class AnimatedCharacter(IMovable, IEntity, IObstacle, IDisplayable):
     def carriedEntity(self, entity) -> None:
         self._carriedEntity = entity
 
-    @property
-    def direction(self) -> int:
-        return self._direction
-
-    @direction.setter
-    def direction(self, value: int) -> None:
-        self._direction = value
+    def hide(self) -> None:
+        self._canSeeThrough = True
+        EntitiesManager().removeEntity(self.id)
+    
+    def show(self) -> None:
+        self._canSeeThrough = False
+        EntitiesManager().addEntity(self.id, self);

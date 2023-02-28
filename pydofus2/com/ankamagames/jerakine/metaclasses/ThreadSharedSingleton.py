@@ -17,6 +17,7 @@ class ThreadSharedSingleton(type):
         return cls._instances[cls]
 
     def clear(cls):
-        with _locks[cls]:
-            if cls in cls._instances:
-                del cls._instances[cls]
+        if cls in _locks:
+            with _locks[cls]:
+                if cls in cls._instances:
+                    del cls._instances[cls]

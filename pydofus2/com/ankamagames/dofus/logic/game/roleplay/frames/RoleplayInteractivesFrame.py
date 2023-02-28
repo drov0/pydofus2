@@ -1,45 +1,47 @@
 from typing import TYPE_CHECKING
-from pydofus2.com.ankamagames.atouin.managers.MapDisplayManager import MapDisplayManager
-from pydofus2.com.ankamagames.dofus.datacenter.interactives.Interactive import Interactive
+
+from pydofus2.com.ankamagames.atouin.managers.MapDisplayManager import \
+    MapDisplayManager
+from pydofus2.com.ankamagames.berilia.managers.KernelEventsManager import (
+    KernelEvent, KernelEventsManager)
+from pydofus2.com.ankamagames.dofus.datacenter.interactives.Interactive import \
+    Interactive
 from pydofus2.com.ankamagames.dofus.datacenter.jobs.Skill import Skill
 from pydofus2.com.ankamagames.dofus.kernel.Kernel import Kernel
-from pydofus2.com.ankamagames.dofus.logic.game.common.managers.PlayedCharacterManager import PlayedCharacterManager
-from pydofus2.com.ankamagames.dofus.logic.game.roleplay.messages.InteractiveElementActivationMessage import (
-    InteractiveElementActivationMessage,
-)
-from pydofus2.com.ankamagames.dofus.network.enums.MapObstacleStateEnum import MapObstacleStateEnum
-from pydofus2.com.ankamagames.dofus.network.messages.game.context.GameContextDestroyMessage import (
-    GameContextDestroyMessage,
-)
-from pydofus2.com.ankamagames.dofus.network.messages.game.context.roleplay.MapObstacleUpdateMessage import (
-    MapObstacleUpdateMessage,
-)
-from pydofus2.com.ankamagames.dofus.network.messages.game.interactive.InteractiveElementUpdatedMessage import (
-    InteractiveElementUpdatedMessage,
-)
-from pydofus2.com.ankamagames.dofus.network.messages.game.interactive.InteractiveMapUpdateMessage import (
-    InteractiveMapUpdateMessage,
-)
-from pydofus2.com.ankamagames.dofus.network.messages.game.interactive.InteractiveUsedMessage import (
-    InteractiveUsedMessage,
-)
-from pydofus2.com.ankamagames.dofus.network.messages.game.interactive.InteractiveUseEndedMessage import (
-    InteractiveUseEndedMessage,
-)
-from pydofus2.com.ankamagames.dofus.network.messages.game.interactive.InteractiveUseErrorMessage import (
-    InteractiveUseErrorMessage,
-)
-from pydofus2.com.ankamagames.dofus.network.messages.game.interactive.StatedElementUpdatedMessage import (
-    StatedElementUpdatedMessage,
-)
-from pydofus2.com.ankamagames.dofus.network.messages.game.interactive.StatedMapUpdateMessage import (
-    StatedMapUpdateMessage,
-)
-from pydofus2.com.ankamagames.dofus.network.types.game.interactive.InteractiveElement import InteractiveElement
-from pydofus2.com.ankamagames.dofus.network.types.game.interactive.InteractiveElementSkill import (
-    InteractiveElementSkill,
-)
-from pydofus2.com.ankamagames.dofus.network.types.game.interactive.StatedElement import StatedElement
+from pydofus2.com.ankamagames.dofus.kernel.net.ConnectionsHandler import \
+    ConnectionsHandler
+from pydofus2.com.ankamagames.dofus.logic.game.common.managers.PlayedCharacterManager import \
+    PlayedCharacterManager
+from pydofus2.com.ankamagames.dofus.network.enums.MapObstacleStateEnum import \
+    MapObstacleStateEnum
+from pydofus2.com.ankamagames.dofus.network.messages.game.context.GameContextDestroyMessage import \
+    GameContextDestroyMessage
+from pydofus2.com.ankamagames.dofus.network.messages.game.context.roleplay.MapObstacleUpdateMessage import \
+    MapObstacleUpdateMessage
+from pydofus2.com.ankamagames.dofus.network.messages.game.interactive.InteractiveElementUpdatedMessage import \
+    InteractiveElementUpdatedMessage
+from pydofus2.com.ankamagames.dofus.network.messages.game.interactive.InteractiveMapUpdateMessage import \
+    InteractiveMapUpdateMessage
+from pydofus2.com.ankamagames.dofus.network.messages.game.interactive.InteractiveUsedMessage import \
+    InteractiveUsedMessage
+from pydofus2.com.ankamagames.dofus.network.messages.game.interactive.InteractiveUseEndedMessage import \
+    InteractiveUseEndedMessage
+from pydofus2.com.ankamagames.dofus.network.messages.game.interactive.InteractiveUseErrorMessage import \
+    InteractiveUseErrorMessage
+from pydofus2.com.ankamagames.dofus.network.messages.game.interactive.InteractiveUseRequestMessage import \
+    InteractiveUseRequestMessage
+from pydofus2.com.ankamagames.dofus.network.messages.game.interactive.skill.InteractiveUseWithParamRequestMessage import \
+    InteractiveUseWithParamRequestMessage
+from pydofus2.com.ankamagames.dofus.network.messages.game.interactive.StatedElementUpdatedMessage import \
+    StatedElementUpdatedMessage
+from pydofus2.com.ankamagames.dofus.network.messages.game.interactive.StatedMapUpdateMessage import \
+    StatedMapUpdateMessage
+from pydofus2.com.ankamagames.dofus.network.types.game.interactive.InteractiveElement import \
+    InteractiveElement
+from pydofus2.com.ankamagames.dofus.network.types.game.interactive.InteractiveElementSkill import \
+    InteractiveElementSkill
+from pydofus2.com.ankamagames.dofus.network.types.game.interactive.StatedElement import \
+    StatedElement
 from pydofus2.com.ankamagames.jerakine.logger.Logger import Logger
 from pydofus2.com.ankamagames.jerakine.messages.Frame import Frame
 from pydofus2.com.ankamagames.jerakine.messages.Message import Message
@@ -47,9 +49,12 @@ from pydofus2.com.ankamagames.jerakine.types.enums.Priority import Priority
 from pydofus2.com.ankamagames.jerakine.types.positions.MapPoint import MapPoint
 
 if TYPE_CHECKING:
-    from pydofus2.com.ankamagames.dofus.logic.game.roleplay.frames.RoleplayEntitiesFrame import RoleplayEntitiesFrame
-    from pydofus2.com.ankamagames.dofus.logic.game.roleplay.frames.RoleplayMovementFrame import RoleplayMovementFrame
-    from pydofus2.com.ankamagames.dofus.logic.game.roleplay.frames.RoleplayWorldFrame import RoleplayWorldFrame
+    from pydofus2.com.ankamagames.dofus.logic.game.roleplay.frames.RoleplayEntitiesFrame import \
+        RoleplayEntitiesFrame
+    from pydofus2.com.ankamagames.dofus.logic.game.roleplay.frames.RoleplayMovementFrame import \
+        RoleplayMovementFrame
+    from pydofus2.com.ankamagames.dofus.logic.game.roleplay.frames.RoleplayWorldFrame import \
+        RoleplayWorldFrame
 
 
 class CollectableElement:
@@ -85,16 +90,18 @@ class RoleplayInteractivesFrame(Frame):
     ACTION_COLLECTABLE_RESOURCES: int = 1
 
     REVIVE_SKILL_ID = 211
+    
+    REQUEST_TIMEOUT = 10
 
     def __init__(self):
         self._usingInteractive: bool = False
         self._ie = dict[int, InteractiveElementData]()
         self._collectableIe = dict[int, CollectableElement]()
         self._currentUsages = list()
-        self._entities = dict()
+        self._enityUsingElement = dict()
         self._interactiveActionTimers = dict()
         self._statedElementsTargetAnimation = dict()
-        self._currentRequestedElementId: int = -1
+        self.currentRequestedElementId: int = -1
         self._currentUsedElementId: int = -1
         super().__init__()
 
@@ -109,23 +116,7 @@ class RoleplayInteractivesFrame(Frame):
     @property
     def movementFrame(self) -> "RoleplayMovementFrame":
         return Kernel().worker.getFrameByName("RoleplayMovementFrame")
-
-    @property
-    def currentRequestedElementId(self) -> int:
-        return self._currentRequestedElementId
-
-    @currentRequestedElementId.setter
-    def currentRequestedElementId(self, pElementId: int) -> None:
-        self._currentRequestedElementId = pElementId
-
-    @property
-    def usingInteractive(self) -> bool:
-        return self._usingInteractive
-
-    @usingInteractive.setter
-    def usingInteractive(self, pUsing: bool) -> None:
-        self._usingInteractive = pUsing
-
+    
     @property
     def interactives(self) -> dict[int, InteractiveElementData]:
         return self._ie
@@ -166,34 +157,29 @@ class RoleplayInteractivesFrame(Frame):
             return True
 
         if isinstance(msg, InteractiveUsedMessage):
-            iumsg = msg
-            if float(PlayedCharacterManager().id) == float(iumsg.entityId) and iumsg.duration > 0:
-                self._currentUsedElementId = iumsg.elemId
-            if self._currentRequestedElementId == iumsg.elemId:
-                self._currentRequestedElementId = -1
-            if iumsg.duration > 0:
-                if PlayedCharacterManager().id == iumsg.entityId:
-                    self._usingInteractive = True
-                    rwf = self.roleplayWorldFrame
-                    if rwf:
-                        rwf.cellClickEnabled = False
-                self._entities[iumsg.elemId] = iumsg.entityId
-                if (
-                    self.movementFrame
-                    and self.movementFrame._followingIe
-                    and self.movementFrame._followingIe["ie"].elementId == iumsg.elemId
-                ):
-                    self.movementFrame.cancelFollowingIe()
-                Logger().debug(
-                    f"[RolePlayInteractives] Interactive element {iumsg.elemId} is being used by the Entity '{'CurrentPlayer' if iumsg.entityId == PlayedCharacterManager().id else iumsg.entityId}'"
-                )
-            return False
-
+            if msg.duration > 0:
+                self._enityUsingElement[msg.elemId] = msg.entityId
+                Logger().info(f"[RolePlayInteractives] Interactive element {msg.elemId} is being used by {msg.entityId}...")
+                KernelEventsManager().send(KernelEvent.INTERACTIVE_ELEMENT_BEING_USED, msg.entityId, msg.elemId)
+                if msg.entityId == PlayedCharacterManager().id:
+                    self.usingInteractive = True
+            return True
+        
+        if isinstance(msg, InteractiveUseEndedMessage):
+            Logger().info(f"[RolePlayInteractives] Interactive element {msg.elemId} used.")
+            if msg.entityId == PlayedCharacterManager().id:
+                self.usingInteractive = False
+            KernelEventsManager().send(KernelEvent.INTERACTIVE_ELEMENT_USED, self._enityUsingElement[msg.elemId], msg.elemId)            
+            del self._enityUsingElement[msg.elemId]
+            del self._collectableIe[msg.elemId]
+            return True
+        
         if isinstance(msg, InteractiveUseErrorMessage):
             iuem = msg
-            if iuem.elemId == self._currentRequestedElementId:
-                self._currentRequestedElementId = -1
-            return False
+            if iuem.elemId == self.currentRequestedElementId:
+                self.currentRequestedElementId = -1
+            KernelEventsManager().send(KernelEvent.INTERACTIVE_USE_ERROR, msg.elemId)
+            return True
 
         if isinstance(msg, StatedMapUpdateMessage):
             smumsg = msg
@@ -215,20 +201,13 @@ class RoleplayInteractivesFrame(Frame):
                 )
             return True
 
-        if isinstance(msg, InteractiveUseEndedMessage):
-            iuemsg = msg
-            self.interactiveUsageFinished(self._entities[iuemsg.elemId])
-            del self._entities[iuemsg.elemId]
-            del self._collectableIe[iuemsg.elemId]
-            return False
-
         if isinstance(msg, GameContextDestroyMessage):
             return False
 
         return False
 
     def pulled(self) -> bool:
-        self._entities.clear()
+        self._enityUsingElement.clear()
         self._ie.clear()
         self._currentUsages.clear()
         self._interactiveActionTimers.clear()
@@ -304,16 +283,3 @@ class RoleplayInteractivesFrame(Frame):
 
     def canBeCollected(self, elementId: int) -> CollectableElement:
         return self._collectableIe.get(elementId)
-
-    def skillClicked(self, ie: InteractiveElementData) -> None:
-        msg: InteractiveElementActivationMessage = InteractiveElementActivationMessage(
-            ie.element, ie.position, ie.skillUID
-        )
-        Kernel().worker.process(msg)
-
-    def interactiveUsageFinished(self, entityId: float) -> None:
-        if entityId == PlayedCharacterManager().id:
-            if self.roleplayWorldFrame:
-                self.roleplayWorldFrame.cellClickEnabled = True
-            self._usingInteractive = False
-            self._currentUsedElementId = -1

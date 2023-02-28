@@ -1,6 +1,6 @@
+from pydofus2.com.ankamagames.jerakine.entities.interfaces.IEntity import \
+    IEntity
 from pydofus2.com.ankamagames.jerakine.logger.Logger import Logger
-from pydofus2.com.ankamagames.jerakine.entities.interfaces.IEntity import IEntity
-from pydofus2.com.ankamagames.jerakine.logger.MemoryProfiler import MemoryProfiler
 from pydofus2.com.ankamagames.jerakine.metaclasses.Singleton import Singleton
 
 
@@ -10,12 +10,12 @@ class EntitiesManager(metaclass=Singleton):
     def __init__(self):
         self._entities = dict[float, "IEntity"]()
         self._entitiesScheduledForDestruction = dict()
-        self._currentRandomEntity: float = self.RANDOM_ENTITIES_ID_START
+        self._currentRandomEntity = self.RANDOM_ENTITIES_ID_START
 
-    def addAnimatedEntity(self, entityId: float, entity: "IEntity", strata: int = 0) -> None:
+    def addEntity(self, entityId: float, entity: "IEntity", strata: int = 0) -> None:
         entityId = float(entityId)
         if entityId in self._entities:
-            Logger().warn(f"Entity overwriting! Entity {float(entityId)} has been replaced.")
+            Logger().warn(f"Entity overwriting! Entity {entityId} has been replaced.")
         self._entities[entityId] = entity
 
     def getEntity(self, entityId: float) -> "IEntity":
@@ -58,12 +58,6 @@ class EntitiesManager(metaclass=Singleton):
     def entitiesScheduledForDestruction(self) -> dict[int, "IEntity"]:
         return self._entitiesScheduledForDestruction
 
-    def entitiesCount(self) -> int:
-        count: int = 0
-        for _ in self._entities:
-            count += 1
-        return count
-
     def getFreeEntityId(self) -> float:
         self._currentRandomEntity -= 1
         while self._entities.get(self._currentRandomEntity) is not None:
@@ -84,18 +78,16 @@ class EntitiesManager(metaclass=Singleton):
                             return e
         return None
 
-    def getEntitiesOnCell(self, cellId: int, oClass=None) -> list:
+    def getEntitiesOnCell(self, cellId: int, oClass=None) -> list[IEntity]:
         useFilter = oClass is not None
-        isMultiFilter: bool = useFilter and isinstance(oClass, list)
-        result: list = []
+        isMultiFilter = useFilter and isinstance(oClass, list)
+        result = []
         for e in self._entities.values():
-            if e and e.position and e.position.cellId == cellId:
-                if not isMultiFilter:
-                    if not useFilter or not isMultiFilter and isinstance(e, oClass):
-                        result.append(e)
+            if e and e.position and int(e.position.cellId) == int(cellId):
+                if isMultiFilter and any(isinstance(e, cls) for cls in oClass):
+                    result.append(e)
+                elif useFilter and isinstance(e, oClass):
+                    result.append(e)
                 else:
-                    for cls in oClass:
-                        if isinstance(e, cls):
-                            result.append(e)
-                            break
+                    result.append(e)
         return result

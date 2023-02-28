@@ -1,4 +1,5 @@
-from pydofus2.com.ankamagames.dofus.logic.common.frames.ChatFrame import ChatFrame
+from pydofus2.com.ankamagames.dofus.logic.common.frames.ChatFrame import \
+    ChatFrame
 from pydofus2.com.ankamagames.dofus.network.Metadata import Metadata
 from pydofus2.com.ankamagames.jerakine.logger.Logger import Logger
 from pydofus2.com.ankamagames.jerakine.metaclasses.Singleton import Singleton
@@ -10,7 +11,7 @@ class Kernel(metaclass=Singleton):
         self._worker: Worker = Worker()
         self.beingInReconection: bool = False
         self._reseted = True
-        self._mule = False
+        self.isMule = False
 
     @property
     def worker(self) -> Worker:
@@ -34,27 +35,32 @@ class Kernel(metaclass=Singleton):
         autoRetry: bool = False,
         reloadData: bool = False,
     ) -> None:
-        from pydofus2.com.ankamagames.atouin.utils.DataMapProvider import DataMapProvider
-        from pydofus2.com.ankamagames.berilia.managers.KernelEventsManager import KernelEventsManager
-        from pydofus2.com.ankamagames.dofus.internalDatacenter.items.ItemWrapper import ItemWrapper
-        from pydofus2.com.ankamagames.dofus.kernel.net.ConnectionsHandler import ConnectionsHandler
-        from pydofus2.com.ankamagames.dofus.logic.common.managers.PlayerManager import PlayerManager
-        from pydofus2.com.ankamagames.dofus.logic.common.managers.StatsManager import StatsManager
-        from pydofus2.com.ankamagames.dofus.logic.connection.managers.AuthentificationManager import (
-            AuthentificationManager,
-        )
-        from pydofus2.com.ankamagames.dofus.logic.game.common.managers.PlayedCharacterManager import (
-            PlayedCharacterManager,
-        )
-        from pydofus2.com.ankamagames.dofus.logic.game.common.misc.DofusEntities import DofusEntities
-        from pydofus2.com.ankamagames.dofus.logic.game.fight.managers.CurrentPlayedFighterManager import (
-            CurrentPlayedFighterManager,
-        )
-        from pydofus2.com.ankamagames.dofus.logic.game.fight.managers.FightersStateManager import FightersStateManager
-        from pydofus2.com.ankamagames.dofus.logic.game.fight.managers.SpellModifiersManager import (
-            SpellModifiersManager,
-        )
-        from pydofus2.com.ankamagames.jerakine.benchmark.BenchmarkTimer import BenchmarkTimer
+        from pydofus2.com.ankamagames.atouin.utils.DataMapProvider import \
+            DataMapProvider
+        from pydofus2.com.ankamagames.berilia.managers.KernelEventsManager import \
+            KernelEventsManager
+        from pydofus2.com.ankamagames.dofus.internalDatacenter.items.ItemWrapper import \
+            ItemWrapper
+        from pydofus2.com.ankamagames.dofus.kernel.net.ConnectionsHandler import \
+            ConnectionsHandler
+        from pydofus2.com.ankamagames.dofus.logic.common.managers.PlayerManager import \
+            PlayerManager
+        from pydofus2.com.ankamagames.dofus.logic.common.managers.StatsManager import \
+            StatsManager
+        from pydofus2.com.ankamagames.dofus.logic.connection.managers.AuthentificationManager import \
+            AuthentificationManager
+        from pydofus2.com.ankamagames.dofus.logic.game.common.managers.PlayedCharacterManager import \
+            PlayedCharacterManager
+        from pydofus2.com.ankamagames.dofus.logic.game.common.misc.DofusEntities import \
+            DofusEntities
+        from pydofus2.com.ankamagames.dofus.logic.game.fight.managers.CurrentPlayedFighterManager import \
+            CurrentPlayedFighterManager
+        from pydofus2.com.ankamagames.dofus.logic.game.fight.managers.FightersStateManager import \
+            FightersStateManager
+        from pydofus2.com.ankamagames.dofus.logic.game.fight.managers.SpellModifiersManager import \
+            SpellModifiersManager
+        from pydofus2.com.ankamagames.jerakine.benchmark.BenchmarkTimer import \
+            BenchmarkTimer
 
         Logger().debug("[KERNEL] Resetting ...")
         KernelEventsManager().reset()
@@ -84,13 +90,16 @@ class Kernel(metaclass=Singleton):
         Logger().debug("[KERNEL] Reseted")
 
     def addInitialFrames(self) -> None:
-        from pydofus2.com.ankamagames.dofus.logic.common.frames.CleanupCrewFrame import CleanupCrewFrame
-        from pydofus2.com.ankamagames.dofus.logic.common.frames.LatencyFrame import LatencyFrame
-        from pydofus2.com.ankamagames.dofus.logic.common.frames.QueueFrame import QueueFrame
-        from pydofus2.com.ankamagames.dofus.logic.connection.frames.AuthentificationFrame import AuthentificationFrame
-        from pydofus2.com.ankamagames.dofus.logic.connection.frames.DisconnectionHandlerFrame import (
-            DisconnectionHandlerFrame,
-        )
+        from pydofus2.com.ankamagames.dofus.logic.common.frames.CleanupCrewFrame import \
+            CleanupCrewFrame
+        from pydofus2.com.ankamagames.dofus.logic.common.frames.LatencyFrame import \
+            LatencyFrame
+        from pydofus2.com.ankamagames.dofus.logic.common.frames.QueueFrame import \
+            QueueFrame
+        from pydofus2.com.ankamagames.dofus.logic.connection.frames.AuthentificationFrame import \
+            AuthentificationFrame
+        from pydofus2.com.ankamagames.dofus.logic.connection.frames.DisconnectionHandlerFrame import \
+            DisconnectionHandlerFrame
 
         Logger().debug("[KERNEL] Adding initial frames ...")
         self._worker.addFrame(LatencyFrame())

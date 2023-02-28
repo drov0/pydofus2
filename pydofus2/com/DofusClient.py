@@ -1,28 +1,34 @@
 import threading
-from pydofus2.com.ankamagames.atouin.Haapi import Haapi
-from pydofus2.com.ankamagames.berilia.managers.KernelEventsManager import KernelEventsManager, KernelEvent
-from pydofus2.com.ankamagames.dofus.kernel.net.DisconnectionReason import DisconnectionReason
-from pydofus2.com.ankamagames.dofus.logic.common.managers.PlayerManager import PlayerManager
 from time import perf_counter
-from pydofus2.com.ankamagames.dofus.kernel.Kernel import Kernel
-from pydofus2.com.ankamagames.dofus.kernel.net.DisconnectionReasonEnum import (
-    DisconnectionReasonEnum,
-)
-from pydofus2.com.ankamagames.dofus.logic.connection.actions.LoginValidationWithTokenAction import (
-    LoginValidationWithTokenAction as LoginAction,
-)
-from pydofus2.com.ankamagames.dofus.logic.connection.managers.AuthentificationManager import AuthentificationManager
-from pydofus2.com.ankamagames.dofus.kernel.net.ConnectionsHandler import ConnectionsHandler
-from pydofus2.com.ankamagames.dofus.logic.game.common.managers.PlayedCharacterManager import (
-    PlayedCharacterManager,
-)
-from pydofus2.com.ankamagames.jerakine.data.I18nFileAccessor import I18nFileAccessor
-from pydofus2.com.ankamagames.jerakine.logger.Logger import Logger
 from typing import TYPE_CHECKING
+
+from pydofus2.com.ankamagames.atouin.Haapi import Haapi
+from pydofus2.com.ankamagames.berilia.managers.KernelEventsManager import (
+    KernelEvent, KernelEventsManager)
+from pydofus2.com.ankamagames.dofus.kernel.Kernel import Kernel
+from pydofus2.com.ankamagames.dofus.kernel.net.ConnectionsHandler import \
+    ConnectionsHandler
+from pydofus2.com.ankamagames.dofus.kernel.net.DisconnectionReason import \
+    DisconnectionReason
+from pydofus2.com.ankamagames.dofus.kernel.net.DisconnectionReasonEnum import \
+    DisconnectionReasonEnum
+from pydofus2.com.ankamagames.dofus.logic.common.managers.PlayerManager import \
+    PlayerManager
+from pydofus2.com.ankamagames.dofus.logic.connection.actions.LoginValidationWithTokenAction import \
+    LoginValidationWithTokenAction as LoginAction
+from pydofus2.com.ankamagames.dofus.logic.connection.managers.AuthentificationManager import \
+    AuthentificationManager
+from pydofus2.com.ankamagames.dofus.logic.game.common.managers.PlayedCharacterManager import \
+    PlayedCharacterManager
+from pydofus2.com.ankamagames.jerakine.data.I18nFileAccessor import \
+    I18nFileAccessor
+from pydofus2.com.ankamagames.jerakine.logger.Logger import Logger
 
 if TYPE_CHECKING:
     from pydofus2.com.ankamagames.jerakine.network.ServerConnection import ServerConnection
-from pydofus2.com.ankamagames.atouin.utils.DataMapProvider import DataMapProvider
+
+from pydofus2.com.ankamagames.atouin.utils.DataMapProvider import \
+    DataMapProvider
 
 
 class DofusClient(threading.Thread):
@@ -49,7 +55,7 @@ class DofusClient(threading.Thread):
     def init(self):
         Logger().info("[DofusClient] initializing")
         Kernel().init()
-        Kernel()._mule = self.mule
+        Kernel().isMule = self.mule
         I18nFileAccessor()
         DataMapProvider()
         KernelEventsManager().once(KernelEvent.CHARACTER_SELECTION_SUCCESS, self._onCharacterSelectionSuccess)

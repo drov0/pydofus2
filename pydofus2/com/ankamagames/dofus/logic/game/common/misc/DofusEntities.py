@@ -1,7 +1,6 @@
 from pydofus2.com.ankamagames.atouin.managers.EntitiesManager import EntitiesManager
 from pydofus2.com.ankamagames.dofus.logic.game.misc.IEntityLocalizer import IEntityLocalizer
 from pydofus2.com.ankamagames.jerakine.entities.interfaces.IEntity import IEntity
-from pydofus2.com.ankamagames.jerakine.logger.MemoryProfiler import MemoryProfiler
 from pydofus2.com.ankamagames.jerakine.metaclasses.ThreadSharedSingleton import ThreadSharedSingleton
 import threading
 
@@ -23,7 +22,7 @@ class DofusEntities(metaclass=ThreadSharedSingleton):
         return EntitiesManager().getEntity(float(entityId))
 
     def registerLocalizer(self, localizer: IEntityLocalizer) -> None:
-        clazz: str = localizer.__class__.__qualname__
+        clazz = localizer.__class__.__qualname__
         for currentLocalizer in self._localizers:
             currentClazz = currentLocalizer.__class__.__qualname__
             if currentClazz == clazz:

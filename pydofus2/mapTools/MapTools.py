@@ -1,8 +1,10 @@
 import math
 from functools import lru_cache
-from pydofus2.com.ankamagames.jerakine.logger.MemoryProfiler import MemoryProfiler
 
-from pydofus2.com.ankamagames.jerakine.types.positions.MapPoint import MapPoint, Point
+from pydofus2.com.ankamagames.jerakine.logger.MemoryProfiler import \
+    MemoryProfiler
+from pydofus2.com.ankamagames.jerakine.types.positions.MapPoint import (
+    MapPoint, Point)
 from pydofus2.mapTools.MapDirection import MapDirection
 
 MAP_GRID_WIDTH: int = 14
@@ -109,7 +111,7 @@ def getCellCoordById(cell_id: int) -> Point:
 
 
 @lru_cache(maxsize=5000)
-def getCellsCoordBetween(cellid1: int, cellid2: int) -> list[MapPoint]:
+def getMpLine(cellid1: int, cellid2: int) -> list[MapPoint]:
     cellsIds = getCellsIdBetween(cellid1, cellid2)
     return [MapPoint.fromCellId(cellid) for cellid in cellsIds]
 

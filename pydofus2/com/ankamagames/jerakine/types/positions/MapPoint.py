@@ -1,8 +1,14 @@
 import math
+
+from pydofus2.com.ankamagames.atouin.managers.EntitiesManager import \
+    EntitiesManager
+from pydofus2.com.ankamagames.jerakine.interfaces.IObstacle import IObstacle
 from pydofus2.com.ankamagames.jerakine.logger.Logger import Logger
-from pydofus2.com.ankamagames.jerakine.map.IDataMapProvider import IDataMapProvider
+from pydofus2.com.ankamagames.jerakine.map.IDataMapProvider import \
+    IDataMapProvider
 from pydofus2.com.ankamagames.jerakine.map.ILosDetector import ILosDetector
-from pydofus2.com.ankamagames.jerakine.types.enums.DirectionsEnum import DirectionsEnum
+from pydofus2.com.ankamagames.jerakine.types.enums.DirectionsEnum import \
+    DirectionsEnum
 from pydofus2.flash.geom.Point import Point
 
 
@@ -122,6 +128,9 @@ class MapPoint:
     def distanceToCell(self, mp: "MapPoint"):
         return abs(self.x - mp.x) + abs(self.y - mp.y)
 
+    def distanceToCellId(self, cellId: int):
+        return self.distanceToCell(MapPoint.fromCellId(cellId))
+    
     def orientationTo(self, mp: "MapPoint") -> int:
         if self._nX == mp._nX and self._nY == mp._nY:
             return DirectionsEnum.DOWN_RIGHT.value
@@ -159,14 +168,10 @@ class MapPoint:
             return 0
         xdiff = target.x - self.x
         ydiff = target.y - self.y
-        dist = math.sqrt(xdiff**2 + ydiff**2)
-        angle = math.acos(xdiff / dist) * 180 / math.pi * (1 if ydiff > 0 else -1)
-        if fourDir:
-            angle = round(angle / 90) * 2 + 1
-        else:
-            angle = round(angle / 45) + 1
-        if angle < 0:
-            angle += 8
+        dir_count = 4 if fourDir else 8
+        angle = dir_count * math.degrees(math.atan2(ydiff, xdiff)) / 360
+        angle = round(angle) % dir_count + 1
+        angle = (angle - 1) % 8 + 1
         return angle
 
     def advancedOrientationTo2(self, target: "MapPoint", fourDir: bool = True) -> int:
@@ -286,6 +291,13 @@ class MapPoint:
         if mp is None and allowItself and mapProvider.pointMov(self._nX, self._nY, allowThoughEntity, self.cellId):
             return self
         return mp
+
+    def hasEntity(self, allowTroughEntity = False) -> bool:
+        cellEntities: list[IObstacle] = EntitiesManager().getEntitiesOnCell(self.cellId, IObstacle)
+        for o in cellEntities:
+            if not (o.canWalkTo or (allowTroughEntity and o.canSeeThrough)):
+                return True
+        return False
 
     def __eq__(self, mp: "MapPoint") -> bool:
         if not isinstance(mp, MapPoint):

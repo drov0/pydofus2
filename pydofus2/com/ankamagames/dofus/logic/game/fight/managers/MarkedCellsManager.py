@@ -30,7 +30,7 @@ from pydofus2.com.ankamagames.jerakine.types.zones.Lozenge import Lozenge
 
 class MarkedCellsManager(IDestroyable, metaclass=Singleton):
 
-    MARK_SELECTIONS_PREFIX: str = "FightMark"
+    MARK_SELECTIONS_PREFIX = "FightMark"
 
     _marks: dict[int, MarkInstance]
 
@@ -94,11 +94,11 @@ class MarkedCellsManager(IDestroyable, metaclass=Singleton):
             self.updateDataMapProvider()
 
     def getMarks(self, pMarkType: int, pTeamId: int, pActiveOnly: bool = True) -> list[MarkInstance]:
-        marks: list[MarkInstance] = list[MarkInstance]()
+        marks = list[MarkInstance]()
         for mi in self._marks:
             if (
                 (pMarkType == 0 or mi.markType == pMarkType)
-                and (pTeamId == TeamEnum.TEAM_SPECTATOR or mi.teamId == pTeamId)
+                and (pTeamId == TeamEnum.TEAM_SPCTEATOR or mi.teamId == pTeamId)
                 and (not pActiveOnly or mi.active)
             ):
                 marks.append(mi)

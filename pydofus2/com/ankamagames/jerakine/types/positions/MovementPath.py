@@ -1,18 +1,23 @@
 from typing import Iterator
-from pydofus2.com.ankamagames.jerakine.types.enums.DirectionsEnum import DirectionsEnum
+
+from pydofus2.com.ankamagames.jerakine.types.enums.DirectionsEnum import \
+    DirectionsEnum
 from pydofus2.com.ankamagames.jerakine.types.positions.MapPoint import MapPoint
-from pydofus2.com.ankamagames.jerakine.types.positions.PathElement import PathElement
+from pydofus2.com.ankamagames.jerakine.types.positions.PathElement import \
+    PathElement
 
 
 class MovementPath:
 
     MAX_PATH_LENGTH: int = 100.0
-    HORIZONTAL_WALK_DURATION = 510.0
-    VERTICAL_WALK_DURATION = 425.0
-    DIAGONAL_WALK_DURATION = 480.0
-    HORIZONTAL_RUN_DURATION = 255.0
-    VERTICAL_RUN_DURATION = 150.0
-    DIAGONAL_RUN_DURATION = 170.0
+    
+    WALK_HORIZONTAL_DIAG_VELOCITY = 510.0
+    WALK_VERTICAL_DIAG_VELOCITY = 425.0
+    WALK_LINEAR_VELOCITY = 480.0
+    
+    RUN_HORIZONTAL_DIAG_VELOCITY = 255
+    RUN_VERTICAL_DIAG_VELOCITY = 150
+    RUN_LINEAR_VELOCITY = 170
 
     def __init__(self):
         super().__init__()
@@ -54,14 +59,20 @@ class MovementPath:
     def length(self) -> int:
         return len(self._aPath)
 
+    def indexOfCell(self, cellId: int) -> int:
+        for i, pe in enumerate(self.path):
+            if int(pe.cellId) == int(cellId):
+                return i
+        return None
+
     def fillFromCellIds(self, cells: list[int]) -> None:
         for cell in cells:
             self._aPath.append(PathElement(MapPoint.fromCellId(cell)))
         for i in range(len(cells) - 1):
             self._aPath[i].orientation = self._aPath[i].step.orientationTo(self._aPath[i + 1].step)
-        if self._aPath[0]:
+        if len(self._aPath) > 0:
             self._oStart = self._aPath[0].step
-            self._oEnd = self._aPath[len(self._aPath) - 1].step
+            self._oEnd = self._aPath[-1].step
 
     def addPoint(self, pathElem: PathElement) -> None:
         self._aPath.append(pathElem)
@@ -165,21 +176,19 @@ class MovementPath:
     def getCrossingDuration(self, run: bool = True) -> int:
         duration = 0
         for i in range(1, len(self._aPath)):
-            incomingDirection = self._aPath[i - 1].orientation
+            orientation = self._aPath[i - 1].orientation
             if not run:
-                if incomingDirection in [DirectionsEnum.LEFT, DirectionsEnum.RIGHT]:
-                    duration += self.HORIZONTAL_WALK_DURATION
-                elif incomingDirection in [DirectionsEnum.UP, DirectionsEnum.DOWN]:
-                    duration += self.VERTICAL_WALK_DURATION
-                else:
-                    duration += self.DIAGONAL_WALK_DURATION
+                if orientation % 2 == 0:
+                    if orientation % 4 == 0:
+                        duration += self.WALK_HORIZONTAL_DIAG_VELOCITY
+                    duration += self.WALK_VERTICAL_DIAG_VELOCITY
+                duration += self.WALK_LINEAR_VELOCITY
             else:
-                if incomingDirection in [DirectionsEnum.LEFT, DirectionsEnum.RIGHT]:
-                    duration += self.HORIZONTAL_RUN_DURATION
-                elif incomingDirection in [DirectionsEnum.UP, DirectionsEnum.DOWN]:
-                    duration += self.VERTICAL_RUN_DURATION
-                else:
-                    duration += self.DIAGONAL_RUN_DURATION
+                if orientation % 2 == 0:
+                    if orientation % 4 == 0:
+                        duration += self.RUN_HORIZONTAL_DIAG_VELOCITY
+                    duration += self.RUN_VERTICAL_DIAG_VELOCITY
+                duration += self.RUN_LINEAR_VELOCITY
         return duration / 1000.0
     
     def keyMoves(self) -> list[int]:

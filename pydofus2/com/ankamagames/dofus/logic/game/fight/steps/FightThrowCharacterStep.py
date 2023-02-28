@@ -57,13 +57,13 @@ class FightThrowCharacterStep(AbstractSequencable, IFightStep):
         carriedEntityInfos: GameFightFighterInformations = entitiesFrame.getEntityInfos(self._carriedId)
         carryingFighterExist: bool = True
         if not carriedEntity or not carriedEntityInfos.spawnInfo.alive:
-            Logger().error(f"Attention, l'entit� [{self._fighterId}] ne porte pas [{self._carriedId}]")
+            Logger().error(f"Warning, the enitity [{self._fighterId}] is not carrying [{self._carriedId}]")
             if carriedEntity:
                 del carriedEntity
             self.throwFinished()
             return
         if not carryingEntity or not carryingEntityInfos.spawnInfo.alive:
-            Logger().error(f"Attention, l'entit� [{self._fighterId}] ne porte pas [{self._carriedId}]")
+            Logger().error(f"warning, the entity [{self._fighterId}] is not carrying [{self._carriedId}]")
             carryingFighterExist = False
         fighterInfos: "GameFightFighterInformations" = FightEntitiesFrame.getCurrentInstance().getEntityInfos(
             self._carriedId
@@ -77,7 +77,7 @@ class FightThrowCharacterStep(AbstractSequencable, IFightStep):
         invisibility: bool = False
         if fighterInfos.stats.invisibilityState == GameActionFightInvisibilityStateEnum.INVISIBLE:
             invisibility = True
-        Logger().debug(f"{self._fighterId} is throwing {self._carriedId} (invisibility : {invisibility})")
+        Logger().info(f"{self._fighterId} is throwing {self._carriedId} (invisibility : {invisibility})")
         if not invisibility:
             FightEntitiesHolder().unholdEntity(self._carriedId)
         if carryingFighterExist:

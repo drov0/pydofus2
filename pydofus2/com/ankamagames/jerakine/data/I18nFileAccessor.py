@@ -3,7 +3,6 @@ import threading
 from time import perf_counter
 from pydofus2.com.ankamagames.dofus import Constants
 from pydofus2.com.ankamagames.jerakine.logger.Logger import Logger
-from pydofus2.com.ankamagames.jerakine.logger.MemoryProfiler import MemoryProfiler
 from pydofus2.com.ankamagames.jerakine.metaclasses.ThreadSharedSingleton import ThreadSharedSingleton
 from pydofus2.com.ankamagames.jerakine.data.BinaryStream import BinaryStream
 

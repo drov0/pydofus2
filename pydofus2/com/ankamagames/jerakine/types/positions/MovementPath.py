@@ -1,5 +1,10 @@
 from typing import Iterator
 
+from pydofus2.com.ankamagames.dofus.logic.game.common.managers.PlayedCharacterManager import \
+    PlayedCharacterManager
+from pydofus2.com.ankamagames.dofus.logic.game.common.misc.DofusEntities import \
+    DofusEntities
+from pydofus2.com.ankamagames.jerakine.logger.Logger import Logger
 from pydofus2.com.ankamagames.jerakine.types.enums.DirectionsEnum import \
     DirectionsEnum
 from pydofus2.com.ankamagames.jerakine.types.positions.MapPoint import MapPoint
@@ -11,13 +16,13 @@ class MovementPath:
 
     MAX_PATH_LENGTH: int = 100.0
     
-    WALK_HORIZONTAL_DIAG_VELOCITY = 510.0
-    WALK_VERTICAL_DIAG_VELOCITY = 425.0
-    WALK_LINEAR_VELOCITY = 480.0
+    WALK_HORIZONTAL_DIAG_DURATION = 510.0
+    WALK_VERTICAL_DIAG_DURATION = 425.0
+    WALK_LINEAR_DURATION = 480.0
     
-    RUN_HORIZONTAL_DIAG_VELOCITY = 255
-    RUN_VERTICAL_DIAG_VELOCITY = 150
-    RUN_LINEAR_VELOCITY = 170
+    RUN_HORIZONTAL_DIAG_DURATION = 255
+    RUN_VERTICAL_DIAG_DURATION = 150
+    RUN_LINEAR_DURATION = 170
 
     def __init__(self):
         super().__init__()
@@ -175,25 +180,27 @@ class MovementPath:
 
     def getCrossingDuration(self, run: bool = True) -> int:
         duration = 0
+        speedAdjust = DofusEntities().getEntity(PlayedCharacterManager().id).speedAdjust
         for i in range(1, len(self._aPath)):
             orientation = self._aPath[i - 1].orientation
             if not run:
                 if orientation % 2 == 0:
                     if orientation % 4 == 0:
-                        duration += self.WALK_HORIZONTAL_DIAG_VELOCITY
-                    duration += self.WALK_VERTICAL_DIAG_VELOCITY
-                duration += self.WALK_LINEAR_VELOCITY
+                        duration += self.WALK_HORIZONTAL_DIAG_DURATION * (speedAdjust / 10 + 1)
+                    duration += self.WALK_VERTICAL_DIAG_DURATION * (speedAdjust / 10 + 1)
+                duration += self.WALK_LINEAR_DURATION * (speedAdjust / 10 + 1)
             else:
                 if orientation % 2 == 0:
                     if orientation % 4 == 0:
-                        duration += self.RUN_HORIZONTAL_DIAG_VELOCITY
-                    duration += self.RUN_VERTICAL_DIAG_VELOCITY
-                duration += self.RUN_LINEAR_VELOCITY
+                        duration += self.RUN_HORIZONTAL_DIAG_DURATION * (speedAdjust / 10 + 1)
+                    duration += self.RUN_VERTICAL_DIAG_DURATION * (speedAdjust / 10 + 1)
+                duration += self.RUN_LINEAR_DURATION * (speedAdjust / 10 + 1)
         return duration / 1000.0
     
     def keyMoves(self) -> list[int]:
         self.compress()
         movement: list[int] = list[int]()
+        lastOrientation = 0
         for pe in self.path:
             lastOrientation = pe.orientation
             value = (int(lastOrientation) & 7) << 12 | pe.step.cellId & 4095

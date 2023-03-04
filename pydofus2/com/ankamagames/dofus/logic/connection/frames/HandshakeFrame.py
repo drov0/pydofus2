@@ -30,14 +30,14 @@ class HandshakeFrame(Frame):
                 KernelEvent.CRASH, "MALFORMED_PROTOCOL: A protocol version is empty or None. What happened ?"
             )
             return
-        clientHash: str = self.extractHashFromProtocolVersion(Metadata.PROTOCOL_BUILD)
+        clientHash = self.extractHashFromProtocolVersion(Metadata.PROTOCOL_BUILD)
         if not clientHash:
             Logger().debug(f"[HandShake] The client protocol version is malformed: {Metadata.PROTOCOL_BUILD}")
             KernelEventsManager().send(
                 KernelEvent.CRASH, "MALFORMED_PROTOCOL: The client protocol version is malformed"
             )
             return
-        serverHash: str = self.extractHashFromProtocolVersion(serverVersion)
+        serverHash = self.extractHashFromProtocolVersion(serverVersion)
         if not serverHash:
             KernelEventsManager().send(
                 KernelEvent.CRASH, "MALFORMED_PROTOCOL: The server protocol version is malformed"
@@ -87,7 +87,7 @@ class HandshakeFrame(Frame):
         return False
 
     def onTimeout(self) -> None:
-        pingMsg: BasicPingMessage = BasicPingMessage(quiet_=True)
+        pingMsg = BasicPingMessage(quiet_=True)
         ConnectionsHandler().send(pingMsg)
 
     def pulled(self) -> bool:

@@ -8,7 +8,6 @@ from pydofus2.com.ankamagames.jerakine.data.BinaryStream import BinaryStream
 from pydofus2.com.ankamagames.jerakine.data.GameDataClassDefinition import GameDataClassDefinition
 from pydofus2.com.ankamagames.jerakine.data.GameDataProcess import GameDataProcess
 from pydofus2.com.ankamagames.jerakine.logger.Logger import Logger
-from pydofus2.com.ankamagames.jerakine.logger.MemoryProfiler import MemoryProfiler
 from pydofus2.com.hurlan.crypto.Signature import Signature
 
 lock = threading.Lock()

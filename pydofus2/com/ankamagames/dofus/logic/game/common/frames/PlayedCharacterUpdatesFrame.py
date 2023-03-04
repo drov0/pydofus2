@@ -248,9 +248,16 @@ class PlayedCharacterUpdatesFrame(Frame):
         if isinstance(msg, CharacterLevelUpMessage):
             clumsg = msg
             entityInfos = None
+            newLevel = None
             previousLevel = pcm.PlayedCharacterManager().infos.level
-            pcm.PlayedCharacterManager().infos.level = clumsg.newLevel
-            if clumsg.newLevel == 10 and PlayerManager().server.gameTypeId != GameServerTypeEnum.SERVER_TYPE_TEMPORIS:
+            if msg.newLevel < pcm.PlayedCharacterManager().infos.level:
+                Logger().warning(f"Recaived a player new level {msg.newLevel} < to player current level {pcm.PlayedCharacterManager().infos.level}.")
+                newLevel = pcm.PlayedCharacterManager().infos.level + 1
+            else:
+                newLevel = msg.newLevel
+            pcm.PlayedCharacterManager().infos.level = newLevel
+            Logger().info(f"Player {pcm.PlayedCharacterManager().id} leveled up, new level {newLevel}")
+            if newLevel == 10 and PlayerManager().server.gameTypeId != GameServerTypeEnum.SERVER_TYPE_TEMPORIS:
                 newSpellWrappers = []
                 playerBreed = Breed.getBreedById(pcm.PlayedCharacterManager().infos.breed)
                 for spellVariant in playerBreed.breedSpellVariants:
@@ -274,7 +281,7 @@ class PlayedCharacterUpdatesFrame(Frame):
                 if entityInfos:
                     for option in entityInfos.humanoidInfo.options:
                         if isinstance(option, HumanOptionOrnament):
-                            option.level = clumsg.newLevel
+                            option.level = newLevel
             return False
 
         if isinstance(msg, CharacterExperienceGainMessage):

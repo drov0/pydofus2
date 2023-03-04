@@ -16,7 +16,6 @@ from pydofus2.com.ankamagames.dofus.network.messages.game.context.GameMapMovemen
     GameMapMovementMessage
 from pydofus2.com.ankamagames.dofus.network.messages.game.context.GameMapNoMovementMessage import \
     GameMapNoMovementMessage
-
 from pydofus2.com.ankamagames.dofus.network.messages.game.context.roleplay.fight.GameRolePlayFightRequestCanceledMessage import \
     GameRolePlayFightRequestCanceledMessage
 from pydofus2.com.ankamagames.dofus.network.messages.game.context.roleplay.havenbag.EditHavenBagFinishedMessage import \
@@ -99,11 +98,11 @@ class RoleplayMovementFrame(Frame):
             startCell = clientMovePath.start.cellId
             endCell = clientMovePath.end.cellId
             if movedEntity:
-                Logger().info(f"[MapMovement] Entity {msg.actorId} moved from cell {startCell} to cell {endCell}.")
+                Logger().info(f"[MapMovement] Actor {msg.actorId} moved from cell {startCell} to cell {endCell}.")
                 movedEntity.position.cellId = endCell
                 self.entitiesFrame.updateEntityCellId(msg.actorId, endCell)
             else:
-                Logger().error(f"[MapMovement] Entity {msg.actorId} not found.")
+                Logger().error(f"[MapMovement] Actor {msg.actorId} moved before it was added to the scene.")
             KernelEventsManager().send(KernelEvent.ENTITY_MOVED, msg.actorId, clientMovePath)
             return True
 

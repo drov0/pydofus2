@@ -3,7 +3,6 @@ from pydofus2.com.ankamagames.dofus.logic.game.common.misc.IEntityLocalizer impo
     IEntityLocalizer,
 )
 from pydofus2.com.ankamagames.jerakine.entities.interfaces.IEntity import IEntity
-from pydofus2.com.ankamagames.jerakine.logger.MemoryProfiler import MemoryProfiler
 from pydofus2.com.ankamagames.jerakine.metaclasses.ThreadSharedSingleton import ThreadSharedSingleton
 import threading
 

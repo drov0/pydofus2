@@ -5,8 +5,6 @@ import time
 from pydofus2.com.ankamagames.berilia.managers.KernelEventsManager import (
     KernelEvent, KernelEventsManager)
 from pydofus2.com.ankamagames.jerakine.logger.Logger import Logger
-from pydofus2.com.ankamagames.jerakine.logger.MemoryProfiler import \
-    MemoryProfiler
 from pydofus2.com.ankamagames.jerakine.messages.DiscardableMessage import \
     DiscardableMessage
 from pydofus2.com.ankamagames.jerakine.messages.Frame import Frame
@@ -167,7 +165,8 @@ class Worker(MessageHandler):
                 break
         self._processingMessage.clear()
         if not processed and not isinstance(msg, DiscardableMessage):
-            raise Exception(f"[WORKER] Discarded message: {msg}!")
+            if type(msg).__name__ != "ServerConnectionClosedMessage":
+                raise Exception(f"[WORKER] Discarded message: {msg}!")
 
     def processFramesInAndOut(self) -> None:
         while self._framesToRemove and not self._terminated.is_set():
@@ -178,7 +177,7 @@ class Worker(MessageHandler):
             self.pushFrame(f)
 
     def removeFrameByName(self, frameName: str) -> None:
-        if not self.getFrameByName(frameName):
-            Logger().warn(f"[WORKER] Tried to remove frame '{frameName}' but it doesn't exist in cache.")
-            return
-        self.removeFrame(self.getFrameByName(frameName))
+        frame = self.getFrameByName(frameName)
+        if not frame:
+            return Logger().warn(f"[WORKER] Tried to remove frame '{frameName}' but it doesn't exist in cache.")
+        self.removeFrame(frame)

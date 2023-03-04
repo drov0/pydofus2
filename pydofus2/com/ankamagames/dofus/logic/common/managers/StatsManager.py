@@ -17,8 +17,6 @@ from pydofus2.com.ankamagames.dofus.network.types.game.character.characteristic.
 from pydofus2.com.ankamagames.dofus.network.types.game.character.characteristic.CharacterUsableCharacteristicDetailed import \
     CharacterUsableCharacteristicDetailed
 from pydofus2.com.ankamagames.jerakine.logger.Logger import Logger
-from pydofus2.com.ankamagames.jerakine.logger.MemoryProfiler import \
-    MemoryProfiler
 from pydofus2.com.ankamagames.jerakine.metaclasses.ThreadSharedSingleton import \
     ThreadSharedSingleton
 

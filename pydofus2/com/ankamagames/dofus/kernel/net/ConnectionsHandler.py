@@ -81,10 +81,11 @@ class ConnectionsHandler(metaclass=Singleton):
         self._wantedSocketLostReason = reason
         self._wantedSocketLost = True
         self._disconnectMessage = message
-        Kernel().worker.removeFrameByName("HandshakeFrame")
-        if self._conn.open:
-            self._conn.close()
-            self._conn.join()
+        if Kernel().worker.contains("HandshakeFrame"):
+            Kernel().worker.removeFrameByName("HandshakeFrame")
+        if self.conn.open:
+            self.conn.close()
+            self.conn.join()
         self._currentConnectionType = ConnectionType.DISCONNECTED
 
     def etablishConnection(self, host: str, port: int, id: str) -> None:

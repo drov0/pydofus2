@@ -8,7 +8,6 @@ from pydofus2.com.ankamagames.atouin.messages.MapLoadedMessage import \
     MapLoadedMessage
 from pydofus2.com.ankamagames.dofus.logic.common.managers.StatsManager import \
     StatsManager
-from pydofus2.com.ankamagames.dofus.network.messages.game.character.stats.CharacterLevelUpMessage import CharacterLevelUpMessage
 from pydofus2.com.ankamagames.jerakine.logger.Logger import Logger
 from pydofus2.com.ankamagames.jerakine.metaclasses.Singleton import Singleton
 from pydofus2.com.ankamagames.jerakine.resources.loaders.MapLoader import \

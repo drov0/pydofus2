@@ -100,12 +100,11 @@ class Kernel(metaclass=Singleton):
             AuthentificationFrame
         from pydofus2.com.ankamagames.dofus.logic.connection.frames.DisconnectionHandlerFrame import \
             DisconnectionHandlerFrame
-
-        Logger().debug("[KERNEL] Adding initial frames ...")
+        Logger().info("[KERNEL] Adding initial frames ...")
         self._worker.addFrame(LatencyFrame())
         self._worker.addFrame(AuthentificationFrame())
         self._worker.addFrame(QueueFrame())
         self._worker.addFrame(DisconnectionHandlerFrame())
         self._worker.addFrame(CleanupCrewFrame())
         Kernel().worker.addFrame(ChatFrame())
-        Logger().debug("[KERNEL] Initial frames added.")
+        Logger().info("[KERNEL] Initial frames added.")

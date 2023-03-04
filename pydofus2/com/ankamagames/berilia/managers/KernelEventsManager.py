@@ -43,6 +43,8 @@ class KernelEvent(Enum):
     ENTITY_MOVED = 29
     ENTITY_VANISHED = 31
     FULL_PODS = 32
+    PARTY_MEMBER_LEFT = 33
+    INACTIVITY_WARNING = 34
 class KernelEventsManager(EventsHandler, metaclass=Singleton):
     def __init__(self):
         super().__init__()

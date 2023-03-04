@@ -23,8 +23,6 @@ from pydofus2.com.ankamagames.dofus.network.types.game.interactive.InteractiveEl
 from pydofus2.com.ankamagames.dofus.types.entities.AnimatedCharacter import \
     AnimatedCharacter
 from pydofus2.com.ankamagames.jerakine.logger.Logger import Logger
-from pydofus2.com.ankamagames.jerakine.logger.MemoryProfiler import \
-    MemoryProfiler
 from pydofus2.com.ankamagames.jerakine.messages.Frame import Frame
 from pydofus2.com.ankamagames.jerakine.messages.Message import Message
 from pydofus2.com.ankamagames.jerakine.types.enums.Priority import Priority
@@ -112,8 +110,8 @@ class AbstractEntitiesFrame(Frame):
         if self._entities.get(actorId):
             self._entitiesTotal -= 1
             del self._entities[actorId]
+            Logger().info(f"[EntitiesManager] Actor {actorId} removed from the scene")
         StatsManager().deleteStats(actorId)
-        Logger().debug(f"[EntitiesManager] Unregistered actor {actorId}.")
 
     def addOrUpdateActor(self, infos: GameContextActorInformations) -> AnimatedCharacter:
         characterEntity: AnimatedCharacter = DofusEntities().getEntity(infos.contextualId)
@@ -125,6 +123,15 @@ class AbstractEntitiesFrame(Frame):
             if isinstance(infos, GameFightMonsterInformations):
                 characterEntity.speedAdjust = Monster.getMonsterById(infos.creatureGenericId).speedAdjust
             EntitiesManager().addEntity(infos.contextualId, characterEntity)
+            if infos.contextualId > 0:
+                Logger().info(f"Actor {infos.contextualId} added to the scene")
+            else:
+                Logger().info(f"Monster Group {infos.contextualId} spawned")
+        else:
+            if infos.contextualId > 0:
+                Logger().info(f"Actor {infos.contextualId} updated in the scene")
+            else:
+                Logger().info(f"Monster Group {infos.contextualId} updated in the scene")
         if isinstance(infos, GameRolePlayHumanoidInformations):
             humanoid = infos
             if int(infos.contextualId) == int(pcm.PlayedCharacterManager().id):

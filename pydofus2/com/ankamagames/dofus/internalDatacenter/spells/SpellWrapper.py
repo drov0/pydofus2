@@ -284,7 +284,8 @@ class SpellWrapper(ISlotData, ICellZoneProvider, IDataCenter):
     def active(self) -> bool:
         if not PlayedCharacterManager().isFighting:
             return True
-        return bool(cpfm.CurrentPlayedFighterManager().canCastThisSpell(self.spellId, self.spellLevel))
+        canCast, reason = cpfm.CurrentPlayedFighterManager().canCastThisSpell(self.spellId, self.spellLevel)
+        return canCast
 
     @property
     def spell(self) -> Spell:

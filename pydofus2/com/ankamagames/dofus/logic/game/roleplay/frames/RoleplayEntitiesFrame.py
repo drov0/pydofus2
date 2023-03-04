@@ -122,6 +122,7 @@ class RoleplayEntitiesFrame(AbstractEntitiesFrame, Frame):
         self._monstersIds = list[float]()
         self.mcidm_processessed: bool = False
         self.mapDataRequestTimer = None
+        self.nbrFails = 0
         super().__init__()
 
     def pulled(self) -> bool:
@@ -157,6 +158,9 @@ class RoleplayEntitiesFrame(AbstractEntitiesFrame, Frame):
         mirmsg = MapInformationsRequestMessage()
         mirmsg.init(mapId_=MapDisplayManager().currentMapPoint.mapId)
         def ontimeout():
+            self.nbrFails += 1
+            if self.nbrFails > 3:
+                return KernelEventsManager().send(KernelEvent.RESTART, "MAP data request data timeout")
             self.mapDataRequestTimer = BenchmarkTimer(2, ontimeout)
             self.mapDataRequestTimer.start()
             ConnectionsHandler().send(mirmsg)

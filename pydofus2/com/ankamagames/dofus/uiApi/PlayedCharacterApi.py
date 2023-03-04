@@ -359,13 +359,13 @@ class PlayedCharacterApi(IApi):
 
     @classmethod
     def canCastThisSpellWithResult(cls, spellId: int, lvl: int, target: float = 0) -> str:
-        resultA: list = ["."]
-        CurrentPlayedFighterManager().canCastThisSpell(spellId, lvl, target, resultA)
-        return resultA[0]
+        canCast, reason = CurrentPlayedFighterManager().canCastThisSpell(spellId, lvl, target)
+        return reason
 
     @classmethod
     def canCastThisSpellOnTarget(cls, spellId: int, lvl: int, pTargetId: float) -> bool:
-        return CurrentPlayedFighterManager().canCastThisSpell(spellId, lvl, pTargetId)
+        canCast, reason = CurrentPlayedFighterManager().canCastThisSpell(spellId, lvl, pTargetId)
+        return canCast
 
     @classmethod
     def isInHisHouse(cls) -> bool:

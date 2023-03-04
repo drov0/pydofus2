@@ -56,17 +56,16 @@ class DofusClient(threading.Thread):
         Logger().info("[DofusClient] initializing")
         Kernel().init()
         Kernel().isMule = self.mule
-        I18nFileAccessor()
-        DataMapProvider()
-        KernelEventsManager().once(KernelEvent.CHARACTER_SELECTION_SUCCESS, self._onCharacterSelectionSuccess)
-        KernelEventsManager().once(KernelEvent.CRASH, self._onCrash)
-        KernelEventsManager().once(KernelEvent.SHUTDOWN, self._onShutdown)
-        KernelEventsManager().once(KernelEvent.RESTART, self._onRestart)
-        KernelEventsManager().once(KernelEvent.RECONNECT, self._onReconnect)
+        KernelEventsManager().once(KernelEvent.CHARACTER_SELECTION_SUCCESS, self.onCharacterSelectionSuccess)
+        KernelEventsManager().once(KernelEvent.CRASH, self.onCrash)
+        KernelEventsManager().once(KernelEvent.SHUTDOWN, self.onShutdown)
+        KernelEventsManager().once(KernelEvent.RESTART, self.onRestart)
+        KernelEventsManager().once(KernelEvent.RECONNECT, self.onReconnect)
         if self._characterId:
             PlayerManager().allowAutoConnectCharacter = True
             PlayedCharacterManager().id = self._characterId
             PlayerManager().autoConnectOfASpecificCharacterId = self._characterId
+        Logger().info("Adding game init frames")
         for frame in self._registredInitFrames:
             self.worker.addFrame(frame())
         Logger().info("[DofusClient] initialized")
@@ -77,24 +76,36 @@ class DofusClient(threading.Thread):
     def registerGameStartFrame(self, frame):
         self._registredGameStartFrames.append(frame)
 
-    def _onCharacterSelectionSuccess(self, event, return_value):
+    def onCharacterSelectionSuccess(self, event, return_value):
+        Logger().info("Adding game start frames")
         for frame in self._registredGameStartFrames:
             self.worker.addFrame(frame())
 
-    def _onCrash(self, event, message):
+    def onCrash(self, event, message):
         Logger().debug(f"[DofusClient] Crashed for reason: {message}")
         self.shutdown()
 
-    def _onShutdown(self, event, message):
+    def onShutdown(self, event, message):
         Logger().debug(f"[DofusClient] Shutdown requested for reason: {message}")
         self.shutdown()
 
-    def _onRestart(self, event, message):
-        self._onReconnect(event, message)
+    def onRestart(self, event, message):
+        self.onReconnect(event, message)
 
-    def _onReconnect(self, event, message):
-        Logger().debug(f"[DofusClient] Reconnect requested for reason: {message}")
+    def onReconnect(self, event, message):
+        Logger().warning(f"[DofusClient] Reconnect requested for reason: {message}")
         Kernel().reset(reloadData=True)
+        KernelEventsManager().once(KernelEvent.CHARACTER_SELECTION_SUCCESS, self.onCharacterSelectionSuccess)
+        KernelEventsManager().once(KernelEvent.CRASH, self.onCrash)
+        KernelEventsManager().once(KernelEvent.SHUTDOWN, self.onShutdown)
+        KernelEventsManager().once(KernelEvent.RESTART, self.onRestart)
+        KernelEventsManager().once(KernelEvent.RECONNECT, self.onReconnect)
+        if self._characterId:
+            PlayerManager().allowAutoConnectCharacter = True
+            PlayedCharacterManager().id = self._characterId
+            PlayerManager().autoConnectOfASpecificCharacterId = self._characterId        
+        for frame in self._registredInitFrames:
+            self.worker.addFrame(frame())
         token = Haapi().getLoginToken(self._certId, self._certHash, apiKey=self._apiKey)
         AuthentificationManager().setToken(token)
         self.worker.process(LoginAction.create(self._serverId != 0, self._serverId))

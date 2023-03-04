@@ -70,7 +70,7 @@ class PlayerManager(IDestroyable, metaclass=Singleton):
 
         self.charactersList = list["BasicCharacterWrapper"]()
 
-        self.allowAutoConnectCharacter: bool = False
+        self.allowAutoConnectCharacter = False
 
         self.autoConnectOfASpecificCharacterId: float = -1
 

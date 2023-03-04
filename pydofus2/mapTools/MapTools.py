@@ -1,8 +1,5 @@
 import math
 from functools import lru_cache
-
-from pydofus2.com.ankamagames.jerakine.logger.MemoryProfiler import \
-    MemoryProfiler
 from pydofus2.com.ankamagames.jerakine.types.positions.MapPoint import (
     MapPoint, Point)
 from pydofus2.mapTools.MapDirection import MapDirection

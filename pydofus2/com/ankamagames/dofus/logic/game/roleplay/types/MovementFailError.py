@@ -1,7 +1,7 @@
 from enum import Enum
 
 
-class MovementFailReason(Enum):
+class MovementFailError(Enum):
     PLAYER_IS_DEAD = 1
     CANT_REACH_DEST_CELL = 2
     ALREADY_REQUESTING_MOVEMENT = 3
@@ -11,3 +11,4 @@ class MovementFailReason(Enum):
     PLAYER_CANT_MOVE = 6
     MOVE_REQUEST_TIMEOUT = 7
     MOVE_REQUEST_REJECTED = 8
+    MAPCHANGE_TIMEOUT = 9

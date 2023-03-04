@@ -1,8 +1,15 @@
-from pydofus2.com.ankamagames.dofus.datacenter.communication.InfoMessage import InfoMessage
-from pydofus2.com.ankamagames.dofus.misc.utils.ParamsDecoder import ParamsDecoder
-from pydofus2.com.ankamagames.dofus.network.enums.TextInformationTypeEnum import TextInformationTypeEnum
-from pydofus2.com.ankamagames.dofus.network.messages.game.basic.TextInformationMessage import TextInformationMessage
-from pydofus2.com.ankamagames.dofus.network.messages.server.basic.SystemMessageDisplayMessage import SystemMessageDisplayMessage
+from pydofus2.com.ankamagames.berilia.managers.KernelEventsManager import (
+    KernelEvent, KernelEventsManager)
+from pydofus2.com.ankamagames.dofus.datacenter.communication.InfoMessage import \
+    InfoMessage
+from pydofus2.com.ankamagames.dofus.misc.utils.ParamsDecoder import \
+    ParamsDecoder
+from pydofus2.com.ankamagames.dofus.network.enums.TextInformationTypeEnum import \
+    TextInformationTypeEnum
+from pydofus2.com.ankamagames.dofus.network.messages.game.basic.TextInformationMessage import \
+    TextInformationMessage
+from pydofus2.com.ankamagames.dofus.network.messages.server.basic.SystemMessageDisplayMessage import \
+    SystemMessageDisplayMessage
 from pydofus2.com.ankamagames.jerakine.data.I18n import I18n
 from pydofus2.com.ankamagames.jerakine.logger.Logger import Logger
 from pydofus2.com.ankamagames.jerakine.messages.Frame import Frame
@@ -75,5 +82,7 @@ class ChatFrame(Frame):
         msgContent = I18n.getText(textId);
         if msgContent:
             msgContent = ParamsDecoder.applyParams(msgContent, a)
-            Logger().warn(f"[{I18n.getUiText('ui.popup.warning')}] | {msgContent}")
-            return
+            Logger().warn(f"[textId {textId}] [{I18n.getUiText('ui.popup.warning')}] | {msgContent}")
+        if textId == 5123:
+            KernelEventsManager().send(KernelEvent.INACTIVITY_WARNING)
+        return

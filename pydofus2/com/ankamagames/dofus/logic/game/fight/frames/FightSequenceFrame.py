@@ -125,8 +125,6 @@ from pydofus2.com.ankamagames.dofus.network.enums.GameActionMarkTypeEnum import 
 from pydofus2.com.ankamagames.jerakine.entities.interfaces.IMovable import \
     IMovable
 from pydofus2.com.ankamagames.jerakine.logger.Logger import Logger
-from pydofus2.com.ankamagames.jerakine.logger.MemoryProfiler import \
-    MemoryProfiler
 from pydofus2.com.ankamagames.jerakine.sequencer.ParallelStartSequenceStep import \
     ParallelStartSequenceStep
 from pydofus2.com.ankamagames.jerakine.types.events.SequencerEvent import \
@@ -797,7 +795,6 @@ class FightSequenceFrame(Frame, ISpellCastProvider):
         if isinstance(msg, GameActionFightDeathMessage):
             gafdmsg = msg
             fightEntitiesFrame = FightEntitiesFrame.getCurrentInstance()
-            Logger().info(f"[FightSequence] Fighter {msg.targetId} died")
             fbf: "FightBattleFrame" = Kernel().worker.getFrameByName("FightBattleFrame")
             self.fighterHasBeenKilled(gafdmsg)
             return True
@@ -1021,7 +1018,7 @@ class FightSequenceFrame(Frame, ISpellCastProvider):
         entityInfos: GameContextActorInformations = FightEntitiesFrame.getCurrentInstance().getEntityInfos(
             gafdmsg.targetId
         )
-        currentPlayedFighterManager: CurrentPlayedFighterManager = CurrentPlayedFighterManager()
+        currentPlayedFighterManager = CurrentPlayedFighterManager()
         if isinstance(entityInfos, GameFightMonsterInformations):
             summonedEntityInfos = entityInfos
             summonedEntityInfos.spawnInfo.alive = False
@@ -1543,7 +1540,7 @@ class FightSequenceFrame(Frame, ISpellCastProvider):
         entityInfosS: GameContextActorInformations = None
         summonedEntityInfosS: GameFightMonsterInformations = None
         monsterS: Monster = None
-        gfsgmsg: GameFightShowFighterMessage = GameFightShowFighterMessage()
+        gfsgmsg = GameFightShowFighterMessage()
         gfsgmsg.init(entity)
         Kernel().worker.process(gfsgmsg)
         if ActionIdHelper.isRevive(actionId):

@@ -44,10 +44,11 @@ class BenchmarkTimer(threading.Thread):
     @classmethod
     def clear(cls) -> None:
         thname = threading.current_thread().name
-        while cls._createdTimers[thname]:
-            timer = cls._createdTimers[thname].pop()
-            if timer:
-                timer.cancel()
+        if thname in cls._createdTimers:
+            while cls._createdTimers[thname]:
+                timer = cls._createdTimers[thname].pop()
+                if timer:
+                    timer.cancel()
 
     def run(self):
         self.finished.wait(self.interval)

@@ -75,6 +75,8 @@ class Kernel(metaclass=Singleton):
         StatsManager.clear()
         PlayerManager.clear()
         DataMapProvider.clear()
+        if not reloadData:
+            self._worker.terminate()
         if ConnectionsHandler().conn is not None and not ConnectionsHandler().conn.closed:
             ConnectionsHandler().conn.close()
             ConnectionsHandler().conn.join()
@@ -85,7 +87,6 @@ class Kernel(metaclass=Singleton):
             self._worker.reset()
             self.addInitialFrames()
         else:
-            self._worker.terminate()
             self._reseted = True
         Logger().debug("[KERNEL] Reseted")
 

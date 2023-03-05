@@ -24,11 +24,13 @@ class EventsHandler(EventDispatcher):
 
         self.once(event, onReceived)
         self.__waiting_evts.append(received)
-        received.wait(timeout)
+        wait_result = received.wait(timeout)
         if received in self.__waiting_evts:
             self.__waiting_evts.remove(received)
-        elif self._crashMessage:
+        if self._crashMessage:
             raise Exception(self._crashMessage)
+        if not wait_result:
+            raise TimeoutError(f"wait event {event} timed out")
         return ret[0]
 
     def on(self, event_id, listener, priority=0):

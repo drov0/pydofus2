@@ -1,6 +1,8 @@
 import threading
 from typing import List, Type, TypeVar
 
+from pydofus2.com.ankamagames.jerakine.logger.Logger import Logger
+
 T = TypeVar("T")
 
 class Singleton(type):
@@ -22,11 +24,11 @@ class Singleton(type):
         if cls not in cls._instances[thrid]:
             cls._instances[thrid][cls] = super(Singleton, cls).__call__(*args, **kwargs)
             if (
-                cls.THREAD_REGISTER in cls._listeners
-                and thrid in cls._listeners[cls.THREAD_REGISTER]
-                and cls in cls._listeners[cls.THREAD_REGISTER][thrid]
+                cls.THREAD_REGISTER in Singleton._listeners
+                and thrid in Singleton._listeners[Singleton.THREAD_REGISTER]
+                and cls in Singleton._listeners[Singleton.THREAD_REGISTER][thrid]
             ):
-                for listener, args, kwargs in cls._listeners[cls.THREAD_REGISTER][thrid][cls]:
+                for listener, args, kwargs in Singleton._listeners[Singleton.THREAD_REGISTER][thrid][cls]:
                     listener(*args, **kwargs)
                 del cls._listeners[cls.THREAD_REGISTER][thrid][cls]
         return cls._instances[thrid][cls]
@@ -48,6 +50,14 @@ class Singleton(type):
         if thname not in cls._listeners[cls.THREAD_REGISTER]:
             cls._listeners[cls.THREAD_REGISTER][thname] = {cls: []}
         cls._listeners[cls.THREAD_REGISTER][thname][cls].append((listener, args, kwargs))
+
+    def WaitThreadRegister(cls, thname: int, timeout: float):
+        if thname in Singleton._instances and cls in Singleton._instances[thname]:
+            return True
+        waitEvt = threading.Event()
+        cls.onceThreadRegister(thname, waitEvt.set)
+        if not waitEvt.wait(timeout):
+            raise TimeoutError(f"wait for {cls.__name__} signleton instanciation from thread {thname} timed out!")
 
     def removeListener(cls, thname: str, listener: object):
         if cls.THREAD_REGISTER in cls._listeners and thname in cls._listeners[cls.THREAD_REGISTER]:

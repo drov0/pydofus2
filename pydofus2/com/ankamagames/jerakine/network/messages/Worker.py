@@ -11,6 +11,7 @@ from pydofus2.com.ankamagames.jerakine.messages.Frame import Frame
 from pydofus2.com.ankamagames.jerakine.messages.Message import Message
 from pydofus2.com.ankamagames.jerakine.messages.MessageHandler import \
     MessageHandler
+from pydofus2.com.ankamagames.jerakine.network.messages.TerminateWorkerMessage import TerminateWorkerMessage
 
 """
 This Class for handling messages and frames in a Dofus 2 game application. The worker class is a subclass of MessageHandler and
@@ -55,20 +56,23 @@ class Worker(MessageHandler):
             # with Worker.LOCK:
             #     Worker.LAST_TIME = current_time
             msg = self._queue.get()
-            # Logger().debug(f"[Worker] [RCV] {msg}")
+            Logger().debug(f"[Worker] [RCV] {msg}")
+            if type(msg).__name__ == "TerminateWorkerMessage":
+                self._terminating.set()
+                break
             self.processFramesInAndOut()
             self.processMessage(msg)
+        self.reset()
         self._terminated.set()
             
     def process(self, msg: Message) -> bool:
         if self._terminated.is_set():
-            return
+            return Logger().warning(f"Can't process message because the worker is terminated")
         self._queue.put(msg)
 
     def addFrame(self, frame: Frame) -> None:
         if self._terminated.is_set() or frame is None:
-            Logger().warning(f"Can't add frame {frame} because the worker is terminated")
-            return
+            return Logger().warning(f"Can't add frame {frame} because the worker is terminated")
 
         if str(frame) in self._currentFrameTypesCache:
             if frame in self._framesToAdd and frame not in self._framesToRemove:
@@ -110,9 +114,10 @@ class Worker(MessageHandler):
         return self._currentFrameTypesCache.get(frameClassName)
 
     def terminate(self) -> None:
-        self._terminating.set()
-        self._terminated.wait(30)
-        self.reset()
+        if not self.terminated.is_set():
+            self._terminating.set()
+            self._queue.put(TerminateWorkerMessage())
+            self._terminated.wait(30)
 
     def reset(self) -> None:
         for f in self._framesList:
@@ -168,7 +173,9 @@ class Worker(MessageHandler):
             if type(msg).__name__ != "ServerConnectionClosedMessage":
                 raise Exception(f"[WORKER] Discarded message: {msg}!")
 
-    def processFramesInAndOut(self) -> None:
+    def processFramesInAndOut(self) -> None:        
+        if self._terminated.is_set():
+            return Logger().warning(f"Can't process frames in and out because the worker is terminated")
         while self._framesToRemove and not self._terminated.is_set():
             f = self._framesToRemove.pop()
             self.pullFrame(f)

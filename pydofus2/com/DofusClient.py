@@ -20,18 +20,14 @@ from pydofus2.com.ankamagames.dofus.logic.connection.managers.AuthentificationMa
     AuthentificationManager
 from pydofus2.com.ankamagames.dofus.logic.game.common.managers.PlayedCharacterManager import \
     PlayedCharacterManager
-from pydofus2.com.ankamagames.jerakine.data.I18nFileAccessor import \
-    I18nFileAccessor
 from pydofus2.com.ankamagames.jerakine.logger.Logger import Logger
+from pydofus2.com.ankamagames.jerakine.network.messages.TerminateWorkerMessage import TerminateWorkerMessage
 
 if TYPE_CHECKING:
     from pydofus2.com.ankamagames.jerakine.network.ServerConnection import ServerConnection
 
-from pydofus2.com.ankamagames.atouin.utils.DataMapProvider import \
-    DataMapProvider
-
-
 class DofusClient(threading.Thread):
+
     def __init__(self, name="unknown"):
         super().__init__(name=name)
         self._killSig = threading.Event()
@@ -46,7 +42,10 @@ class DofusClient(threading.Thread):
         self._certHash = None
         self._serverId = None
         self._characterId = None
-        self.mule = False
+        self._loginToken = None
+        self._mule = False
+        self._shutDownReason = None
+        self.terminated = threading.Event()
 
     @property
     def worker(self):
@@ -55,7 +54,7 @@ class DofusClient(threading.Thread):
     def init(self):
         Logger().info("[DofusClient] initializing")
         Kernel().init()
-        Kernel().isMule = self.mule
+        Kernel().isMule = self._mule
         KernelEventsManager().once(KernelEvent.CHARACTER_SELECTION_SUCCESS, self.onCharacterSelectionSuccess)
         KernelEventsManager().once(KernelEvent.CRASH, self.onCrash)
         KernelEventsManager().once(KernelEvent.SHUTDOWN, self.onShutdown)
@@ -111,11 +110,9 @@ class DofusClient(threading.Thread):
         self.worker.process(LoginAction.create(self._serverId != 0, self._serverId))
 
     def shutdown(self, reason=DisconnectionReasonEnum.WANTED_SHUTDOWN, msg=""):
-        Logger().info("[DofusClient] Shuting down ...")
-        Kernel().reset()
-
-    def relogin(self):
-        self.login(self._loginToken, self._serverId, self._characterId)
+        self._shutDownReason = reason
+        Kernel.getInstance(self.name).worker.process(TerminateWorkerMessage())    
+        return self.terminated.wait(20)    
 
     @property
     def connection(self) -> "ServerConnection":
@@ -136,13 +133,17 @@ class DofusClient(threading.Thread):
                 Logger().info("[DofusClient] Login request too soon, will wait some time")
                 self._killSig.wait(self._minLoginInterval - (perf_counter() - self._lastLoginTime))
             self._lastLoginTime = perf_counter()
-            if not self._apiKey:
-                raise Exception("No API key provided")
-            token = Haapi().getLoginToken(self._certId, self._certHash, apiKey=self._apiKey)
-            AuthentificationManager().setToken(token)
+            if not self._loginToken:            
+                if not self._apiKey:
+                    raise Exception("No API key provided")
+                self._loginToken = Haapi().getLoginToken(self._certId, self._certHash, apiKey=self._apiKey)
+            AuthentificationManager().setToken(self._loginToken)
             self.worker.process(LoginAction.create(self._serverId != 0, self._serverId))
             self.worker.run()
         except Exception as e:
             Logger().error(f"[DofusClient] Error in main: {e}", exc_info=True)
-        self.shutdown()
+        if self._shutDownReason:
+            Logger().info(f"Wanted shutdown for reason : {self._shutDownReason}")
+        Kernel().reset()
         Logger().info("[DofusClient] Stopped")
+        self.terminated.set()

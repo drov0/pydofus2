@@ -35,9 +35,9 @@ class Logger(logging.Logger, metaclass=LoggerSingleton):
         fileHandler = logging.FileHandler(LOGS_PATH / f"{self.prefix}_{now.strftime('%Y-%m-%d')}.log")
         fileHandler.setFormatter(formatter)
         self.addHandler(fileHandler)
-        # streamHandler = logging.StreamHandler(sys.stdout)
-        # streamHandler.setFormatter(formatter)
-        # self.addHandler(streamHandler)
+        streamHandler = logging.StreamHandler(sys.stdout)
+        streamHandler.setFormatter(formatter)
+        self.addHandler(streamHandler)
     
     def separator(self, msg, separator="="):
         format_row = "\n{:<50} {:^30} {:>70}\n"

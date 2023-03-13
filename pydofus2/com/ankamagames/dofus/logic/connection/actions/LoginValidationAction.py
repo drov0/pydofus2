@@ -26,8 +26,9 @@ class LoginValidationAction(AbstractAction, Action, IDontLogThisMessage):
         autoSelectServer: bool,
         serverId: int = 0,
         host: str = None,
+        *args
     ) -> "LoginValidationAction":
-        a: LoginValidationAction = LoginValidationAction(self._parameters)
+        a: LoginValidationAction = LoginValidationAction(args)
         a.password = password
         a.username = username
         a.autoSelectServer = autoSelectServer

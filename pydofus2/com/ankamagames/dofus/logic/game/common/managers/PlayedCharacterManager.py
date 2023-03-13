@@ -57,6 +57,7 @@ from pydofus2.flash.geom.Point import Point
 
 
 class PlayedCharacterManager(IDestroyable, metaclass=Singleton):
+
     def __init__(self):
         self._followingPlayerIds = list[float]()
         self._soloIdols = list[int]()
@@ -112,6 +113,7 @@ class PlayedCharacterManager(IDestroyable, metaclass=Singleton):
         self._knownZaapMapIds: list[float] = list()
         self._isPartyLeader: bool = False
         self.isFighting = False
+        self.instanceId = None
         super().__init__()
 
     @property

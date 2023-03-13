@@ -58,6 +58,7 @@ from pydofus2.com.ankamagames.dofus.network.messages.game.character.spell.forget
     ForgettableSpellListUpdateMessage
 from pydofus2.com.ankamagames.dofus.network.messages.game.character.stats.CharacterExperienceGainMessage import \
     CharacterExperienceGainMessage
+from pydofus2.com.ankamagames.dofus.network.messages.game.character.stats.CharacterLevelUpInformationMessage import CharacterLevelUpInformationMessage
 from pydofus2.com.ankamagames.dofus.network.messages.game.character.stats.CharacterLevelUpMessage import \
     CharacterLevelUpMessage
 from pydofus2.com.ankamagames.dofus.network.messages.game.character.stats.CharacterStatsListMessage import \
@@ -180,7 +181,8 @@ class PlayedCharacterUpdatesFrame(Frame):
             if krnl.Kernel().worker.getFrameByName("QuestFrame"):
                 if krnl.Kernel().worker.getFrameByName("QuestFrame").achievmentsListProcessed == False:
                     krnl.Kernel().worker.getFrameByName("QuestFrame")
-            return False
+            KernelEventsManager().send(KernelEvent.CHARACTER_STATS)
+            return True
 
         if isinstance(msg, MapComplementaryInformationsDataMessage):
             mcidmsg = msg
@@ -191,27 +193,6 @@ class PlayedCharacterUpdatesFrame(Frame):
                     for opt in grpci.humanoidInfo.options:
                         if isinstance(opt, HumanOptionAlliance):
                             pcm.PlayedCharacterManager().characteristics.alignmentInfos.aggressable = opt.aggressable
-            # if not (
-            #     pcm.PlayedCharacterManager().characteristics.alignmentInfos.aggressable
-            #     == AggressableStatusEnum.AvA_DISQUALIFIED
-            #     or pcm.PlayedCharacterManager().characteristics.alignmentInfos.aggressable
-            #     == AggressableStatusEnum.AvA_ENABLED_AGGRESSABLE
-            #     or pcm.PlayedCharacterManager().characteristics.alignmentInfos.aggressable
-            #     == AggressableStatusEnum.AvA_ENABLED_NON_AGGRESSABLE
-            #     or pcm.PlayedCharacterManager().characteristics.alignmentInfos.aggressable
-            #     == AggressableStatusEnum.AvA_PREQUALIFIED_AGGRESSABLE
-            # ):
-            #     return False
-
-            # SubArea.getSubAreaByMapId(mcidmsg.mapId)
-
-            # if pcm.PlayedCharacterManager().currentSubArea and newSubArea:
-            #    if PrismSubAreaWrapper.prismList[newSubArea.id]:
-            #       prism = PrismSubAreaWrapper.prismList[newSubArea.id]
-            #       if prism.state == PrismStateEnum.PRISM_STATE_VULNERABLE:
-            #          if krnl.Kernel().worker.contains(AllianceFrame):
-            #             allianceFrame = krnl.Kernel().worker.getFrame("AllianceFrame")
-
             return False
 
         if isinstance(msg, CharacterCapabilitiesMessage):
@@ -245,44 +226,44 @@ class PlayedCharacterUpdatesFrame(Frame):
                 Logger().info(I18n.getUiText(statUpgradeErrorText))
             return True
 
-        if isinstance(msg, CharacterLevelUpMessage):
-            clumsg = msg
-            entityInfos = None
-            newLevel = None
-            previousLevel = pcm.PlayedCharacterManager().infos.level
-            if msg.newLevel < pcm.PlayedCharacterManager().infos.level:
-                Logger().warning(f"Recaived a player new level {msg.newLevel} < to player current level {pcm.PlayedCharacterManager().infos.level}.")
-                newLevel = pcm.PlayedCharacterManager().infos.level + 1
-            else:
+        if isinstance(msg, CharacterLevelUpInformationMessage):
+            Logger().info(f"Player {msg.name} ({msg.id}) leveled up, new {msg.newLevel}")
+            if msg.id == pcm.PlayedCharacterManager().id:
+                clumsg = msg
+                entityInfos = None
+                newLevel = None
+                previousLevel = pcm.PlayedCharacterManager().infos.level
+                Logger().warning(f"Received a player new level {msg.newLevel}, previous level {pcm.PlayedCharacterManager().infos.level}.")
                 newLevel = msg.newLevel
-            pcm.PlayedCharacterManager().infos.level = newLevel
-            Logger().info(f"Player {pcm.PlayedCharacterManager().id} leveled up, new level {newLevel}")
-            if newLevel == 10 and PlayerManager().server.gameTypeId != GameServerTypeEnum.SERVER_TYPE_TEMPORIS:
-                newSpellWrappers = []
-                playerBreed = Breed.getBreedById(pcm.PlayedCharacterManager().infos.breed)
-                for spellVariant in playerBreed.breedSpellVariants:
-                    for spellBreed in spellVariant.spells:
-                        for spellLevelBreedId in spellBreed.spellLevels:
-                            spellLevelBreed = SpellLevel.getLevelById(spellLevelBreedId)
-                            if spellLevelBreed:
-                                obtentionLevel = spellLevelBreed.minPlayerLevel
-                                if obtentionLevel <= clumsg.newLevel and obtentionLevel > previousLevel:
-                                    newSpellWrappers.append(
-                                        swmod.SpellWrapper.create(spellBreed.id, spellLevelBreed.grade, False)
-                                    )
-                for spellWrapper in pcm.PlayedCharacterManager().spellsInventory:
-                    spellWrapper.updateSpellLevelAndEffectsAccordingToPlayerLevel()
+                pcm.PlayedCharacterManager().infos.level = newLevel
+                Logger().info(f"Player {pcm.PlayedCharacterManager().id} leveled up, new level {newLevel}")
+                if newLevel == 10 and PlayerManager().server.gameTypeId != GameServerTypeEnum.SERVER_TYPE_TEMPORIS:
+                    newSpellWrappers = []
+                    playerBreed = Breed.getBreedById(pcm.PlayedCharacterManager().infos.breed)
+                    for spellVariant in playerBreed.breedSpellVariants:
+                        for spellBreed in spellVariant.spells:
+                            for spellLevelBreedId in spellBreed.spellLevels:
+                                spellLevelBreed = SpellLevel.getLevelById(spellLevelBreedId)
+                                if spellLevelBreed:
+                                    obtentionLevel = spellLevelBreed.minPlayerLevel
+                                    if obtentionLevel <= clumsg.newLevel and obtentionLevel > previousLevel:
+                                        newSpellWrappers.append(
+                                            swmod.SpellWrapper.create(spellBreed.id, spellLevelBreed.grade, False)
+                                        )
+                    for spellWrapper in pcm.PlayedCharacterManager().spellsInventory:
+                        spellWrapper.updateSpellLevelAndEffectsAccordingToPlayerLevel()
 
-                if self.roleplayContextFrame:
-                    entityInfos = self.roleplayContextFrame.entitiesFrame.getEntityInfos(
-                        pcm.PlayedCharacterManager().id
-                    )
+                    if self.roleplayContextFrame:
+                        entityInfos = self.roleplayContextFrame.entitiesFrame.getEntityInfos(
+                            pcm.PlayedCharacterManager().id
+                        )
 
-                if entityInfos:
-                    for option in entityInfos.humanoidInfo.options:
-                        if isinstance(option, HumanOptionOrnament):
-                            option.level = newLevel
-            return False
+                    if entityInfos:
+                        for option in entityInfos.humanoidInfo.options:
+                            if isinstance(option, HumanOptionOrnament):
+                                option.level = newLevel
+                KernelEventsManager().send(KernelEvent.LEVEL_UP, previousLevel, msg.newLevel)
+            return True
 
         if isinstance(msg, CharacterExperienceGainMessage):
             return True
@@ -476,19 +457,23 @@ class PlayedCharacterUpdatesFrame(Frame):
 
         return False
 
-    def updateCharacterStatsList(self, stats: CharacterCharacteristicsInformations) -> None:
-        playerId: float = pcm.PlayedCharacterManager().id
-        statsManager: StatsManager = StatsManager()
-        playerStats: EntityStats = statsManager.getStats(playerId)
-        if playerStats is not None:
-            playerStats.getStatTotalValue(StatIds.ENERGY_POINTS)
-        statsManager.addRawStats(playerId, stats.characteristics)
+    @classmethod
+    def updateCharacterStatsList(cls, stats: CharacterCharacteristicsInformations, isInFight=False) -> None:
+        if isInFight:
+            player = CurrentPlayedFighterManager().playerManager
+        else:
+            player = pcm.PlayedCharacterManager()
+        playerInventory = InventoryManager.getInstance(player.instanceId)
+        playerId = player.id
+        StatsManager().addRawStats(playerId, stats.characteristics)
         SpellModifiersManager().setRawSpellsModifiers(playerId, stats.spellModifications)
-        if stats.kamas != InventoryManager().inventory.kamas:
-            InventoryManager().inventory.kamas = stats.kamas
-        pcm.PlayedCharacterManager().characteristics = stats
-        if pcm.PlayedCharacterManager().isFighting:
-            swmod.SpellWrapper.refreshAllPlayerSpellHolder(pcm.PlayedCharacterManager().id)
+        if playerInventory:
+            if stats.kamas != playerInventory.inventory.kamas:
+                playerInventory.inventory.kamas = stats.kamas
+        player.characteristics = stats
+        if player.isFighting:
+            swmod.SpellWrapper.refreshAllPlayerSpellHolder(playerId)
+        Logger().info(f"Updated stats of player {playerId}")
 
     def updateSpellModifier(self, targetId: float, spellId: float, statId: float) -> None:
         playerId: float = pcm.PlayedCharacterManager().id

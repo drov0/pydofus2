@@ -22,3 +22,5 @@ class DisconnectionReasonEnum(Enum):
     EXCEPTION_THROWN = 8
 
     CONNECTION_LOST = 9
+    
+    CHANGING_SERVER = 10

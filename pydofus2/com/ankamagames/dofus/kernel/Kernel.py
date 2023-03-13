@@ -1,3 +1,5 @@
+from pyd2bot.logic.roleplay.behaviors.AbstractBehavior import AbstractBehavior
+from pydofus2.com.ankamagames.dofus.kernel.net.DisconnectionReasonEnum import DisconnectionReasonEnum
 from pydofus2.com.ankamagames.dofus.logic.common.frames.ChatFrame import \
     ChatFrame
 from pydofus2.com.ankamagames.dofus.network.Metadata import Metadata
@@ -63,6 +65,7 @@ class Kernel(metaclass=Singleton):
             BenchmarkTimer
 
         Logger().debug("[KERNEL] Resetting ...")
+        AbstractBehavior.clearAllChilds()
         KernelEventsManager().reset()
         if not autoRetry:
             AuthentificationManager.clear()
@@ -77,14 +80,14 @@ class Kernel(metaclass=Singleton):
         DataMapProvider.clear()
         if not reloadData:
             self._worker.terminate()
+        self._worker.reset()
         if ConnectionsHandler().conn is not None and not ConnectionsHandler().conn.closed:
-            ConnectionsHandler().conn.close()
+            ConnectionsHandler().closeConnection(DisconnectionReasonEnum.WANTED_SHUTDOWN)
             ConnectionsHandler().conn.join()
         ConnectionsHandler.clear()
         SpellModifiersManager.clear()
         self.beingInReconection = False
         if reloadData:
-            self._worker.reset()
             self.addInitialFrames()
         else:
             self._reseted = True

@@ -25,14 +25,10 @@ from pydofus2.com.ankamagames.jerakine.entities.interfaces.IEntity import IEntit
 class FightTeam(GameContextActorInformations):
 
     fight: "Fight"
-
     teamType: int
-
     teamEntity: IEntity
-
     teamInfos: FightTeamInformations
-
-    teamOptions: list
+    teamOptions: dict
 
     def __init__(
         self,
@@ -71,7 +67,6 @@ class FightTeam(GameContextActorInformations):
         return teamHasGroupMember
 
     def hasOptions(self) -> bool:
-        opt = None
         hasOptions: bool = False
         for opt in self.teamOptions:
             if self.teamOptions.get(opt):

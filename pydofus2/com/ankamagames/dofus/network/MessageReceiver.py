@@ -1,6 +1,5 @@
 import importlib
 import json
-
 import pydofus2.com.ankamagames.dofus.Constants as Constants
 from pydofus2.com.ankamagames.dofus.kernel.Kernel import Kernel
 from pydofus2.com.ankamagames.jerakine.logger.Logger import Logger
@@ -163,5 +162,6 @@ class MessageReceiver(RawDataParser, metaclass=ThreadSharedSingleton):
     def getMsgNameById(cls, messageId: int) -> str:
         messageType = _messagesTypes.get(messageId)
         if not messageType:
-            raise Exception(f"Unknown packet ID {messageId}")
+            Logger().warning(f"Unknown packet ID {messageId}")
+            return None
         return messageType.__name__

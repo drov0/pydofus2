@@ -93,10 +93,9 @@ class CurrentPlayedFighterManager(metaclass=Singleton):
         return self._currentFighterIsRealPlayer
 
     def resetPlayerSpellList(self) -> None:
-        if self.playerManager:
-            if self.playerManager.spellsInventory != self.playerManager.playerSpellList:
-                Logger().info(f"Update the player list of spells.")
-                self.playerManager.spellsInventory = self.playerManager.playerSpellList
+        if self.playerManager and self.playerManager.spellsInventory != self.playerManager.playerSpellList:
+            Logger().info(f"Update the player list of spells.")
+            self.playerManager.spellsInventory = self.playerManager.playerSpellList
 
     def setCharacteristicsInformations(self, id: float, characteristics: CharacterCharacteristicsInformations) -> None:
         self._characteristicsInformationsList[id] = characteristics
@@ -187,8 +186,7 @@ class CurrentPlayedFighterManager(metaclass=Singleton):
             #             "ui.fightAutomsg.spellcast.levelTooLow", [spellName, player.infos.level]
             #         )
             #     return False, reason
-            characteristics = self.playerManager.characteristics
-            if not characteristics:
+            if not StatsManager().getStats(self.currentFighterId):
                 reason = I18n.getUiText("ui.fightAutomsg.spellcast.notAvailableWithoutStats", [spellName])
                 return False, reason
         selfSpell = None

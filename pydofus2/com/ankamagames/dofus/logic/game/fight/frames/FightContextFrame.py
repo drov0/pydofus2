@@ -352,7 +352,7 @@ class FightContextFrame(Frame):
             mdm.MapDisplayManager().loadMap(mcmsg.mapId)
             PlayedCharacterManager().currentMap = wp
             PlayedCharacterManager().currentSubArea = SubArea.getSubAreaByMapId(mcmsg.mapId)
-            return False
+            return True
 
         elif isinstance(msg, MapLoadedMessage):
             Logger().info(f"[FightContext] Fight map Loaded")

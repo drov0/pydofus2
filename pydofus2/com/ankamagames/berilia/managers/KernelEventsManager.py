@@ -1,7 +1,9 @@
 from enum import Enum
-
+from time import perf_counter
+from pydofus2.com.ankamagames.dofus.network.types.game.context.fight.FightCommonInformations import FightCommonInformations
+from pydofus2.com.ankamagames.jerakine.logger.Logger import Logger
 from pydofus2.com.ankamagames.berilia.managers.EventsHandler import \
-    EventsHandler
+    Event, EventsHandler, Listener
 from pydofus2.com.ankamagames.dofus.network.types.game.context.roleplay.GameRolePlayHumanoidInformations import \
     GameRolePlayHumanoidInformations
 from pydofus2.com.ankamagames.jerakine.metaclasses.Singleton import Singleton
@@ -10,7 +12,7 @@ from pydofus2.com.ankamagames.jerakine.types.positions.MovementPath import \
 
 
 class KernelEvent(Enum):
-    MOVEMENT_STOPPED = 0
+    MOVE_REQUEST_REJECTED = 0
     SERVERS_LIST = 1
     CHARACTERS_LIST = 2
     CRASH = 3
@@ -45,6 +47,24 @@ class KernelEvent(Enum):
     FULL_PODS = 32
     PARTY_MEMBER_LEFT = 33
     INACTIVITY_WARNING = 34
+    LEVEL_UP = 35
+    CHARACTER_STATS = 36
+    RELOGIN_TOKEN = 37
+    CHARACTER_NAME_SUGGESTION = 38
+    CHARACTER_NAME_SUGGESTION_FAILED = 46
+    CHARACTER_CRATION_RESULT = 39
+    NPC_DIALOG_OPEN = 40
+    NPC_QUESTION = 41
+    NPC_DIALOG_LEFT = 43
+    INVENTORY_WEIGHT_UPDATE = 42
+    EXCHANGE_OPEN = 44
+    EXCHANGE_CLOSE = 45
+    QUEST_START = 47
+    CHAR_DEL_PREP = 48
+    TEXT_INFO = 49
+    FIGHT_SWORD_SHOWED = 50
+    CURRENT_MAP = 51
+    MULE_FIGHT_CONTEXT = 52
 class KernelEventsManager(EventsHandler, metaclass=Singleton):
     def __init__(self):
         super().__init__()
@@ -53,38 +73,39 @@ class KernelEventsManager(EventsHandler, metaclass=Singleton):
         def onEvt(e, frame):
             if str(frame) == frameName:
                 callback(*args)
-
         self.on(KernelEvent.FRAME_PUSHED, onEvt)
 
     def onceFramePushed(self, frameName, callback, args=[]):
-        def onEvt(e, frame):
+        def onEvt(evt: Event, frame):
             if str(frame) == frameName:
-                self.remove_listener(KernelEvent.FRAME_PUSHED, onEvt)
+                evt.listener.delete()
                 callback(*args)
-
         self.on(KernelEvent.FRAME_PUSHED, onEvt)
 
     def onceFramePulled(self, frameName, callback, args=[]):
-        def onEvt(e, frame):
+        def onEvt(e: Event, frame):
             if str(frame) == frameName:
-                self.remove_listener(KernelEvent.FRAME_PULLED, onEvt)
+                e.listener.delete()
                 callback(*args)
-
-        self.on(KernelEvent.FRAME_PULLED, onEvt)
+        return self.on(KernelEvent.FRAME_PULLED, onEvt)
     
-    def onceMapProcessed(self, callback, args=[], mapId=None):
-        def onEvt(event, processedMapId):
+    def onceMapProcessed(self, callback, args=[], mapId=None, timeout=None, ontimeout=None) -> 'Listener':
+        once = mapId is None
+        startTime = perf_counter()
+        def onEvt(event: Event, processedMapId):
             if mapId is not None:
                 if processedMapId == mapId:
-                    self.remove_listener(KernelEvent.MAPPROCESSED, onEvt)
-                    callback(*args)
+                    event.listener.delete()
+                    return callback(*args)
+                if timeout:
+                    remaining = timeout - (perf_counter() - startTime)
+                    if remaining > 0:
+                        event.listener.armTimer(remaining)
+                    else:
+                        ontimeout(event.listener)
             else:
                 callback(*args)
-        if mapId is not None:
-            self.on(KernelEvent.MAPPROCESSED, onEvt)
-        else:
-            self.once(KernelEvent.MAPPROCESSED, onEvt)
-        return onEvt
+        return self.on(KernelEvent.MAPPROCESSED, onEvt, once=once, timeout=timeout, ontimeout=ontimeout)
 
     def send(self, event_id: KernelEvent, *args, **kwargs):
         if event_id == KernelEvent.CRASH:
@@ -92,24 +113,45 @@ class KernelEventsManager(EventsHandler, metaclass=Singleton):
         super().send(event_id, *args, **kwargs)
 
     def onceActorShowed(self, actorId, callback, args=[]):
-        def onActorShowed(event, infos: "GameRolePlayHumanoidInformations"):
+        def onActorShowed(event: Event, infos: "GameRolePlayHumanoidInformations"):
             if int(actorId) == int(infos.contextualId):
-                self.remove_listener(KernelEvent.ACTORSHOWED, onActorShowed)
+                event.listener.delete()
                 callback(*args)
-        self.on(KernelEvent.ACTORSHOWED, onActorShowed)
+        return self.on(KernelEvent.ACTORSHOWED, onActorShowed)
     
-    def onceEntityMoved(self, entityId, callback, args=[]):
-        def onEntityMoved(e, movedEntityId, clientMovePath: MovementPath):
+    def onEntityMoved(self, entityId, callback, timeout=None, ontimeout=None, once=False):
+        startTime = perf_counter()
+        def onEntityMoved(event: Event, movedEntityId, clientMovePath: MovementPath):
+            Logger().debug(f"Entity {movedEntityId} moved folowing path : {clientMovePath}")
             if movedEntityId == entityId:
-                self.remove_listener(KernelEvent.ENTITY_MOVED, onEntityMoved)
-                callback(clientMovePath, *args)
-        self.on(KernelEvent.ENTITY_MOVED, onEntityMoved)
-        return onEntityMoved
+                if once:
+                    event.listener.delete()
+                return callback(event, clientMovePath)
+            if timeout:
+                remaining = timeout - (perf_counter() - startTime)
+                if remaining > 0:
+                    event.listener.armTimer(remaining)
+                else:
+                    ontimeout(event.listener)
+        return self.on(KernelEvent.ENTITY_MOVED, onEntityMoved, timeout=timeout, ontimeout=ontimeout)
+    
+    def onceEntityMoved(self, entityId, callback, timeout=None, ontimeout=None):
+        return self.onEntityMoved(entityId, callback, timeout=timeout, ontimeout=ontimeout, once=True)
     
     def onceEntityVanished(self, entityId, callback, args=[]):
-        def onEntityVanished(e, vanishedEntityId):
+        def onEntityVanished(event: Event, vanishedEntityId):
             if vanishedEntityId == entityId:
-                self.remove_listener(KernelEvent.ENTITY_VANISHED, onEntityVanished)
+                event.listener.delete()
                 callback(*args)
-        self.on(KernelEvent.ENTITY_VANISHED, onEntityVanished)
-        return onEntityVanished
+        return self.on(KernelEvent.ENTITY_VANISHED, onEntityVanished)
+    
+    def onceFightSword(self, entityId, entityCell, callback, args=[]):
+        def onFightSword(event: Event, infos: FightCommonInformations):
+            for team in infos.fightTeams:
+                if team.leaderId == entityId and infos.fightTeamsPositions[team.teamId] == entityCell:
+                    event.listener.delete()
+                    callback(*args)
+        return self.on(KernelEvent.FIGHT_SWORD_SHOWED, onFightSword)
+            
+    def onceFightStarted(self, callback, timeout, ontimeout):
+        return self.on(KernelEvent.FIGHT_STARTED, callback, timeout=timeout, ontimeout=ontimeout, once=True)

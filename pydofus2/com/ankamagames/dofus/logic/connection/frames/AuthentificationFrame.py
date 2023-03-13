@@ -1,5 +1,6 @@
 import hashlib
 import random
+from pydofus2.com.ankamagames.dofus.logic.common.frames.CharacterFrame import CharacterFrame
 
 import pydofus2.com.ankamagames.dofus.logic.connection.frames.ServerSelectionFrame as ssfrm
 from pydofus2.com.ankamagames.berilia.managers.KernelEventsManager import KernelEvent, KernelEventsManager
@@ -26,7 +27,6 @@ from pydofus2.com.ankamagames.dofus.network.messages.connection.IdentificationSu
 from pydofus2.com.ankamagames.dofus.network.messages.connection.IdentificationSuccessWithLoginTokenMessage import (
     IdentificationSuccessWithLoginTokenMessage,
 )
-from pydofus2.com.ankamagames.dofus.network.messages.security.ClientKeyMessage import ClientKeyMessage
 from pydofus2.com.ankamagames.jerakine.data.XmlConfig import XmlConfig
 from pydofus2.com.ankamagames.jerakine.logger.Logger import Logger
 from pydofus2.com.ankamagames.jerakine.messages.Frame import Frame
@@ -48,7 +48,6 @@ class AuthentificationFrame(Frame):
         self._connexionHosts: list = []
         self._dispatchModuleHook: bool = False
         self._connexionSequence: list
-        self._lastLoginHash: str = None
         self._currentLogIsForced: bool = False
 
     @property
@@ -74,17 +73,12 @@ class AuthentificationFrame(Frame):
             return True
 
         elif isinstance(msg, HelloConnectMessage):
-            hcmsg = msg
-            AuthentificationManager().setPublicKey(hcmsg.key)
-            AuthentificationManager().setSalt(hcmsg.salt)
+            AuthentificationManager().setPublicKey(msg.key)
+            AuthentificationManager().setSalt(msg.salt)
             AuthentificationManager().initAESKey()
             iMsg = AuthentificationManager().getIdentificationMessage()
             self._currentLogIsForced = isinstance(iMsg, IdentificationAccountForceMessage)
             ConnectionsHandler().send(iMsg)
-            if InterClientManager.flashKey:
-                flashKeyMsg = ClientKeyMessage()
-                flashKeyMsg.key = InterClientManager.flashKey
-                ConnectionsHandler().send(flashKeyMsg)
             KernelEventsManager().send(KernelEvent.IN_GAME, msg)
             return True
 
@@ -106,6 +100,7 @@ class AuthentificationFrame(Frame):
             DataStoreType.ACCOUNT_ID = str(ismsg.accountId)
             KernelEventsManager().send(KernelEvent.LOGGED_IN, ismsg)
             Kernel().worker.removeFrame(self)
+            Kernel().worker.addFrame(CharacterFrame())
             Kernel().worker.addFrame(ssfrm.ServerSelectionFrame())
             return True
 
@@ -121,13 +116,11 @@ class AuthentificationFrame(Frame):
             return True
 
         elif isinstance(msg, LoginValidationAction):
-            lva = msg
-            self._lastLoginHash = hashlib.md5(lva.username.encode("utf-8")).hexdigest()
             connexionPorts = [int(_) for _ in XmlConfig().getEntry("config.connection.port").split(",")]
             connectionHostsEntry = XmlConfig().getEntry("config.connection.host")
             connexionHosts = (
-                [lva.host]
-                if lva.host
+                [msg.host]
+                if msg.host
                 else (self._connexionHosts if len(self._connexionHosts) > 0 else connectionHostsEntry.split(","))
             )
             self._connexionHosts = connexionHosts
@@ -151,7 +144,7 @@ class AuthentificationFrame(Frame):
                 for host in connexionHosts:
                     self._connexionSequence.append({"host": host, "port": self.HIDDEN_PORT})
             self._connexionSequence = firstConnexionSequence + self._connexionSequence
-            AuthentificationManager().loginValidationAction = lva
+            AuthentificationManager().loginValidationAction = msg
             connInfo = self._connexionSequence.pop(0)
             ConnectionsHandler().connectToLoginServer(connInfo["host"], connInfo["port"])
             return True

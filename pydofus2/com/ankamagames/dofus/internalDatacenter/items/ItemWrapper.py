@@ -339,35 +339,19 @@ class ItemWrapper(Item, ISlotData, ICellZoneProvider, IDataCenter):
 
     @property
     def minimalRange(self) -> int:
-        return int(self["minRange"]) if not self.hasOwnProperty("minRange") else int(0)
-
-    @minimalRange.setter
-    def minimalRange(self, pMinRange: int) -> None:
-        pass
-
+        return int(self["minRange"]) if not hasattr(self, "minRange") else int(0)
+    
     @property
     def maximalRange(self) -> int:
-        return int(self["range"]) if not self.hasOwnProperty("range") else int(0)
-
-    @maximalRange.setter
-    def maximalRange(self, pRange: int) -> None:
-        pass
+        return int(self["range"]) if not hasattr(self, "range") else int(0)
 
     @property
     def castZoneInLine(self) -> bool:
-        return bool(self["castInLine"]) if not self.hasOwnProperty("castInLine") else bool(0)
-
-    @castZoneInLine.setter
-    def castZoneInLine(self, pCastInLine: bool) -> None:
-        pass
+        return bool(self["castInLine"]) if not hasattr(self, "castInLine") else bool(0)
 
     @property
     def castZoneInDiagonal(self) -> bool:
         return bool(self["castInDiagonal"]) if not self.hasOwnProperty("castInDiagonal") else bool(0)
-
-    @castZoneInDiagonal.setter
-    def castZoneInDiagonal(self, pCastInDiagonal: bool) -> None:
-        pass
 
     @property
     def spellZoneEffects(self) -> list[IZoneShape]:

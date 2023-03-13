@@ -1,3 +1,4 @@
+import heapq
 import math
 from functools import lru_cache
 from pydofus2.com.ankamagames.jerakine.types.positions.MapPoint import (
@@ -98,13 +99,9 @@ def isValidCoord(param1: int, param2: int) -> bool:
 def getCellCoordById(cell_id: int) -> Point:
     if not isValidCellId(cell_id):
         return None
-
-    row = math.floor(cell_id / MAP_GRID_WIDTH)
-    row_half = math.floor((row + 1) / 2)
-    row_offset = row - row_half
-    col = cell_id - row * MAP_GRID_WIDTH
-
-    return Point(row_half + col, col - row_offset)
+    y = cell_id // MAP_GRID_WIDTH
+    x = cell_id % MAP_GRID_WIDTH
+    return x, y
 
 
 @lru_cache(maxsize=5000)
@@ -183,3 +180,52 @@ def getLookDirection4DiagExactByCoord(param1: int, param2: int, param3: int, par
             return 4
         return 0
     return -1
+
+def isLeftCol(cellId):
+    return cellId % 14 == 0
+
+def isRightCol(cellId):
+    return isLeftCol(cellId + 1)
+
+def isTopRow(cellId):
+    return cellId < 2 * MAP_GRID_WIDTH
+
+def isBottomRow(cellId):
+    return cellId > 531
+
+LEFT_COL_CELLS = set([i for i in range(CELLCOUNT) if isLeftCol(i)])
+RIGHT_COL_CELLS = set([i for i in range(CELLCOUNT) if isRightCol(i)])
+TOP_ROW_CELLS = set([i for i in range(CELLCOUNT) if isTopRow(i)])
+BOT_ROW_CELLS = set([i for i in range(CELLCOUNT) if isBottomRow(i)])
+
+
+def iterChilds(cell):
+    return MapPoint.fromCellId(cell).iterReachableChilds()
+
+def manhattanDistance(cell1, cell2):
+    x1, y1 = getCellCoordById(cell1)
+    x2, y2 = getCellCoordById(cell2)
+    return abs(x2 - x1) + abs(y2 - y1)
+    
+def findAccessibleCells(startCell, zone: set):
+    # Uses A* algorithm to find all left column cells accessible from a given cell
+    queue = []
+    visited = set()
+    accessible = {}
+    heapq.heappush(queue, (0, startCell))
+    while queue:
+        cost, cell = heapq.heappop(queue)
+        if cell in visited:
+            continue
+        visited.add(cell)
+        if cell in zone:
+            accessible[cell] = cost
+        for child in iterChilds(cell):
+            if child not in visited:
+                child_cost = cost + manhattanDistance(child, cell)
+                heapq.heappush(queue, (child_cost, child))
+    sorted_accessible = sorted(accessible.items(), key=lambda x: x[1])
+    return [cell for cell, _ in sorted_accessible]
+
+
+

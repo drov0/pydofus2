@@ -67,9 +67,8 @@ class ChatFrame(Frame):
                 Logger().info(f"text info for id {textId}: {msgContent}")
             else:
                 Logger().error(f"There's no message for id {timsg.msgType * 10000 + timsg.msgId}")
-            return False
-
-        return False
+            KernelEventsManager().send(KernelEvent.TEXT_INFO, msg.msgId, msg.msgType, textId, msgContent)
+            return True
 
     def systemMessageDisplay(self, msg : SystemMessageDisplayMessage):
         a = msg.parameters
@@ -85,4 +84,3 @@ class ChatFrame(Frame):
             Logger().warn(f"[textId {textId}] [{I18n.getUiText('ui.popup.warning')}] | {msgContent}")
         if textId == 5123:
             KernelEventsManager().send(KernelEvent.INACTIVITY_WARNING)
-        return

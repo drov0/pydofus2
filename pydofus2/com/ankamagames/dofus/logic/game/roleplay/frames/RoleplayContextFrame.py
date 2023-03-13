@@ -68,17 +68,17 @@ class RoleplayContextFrame(Frame):
     def process(self, msg: Message) -> bool:
 
         if isinstance(msg, CurrentMapMessage):
-            mcmsg = msg
-            Logger().debug(f"[RoleplayContext] Loading roleplay map {mcmsg.mapId}")
+            KernelEventsManager().send(KernelEvent.CURRENT_MAP, msg.mapId)
+            Logger().debug(f"[RoleplayContext] Loading roleplay map {msg.mapId}")
             self._newCurrentMapIsReceived = True
-            newSubArea = SubArea.getSubAreaByMapId(mcmsg.mapId)
+            newSubArea = SubArea.getSubAreaByMapId(msg.mapId)
             PlayedCharacterManager().currentSubArea = newSubArea
-            if isinstance(mcmsg, CurrentMapInstanceMessage):
-                MapDisplayManager().mapInstanceId = mcmsg.instantiatedMapId
+            if isinstance(msg, CurrentMapInstanceMessage):
+                MapDisplayManager().mapInstanceId = msg.instantiatedMapId
             else:
                 MapDisplayManager().mapInstanceId = 0
             wp = None
-            ConnectionsHandler().pause()
+            Kernel().worker.pause()
             if self._entitiesFrame:
                 Kernel().worker.removeFrame(self._entitiesFrame)
             if self._worldFrame:
@@ -89,32 +89,31 @@ class RoleplayContextFrame(Frame):
                 Kernel().worker.removeFrame(self.movementFrame)
             if PlayedCharacterManager().isInHouse:
                 wp = WorldPointWrapper(
-                    mcmsg.mapId,
+                    msg.mapId,
                     True,
                     PlayedCharacterManager().currentMap.outdoorX,
                     PlayedCharacterManager().currentMap.outdoorY,
                 )
             else:
-                wp = WorldPointWrapper(int(mcmsg.mapId))
+                wp = WorldPointWrapper(int(msg.mapId))
             if PlayedCharacterManager().currentMap:
                 self._previousMapId = PlayedCharacterManager().currentMap.mapId
             PlayedCharacterManager().currentMap = wp
-            MapDisplayManager().loadMap(int(mcmsg.mapId))
-            return False
+            MapDisplayManager().loadMap(int(msg.mapId))
+            return True
 
         elif isinstance(msg, MapLoadedMessage):
             Kernel().worker.addFrame(self._entitiesFrame)
             Kernel().worker.addFrame(self._worldFrame)
             Kernel().worker.addFrame(self.movementFrame)
             Kernel().worker.addFrame(self._interactivesFrame)
-            ConnectionsHandler().resume()
+            Kernel().worker.resume()
             KernelEventsManager().send(KernelEvent.MAPLOADED, msg.id)
             self._listMapNpcsMsg = None
             return True
 
         elif isinstance(msg, GameContextDestroyMessage):
             Kernel().worker.removeFrame(self)
-
             return False
 
         elif isinstance(msg, ObtainedItemMessage):
@@ -128,12 +127,4 @@ class RoleplayContextFrame(Frame):
         Kernel().worker.removeFrame(self._worldFrame)
         Kernel().worker.removeFrame(self.movementFrame)
         Kernel().worker.removeFrame(self._interactivesFrame)
-        # TODO : Don't forget to uncomment this when those frames are implemented dumpass
-        # Kernel().worker.removeFrame(self._spectatorManagementFrame)
-        # Kernel().worker.removeFrame(self._npcDialogFrame)
-        # Kernel().worker.removeFrame(self._documentFrame)
-        # Kernel().worker.removeFrame(self._zaapFrame)
-        # Kernel().worker.removeFrame(self._paddockFrame)
-        # if Kernel().worker.contains("HavenbagFrame"):
-        #     Kernel().worker.removeFrame(Kernel().worker.getFrame("HavenbagFrame"))
         return True

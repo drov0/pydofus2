@@ -61,6 +61,7 @@ class DisconnectionHandlerFrame(Frame):
         if isinstance(msg, ServerConnectionClosedMessage):
             gsaF.GameServerApproachFrame.authenticationTicketAccepted = False
             reason = ConnectionsHandler().handleDisconnection()
+            Logger().info(f"[DisconnectionHandler] connection closed for reason {reason}")
             if ConnectionsHandler().hasReceivedMsg:
                 if (
                     not reason.expected
@@ -93,9 +94,10 @@ class DisconnectionHandlerFrame(Frame):
                         ):
                             KernelEventsManager().send(KernelEvent.RESTART, message=reason.message)
                         else:
+                            Logger().info("[DisconnectionHandler] Expected socket closure")
                             Kernel().worker.process(ExpectedSocketClosureMessage(reason.reason))
             else:
-                Logger().warn("The connection hasn't even start.")
+                Logger().warning("The connection hasn't even start.")
             return True
 
         elif isinstance(msg, WrongSocketClosureReasonMessage):

@@ -1,4 +1,5 @@
 from types import FunctionType
+from pydofus2.com.ankamagames.berilia.managers.KernelEventsManager import KernelEvent, KernelEventsManager
 import pydofus2.com.ankamagames.dofus.datacenter.quest.Quest as qst
 from pydofus2.com.ankamagames.dofus.network.messages.game.achievement.AchievementListMessage import (
     AchievementListMessage,
@@ -6,6 +7,7 @@ from pydofus2.com.ankamagames.dofus.network.messages.game.achievement.Achievemen
 from pydofus2.com.ankamagames.dofus.network.messages.game.context.roleplay.quest.QuestListMessage import (
     QuestListMessage,
 )
+from pydofus2.com.ankamagames.dofus.network.messages.game.context.roleplay.quest.QuestStartedMessage import QuestStartedMessage
 from pydofus2.com.ankamagames.dofus.network.messages.game.context.roleplay.quest.QuestStepInfoMessage import (
     QuestStepInfoMessage,
 )
@@ -177,6 +179,10 @@ class QuestFrame(Frame):
                         if questStepObjId in self._activeObjectives:
                             self._activeObjectives.remove(questStepObjId)
                         self._completedObjectives.append(questStepObjId)
+            return True
+
+        elif isinstance(msg, QuestStartedMessage):
+            KernelEventsManager().send(KernelEvent.QUEST_START, msg)
             return True
 
         elif isinstance(msg, QuestListMessage):

@@ -33,7 +33,7 @@ class Pathfinding(metaclass=Singleton):
                 y == parentY
                 or x == parentX
                 or self._allowDiag
-                and (self._mapData.pointMov(parentX, y, parentId) or self._mapData.pointMov(x, parentY, parentId))
+                and (self._mapData.pointMov(parentX, y, self._allowTroughEntity, parentId) or self._mapData.pointMov(x, parentY, self._allowTroughEntity, parentId))
             )
         )
 

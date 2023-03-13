@@ -1,5 +1,6 @@
 from types import FunctionType
 from typing import TYPE_CHECKING
+from pydofus2.com.ankamagames.dofus.logic.common.managers.StatsManager import StatsManager
 
 import pydofus2.com.ankamagames.dofus.logic.game.common.frames.PlayedCharacterUpdatesFrame as pcuF
 import pydofus2.com.ankamagames.dofus.logic.game.fight.frames.FightEntitiesFrame as fenf
@@ -397,9 +398,7 @@ class FightBattleFrame(Frame):
     def applyDelayedStats(self) -> None:
         if not self._delayCslmsg:
             return
-        characterFrame: pcuF.PlayedCharacterUpdatesFrame = Kernel().worker.getFrameByName("PlayedCharacterUpdatesFrame")
-        if characterFrame:
-            characterFrame.updateCharacterStatsList(self._delayCslmsg.stats)
+        pcuF.PlayedCharacterUpdatesFrame.updateCharacterStatsList(self._delayCslmsg.stats, True)
         self._delayCslmsg = None
 
     def sendAcknowledgement(self) -> None:
@@ -470,6 +469,7 @@ class FightBattleFrame(Frame):
                     and not DofusEntities().getEntity(fighterInfos.contextualId)
                 )
                 entitiesFrame.updateFighter(fighterInfos)
+                StatsManager().addRawStats(fighterInfos.contextualId, fighterInfos.stats.characteristics.characteristics)
                 bffm.BuffManager().markFinishingBuffs(fighterInfos.contextualId, False)
                 for buff in bffm.BuffManager().getAllBuff(fighterInfos.contextualId):
                     if isinstance(buff, StatBuff):

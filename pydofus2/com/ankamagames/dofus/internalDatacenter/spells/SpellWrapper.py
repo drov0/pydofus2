@@ -603,13 +603,12 @@ class SpellWrapper(ISlotData, ICellZoneProvider, IDataCenter):
         return f"[SpellWrapper #{self.id}]"
 
     def updateSpellLevelAccordingToPlayerLevel(self) -> None:
-        i: int = 0
         currentCharacterLevel: int = PlayedCharacterManager().limitedLevel
         if not self.spell:
             return
-        spellLevels: list = self._spell.spellLevelsInfo
-        spellLevelsCount: int = len(spellLevels)
-        index: int = 0
+        spellLevels = self._spell.spellLevelsInfo
+        spellLevelsCount = len(spellLevels)
+        index = 0
         for i in range(spellLevelsCount - 1, -1, -1):
             if currentCharacterLevel >= spellLevels[i].minPlayerLevel:
                 index = i

@@ -1,6 +1,7 @@
 import math
 import time
 from pydofus2.com.ankamagames.dofus.datacenter.servers.Server import Server
+from pydofus2.com.ankamagames.dofus.internalDatacenter.connection.BasicCharacterWrapper import BasicCharacterWrapper
 from pydofus2.com.ankamagames.jerakine.metaclasses.Singleton import Singleton
 from typing import TYPE_CHECKING
 

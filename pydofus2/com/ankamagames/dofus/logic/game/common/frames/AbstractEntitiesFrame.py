@@ -32,10 +32,7 @@ from pydofus2.com.ankamagames.jerakine.types.positions.MapPoint import MapPoint
 class AbstractEntitiesFrame(Frame):
     def __init__(self):
         self._entities = dict[int, GameContextActorInformations]()
-        self._entitiesTotal: int = 0
-        self._entitiesVisibleNumber: int = 0
         self._interactiveElements = list[InteractiveElement]()
-        self._entitiesIcons = dict()
         self._carriedEntities = dict()
         self._pendingCarriedEntities = dict()
         self._currentSubAreaId = None
@@ -43,8 +40,6 @@ class AbstractEntitiesFrame(Frame):
 
     def pulled(self) -> bool:
         self._entities = dict[int, GameContextActorInformations]()
-        self._entitiesTotal: int = 0
-        self._entitiesVisibleNumber: int = 0
         self._interactiveElements = list[InteractiveElement]()
         self._entitiesIcons = dict()
         self._carriedEntities = dict()
@@ -62,7 +57,6 @@ class AbstractEntitiesFrame(Frame):
 
     def pushed(self) -> bool:
         self._entities = dict()
-        self._entitiesTotal = 0
         self._interactiveElements = list[InteractiveElement]()
         return True
 
@@ -100,7 +94,6 @@ class AbstractEntitiesFrame(Frame):
         if self._entities is None:
             self._entities = dict[int, GameContextActorInformations]()
         if actorId not in self._entities:
-            self._entitiesTotal += 1
             self._entities[actorId] = infos
         if isinstance(infos, GameFightFighterInformations):
             StatsManager().addRawStats(actorId, infos.stats.characteristics.characteristics)
@@ -108,9 +101,8 @@ class AbstractEntitiesFrame(Frame):
     def unregisterActor(self, actorId: float) -> None:
         actorId = float(actorId)
         if self._entities.get(actorId):
-            self._entitiesTotal -= 1
             del self._entities[actorId]
-            Logger().info(f"[EntitiesManager] Actor {actorId} removed from the scene")
+            # Logger().debug(f"[EntitiesManager] Actor {actorId} removed from the scene")
         StatsManager().deleteStats(actorId)
 
     def addOrUpdateActor(self, infos: GameContextActorInformations) -> AnimatedCharacter:
@@ -123,19 +115,13 @@ class AbstractEntitiesFrame(Frame):
             if isinstance(infos, GameFightMonsterInformations):
                 characterEntity.speedAdjust = Monster.getMonsterById(infos.creatureGenericId).speedAdjust
             EntitiesManager().addEntity(infos.contextualId, characterEntity)
-            if infos.contextualId > 0:
-                Logger().info(f"Actor {infos.contextualId} added to the scene")
-            else:
-                Logger().info(f"Monster Group {infos.contextualId} spawned")
+            # Logger().debug(f"Actor {infos.contextualId} added to the scene")
         else:
-            if infos.contextualId > 0:
-                Logger().info(f"Actor {infos.contextualId} updated in the scene")
-            else:
-                Logger().info(f"Monster Group {infos.contextualId} updated in the scene")
+            # Logger().debug(f"Actor {infos.contextualId} updated in the scene")
+            pass
         if isinstance(infos, GameRolePlayHumanoidInformations):
-            humanoid = infos
-            if int(infos.contextualId) == int(pcm.PlayedCharacterManager().id):
-                pcm.PlayedCharacterManager().restrictions = humanoid.humanoidInfo.restrictions
+            if infos.contextualId == pcm.PlayedCharacterManager().id:
+                pcm.PlayedCharacterManager().restrictions = infos.humanoidInfo.restrictions
         if infos.disposition.cellId != -1:
             characterEntity.position = MapPoint.fromCellId(infos.disposition.cellId)
         return characterEntity

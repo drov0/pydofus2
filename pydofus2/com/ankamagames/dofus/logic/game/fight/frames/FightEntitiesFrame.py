@@ -480,15 +480,13 @@ class FightEntitiesFrame(AbstractEntitiesFrame, Frame):
                 lastInvisibilityStat == GameActionFightInvisibilityStateEnum.INVISIBLE
                 and fighterInfos.stats.invisibilityState == lastInvisibilityStat
             ):
-                self.registerActor(fighterInfos)
-                return
+                return self.registerActor(fighterInfos)
             if (
                 fighterInfos.stats.invisibilityState != GameActionFightInvisibilityStateEnum.VISIBLE
                 and fighterInfos.stats.invisibilityState != lastInvisibilityStat
             ):
                 from pydofus2.com.ankamagames.dofus.logic.game.fight.steps.FightChangeVisibilityStep import \
                     FightChangeVisibilityStep
-
                 inviStep = FightChangeVisibilityStep(fighterId, fighterInfos.stats.invisibilityState);
                 inviStep.start();
         else:

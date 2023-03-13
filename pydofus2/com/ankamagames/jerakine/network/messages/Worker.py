@@ -41,6 +41,8 @@ class Worker(MessageHandler):
         self._terminating = threading.Event()
         self._currentFrameTypesCache = dict[str, Frame]()
         self._queue = queue.Queue()
+        self.paused = threading.Event()
+        self.resumed = threading.Event()
 
     @property
     def terminated(self) -> threading.Event:
@@ -60,11 +62,21 @@ class Worker(MessageHandler):
             if type(msg).__name__ == "TerminateWorkerMessage":
                 self._terminating.set()
                 break
+            if self.paused.is_set():
+                self.resumed.wait()
             self.processFramesInAndOut()
             self.processMessage(msg)
         self.reset()
         self._terminated.set()
-            
+
+    def pause(self) -> None:
+        self.paused.set()
+        self.resumed.clear()
+
+    def resume(self) -> None:
+        self.paused.clear()
+        self.resumed.set()
+
     def process(self, msg: Message) -> bool:
         if self._terminated.is_set():
             return Logger().warning(f"Can't process message because the worker is terminated")
@@ -128,6 +140,7 @@ class Worker(MessageHandler):
         self._currentFrameTypesCache.clear()
         self._processingMessage.clear()
         self._processingMessage.clear()
+        self._queue = queue.Queue()
  
 
     def pushFrame(self, frame: Frame) -> None:
@@ -163,15 +176,17 @@ class Worker(MessageHandler):
         processed: bool = False
         self._processingMessage.set()
         for frame in self._framesList:
-            if self._terminated.is_set():
+            if self._terminating.is_set() or self._terminated.is_set():
                 return
             if frame.process(msg):
                 processed = True
                 break
         self._processingMessage.clear()
         if not processed and not isinstance(msg, DiscardableMessage):
+            if self._terminating.is_set() or self._terminated.is_set():
+                return
             if type(msg).__name__ != "ServerConnectionClosedMessage":
-                raise Exception(f"[WORKER] Discarded message: {msg}!")
+                Logger().error(f"[WORKER] Discarded message: {msg}!")
 
     def processFramesInAndOut(self) -> None:        
         if self._terminated.is_set():

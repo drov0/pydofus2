@@ -1,5 +1,4 @@
 from types import FunctionType
-
 from pydofus2.com.ankamagames.berilia.managers.KernelEventsManager import (
     KernelEvent, KernelEventsManager)
 from pydofus2.com.ankamagames.dofus.datacenter.servers.Server import Server
@@ -33,13 +32,12 @@ from pydofus2.com.ankamagames.jerakine.benchmark.BenchmarkTimer import \
 from pydofus2.com.ankamagames.jerakine.logger.Logger import Logger
 from pydofus2.com.ankamagames.jerakine.messages.Frame import Frame
 from pydofus2.com.ankamagames.jerakine.messages.Message import Message
-from pydofus2.com.ankamagames.jerakine.messages.WrongSocketClosureReasonMessage import \
-    WrongSocketClosureReasonMessage
+from pydofus2.com.ankamagames.dofus.logic.connection.actions.LoginValidationWithTokenAction import \
+    LoginValidationWithTokenAction
 from pydofus2.com.ankamagames.jerakine.network.messages.ExpectedSocketClosureMessage import \
     ExpectedSocketClosureMessage
 from pydofus2.com.ankamagames.jerakine.network.messages.Worker import Worker
 from pydofus2.com.ankamagames.jerakine.types.enums.Priority import Priority
-
 
 class ServerSelectionFrame(Frame):
     def __init__(self):
@@ -81,8 +79,9 @@ class ServerSelectionFrame(Frame):
             self._serversList = slmsg.servers
             self._serversList.sort(key=lambda x: x.date)
             self.broadcastServersListUpdate()
-            Kernel().worker.process(ServerSelectionAction.create(AuthentificationManager()._lva.serverId))
-            return False
+            if AuthentificationManager()._lva and AuthentificationManager()._lva.serverId is not None:
+                self.process(ServerSelectionAction.create(AuthentificationManager()._lva.serverId))
+            return True
 
         elif isinstance(msg, ServerStatusUpdateMessage):
             ssumsg = msg
@@ -144,7 +143,7 @@ class ServerSelectionFrame(Frame):
                         Logger().debug(
                             f"Server {server.id} not online but has status {ServerStatusEnum(server.status).name}."
                         )
-                        BenchmarkTimer(60, lambda: Kernel().worker.process(msg)).start()
+                        BenchmarkTimer(60, lambda: self.process(msg)).start()
                         return True
             return True
 
@@ -157,27 +156,31 @@ class ServerSelectionFrame(Frame):
         elif isinstance(msg, ExpectedSocketClosureMessage):
             from pydofus2.com.ankamagames.dofus.logic.game.approach.frames.GameServerApproachFrame import \
                 GameServerApproachFrame
+            if msg.reason == DisconnectionReasonEnum.SWITCHING_TO_GAME_SERVER:
+                Kernel().worker.addFrame(GameServerApproachFrame())
+                ConnectionsHandler().connectToGameServer(self._selectedServer.address, self._selectedServer.ports[0])
+            elif msg.reason == DisconnectionReasonEnum.CHANGING_SERVER:
+                if not AuthentificationManager()._lva or AuthentificationManager()._lva.serverId is None:
+                    Logger().error(f"Closed connection to change server but no serverId is specified in Auth Manager")
+                else:
+                    from pydofus2.com.ankamagames.dofus.logic.connection.frames.AuthentificationFrame import AuthentificationFrame
+                    from pydofus2.com.ankamagames.dofus.logic.common.frames.QueueFrame import QueueFrame
 
-            escmsg = msg
-            if escmsg.reason != DisconnectionReasonEnum.SWITCHING_TO_GAME_SERVER:
-                Kernel().worker.process(
-                    WrongSocketClosureReasonMessage(DisconnectionReasonEnum.SWITCHING_TO_GAME_SERVER, escmsg.reason)
-                )
-                return True
-            Kernel().worker.addFrame(GameServerApproachFrame())
-            ConnectionsHandler().connectToGameServer(self._selectedServer.address, self._selectedServer.ports[0])
+                    Logger().info(f"Connection closed to change server to {AuthentificationManager()._lva.serverId}, will reconnect")
+                    Kernel().worker.addFrame(AuthentificationFrame())
+                    Kernel().worker.addFrame(QueueFrame())
+                    Kernel().worker.process(LoginValidationWithTokenAction.create(AuthentificationManager()._lva.serverId != 0, AuthentificationManager()._lva.serverId))
             return True
 
         if isinstance(msg, (SelectedServerDataMessage, SelectedServerDataExtendedMessage)):
-            ssdmsg: SelectedServerDataMessage = msg
-            ConnectionsHandler().closeConnection(DisconnectionReasonEnum.SWITCHING_TO_GAME_SERVER)
-            self._selectedServer = ssdmsg
+            self._selectedServer = msg
             AuthentificationManager().gameServerTicket = (
-                AuthentificationManager().decodeWithAES(ssdmsg.ticket).decode()
+                AuthentificationManager().decodeWithAES(msg.ticket).decode()
             )
-            PlayerManager().server = Server.getServerById(ssdmsg.serverId)
+            PlayerManager().server = Server.getServerById(msg.serverId)
             PlayerManager().kisServerPort = 0
-            self._connexionPorts = ssdmsg.ports
+            self._connexionPorts = msg.ports
+            ConnectionsHandler().closeConnection(DisconnectionReasonEnum.SWITCHING_TO_GAME_SERVER)
             return True
 
     def pulled(self) -> bool:
@@ -224,7 +227,6 @@ class ServerSelectionFrame(Frame):
             gsi = element
             if serverId == gsi.id:
                 gsi.status = newStatus
-
         return function
 
     def onValidServerSelection(self) -> None:

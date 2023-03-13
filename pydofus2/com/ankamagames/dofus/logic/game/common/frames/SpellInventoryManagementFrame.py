@@ -50,11 +50,11 @@ from pydofus2.com.ankamagames.dofus.uiApi.PlayedCharacterApi import PlayedCharac
 from pydofus2.com.ankamagames.jerakine.logger.Logger import Logger
 from pydofus2.com.ankamagames.jerakine.messages.Frame import Frame
 from pydofus2.com.ankamagames.jerakine.messages.Message import Message
-from pydofus2.com.ankamagames.jerakine.metaclasses.ThreadSharedSingleton import ThreadSharedSingleton
+from pydofus2.com.ankamagames.jerakine.metaclasses.Singleton import Singleton
 from pydofus2.com.ankamagames.jerakine.types.enums.Priority import Priority
 
 
-class SpellInventoryManagementFrame(Frame, metaclass=ThreadSharedSingleton):
+class SpellInventoryManagementFrame(Frame, metaclass=Singleton):
     
     def __init__(self):
         self._fullSpellList = dict[int, list[SpellWrapper]]()
@@ -84,12 +84,11 @@ class SpellInventoryManagementFrame(Frame, metaclass=ThreadSharedSingleton):
     def process(self, msg: Message) -> bool:
         
         if isinstance(msg, SpellListMessage):
-            slmsg = msg
             alternativeBreedSpells = FeatureManager().isFeatureWithKeywordEnabled("character.spell.breed.alternative")
             playerId = PlayedCharacterManager().id
             self._fullSpellList[playerId] = list()
             idsList = list()
-            for spell in slmsg.spells:
+            for spell in msg.spells:
                 spellData = Spell.getSpellById(spell.spellId)
                 if spellData is None:
                     raise Exception(f"Spell with id {spell.spellId} not found")
@@ -127,7 +126,7 @@ class SpellInventoryManagementFrame(Frame, metaclass=ThreadSharedSingleton):
                                 )
                             )
                         idsList.append(spellInVariantData.id)
-            if slmsg.spellPrevisualization:
+            if msg.spellPrevisualization:
                 if alternativeBreedSpells:
                     customModeBreedSpells = CustomModeBreedSpell.getCustomModeBreedSpellList(
                         PlayedCharacterManager().infos.breed
@@ -179,6 +178,7 @@ class SpellInventoryManagementFrame(Frame, metaclass=ThreadSharedSingleton):
                                 )
             PlayedCharacterManager().spellsInventory = self._fullSpellList[playerId]
             PlayedCharacterManager().playerSpellList = self._fullSpellList[playerId]
+            Logger().info(f"Player have {len(self._fullSpellList[playerId])} spells")
             return True
 
         elif isinstance(msg, SlaveSwitchContextMessage):

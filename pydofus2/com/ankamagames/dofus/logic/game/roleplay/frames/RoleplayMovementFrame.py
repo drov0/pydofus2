@@ -87,9 +87,12 @@ class RoleplayMovementFrame(Frame):
             self.isMoving = False
             self.canMove = True
             player = DofusEntities().getEntity(PlayedCharacterManager().id)
-            player.position = newPos
-            self.entitiesFrame.updateEntityCellId(PlayedCharacterManager().id, newPos.cellId)            
-            KernelEventsManager().send(KernelEvent.MOVEMENT_STOPPED, newPos)
+            if player:
+                player.position = newPos
+                self.entitiesFrame.updateEntityCellId(PlayedCharacterManager().id, newPos.cellId)            
+                KernelEventsManager().send(KernelEvent.MOVE_REQUEST_REJECTED)
+            else:
+                Logger().error("Movement reject received but player data not loaded yet, maybe map changed after a map move request that was rejected")
             return True
 
         if isinstance(msg, GameMapMovementMessage):
@@ -97,8 +100,9 @@ class RoleplayMovementFrame(Frame):
             clientMovePath = MapMovementAdapter.getClientMovement(msg.keyMovements)
             startCell = clientMovePath.start.cellId
             endCell = clientMovePath.end.cellId
+            if msg.actorId == PlayedCharacterManager().id:
+                Logger().debug(f"[MapMovement] Player {msg.actorId} moved from {startCell} to {endCell}.")
             if movedEntity:
-                Logger().info(f"[MapMovement] Actor {msg.actorId} moved from cell {startCell} to cell {endCell}.")
                 movedEntity.position.cellId = endCell
                 self.entitiesFrame.updateEntityCellId(msg.actorId, endCell)
             else:

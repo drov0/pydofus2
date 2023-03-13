@@ -22,5 +22,4 @@ class FightTeamInformations(AbstractFightTeamInformations):
         nbWaves_: int,
     ):
         self.teamMembers = teamMembers_
-
         super().init(teamId_, leaderId_, teamSide_, teamTypeId_, nbWaves_)

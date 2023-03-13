@@ -6,8 +6,6 @@ from pydofus2.com.ankamagames.atouin.enums.ElementTypesEnum import \
     ElementTypesEnum
 from pydofus2.com.ankamagames.atouin.messages.MapLoadedMessage import \
     MapLoadedMessage
-from pydofus2.com.ankamagames.dofus.logic.common.managers.StatsManager import \
-    StatsManager
 from pydofus2.com.ankamagames.jerakine.logger.Logger import Logger
 from pydofus2.com.ankamagames.jerakine.metaclasses.Singleton import Singleton
 from pydofus2.com.ankamagames.jerakine.resources.loaders.MapLoader import \
@@ -82,7 +80,6 @@ class MapDisplayManager(metaclass=Singleton):
         Logger().separator(f"Map {self.currentDataMap.id} loaded", "#")
         dmpm.DataMapProvider().resetUpdatedCell()
         dmpm.DataMapProvider().resetSpecialEffects()
-        StatsManager().purgeNonPlayersStats()
         self._currentMap = WorldPoint.fromMapId(self.currentDataMap.id)
         msg = MapLoadedMessage()
         msg.id = self._currentMap.mapId

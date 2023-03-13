@@ -37,12 +37,9 @@ class FightFighterStatsListStep(AbstractSequencable, IFightStep):
         return "fighterStatsList"
 
     def start(self) -> None:
-        self._playerId = PlayedCharacterManager().id
-        isRealPlayer: bool = CurrentPlayedFighterManager().isRealPlayer()
+        self._playerId = CurrentPlayedFighterManager().playerManager.id
         CurrentPlayedFighterManager().setCharacteristicsInformations(self._playerId, self._stats)
-        characterFrame: "PlayedCharacterUpdatesFrame" = Kernel().worker.getFrameByName("PlayedCharacterUpdatesFrame")
-        if characterFrame and isRealPlayer:
-            characterFrame.updateCharacterStatsList(self._stats)
+        PlayedCharacterUpdatesFrame.updateCharacterStatsList(self._stats, True)
         SpellWrapper.refreshAllPlayerSpellHolder(self._playerId)
         self.executeCallbacks()
 
@@ -58,25 +55,25 @@ class FightFighterStatsListStep(AbstractSequencable, IFightStep):
         characterBaseCharacteristicChangeDetails: str = ""
         if newStat.base != oldStat.base:
             characterBaseCharacteristicChangeDetails += (
-                "\r        - base : " + str(oldStat.base) + " � " + str(newStat.base)
+                "\r        - base : " + str(oldStat.base) + " -> " + str(newStat.base)
             )
         if newStat.additional != oldStat.additional:
             characterBaseCharacteristicChangeDetails += (
-                "\r        - additional : " + str(oldStat.additional) + " � " + str(newStat.additional)
+                "\r        - additional : " + str(oldStat.additional) + " -> " + str(newStat.additional)
             )
         if newStat.objectsAndMountBonus != oldStat.objectsAndMountBonus:
             characterBaseCharacteristicChangeDetails += (
                 "\r        - objectsAndMountBonus : "
                 + str(oldStat.objectsAndMountBonus)
-                + " � "
+                + " , "
                 + str(newStat.objectsAndMountBonus)
             )
         if newStat.alignGiftBonus != oldStat.alignGiftBonus:
             characterBaseCharacteristicChangeDetails += (
-                "\r        - alignGiftBonus : " + str(oldStat.alignGiftBonus) + " � " + str(newStat.alignGiftBonus)
+                "\r        - alignGiftBonus : " + str(oldStat.alignGiftBonus) + " -> " + str(newStat.alignGiftBonus)
             )
         if newStat.contextModif != oldStat.contextModif:
             characterBaseCharacteristicChangeDetails += (
-                "\r        - contextModif : " + str(oldStat.contextModif) + " � " + str(newStat.contextModif)
+                "\r        - contextModif : " + str(oldStat.contextModif) + " -> " + str(newStat.contextModif)
             )
         return characterBaseCharacteristicChangeDetails

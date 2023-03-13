@@ -177,25 +177,6 @@ class MovementPath:
         clonePath.end = self._oEnd
         clonePath.path = self._aPath.copy()
         return clonePath
-
-    def getCrossingDuration(self, run: bool = True) -> int:
-        duration = 0
-        speedAdjust = DofusEntities().getEntity(PlayedCharacterManager().id).speedAdjust
-        for i in range(1, len(self._aPath)):
-            orientation = self._aPath[i - 1].orientation
-            if not run:
-                if orientation % 2 == 0:
-                    if orientation % 4 == 0:
-                        duration += self.WALK_HORIZONTAL_DIAG_DURATION * (speedAdjust / 10 + 1)
-                    duration += self.WALK_VERTICAL_DIAG_DURATION * (speedAdjust / 10 + 1)
-                duration += self.WALK_LINEAR_DURATION * (speedAdjust / 10 + 1)
-            else:
-                if orientation % 2 == 0:
-                    if orientation % 4 == 0:
-                        duration += self.RUN_HORIZONTAL_DIAG_DURATION * (speedAdjust / 10 + 1)
-                    duration += self.RUN_VERTICAL_DIAG_DURATION * (speedAdjust / 10 + 1)
-                duration += self.RUN_LINEAR_DURATION * (speedAdjust / 10 + 1)
-        return duration / 1000.0
     
     def keyMoves(self) -> list[int]:
         self.compress()

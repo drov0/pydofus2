@@ -144,9 +144,18 @@ class ServerConnection(mp.Thread):
         if not self.open:
             if self.connecting:
                 self.__sendingQueue.append(msg)
-            return
+            return Logger().warning(f"Message {msg} was queued")
         Logger().debug(f"[{self.id}] [SND] > {msg}")
-        self.__socket.send(msg.pack())
+        try:
+            data = msg.pack()
+            total_sent = 0
+            while total_sent < len(data):
+                sent = self.__socket.send(data[total_sent:])
+                if sent == 0:
+                    raise RuntimeError("Socket connection broken")
+                total_sent += sent
+        except OSError as e:
+            Logger().debug(f"[SND]{e.errno}, {errno.errorcode[e.errno]} OS error received")
         self._latestSent = perf_counter()
         self._lastSent = perf_counter()
         self._sendSequenceId += 1
@@ -163,7 +172,7 @@ class ServerConnection(mp.Thread):
                 Logger().debug(f"[{self.id}] [RCV] (after Resume) {msg}")
             self.__receptionQueue.put(msg)
 
-    def __parse(self) -> NetworkMessage:
+    def __parse(self):
         buffer = self.__receivedStream
         while buffer.remaining() and not self._closing.is_set():
             if self.__msg_len_len is None:
@@ -265,8 +274,8 @@ class ServerConnection(mp.Thread):
         self._remoteSrvHost = host
         self._remoteSrvPort = port
         Logger().info(f"[{self.id}] Connecting to {host}:{port}...")
-        self.__connectionTimeout = BenchmarkTimer(timeout, self.__onConnectionTimeout)
-        self.__connectionTimeout.start()
+        # self.__connectionTimeout = BenchmarkTimer(timeout, self.__onConnectionTimeout)
+        # self.__connectionTimeout.start()
         self.__socket.connect((host, port))
 
     @sendTrace
@@ -294,9 +303,14 @@ class ServerConnection(mp.Thread):
                 elif e.errno == errno.WSAECONNABORTED:
                     Logger().debug(f"[{self.id}] Connection aborted by user.")
                     self._closing.set()
-                # elif e.errno == errno.WSAECONNRESET:
-                #     Logger().debug(f"[{self.id}] Connection reset by peer.")
-                #     self.connect(self._remoteSrvHost, self._remoteSrvPort)
+                elif e.errno == errno.WSAECONNRESET:
+                    Logger().debug(f"[{self.id}] Connection reset by peer.")
+                    self._closing.set()
+                elif e.errno == errno.WSAENOTSOCK:
+                    Logger().debug(f"[{self.id}] Socket apears to be closed.")
+                    if not self._closing.is_set():
+                        err = e
+                        self._closing.set()
                 # elif e.errno == errno.WSAETIMEDOUT:
                 #     Logger().debug(f"[{self.id}] Connection timed out.")
                 else:

@@ -299,6 +299,38 @@ class MapPoint:
                 return True
         return False
 
+    def iterChilds(self):
+        for y in range(self.y - 1, self.y + 2):
+            for x in range(self.x - 1, self.x + 2):
+                if self.isChild(x, y):
+                    yield x, y
+
+    def iterReachableChilds(self):
+        for x, y in self.iterChilds():
+            if self.isChild(x, y):
+                return x, y
+
+    def isChild(self, x, y, allowDiag=True, allowTroughEntity=True):
+        from pydofus2.mapTools import MapTools
+
+        parentId = self.cellId
+        cellId = MapTools.getCellIdByCoord(x, y)
+        parentX, parentY = MapTools.getCellCoordById(parentId)
+        from pydofus2.com.ankamagames.atouin.utils.DataMapProvider import DataMapProvider
+
+        canMoveFromParentToEnd = DataMapProvider().pointMov(x, y, allowTroughEntity, parentId)
+        return (
+            cellId is not None
+            and cellId != parentId
+            and canMoveFromParentToEnd
+            and (
+                y == parentY
+                or x == parentX
+                or (allowDiag
+                and (DataMapProvider().pointMov(parentX, y, allowTroughEntity, parentId) or DataMapProvider().pointMov(x, parentY, allowTroughEntity, parentId)))
+            )
+        )
+    
     def __eq__(self, mp: "MapPoint") -> bool:
         if not isinstance(mp, MapPoint):
             raise TypeError("mp must be a MapPoint")

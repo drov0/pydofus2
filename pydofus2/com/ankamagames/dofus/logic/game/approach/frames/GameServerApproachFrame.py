@@ -7,6 +7,7 @@ from pydofus2.com.ankamagames.dofus.internalDatacenter.items.ItemWrapper import 
 from pydofus2.com.ankamagames.dofus.kernel.Kernel import Kernel
 from pydofus2.com.ankamagames.dofus.kernel.net.ConnectionsHandler import ConnectionsHandler
 from pydofus2.com.ankamagames.dofus.logic.common.frames.ChatFrame import ChatFrame
+from pydofus2.com.ankamagames.dofus.logic.common.frames.NpcFrame import NpcFrame
 from pydofus2.com.ankamagames.dofus.logic.common.frames.QuestFrame import QuestFrame
 from pydofus2.com.ankamagames.dofus.logic.common.managers.InterClientManager import InterClientManager
 from pydofus2.com.ankamagames.dofus.logic.common.managers.PlayerManager import PlayerManager
@@ -71,6 +72,7 @@ from pydofus2.com.ankamagames.dofus.network.messages.game.character.choice.Chara
 from pydofus2.com.ankamagames.dofus.network.messages.game.context.GameContextCreateRequestMessage import (
     GameContextCreateRequestMessage,
 )
+from pydofus2.com.ankamagames.dofus.network.messages.game.initialization.CharacterLoadingCompleteMessage import CharacterLoadingCompleteMessage
 from pydofus2.com.ankamagames.dofus.network.messages.game.moderation.PopupWarningClosedMessage import (
     PopupWarningClosedMessage,
 )
@@ -105,7 +107,6 @@ class GameServerApproachFrame(Frame):
         self.authenticationTicketAccepted = False
         self._charactersList = list[BasicCharacterWrapper]()
         self._waitingMessages = list[NetworkMessage]()
-        self._requestedCharacterId = None
         self._loadingStart = False
         self._reconnectMsgSend = False
         super().__init__()
@@ -121,19 +122,6 @@ class GameServerApproachFrame(Frame):
     @property
     def charaListMinusDeadPeople(self) -> list:
         return self._charaListMinusDeadPeople
-
-    @property
-    def requestedCharaId(self) -> float:
-        return self._requestedCharacterId
-
-    @requestedCharaId.setter
-    def requestedCharaId(self, id: float) -> None:
-        self._requestedCharacterId = id
-
-    def isCharacterWaitingForChange(self, id: float) -> bool:
-        if self._charactersToRemodelList.get(id):
-            return True
-        return False
 
     def process(self, msg: Message) -> bool:
 
@@ -236,27 +224,27 @@ class GameServerApproachFrame(Frame):
             Kernel().worker.addFrame(JobsFrame())
             Kernel().worker.addFrame(QuestFrame())
             Kernel().worker.addFrame(AveragePricesFrame())
+            Kernel().worker.addFrame(NpcFrame())
             KernelEventsManager().send(KernelEvent.CHARACTER_SELECTION_SUCCESS, return_value=cssmsg.infos)
             if Kernel().beingInReconection and not self._reconnectMsgSend:
                 self._reconnectMsgSend = True
                 ConnectionsHandler().send(CharacterSelectedForceReadyMessage())
-            if InterClientManager.flashKey and (
-                not PlayerManager() or PlayerManager().server.id != 129 and PlayerManager().server.id != 130
-            ):
-                flashKeyMsg = ClientKeyMessage()
-                flashKeyMsg.init(InterClientManager.flashKey)
-                ConnectionsHandler().send(flashKeyMsg)
             self._cssmsg = cssmsg
             PlayedCharacterManager().infos = self._cssmsg.infos
             DataStoreType.CHARACTER_ID = str(self._cssmsg.infos.id)
-            Kernel().worker.removeFrame(self)
-            gccrmsg = GameContextCreateRequestMessage()
-            ConnectionsHandler().send(gccrmsg)
             now = time.perf_counter()
             delta = now - self._loadingStart
             if delta > self.LOADING_TIMEOUT:
                 Logger().warn(f"Client took too long to load ({delta}s).")
             return True
+
+        elif isinstance(msg, CharacterLoadingCompleteMessage):
+            Kernel().worker.removeFrame(self)
+            flashKeyMsg = ClientKeyMessage()
+            flashKeyMsg.init(InterClientManager().getFlashKey())
+            ConnectionsHandler().send(flashKeyMsg)
+            gccrmsg = GameContextCreateRequestMessage()
+            ConnectionsHandler().send(gccrmsg)
 
         elif isinstance(msg, ConnectionResumedMessage):
             return True
@@ -313,8 +301,6 @@ class GameServerApproachFrame(Frame):
 
         elif isinstance(msg, CharacterSelectionAction):
             characterId = msg.characterId
-            self._requestedCharacterId = characterId
-            self._requestedToRemodelCharacterId = 0
             csmsg = CharacterSelectionMessage()
             csmsg.init(id_=characterId)
             ConnectionsHandler().send(csmsg)

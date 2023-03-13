@@ -1,7 +1,11 @@
+import random
+import threading
+from time import sleep
 from typing import TYPE_CHECKING
+from pydofus2.com.ankamagames.dofus.logic.common.managers.StatsManager import StatsManager
+from pydofus2.com.ankamagames.dofus.logic.game.common.misc.DofusEntities import DofusEntities
 
 import pydofus2.com.ankamagames.dofus.logic.game.roleplay.frames.RoleplayContextFrame as rcf
-import pydofus2.com.ankamagames.dofus.logic.game.roleplay.frames.RoleplayInteractivesFrame as rif
 from pydofus2.com.ankamagames.atouin.managers.EntitiesManager import \
     EntitiesManager
 from pydofus2.com.ankamagames.atouin.managers.MapDisplayManager import \
@@ -14,7 +18,6 @@ from pydofus2.com.ankamagames.berilia.managers.KernelEventsManager import (
     KernelEvent, KernelEventsManager)
 from pydofus2.com.ankamagames.dofus.datacenter.monsters.Monster import Monster
 from pydofus2.com.ankamagames.dofus.datacenter.world.SubArea import SubArea
-from pydofus2.com.ankamagames.dofus.internalDatacenter.DataEnum import DataEnum
 from pydofus2.com.ankamagames.dofus.internalDatacenter.world.WorldPointWrapper import \
     WorldPointWrapper
 from pydofus2.com.ankamagames.dofus.kernel.Kernel import Kernel
@@ -74,6 +77,7 @@ from pydofus2.com.ankamagames.dofus.network.types.game.context.fight.FightTeamIn
     FightTeamInformations
 from pydofus2.com.ankamagames.dofus.network.types.game.context.GameContextActorInformations import \
     GameContextActorInformations
+from pydofus2.com.ankamagames.dofus.network.types.game.context.fight.GameFightFighterInformations import GameFightFighterInformations
 from pydofus2.com.ankamagames.dofus.network.types.game.context.roleplay.GameRolePlayCharacterInformations import \
     GameRolePlayCharacterInformations
 from pydofus2.com.ankamagames.dofus.network.types.game.context.roleplay.GameRolePlayGroupMonsterInformations import \
@@ -101,28 +105,35 @@ from pydofus2.com.ankamagames.jerakine.entities.interfaces.IEntity import \
 from pydofus2.com.ankamagames.jerakine.logger.Logger import Logger
 from pydofus2.com.ankamagames.jerakine.messages.Frame import Frame
 from pydofus2.com.ankamagames.jerakine.messages.Message import Message
+from pydofus2.com.ankamagames.jerakine.metaclasses.Singleton import Singleton
 
 if TYPE_CHECKING:
     from pydofus2.com.ankamagames.dofus.logic.game.roleplay.frames.RoleplayMovementFrame import \
         RoleplayMovementFrame
+    from pydofus2.com.ankamagames.dofus.logic.game.roleplay.frames.RoleplayInteractivesFrame import \
+        RoleplayInteractivesFrame
 
 
+class LastMCIDM(metaclass=Singleton):
+
+    def __init__(self) -> None:
+        self.msg: MapComplementaryInformationsDataMessage = None
 class RoleplayEntitiesFrame(AbstractEntitiesFrame, Frame):
     
     def __init__(self):
         self._fights = dict[int, Fight]()
         self._objects = dict()
         self._fightNumber: int = 0
-        self._mapTotalRewardRate: int = 0
         self._playersId = list()
         self._merchantsList = list["GameRolePlayMerchantInformations"]()
         self._npcList = dict()
         self._housesList = dict()
         self._waitForMap: bool = False
         self._monstersIds = list[float]()
-        self.mcidm_processessed: bool = False
+        self.mcidm_processed: bool = False
         self.mapDataRequestTimer = None
         self.nbrFails = 0
+        self.processingMapData = threading.Event()
         super().__init__()
 
     def pulled(self) -> bool:
@@ -130,11 +141,13 @@ class RoleplayEntitiesFrame(AbstractEntitiesFrame, Frame):
         self._objects.clear()
         self._npcList.clear()
         self._housesList.clear()
+        self.mcidm_processed = False
+        LastMCIDM.clear()
         return super().pulled()
 
     def pushed(self) -> bool:
         self.initNewMap()
-        self.mcidm_processessed = False
+        self.mcidm_processed = False
         if MapDisplayManager()._currentMapRendered:
             self.requestMapData()
         else:
@@ -146,29 +159,89 @@ class RoleplayEntitiesFrame(AbstractEntitiesFrame, Frame):
         self._fights = dict()
         self._objects = dict()
         self._entities.clear()
-        self._entitiesTotal = 0
         self._interactiveElements = list[InteractiveElement]()
-        self._playersId = list()
+        self._playersId = list[float]()
         self._merchantsList = list["GameRolePlayMerchantInformations"]()
         self._monstersIds = list[float]()
-        self._entitiesVisibleNumber = 0
+        self._fightfloat = None
+        self._currentSubAreaId = None
+        self.mapWithNoMonsters = True
+        self._isIndoor = None
+        self._worldPoint = None
+        self._housesList = []
 
     def requestMapData(self):
-        self.mcidm_processessed = False
-        mirmsg = MapInformationsRequestMessage()
-        mirmsg.init(mapId_=MapDisplayManager().currentMapPoint.mapId)
+        self.mcidm_processed = False
         def ontimeout():
             self.nbrFails += 1
-            if self.nbrFails > 3:
-                return KernelEventsManager().send(KernelEvent.RESTART, "MAP data request data timeout")
-            self.mapDataRequestTimer = BenchmarkTimer(2, ontimeout)
-            self.mapDataRequestTimer.start()
-            ConnectionsHandler().send(mirmsg)
-        self.mapDataRequestTimer = BenchmarkTimer(2, ontimeout)
+            if self.nbrFails > 6:
+                return KernelEventsManager().send(KernelEvent.RESTART, "map data request timeout")
+            self.mapDataRequestTimer = BenchmarkTimer(4, ontimeout)
+            self.mapDataRequestTimer.start()        
+            self.sendMapDataRequest()
+        self.mapDataRequestTimer = BenchmarkTimer(3, ontimeout)
         self.mapDataRequestTimer.start()
-        ConnectionsHandler().send(mirmsg)
+        Logger().debug(f"Requesting data for map {MapDisplayManager().currentMapPoint.mapId}")
+        self.sendMapDataRequest()
         self._waitForMap = False
-        
+
+    def sendMapDataRequest(self):
+        msg = MapInformationsRequestMessage()
+        msg.init(MapDisplayManager().currentMapPoint.mapId)
+        ConnectionsHandler().send(msg)
+    
+    def replicateMcidm(self, instId, msg: MapComplementaryInformationsDataMessage):
+        instWorker = Kernel.getInstance(instId).worker
+        instRef: "RoleplayEntitiesFrame" = instWorker.getFrameByName("RoleplayEntitiesFrame")
+        if not instRef.mcidm_processed:
+            Logger().info(f"Waiting for {instId} to finish processing Map to replicate ...")
+            instRef.processingMapData.wait()
+        instRif: "RoleplayInteractivesFrame" = instWorker.getFrameByName("RoleplayInteractivesFrame")
+        instPlayer = PlayedCharacterManager.getInstance(instId)
+        if self.mapDataRequestTimer:
+            self.mapDataRequestTimer.cancel()
+        DataMapProvider()._updatedCell = DataMapProvider.getInstance(instId)._updatedCell
+        self._fightfloat = instRef._fightfloat
+        self._fights = instRef._fights
+        self._merchantsList = instRef._merchantsList
+        self._entities = instRef._entities
+        self.mapWithNoMonsters = instRef.mapWithNoMonsters
+        PlayedCharacterManager().currentMap = instRef._worldPoint
+        self._worldPoint = instRef._worldPoint
+        self._playersId = instRef._playersId
+        self._monstersIds = instRef._monstersIds
+        self._fightNumber = instRef._fightNumber
+        self._interactiveElements = instRef._interactiveElements
+        PlayedCharacterManager().isInAnomaly = self._isInAnomaly = instRef._isInAnomaly
+        PlayedCharacterManager().isIndoor = self._isIndoor = instRef._isIndoor
+        PlayedCharacterManager().currentSubArea = instPlayer.currentSubArea                
+        EntitiesManager()._entities = EntitiesManager.getInstance(instId)._entities
+        StatsManager()._entityStats = StatsManager.getInstance(instId)._entityStats 
+        for actor in msg.actors:
+            if actor.contextualId == PlayedCharacterManager().id and isinstance(actor, GameRolePlayHumanoidInformations):
+                PlayedCharacterManager().restrictions = actor.humanoidInfo.restrictions   
+        if self.rif:
+            imumsg = InteractiveMapUpdateMessage()
+            imumsg.init(msg.interactiveElements)
+            self.rif.process(imumsg)
+            smumsg = StatedMapUpdateMessage()
+            smumsg.init(msg.statedElements)
+            self.rif.process(smumsg)
+        self.mcidm_processed = True
+        Logger().info("Map data processed")
+        KernelEventsManager().send(KernelEvent.MAPPROCESSED, msg.mapId)
+
+    def checkExistMCIDM(self, mapId):
+        for instId, lmcidm in LastMCIDM.getInstances():
+            if instId != PlayedCharacterManager().instanceId and lmcidm.msg.mapId == mapId:
+                Logger().info(f"Player {instId} already loaded map {mapId}")
+                return instId, lmcidm.msg
+        return None, None
+
+    @property
+    def rif(self) -> "RoleplayInteractivesFrame":
+        return Kernel().worker.getFrameByName("RoleplayInteractivesFrame")
+
     def process(self, msg: Message):
 
         if isinstance(msg, MapLoadedMessage):
@@ -177,27 +250,13 @@ class RoleplayEntitiesFrame(AbstractEntitiesFrame, Frame):
             return False
 
         elif isinstance(msg, MapComplementaryInformationsDataMessage):
+            Logger().info("Map data received")
+            self.processingMapData.clear()
             if self.mapDataRequestTimer:
                 self.mapDataRequestTimer.cancel()
-            mcidmsg = msg
             currentMapHasChanged = False
-            currentSubAreaHasChanged = False
-            self._interactiveElements = mcidmsg.interactiveElements
-            self._fightfloat = len(mcidmsg.fights)
-            self._mapTotalRewardRate = 0
-
-            if isinstance(msg, MapComplementaryInformationsBreachMessage):
-                mcidm = msg
-                if mcidm.subAreaId != DataEnum.SUBAREA_INFINITE_BREACH:
-                    pass
-                if PlayedCharacterManager().isInBreach:
-                    PlayedCharacterManager().isInBreach = False
-
-            if PlayedCharacterManager().isInHouse and not isinstance(
-                msg, MapComplementaryInformationsDataInHouseMessage
-            ):
-                PlayedCharacterManager().isInHouse = False
-                PlayedCharacterManager().isInHisHouse = False
+            self._interactiveElements = msg.interactiveElements
+            self._fightfloat = len(msg.fights)
 
             if PlayedCharacterManager().isIndoor and not isinstance(
                 msg, MapComplementaryInformationsWithCoordsMessage
@@ -210,26 +269,16 @@ class RoleplayEntitiesFrame(AbstractEntitiesFrame, Frame):
                 self._worldPoint = WorldPointWrapper(mciwcmsg.mapId, True, mciwcmsg.worldX, mciwcmsg.worldY)
 
             elif isinstance(msg, MapComplementaryInformationsDataInHouseMessage):
-                mcidihmsg = msg
-                isPlayerHouse = (
-                    PlayerManager().nickname == mcidihmsg.currentHouse.houseInfos.ownerTag.nickname
-                    and PlayerManager().tag == mcidihmsg.currentHouse.houseInfos.ownerTag.tagNumber
-                )
-                PlayedCharacterManager().isInHouse = True
-                if isPlayerHouse:
-                    PlayedCharacterManager().isInHisHouse = True
-                self._housesList = dict()
-                self._housesList[0] = HouseWrapper.createInside(mcidihmsg.currentHouse)
+                self.checkPlayerInHouse(msg)
                 self._worldPoint = WorldPointWrapper(
-                    mcidihmsg.mapId,
+                    msg.mapId,
                     True,
-                    mcidihmsg.currentHouse.worldX,
-                    mcidihmsg.currentHouse.worldY,
+                    msg.currentHouse.worldX,
+                    msg.currentHouse.worldY,
                 )
-
             else:
-                self._worldPoint = WorldPointWrapper(int(mcidmsg.mapId))
-
+                self._worldPoint = WorldPointWrapper(int(msg.mapId))
+            self._isIndoor = PlayedCharacterManager().isIndoor
             roleplayContextFrame: rcf.RoleplayContextFrame = Kernel().worker.getFrameByName("RoleplayContextFrame")
             previousMap = PlayedCharacterManager().currentMap
             if (
@@ -242,24 +291,21 @@ class RoleplayEntitiesFrame(AbstractEntitiesFrame, Frame):
                 PlayedCharacterManager().currentMap = self._worldPoint
 
             roleplayContextFrame.newCurrentMapIsReceived = False
-            if self._currentSubAreaId != mcidmsg.subAreaId or not PlayedCharacterManager().currentSubArea:
-                currentSubAreaHasChanged = True
-                self._currentSubAreaId = mcidmsg.subAreaId
+            if self._currentSubAreaId != msg.subAreaId or not PlayedCharacterManager().currentSubArea:
+                self._currentSubAreaId = msg.subAreaId
                 newSubArea = SubArea.getSubAreaById(self._currentSubAreaId)
                 PlayedCharacterManager().currentSubArea = newSubArea
 
-            self._playersId = list()
+            self._playersId = list[float]()
             self._monstersIds = list[float]()
-
-            for actor in mcidmsg.actors:
+            for actor in msg.actors:
                 if actor.contextualId > 0:
                     self._playersId.append(actor.contextualId)
                 elif isinstance(actor, GameRolePlayGroupMonsterInformations):
                     self._monstersIds.append(actor.contextualId)
 
-            self._entitiesVisibleNumber = len(self._playersId) + len(self._monstersIds)
-            mapWithNoMonsters = True
-            for actor1 in mcidmsg.actors:
+            self.mapWithNoMonsters = True
+            for actor1 in msg.actors:
                 ac = self.addOrUpdateActor(actor1)
                 if ac:
                     if ac.id == PlayedCharacterManager().id:
@@ -282,71 +328,44 @@ class RoleplayEntitiesFrame(AbstractEntitiesFrame, Frame):
                                     iumsg = InteractiveUsedMessage()
                                     iumsg.init(character.contextualId, hosu.elementId, hosu.skillId, duration, True)
                                     Kernel().worker.process(iumsg)
-                if mapWithNoMonsters:
+                if self.mapWithNoMonsters:
                     if isinstance(actor1, GameRolePlayGroupMonsterInformations):
-                        mapWithNoMonsters = False
-                        # TODO: Here notify the bot that map contains monsters
-
-                if isinstance(actor1, GameRolePlayCharacterInformations):
-                    pass
-
+                        self.mapWithNoMonsters = False
                 elif isinstance(actor1, GameRolePlayMerchantInformations):
                     self._merchantsList.append(actor1)
 
             self._merchantsList.sort(key=lambda x: x.name)
-            selfFightExists = False
-            fightIdsToRemove = list()
-
-            for fight in mcidmsg.fights:
-                selfFightExists = False
-                for fightCache in self._fights.values():
-                    if fight.fightId == fightCache.fightId:
-                        selfFightExists = True
-                if not selfFightExists:
-                    self.addFight(fight)
-
-            for fightCache in self._fights.values():
-                selfFightExists = False
-                for fight in mcidmsg.fights:
-                    if fight.fightId == fightCache.fightId:
-                        selfFightExists = True
-                if not selfFightExists:
-                    fightIdsToRemove.append(fightCache.fightId)
-
-            for fightId in fightIdsToRemove:
-                del self._fights[fightId]
-
+            self._fights.clear()
+            for fight in msg.fights:
+                self.addFight(fight)
             if currentMapHasChanged:
-                for mo in mcidmsg.obstacles:
+                for mo in msg.obstacles:
                     DataMapProvider().updateCellMovLov(
                         mo.obstacleCellId,
                         mo.state == MapObstacleStateEnum.OBSTACLE_OPENED,
                     )
-
-            rpIntFrame: rif.RoleplayInteractivesFrame = Kernel().worker.getFrameByName("RoleplayInteractivesFrame")
-            if rpIntFrame:
+            if self.rif:
                 imumsg = InteractiveMapUpdateMessage()
-                imumsg.init(mcidmsg.interactiveElements)
-                rpIntFrame.process(imumsg)
+                imumsg.init(msg.interactiveElements)
+                self.rif.process(imumsg)
                 smumsg = StatedMapUpdateMessage()
-                smumsg.init(mcidmsg.statedElements)
-                rpIntFrame.process(smumsg)
+                smumsg.init(msg.statedElements)
+                self.rif.process(smumsg)
 
-            if currentMapHasChanged or currentSubAreaHasChanged:
-                # TODO: Here you notify the bot throught BotEventsManager that the map(or subarea) has changed
-                pass
 
             if isinstance(msg, MapComplementaryInformationsAnomalyMessage):
                 PlayedCharacterManager().isInAnomaly = True
 
             elif PlayedCharacterManager().isInAnomaly:
                 PlayedCharacterManager().isInAnomaly = False
-
-            self.mcidm_processessed = True
+            self._isInAnomaly = PlayedCharacterManager().isInAnomaly
+            self.mcidm_processed = True
+            self.processingMapData.set()
             KernelEventsManager().send(KernelEvent.MAPPROCESSED, msg.mapId)
             return False
 
         if isinstance(msg, GameRolePlayShowActorMessage):
+            # Logger().debug(f"Actor {msg.informations.contextualId} showed")
             if int(msg.informations.contextualId) == int(PlayedCharacterManager().id):
                 humi: HumanInformations = msg.informations.humanoidInfo
                 PlayedCharacterManager().restrictions = humi.restrictions
@@ -408,6 +427,15 @@ class RoleplayEntitiesFrame(AbstractEntitiesFrame, Frame):
             for element_id in gcrmemsg.elementsIds:
                 self.process(GameContextRemoveElementMessage(element_id))
             return True
+
+    def checkPlayerInHouse(self, msg: MapComplementaryInformationsDataInHouseMessage):
+        isPlayerHouse = (
+            PlayerManager().nickname == msg.currentHouse.houseInfos.ownerTag.nickname
+            and PlayerManager().tag == msg.currentHouse.houseInfos.ownerTag.tagNumber
+        )
+        PlayedCharacterManager().isInHouse = True
+        if isPlayerHouse:
+            PlayedCharacterManager().isInHisHouse = True
 
     def removeFight(self, fightId: int) -> None:
         fight: Fight = self._fights.get(fightId)
@@ -471,6 +499,8 @@ class RoleplayEntitiesFrame(AbstractEntitiesFrame, Frame):
             self.registerActorWithId(fightTeam, teamEntity.id)
             teams.append(fightTeam)
         self._fights[infos.fightId] = fight
+        Logger().info(f"Fight({infos.fightId}) appeared with team entities {['leader : ' + str(ft.leaderId) + ', cell: ' + str(infos.fightTeamsPositions[ft.teamId]) for ft in infos.fightTeams]}.")
+        KernelEventsManager().send(KernelEvent.FIGHT_SWORD_SHOWED, infos)
 
     def updateMonstersGroup(self, pMonstersInfo: GameRolePlayGroupMonsterInformations) -> None:
         monstersGroup: list[MonsterInGroupLightInformations] = self.getMonsterGroup(pMonstersInfo.staticInfos)

@@ -17,11 +17,10 @@ from pydofus2.com.ankamagames.dofus.network.types.game.character.characteristic.
 from pydofus2.com.ankamagames.dofus.network.types.game.character.characteristic.CharacterUsableCharacteristicDetailed import \
     CharacterUsableCharacteristicDetailed
 from pydofus2.com.ankamagames.jerakine.logger.Logger import Logger
-from pydofus2.com.ankamagames.jerakine.metaclasses.ThreadSharedSingleton import \
-    ThreadSharedSingleton
+from pydofus2.com.ankamagames.jerakine.metaclasses.Singleton import Singleton
 
 
-class StatsManager(metaclass=ThreadSharedSingleton):
+class StatsManager(metaclass=Singleton):
     DEFAULT_IS_VERBOSE = True
     DATA_STORE_CATEGORY = "ComputerModule_statsManager"
     DATA_STORE_KEY_IS_VERBOSE = "statsManagerIsVerbose"
@@ -75,23 +74,11 @@ class StatsManager(metaclass=ThreadSharedSingleton):
                     continue
                 entityStats.setStat(entityStat, False)
 
-    def purgeNonPlayersStats(self) -> None:
-        with self._lock:
-            from pydofus2.com.ankamagames.dofus.logic.game.common.managers.PlayedCharacterManager import \
-                PlayedCharacterManager
-            keys = list(self._entityStats.keys())
-            players: list[PlayedCharacterManager] = PlayedCharacterManager.getInstances()
-            playersIDs = [float(player.id) for player in players]
-            for ctxid in keys:
-                if ctxid not in playersIDs:
-                    Logger().debug(f"[StatsManager] Purge stats of non player {ctxid}")
-                    del self._entityStats[ctxid]
-
     def deleteStats(self, entityId: float) -> bool:
         from pydofus2.com.ankamagames.dofus.logic.game.common.managers.PlayedCharacterManager import \
                 PlayedCharacterManager
         with self._lock:
-            playersIDs = [float(player.id) for player in PlayedCharacterManager.getInstances()]
+            playersIDs = [float(player.id) for instId, player in PlayedCharacterManager.getInstances()]
             entityId = float(entityId)
             if entityId in playersIDs:
                 return

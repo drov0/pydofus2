@@ -126,6 +126,7 @@ class RoleplayInteractivesFrame(Frame):
         return self._collectableIe
 
     def pushed(self) -> bool:
+        Logger().debug("RoleplayInteractivesFrame pushed")
         return True
 
     def process(self, msg: Message) -> bool:
@@ -159,10 +160,14 @@ class RoleplayInteractivesFrame(Frame):
         if isinstance(msg, InteractiveUsedMessage):
             if msg.duration > 0:
                 self._enityUsingElement[msg.elemId] = msg.entityId
-                Logger().info(f"[RolePlayInteractives] Interactive element {msg.elemId} is being used by {msg.entityId}...")
                 KernelEventsManager().send(KernelEvent.INTERACTIVE_ELEMENT_BEING_USED, msg.entityId, msg.elemId)
-                if msg.entityId == PlayedCharacterManager().id:
+                if msg.entityId == PlayedCharacterManager().id:                
+                    Logger().info(f"[RolePlayInteractives] Player is using element {msg.elemId} ...")
                     self.usingInteractive = True
+            else:
+                if msg.entityId == PlayedCharacterManager().id:    
+                    Logger().info(f"[RolePlayInteractives] Player is used element {msg.elemId}")
+                KernelEventsManager().send(KernelEvent.INTERACTIVE_ELEMENT_USED, msg.entityId, msg.elemId)
             return True
         
         if isinstance(msg, InteractiveUseEndedMessage):

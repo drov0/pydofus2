@@ -8,12 +8,11 @@ from pydofus2.com.ankamagames.dofus.logic.game.common.actions.GameContextQuitAct
     GameContextQuitAction
 from pydofus2.com.ankamagames.dofus.network.enums.GameContextEnum import \
     GameContextEnum
+from pydofus2.com.ankamagames.dofus.network.messages.game.context.GameContextDestroyMessage import GameContextDestroyMessage
 from pydofus2.com.ankamagames.dofus.network.messages.game.context.GameContextCreateMessage import \
     GameContextCreateMessage
 from pydofus2.com.ankamagames.dofus.network.messages.game.context.GameContextQuitMessage import \
     GameContextQuitMessage
-from pydofus2.com.ankamagames.dofus.network.messages.game.context.roleplay.CurrentMapMessage import \
-    CurrentMapMessage
 from pydofus2.com.ankamagames.jerakine.logger.Logger import Logger
 from pydofus2.com.ankamagames.jerakine.messages.Frame import Frame
 from pydofus2.com.ankamagames.jerakine.messages.Message import Message
@@ -21,6 +20,7 @@ from pydofus2.com.ankamagames.jerakine.types.enums.Priority import Priority
 
 
 class ContextChangeFrame(Frame):
+
     def __init__(self):
         self.mapChangeConnexion = ""
         self.currentContext = None
@@ -35,7 +35,10 @@ class ContextChangeFrame(Frame):
 
     def process(self, msg: Message) -> bool:
 
-        if isinstance(msg, GameContextCreateMessage):
+        if isinstance(msg, GameContextDestroyMessage):
+            pass
+        
+        elif isinstance(msg, GameContextCreateMessage):
             self.currentContext = msg.context
             if self.currentContext == GameContextEnum.ROLE_PLAY:
                 from pydofus2.com.ankamagames.dofus.logic.game.roleplay.frames.RoleplayContextFrame import \
@@ -50,18 +53,10 @@ class ContextChangeFrame(Frame):
                 KernelEventsManager().send(KernelEvent.FIGHT_STARTED)
             return False
 
-        if isinstance(msg, GameContextQuitAction):
+        elif isinstance(msg, GameContextQuitAction):
             gcqmsg = GameContextQuitMessage()
             ConnectionsHandler().send(gcqmsg)
             return True
-
-        if isinstance(msg, CurrentMapMessage):
-            mcmsg = msg
-            self.mapChangeConnexion = mcmsg.sourceConnection
-            return False
-
-        else:
-            return False
 
     def pulled(self) -> bool:
         return True

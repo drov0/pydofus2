@@ -27,6 +27,8 @@ if TYPE_CHECKING:
     from pydofus2.com.ankamagames.jerakine.network.ServerConnection import ServerConnection
 
 class DofusClient(threading.Thread):
+    lastLoginTime = None
+    minLoginInterval = 10
 
     def __init__(self, name="unknown"):
         super().__init__(name=name)
@@ -34,8 +36,6 @@ class DofusClient(threading.Thread):
         self._registredInitFrames = []
         self._registredGameStartFrames = []
         self._stopReason: DisconnectionReason = None
-        self._lastLoginTime = None
-        self._minLoginInterval = 10
         self._lock = None
         self._certId = None
         self._apiKey = None
@@ -43,7 +43,7 @@ class DofusClient(threading.Thread):
         self._serverId = None
         self._characterId = None
         self._loginToken = None
-        self._mule = False
+        self.mule = False
         self._shutDownReason = None
         self.terminated = threading.Event()
 
@@ -54,8 +54,9 @@ class DofusClient(threading.Thread):
     def init(self):
         Logger().info("[DofusClient] initializing")
         Kernel().init()
-        Kernel().isMule = self._mule
+        Kernel().isMule = self.mule
         KernelEventsManager().once(KernelEvent.CHARACTER_SELECTION_SUCCESS, self.onCharacterSelectionSuccess)
+        KernelEventsManager().once(KernelEvent.IN_GAME, self.onInGame)
         KernelEventsManager().once(KernelEvent.CRASH, self.onCrash)
         KernelEventsManager().once(KernelEvent.SHUTDOWN, self.onShutdown)
         KernelEventsManager().once(KernelEvent.RESTART, self.onRestart)
@@ -80,6 +81,9 @@ class DofusClient(threading.Thread):
         for frame in self._registredGameStartFrames:
             self.worker.addFrame(frame())
 
+    def onInGame(self, event, msg):
+        Logger().info("Character entered game server successfully")
+
     def onCrash(self, event, message):
         Logger().debug(f"[DofusClient] Crashed for reason: {message}")
         self.shutdown()
@@ -100,6 +104,7 @@ class DofusClient(threading.Thread):
         KernelEventsManager().once(KernelEvent.RESTART, self.onRestart)
         KernelEventsManager().once(KernelEvent.RECONNECT, self.onReconnect)
         if self._characterId:
+            PlayedCharacterManager().instanceId = self.name
             PlayerManager().allowAutoConnectCharacter = True
             PlayedCharacterManager().id = self._characterId
             PlayerManager().autoConnectOfASpecificCharacterId = self._characterId        
@@ -107,12 +112,16 @@ class DofusClient(threading.Thread):
             self.worker.addFrame(frame())
         token = Haapi().getLoginToken(self._certId, self._certHash, apiKey=self._apiKey)
         AuthentificationManager().setToken(token)
+        if DofusClient.lastLoginTime is not None and perf_counter() - DofusClient.lastLoginTime < DofusClient.minLoginInterval:
+            Logger().info("[DofusClient] Login request too soon, will wait some time")
+            self.terminated.wait(DofusClient.minLoginInterval - (perf_counter() - DofusClient.lastLoginTime))
+        self._lastLoginTime = perf_counter()
         self.worker.process(LoginAction.create(self._serverId != 0, self._serverId))
 
     def shutdown(self, reason=DisconnectionReasonEnum.WANTED_SHUTDOWN, msg=""):
         self._shutDownReason = reason
         Kernel.getInstance(self.name).worker.process(TerminateWorkerMessage())    
-        return self.terminated.wait(20)    
+        return self.terminated.wait(5)    
 
     @property
     def connection(self) -> "ServerConnection":
@@ -129,9 +138,9 @@ class DofusClient(threading.Thread):
     def run(self):
         try:
             self.init()
-            if self._lastLoginTime is not None and perf_counter() - self._lastLoginTime < self._minLoginInterval:
+            if DofusClient.lastLoginTime is not None and perf_counter() - DofusClient.lastLoginTime < DofusClient.minLoginInterval:
                 Logger().info("[DofusClient] Login request too soon, will wait some time")
-                self._killSig.wait(self._minLoginInterval - (perf_counter() - self._lastLoginTime))
+                self._killSig.wait(DofusClient.minLoginInterval - (perf_counter() - DofusClient.lastLoginTime))
             self._lastLoginTime = perf_counter()
             if not self._loginToken:            
                 if not self._apiKey:

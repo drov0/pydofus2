@@ -9,6 +9,7 @@ from pydofus2.com.ankamagames.dofus.kernel.net.DisconnectionReason import \
     DisconnectionReason
 from pydofus2.com.ankamagames.dofus.kernel.net.DisconnectionReasonEnum import \
     DisconnectionReasonEnum
+from pydofus2.com.ankamagames.dofus.kernel.net.PlayerDisconnectedMessage import PlayerDisconnectedMessage
 from pydofus2.com.ankamagames.dofus.logic.common.managers.PlayerManager import \
     PlayerManager
 from pydofus2.com.ankamagames.jerakine.logger.Logger import Logger
@@ -17,14 +18,15 @@ from pydofus2.com.ankamagames.jerakine.network.INetworkMessage import \
     INetworkMessage
 from pydofus2.com.ankamagames.jerakine.network.ServerConnection import \
     ServerConnection
-
+lock = threading.Lock()
 
 class ConnectionsHandler(metaclass=Singleton):
 
     GAME_SERVER: str = "game_server"
     KOLI_SERVER: str = "koli_server"
     CONNECTION_TIMEOUT: int = 3
-    MINTIME_BETWEEN_SENDS = 0.05
+    MINTIME_BETWEEN_SENDS = 0.2
+    LAST_SEND_TIME = None
 
     def __init__(self):
         self._conn: ServerConnection = None
@@ -37,7 +39,6 @@ class ConnectionsHandler(metaclass=Singleton):
         self._receivedMsgsQueue = Kernel().worker._queue
         self.paused = threading.Event()
         self.resumed = threading.Event()
-        self.lastSendTime = None
 
     @property
     def connectionType(self) -> str:
@@ -59,14 +60,6 @@ class ConnectionsHandler(metaclass=Singleton):
     def restart(self) -> None:
         self.closeConnection(DisconnectionReasonEnum.RESTARTING)
 
-    def pause(self) -> None:
-        self.paused.set()
-        self.resumed.clear()
-
-    def resume(self) -> None:
-        self.paused.clear()
-        self.resumed.set()
-
     def handleDisconnection(self) -> DisconnectionReason:
         reason: DisconnectionReason = DisconnectionReason(
             self._wantedSocketLost, self._wantedSocketLostReason, self._disconnectMessage
@@ -86,6 +79,10 @@ class ConnectionsHandler(metaclass=Singleton):
         if self.conn.open:
             self.conn.close()
             self.conn.join()
+        if self._currentConnectionType == ConnectionType.TO_GAME_SERVER:
+            for instId, inst in Kernel.getInstances():
+                if inst != Kernel():
+                    inst.worker.process(PlayerDisconnectedMessage(threading.currentThread().name))
         self._currentConnectionType = ConnectionType.DISCONNECTED
 
     def etablishConnection(self, host: str, port: int, id: str) -> None:
@@ -97,9 +94,13 @@ class ConnectionsHandler(metaclass=Singleton):
         self._conn.connect(host, port)
 
     def send(self, msg: INetworkMessage) -> None:
-        # if self.lastSendTime:
-        #     timeSinceLastSend = perf_counter() - self.lastSendTime
-        #     if timeSinceLastSend < self.MINTIME_BETWEEN_SENDS:
-        #         time.sleep(self.MINTIME_BETWEEN_SENDS - timeSinceLastSend)
-        # self.lastSendTime = perf_counter()
+        if ConnectionsHandler.LAST_SEND_TIME is not None:
+            minNextSendTime = ConnectionsHandler.LAST_SEND_TIME + self.MINTIME_BETWEEN_SENDS
+            if perf_counter() < minNextSendTime:
+                Kernel().worker.terminated.wait(minNextSendTime - perf_counter())
         self._conn.send(msg)
+        with lock:
+            ConnectionsHandler.LAST_SEND_TIME = perf_counter()
+
+    def inGameServer(self):
+        return self._currentConnectionType == ConnectionType.TO_GAME_SERVER

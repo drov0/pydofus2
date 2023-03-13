@@ -1,4 +1,3 @@
-import sys
 from pydofus2.com.ankamagames.dofus.logic.connection.actions.LoginValidationAction import (
     LoginValidationAction,
 )
@@ -10,9 +9,9 @@ class LoginValidationWithTokenAction(LoginValidationAction):
 
     @classmethod
     def create(
-        cls, autoSelectServer: bool = False, serverId: int = 0, host: str = None
+        cls, autoSelectServer: bool = False, serverId: int = 0, host: str = None, *args
     ) -> "LoginValidationWithTokenAction":
-        a: LoginValidationWithTokenAction = LoginValidationWithTokenAction(sys.argv[1:])
+        a: LoginValidationWithTokenAction = LoginValidationWithTokenAction(args)
         a.password = ""
         a.username = ""
         a.autoSelectServer = autoSelectServer

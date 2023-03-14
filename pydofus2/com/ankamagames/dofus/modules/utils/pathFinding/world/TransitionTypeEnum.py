@@ -3,18 +3,18 @@ from enum import Enum
 
 class TransitionTypeEnum(Enum):
 
-    UNSPECIFIED: int = 0
+    UNSPECIFIED = 0
 
-    SCROLL: int = 1
+    SCROLL = 1
 
-    SCROLL_ACTION: int = 2
+    SCROLL_ACTION = 2
 
-    MAP_EVENT: int = 4
+    MAP_EVENT = 4
 
-    MAP_ACTION: int = 8
+    MAP_ACTION = 8
 
-    MAP_OBSTACLE: int = 16
+    MAP_OBSTACLE = 16
 
-    INTERACTIVE: int = 32
+    INTERACTIVE = 32
 
-    NPC_ACTION: int = 64
+    NPC_ACTION = 64

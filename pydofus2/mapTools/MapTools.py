@@ -200,7 +200,8 @@ BOT_ROW_CELLS = set([i for i in range(CELLCOUNT) if isBottomRow(i)])
 
 
 def iterChilds(cell):
-    return MapPoint.fromCellId(cell).iterReachableChilds()
+    for x, y in MapPoint.fromCellId(cell).iterChilds():
+        yield getCellIdByCoord(x, y)
 
 def manhattanDistance(cell1, cell2):
     x1, y1 = getCellCoordById(cell1)
@@ -226,6 +227,3 @@ def findAccessibleCells(startCell, zone: set):
                 heapq.heappush(queue, (child_cost, child))
     sorted_accessible = sorted(accessible.items(), key=lambda x: x[1])
     return [cell for cell, _ in sorted_accessible]
-
-
-

@@ -49,6 +49,7 @@ class ConnectionsHandler(metaclass=Singleton):
         return self._conn
 
     def connectToLoginServer(self, host: str, port: int) -> None:
+        Logger().debug("Connecting to login server ...")
         self.etablishConnection(host, port, ConnectionType.TO_LOGIN_SERVER)
         self._currentConnectionType = ConnectionType.TO_LOGIN_SERVER
 
@@ -82,7 +83,7 @@ class ConnectionsHandler(metaclass=Singleton):
         if self._currentConnectionType == ConnectionType.TO_GAME_SERVER:
             for instId, inst in Kernel.getInstances():
                 if inst != Kernel():
-                    inst.worker.process(PlayerDisconnectedMessage(threading.currentThread().name))
+                    inst.worker.process(PlayerDisconnectedMessage(threading.currentThread().name, self._currentConnectionType))
         self._currentConnectionType = ConnectionType.DISCONNECTED
 
     def etablishConnection(self, host: str, port: int, id: str) -> None:
@@ -94,6 +95,8 @@ class ConnectionsHandler(metaclass=Singleton):
         self._conn.connect(host, port)
 
     def send(self, msg: INetworkMessage) -> None:
+        if not self._conn:
+            return Logger().warning(f"Can't send message when no connection is established!, maybe we are shuting down?")
         if ConnectionsHandler.LAST_SEND_TIME is not None:
             minNextSendTime = ConnectionsHandler.LAST_SEND_TIME + self.MINTIME_BETWEEN_SENDS
             if perf_counter() < minNextSendTime:

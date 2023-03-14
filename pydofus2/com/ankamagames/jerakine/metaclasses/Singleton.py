@@ -36,7 +36,7 @@ class Singleton(type):
     def clearAllChilds(cls):
         scheduledForDelete = []
         for clz in Singleton._instances[cls.threadName()]:
-            if isinstance(cls, clz):
+            if issubclass(clz, cls):
                 scheduledForDelete.append(clz)
         for clz in scheduledForDelete:
             Logger().debug(f"{clz.__name__} singleton instance cleared")

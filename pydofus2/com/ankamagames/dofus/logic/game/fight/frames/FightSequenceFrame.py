@@ -673,8 +673,7 @@ class FightSequenceFrame(Frame, ISpellCastProvider):
             return True
 
         if isinstance(msg, GameMapMovementMessage):
-            gmmmsg = msg
-            self.fighterHasMoved(gmmmsg)
+            self.fighterHasMoved(msg)
             return False
 
         if isinstance(msg, FighterStatsListMessage):
@@ -1231,6 +1230,8 @@ class FightSequenceFrame(Frame, ISpellCastProvider):
         movementPathCells: list[int] = movementPath.getCells()
         Logger().info(f"Fighter {gmmmsg.actorId} has moved following the path {movementPathCells}")
         movingEntity: IMovable = DofusEntities().getEntity(gmmmsg.actorId)
+        if not movingEntity:
+            return Logger().error("Moving entity not found")
         if movingEntity.id == gmmmsg.actorId:
             movingEntity.position.cellId = movementPath.end.cellId
         else:

@@ -5,62 +5,76 @@ from whistle import EventDispatcher
 from pydofus2.com.ankamagames.jerakine.benchmark.BenchmarkTimer import BenchmarkTimer
 from pydofus2.com.ankamagames.jerakine.logger.Logger import Logger
 from typing import Any
+
 lock = threading.RLock()
+
 
 class Event(object):
     propagation_stopped = False
-    sender: 'EventsHandler'
+    sender: "EventsHandler"
     name: Any
-    listener: 'Listener'
+    listener: "Listener"
+
     def stop_propagation(self):
         self.propagation_stopped = True
 
+
 class Listener:
-    
-    def __init__(self, manager: 'EventsHandler', event_id, callback: callable, timeout=None, ontimeout=None, once=False, priority=0):
+    def __init__(
+        self,
+        manager: "EventsHandler",
+        event_id,
+        callback: callable,
+        timeout=None,
+        ontimeout=None,
+        once=False,
+        priority=0,
+        originator=None,
+    ):
+        self._deleted = False
         self.event_id = event_id
         self.callback = callback
         self.timeout = timeout
         self.timeoutCallback = ontimeout
         self.timeoutTimer = None
-        if timeout:                
+        if timeout:
             self.armTimer()
         self.once = once
         self.priority = priority
         self.manager = manager
         self.thname = threading.current_thread().name
-        self._deleted = False
+        self.originator = originator
 
     def call(self, event: Event, *args, **kwargs):
         if self._deleted:
-            return Logger.getInstance(self.thname).warning("Callback called of a deleted listener")
+            return Logger().warning("Callback called of a deleted listener")
         self.cancelTimer()
         self.callback(event, *args, **kwargs)
-    
+
     def delete(self):
         self._deleted = True
         self.cancelTimer()
         if self.event_id not in self.manager._listeners:
-            Logger().warning("Trying to delete Event not registred")
-            return
+            return Logger().warning("Trying to delete Event not registred")
         listeners = self.manager._listeners[self.event_id][self.priority]
         if self in listeners:
             listeners.remove(self)
             if self.event_id in self.manager._sorted:
                 del self.manager._sorted[self.event_id]
-        else:
-            Logger.getInstance(self.thname).warning(f"Listener not found in list of listeners for event {self.event_id}")
-        del self
-    
+
     def armTimer(self, newTimeout=None):
+        if self._deleted:
+            return Logger().warning("arm timer of a deleted listener")
         if newTimeout:
             self.timeout = newTimeout
         self.timeoutTimer = BenchmarkTimer(self.timeout, lambda: self.timeoutCallback(self))
         self.timeoutTimer.start()
-        
+
     def cancelTimer(self):
         if self.timeoutTimer:
             self.timeoutTimer.cancel()
+
+
 class EventsHandler(EventDispatcher):
     def __init__(self):
         super().__init__()
@@ -69,7 +83,7 @@ class EventsHandler(EventDispatcher):
         self.__waiting_evts = list[threading.Event]()
         self._crashMessage = None
 
-    def wait(self, event, timeout: float = None):
+    def wait(self, event, timeout: float = None, originator=None):
         received = threading.Event()
         ret = [None]
 
@@ -77,7 +91,7 @@ class EventsHandler(EventDispatcher):
             received.set()
             ret[0] = kwargs.get("return_value", None)
 
-        self.once(event, onReceived)
+        self.once(event, onReceived, originator=originator)
         self.__waiting_evts.append(received)
         wait_result = received.wait(timeout)
         if received in self.__waiting_evts:
@@ -88,12 +102,12 @@ class EventsHandler(EventDispatcher):
             raise TimeoutError(f"wait event {event} timed out")
         return ret[0]
 
-    def on(self, event_id, callback, priority=0, timeout=None, ontimeout=None, once=False):
+    def on(self, event_id, callback, priority=0, timeout=None, ontimeout=None, once=False, originator=None):
         if event_id not in self._listeners:
             self._listeners[event_id] = {}
         if priority not in self._listeners[event_id]:
             self._listeners[event_id][priority] = []
-        listener = Listener(self, event_id, callback, timeout, ontimeout, once, priority)
+        listener = Listener(self, event_id, callback, timeout, ontimeout, once, priority, originator)
         if event_id not in self._listeners:
             return
         self._listeners[event_id][priority].append(listener)
@@ -101,14 +115,15 @@ class EventsHandler(EventDispatcher):
             del self._sorted[event_id]
         return listener
 
-    def once(self, event_id, callback, priority=0, timeout=None, ontimeout=None):
-        return self.on(event_id, callback, priority, timeout, ontimeout, once=True)
+    def once(self, event_id, callback, priority=0, timeout=None, ontimeout=None, originator=None):
+        return self.on(event_id, callback, priority, timeout, ontimeout, once=True, originator=originator)
 
     def sort_listeners(self, event_id):
         self._sorted[event_id] = []
         if event_id in self._listeners:
             self._sorted[event_id] = [
-                listener for listeners in sorted(self._listeners[event_id].items(), key=operator.itemgetter(0))
+                listener
+                for listeners in sorted(self._listeners[event_id].items(), key=operator.itemgetter(0))
                 for listener in listeners[1]
             ]
 
@@ -130,7 +145,7 @@ class EventsHandler(EventDispatcher):
             return event
         event_listeners = self.getSortedListeners(event_id)
         to_remove = list[Listener]()
-        for listener in event_listeners:        
+        for listener in event_listeners:
             event = Event()
             event.sender = self
             event.name = event_id
@@ -146,7 +161,6 @@ class EventsHandler(EventDispatcher):
                         del self._sorted[event_id]
                     for listener in to_remove:
                         listener.delete()
-                
 
     def reset(self):
         self.stopAllwaiting()
@@ -164,7 +178,7 @@ class EventsHandler(EventDispatcher):
             listeners = list(filter(lambda l: l.callback not in callbacks, listeners))
         if event_id in self._sorted:
             del self._sorted[event_id]
-            
+
     def remove_listener(self, event_id, callback):
         if event_id not in self._listeners:
             return Logger().warning(f"Event {event_id} not found")
@@ -172,3 +186,13 @@ class EventsHandler(EventDispatcher):
             listeners = list(filter(lambda l: l.callback != callback, listeners))
         if event_id in self._sorted:
             del self._sorted[event_id]
+    
+    def clearAllByOrigin(self, origin):
+        toBeDeleted = list[Listener]()
+        for listenersByPrio in self._listeners.values():
+            for listeners in listenersByPrio.values():
+                for listener in listeners:
+                    if listener.originator and listener.originator == origin:
+                        toBeDeleted.append(listener)
+        for listener in toBeDeleted:
+            listener.delete()

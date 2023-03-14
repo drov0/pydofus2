@@ -58,7 +58,7 @@ class Worker(MessageHandler):
             # with Worker.LOCK:
             #     Worker.LAST_TIME = current_time
             msg = self._queue.get()
-            Logger().debug(f"[Worker] [RCV] {msg}")
+            # Logger().debug(f"[Worker] [RCV] {msg}")
             if type(msg).__name__ == "TerminateWorkerMessage":
                 self._terminating.set()
                 break
@@ -173,6 +173,8 @@ class Worker(MessageHandler):
             Logger().warn(f"[WORKER] Frame {frame} refused to be pulled.")
 
     def processMessage(self, msg: Message) -> None:
+        if self._terminating.is_set() or self._terminated.is_set():
+            return Logger().warning(f"Can't process message if the worker is terminated")
         processed: bool = False
         self._processingMessage.set()
         for frame in self._framesList:
@@ -189,7 +191,7 @@ class Worker(MessageHandler):
                 Logger().error(f"[WORKER] Discarded message: {msg}!")
 
     def processFramesInAndOut(self) -> None:        
-        if self._terminated.is_set():
+        if self._terminating.is_set() or self._terminated.is_set():
             return Logger().warning(f"Can't process frames in and out because the worker is terminated")
         while self._framesToRemove and not self._terminated.is_set():
             f = self._framesToRemove.pop()

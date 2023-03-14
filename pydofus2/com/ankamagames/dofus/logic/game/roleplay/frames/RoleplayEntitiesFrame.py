@@ -3,8 +3,6 @@ import threading
 from time import sleep
 from typing import TYPE_CHECKING
 from pydofus2.com.ankamagames.dofus.logic.common.managers.StatsManager import StatsManager
-from pydofus2.com.ankamagames.dofus.logic.game.common.misc.DofusEntities import DofusEntities
-
 import pydofus2.com.ankamagames.dofus.logic.game.roleplay.frames.RoleplayContextFrame as rcf
 from pydofus2.com.ankamagames.atouin.managers.EntitiesManager import \
     EntitiesManager
@@ -39,6 +37,7 @@ from pydofus2.com.ankamagames.dofus.logic.game.roleplay.types.FightTeam import \
     FightTeam
 from pydofus2.com.ankamagames.dofus.network.enums.MapObstacleStateEnum import \
     MapObstacleStateEnum
+from pydofus2.com.ankamagames.dofus.network.messages.common.basic.BasicPingMessage import BasicPingMessage
 from pydofus2.com.ankamagames.dofus.network.messages.game.context.fight.GameFightUpdateTeamMessage import \
     GameFightUpdateTeamMessage
 from pydofus2.com.ankamagames.dofus.network.messages.game.context.GameContextRemoveElementMessage import \
@@ -47,8 +46,6 @@ from pydofus2.com.ankamagames.dofus.network.messages.game.context.GameContextRem
     GameContextRemoveMultipleElementsMessage
 from pydofus2.com.ankamagames.dofus.network.messages.game.context.roleplay.anomaly.MapComplementaryInformationsAnomalyMessage import \
     MapComplementaryInformationsAnomalyMessage
-from pydofus2.com.ankamagames.dofus.network.messages.game.context.roleplay.breach.MapComplementaryInformationsBreachMessage import \
-    MapComplementaryInformationsBreachMessage
 from pydofus2.com.ankamagames.dofus.network.messages.game.context.roleplay.fight.GameRolePlayRemoveChallengeMessage import \
     GameRolePlayRemoveChallengeMessage
 from pydofus2.com.ankamagames.dofus.network.messages.game.context.roleplay.fight.GameRolePlayShowChallengeMessage import \
@@ -100,8 +97,6 @@ from pydofus2.com.ankamagames.dofus.types.entities.AnimatedCharacter import \
     AnimatedCharacter
 from pydofus2.com.ankamagames.jerakine.benchmark.BenchmarkTimer import \
     BenchmarkTimer
-from pydofus2.com.ankamagames.jerakine.entities.interfaces.IEntity import \
-    IEntity
 from pydofus2.com.ankamagames.jerakine.logger.Logger import Logger
 from pydofus2.com.ankamagames.jerakine.messages.Frame import Frame
 from pydofus2.com.ankamagames.jerakine.messages.Message import Message
@@ -119,7 +114,9 @@ class LastMCIDM(metaclass=Singleton):
     def __init__(self) -> None:
         self.msg: MapComplementaryInformationsDataMessage = None
 class RoleplayEntitiesFrame(AbstractEntitiesFrame, Frame):
-    
+    MAX_MAPDATA_REQ_FAILS = 30
+    MAPDATA_REQ_TIMEOUT = 0.7
+
     def __init__(self):
         self._fights = dict[int, Fight]()
         self._objects = dict()
@@ -146,6 +143,7 @@ class RoleplayEntitiesFrame(AbstractEntitiesFrame, Frame):
         return super().pulled()
 
     def pushed(self) -> bool:
+        self.nbrFails = 0
         self.initNewMap()
         self.mcidm_processed = False
         if MapDisplayManager()._currentMapRendered:
@@ -173,13 +171,16 @@ class RoleplayEntitiesFrame(AbstractEntitiesFrame, Frame):
     def requestMapData(self):
         self.mcidm_processed = False
         def ontimeout():
+            pingMsg = BasicPingMessage()
+            pingMsg.init(True)
+            ConnectionsHandler().send(pingMsg)
             self.nbrFails += 1
-            if self.nbrFails > 6:
+            if self.nbrFails > self.MAX_MAPDATA_REQ_FAILS:
                 return KernelEventsManager().send(KernelEvent.RESTART, "map data request timeout")
-            self.mapDataRequestTimer = BenchmarkTimer(4, ontimeout)
+            self.mapDataRequestTimer = BenchmarkTimer(self.MAPDATA_REQ_TIMEOUT, ontimeout)
             self.mapDataRequestTimer.start()        
             self.sendMapDataRequest()
-        self.mapDataRequestTimer = BenchmarkTimer(3, ontimeout)
+        self.mapDataRequestTimer = BenchmarkTimer(self.MAPDATA_REQ_TIMEOUT, ontimeout)
         self.mapDataRequestTimer.start()
         Logger().debug(f"Requesting data for map {MapDisplayManager().currentMapPoint.mapId}")
         self.sendMapDataRequest()
@@ -246,11 +247,12 @@ class RoleplayEntitiesFrame(AbstractEntitiesFrame, Frame):
 
         if isinstance(msg, MapLoadedMessage):
             if self._waitForMap:
+                self.nbrFails = 0
                 self.requestMapData()
             return False
 
         elif isinstance(msg, MapComplementaryInformationsDataMessage):
-            Logger().info("Map data received")
+            Logger().info("[MapMove] Map data received")
             self.processingMapData.clear()
             if self.mapDataRequestTimer:
                 self.mapDataRequestTimer.cancel()

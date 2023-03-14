@@ -3,6 +3,7 @@ from time import perf_counter
 from typing import TYPE_CHECKING
 
 from pydofus2.com.ankamagames.atouin.Haapi import Haapi
+from pydofus2.com.ankamagames.berilia.managers.EventsHandler import Listener
 from pydofus2.com.ankamagames.berilia.managers.KernelEventsManager import (
     KernelEvent, KernelEventsManager)
 from pydofus2.com.ankamagames.dofus.kernel.Kernel import Kernel
@@ -15,7 +16,7 @@ from pydofus2.com.ankamagames.dofus.kernel.net.DisconnectionReasonEnum import \
 from pydofus2.com.ankamagames.dofus.logic.common.managers.PlayerManager import \
     PlayerManager
 from pydofus2.com.ankamagames.dofus.logic.connection.actions.LoginValidationWithTokenAction import \
-    LoginValidationWithTokenAction as LoginAction
+    LoginValidationWithTokenAction
 from pydofus2.com.ankamagames.dofus.logic.connection.managers.AuthentificationManager import \
     AuthentificationManager
 from pydofus2.com.ankamagames.dofus.logic.game.common.managers.PlayedCharacterManager import \
@@ -55,12 +56,12 @@ class DofusClient(threading.Thread):
         Logger().info("[DofusClient] initializing")
         Kernel().init()
         Kernel().isMule = self.mule
-        KernelEventsManager().once(KernelEvent.CHARACTER_SELECTION_SUCCESS, self.onCharacterSelectionSuccess)
-        KernelEventsManager().once(KernelEvent.IN_GAME, self.onInGame)
-        KernelEventsManager().once(KernelEvent.CRASH, self.onCrash)
-        KernelEventsManager().once(KernelEvent.SHUTDOWN, self.onShutdown)
-        KernelEventsManager().once(KernelEvent.RESTART, self.onRestart)
-        KernelEventsManager().once(KernelEvent.RECONNECT, self.onReconnect)
+        KernelEventsManager().once(KernelEvent.CHARACTER_SELECTION_SUCCESS, self.onCharacterSelectionSuccess, originator=self)
+        KernelEventsManager().once(KernelEvent.IN_GAME, self.onInGame, originator=self)
+        KernelEventsManager().once(KernelEvent.CRASH, self.onCrash, originator=self)
+        KernelEventsManager().once(KernelEvent.SHUTDOWN, self.onShutdown, originator=self)
+        KernelEventsManager().once(KernelEvent.RESTART, self.onRestart, originator=self)
+        KernelEventsManager().once(KernelEvent.RECONNECT, self.onReconnect, originator=self)
         if self._characterId:
             PlayerManager().allowAutoConnectCharacter = True
             PlayedCharacterManager().id = self._characterId
@@ -95,14 +96,21 @@ class DofusClient(threading.Thread):
     def onRestart(self, event, message):
         self.onReconnect(event, message)
 
+    def onLoginTimeout(self, listener: Listener):
+        self.worker.process(LoginValidationWithTokenAction.create(self._serverId != 0, self._serverId))
+        listener.armTimer()
+        self._lastLoginTime = perf_counter()
+        
+        
     def onReconnect(self, event, message):
         Logger().warning(f"[DofusClient] Reconnect requested for reason: {message}")
         Kernel().reset(reloadData=True)
-        KernelEventsManager().once(KernelEvent.CHARACTER_SELECTION_SUCCESS, self.onCharacterSelectionSuccess)
-        KernelEventsManager().once(KernelEvent.CRASH, self.onCrash)
-        KernelEventsManager().once(KernelEvent.SHUTDOWN, self.onShutdown)
-        KernelEventsManager().once(KernelEvent.RESTART, self.onRestart)
-        KernelEventsManager().once(KernelEvent.RECONNECT, self.onReconnect)
+        KernelEventsManager().once(KernelEvent.CHARACTER_SELECTION_SUCCESS, self.onCharacterSelectionSuccess, originator=self)        
+        KernelEventsManager().once(KernelEvent.IN_GAME, self.onInGame, timeout=20, ontimeout=self.onLoginTimeout, originator=self)
+        KernelEventsManager().once(KernelEvent.CRASH, self.onCrash, originator=self)
+        KernelEventsManager().once(KernelEvent.SHUTDOWN, self.onShutdown, originator=self)
+        KernelEventsManager().once(KernelEvent.RESTART, self.onRestart, originator=self)
+        KernelEventsManager().once(KernelEvent.RECONNECT, self.onReconnect, originator=self)
         if self._characterId:
             PlayedCharacterManager().instanceId = self.name
             PlayerManager().allowAutoConnectCharacter = True
@@ -116,7 +124,8 @@ class DofusClient(threading.Thread):
             Logger().info("[DofusClient] Login request too soon, will wait some time")
             self.terminated.wait(DofusClient.minLoginInterval - (perf_counter() - DofusClient.lastLoginTime))
         self._lastLoginTime = perf_counter()
-        self.worker.process(LoginAction.create(self._serverId != 0, self._serverId))
+        self.worker.process(LoginValidationWithTokenAction.create(self._serverId != 0, self._serverId))
+        
 
     def shutdown(self, reason=DisconnectionReasonEnum.WANTED_SHUTDOWN, msg=""):
         self._shutDownReason = reason
@@ -147,7 +156,7 @@ class DofusClient(threading.Thread):
                     raise Exception("No API key provided")
                 self._loginToken = Haapi().getLoginToken(self._certId, self._certHash, apiKey=self._apiKey)
             AuthentificationManager().setToken(self._loginToken)
-            self.worker.process(LoginAction.create(self._serverId != 0, self._serverId))
+            self.worker.process(LoginValidationWithTokenAction.create(self._serverId != 0, self._serverId))
             self.worker.run()
         except Exception as e:
             Logger().error(f"[DofusClient] Error in main: {e}", exc_info=True)

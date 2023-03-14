@@ -305,17 +305,13 @@ class MapPoint:
                 if self.isChild(x, y):
                     yield x, y
 
-    def iterReachableChilds(self):
-        for x, y in self.iterChilds():
-            if self.isChild(x, y):
-                return x, y
-
     def isChild(self, x, y, allowDiag=True, allowTroughEntity=True):
         from pydofus2.mapTools import MapTools
 
         parentId = self.cellId
         cellId = MapTools.getCellIdByCoord(x, y)
-        parentX, parentY = MapTools.getCellCoordById(parentId)
+        parentX = MapTools.getCellIdXCoord(parentId)
+        parentY = MapTools.getCellIdYCoord(parentId)
         from pydofus2.com.ankamagames.atouin.utils.DataMapProvider import DataMapProvider
 
         canMoveFromParentToEnd = DataMapProvider().pointMov(x, y, allowTroughEntity, parentId)
@@ -330,6 +326,7 @@ class MapPoint:
                 and (DataMapProvider().pointMov(parentX, y, allowTroughEntity, parentId) or DataMapProvider().pointMov(x, parentY, allowTroughEntity, parentId)))
             )
         )
+
     
     def __eq__(self, mp: "MapPoint") -> bool:
         if not isinstance(mp, MapPoint):

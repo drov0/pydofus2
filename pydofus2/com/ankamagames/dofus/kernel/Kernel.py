@@ -65,7 +65,6 @@ class Kernel(metaclass=Singleton):
             BenchmarkTimer
 
         Logger().debug("[KERNEL] Resetting ...")
-        AbstractBehavior.clearAllChilds()
         KernelEventsManager().reset()
         if not autoRetry:
             AuthentificationManager.clear()

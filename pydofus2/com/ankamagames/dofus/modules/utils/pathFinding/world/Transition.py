@@ -1,4 +1,6 @@
 from pydofus2.com.ankamagames.dofus.datacenter.items.criterion.GroupItemCriterion import GroupItemCriterion
+from pydofus2.com.ankamagames.dofus.modules.utils.pathFinding.world.TransitionTypeEnum import TransitionTypeEnum
+from pydofus2.com.ankamagames.jerakine.types.enums.DirectionsEnum import DirectionsEnum
 
 
 class Transition:
@@ -86,7 +88,7 @@ class Transition:
         return True
 
     def __str__(self) -> str:
-        return f"Transition(type={self._type}, direction={self._direction}, skillId={self._skillId}, criterion={self._criterion}, transitionMapId={self._transitionMapId}, cell={self._cell}, id={self._id})"
+        return f"Transition(type={TransitionTypeEnum(self._type).name}, direction={DirectionsEnum(self._direction).name}, skillId={self._skillId}, criterion={self._criterion}, transitionMapId={self._transitionMapId}, cell={self._cell}, id={self._id})"
 
     def to_json(self):
         return {

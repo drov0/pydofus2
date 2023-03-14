@@ -84,10 +84,18 @@ class FightChangeVisibilityStep(AbstractSequencable, IFightStep):
     def targets(self) -> list[float]:
         return [self._entityId]
 
+    @property
+    def fightEntitiesFrame(self) -> "FightEntitiesFrame":
+        return Kernel().worker.getFrameByName("FightEntitiesFrame")
+    
     def unspawnEntity(self) -> None:
         if FightEntitiesHolder().getEntity(self._entityId):
             return
         entity:AnimatedCharacter = DofusEntities().getEntity(self._entityId)
+        if not entity:
+            entity = self.fightEntitiesFrame.entities.get(self._entityId)
+            if not entity:
+                return Logger().info("Can't hold entity while invisible coz its not found")
         FightEntitiesHolder().holdEntity(entity)
         if entity:
             entity.hide()

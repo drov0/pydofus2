@@ -33,7 +33,7 @@ class Logger(logging.Logger, metaclass=LoggerSingleton):
         super().__init__(self.prefix)
         self.setLevel(logging.DEBUG)
         formatter = logging.Formatter(
-            "%(threadName)s|%(asctime)s.%(msecs)03d [%(levelname)s] %(message)s", datefmt="%H:%M:%S"
+            "%(filename)s|%(asctime)s.%(msecs)03d [%(levelname)s] %(message)s", datefmt="%H:%M:%S"
         )
         now = datetime.datetime.now()
         fileHandler = logging.FileHandler(LOGS_PATH / f"{self.prefix}_{now.strftime('%Y-%m-%d')}.log")

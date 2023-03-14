@@ -1,5 +1,6 @@
 import errno
 import functools
+import math
 import queue
 import socket
 import sys
@@ -41,7 +42,7 @@ class ServerConnection(mp.Thread):
     LOG_ENCODED_CLIENT_MESSAGES: bool = False
     DEBUG_LOW_LEVEL_VERBOSE: bool = False
     DEBUG_DATA: bool = False
-    LATENCY_AVG_BUFFER_SIZE: int = 50
+    LATENCY_AVG_BUFFER_SIZE: int = 200
     MESSAGE_SIZE_ASYNC_THRESHOLD: int = 300 * 1024
     CONNECTION_TIMEOUT = 7
 
@@ -69,6 +70,7 @@ class ServerConnection(mp.Thread):
         self._sendSequenceId: int = 0
         self._latestSent: int = 0
         self._lastSent: int = None
+        self.lastSentPingTime = None
 
         self._firstConnectionTry: bool = True
         if receptionQueue is None:
@@ -79,13 +81,24 @@ class ServerConnection(mp.Thread):
         self.__connectionTimeout = None
 
     @property
-    def latencyAvg(self) -> int:
+    def latencyAvg(self) -> float:
         if len(self._latencyBuffer) == 0:
             return 0
-        total: int = 0
+        total = 0
         for latency in self._latencyBuffer:
             total += latency
-        return int(total / len(self._latencyBuffer))
+        return round(1000 * total / len(self._latencyBuffer), 2)
+
+    @property
+    def latencyVar(self) -> float:
+        avg = self.latencyAvg
+        if len(self._latencyBuffer) == 0:
+            return 0
+        total = 0
+        for latency in self._latencyBuffer:
+            total += math.pow(latency - avg, 2)
+        total = math.sqrt(total / len(self._latencyBuffer))
+        return round(total, 2)
 
     @property
     def latencySamplesCount(self) -> int:
@@ -144,7 +157,9 @@ class ServerConnection(mp.Thread):
         if not self.open:
             if self.connecting:
                 self.__sendingQueue.append(msg)
-            return Logger().warning(f"Message {msg} was queued")
+                return Logger().warning(f"Message {msg} was queued")
+            elif self._closing.is_set() or self.closed:
+                return Logger().warning(f"Discarded Message {msg}")
         Logger().debug(f"[{self.id}] [SND] > {msg}")
         try:
             data = msg.pack()
@@ -154,6 +169,8 @@ class ServerConnection(mp.Thread):
                 if sent == 0:
                     raise RuntimeError("Socket connection broken")
                 total_sent += sent
+            if type(msg).__name__ == "BasicPingMessage":
+                self.lastSentPingTime = perf_counter()
         except OSError as e:
             Logger().debug(f"[SND]{e.errno}, {errno.errorcode[e.errno]} OS error received")
         self._latestSent = perf_counter()
@@ -189,6 +206,10 @@ class ServerConnection(mp.Thread):
                 break
             self.updateLatency()
             msg: NetworkMessage = MessageReceiver().parse(buffer, self.__packet_id, self.__msg_len)
+            if type(msg).__name__ == "BasicPongMessage":
+                latency = round(1000 * (perf_counter() - self.lastSentPingTime), 2)
+                Logger().info(f"Latency : {latency}ms, average {self.latencyAvg}, var {self.latencyVar}")
+                
             if msg.unpacked:
                 msg.receptionTime = perf_counter()
                 msg.sourceConnection = self.id
@@ -202,12 +223,18 @@ class ServerConnection(mp.Thread):
     def updateLatency(self) -> None:
         if self._paused.is_set() or len(self.__pauseQueue) > 0 or self._latestSent == 0:
             return
-        packetReceived: int = perf_counter()
-        latency: int = packetReceived - self._latestSent
+        packetReceived = perf_counter()
+        latency = packetReceived - self._latestSent
         self._latestSent = 0
         self._latencyBuffer.append(latency)
         if len(self._latencyBuffer) > self.LATENCY_AVG_BUFFER_SIZE:
             self._latencyBuffer.pop(0)
+
+    @property
+    def latencyMax(self) -> float:
+        if len(self._latencyBuffer) == 0:
+            return 0.3
+        return max(self._latencyBuffer)
 
     def stopConnectionTimeout(self) -> None:
         if self.__connectionTimeout:

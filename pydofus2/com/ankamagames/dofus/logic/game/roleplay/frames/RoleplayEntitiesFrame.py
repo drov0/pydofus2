@@ -1,6 +1,4 @@
-import random
 import threading
-from time import sleep
 from typing import TYPE_CHECKING
 from pydofus2.com.ankamagames.dofus.logic.common.managers.StatsManager import StatsManager
 import pydofus2.com.ankamagames.dofus.logic.game.roleplay.frames.RoleplayContextFrame as rcf
@@ -74,7 +72,6 @@ from pydofus2.com.ankamagames.dofus.network.types.game.context.fight.FightTeamIn
     FightTeamInformations
 from pydofus2.com.ankamagames.dofus.network.types.game.context.GameContextActorInformations import \
     GameContextActorInformations
-from pydofus2.com.ankamagames.dofus.network.types.game.context.fight.GameFightFighterInformations import GameFightFighterInformations
 from pydofus2.com.ankamagames.dofus.network.types.game.context.roleplay.GameRolePlayCharacterInformations import \
     GameRolePlayCharacterInformations
 from pydofus2.com.ankamagames.dofus.network.types.game.context.roleplay.GameRolePlayGroupMonsterInformations import \
@@ -103,8 +100,6 @@ from pydofus2.com.ankamagames.jerakine.messages.Message import Message
 from pydofus2.com.ankamagames.jerakine.metaclasses.Singleton import Singleton
 
 if TYPE_CHECKING:
-    from pydofus2.com.ankamagames.dofus.logic.game.roleplay.frames.RoleplayMovementFrame import \
-        RoleplayMovementFrame
     from pydofus2.com.ankamagames.dofus.logic.game.roleplay.frames.RoleplayInteractivesFrame import \
         RoleplayInteractivesFrame
 
@@ -114,8 +109,8 @@ class LastMCIDM(metaclass=Singleton):
     def __init__(self) -> None:
         self.msg: MapComplementaryInformationsDataMessage = None
 class RoleplayEntitiesFrame(AbstractEntitiesFrame, Frame):
-    MAX_MAPDATA_REQ_FAILS = 30
-    MAPDATA_REQ_TIMEOUT = 0.7
+    MAX_MAPDATA_REQ_FAILS = 20
+    MAPDATA_REQ_TIMEOUT = 0.2
 
     def __init__(self):
         self._fights = dict[int, Fight]()

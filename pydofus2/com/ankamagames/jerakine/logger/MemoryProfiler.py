@@ -3,7 +3,6 @@ import objgraph
 import os
 import sys
 import threading
-from time import perf_counter
 import traceback
 import tracemalloc
 import psutil

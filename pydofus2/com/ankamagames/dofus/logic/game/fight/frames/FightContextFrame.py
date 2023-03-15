@@ -22,7 +22,6 @@ from pydofus2.com.ankamagames.dofus.logic.game.common.frames.SpellInventoryManag
 )
 from pydofus2.com.ankamagames.dofus.logic.game.common.managers.PlayedCharacterManager import PlayedCharacterManager
 from pydofus2.com.ankamagames.dofus.logic.game.common.messages.FightEndingMessage import FightEndingMessage
-from pydofus2.com.ankamagames.dofus.logic.game.common.misc.DofusEntities import DofusEntities
 from pydofus2.com.ankamagames.dofus.logic.game.fight.actions.ChallengeTargetsListRequestAction import (
     ChallengeTargetsListRequestAction,
 )
@@ -30,7 +29,6 @@ from pydofus2.com.ankamagames.dofus.logic.game.fight.actions.UpdateSpellModifier
 from pydofus2.com.ankamagames.dofus.logic.game.fight.frames.FightBattleFrame import FightBattleFrame
 from pydofus2.com.ankamagames.dofus.logic.game.fight.frames.FightEntitiesFrame import FightEntitiesFrame
 from pydofus2.com.ankamagames.dofus.logic.game.fight.frames.FightPreparationFrame import FightPreparationFrame
-from pydofus2.com.ankamagames.dofus.logic.game.fight.frames.FightSequenceFrame import FightSequenceFrame
 from pydofus2.com.ankamagames.dofus.logic.game.fight.managers.BuffManager import BuffManager
 from pydofus2.com.ankamagames.dofus.logic.game.fight.managers.CurrentPlayedFighterManager import (
     CurrentPlayedFighterManager,
@@ -151,7 +149,6 @@ from pydofus2.com.ankamagames.jerakine.data.I18n import I18n
 from pydofus2.com.ankamagames.jerakine.logger.Logger import Logger
 from pydofus2.com.ankamagames.jerakine.messages.Frame import Frame
 from pydofus2.com.ankamagames.jerakine.messages.Message import Message
-from pydofus2.com.ankamagames.jerakine.sequencer.SerialSequencer import SerialSequencer
 from pydofus2.com.ankamagames.jerakine.types.enums.Priority import Priority
 
 

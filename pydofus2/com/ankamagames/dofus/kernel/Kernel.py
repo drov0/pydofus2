@@ -1,4 +1,3 @@
-from pyd2bot.logic.roleplay.behaviors.AbstractBehavior import AbstractBehavior
 from pydofus2.com.ankamagames.dofus.kernel.net.DisconnectionReasonEnum import DisconnectionReasonEnum
 from pydofus2.com.ankamagames.dofus.logic.common.frames.ChatFrame import \
     ChatFrame

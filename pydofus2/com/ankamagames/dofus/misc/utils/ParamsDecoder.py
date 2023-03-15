@@ -1,11 +1,6 @@
-from pydofus2.com.ankamagames.dofus.datacenter.items.Item import Item
 from pydofus2.com.ankamagames.dofus.datacenter.items.ItemType import ItemType
 from pydofus2.com.ankamagames.dofus.datacenter.jobs.Job import Job
 from pydofus2.com.ankamagames.dofus.datacenter.quest.Quest import Quest
-from pydofus2.com.ankamagames.dofus.internalDatacenter.items.ItemWrapper import \
-    ItemWrapper
-from pydofus2.com.ankamagames.dofus.logic.common.managers.HyperlinkItemManager import \
-    HyperlinkItemManager
 from pydofus2.com.ankamagames.jerakine.data.I18n import I18n
 from pydofus2.com.ankamagames.jerakine.logger.Logger import Logger
 

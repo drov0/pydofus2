@@ -6,7 +6,6 @@ from pydofus2.com.ankamagames.dofus.internalDatacenter.connection.BasicCharacter
 from pydofus2.com.ankamagames.dofus.internalDatacenter.items.ItemWrapper import ItemWrapper
 from pydofus2.com.ankamagames.dofus.kernel.Kernel import Kernel
 from pydofus2.com.ankamagames.dofus.kernel.net.ConnectionsHandler import ConnectionsHandler
-from pydofus2.com.ankamagames.dofus.logic.common.frames.ChatFrame import ChatFrame
 from pydofus2.com.ankamagames.dofus.logic.common.frames.NpcFrame import NpcFrame
 from pydofus2.com.ankamagames.dofus.logic.common.frames.QuestFrame import QuestFrame
 from pydofus2.com.ankamagames.dofus.logic.common.managers.InterClientManager import InterClientManager

@@ -1,7 +1,4 @@
-from pydofus2.com.ankamagames.dofus.network.messages.game.context.roleplay.party.AbstractPartyMessage import (
-    AbstractPartyMessage,
-)
-
+from pydofus2.com.ankamagames.dofus.network.messages.game.context.roleplay.party.AbstractPartyMessage import AbstractPartyMessage
 
 class PartyFollowStatusUpdateMessage(AbstractPartyMessage):
     followedId: int
@@ -9,10 +6,10 @@ class PartyFollowStatusUpdateMessage(AbstractPartyMessage):
     isFollowed: bool
     success: bool
     isFollowed: bool
-
     def init(self, followedId_: int, success_: bool, isFollowed_: bool, partyId_: int):
         self.followedId = followedId_
         self.success = success_
         self.isFollowed = isFollowed_
-
+        
         super().init(partyId_)
+    

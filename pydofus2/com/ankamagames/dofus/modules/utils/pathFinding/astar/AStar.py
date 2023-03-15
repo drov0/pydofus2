@@ -1,9 +1,5 @@
 import heapq
 from time import perf_counter
-from types import FunctionType
-from pydofus2.com.ankamagames.atouin.utils.DataMapProvider import DataMapProvider
-from pydofus2.com.ankamagames.dofus.logic.game.common.managers.PlayedCharacterManager import PlayedCharacterManager
-from pydofus2.com.ankamagames.dofus.modules.utils.pathFinding.world.TransitionTypeEnum import TransitionTypeEnum
 from pydofus2.com.ankamagames.jerakine.metaclasses.Singleton import Singleton
 from pydofus2.com.ankamagames.jerakine.pathfinding.Pathfinding import Pathfinding
 from pydofus2.com.ankamagames.jerakine.types.positions.MapPoint import MapPoint

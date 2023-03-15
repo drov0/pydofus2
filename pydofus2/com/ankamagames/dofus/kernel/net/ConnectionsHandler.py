@@ -1,5 +1,4 @@
 import threading
-import time
 from time import perf_counter
 
 from pydofus2.com.ankamagames.dofus.kernel.Kernel import Kernel

@@ -5,7 +5,6 @@ from datetime import datetime
 from pydofus2.com.ankamagames.dofus import Constants
 from pydofus2.com.ankamagames.dofus.kernel.net.ConnectionsHandler import ConnectionsHandler
 from pydofus2.com.ankamagames.dofus.logic.common.managers.PlayerManager import PlayerManager
-from pydofus2.com.ankamagames.dofus.network.enums.GameContextEnum import GameContextEnum
 from pydofus2.com.ankamagames.dofus.network.messages.game.context.GameContextCreateMessage import (
     GameContextCreateMessage,
 )

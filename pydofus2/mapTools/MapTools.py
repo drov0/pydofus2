@@ -1,8 +1,7 @@
 import heapq
 import math
 from functools import lru_cache
-from pydofus2.com.ankamagames.jerakine.types.positions.MapPoint import (
-    MapPoint, Point)
+from pydofus2.com.ankamagames.jerakine.types.positions.MapPoint import MapPoint, Point
 from pydofus2.mapTools.MapDirection import MapDirection
 
 MAP_GRID_WIDTH: int = 14
@@ -47,7 +46,6 @@ def getCellsIdBetween(cell1Id: int, cell2Id: int) -> list:
 
     result = []
     while mp1X != mp2X or mp1Y != mp2Y:
-
         if abs(curr_x - curr_y) < precision:
             curr_x += x_step
             curr_y += y_step
@@ -108,6 +106,7 @@ def getCellCoordById(cell_id: int) -> Point:
 def getMpLine(cellid1: int, cellid2: int) -> list[MapPoint]:
     cellsIds = getCellsIdBetween(cellid1, cellid2)
     return [MapPoint.fromCellId(cellid) for cellid in cellsIds]
+
 
 @lru_cache(maxsize=5000)
 def getDistance(param1: int, param2: int) -> int:
@@ -181,17 +180,22 @@ def getLookDirection4DiagExactByCoord(param1: int, param2: int, param3: int, par
         return 0
     return -1
 
+
 def isLeftCol(cellId):
     return cellId % 14 == 0
+
 
 def isRightCol(cellId):
     return isLeftCol(cellId + 1)
 
+
 def isTopRow(cellId):
     return cellId < 2 * MAP_GRID_WIDTH
 
+
 def isBottomRow(cellId):
     return cellId > 531
+
 
 LEFT_COL_CELLS = set([i for i in range(CELLCOUNT) if isLeftCol(i)])
 RIGHT_COL_CELLS = set([i for i in range(CELLCOUNT) if isRightCol(i)])
@@ -203,11 +207,13 @@ def iterChilds(cell):
     for x, y in MapPoint.fromCellId(cell).iterChilds():
         yield getCellIdByCoord(x, y)
 
+
 def manhattanDistance(cell1, cell2):
     x1, y1 = getCellCoordById(cell1)
     x2, y2 = getCellCoordById(cell2)
     return abs(x2 - x1) + abs(y2 - y1)
-    
+
+
 def findAccessibleCells(startCell, zone: set):
     # Uses A* algorithm to find all left column cells accessible from a given cell
     queue = []

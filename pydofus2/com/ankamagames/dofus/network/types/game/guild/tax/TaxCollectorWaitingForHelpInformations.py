@@ -1,18 +1,13 @@
-from pydofus2.com.ankamagames.dofus.network.types.game.guild.tax.TaxCollectorComplementaryInformations import (
-    TaxCollectorComplementaryInformations,
-)
+from pydofus2.com.ankamagames.dofus.network.types.game.guild.tax.TaxCollectorComplementaryInformations import TaxCollectorComplementaryInformations
 from typing import TYPE_CHECKING
-
 if TYPE_CHECKING:
-    from pydofus2.com.ankamagames.dofus.network.types.game.fight.ProtectedEntityWaitingForHelpInfo import (
-        ProtectedEntityWaitingForHelpInfo,
-    )
-
+    from pydofus2.com.ankamagames.dofus.network.types.game.fight.ProtectedEntityWaitingForHelpInfo import ProtectedEntityWaitingForHelpInfo
+    
 
 class TaxCollectorWaitingForHelpInformations(TaxCollectorComplementaryInformations):
-    waitingForHelpInfo: "ProtectedEntityWaitingForHelpInfo"
-
-    def init(self, waitingForHelpInfo_: "ProtectedEntityWaitingForHelpInfo"):
+    waitingForHelpInfo: 'ProtectedEntityWaitingForHelpInfo'
+    def init(self, waitingForHelpInfo_: 'ProtectedEntityWaitingForHelpInfo'):
         self.waitingForHelpInfo = waitingForHelpInfo_
-
+        
         super().init()
+    

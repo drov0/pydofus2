@@ -1,17 +1,10 @@
 from pydofus2.com.ankamagames.jerakine.network.NetworkMessage import NetworkMessage
 from typing import TYPE_CHECKING
-
 if TYPE_CHECKING:
-    from pydofus2.com.ankamagames.dofus.network.types.game.character.alignment.ActorExtendedAlignmentInformations import (
-        ActorExtendedAlignmentInformations,
-    )
-    from pydofus2.com.ankamagames.dofus.network.types.game.character.characteristic.CharacterCharacteristic import (
-        CharacterCharacteristic,
-    )
-    from pydofus2.com.ankamagames.dofus.network.types.game.character.characteristic.CharacterSpellModification import (
-        CharacterSpellModification,
-    )
-
+    from pydofus2.com.ankamagames.dofus.network.types.game.character.alignment.ActorExtendedAlignmentInformations import ActorExtendedAlignmentInformations
+    from pydofus2.com.ankamagames.dofus.network.types.game.character.characteristic.CharacterCharacteristic import CharacterCharacteristic
+    from pydofus2.com.ankamagames.dofus.network.types.game.character.characteristic.CharacterSpellModification import CharacterSpellModification
+    
 
 class CharacterCharacteristicsInformations(NetworkMessage):
     experience: int
@@ -19,25 +12,12 @@ class CharacterCharacteristicsInformations(NetworkMessage):
     experienceNextLevelFloor: int
     experienceBonusLimit: int
     kamas: int
-    alignmentInfos: "ActorExtendedAlignmentInformations"
+    alignmentInfos: 'ActorExtendedAlignmentInformations'
     criticalHitWeapon: int
-    characteristics: list["CharacterCharacteristic"]
-    spellModifications: list["CharacterSpellModification"]
+    characteristics: list['CharacterCharacteristic']
+    spellModifications: list['CharacterSpellModification']
     probationTime: int
-
-    def init(
-        self,
-        experience_: int,
-        experienceLevelFloor_: int,
-        experienceNextLevelFloor_: int,
-        experienceBonusLimit_: int,
-        kamas_: int,
-        alignmentInfos_: "ActorExtendedAlignmentInformations",
-        criticalHitWeapon_: int,
-        characteristics_: list["CharacterCharacteristic"],
-        spellModifications_: list["CharacterSpellModification"],
-        probationTime_: int,
-    ):
+    def init(self, experience_: int, experienceLevelFloor_: int, experienceNextLevelFloor_: int, experienceBonusLimit_: int, kamas_: int, alignmentInfos_: 'ActorExtendedAlignmentInformations', criticalHitWeapon_: int, characteristics_: list['CharacterCharacteristic'], spellModifications_: list['CharacterSpellModification'], probationTime_: int):
         self.experience = experience_
         self.experienceLevelFloor = experienceLevelFloor_
         self.experienceNextLevelFloor = experienceNextLevelFloor_
@@ -48,5 +28,6 @@ class CharacterCharacteristicsInformations(NetworkMessage):
         self.characteristics = characteristics_
         self.spellModifications = spellModifications_
         self.probationTime = probationTime_
-
+        
         super().__init__()
+    

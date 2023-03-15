@@ -1,18 +1,15 @@
 from pydofus2.com.ankamagames.jerakine.network.NetworkMessage import NetworkMessage
 from typing import TYPE_CHECKING
-
 if TYPE_CHECKING:
-    from pydofus2.com.ankamagames.dofus.network.types.game.character.choice.CharacterBaseInformations import (
-        CharacterBaseInformations,
-    )
-
+    from pydofus2.com.ankamagames.dofus.network.types.game.character.choice.CharacterBaseInformations import CharacterBaseInformations
+    
 
 class CharacterSelectedSuccessMessage(NetworkMessage):
-    infos: "CharacterBaseInformations"
+    infos: 'CharacterBaseInformations'
     isCollectingStats: bool
-
-    def init(self, infos_: "CharacterBaseInformations", isCollectingStats_: bool):
+    def init(self, infos_: 'CharacterBaseInformations', isCollectingStats_: bool):
         self.infos = infos_
         self.isCollectingStats = isCollectingStats_
-
+        
         super().__init__()
+    

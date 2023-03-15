@@ -11,12 +11,9 @@ from pydofus2.com.ankamagames.dofus.logic.game.fight.managers.SpellModifiersMana
     SpellModifiersManager
 from pydofus2.com.ankamagames.dofus.network.enums.CharacterSpellModificationTypeEnum import \
     CharacterSpellModificationTypeEnum
-from pydofus2.com.ankamagames.dofus.network.ProtocolConstantsEnum import \
-    ProtocolConstantsEnum
 from pydofus2.com.ankamagames.jerakine.data.I18n import I18n
 
 if TYPE_CHECKING:
-    from pydofus2.com.ankamagames.dofus.datacenter.spells.SpellLevel import SpellLevel
     from pydofus2.com.ankamagames.dofus.internalDatacenter.spells.SpellWrapper import (
         SpellWrapper,
     )
@@ -37,8 +34,6 @@ from pydofus2.com.ankamagames.dofus.logic.game.common.misc.DofusEntities import 
     DofusEntities
 from pydofus2.com.ankamagames.dofus.logic.game.fight.managers.FightersStateManager import \
     FightersStateManager
-from pydofus2.com.ankamagames.dofus.logic.game.fight.types.castSpellManager.SpellManager import \
-    SpellManager
 from pydofus2.com.ankamagames.dofus.network.types.game.character.characteristic.CharacterCharacteristicsInformations import \
     CharacterCharacteristicsInformations
 from pydofus2.com.ankamagames.jerakine.logger.Logger import Logger

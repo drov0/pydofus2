@@ -1,15 +1,11 @@
-from pydofus2.com.ankamagames.dofus.network.messages.game.context.fight.character.GameFightShowFighterMessage import (
-    GameFightShowFighterMessage,
-)
+from pydofus2.com.ankamagames.dofus.network.messages.game.context.fight.character.GameFightShowFighterMessage import GameFightShowFighterMessage
 from typing import TYPE_CHECKING
-
 if TYPE_CHECKING:
-    from pydofus2.com.ankamagames.dofus.network.types.game.context.fight.GameFightFighterInformations import (
-        GameFightFighterInformations,
-    )
-
+    from pydofus2.com.ankamagames.dofus.network.types.game.context.fight.GameFightFighterInformations import GameFightFighterInformations
+    
 
 class GameFightShowFighterRandomStaticPoseMessage(GameFightShowFighterMessage):
-    def init(self, informations_: "GameFightFighterInformations"):
-
+    def init(self, informations_: 'GameFightFighterInformations'):
+        
         super().init(informations_)
+    

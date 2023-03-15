@@ -8,8 +8,6 @@ from pydofus2.com.ankamagames.dofus.internalDatacenter.spells.SpellWrapper impor
     SpellWrapper
 from pydofus2.com.ankamagames.dofus.logic.game.common.misc.ISpellCastProvider import \
     ISpellCastProvider
-from pydofus2.com.ankamagames.dofus.logic.game.fight.frames.FightTurnFrame import \
-    FightTurnFrame
 from pydofus2.com.ankamagames.dofus.logic.game.fight.managers.MarkedCellsManager import \
     MarkedCellsManager
 from pydofus2.com.ankamagames.dofus.logic.game.fight.messages.GameActionFightLeaveMessage import \

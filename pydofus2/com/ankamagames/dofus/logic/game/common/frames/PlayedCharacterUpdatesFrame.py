@@ -11,9 +11,6 @@ from pydofus2.com.ankamagames.berilia.managers.KernelEventsManager import (
 from pydofus2.com.ankamagames.dofus.datacenter.breeds.Breed import Breed
 from pydofus2.com.ankamagames.dofus.datacenter.spells.SpellLevel import \
     SpellLevel
-from pydofus2.com.ankamagames.dofus.datacenter.world.SubArea import SubArea
-from pydofus2.com.ankamagames.dofus.internalDatacenter.stats.EntityStats import \
-    EntityStats
 from pydofus2.com.ankamagames.dofus.logic.common.managers.PlayerManager import \
     PlayerManager
 from pydofus2.com.ankamagames.dofus.logic.common.managers.StatsManager import \
@@ -28,8 +25,6 @@ from pydofus2.com.ankamagames.dofus.logic.game.fight.managers.CurrentPlayedFight
     CurrentPlayedFighterManager
 from pydofus2.com.ankamagames.dofus.logic.game.fight.managers.SpellModifiersManager import \
     SpellModifiersManager
-from pydofus2.com.ankamagames.dofus.network.enums.AggressableStatusEnum import \
-    AggressableStatusEnum
 from pydofus2.com.ankamagames.dofus.network.enums.GameServerTypeEnum import \
     GameServerTypeEnum
 from pydofus2.com.ankamagames.dofus.network.enums.PlayerLifeStatusEnum import \
@@ -59,8 +54,6 @@ from pydofus2.com.ankamagames.dofus.network.messages.game.character.spell.forget
 from pydofus2.com.ankamagames.dofus.network.messages.game.character.stats.CharacterExperienceGainMessage import \
     CharacterExperienceGainMessage
 from pydofus2.com.ankamagames.dofus.network.messages.game.character.stats.CharacterLevelUpInformationMessage import CharacterLevelUpInformationMessage
-from pydofus2.com.ankamagames.dofus.network.messages.game.character.stats.CharacterLevelUpMessage import \
-    CharacterLevelUpMessage
 from pydofus2.com.ankamagames.dofus.network.messages.game.character.stats.CharacterStatsListMessage import \
     CharacterStatsListMessage
 from pydofus2.com.ankamagames.dofus.network.messages.game.context.GameMapSpeedMovementMessage import \
@@ -104,7 +97,6 @@ from pydofus2.com.ankamagames.jerakine.logger.Logger import Logger
 from pydofus2.com.ankamagames.jerakine.messages.Frame import Frame
 from pydofus2.com.ankamagames.jerakine.messages.Message import Message
 from pydofus2.com.ankamagames.jerakine.types.enums.Priority import Priority
-from pydofus2.damageCalculation.tools.StatIds import StatIds
 
 if TYPE_CHECKING:
     from pydofus2.com.ankamagames.dofus.logic.game.fight.frames.FightBattleFrame import \

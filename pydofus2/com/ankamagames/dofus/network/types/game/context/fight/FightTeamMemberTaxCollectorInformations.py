@@ -1,7 +1,4 @@
-from pydofus2.com.ankamagames.dofus.network.types.game.context.fight.FightTeamMemberInformations import (
-    FightTeamMemberInformations,
-)
-
+from pydofus2.com.ankamagames.dofus.network.types.game.context.fight.FightTeamMemberInformations import FightTeamMemberInformations
 
 class FightTeamMemberTaxCollectorInformations(FightTeamMemberInformations):
     firstNameId: int
@@ -9,12 +6,12 @@ class FightTeamMemberTaxCollectorInformations(FightTeamMemberInformations):
     level: int
     guildId: int
     uid: int
-
     def init(self, firstNameId_: int, lastNameId_: int, level_: int, guildId_: int, uid_: int, id_: int):
         self.firstNameId = firstNameId_
         self.lastNameId = lastNameId_
         self.level = level_
         self.guildId = guildId_
         self.uid = uid_
-
+        
         super().init(id_)
+    

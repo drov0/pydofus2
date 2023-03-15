@@ -3,7 +3,6 @@ import math
 from zlib import decompress
 import struct
 
-from pydofus2.com.ankamagames.jerakine.logger.Logger import Logger
 
 
 class ByteArray(bytearray):

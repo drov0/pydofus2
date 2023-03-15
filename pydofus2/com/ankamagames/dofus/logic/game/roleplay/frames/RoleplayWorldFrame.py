@@ -1,5 +1,4 @@
 from typing import TYPE_CHECKING, Tuple
-import pydofus2.com.ankamagames.dofus.logic.game.roleplay.frames.RoleplayInteractivesFrame as riF
 from pydofus2.com.ankamagames.atouin.managers.MapDisplayManager import \
     MapDisplayManager
 from pydofus2.com.ankamagames.atouin.utils.DataMapProvider import \
@@ -29,7 +28,6 @@ from pydofus2.com.ankamagames.dofus.network.types.game.context.fight.FightStarti
     FightStartingPositions
 from pydofus2.com.ankamagames.dofus.types.entities.AnimatedCharacter import \
     AnimatedCharacter
-from pydofus2.com.ankamagames.jerakine.logger.Logger import Logger
 from pydofus2.com.ankamagames.jerakine.messages.events.FramePushedEvent import \
     FramePushedEvent
 from pydofus2.com.ankamagames.jerakine.messages.Frame import Frame

@@ -1,4 +1,3 @@
-from time import perf_counter
 from typing import TYPE_CHECKING
 
 from pydofus2.com.ankamagames.berilia.managers.KernelEventsManager import (

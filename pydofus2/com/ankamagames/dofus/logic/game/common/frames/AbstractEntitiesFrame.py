@@ -2,8 +2,6 @@ import pydofus2.com.ankamagames.dofus.logic.game.common.managers.PlayedCharacter
 from pydofus2.com.ankamagames.atouin.managers.EntitiesManager import \
     EntitiesManager
 from pydofus2.com.ankamagames.dofus.datacenter.monsters.Monster import Monster
-from pydofus2.com.ankamagames.dofus.internalDatacenter.world.WorldPointWrapper import \
-    WorldPointWrapper
 from pydofus2.com.ankamagames.dofus.logic.common.managers.StatsManager import \
     StatsManager
 from pydofus2.com.ankamagames.dofus.logic.game.common.misc.DofusEntities import \

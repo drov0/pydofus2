@@ -8,7 +8,6 @@ from pydofus2.com.ankamagames.dofus.network.messages.game.approach.ReloginTokenR
 from pydofus2.com.ankamagames.dofus.network.messages.game.approach.ReloginTokenStatusMessage import ReloginTokenStatusMessage
 from pydofus2.com.ankamagames.dofus.network.messages.game.character.creation.CharacterNameSuggestionFailureMessage import CharacterNameSuggestionFailureMessage
 from pydofus2.com.ankamagames.dofus.network.messages.game.character.creation.CharacterCreationResultMessage import CharacterCreationResultMessage
-from pydofus2.com.ankamagames.dofus.network.messages.game.character.creation.CharacterNameSuggestionRequestMessage import CharacterNameSuggestionRequestMessage
 from pydofus2.com.ankamagames.dofus.network.messages.game.character.creation.CharacterNameSuggestionSuccessMessage import CharacterNameSuggestionSuccessMessage
 from pydofus2.com.ankamagames.dofus.network.messages.game.character.deletion.CharacterDeletionPrepareMessage import CharacterDeletionPrepareMessage
 from pydofus2.com.ankamagames.jerakine.messages.Frame import Frame

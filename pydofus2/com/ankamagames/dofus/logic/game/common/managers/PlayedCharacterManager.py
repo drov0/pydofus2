@@ -33,10 +33,6 @@ if TYPE_CHECKING:
     )
     from pydofus2.com.ankamagames.atouin.data.map.Cell import Cell
     from pydofus2.com.ankamagames.dofus.internalDatacenter.spells.SpellWrapper import SpellWrapper
-    from pydofus2.com.ankamagames.dofus.internalDatacenter.items.ItemWrapper import ItemWrapper
-    from pydofus2.com.ankamagames.dofus.network.types.game.havenbag.HavenBagRoomPreviewInformation import (
-        HavenBagRoomPreviewInformation,
-    )
 
 from pydofus2.com.ankamagames.dofus.internalDatacenter.DataEnum import DataEnum
 from pydofus2.com.ankamagames.dofus.logic.common.managers.StatsManager import \

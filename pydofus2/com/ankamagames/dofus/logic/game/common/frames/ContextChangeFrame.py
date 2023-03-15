@@ -3,7 +3,6 @@ from pydofus2.com.ankamagames.berilia.managers.KernelEventsManager import (
 from pydofus2.com.ankamagames.dofus.kernel.Kernel import Kernel
 from pydofus2.com.ankamagames.dofus.kernel.net.ConnectionsHandler import \
     ConnectionsHandler
-from pydofus2.com.ankamagames.dofus.kernel.PanicMessages import PanicMessages
 from pydofus2.com.ankamagames.dofus.logic.game.common.actions.GameContextQuitAction import \
     GameContextQuitAction
 from pydofus2.com.ankamagames.dofus.network.enums.GameContextEnum import \
@@ -13,7 +12,6 @@ from pydofus2.com.ankamagames.dofus.network.messages.game.context.GameContextCre
     GameContextCreateMessage
 from pydofus2.com.ankamagames.dofus.network.messages.game.context.GameContextQuitMessage import \
     GameContextQuitMessage
-from pydofus2.com.ankamagames.jerakine.logger.Logger import Logger
 from pydofus2.com.ankamagames.jerakine.messages.Frame import Frame
 from pydofus2.com.ankamagames.jerakine.messages.Message import Message
 from pydofus2.com.ankamagames.jerakine.types.enums.Priority import Priority

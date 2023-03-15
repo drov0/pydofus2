@@ -1,6 +1,5 @@
 from pydofus2.com.ankamagames.jerakine.network.NetworkMessage import NetworkMessage
 
-
 class SellerBuyerDescriptor(NetworkMessage):
     quantities: list[int]
     types: list[int]
@@ -10,18 +9,7 @@ class SellerBuyerDescriptor(NetworkMessage):
     maxItemPerAccount: int
     npcContextualId: int
     unsoldDelay: int
-
-    def init(
-        self,
-        quantities_: list[int],
-        types_: list[int],
-        taxPercentage_: int,
-        taxModificationPercentage_: int,
-        maxItemLevel_: int,
-        maxItemPerAccount_: int,
-        npcContextualId_: int,
-        unsoldDelay_: int,
-    ):
+    def init(self, quantities_: list[int], types_: list[int], taxPercentage_: int, taxModificationPercentage_: int, maxItemLevel_: int, maxItemPerAccount_: int, npcContextualId_: int, unsoldDelay_: int):
         self.quantities = quantities_
         self.types = types_
         self.taxPercentage = taxPercentage_
@@ -30,5 +18,6 @@ class SellerBuyerDescriptor(NetworkMessage):
         self.maxItemPerAccount = maxItemPerAccount_
         self.npcContextualId = npcContextualId_
         self.unsoldDelay = unsoldDelay_
-
+        
         super().__init__()
+    

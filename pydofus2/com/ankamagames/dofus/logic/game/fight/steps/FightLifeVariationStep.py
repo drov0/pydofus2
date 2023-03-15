@@ -1,5 +1,3 @@
-from pydofus2.com.ankamagames.dofus.internalDatacenter.stats.EntityStats import \
-    EntityStats
 from pydofus2.com.ankamagames.dofus.internalDatacenter.stats.Stat import Stat
 from pydofus2.com.ankamagames.dofus.logic.common.managers.StatsManager import \
     StatsManager

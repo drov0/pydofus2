@@ -1,4 +1,3 @@
-from typing import TYPE_CHECKING
 
 import pydofus2.com.ankamagames.dofus.kernel.Kernel as krnl
 import pydofus2.com.ankamagames.dofus.logic.game.common.managers.PlayedCharacterManager as pcm

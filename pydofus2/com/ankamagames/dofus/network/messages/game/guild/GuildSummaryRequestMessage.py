@@ -1,7 +1,4 @@
-from pydofus2.com.ankamagames.dofus.network.messages.game.PaginationRequestAbstractMessage import (
-    PaginationRequestAbstractMessage,
-)
-
+from pydofus2.com.ankamagames.dofus.network.messages.game.PaginationRequestAbstractMessage import PaginationRequestAbstractMessage
 
 class GuildSummaryRequestMessage(PaginationRequestAbstractMessage):
     nameFilter: str
@@ -19,25 +16,7 @@ class GuildSummaryRequestMessage(PaginationRequestAbstractMessage):
     sortDescending: bool
     hideFullFilter: bool
     sortDescending: bool
-
-    def init(
-        self,
-        nameFilter_: str,
-        criterionFilter_: list[int],
-        languagesFilter_: list[int],
-        recruitmentTypeFilter_: list[int],
-        minLevelFilter_: int,
-        maxLevelFilter_: int,
-        minPlayerLevelFilter_: int,
-        maxPlayerLevelFilter_: int,
-        minSuccessFilter_: int,
-        maxSuccessFilter_: int,
-        sortType_: int,
-        hideFullFilter_: bool,
-        sortDescending_: bool,
-        offset_: int,
-        count_: int,
-    ):
+    def init(self, nameFilter_: str, criterionFilter_: list[int], languagesFilter_: list[int], recruitmentTypeFilter_: list[int], minLevelFilter_: int, maxLevelFilter_: int, minPlayerLevelFilter_: int, maxPlayerLevelFilter_: int, minSuccessFilter_: int, maxSuccessFilter_: int, sortType_: int, hideFullFilter_: bool, sortDescending_: bool, offset_: int, count_: int):
         self.nameFilter = nameFilter_
         self.criterionFilter = criterionFilter_
         self.languagesFilter = languagesFilter_
@@ -51,5 +30,6 @@ class GuildSummaryRequestMessage(PaginationRequestAbstractMessage):
         self.sortType = sortType_
         self.hideFullFilter = hideFullFilter_
         self.sortDescending = sortDescending_
-
+        
         super().init(offset_, count_)
+    

@@ -4,8 +4,6 @@ from pydofus2.com.ankamagames.atouin.managers.EntitiesManager import \
     EntitiesManager
 from pydofus2.com.ankamagames.dofus.internalDatacenter.spells.SpellWrapper import \
     SpellWrapper
-from pydofus2.com.ankamagames.dofus.internalDatacenter.stats.EntityStats import \
-    EntityStats
 from pydofus2.com.ankamagames.dofus.internalDatacenter.stats.Stat import Stat
 from pydofus2.com.ankamagames.dofus.kernel.Kernel import Kernel
 from pydofus2.com.ankamagames.dofus.logic.common.managers.StatsManager import \

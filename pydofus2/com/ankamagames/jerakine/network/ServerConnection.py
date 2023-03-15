@@ -10,12 +10,10 @@ from time import perf_counter
 from typing import TYPE_CHECKING
 
 from pydofus2.com.ankamagames.dofus.network.MessageReceiver import MessageReceiver
-from pydofus2.com.ankamagames.jerakine.benchmark.BenchmarkTimer import BenchmarkTimer
 from pydofus2.com.ankamagames.jerakine.logger.Logger import Logger
 from pydofus2.com.ankamagames.jerakine.messages.ConnectedMessage import ConnectedMessage
 from pydofus2.com.ankamagames.jerakine.messages.ConnectionProcessCrashedMessage import ConnectionProcessCrashedMessage
 from pydofus2.com.ankamagames.jerakine.network.CustomDataWrapper import ByteArray
-from pydofus2.com.ankamagames.jerakine.network.LagometerAck import LagometerAck
 from pydofus2.com.ankamagames.jerakine.network.NetworkMessage import NetworkMessage
 
 if TYPE_CHECKING:
@@ -301,8 +299,6 @@ class ServerConnection(mp.Thread):
         self._remoteSrvHost = host
         self._remoteSrvPort = port
         Logger().info(f"[{self.id}] Connecting to {host}:{port}...")
-        # self.__connectionTimeout = BenchmarkTimer(timeout, self.__onConnectionTimeout)
-        # self.__connectionTimeout.start()
         self.__socket.connect((host, port))
 
     @sendTrace

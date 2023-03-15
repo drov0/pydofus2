@@ -1,35 +1,18 @@
-from pydofus2.com.ankamagames.dofus.network.types.game.guild.logbook.GuildLogbookEntryBasicInformation import (
-    GuildLogbookEntryBasicInformation,
-)
+from pydofus2.com.ankamagames.dofus.network.types.game.guild.logbook.GuildLogbookEntryBasicInformation import GuildLogbookEntryBasicInformation
 from typing import TYPE_CHECKING
-
 if TYPE_CHECKING:
-    from pydofus2.com.ankamagames.dofus.network.types.game.data.items.ObjectItemNotInContainer import (
-        ObjectItemNotInContainer,
-    )
-
+    from pydofus2.com.ankamagames.dofus.network.types.game.data.items.ObjectItemNotInContainer import ObjectItemNotInContainer
+    
 
 class GuildLogbookChestActivity(GuildLogbookEntryBasicInformation):
     playerId: int
     playerName: str
     eventType: int
     quantity: int
-    object: "ObjectItemNotInContainer"
+    object: 'ObjectItemNotInContainer'
     sourceTabId: int
     destinationTabId: int
-
-    def init(
-        self,
-        playerId_: int,
-        playerName_: str,
-        eventType_: int,
-        quantity_: int,
-        object_: "ObjectItemNotInContainer",
-        sourceTabId_: int,
-        destinationTabId_: int,
-        id_: int,
-        date_: int,
-    ):
+    def init(self, playerId_: int, playerName_: str, eventType_: int, quantity_: int, object_: 'ObjectItemNotInContainer', sourceTabId_: int, destinationTabId_: int, id_: int, date_: int):
         self.playerId = playerId_
         self.playerName = playerName_
         self.eventType = eventType_
@@ -37,5 +20,6 @@ class GuildLogbookChestActivity(GuildLogbookEntryBasicInformation):
         self.object = object_
         self.sourceTabId = sourceTabId_
         self.destinationTabId = destinationTabId_
-
+        
         super().init(id_, date_)
+    

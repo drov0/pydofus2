@@ -1,5 +1,4 @@
 class MapDirection:
-
     INVALID_DIRECTION: int = -1
 
     DEFAULT_DIRECTION: int = 1

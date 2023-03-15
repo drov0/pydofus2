@@ -8,8 +8,6 @@ from pydofus2.com.ankamagames.dofus.datacenter.interactives.Interactive import \
     Interactive
 from pydofus2.com.ankamagames.dofus.datacenter.jobs.Skill import Skill
 from pydofus2.com.ankamagames.dofus.kernel.Kernel import Kernel
-from pydofus2.com.ankamagames.dofus.kernel.net.ConnectionsHandler import \
-    ConnectionsHandler
 from pydofus2.com.ankamagames.dofus.logic.game.common.managers.PlayedCharacterManager import \
     PlayedCharacterManager
 from pydofus2.com.ankamagames.dofus.network.enums.MapObstacleStateEnum import \
@@ -28,10 +26,6 @@ from pydofus2.com.ankamagames.dofus.network.messages.game.interactive.Interactiv
     InteractiveUseEndedMessage
 from pydofus2.com.ankamagames.dofus.network.messages.game.interactive.InteractiveUseErrorMessage import \
     InteractiveUseErrorMessage
-from pydofus2.com.ankamagames.dofus.network.messages.game.interactive.InteractiveUseRequestMessage import \
-    InteractiveUseRequestMessage
-from pydofus2.com.ankamagames.dofus.network.messages.game.interactive.skill.InteractiveUseWithParamRequestMessage import \
-    InteractiveUseWithParamRequestMessage
 from pydofus2.com.ankamagames.dofus.network.messages.game.interactive.StatedElementUpdatedMessage import \
     StatedElementUpdatedMessage
 from pydofus2.com.ankamagames.dofus.network.messages.game.interactive.StatedMapUpdateMessage import \

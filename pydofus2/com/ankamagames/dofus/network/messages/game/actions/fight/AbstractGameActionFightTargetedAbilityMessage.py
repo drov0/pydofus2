@@ -1,7 +1,4 @@
-from pydofus2.com.ankamagames.dofus.network.messages.game.actions.AbstractGameActionMessage import (
-    AbstractGameActionMessage,
-)
-
+from pydofus2.com.ankamagames.dofus.network.messages.game.actions.AbstractGameActionMessage import AbstractGameActionMessage
 
 class AbstractGameActionFightTargetedAbilityMessage(AbstractGameActionMessage):
     targetId: int
@@ -11,21 +8,12 @@ class AbstractGameActionFightTargetedAbilityMessage(AbstractGameActionMessage):
     verboseCast: bool
     silentCast: bool
     verboseCast: bool
-
-    def init(
-        self,
-        targetId_: int,
-        destinationCellId_: int,
-        critical_: int,
-        silentCast_: bool,
-        verboseCast_: bool,
-        actionId_: int,
-        sourceId_: int,
-    ):
+    def init(self, targetId_: int, destinationCellId_: int, critical_: int, silentCast_: bool, verboseCast_: bool, actionId_: int, sourceId_: int):
         self.targetId = targetId_
         self.destinationCellId = destinationCellId_
         self.critical = critical_
         self.silentCast = silentCast_
         self.verboseCast = verboseCast_
-
+        
         super().init(actionId_, sourceId_)
+    

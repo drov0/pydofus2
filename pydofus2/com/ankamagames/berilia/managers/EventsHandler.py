@@ -1,4 +1,3 @@
-from enum import Enum
 import operator
 import threading
 from whistle import EventDispatcher
@@ -164,7 +163,16 @@ class EventsHandler(EventDispatcher):
 
     def reset(self):
         self.stopAllwaiting()
+        for listener in self.iterListeners():
+            listener.delete()
         self._listeners.clear()
+        self._sorted.clear()
+
+    def iterListeners(self):
+        for listenersByPrio in self._listeners.values():
+            for listeners in listenersByPrio.values():
+                for listener in listeners:
+                    yield listener
 
     def stopAllwaiting(self):
         for evt in self.__waiting_evts:

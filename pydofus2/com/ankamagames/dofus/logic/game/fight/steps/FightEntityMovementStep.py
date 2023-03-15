@@ -18,8 +18,6 @@ from pydofus2.com.ankamagames.jerakine.sequencer.AbstractSequencable import \
 if TYPE_CHECKING:
     from pydofus2.com.ankamagames.dofus.logic.game.fight.frames.FightContextFrame import \
         FightContextFrame
-    from pydofus2.com.ankamagames.dofus.logic.game.fight.frames.FightTurnFrame import \
-        FightTurnFrame
     from pydofus2.com.ankamagames.dofus.types.entities.AnimatedCharacter import \
         AnimatedCharacter
     from pydofus2.com.ankamagames.jerakine.types.positions.MovementPath import \

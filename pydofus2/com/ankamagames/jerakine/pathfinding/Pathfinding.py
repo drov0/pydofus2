@@ -1,9 +1,7 @@
 import heapq
 from pydofus2.com.ankamagames.atouin.utils.DataMapProvider import DataMapProvider
-from pydofus2.com.ankamagames.jerakine.logger.Logger import Logger
 from pydofus2.com.ankamagames.jerakine.metaclasses.Singleton import Singleton
 import pydofus2.mapTools.MapTools as MapTools
-from pydofus2.com.ankamagames.jerakine.map.IDataMapProvider import IDataMapProvider
 from pydofus2.com.ankamagames.jerakine.types.positions.MapPoint import MapPoint
 from pydofus2.com.ankamagames.jerakine.types.positions.MovementPath import MovementPath
 from pydofus2.com.ankamagames.jerakine.types.positions.PathElement import PathElement

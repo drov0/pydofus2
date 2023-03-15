@@ -10,9 +10,6 @@ from pydofus2.com.ankamagames.atouin.managers.EntitiesManager import EntitiesMan
 from pydofus2.com.ankamagames.dofus.logic.game.fight.frames.FightEntitiesFrame import (
     FightEntitiesFrame,
 )
-from pydofus2.com.ankamagames.dofus.network.types.game.context.fight.GameFightFighterInformations import (
-    GameFightFighterInformations,
-)
 from pydofus2.com.ankamagames.dofus.network.types.game.context.fight.GameFightMonsterInformations import (
     GameFightMonsterInformations,
 )

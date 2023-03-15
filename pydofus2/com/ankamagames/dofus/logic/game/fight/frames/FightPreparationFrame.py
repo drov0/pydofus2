@@ -16,11 +16,10 @@ from pydofus2.com.ankamagames.dofus.logic.game.fight.actions.GameFightPlacementS
 from pydofus2.com.ankamagames.dofus.logic.game.fight.actions.GameFightPlacementSwapPositionsRequestAction import (
     GameFightPlacementSwapPositionsRequestAction,
 )
-from pydofus2.com.ankamagames.dofus.logic.game.fight.actions.GameFightReadyAction import GameFightReadyAction
 from pydofus2.com.ankamagames.dofus.logic.game.fight.actions.RemoveEntityAction import RemoveEntityAction
 
 if TYPE_CHECKING:
-    from pydofus2.com.ankamagames.dofus.logic.game.fight.frames.FightEntitiesFrame import FightEntitiesFrame
+    pass
 
     from pydofus2.com.ankamagames.dofus.logic.game.fight.frames.FightContextFrame import (
         FightContextFrame,

@@ -2,13 +2,12 @@ import logging
 import datetime
 import os
 from pathlib import Path
-import sys
 import threading
 
 LOGS_PATH = Path(os.getenv("APPDATA")) / "pydofus2" / "logs"
 if not os.path.isdir(LOGS_PATH):
     os.makedirs(LOGS_PATH)
-from typing import List, Type, TypeVar
+from typing import Type, TypeVar
 T = TypeVar("T")
 class LoggerSingleton(type):
     _instances = dict[str, object]()

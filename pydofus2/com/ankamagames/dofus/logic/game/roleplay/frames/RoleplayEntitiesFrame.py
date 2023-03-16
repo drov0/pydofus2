@@ -1,6 +1,6 @@
 import threading
 from typing import TYPE_CHECKING
-from pydofus2.com.ankamagames.dofus.logic.common.managers.StatsManager import StatsManager
+
 import pydofus2.com.ankamagames.dofus.logic.game.roleplay.frames.RoleplayContextFrame as rcf
 from pydofus2.com.ankamagames.atouin.managers.EntitiesManager import \
     EntitiesManager
@@ -21,6 +21,8 @@ from pydofus2.com.ankamagames.dofus.kernel.net.ConnectionsHandler import \
     ConnectionsHandler
 from pydofus2.com.ankamagames.dofus.logic.common.managers.PlayerManager import \
     PlayerManager
+from pydofus2.com.ankamagames.dofus.logic.common.managers.StatsManager import \
+    StatsManager
 from pydofus2.com.ankamagames.dofus.logic.game.common.frames.AbstractEntitiesFrame import \
     AbstractEntitiesFrame
 from pydofus2.com.ankamagames.dofus.logic.game.common.managers.PlayedCharacterManager import \
@@ -35,7 +37,8 @@ from pydofus2.com.ankamagames.dofus.logic.game.roleplay.types.FightTeam import \
     FightTeam
 from pydofus2.com.ankamagames.dofus.network.enums.MapObstacleStateEnum import \
     MapObstacleStateEnum
-from pydofus2.com.ankamagames.dofus.network.messages.common.basic.BasicPingMessage import BasicPingMessage
+from pydofus2.com.ankamagames.dofus.network.messages.common.basic.BasicPingMessage import \
+    BasicPingMessage
 from pydofus2.com.ankamagames.dofus.network.messages.game.context.fight.GameFightUpdateTeamMessage import \
     GameFightUpdateTeamMessage
 from pydofus2.com.ankamagames.dofus.network.messages.game.context.GameContextRemoveElementMessage import \
@@ -110,7 +113,7 @@ class LastMCIDM(metaclass=Singleton):
         self.msg: MapComplementaryInformationsDataMessage = None
 class RoleplayEntitiesFrame(AbstractEntitiesFrame, Frame):
     MAX_MAPDATA_REQ_FAILS = 20
-    MAPDATA_REQ_TIMEOUT = 0.2
+    MAPDATA_REQ_TIMEOUT = 60 * 5
 
     def __init__(self):
         self._fights = dict[int, Fight]()
@@ -165,23 +168,23 @@ class RoleplayEntitiesFrame(AbstractEntitiesFrame, Frame):
 
     def requestMapData(self):
         self.mcidm_processed = False
-        def ontimeout():
-            pingMsg = BasicPingMessage()
-            pingMsg.init(True)
-            ConnectionsHandler().send(pingMsg)
-            self.nbrFails += 1
-            if self.nbrFails > self.MAX_MAPDATA_REQ_FAILS:
-                return KernelEventsManager().send(KernelEvent.RESTART, "map data request timeout")
-            self.mapDataRequestTimer = BenchmarkTimer(self.MAPDATA_REQ_TIMEOUT, ontimeout)
-            self.mapDataRequestTimer.start()        
-            self.sendMapDataRequest()
-        self.mapDataRequestTimer = BenchmarkTimer(self.MAPDATA_REQ_TIMEOUT, ontimeout)
-        self.mapDataRequestTimer.start()
-        Logger().debug(f"Requesting data for map {MapDisplayManager().currentMapPoint.mapId}")
-        self.sendMapDataRequest()
         self._waitForMap = False
+        self.sendMapDataRequest()
 
+    def ontimeout(self):
+        Logger().warning("[ChangeMap] Map data request timeout")
+        pingMsg = BasicPingMessage()
+        pingMsg.init(True)
+        ConnectionsHandler().send(pingMsg)
+        self.nbrFails += 1
+        if self.nbrFails > self.MAX_MAPDATA_REQ_FAILS:
+            return KernelEventsManager().send(KernelEvent.RESTART, "map data request timeout")
+        self.sendMapDataRequest()
+    
     def sendMapDataRequest(self):
+        Logger().info(f"Requesting data for map {MapDisplayManager().currentMapPoint.mapId}")
+        self.mapDataRequestTimer = BenchmarkTimer(self.MAPDATA_REQ_TIMEOUT, self.ontimeout)
+        self.mapDataRequestTimer.start()
         msg = MapInformationsRequestMessage()
         msg.init(MapDisplayManager().currentMapPoint.mapId)
         ConnectionsHandler().send(msg)
@@ -248,9 +251,9 @@ class RoleplayEntitiesFrame(AbstractEntitiesFrame, Frame):
 
         elif isinstance(msg, MapComplementaryInformationsDataMessage):
             Logger().info("[MapMove] Map data received")
-            self.processingMapData.clear()
             if self.mapDataRequestTimer:
                 self.mapDataRequestTimer.cancel()
+            self.processingMapData.clear()
             currentMapHasChanged = False
             self._interactiveElements = msg.interactiveElements
             self._fightfloat = len(msg.fights)

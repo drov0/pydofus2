@@ -1,4 +1,4 @@
-from pydofus2.com.ankamagames.jerakine.logger.Logger import Logger
+from pydofus2.com.ankamagames.jerakine.logger.Logger import TraceLogger
 from pydofus2.com.ankamagames.jerakine.network.CustomDataWrapper import ByteArray
 from pydofus2.com.ankamagames.jerakine.network.parser.ProtocolSpec import ProtocolSpec
 from pydofus2.com.ankamagames.jerakine.network.parser.TypeEnum import TypeEnum
@@ -6,8 +6,7 @@ import pydofus2.com.ankamagames.jerakine.network.parser.NetworkMessageClassDefin
 
 
 class NetMsgDataField:
-
-    TRACE = False
+    TRACE = True
 
     dataReader = {
         TypeEnum.INT: "readInt",
@@ -46,7 +45,7 @@ class NetMsgDataField:
             lTypeId = self._spec.get("lengthTypeId")
             if lTypeId is not None:
                 if self.TRACE:
-                    Logger().debug("field has length type id " + str(lTypeId))
+                    TraceLogger().debug("field has length type id " + str(lTypeId))
                 return self.readPrimitive(TypeEnum(lTypeId))
         return l
 
@@ -67,7 +66,7 @@ class NetMsgDataField:
             raise Exception(f"Type id {typeId} not found in known types ids")
         ret = getattr(self._raw, dataReader)()
         if self.TRACE:
-            Logger().debug(f"{self._spec['name']} : {TypeEnum(self._spec['typeId']).name} =  value is {ret}")
+            TraceLogger().debug(f"{self._spec['name']} : {TypeEnum(self._spec['typeId']).name} =  value is {ret}")
         return ret
 
     def readObject(self):
@@ -77,20 +76,20 @@ class NetMsgDataField:
             classSpec = ProtocolSpec.getTypeSpecById(typeId)
             className = classSpec["name"]
         if self.TRACE:
-            Logger().debug(className + " {")
+            TraceLogger().debug(className + " {")
         obj = nmcd.NetworkMessageClassDefinition(className, self._raw).deserialize()
         if self.TRACE:
-            Logger().debug("}")
+            TraceLogger().debug("}")
         return obj
 
     def readVector(self):
         if self.TRACE:
-            Logger().debug("reading vector of length " + str(self.length))
+            TraceLogger().debug("reading vector of length " + str(self.length))
         ret = []
         for i in range(self.length):
             if self.TRACE:
-                Logger().debug("------------------------------------------------")
-                Logger().debug("Reading vector element " + str(i))
+                TraceLogger().debug("------------------------------------------------")
+                TraceLogger().debug("Reading vector element " + str(i))
             if self.isPrimitive:
                 ret.append(self.readPrimitive())
             else:

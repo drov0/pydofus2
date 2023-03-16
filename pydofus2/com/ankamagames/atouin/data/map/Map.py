@@ -2,7 +2,6 @@ from pydofus2.com.ankamagames.atouin.AtouinConstants import AtouinConstants
 from pydofus2.com.ankamagames.atouin.data.map.Cell import Cell
 from pydofus2.com.ankamagames.atouin.data.map.Fixture import Fixture
 from pydofus2.com.ankamagames.atouin.data.map.Layer import Layer
-from pydofus2.com.ankamagames.atouin.utils.DataMapProvider import DataMapProvider
 from pydofus2.com.ankamagames.jerakine.data.BinaryStream import BinaryStream
 from pydofus2.com.ankamagames.jerakine.logger.Logger import Logger
 from pydofus2.com.ankamagames.jerakine.types.enums.DirectionsEnum import DirectionsEnum
@@ -163,6 +162,8 @@ class Map:
         raise Exception("Invalid direction.")
 
     def getCellNeighbours(self, cellId: int, allowThrought: bool = True) -> set["Cell"]:
+        from pydofus2.com.ankamagames.atouin.utils.DataMapProvider import DataMapProvider
+
         currMp = MapPoint.fromCellId(cellId)
         neighbours = set[Cell]()
         for i in DirectionsEnum:

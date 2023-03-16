@@ -1,8 +1,18 @@
 import heapq
 import math
 from functools import lru_cache
-from pydofus2.com.ankamagames.jerakine.types.positions.MapPoint import MapPoint, Point
+from pydofus2.com.ankamagames.atouin.AtouinConstants import AtouinConstants
+from pydofus2.com.ankamagames.dofus.logic.game.common.misc.DofusEntities import \
+    DofusEntities
+from pydofus2.com.ankamagames.jerakine.types.enums.DirectionsEnum import \
+    DirectionsEnum
+from pydofus2.com.ankamagames.jerakine.types.positions.MapPoint import (
+    MapPoint, Point)
 from pydofus2.mapTools.MapDirection import MapDirection
+
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from pydofus2.com.ankamagames.atouin.data.map.Map import Map
 
 MAP_GRID_WIDTH: int = 14
 MAP_GRID_HEIGHT: int = 20
@@ -183,20 +193,12 @@ def getLookDirection4DiagExactByCoord(param1: int, param2: int, param3: int, par
 
 def isLeftCol(cellId):
     return cellId % 14 == 0
-
-
 def isRightCol(cellId):
     return isLeftCol(cellId + 1)
-
-
 def isTopRow(cellId):
     return cellId < 2 * MAP_GRID_WIDTH
-
-
 def isBottomRow(cellId):
     return cellId > 531
-
-
 LEFT_COL_CELLS = set([i for i in range(CELLCOUNT) if isLeftCol(i)])
 RIGHT_COL_CELLS = set([i for i in range(CELLCOUNT) if isRightCol(i)])
 TOP_ROW_CELLS = set([i for i in range(CELLCOUNT) if isTopRow(i)])
@@ -214,22 +216,79 @@ def manhattanDistance(cell1, cell2):
     return abs(x2 - x1) + abs(y2 - y1)
 
 
-def findAccessibleCells(startCell, zone: set):
-    # Uses A* algorithm to find all left column cells accessible from a given cell
-    queue = []
-    visited = set()
-    accessible = {}
-    heapq.heappush(queue, (0, startCell))
+def getZone(direction):
+    direction = DirectionsEnum(direction)
+    if direction == DirectionsEnum.DOWN:
+        return BOT_ROW_CELLS
+    elif direction == DirectionsEnum.UP:
+        return TOP_ROW_CELLS
+    elif direction == DirectionsEnum.LEFT:
+        return LEFT_COL_CELLS
+    elif direction == DirectionsEnum.RIGHT:
+        return RIGHT_COL_CELLS
+    
+def isLeftCol(cellId):
+    return cellId % MAP_GRID_WIDTH == 0
+def isRightCol(cellId):
+    return isLeftCol(cellId + 1)
+def isTopRow(cellId):
+    return cellId < 2 * MAP_GRID_WIDTH
+def isBottomRow(cellId):
+    return cellId > 531
+
+LEFT_COL_CELLS = set([i for i in range(CELLCOUNT) if isLeftCol(i)])
+RIGHT_COL_CELLS = set([i for i in range(CELLCOUNT) if isRightCol(i)])
+TOP_ROW_CELLS = set([i for i in range(CELLCOUNT) if isTopRow(i)])
+BOT_ROW_CELLS = set([i for i in range(CELLCOUNT) if isBottomRow(i)])
+
+def allowsMapChange(currentMap: "Map", cellId, direction: int):
+    direction = DirectionsEnum(direction)
+    mapChangeData = currentMap.cells[cellId].mapChangeData
+    
+    if direction == DirectionsEnum.RIGHT:
+        isOnRightEdge = (cellId + 1) % (AtouinConstants.MAP_WIDTH * 2) == 0
+        canChangeMapWith = (mapChangeData & 1) or (isOnRightEdge and ((mapChangeData & 2) or (mapChangeData & 128)))
+        
+    elif direction == DirectionsEnum.DOWN:
+        isOnBottomEdge = cellId >= AtouinConstants.MAP_CELLS_COUNT - AtouinConstants.MAP_WIDTH
+        canChangeMapWith = (mapChangeData & 4) or (isOnBottomEdge and ((mapChangeData & 2) or (mapChangeData & 8)))
+        
+    elif direction == DirectionsEnum.LEFT:        
+        isOnLeftEdge = cellId % (AtouinConstants.MAP_WIDTH * 2) == 0
+        canChangeMapWith = (mapChangeData & 16) or (isOnLeftEdge and ((mapChangeData & 8) or (mapChangeData & 32)))
+        
+    elif direction == DirectionsEnum.UP:
+        isOnTopEdge = cellId < AtouinConstants.MAP_WIDTH
+        canChangeMapWith = (mapChangeData & 64) or (isOnTopEdge and ((mapChangeData & 32) or (mapChangeData & 128)))
+        
+    else:
+        canChangeMapWith = False
+    return canChangeMapWith
+    
+def iterMapChangeCells(direction):
+    from pydofus2.com.ankamagames.atouin.managers.MapDisplayManager import \
+    MapDisplayManager
+    from pydofus2.com.ankamagames.dofus.logic.game.common.managers.PlayedCharacterManager import \
+        PlayedCharacterManager
+
+    currentMap = MapDisplayManager().dataMap
+    playedEntity = DofusEntities().getEntity(PlayedCharacterManager().id)
+    playerCellId = playedEntity.position.cellId
+    myLinkedZone = currentMap.cells[playerCellId].linkedZoneRP
+    
+    visited = [False] * AtouinConstants.MAP_CELLS_COUNT
+    queue = [(0, playerCellId)]
+    
     while queue:
-        cost, cell = heapq.heappop(queue)
-        if cell in visited:
+        cost, cellId = heapq.heappop(queue)
+        if visited[cellId]:
             continue
-        visited.add(cell)
-        if cell in zone:
-            accessible[cell] = cost
-        for child in iterChilds(cell):
-            if child not in visited:
-                child_cost = cost + manhattanDistance(child, cell)
-                heapq.heappush(queue, (child_cost, child))
-    sorted_accessible = sorted(accessible.items(), key=lambda x: x[1])
-    return [cell for cell, _ in sorted_accessible]
+        visited[cellId] = True
+        
+        cell = currentMap.cells[cellId]
+        if cell.mov and cell.linkedZoneRP == myLinkedZone and allowsMapChange(currentMap, cellId, direction):
+            yield cellId
+            
+        for child in iterChilds(cellId):
+            if not visited[child]:
+                heapq.heappush(queue, (cost + 1, child))

@@ -1,4 +1,5 @@
 import threading
+from time import perf_counter
 from types import FunctionType
 from pydofus2.com.ankamagames.jerakine.logger.Logger import Logger
 import threading
@@ -20,6 +21,7 @@ class BenchmarkTimer(threading.Thread):
         self.args = args if args is not None else []
         self.kwargs = kwargs if kwargs is not None else {}
         self.finished = threading.Event()
+        self.startedTime = None
         BenchmarkTimer._timers_count += 1
         with lock:
             if self.parent.name not in BenchmarkTimer._createdTimers:
@@ -34,9 +36,15 @@ class BenchmarkTimer(threading.Thread):
 
     def start(self) -> None:
         BenchmarkTimer._started_timers_count += 1
+        self.startedTime = perf_counter()
         super().start()
-        # sumAllTimers = sum([len(timers) for timers in BenchmarkTimer._createdTimers.values()])
-        # Logger().info(f"{self.callerName} in timer  Total Timers in all threads: {sumAllTimers}")
+    
+    def debugData(self):
+        sumAllTimers = sum([len(timers) for timers in BenchmarkTimer._createdTimers.values()])
+        Logger().info(f"{self.callerName} in timer, Total Timers in all threads: {sumAllTimers}")
+
+    def remainingTime(self) -> int:
+        return self.interval - (perf_counter() - self.startedTime)
 
     def cancel(self) -> None:
         self.finished.set()
@@ -51,8 +59,7 @@ class BenchmarkTimer(threading.Thread):
                     timer.cancel()
 
     def run(self):
-        self.finished.wait(self.interval)
-        if not self.finished.is_set():
+        if not self.finished.wait(self.interval):
             self.function(*self.args, **self.kwargs)
         self.finished.set()
         if self in BenchmarkTimer._createdTimers[self.parent.name]:

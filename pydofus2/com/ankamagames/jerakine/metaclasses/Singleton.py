@@ -1,9 +1,12 @@
-from enum import Enum
 import threading
+from enum import Enum
 from typing import List, Tuple, Type, TypeVar
-from pydofus2.com.ankamagames.berilia.managers.EventsHandler import Event, EventsHandler
+
+from pydofus2.com.ankamagames.berilia.managers.EventsHandler import (
+    Event, EventsHandler)
 from pydofus2.com.ankamagames.jerakine.logger.Logger import Logger
 
+LOCK = threading.Lock()
 T = TypeVar("T")
 
 class SingletonEvent(Enum):
@@ -30,18 +33,26 @@ class Singleton(type):
         return Singleton._instances[thrid][cls]
 
     def clear(cls):
-        if cls in Singleton._instances[cls.threadName()]:
-            del Singleton._instances[cls.threadName()][cls]
+        with LOCK:
+            if cls in Singleton._instances[cls.threadName()]:
+                del Singleton._instances[cls.threadName()][cls]
 
-    def clearAllChilds(cls):
-        scheduledForDelete = []
-        for clz in Singleton._instances[cls.threadName()]:
+    def getAllChilds(cls: Type[T], thname=None) -> list[T]:
+        thname = thname if thname is not None else cls.threadName()
+        for clz in Singleton._instances[thname]:
             if issubclass(clz, cls):
-                scheduledForDelete.append(clz)
-        for clz in scheduledForDelete:
-            Logger().debug(f"{clz.__name__} singleton instance cleared")
-            del Singleton._instances[cls.threadName()][clz]
-        scheduledForDelete.clear()
+                yield Singleton._instances[thname][clz]
+    
+    def clearAllChilds(cls):
+        with LOCK:
+            scheduledForDelete = []
+            for clz in Singleton._instances[cls.threadName()]:
+                if issubclass(clz, cls):
+                    scheduledForDelete.append(clz)
+            for clz in scheduledForDelete:
+                Logger().debug(f"{clz.__name__} singleton instance cleared")
+                del Singleton._instances[cls.threadName()][clz]
+            scheduledForDelete.clear()
 
     def getInstance(cls: Type[T], thrid: int) -> T:
         if thrid in Singleton._instances:
@@ -55,7 +66,6 @@ class Singleton(type):
         if thname in Singleton._instances and cls in Singleton._instances[thname]:
             return listener(*args, **kwargs)
         def onThreadRegister(evt: Event, thid, clazz):
-            # Logger.getInstance(callerThname).debug(f"thread {thid} registred class {clazz.__name__}, waiting for {thname} to register {cls.__name__}")
             if thid == thname and clazz.__name__ == cls.__name__:
                 Logger.getInstance(callerThname).info(f"{thid} registred class {clazz.__name__}")
                 evt.listener.delete()

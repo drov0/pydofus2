@@ -1,15 +1,17 @@
 from enum import Enum
 from time import perf_counter
-from pydofus2.com.ankamagames.dofus.network.types.game.context.fight.FightCommonInformations import (
-    FightCommonInformations,
-)
+
+from pydofus2.com.ankamagames.berilia.managers.EventsHandler import (
+    Event, EventsHandler, Listener)
+from pydofus2.com.ankamagames.dofus.network.types.game.context.fight.FightCommonInformations import \
+    FightCommonInformations
+from pydofus2.com.ankamagames.dofus.network.types.game.context.roleplay.GameRolePlayHumanoidInformations import \
+    GameRolePlayHumanoidInformations
+from pydofus2.com.ankamagames.dofus.network.types.game.context.roleplay.party.PartyMemberInformations import PartyMemberInformations
 from pydofus2.com.ankamagames.jerakine.logger.Logger import Logger
-from pydofus2.com.ankamagames.berilia.managers.EventsHandler import Event, EventsHandler, Listener
-from pydofus2.com.ankamagames.dofus.network.types.game.context.roleplay.GameRolePlayHumanoidInformations import (
-    GameRolePlayHumanoidInformations,
-)
 from pydofus2.com.ankamagames.jerakine.metaclasses.Singleton import Singleton
-from pydofus2.com.ankamagames.jerakine.types.positions.MovementPath import MovementPath
+from pydofus2.com.ankamagames.jerakine.types.positions.MovementPath import \
+    MovementPath
 
 
 class KernelEvent(Enum):
@@ -46,7 +48,6 @@ class KernelEvent(Enum):
     ENTITY_MOVED = 29
     ENTITY_VANISHED = 31
     FULL_PODS = 32
-    PARTY_MEMBER_LEFT = 33
     INACTIVITY_WARNING = 34
     LEVEL_UP = 35
     CHARACTER_STATS = 36
@@ -66,7 +67,15 @@ class KernelEvent(Enum):
     FIGHT_SWORD_SHOWED = 50
     CURRENT_MAP = 51
     MULE_FIGHT_CONTEXT = 52
-
+    
+    I_JOINED_PARTY = 53
+    MEMBER_JOINED_PARTY = 54
+    MEMBER_LEFT_PARTY = 55
+    PARTY_DELETED = 56
+    PARTY_INVITATION = 57
+    PARTY_MEMBER_IN_FIGHT = 58
+    PARTY_JOIN_FAILED = 59
+    PARTY_INVITE_CANCEL_NOTIF = 60
 
 class KernelEventsManager(EventsHandler, metaclass=Singleton):
     def __init__(self):
@@ -130,9 +139,7 @@ class KernelEventsManager(EventsHandler, metaclass=Singleton):
 
     def onEntityMoved(self, entityId, callback, timeout=None, ontimeout=None, once=False, originator=None):
         startTime = perf_counter()
-
         def onEntityMoved(event: Event, movedEntityId, clientMovePath: MovementPath):
-            Logger().debug(f"Entity {movedEntityId} moved folowing path : {clientMovePath}")
             if movedEntityId == entityId:
                 if once:
                     event.listener.delete()
@@ -143,7 +150,6 @@ class KernelEventsManager(EventsHandler, metaclass=Singleton):
                     event.listener.armTimer(remaining)
                 else:
                     ontimeout(event.listener)
-
         return self.on(KernelEvent.ENTITY_MOVED, onEntityMoved, timeout=timeout, ontimeout=ontimeout, originator=originator)
 
     def onceEntityMoved(self, entityId, callback, timeout=None, ontimeout=None, originator=None):
@@ -166,3 +172,17 @@ class KernelEventsManager(EventsHandler, metaclass=Singleton):
 
     def onceFightStarted(self, callback, timeout, ontimeout, originator=None):
         return self.on(KernelEvent.FIGHT_STARTED, callback, timeout=timeout, ontimeout=ontimeout, once=True, originator=originator)
+
+    def onceMemberJoinedParty(self, memberId, callback, args=[], timeout=None, ontimeout=None, originator=None):
+        startTime = perf_counter()
+        def onNewMember(event: Event, partyId, member: PartyMemberInformations):
+            if member.id == memberId:
+                event.listener.delete()
+                return callback(*args)
+            if timeout:
+                remaining = timeout - (perf_counter() - startTime)
+                if remaining > 0:
+                    event.listener.armTimer(remaining)
+                else:
+                    ontimeout(event.listener)
+        KernelEventsManager().on(KernelEvent.MEMBER_JOINED_PARTY, onNewMember, timeout=None, ontimeout=None, originator=originator)

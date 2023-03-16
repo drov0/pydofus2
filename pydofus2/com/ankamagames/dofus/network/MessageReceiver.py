@@ -1,5 +1,6 @@
 import importlib
 import json
+
 import pydofus2.com.ankamagames.dofus.Constants as Constants
 from pydofus2.com.ankamagames.dofus.kernel.Kernel import Kernel
 from pydofus2.com.ankamagames.jerakine.logger.Logger import Logger
@@ -17,6 +18,7 @@ from pydofus2.com.ankamagames.jerakine.network.RawDataParser import \
 with open(Constants.PROTOCOL_MSG_SHUFFLE_PATH, "r") as fp:
     msgShuffle: dict = json.load(fp)
 
+# _messages_to_discard = {}
 _messages_to_discard = {
     "SetCharacterRestrictionsMessage",
     "GameContextRefreshEntityLookMessage",

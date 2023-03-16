@@ -69,7 +69,7 @@ class DataMapProvider(IDataMapProvider, metaclass=Singleton):
             cellId = MapTools.getCellIdByCoord(x, y)
             cellData = dataMap.cells[cellId]
             mov = cellData.mov and not (self.isInFight and cellData.nonWalkableDuringFight)
-            if cellId in self._updatedCell:
+            if mov and cellId in self._updatedCell:
                 mov = self._updatedCell[cellId]
             if mov and useNewSystem and previousCellId != -1 and previousCellId != cellId:
                 previousCellData = dataMap.cells[previousCellId]
@@ -77,12 +77,14 @@ class DataMapProvider(IDataMapProvider, metaclass=Singleton):
                 if (
                     previousCellData.moveZone != cellData.moveZone
                     and diff > 0
-                    or previousCellData.moveZone == cellData.moveZone
+                ) or \
+                (
+                    previousCellData.moveZone == cellData.moveZone
                     and cellData.moveZone == 0
                     and diff > self.TOLERANCE_ELEVATION
                 ):
-                    mov = False
-            if not bAllowTroughEntity:
+                    return False
+            if mov and not bAllowTroughEntity:
                 for entity in EntitiesManager().entities.values():
                     if isinstance(entity, IObstacle) and entity.position and entity.position.cellId == cellId:
                         if not (endCellId == cellId and entity.canWalkTo):
@@ -90,9 +92,9 @@ class DataMapProvider(IDataMapProvider, metaclass=Singleton):
                                 return False
                 if avoidObstacles and (cellId in self.obstaclesCells and cellId != endCellId):
                     return False
+            return mov
         else:
-            mov = False
-        return mov
+            return False
 
     def pointCanStop(self, x: int, y: int, bAllowTroughEntity: bool = True) -> bool:
         cellId: int = MapTools.getCellIdByCoord(x, y)

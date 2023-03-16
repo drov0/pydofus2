@@ -1,6 +1,8 @@
 import math
 import random
-from pydofus2.com.ankamagames.jerakine.metaclasses.ThreadSharedSingleton import ThreadSharedSingleton
+
+from pydofus2.com.ankamagames.jerakine.metaclasses.ThreadSharedSingleton import \
+    ThreadSharedSingleton
 
 
 class InterClientManager(metaclass=ThreadSharedSingleton):
@@ -17,7 +19,8 @@ class InterClientManager(metaclass=ThreadSharedSingleton):
             if key not in self.used_keys:
                 self.used_keys.add(key)
                 nbrKeys = len(self.used_keys)
-                suffix = f"#{0 if nbrKeys < 10 else ''}{nbrKeys}"
+                # suffix = f"#{0 if nbrKeys < 10 else ''}{nbrKeys}"
+                suffix = f"#01"
                 return key + suffix
 
     @classmethod

@@ -11,7 +11,8 @@ from pydofus2.com.ankamagames.jerakine.messages.Frame import Frame
 from pydofus2.com.ankamagames.jerakine.messages.Message import Message
 from pydofus2.com.ankamagames.jerakine.messages.MessageHandler import \
     MessageHandler
-from pydofus2.com.ankamagames.jerakine.network.messages.TerminateWorkerMessage import TerminateWorkerMessage
+from pydofus2.com.ankamagames.jerakine.network.messages.TerminateWorkerMessage import \
+    TerminateWorkerMessage
 
 """
 This Class for handling messages and frames in a Dofus 2 game application. The worker class is a subclass of MessageHandler and
@@ -58,12 +59,12 @@ class Worker(MessageHandler):
             # with Worker.LOCK:
             #     Worker.LAST_TIME = current_time
             msg = self._queue.get()
-            # Logger().debug(f"[Worker] [RCV] {msg}")
+            Logger().debug(f"[RCV] {msg}")
             if type(msg).__name__ == "TerminateWorkerMessage":
                 self._terminating.set()
                 break
-            if self.paused.is_set():
-                self.resumed.wait()
+            # if self.paused.is_set():
+            #     self.resumed.wait()
             self.processFramesInAndOut()
             self.processMessage(msg)
         self.reset()

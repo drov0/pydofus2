@@ -9,15 +9,21 @@ import traceback
 from time import perf_counter
 from typing import TYPE_CHECKING
 
-from pydofus2.com.ankamagames.dofus.network.MessageReceiver import MessageReceiver
-from pydofus2.com.ankamagames.jerakine.logger.Logger import Logger
-from pydofus2.com.ankamagames.jerakine.messages.ConnectedMessage import ConnectedMessage
-from pydofus2.com.ankamagames.jerakine.messages.ConnectionProcessCrashedMessage import ConnectionProcessCrashedMessage
-from pydofus2.com.ankamagames.jerakine.network.CustomDataWrapper import ByteArray
-from pydofus2.com.ankamagames.jerakine.network.NetworkMessage import NetworkMessage
+from pydofus2.com.ankamagames.dofus.network.MessageReceiver import \
+    MessageReceiver
+from pydofus2.com.ankamagames.jerakine.logger.Logger import Logger, TraceLogger
+from pydofus2.com.ankamagames.jerakine.messages.ConnectedMessage import \
+    ConnectedMessage
+from pydofus2.com.ankamagames.jerakine.messages.ConnectionProcessCrashedMessage import \
+    ConnectionProcessCrashedMessage
+from pydofus2.com.ankamagames.jerakine.network.CustomDataWrapper import \
+    ByteArray
+from pydofus2.com.ankamagames.jerakine.network.NetworkMessage import \
+    NetworkMessage
 
 if TYPE_CHECKING:
-    from pydofus2.com.ankamagames.jerakine.network.INetworkMessage import INetworkMessage
+    from pydofus2.com.ankamagames.jerakine.network.INetworkMessage import \
+        INetworkMessage
 
 
 def sendTrace(func):
@@ -162,15 +168,16 @@ class ServerConnection(mp.Thread):
         try:
             data = msg.pack()
             total_sent = 0
+            if type(msg).__name__ == "BasicPingMessage":
+                self.lastSentPingTime = perf_counter()
             while total_sent < len(data):
                 sent = self.__socket.send(data[total_sent:])
                 if sent == 0:
                     raise RuntimeError("Socket connection broken")
                 total_sent += sent
-            if type(msg).__name__ == "BasicPingMessage":
-                self.lastSentPingTime = perf_counter()
         except OSError as e:
-            Logger().debug(f"[SND]{e.errno}, {errno.errorcode[e.errno]} OS error received")
+            Logger().error(f"{e.errno}, {errno.errorcode[e.errno]} OS error received")
+            self.close()
         self._latestSent = perf_counter()
         self._lastSent = perf_counter()
         self._sendSequenceId += 1
@@ -196,18 +203,22 @@ class ServerConnection(mp.Thread):
                 staticHeader = buffer.readUnsignedShort()
                 self.__packet_id = staticHeader >> NetworkMessage.BIT_RIGHT_SHIFT_LEN_PACKET_ID
                 self.__msg_len_len = staticHeader & NetworkMessage.BIT_MASK
+                TraceLogger().debug(f"msgId : {self.__packet_id}, msg_len_len : {self.__msg_len_len}")
             if self.__msg_len is None:
                 if buffer.remaining() < self.__msg_len_len:
                     break
                 self.__msg_len = int.from_bytes(buffer.read(self.__msg_len_len), "big")
+                TraceLogger().debug(f"msg_len : {self.__msg_len}")
             if buffer.remaining() < self.__msg_len:
                 break
             self.updateLatency()
+            TraceLogger().debug("Parsing ...")
             msg: NetworkMessage = MessageReceiver().parse(buffer, self.__packet_id, self.__msg_len)
+            TraceLogger().debug(f"Parsed, got : {type(msg).__name__}")
             if type(msg).__name__ == "BasicPongMessage":
-                latency = round(1000 * (perf_counter() - self.lastSentPingTime), 2)
-                Logger().info(f"Latency : {latency}ms, average {self.latencyAvg}, var {self.latencyVar}")
-                
+                if self.lastSentPingTime:
+                    latency = round(1000 * (perf_counter() - self.lastSentPingTime), 2)
+                    Logger().info(f"Latency : {latency}ms, average {self.latencyAvg}, var {self.latencyVar}")
             if msg.unpacked:
                 msg.receptionTime = perf_counter()
                 msg.sourceConnection = self.id
@@ -257,9 +268,8 @@ class ServerConnection(mp.Thread):
         Logger().debug(f"[{self.id}] Connection closed. {err}")
         self.__socket.close()
         self._connected.clear()
-        from pydofus2.com.ankamagames.jerakine.network.ServerConnectionClosedMessage import (
-            ServerConnectionClosedMessage,
-        )
+        from pydofus2.com.ankamagames.jerakine.network.ServerConnectionClosedMessage import \
+            ServerConnectionClosedMessage
 
         self.__receptionQueue.put(ServerConnectionClosedMessage(self.id))
         self.finished.set()
@@ -272,9 +282,8 @@ class ServerConnection(mp.Thread):
         return self._closing.is_set()
 
     def __onConnectionTimeout(self) -> None:
-        from pydofus2.com.ankamagames.jerakine.network.messages.ServerConnectionFailedMessage import (
-            ServerConnectionFailedMessage,
-        )
+        from pydofus2.com.ankamagames.jerakine.network.messages.ServerConnectionFailedMessage import \
+            ServerConnectionFailedMessage
 
         self.stopConnectionTimeout()
         if self._connected.is_set() or self.finished.is_set() or self._closing.is_set():
@@ -306,7 +315,8 @@ class ServerConnection(mp.Thread):
         err = ""
         while not self._closing.is_set() and not self.finished.is_set():
             try:
-                rdata = self.__socket.recv(2056)
+                rdata = self.__socket.recv(14000)
+                TraceLogger().debug(f"receiver size {len(rdata)}")
                 if rdata:
                     if self._connecting.is_set():
                         self.__onConnect()

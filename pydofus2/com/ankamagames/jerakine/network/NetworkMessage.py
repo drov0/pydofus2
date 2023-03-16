@@ -1,9 +1,14 @@
 from types import FunctionType
-from pydofus2.com.ankamagames.jerakine.network.CustomDataWrapper import ByteArray
-from pydofus2.com.ankamagames.jerakine.network.INetworkMessage import INetworkMessage
+
 import pydofus2.com.ankamagames.jerakine.network.parser.NetworkMessageClassDefinition as nmcd
 import pydofus2.com.ankamagames.jerakine.network.parser.NetworkMessageEncoder as nmencoder
-from pydofus2.com.ankamagames.jerakine.network.parser.ProtocolSpec import ProtocolSpec
+from pydofus2.com.ankamagames.jerakine.logger.Logger import Logger
+from pydofus2.com.ankamagames.jerakine.network.CustomDataWrapper import \
+    ByteArray
+from pydofus2.com.ankamagames.jerakine.network.INetworkMessage import \
+    INetworkMessage
+from pydofus2.com.ankamagames.jerakine.network.parser.ProtocolSpec import \
+    ProtocolSpec
 from pydofus2.com.ankamagames.jerakine.network.utils.FuncTree import FuncTree
 
 
@@ -75,6 +80,7 @@ class NetworkMessage(INetworkMessage):
 
     @classmethod
     def unpack(cls, data: ByteArray, length: int = None) -> "NetworkMessage":
+        # Logger().debug(f"unpacking message of length {length}")
         if length is None:
             length = data.remaining()
         return nmcd.NetworkMessageClassDefinition(cls.__name__, data.read(length)).deserialize()

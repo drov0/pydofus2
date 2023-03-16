@@ -29,6 +29,7 @@ from pydofus2.com.ankamagames.dofus.logic.game.common.frames.WorldFrame import W
 from pydofus2.com.ankamagames.dofus.logic.game.common.managers.FeatureManager import FeatureManager
 from pydofus2.com.ankamagames.dofus.logic.game.common.managers.PlayedCharacterManager import PlayedCharacterManager
 from pydofus2.com.ankamagames.dofus.logic.game.common.managers.TimeManager import TimeManager
+from pydofus2.com.ankamagames.dofus.logic.game.roleplay.frames.PartyFrame import PartyFrame
 from pydofus2.com.ankamagames.dofus.network.enums.GameServerTypeEnum import GameServerTypeEnum
 from pydofus2.com.ankamagames.dofus.network.messages.game.approach.AccountCapabilitiesMessage import (
     AccountCapabilitiesMessage,
@@ -224,6 +225,7 @@ class GameServerApproachFrame(Frame):
             Kernel().worker.addFrame(QuestFrame())
             Kernel().worker.addFrame(AveragePricesFrame())
             Kernel().worker.addFrame(NpcFrame())
+            Kernel().worker.addFrame(PartyFrame())
             KernelEventsManager().send(KernelEvent.CHARACTER_SELECTION_SUCCESS, return_value=cssmsg.infos)
             if Kernel().beingInReconection and not self._reconnectMsgSend:
                 self._reconnectMsgSend = True

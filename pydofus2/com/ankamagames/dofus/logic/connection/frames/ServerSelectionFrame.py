@@ -122,21 +122,20 @@ class ServerSelectionFrame(Frame):
             return True
 
         elif isinstance(msg, ServerSelectionAction):
-            ssaction = msg
-            if self._alreadyConnectedToServerId > 0 and ssaction.serverId != self._alreadyConnectedToServerId:
-                self._serverSelectionAction = ssaction
+            if self._alreadyConnectedToServerId > 0 and msg.serverId != self._alreadyConnectedToServerId:
+                self._serverSelectionAction = msg
                 self.serverAlreadyInName = Server.getServerById(self._alreadyConnectedToServerId).name
-                self.serverSelectedName = Server.getServerById(ssaction.serverId).name
+                self.serverSelectedName = Server.getServerById(msg.serverId).name
                 return True
             for server in self._serversList:
                 Logger().info(f"Server {server.id} status {ServerStatusEnum(server.status).name}.")
-                if str(server.id) == str(ssaction.serverId):
+                if str(server.id) == str(msg.serverId):
                     if (
                         ServerStatusEnum(server.status) == ServerStatusEnum.ONLINE
                         or ServerStatusEnum(server.status) == ServerStatusEnum.NOJOIN
                     ):
                         ssmsg = ServerSelectionMessage()
-                        ssmsg.init(ssaction.serverId)
+                        ssmsg.init(msg.serverId)
                         ConnectionsHandler().send(ssmsg)
                         return True
                     else:

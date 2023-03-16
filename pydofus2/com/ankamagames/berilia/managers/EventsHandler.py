@@ -1,3 +1,4 @@
+from datetime import timedelta
 import operator
 import threading
 from whistle import EventDispatcher
@@ -72,6 +73,15 @@ class Listener:
     def cancelTimer(self):
         if self.timeoutTimer:
             self.timeoutTimer.cancel()
+    
+    def __str__(self):
+        summary = f"Listener(event_id={self.event_id}, priority={self.priority}, callback={self.callback.__name__}, "
+        if self.timeoutTimer and not self.timeoutTimer.finished.is_set():
+            remaining_time = self.timeoutTimer.remainingTime()
+            summary += f"timeout={self.timeout}, time_left={remaining_time})"
+        else:
+            summary += f"timeout={self.timeout})"
+        return summary
 
 
 class EventsHandler(EventDispatcher):
@@ -195,12 +205,16 @@ class EventsHandler(EventDispatcher):
         if event_id in self._sorted:
             del self._sorted[event_id]
     
-    def clearAllByOrigin(self, origin):
-        toBeDeleted = list[Listener]()
+    def getListenersByOrigin(self, origin):
+        result = list[Listener]()
         for listenersByPrio in self._listeners.values():
             for listeners in listenersByPrio.values():
                 for listener in listeners:
                     if listener.originator and listener.originator == origin:
-                        toBeDeleted.append(listener)
+                        result.append(listener)
+        return result
+
+    def clearAllByOrigin(self, origin):
+        toBeDeleted = self.getListenersByOrigin(origin)
         for listener in toBeDeleted:
             listener.delete()

@@ -1,8 +1,7 @@
 from pydofus2.com.ankamagames.dofus.internalDatacenter.stats.Stat import Stat
+from pydofus2.com.ankamagames.dofus.kernel.Kernel import Kernel
 from pydofus2.com.ankamagames.dofus.logic.common.managers.StatsManager import \
     StatsManager
-from pydofus2.com.ankamagames.dofus.logic.game.fight.frames.FightEntitiesFrame import \
-    FightEntitiesFrame
 from pydofus2.com.ankamagames.dofus.logic.game.fight.steps.abstract.AbstractStatContextualStep import \
     AbstractStatContextualStep
 from pydofus2.com.ankamagames.dofus.logic.game.fight.steps.IFightStep import \
@@ -57,7 +56,7 @@ class FightLifeVariationStep(AbstractStatContextualStep, IFightStep):
         return self._elementId
 
     def start(self) -> None:
-        self._fighterInfo = FightEntitiesFrame.getCurrentInstance().getEntityInfos(self._targetId)
+        self._fighterInfo = Kernel().fightEntitiesFrame.getEntityInfos(self._targetId)
         if not self._fighterInfo:
             Logger().error(f"Can't find fighter info for entity {self._targetId}")
             super().executeCallbacks()

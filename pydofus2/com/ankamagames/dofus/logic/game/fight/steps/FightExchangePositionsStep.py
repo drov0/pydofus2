@@ -1,11 +1,10 @@
-from pydofus2.com.ankamagames.dofus.logic.game.fight.steps.IFightStep import IFightStep
-from pydofus2.com.ankamagames.dofus.logic.game.fight.frames.FightEntitiesFrame import (
-    FightEntitiesFrame,
-)
-from pydofus2.com.ankamagames.dofus.network.types.game.context.fight.GameFightFighterInformations import (
-    GameFightFighterInformations,
-)
-from pydofus2.com.ankamagames.jerakine.sequencer.AbstractSequencable import AbstractSequencable
+from pydofus2.com.ankamagames.dofus.kernel.Kernel import Kernel
+from pydofus2.com.ankamagames.dofus.logic.game.fight.steps.IFightStep import \
+    IFightStep
+from pydofus2.com.ankamagames.dofus.network.types.game.context.fight.GameFightFighterInformations import \
+    GameFightFighterInformations
+from pydofus2.com.ankamagames.jerakine.sequencer.AbstractSequencable import \
+    AbstractSequencable
 
 
 class FightExchangePositionsStep(AbstractSequencable, IFightStep):
@@ -32,12 +31,12 @@ class FightExchangePositionsStep(AbstractSequencable, IFightStep):
         self._fighterOneNewCell = fighterOneNewCell
         self._fighterTwo = fighterTwo
         self._fighterTwoNewCell = fighterTwoNewCell
-        infos: "GameFightFighterInformations" = FightEntitiesFrame.getCurrentInstance().getEntityInfos(
+        infos: "GameFightFighterInformations" = Kernel().fightEntitiesFrame.getEntityInfos(
             self._fighterOne
         )
         self._fighterOneVisibility = infos.stats.invisibilityState
         infos.disposition.cellId = self._fighterOneNewCell
-        infos = FightEntitiesFrame.getCurrentInstance().getEntityInfos(self._fighterTwo)
+        infos = Kernel().fightEntitiesFrame.getEntityInfos(self._fighterTwo)
         infos.disposition.cellId = self._fighterTwoNewCell
 
     @property
@@ -45,10 +44,10 @@ class FightExchangePositionsStep(AbstractSequencable, IFightStep):
         return "exchangePositions"
 
     def start(self) -> None:
-        fighterInfosOne: GameFightFighterInformations = FightEntitiesFrame.getCurrentInstance().getEntityInfos(
+        fighterInfosOne: GameFightFighterInformations = Kernel().fightEntitiesFrame.getEntityInfos(
             self._fighterOne
         )
-        fighterInfosTwo: GameFightFighterInformations = FightEntitiesFrame.getCurrentInstance().getEntityInfos(
+        fighterInfosTwo: GameFightFighterInformations = Kernel().fightEntitiesFrame.getEntityInfos(
             self._fighterTwo
         )
         fighterInfosOne.disposition.cellId = self._fighterOneNewCell

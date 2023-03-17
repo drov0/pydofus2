@@ -1,24 +1,27 @@
-from pydofus2.com.ankamagames.dofus.logic.game.fight.frames.FightEntitiesFrame import FightEntitiesFrame
-from pydofus2.com.ankamagames.dofus.logic.game.fight.steps.IFightStep import IFightStep
-from pydofus2.com.ankamagames.jerakine.logger.Logger import Logger
 from whistle import Event
+
 from pydofus2.com.ankamagames.dofus.kernel.Kernel import Kernel
-from pydofus2.com.ankamagames.dofus.logic.game.common.misc.DofusEntities import DofusEntities
-from pydofus2.com.ankamagames.dofus.logic.game.fight.frames.FightTurnFrame import FightTurnFrame
-from pydofus2.com.ankamagames.dofus.logic.game.fight.managers.CurrentPlayedFighterManager import (
-    CurrentPlayedFighterManager,
-)
-from pydofus2.com.ankamagames.dofus.logic.game.fight.miscs.FightEntitiesHolder import (
-    FightEntitiesHolder,
-)
-from pydofus2.com.ankamagames.dofus.network.enums.GameActionFightInvisibilityStateEnum import (
-    GameActionFightInvisibilityStateEnum,
-)
-from pydofus2.com.ankamagames.dofus.network.types.game.context.fight.GameFightFighterInformations import (
-    GameFightFighterInformations,
-)
-from pydofus2.com.ankamagames.jerakine.entities.interfaces.IEntity import IEntity
-from pydofus2.com.ankamagames.jerakine.sequencer.AbstractSequencable import AbstractSequencable
+from pydofus2.com.ankamagames.dofus.logic.game.common.misc.DofusEntities import \
+    DofusEntities
+from pydofus2.com.ankamagames.dofus.logic.game.fight.frames.FightEntitiesFrame import \
+    FightEntitiesFrame
+from pydofus2.com.ankamagames.dofus.logic.game.fight.frames.FightTurnFrame import \
+    FightTurnFrame
+from pydofus2.com.ankamagames.dofus.logic.game.fight.managers.CurrentPlayedFighterManager import \
+    CurrentPlayedFighterManager
+from pydofus2.com.ankamagames.dofus.logic.game.fight.miscs.FightEntitiesHolder import \
+    FightEntitiesHolder
+from pydofus2.com.ankamagames.dofus.logic.game.fight.steps.IFightStep import \
+    IFightStep
+from pydofus2.com.ankamagames.dofus.network.enums.GameActionFightInvisibilityStateEnum import \
+    GameActionFightInvisibilityStateEnum
+from pydofus2.com.ankamagames.dofus.network.types.game.context.fight.GameFightFighterInformations import \
+    GameFightFighterInformations
+from pydofus2.com.ankamagames.jerakine.entities.interfaces.IEntity import \
+    IEntity
+from pydofus2.com.ankamagames.jerakine.logger.Logger import Logger
+from pydofus2.com.ankamagames.jerakine.sequencer.AbstractSequencable import \
+    AbstractSequencable
 from pydofus2.com.ankamagames.jerakine.types.positions.MapPoint import MapPoint
 
 
@@ -65,7 +68,7 @@ class FightThrowCharacterStep(AbstractSequencable, IFightStep):
         if not carryingEntity or not carryingEntityInfos.spawnInfo.alive:
             Logger().error(f"warning, the entity [{self._fighterId}] is not carrying [{self._carriedId}]")
             carryingFighterExist = False
-        fighterInfos: "GameFightFighterInformations" = FightEntitiesFrame.getCurrentInstance().getEntityInfos(
+        fighterInfos: "GameFightFighterInformations" = Kernel().fightEntitiesFrame.getEntityInfos(
             self._carriedId
         )
         if self._cellId != -1:

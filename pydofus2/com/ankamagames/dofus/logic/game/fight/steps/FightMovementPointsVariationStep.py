@@ -1,11 +1,10 @@
-from pydofus2.com.ankamagames.dofus.logic.game.fight.frames.FightEntitiesFrame import (
-    FightEntitiesFrame,
-)
-from pydofus2.com.ankamagames.dofus.logic.game.fight.steps.IFightStep import IFightStep
-from pydofus2.com.ankamagames.dofus.logic.game.fight.steps.abstract.AbstractStatContextualStep import (
-    AbstractStatContextualStep,
-)
-from pydofus2.com.ankamagames.dofus.network.enums.GameContextEnum import GameContextEnum
+from pydofus2.com.ankamagames.dofus.kernel.Kernel import Kernel
+from pydofus2.com.ankamagames.dofus.logic.game.fight.steps.abstract.AbstractStatContextualStep import \
+    AbstractStatContextualStep
+from pydofus2.com.ankamagames.dofus.logic.game.fight.steps.IFightStep import \
+    IFightStep
+from pydofus2.com.ankamagames.dofus.network.enums.GameContextEnum import \
+    GameContextEnum
 
 
 class FightMovementPointsVariationStep(AbstractStatContextualStep, IFightStep):
@@ -53,7 +52,7 @@ class FightMovementPointsVariationStep(AbstractStatContextualStep, IFightStep):
 
     def start(self) -> None:
         if self._updateCharacteristicManager:
-            FightEntitiesFrame.getCurrentInstance().setLastKnownEntityMovementPoint(
+            Kernel().fightEntitiesFrame.setLastKnownEntityMovementPoint(
                 self._targetId, -self._intValue, True
             )
         self.executeCallbacks()

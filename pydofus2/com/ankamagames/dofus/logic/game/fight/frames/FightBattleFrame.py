@@ -1,6 +1,5 @@
 from types import FunctionType
 from typing import TYPE_CHECKING
-from pydofus2.com.ankamagames.dofus.logic.common.managers.StatsManager import StatsManager
 
 import pydofus2.com.ankamagames.dofus.logic.game.common.frames.PlayedCharacterUpdatesFrame as pcuF
 import pydofus2.com.ankamagames.dofus.logic.game.fight.frames.FightEntitiesFrame as fenf
@@ -13,6 +12,8 @@ from pydofus2.com.ankamagames.berilia.managers.KernelEventsManager import (
 from pydofus2.com.ankamagames.dofus.internalDatacenter.spells.SpellWrapper import \
     SpellWrapper
 from pydofus2.com.ankamagames.dofus.kernel.Kernel import Kernel
+from pydofus2.com.ankamagames.dofus.logic.common.managers.StatsManager import \
+    StatsManager
 from pydofus2.com.ankamagames.dofus.logic.game.common.managers.PlayedCharacterManager import \
     PlayedCharacterManager
 from pydofus2.com.ankamagames.dofus.logic.game.common.misc.DofusEntities import \
@@ -194,9 +195,9 @@ class FightBattleFrame(Frame):
                     if (
                         fighter.spawnInfo.alive
                         and fighter.wave == self._newWaveId
-                        and not fenf.FightEntitiesFrame.getCurrentInstance().getEntityInfos(fighter.contextualId)
+                        and not Kernel().fightEntitiesFrame.getEntityInfos(fighter.contextualId)
                     ):
-                        fenf.FightEntitiesFrame.getCurrentInstance().addOrUpdateActor(fighter)
+                        Kernel().fightEntitiesFrame.addOrUpdateActor(fighter)
             if self._executingSequence:
                 self._synchroniseFighters = gftcimsg.fighters
                 self._synchroniseFightersInstanceId = fseqf.FightSequenceFrame.currentInstanceId
@@ -270,7 +271,7 @@ class FightBattleFrame(Frame):
 
         elif isinstance(msg, GameFightLeaveMessage):
             gflmsg = msg
-            fighterInfos2 = fenf.FightEntitiesFrame.getCurrentInstance().getEntityInfos(self._lastPlayerId)
+            fighterInfos2 = Kernel().fightEntitiesFrame.getEntityInfos(self._lastPlayerId)
             leaveSequenceFrame = fseqf.FightSequenceFrame(self)
             if fighterInfos2 and fighterInfos2.spawnInfo.alive:
                 fakeDeathMessage = GameActionFightDeathMessage()
@@ -320,7 +321,7 @@ class FightBattleFrame(Frame):
                 self._lastPlayerId = gftemsg.id
             else:
                 self._nextLastPlayerId = gftemsg.id
-            entityInfos = fenf.FightEntitiesFrame.getCurrentInstance().getEntityInfos(gftemsg.id)
+            entityInfos = Kernel().fightEntitiesFrame.getEntityInfos(gftemsg.id)
             if isinstance(entityInfos, GameFightFighterInformations) and not entityInfos:
                 bffm.BuffManager().markFinishingBuffs(gftemsg.id)
                 if gftemsg.id == CurrentPlayedFighterManager().currentFighterId:

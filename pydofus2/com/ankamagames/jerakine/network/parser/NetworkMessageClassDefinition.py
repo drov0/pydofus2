@@ -13,7 +13,7 @@ from pydofus2.com.ankamagames.jerakine.network.parser.ProtocolSpec import \
 
 
 class NetworkMessageClassDefinition:
-    TRACE = True
+    TRACE = False
     
     def __init__(self, className: str, raw: ByteArray) -> None:
         if self.TRACE:

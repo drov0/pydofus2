@@ -16,6 +16,8 @@ from pydofus2.com.ankamagames.dofus.logic.game.fight.miscs.ActionIdHelper import
     ActionIdHelper
 from pydofus2.com.ankamagames.dofus.logic.game.fight.miscs.ActionIdProtocol import \
     ActionIdProtocol
+from pydofus2.com.ankamagames.dofus.logic.game.fight.miscs.FightEntitiesHolder import \
+    FightEntitiesHolder
 from pydofus2.com.ankamagames.dofus.logic.game.fight.miscs.SpellScriptBuffer import \
     SpellScriptBuffer
 from pydofus2.com.ankamagames.dofus.logic.game.fight.steps.FightActionPointsLossDodgeStep import \
@@ -404,10 +406,6 @@ class FightSequenceFrame(Frame, ISpellCastProvider):
         self._sequencer.clear()
         return True
 
-    @property
-    def fightEntitiesFrame(self) -> "FightEntitiesFrame":
-        return Kernel().worker.getFrameByName("FightEntitiesFrame")
-
     def addSubSequence(self, sequence: ISequencer) -> None:
         self._subSequenceWaitingCount += 1
         # Logger().debug(f"Adding ParallelStartSequenceStep to sequence #{self._instanceId}")
@@ -445,7 +443,7 @@ class FightSequenceFrame(Frame, ISpellCastProvider):
                 )
                 if forceDetailedLogs:
                     gafscmsg.verboseCast = True
-            fightEntitiesFrame: FightEntitiesFrame = FightEntitiesFrame.getCurrentInstance()
+            fightEntitiesFrame = Kernel().fightEntitiesFrame
             sourceCellId = -1
             if fightEntitiesFrame and fightEntitiesFrame.hasEntity(gafscmsg.sourceId):
                 fighterInfo = fightEntitiesFrame.getEntityInfos(gafscmsg.sourceId)
@@ -552,7 +550,7 @@ class FightSequenceFrame(Frame, ISpellCastProvider):
                     gafscmsg.spellId, gafscmsg.spellLevel, spellTargetEntities
                 )
             gafscmsg.critical == FightSpellCastCriticalEnum.CRITICAL_HIT
-            entities = FightEntitiesFrame.getCurrentInstance().entities
+            entities = Kernel().fightEntitiesFrame.entities
             fighter = entities[gafscmsg.sourceId]
             if closeCombatWeaponId != 0:
                 self.pushStep(
@@ -752,9 +750,8 @@ class FightSequenceFrame(Frame, ISpellCastProvider):
 
         if isinstance(msg, RefreshCharacterStatsMessage):
             rcmsg = msg
-            fightEntitiesFrame = FightEntitiesFrame.getCurrentInstance()
-            if fightEntitiesFrame:
-                infos = fightEntitiesFrame.getEntityInfos(rcmsg.fighterId)
+            if Kernel().fightEntitiesFrame:
+                infos = Kernel().fightEntitiesFrame.getEntityInfos(rcmsg.fighterId)
                 if infos:
                     infos.stats = rcmsg.stats
             self.pushStep(FightUpdateStatStep(rcmsg.fighterId, rcmsg.stats.characteristics.characteristics))
@@ -772,15 +769,15 @@ class FightSequenceFrame(Frame, ISpellCastProvider):
             return True
 
         if isinstance(msg, GameActionFightInvisibilityMessage):
-            inviInfo = self.fightEntitiesFrame.getEntityInfos(msg.targetId)
+            inviInfo = Kernel().fightEntitiesFrame.getEntityInfos(msg.targetId)
             if not inviInfo:
                 return True
             stateName = GameActionFightInvisibilityStateEnum.getStateName(msg.state)
             Logger().info(
                 f"[BUFFS] Invisibility change of ({msg.targetId}) cell ({inviInfo.disposition.cellId}) new state ({stateName})"
             )
-            self.fightEntitiesFrame.setLastKnownEntityPosition(msg.targetId, inviInfo.disposition.cellId)
-            self.fightEntitiesFrame.setLastKnownEntityMovementPoint(msg.targetId, 0, True)
+            Kernel().fightEntitiesFrame.setLastKnownEntityPosition(msg.targetId, inviInfo.disposition.cellId)
+            Kernel().fightEntitiesFrame.setLastKnownEntityMovementPoint(msg.targetId, 0, True)
             self.pushStep(FightChangeVisibilityStep(msg.targetId, msg.state))
             return True
 
@@ -791,7 +788,7 @@ class FightSequenceFrame(Frame, ISpellCastProvider):
 
         if isinstance(msg, GameActionFightDeathMessage):
             gafdmsg = msg
-            fightEntitiesFrame = FightEntitiesFrame.getCurrentInstance()
+            fightEntitiesFrame = Kernel().fightEntitiesFrame
             fbf: "FightBattleFrame" = Kernel().worker.getFrameByName("FightBattleFrame")
             self.fighterHasBeenKilled(gafdmsg)
             return True
@@ -799,7 +796,7 @@ class FightSequenceFrame(Frame, ISpellCastProvider):
         if isinstance(msg, GameActionFightVanishMessage):
             gafvmsg = msg
             self.pushStep(FightVanishStep(gafvmsg.targetId, gafvmsg.sourceId))
-            entityInfosv = FightEntitiesFrame.getCurrentInstance().getEntityInfos(gafvmsg.targetId)
+            entityInfosv = Kernel().fightEntitiesFrame.getEntityInfos(gafvmsg.targetId)
             if isinstance(entityInfosv, GameFightFighterInformations):
                 entityInfosv.spawnInfo.alive = False
             return True
@@ -953,9 +950,17 @@ class FightSequenceFrame(Frame, ISpellCastProvider):
         if isinstance(msg, GameActionFightInvisibleDetectedMessage):
             gafidMsg = msg
             srcEntity = DofusEntities().getEntity(gafidMsg.sourceId)
-            self.pushStep(FightInvisibleTemporarilyDetectedStep(srcEntity, gafidMsg.cellId))
-            FightEntitiesFrame.getCurrentInstance().setLastKnownEntityPosition(gafidMsg.targetId, gafidMsg.cellId)
-            FightEntitiesFrame.getCurrentInstance().setLastKnownEntityMovementPoint(gafidMsg.targetId, 0)
+            if not srcEntity:
+                Logger().error("Source entity not found with dofus entities")
+                srcEntity = FightEntitiesHolder().getEntity(gafidMsg.sourceId)
+                if not srcEntity:
+                    Logger().error("Source entity not found with fight entities holder!")
+                    srcEntity = Kernel().fightEntitiesFrame.getEntityInfos(gafidMsg.sourceId)
+                    if not srcEntity:
+                        Logger().error("Source entity not found with fight entities!")
+            self.pushStep(FightInvisibleTemporarilyDetectedStep(gafidMsg.sourceId, gafidMsg.cellId))
+            Kernel().fightEntitiesFrame.setLastKnownEntityPosition(gafidMsg.targetId, gafidMsg.cellId)
+            Kernel().fightEntitiesFrame.setLastKnownEntityMovementPoint(gafidMsg.targetId, 0)
             return True
 
         if isinstance(msg, GameFightTurnListMessage):
@@ -980,16 +985,16 @@ class FightSequenceFrame(Frame, ISpellCastProvider):
     def fighterHasBeenKilled(self, gafdmsg: GameActionFightDeathMessage) -> None:
         summonDestroyedWithSummoner: bool = False
         summonerIsMe: bool = False
-        entitiesDictionnary = FightEntitiesFrame.getCurrentInstance().entities
+        entitiesDictionnary = Kernel().fightEntitiesFrame.entities
         for actorInfo in entitiesDictionnary.values():
             if isinstance(actorInfo, GameFightFighterInformations):
                 if actorInfo.spawnInfo.alive and actorInfo.stats.summoner == gafdmsg.targetId:
                     self.pushStep(FightDeathStep(actorInfo.contextualId))
         playerId = PlayedCharacterManager().id
-        self.fightEntitiesFrame.getEntityInfos(gafdmsg.sourceId)
-        targetInfos = self.fightEntitiesFrame.getEntityInfos(gafdmsg.targetId)
+        Kernel().fightEntitiesFrame.getEntityInfos(gafdmsg.sourceId)
+        targetInfos = Kernel().fightEntitiesFrame.getEntityInfos(gafdmsg.targetId)
 
-        playerInfos = self.fightEntitiesFrame.getEntityInfos(playerId)
+        playerInfos = Kernel().fightEntitiesFrame.getEntityInfos(playerId)
         summonDestroyedWithSummoner = False
         summonerIsMe = True
         if (
@@ -998,11 +1003,11 @@ class FightSequenceFrame(Frame, ISpellCastProvider):
             and not isinstance(targetInfos, GameFightFighterNamedInformations)
             and not isinstance(targetInfos, GameFightEntityInformation)
         ):
-            summonerInfos = self.fightEntitiesFrame.getEntityInfos(targetInfos.stats.summoner)
+            summonerInfos = Kernel().fightEntitiesFrame.getEntityInfos(targetInfos.stats.summoner)
             summonDestroyedWithSummoner = summonerInfos is None or not summonerInfos.spawnInfo.alive
             summonerIsMe = summonerInfos is not None and summonerInfos == playerInfos
         if not summonDestroyedWithSummoner and summonerIsMe:
-            self.fightEntitiesFrame.addLastKilledAlly(targetInfos)
+            Kernel().fightEntitiesFrame.addLastKilledAlly(targetInfos)
         entityDeathStepAlreadyInBuffer: bool = False
 
         for step in self._stepsBuffer:
@@ -1012,7 +1017,7 @@ class FightSequenceFrame(Frame, ISpellCastProvider):
         if not entityDeathStepAlreadyInBuffer:
             self.pushStep(FightDeathStep(gafdmsg.targetId))
 
-        entityInfos: GameContextActorInformations = FightEntitiesFrame.getCurrentInstance().getEntityInfos(
+        entityInfos: GameContextActorInformations = Kernel().fightEntitiesFrame.getEntityInfos(
             gafdmsg.targetId
         )
         currentPlayedFighterManager = CurrentPlayedFighterManager()
@@ -1035,7 +1040,7 @@ class FightSequenceFrame(Frame, ISpellCastProvider):
                     SpellWrapper.refreshAllPlayerSpellHolder(fighterInfos.stats.summoner)
 
     def fighterHasLeftBattle(self, gaflmsg: GameActionFightLeaveMessage) -> None:
-        fightEntityFrame_gaflmsg: FightEntitiesFrame = FightEntitiesFrame.getCurrentInstance()
+        fightEntityFrame_gaflmsg: FightEntitiesFrame = Kernel().fightEntitiesFrame
         entitiesL: dict = fightEntityFrame_gaflmsg.entities
         for gcaiL in entitiesL.values():
             if isinstance(gcaiL, GameFightFighterInformations):
@@ -1175,11 +1180,11 @@ class FightSequenceFrame(Frame, ISpellCastProvider):
                 gafsnmsg.actionId == ActionIds.ACTION_CHARACTER_ADD_ILLUSION_RANDOM
                 or gafsnmsg.actionId == ActionIds.ACTION_CHARACTER_ADD_ILLUSION_MIRROR
             ):
-                fightEntities = self.fightEntitiesFrame.entities
+                fightEntities = Kernel().fightEntitiesFrame.entities
                 for fighterId in fightEntities:
-                    infos = self.fightEntitiesFrame.getEntityInfos(fighterId)
+                    infos = Kernel().fightEntitiesFrame.getEntityInfos(fighterId)
                     if (
-                        not self.fightEntitiesFrame.entityIsIllusion(fighterId)
+                        not Kernel().fightEntitiesFrame.entityIsIllusion(fighterId)
                         and hasattr(infos, "name")
                         and hasattr(summon, "name")
                         and getattr(infos, "name") == getattr(summon, "name")
@@ -1255,7 +1260,7 @@ class FightSequenceFrame(Frame, ISpellCastProvider):
         self._castingSpell = CastingSpell()
         self._castingSpell.casterId = gaftgtmsg.sourceId
         triggeringCharacterInfos: GameFightFighterInformations = (
-            FightEntitiesFrame.getCurrentInstance().getEntityInfos(gaftgtmsg.triggeringCharacterId)
+            Kernel().fightEntitiesFrame.getEntityInfos(gaftgtmsg.triggeringCharacterId)
         )
         triggeredCellId = triggeringCharacterInfos.disposition.cellId if triggeringCharacterInfos else -1
         mark: MarkInstance = MarkedCellsManager().getMarkDatas(gaftgtmsg.markId)
@@ -1543,7 +1548,7 @@ class FightSequenceFrame(Frame, ISpellCastProvider):
         gfsgmsg.init(entity)
         Kernel().worker.process(gfsgmsg)
         if ActionIdHelper.isRevive(actionId):
-            self.fightEntitiesFrame.removeLastKilledAlly(entity.spawnInfo.teamId)
+            Kernel().fightEntitiesFrame.removeLastKilledAlly(entity.spawnInfo.teamId)
         summonedCreature = DofusEntities().getEntity(entity.contextualId)
         if summonedCreature:
             summonedCreature.visible = False
@@ -1554,7 +1559,7 @@ class FightSequenceFrame(Frame, ISpellCastProvider):
         if actionId == ActionIds.ACTION_SUMMON_BOMB:
             isBomb = True
         else:
-            entityInfosS = FightEntitiesFrame.getCurrentInstance().getEntityInfos(entity.contextualId)
+            entityInfosS = Kernel().fightEntitiesFrame.getEntityInfos(entity.contextualId)
             isBomb = False
             summonedEntityInfosS = entityInfosS
             if isinstance(summonedEntityInfosS, GameFightMonsterInformations):

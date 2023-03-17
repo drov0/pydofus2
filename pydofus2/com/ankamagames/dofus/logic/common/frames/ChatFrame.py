@@ -48,7 +48,7 @@ class ChatFrame(Frame):
             if msgInfo:
                 textId = msgInfo.textId
                 if timsg.msgId == 28 or timsg.msgId == 29:
-                    Logger().debug("waiting_for_player")
+                    Logger().debug("Player is lagging")
                 if param:
                     if param[0] and "~" in param[0]:
                         params = param[0].split("~")
@@ -64,10 +64,10 @@ class ChatFrame(Frame):
             msgContent = I18n.getText(textId)
             if msgContent:
                 msgContent = ParamsDecoder.applyParams(msgContent, params)
-                Logger().info(f"text info for id {textId}: {msgContent}")
+                Logger().info(f"text info for id {textId}, params {params}: {msgContent}")
             else:
                 Logger().error(f"There's no message for id {timsg.msgType * 10000 + timsg.msgId}")
-            KernelEventsManager().send(KernelEvent.TEXT_INFO, msg.msgId, msg.msgType, textId, msgContent)
+            KernelEventsManager().send(KernelEvent.TEXT_INFO, msg.msgId, msg.msgType, textId, msgContent, params)
             return True
 
     def systemMessageDisplay(self, msg : SystemMessageDisplayMessage):

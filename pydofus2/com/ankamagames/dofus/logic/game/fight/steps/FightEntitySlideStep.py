@@ -41,7 +41,7 @@ class FightEntitySlideStep(AbstractSequencable, IFightStep):
         self._fighterId = fighterId
         self._startCell = startCell
         self._endCell = endCell
-        infos = FightEntitiesFrame.getCurrentInstance().getEntityInfos(fighterId)
+        infos = Kernel().fightEntitiesFrame.getEntityInfos(fighterId)
         infos.disposition.cellId = endCell.cellId
         Logger().info(f"Slide fighter {fighterId} from {startCell.cellId} to {endCell.cellId}")
         self._entity: "AnimatedCharacter" = DofusEntities().getEntity(self._fighterId)

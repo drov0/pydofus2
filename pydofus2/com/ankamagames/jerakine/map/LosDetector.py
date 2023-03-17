@@ -1,5 +1,4 @@
-from pydofus2.com.ankamagames.dofus.logic.game.fight.frames.FightEntitiesFrame import \
-    FightEntitiesFrame
+from pydofus2.com.ankamagames.dofus.kernel.Kernel import Kernel
 from pydofus2.com.ankamagames.jerakine.map.IDataMapProvider import \
     IDataMapProvider
 from pydofus2.com.ankamagames.jerakine.map.ILosDetector import ILosDetector
@@ -23,7 +22,7 @@ class LosDetector(ILosDetector):
             los = True
             for j in range(len(line) - 1):
                 if MapPoint.isInMap(line[j].x, line[j].y):
-                    if j > 0 and FightEntitiesFrame.getCurrentInstance().isEntityOnCell(line[j-1].cellId):
+                    if j > 0 and Kernel().fightEntitiesFrame.isEntityOnCell(line[j-1].cellId):
                         los = False
                     elif targetPos not in tested:
                         los = los and mapProvider.pointLos(line[j].x, line[j].y, False)

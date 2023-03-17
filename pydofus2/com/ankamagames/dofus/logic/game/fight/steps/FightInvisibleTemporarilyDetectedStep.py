@@ -6,17 +6,9 @@ from pydofus2.com.ankamagames.jerakine.sequencer.AbstractSequencable import Abst
 
 class FightInvisibleTemporarilyDetectedStep(AbstractSequencable, IFightStep):
 
-    _duplicateSprite: AnimatedCharacter
-
-    _cellId: int
-
-    _targetId: float
-
-    def __init__(self, target: AnimatedCharacter, cellId: int):
+    def __init__(self, targetId, cellId: int):
         super().__init__()
-        self._targetId = target.id
-        id: float = EntitiesManager().getFreeEntityId()
-        self._duplicateSprite = AnimatedCharacter(id)
+        self._targetId = targetId
         self._cellId = cellId
 
     @property
@@ -26,12 +18,6 @@ class FightInvisibleTemporarilyDetectedStep(AbstractSequencable, IFightStep):
     def start(self) -> None:
         self.executeCallbacks()
 
-    def clear(self) -> None:
-        pass
-
     @property
     def targets(self) -> list[float]:
         return [self._targetId]
-
-    def onFade(self, e) -> None:
-        pass

@@ -12,8 +12,6 @@ from pydofus2.com.ankamagames.dofus.logic.game.common.managers.PlayedCharacterMa
     PlayedCharacterManager
 from pydofus2.com.ankamagames.dofus.logic.game.common.misc.DofusEntities import \
     DofusEntities
-from pydofus2.com.ankamagames.dofus.logic.game.fight.frames.FightEntitiesFrame import \
-    FightEntitiesFrame
 from pydofus2.com.ankamagames.dofus.logic.game.fight.managers.BuffManager import \
     BuffManager
 from pydofus2.com.ankamagames.dofus.logic.game.fight.managers.CurrentPlayedFighterManager import \
@@ -60,7 +58,7 @@ class FightSummonStep(AbstractSequencable, IFightStep):
         else:
             gfsgmsg = GameFightShowFighterMessage()
             gfsgmsg.init(self._summonInfos)
-            FightEntitiesFrame.getCurrentInstance().process(gfsgmsg)
+            Kernel().fightEntitiesFrame.process(gfsgmsg)
         if EntitiesManager().entitiesScheduledForDestruction.get(self._summonInfos.contextualId):
             del EntitiesManager().entitiesScheduledForDestruction[self._summonInfos.contextualId]
         SpellWrapper.refreshAllPlayerSpellHolder(self._summonerId)
@@ -74,7 +72,7 @@ class FightSummonStep(AbstractSequencable, IFightStep):
         summonStats = StatsManager().getStats(self._summonInfos.contextualId)
         summonLifePoints = summonStats.getHealthPoints()
         if self._summonInfos.contextualId == PlayedCharacterManager().id:
-            fighterInfos = FightEntitiesFrame.getCurrentInstance().getEntityInfos(
+            fighterInfos = Kernel().fightEntitiesFrame.getEntityInfos(
                 self._summonInfos.contextualId
             )
             stats = StatsManager().getStats(fighterInfos.contextualId)

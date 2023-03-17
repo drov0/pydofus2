@@ -53,7 +53,7 @@ class FightEntityMovementStep(AbstractSequencable, IFightStep):
         self._entity = DofusEntities().getEntity(self._entityId)
         if self._entity:
             self._entity.position.cellId = self._path.end.cellId
-            fighterInfos = FightEntitiesFrame.getCurrentInstance().getEntityInfos(self._entityId)
+            fighterInfos = Kernel().fightEntitiesFrame.getEntityInfos(self._entityId)
             fighterInfos.disposition.cellId = self._path.end.cellId
             for e in EntitiesManager().getEntitiesOnCell(self._path.end.cellId):
                 if e.id != self._entityId:

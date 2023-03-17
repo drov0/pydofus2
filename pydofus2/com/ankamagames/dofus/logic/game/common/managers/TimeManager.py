@@ -1,9 +1,9 @@
 from datetime import datetime, timezone, timedelta
 from pydofus2.com.ankamagames.jerakine.data.I18n import I18n
-from pydofus2.com.ankamagames.jerakine.metaclasses.ThreadSharedSingleton import ThreadSharedSingleton
+from pydofus2.com.ankamagames.jerakine.metaclasses.Singleton import Singleton
 
 
-class TimeManager(metaclass=ThreadSharedSingleton):
+class TimeManager(metaclass=Singleton):
     def __init__(self) -> None:
         self.serverTimeLag: int = 0
         self.serverUtcTimeLag: int = 0

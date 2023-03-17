@@ -112,8 +112,8 @@ class LastMCIDM(metaclass=Singleton):
     def __init__(self) -> None:
         self.msg: MapComplementaryInformationsDataMessage = None
 class RoleplayEntitiesFrame(AbstractEntitiesFrame, Frame):
-    MAX_MAPDATA_REQ_FAILS = 20
-    MAPDATA_REQ_TIMEOUT = 60 * 5
+    MAX_MAPDATA_REQ_FAILS = 3
+    MAPDATA_REQ_TIMEOUT = 10
 
     def __init__(self):
         self._fights = dict[int, Fight]()

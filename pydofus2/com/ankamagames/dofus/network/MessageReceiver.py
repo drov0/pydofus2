@@ -4,8 +4,8 @@ import json
 import pydofus2.com.ankamagames.dofus.Constants as Constants
 from pydofus2.com.ankamagames.dofus.kernel.Kernel import Kernel
 from pydofus2.com.ankamagames.jerakine.logger.Logger import Logger
-from pydofus2.com.ankamagames.jerakine.metaclasses.ThreadSharedSingleton import \
-    ThreadSharedSingleton
+from pydofus2.com.ankamagames.jerakine.metaclasses.Singleton import \
+    Singleton
 from pydofus2.com.ankamagames.jerakine.network.CustomDataWrapper import \
     ByteArray
 from pydofus2.com.ankamagames.jerakine.network.INetworkMessage import \
@@ -133,7 +133,8 @@ for cls_name, cls_infos in msgShuffle.items():
         _messagesTypes[cls_infos["id"]] = cls
 
 
-class MessageReceiver(RawDataParser, metaclass=ThreadSharedSingleton):
+class MessageReceiver(RawDataParser, metaclass=Singleton):
+
     def __init__(self):
         self.infight = False
         super().__init__()

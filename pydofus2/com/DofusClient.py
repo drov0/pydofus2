@@ -139,12 +139,11 @@ class DofusClient(threading.Thread):
             self.worker.addFrame(frame())
         token = Haapi().getLoginToken(self._certId, self._certHash, apiKey=self._apiKey)
         AuthentificationManager().setToken(token)
-        if (
-            DofusClient.lastLoginTime is not None
-            and perf_counter() - DofusClient.lastLoginTime < DofusClient.minLoginInterval
-        ):
-            Logger().info("[DofusClient] Login request too soon, will wait some time")
-            self.terminated.wait(DofusClient.minLoginInterval - (perf_counter() - DofusClient.lastLoginTime))
+        if DofusClient.lastLoginTime is not None:
+            diff = DofusClient.minLoginInterval - (perf_counter() - DofusClient.lastLoginTime)
+            if diff > 0:
+                Logger().info("[DofusClient] Login request too soon, will wait some time")
+                self.terminated.wait(diff)
         self._lastLoginTime = perf_counter()
         self.worker.process(LoginValidationWithTokenAction.create(self._serverId != 0, self._serverId))
 

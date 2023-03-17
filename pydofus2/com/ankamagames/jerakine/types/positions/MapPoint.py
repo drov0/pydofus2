@@ -1,4 +1,5 @@
 import math
+from pydofus2.com.ankamagames.atouin.AtouinConstants import AtouinConstants
 
 from pydofus2.com.ankamagames.atouin.managers.EntitiesManager import \
     EntitiesManager
@@ -298,22 +299,53 @@ class MapPoint:
             if not (o.canWalkTo or (allowTroughEntity and o.canSeeThrough)):
                 return True
         return False
+    
+    def allowsMapChange(self):
+        for direction in DirectionsEnum.getMapChangeDirections():
+            if self.allowsMapChangeToDirection(direction):
+                return True
+        return False
 
-    def iterChilds(self):
+    def allowsMapChangeToDirection(self, direction: int):
+        from pydofus2.com.ankamagames.atouin.managers.MapDisplayManager import MapDisplayManager
+
+        currentMap = MapDisplayManager().dataMap 
+        direction = DirectionsEnum(direction)
+        mapChangeData = currentMap.cells[self.cellId].mapChangeData
+        
+        if direction == DirectionsEnum.RIGHT:
+            isOnRightEdge = (self.cellId + 1) % (AtouinConstants.MAP_WIDTH * 2) == 0
+            canChangeMapWith = (mapChangeData & 1) or (isOnRightEdge and ((mapChangeData & 2) or (mapChangeData & 128)))
+            
+        elif direction == DirectionsEnum.DOWN:
+            isOnBottomEdge = self.cellId >= AtouinConstants.MAP_CELLS_COUNT - AtouinConstants.MAP_WIDTH
+            canChangeMapWith = (mapChangeData & 4) or (isOnBottomEdge and ((mapChangeData & 2) or (mapChangeData & 8)))
+            
+        elif direction == DirectionsEnum.LEFT:        
+            isOnLeftEdge = self.cellId % (AtouinConstants.MAP_WIDTH * 2) == 0
+            canChangeMapWith = (mapChangeData & 16) or (isOnLeftEdge and ((mapChangeData & 8) or (mapChangeData & 32)))
+            
+        elif direction == DirectionsEnum.UP:
+            isOnTopEdge = self.cellId < AtouinConstants.MAP_WIDTH
+            canChangeMapWith = (mapChangeData & 64) or (isOnTopEdge and ((mapChangeData & 32) or (mapChangeData & 128)))
+            
+        else:
+            canChangeMapWith = False
+        return canChangeMapWith
+    
+    def iterChilds(self, changeMap=True):
         for y in range(self.y - 1, self.y + 2):
             for x in range(self.x - 1, self.x + 2):
-                if self.isChild(x, y):
+                if self.isChild(x, y) and (changeMap or MapPoint.fromCoords(x, y).allowsMapChange()):
                     yield x, y
 
     def isChild(self, x, y, allowDiag=True, allowTroughEntity=True):
         from pydofus2.mapTools import MapTools
-
+        from pydofus2.com.ankamagames.atouin.utils.DataMapProvider import DataMapProvider
         parentId = self.cellId
         cellId = MapTools.getCellIdByCoord(x, y)
         parentX = MapTools.getCellIdXCoord(parentId)
         parentY = MapTools.getCellIdYCoord(parentId)
-        from pydofus2.com.ankamagames.atouin.utils.DataMapProvider import DataMapProvider
-
         canMoveFromParentToEnd = DataMapProvider().pointMov(x, y, allowTroughEntity, parentId)
         return (
             cellId is not None

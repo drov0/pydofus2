@@ -4,10 +4,10 @@ from pydofus2.com.ankamagames.dofus.network.types.game.character.characteristic.
     CharacterSpellModification,
 )
 from pydofus2.com.ankamagames.jerakine.logger.Logger import Logger
-from pydofus2.com.ankamagames.jerakine.metaclasses.ThreadSharedSingleton import ThreadSharedSingleton
+from pydofus2.com.ankamagames.jerakine.metaclasses.Singleton import Singleton
 
 
-class SpellModifiersManager(metaclass=ThreadSharedSingleton):
+class SpellModifiersManager(metaclass=Singleton):
 
     DATA_STORE_CATEGORY: str = "ComputerModule_spellModifiersManager"
 

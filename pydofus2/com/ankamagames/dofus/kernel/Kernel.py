@@ -106,7 +106,8 @@ class Kernel(metaclass=Singleton):
         self._worker.reset()
         if ConnectionsHandler().conn is not None and not ConnectionsHandler().conn.closed:
             ConnectionsHandler().closeConnection(DisconnectionReasonEnum.WANTED_SHUTDOWN)
-            ConnectionsHandler().conn.join()
+            if ConnectionsHandler().conn:
+                ConnectionsHandler().conn.join()
         ConnectionsHandler.clear()
         SpellModifiersManager.clear()
         self.beingInReconection = False

@@ -1,31 +1,31 @@
-from pydofus2.com.ankamagames.dofus.kernel.Kernel import Kernel
-from pydofus2.com.ankamagames.dofus.logic.game.common.misc.DofusEntities import DofusEntities
-from pydofus2.com.ankamagames.dofus.logic.game.fight.actions.RemoveEntityAction import (
-    RemoveEntityAction,
-)
-from pydofus2.com.ankamagames.dofus.logic.game.fight.frames.FightEntitiesFrame import (
-    FightEntitiesFrame,
-)
-from pydofus2.com.ankamagames.dofus.logic.game.fight.miscs.FightEntitiesHolder import (
-    FightEntitiesHolder,
-)
-from pydofus2.com.ankamagames.dofus.logic.game.fight.steps.IFightStep import IFightStep
-from pydofus2.com.ankamagames.dofus.network.enums.GameActionFightInvisibilityStateEnum import (
-    GameActionFightInvisibilityStateEnum,
-)
-from pydofus2.com.ankamagames.dofus.network.types.game.context.fight.GameFightFighterInformations import (
-    GameFightFighterInformations,
-)
-from pydofus2.com.ankamagames.dofus.types.entities.AnimatedCharacter import AnimatedCharacter
-from pydofus2.com.ankamagames.jerakine.entities.interfaces.IEntity import IEntity
-from pydofus2.com.ankamagames.jerakine.logger.Logger import Logger
-from pydofus2.com.ankamagames.jerakine.sequencer.AbstractSequencable import AbstractSequencable
 from typing import TYPE_CHECKING
 
+from pydofus2.com.ankamagames.dofus.kernel.Kernel import Kernel
+from pydofus2.com.ankamagames.dofus.logic.game.common.misc.DofusEntities import \
+    DofusEntities
+from pydofus2.com.ankamagames.dofus.logic.game.fight.actions.RemoveEntityAction import \
+    RemoveEntityAction
+from pydofus2.com.ankamagames.dofus.logic.game.fight.frames.FightEntitiesFrame import \
+    FightEntitiesFrame
+from pydofus2.com.ankamagames.dofus.logic.game.fight.miscs.FightEntitiesHolder import \
+    FightEntitiesHolder
+from pydofus2.com.ankamagames.dofus.logic.game.fight.steps.IFightStep import \
+    IFightStep
+from pydofus2.com.ankamagames.dofus.network.enums.GameActionFightInvisibilityStateEnum import \
+    GameActionFightInvisibilityStateEnum
+from pydofus2.com.ankamagames.dofus.network.types.game.context.fight.GameFightFighterInformations import \
+    GameFightFighterInformations
+from pydofus2.com.ankamagames.dofus.types.entities.AnimatedCharacter import \
+    AnimatedCharacter
+from pydofus2.com.ankamagames.jerakine.entities.interfaces.IEntity import \
+    IEntity
+from pydofus2.com.ankamagames.jerakine.logger.Logger import Logger
+from pydofus2.com.ankamagames.jerakine.sequencer.AbstractSequencable import \
+    AbstractSequencable
+
 if TYPE_CHECKING:
-    from pydofus2.com.ankamagames.dofus.logic.game.fight.frames.FightContextFrame import (
-        FightContextFrame,
-    )
+    from pydofus2.com.ankamagames.dofus.logic.game.fight.frames.FightContextFrame import \
+        FightContextFrame
 
 
 class FightChangeVisibilityStep(AbstractSequencable, IFightStep):
@@ -36,7 +36,7 @@ class FightChangeVisibilityStep(AbstractSequencable, IFightStep):
 
     def __init__(self, entityId: float, visibilityState: int):
         super().__init__()
-        fighterInfos: GameFightFighterInformations = FightEntitiesFrame.getCurrentInstance().getEntityInfos(entityId)
+        fighterInfos: GameFightFighterInformations = Kernel().fightEntitiesFrame.getEntityInfos(entityId)
         self._oldVisibilityState = fighterInfos.stats.invisibilityState
         self._entityId = entityId
         self._visibilityState = visibilityState
@@ -76,7 +76,7 @@ class FightChangeVisibilityStep(AbstractSequencable, IFightStep):
             fcf.addToHiddenEntities(self._entityId)
         else:
             fcf.removeFromHiddenEntities(self._entityId)
-        fighterInfos = FightEntitiesFrame.getCurrentInstance().getEntityInfos(self._entityId)
+        fighterInfos = Kernel().fightEntitiesFrame.getEntityInfos(self._entityId)
         fighterInfos.stats.invisibilityState = self._visibilityState
         self.executeCallbacks()
 

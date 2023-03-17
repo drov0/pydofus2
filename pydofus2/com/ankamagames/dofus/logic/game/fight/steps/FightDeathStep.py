@@ -61,7 +61,7 @@ class FightDeathStep(AbstractSequencable, IFightStep):
         dyingEntity: IEntity = DofusEntities().getEntity(self._entityId)
         if not dyingEntity:
             return
-        fightEntitites = FightEntitiesFrame.getCurrentInstance()
+        fightEntitites = Kernel().fightEntitiesFrame
         fighterInfos: GameFightFighterInformations = fightEntitites.getEntityInfos(self._entityId)
         fighterStats: EntityStats = StatsManager().getStats(fighterInfos.contextualId)
         fightBattleFrame: "FightBattleFrame" = Kernel().worker.getFrameByName("FightBattleFrame")

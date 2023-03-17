@@ -9,8 +9,8 @@ import traceback
 from time import perf_counter
 from typing import TYPE_CHECKING
 
-from pydofus2.com.ankamagames.dofus.network.MessageReceiver import \
-    MessageReceiver
+from pydofus2.com.ankamagames.dofus.network.MessageReceiver import (
+    MessageReceiver, _messagesTypes)
 from pydofus2.com.ankamagames.jerakine.logger.Logger import Logger, TraceLogger
 from pydofus2.com.ankamagames.jerakine.messages.ConnectedMessage import \
     ConnectedMessage
@@ -24,7 +24,8 @@ from pydofus2.com.ankamagames.jerakine.network.NetworkMessage import \
 if TYPE_CHECKING:
     from pydofus2.com.ankamagames.jerakine.network.INetworkMessage import \
         INetworkMessage
-
+        
+LOCK = mp.Lock()
 
 def sendTrace(func):
     @functools.wraps(func)
@@ -83,6 +84,7 @@ class ServerConnection(mp.Thread):
             self.__receptionQueue = receptionQueue
         self.__socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.__connectionTimeout = None
+        self.nbrSendFails = 0
 
     @property
     def latencyAvg(self) -> float:
@@ -177,7 +179,13 @@ class ServerConnection(mp.Thread):
                 total_sent += sent
         except OSError as e:
             Logger().error(f"{e.errno}, {errno.errorcode[e.errno]} OS error received")
-            self.close()
+            if e.errno == errno.WSAECONNABORTED:
+                self.nbrSendFails += 1
+                if self.nbrSendFails > 3:
+                    return self.close()
+                self.send(msg)
+            # self.close()
+        self.nbrSendFails = 0
         self._latestSent = perf_counter()
         self._lastSent = perf_counter()
         self._sendSequenceId += 1
@@ -195,38 +203,42 @@ class ServerConnection(mp.Thread):
             self.__receptionQueue.put(msg)
 
     def __parse(self):
-        buffer = self.__receivedStream
-        while buffer.remaining() and not self._closing.is_set():
-            if self.__msg_len_len is None:
-                if buffer.remaining() < 2:
+        with LOCK:
+            buffer = self.__receivedStream
+            while buffer.remaining() and not self._closing.is_set():
+                if self.__msg_len_len is None:
+                    if buffer.remaining() < 2:
+                        break
+                    staticHeader = buffer.readUnsignedShort()
+                    self.__packet_id = staticHeader >> NetworkMessage.BIT_RIGHT_SHIFT_LEN_PACKET_ID
+                    if self.__packet_id in _messagesTypes:
+                        if _messagesTypes[self.__packet_id].__name__ == "MapComplementaryInformationsDataMessage":
+                            Logger().info("Received header of MapComplementaryInformationsDataMessage")
+                    self.__msg_len_len = staticHeader & NetworkMessage.BIT_MASK
+                    TraceLogger().debug(f"msgId : {self.__packet_id}, msg_len_len : {self.__msg_len_len}")
+                if self.__msg_len is None:
+                    if buffer.remaining() < self.__msg_len_len:
+                        break
+                    self.__msg_len = int.from_bytes(buffer.read(self.__msg_len_len), "big")
+                    TraceLogger().debug(f"msg_len : {self.__msg_len}")
+                if buffer.remaining() < self.__msg_len:
                     break
-                staticHeader = buffer.readUnsignedShort()
-                self.__packet_id = staticHeader >> NetworkMessage.BIT_RIGHT_SHIFT_LEN_PACKET_ID
-                self.__msg_len_len = staticHeader & NetworkMessage.BIT_MASK
-                TraceLogger().debug(f"msgId : {self.__packet_id}, msg_len_len : {self.__msg_len_len}")
-            if self.__msg_len is None:
-                if buffer.remaining() < self.__msg_len_len:
-                    break
-                self.__msg_len = int.from_bytes(buffer.read(self.__msg_len_len), "big")
-                TraceLogger().debug(f"msg_len : {self.__msg_len}")
-            if buffer.remaining() < self.__msg_len:
-                break
-            self.updateLatency()
-            TraceLogger().debug("Parsing ...")
-            msg: NetworkMessage = MessageReceiver().parse(buffer, self.__packet_id, self.__msg_len)
-            TraceLogger().debug(f"Parsed, got : {type(msg).__name__}")
-            if type(msg).__name__ == "BasicPongMessage":
-                if self.lastSentPingTime:
-                    latency = round(1000 * (perf_counter() - self.lastSentPingTime), 2)
-                    Logger().info(f"Latency : {latency}ms, average {self.latencyAvg}, var {self.latencyVar}")
-            if msg.unpacked:
-                msg.receptionTime = perf_counter()
-                msg.sourceConnection = self.id
-                self._put(msg)
-            self.__packet_id = None
-            self.__msg_len_len = None
-            self.__msg_len = None
-        buffer.trim()
+                self.updateLatency()
+                TraceLogger().debug("Parsing ...")
+                msg: NetworkMessage = MessageReceiver().parse(buffer, self.__packet_id, self.__msg_len)
+                TraceLogger().debug(f"Parsed, got : {type(msg).__name__}")
+                if type(msg).__name__ == "BasicPongMessage":
+                    if self.lastSentPingTime:
+                        latency = round(1000 * (perf_counter() - self.lastSentPingTime), 2)
+                        Logger().info(f"Latency : {latency}ms, average {self.latencyAvg}, var {self.latencyVar}")
+                if msg.unpacked:
+                    msg.receptionTime = perf_counter()
+                    msg.sourceConnection = self.id
+                    self._put(msg)
+                self.__packet_id = None
+                self.__msg_len_len = None
+                self.__msg_len = None
+            buffer.trim()
 
     @sendTrace
     def updateLatency(self) -> None:
@@ -344,8 +356,10 @@ class ServerConnection(mp.Thread):
                     if not self._closing.is_set():
                         err = e
                         self._closing.set()
-                # elif e.errno == errno.WSAETIMEDOUT:
-                #     Logger().debug(f"[{self.id}] Connection timed out.")
+                elif e.errno == errno.WSAETIMEDOUT:
+                    Logger().debug(f"[{self.id}] Connection timed out.")
+                    if self._connecting.is_set():
+                        self.__onConnectionTimeout()
                 else:
                     Logger().debug(f"{e.errno}, {errno.errorcode[e.errno]} OS error received")
                     err = e

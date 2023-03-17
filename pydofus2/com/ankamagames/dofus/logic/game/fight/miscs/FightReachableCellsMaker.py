@@ -1,20 +1,21 @@
-from pydofus2.com.ankamagames.atouin.managers.MapDisplayManager import MapDisplayManager
-from pydofus2.com.ankamagames.dofus.logic.game.fight.miscs.TackleUtil import TackleUtil
-from pydofus2.com.ankamagames.dofus.network.types.game.context.FightEntityDispositionInformations import (
-    FightEntityDispositionInformations,
-)
-from pydofus2.com.ankamagames.jerakine.logger.Logger import Logger
+from pydofus2.com.ankamagames.atouin.managers.EntitiesManager import \
+    EntitiesManager
+from pydofus2.com.ankamagames.atouin.managers.MapDisplayManager import \
+    MapDisplayManager
 from pydofus2.com.ankamagames.dofus.kernel.Kernel import Kernel
-from pydofus2.com.ankamagames.dofus.logic.common.managers.StatsManager import StatsManager
-from pydofus2.com.ankamagames.atouin.managers.EntitiesManager import EntitiesManager
-from pydofus2.com.ankamagames.dofus.logic.game.fight.frames.FightEntitiesFrame import (
-    FightEntitiesFrame,
-)
-from pydofus2.com.ankamagames.dofus.network.types.game.context.fight.GameFightMonsterInformations import (
-    GameFightMonsterInformations,
-)
-from pydofus2.damageCalculation.tools.StatIds import StatIds
+from pydofus2.com.ankamagames.dofus.logic.common.managers.StatsManager import \
+    StatsManager
+from pydofus2.com.ankamagames.dofus.logic.game.fight.frames.FightEntitiesFrame import \
+    FightEntitiesFrame
+from pydofus2.com.ankamagames.dofus.logic.game.fight.miscs.TackleUtil import \
+    TackleUtil
+from pydofus2.com.ankamagames.dofus.network.types.game.context.fight.GameFightMonsterInformations import \
+    GameFightMonsterInformations
+from pydofus2.com.ankamagames.dofus.network.types.game.context.FightEntityDispositionInformations import \
+    FightEntityDispositionInformations
+from pydofus2.com.ankamagames.jerakine.logger.Logger import Logger
 from pydofus2.com.ankamagames.jerakine.types.positions.MapPoint import MapPoint
+from pydofus2.damageCalculation.tools.StatIds import StatIds
 
 
 class ReachableCellData:
@@ -47,7 +48,7 @@ class ReachableCellData:
     def findState(self) -> None:
         neighbour = None
         cellData = MapDisplayManager().dataMap.cells[self.mapPoint.cellId]
-        enityOncell = FightEntitiesFrame.getCurrentInstance().isEntityOnCell(self.mapPoint.cellId)
+        enityOncell = Kernel().fightEntitiesFrame.isEntityOnCell(self.mapPoint.cellId)
         if not cellData.mov or cellData.nonWalkableDuringFight or enityOncell:
             self.state = self.STATE_UNREACHABLE
         else:

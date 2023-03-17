@@ -69,6 +69,7 @@ class Worker(MessageHandler):
             self.processMessage(msg)
         self.reset()
         self._terminated.set()
+        Logger().warning("Worker terminated!")
 
     def pause(self) -> None:
         self.paused.set()

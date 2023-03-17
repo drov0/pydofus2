@@ -1,4 +1,5 @@
 from typing import TYPE_CHECKING
+
 from pydofus2.com.ankamagames.berilia.managers.KernelEventsManager import (
     KernelEvent, KernelEventsManager)
 from pydofus2.com.ankamagames.dofus.kernel.net.ConnectionsHandler import \
@@ -7,7 +8,8 @@ from pydofus2.com.ankamagames.dofus.network.enums.PartyJoinErrorEnum import \
     PartyJoinErrorEnum
 from pydofus2.com.ankamagames.dofus.network.messages.game.atlas.compass.CompassUpdatePartyMemberMessage import \
     CompassUpdatePartyMemberMessage
-from pydofus2.com.ankamagames.dofus.network.messages.game.context.roleplay.party.PartyAcceptInvitationMessage import PartyAcceptInvitationMessage
+from pydofus2.com.ankamagames.dofus.network.messages.game.context.roleplay.party.PartyAcceptInvitationMessage import \
+    PartyAcceptInvitationMessage
 from pydofus2.com.ankamagames.dofus.network.messages.game.context.roleplay.party.PartyCancelInvitationMessage import \
     PartyCancelInvitationMessage
 from pydofus2.com.ankamagames.dofus.network.messages.game.context.roleplay.party.PartyCancelInvitationNotificationMessage import \
@@ -16,7 +18,8 @@ from pydofus2.com.ankamagames.dofus.network.messages.game.context.roleplay.party
     PartyCannotJoinErrorMessage
 from pydofus2.com.ankamagames.dofus.network.messages.game.context.roleplay.party.PartyDeletedMessage import \
     PartyDeletedMessage
-from pydofus2.com.ankamagames.dofus.network.messages.game.context.roleplay.party.PartyFollowMemberRequestMessage import PartyFollowMemberRequestMessage
+from pydofus2.com.ankamagames.dofus.network.messages.game.context.roleplay.party.PartyFollowMemberRequestMessage import \
+    PartyFollowMemberRequestMessage
 from pydofus2.com.ankamagames.dofus.network.messages.game.context.roleplay.party.PartyInvitationMessage import \
     PartyInvitationMessage
 from pydofus2.com.ankamagames.dofus.network.messages.game.context.roleplay.party.PartyInvitationRequestMessage import \
@@ -33,7 +36,8 @@ from pydofus2.com.ankamagames.dofus.network.messages.game.context.roleplay.party
     PartyNewGuestMessage
 from pydofus2.com.ankamagames.dofus.network.messages.game.context.roleplay.party.PartyNewMemberMessage import \
     PartyNewMemberMessage
-from pydofus2.com.ankamagames.dofus.network.messages.game.context.roleplay.party.PartyRefuseInvitationMessage import PartyRefuseInvitationMessage
+from pydofus2.com.ankamagames.dofus.network.messages.game.context.roleplay.party.PartyRefuseInvitationMessage import \
+    PartyRefuseInvitationMessage
 from pydofus2.com.ankamagames.dofus.network.types.common.PlayerSearchCharacterNameInformation import \
     PlayerSearchCharacterNameInformation
 from pydofus2.com.ankamagames.dofus.network.types.game.context.roleplay.party.PartyMemberInformations import \
@@ -97,7 +101,7 @@ class PartyFrame(Frame):
 
     def leaveParty(self):
         if self.currentPartyId is None:
-            return Logger().warning("No party to leave")
+            return
         plmsg = PartyLeaveRequestMessage()
         plmsg.init(self.currentPartyId)
         ConnectionsHandler().send(plmsg)

@@ -1,12 +1,14 @@
-from pydofus2.com.ankamagames.jerakine.logger.Logger import TraceLogger
-from pydofus2.com.ankamagames.jerakine.network.CustomDataWrapper import ByteArray
-from pydofus2.com.ankamagames.jerakine.network.parser.ProtocolSpec import ProtocolSpec
-from pydofus2.com.ankamagames.jerakine.network.parser.TypeEnum import TypeEnum
 import pydofus2.com.ankamagames.jerakine.network.parser.NetworkMessageClassDefinition as nmcd
+from pydofus2.com.ankamagames.jerakine.logger.Logger import TraceLogger
+from pydofus2.com.ankamagames.jerakine.network.CustomDataWrapper import \
+    ByteArray
+from pydofus2.com.ankamagames.jerakine.network.parser.ProtocolSpec import \
+    ProtocolSpec
+from pydofus2.com.ankamagames.jerakine.network.parser.TypeEnum import TypeEnum
 
 
 class NetMsgDataField:
-    TRACE = True
+    TRACE = False
 
     dataReader = {
         TypeEnum.INT: "readInt",

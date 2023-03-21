@@ -12,6 +12,8 @@ from pydofus2.com.ankamagames.jerakine.network.messages.Worker import Worker
 if TYPE_CHECKING:
     from pyd2bot.logic.common.frames.BotRPCFrame import BotRPCFrame
     from pyd2bot.logic.roleplay.behaviors.FarmFights import FarmFights
+    from pydofus2.com.ankamagames.dofus.logic.connection.frames.AuthentificationFrame import \
+        AuthentificationFrame
     from pydofus2.com.ankamagames.dofus.logic.game.fight.frames.FightBattleFrame import \
         FightBattleFrame
     from pydofus2.com.ankamagames.dofus.logic.game.fight.frames.FightContextFrame import \
@@ -61,57 +63,26 @@ class Kernel(metaclass=Singleton):
         autoRetry: bool = False,
         reloadData: bool = False,
     ) -> None:
-        from pydofus2.com.ankamagames.atouin.utils.DataMapProvider import \
-            DataMapProvider
         from pydofus2.com.ankamagames.berilia.managers.KernelEventsManager import \
             KernelEventsManager
-        from pydofus2.com.ankamagames.dofus.internalDatacenter.items.ItemWrapper import \
-            ItemWrapper
         from pydofus2.com.ankamagames.dofus.kernel.net.ConnectionsHandler import \
             ConnectionsHandler
-        from pydofus2.com.ankamagames.dofus.logic.common.managers.PlayerManager import \
-            PlayerManager
-        from pydofus2.com.ankamagames.dofus.logic.common.managers.StatsManager import \
-            StatsManager
-        from pydofus2.com.ankamagames.dofus.logic.connection.managers.AuthentificationManager import \
-            AuthentificationManager
-        from pydofus2.com.ankamagames.dofus.logic.game.common.managers.PlayedCharacterManager import \
-            PlayedCharacterManager
-        from pydofus2.com.ankamagames.dofus.logic.game.common.misc.DofusEntities import \
-            DofusEntities
-        from pydofus2.com.ankamagames.dofus.logic.game.fight.managers.CurrentPlayedFighterManager import \
-            CurrentPlayedFighterManager
-        from pydofus2.com.ankamagames.dofus.logic.game.fight.managers.FightersStateManager import \
-            FightersStateManager
-        from pydofus2.com.ankamagames.dofus.logic.game.fight.managers.SpellModifiersManager import \
-            SpellModifiersManager
         from pydofus2.com.ankamagames.jerakine.benchmark.BenchmarkTimer import \
             BenchmarkTimer
 
         Logger().debug("[KERNEL] Resetting ...")
+        BenchmarkTimer.reset()
         KernelEventsManager().reset()
-        if not autoRetry:
-            AuthentificationManager.clear()
-        FightersStateManager.clear()
-        CurrentPlayedFighterManager.clear()
-        DofusEntities().reset()
-        ItemWrapper.clearCache()
-        PlayedCharacterManager.clear()
-        BenchmarkTimer.clear()
-        StatsManager.clear()
-        PlayerManager.clear()
-        DataMapProvider.clear()
         if not reloadData:
             self._worker.terminate()
-        self._worker.reset()
-        if ConnectionsHandler().conn is not None and not ConnectionsHandler().conn.closed:
+        else:
+            self._worker.reset()
+        if ConnectionsHandler().conn and not ConnectionsHandler().conn.closed:
             ConnectionsHandler().closeConnection(DisconnectionReasonEnum.WANTED_SHUTDOWN)
-            if ConnectionsHandler().conn:
-                ConnectionsHandler().conn.join()
-        ConnectionsHandler.clear()
-        SpellModifiersManager.clear()
+        Singleton.clearAll()
         self.beingInReconection = False
         if reloadData:
+            self.beingInReconection = True
             self.addInitialFrames()
         else:
             self._reseted = True
@@ -160,24 +131,28 @@ class Kernel(metaclass=Singleton):
 
     @property
     def interactivesFrame(self) -> "RoleplayInteractivesFrame":
-        return Kernel().worker.getFrameByName("RoleplayInteractivesFrame")
+        return self._worker.getFrameByName("RoleplayInteractivesFrame")
 
     @property
     def worldFrame(self) -> "RoleplayWorldFrame":
-        return Kernel().worker.getFrameByName("RoleplayWorldFrame")
+        return self._worker.getFrameByName("RoleplayWorldFrame")
 
     @property
     def fightEntitiesFrame(self) -> "FightEntitiesFrame":
-        return Kernel().worker.getFrameByName("FightEntitiesFrame")
+        return self._worker.getFrameByName("FightEntitiesFrame")
 
     @property
     def battleFrame(self) -> "FightBattleFrame":
-        return Kernel().worker.getFrameByName("FightBattleFrame")
+        return self._worker.getFrameByName("FightBattleFrame")
 
     @property
     def turnFrame(self) -> "FightTurnFrame":
-        return Kernel().worker.getFrameByName("FightTurnFrame")
+        return self._worker.getFrameByName("FightTurnFrame")
 
     @property
     def fightContextFrame(self) -> "FightContextFrame":
-        return Kernel().worker.getFrameByName("FightContextFrame")
+        return self._worker.getFrameByName("FightContextFrame")
+
+    @property
+    def authFrame(self) -> "AuthentificationFrame":
+        return self._worker.getFrameByName("AuthentificationFrame")

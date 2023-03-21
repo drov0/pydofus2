@@ -13,3 +13,4 @@ class MovementFailError(Enum):
     MOVE_REQUEST_REJECTED = 8
     MAPCHANGE_TIMEOUT = 9
     INTERACTIVE_USE_ERROR = 10
+    NO_PATH_FOUND = 11

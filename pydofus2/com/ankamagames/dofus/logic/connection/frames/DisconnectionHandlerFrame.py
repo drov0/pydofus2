@@ -129,4 +129,5 @@ class DisconnectionHandlerFrame(Frame):
         KernelEventsManager().send(KernelEvent.RECONNECT, message="Connection closed unexpectedly")
 
     def pulled(self) -> bool:
+        Logger().info("Disconnection handler pulled")
         return True

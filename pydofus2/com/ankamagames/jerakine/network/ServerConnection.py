@@ -211,22 +211,19 @@ class ServerConnection(mp.Thread):
                         break
                     staticHeader = buffer.readUnsignedShort()
                     self.__packet_id = staticHeader >> NetworkMessage.BIT_RIGHT_SHIFT_LEN_PACKET_ID
-                    if self.__packet_id in _messagesTypes:
-                        if _messagesTypes[self.__packet_id].__name__ == "MapComplementaryInformationsDataMessage":
-                            Logger().info("Received header of MapComplementaryInformationsDataMessage")
                     self.__msg_len_len = staticHeader & NetworkMessage.BIT_MASK
-                    TraceLogger().debug(f"msgId : {self.__packet_id}, msg_len_len : {self.__msg_len_len}")
+                    # TraceLogger().debug(f"msgId : {self.__packet_id}, msg_len_len : {self.__msg_len_len}")
                 if self.__msg_len is None:
                     if buffer.remaining() < self.__msg_len_len:
                         break
                     self.__msg_len = int.from_bytes(buffer.read(self.__msg_len_len), "big")
-                    TraceLogger().debug(f"msg_len : {self.__msg_len}")
+                    # TraceLogger().debug(f"msg_len : {self.__msg_len}")
                 if buffer.remaining() < self.__msg_len:
                     break
                 self.updateLatency()
-                TraceLogger().debug("Parsing ...")
+                # TraceLogger().debug("Parsing ...")
                 msg: NetworkMessage = MessageReceiver().parse(buffer, self.__packet_id, self.__msg_len)
-                TraceLogger().debug(f"Parsed, got : {type(msg).__name__}")
+                # TraceLogger().debug(f"Parsed, got : {type(msg).__name__}")
                 if type(msg).__name__ == "BasicPongMessage":
                     if self.lastSentPingTime:
                         latency = round(1000 * (perf_counter() - self.lastSentPingTime), 2)
@@ -328,7 +325,7 @@ class ServerConnection(mp.Thread):
         while not self._closing.is_set() and not self.finished.is_set():
             try:
                 rdata = self.__socket.recv(14000)
-                TraceLogger().debug(f"receiver size {len(rdata)}")
+                # TraceLogger().debug(f"receiver size {len(rdata)}")
                 if rdata:
                     if self._connecting.is_set():
                         self.__onConnect()

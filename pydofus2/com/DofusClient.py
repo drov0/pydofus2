@@ -5,32 +5,29 @@ from typing import TYPE_CHECKING
 from pydofus2.com.ankamagames.atouin.Haapi import Haapi
 from pydofus2.com.ankamagames.berilia.managers.EventsHandler import Listener
 from pydofus2.com.ankamagames.berilia.managers.KernelEventsManager import (
-    KernelEvent,
-    KernelEventsManager,
-)
+    KernelEvent, KernelEventsManager)
 from pydofus2.com.ankamagames.dofus.kernel.Kernel import Kernel
-from pydofus2.com.ankamagames.dofus.kernel.net.ConnectionsHandler import ConnectionsHandler
-from pydofus2.com.ankamagames.dofus.kernel.net.DisconnectionReason import DisconnectionReason
-from pydofus2.com.ankamagames.dofus.kernel.net.DisconnectionReasonEnum import (
-    DisconnectionReasonEnum,
-)
-from pydofus2.com.ankamagames.dofus.logic.common.managers.PlayerManager import PlayerManager
-from pydofus2.com.ankamagames.dofus.logic.connection.actions.LoginValidationWithTokenAction import (
-    LoginValidationWithTokenAction,
-)
-from pydofus2.com.ankamagames.dofus.logic.connection.managers.AuthentificationManager import (
-    AuthentificationManager,
-)
-from pydofus2.com.ankamagames.dofus.logic.game.common.managers.PlayedCharacterManager import (
-    PlayedCharacterManager,
-)
+from pydofus2.com.ankamagames.dofus.kernel.net.ConnectionsHandler import \
+    ConnectionsHandler
+from pydofus2.com.ankamagames.dofus.kernel.net.DisconnectionReason import \
+    DisconnectionReason
+from pydofus2.com.ankamagames.dofus.kernel.net.DisconnectionReasonEnum import \
+    DisconnectionReasonEnum
+from pydofus2.com.ankamagames.dofus.logic.common.managers.PlayerManager import \
+    PlayerManager
+from pydofus2.com.ankamagames.dofus.logic.connection.actions.LoginValidationWithTokenAction import \
+    LoginValidationWithTokenAction
+from pydofus2.com.ankamagames.dofus.logic.connection.managers.AuthentificationManager import \
+    AuthentificationManager
+from pydofus2.com.ankamagames.dofus.logic.game.common.managers.PlayedCharacterManager import \
+    PlayedCharacterManager
 from pydofus2.com.ankamagames.jerakine.logger.Logger import Logger
-from pydofus2.com.ankamagames.jerakine.network.messages.TerminateWorkerMessage import (
-    TerminateWorkerMessage,
-)
+from pydofus2.com.ankamagames.jerakine.network.messages.TerminateWorkerMessage import \
+    TerminateWorkerMessage
 
 if TYPE_CHECKING:
-    from pydofus2.com.ankamagames.jerakine.network.ServerConnection import ServerConnection
+    from pydofus2.com.ankamagames.jerakine.network.ServerConnection import \
+        ServerConnection
 
 
 class DofusClient(threading.Thread):
@@ -109,7 +106,7 @@ class DofusClient(threading.Thread):
     def onLoginTimeout(self, listener: Listener):
         self.worker.process(LoginValidationWithTokenAction.create(self._serverId != 0, self._serverId))
         listener.armTimer()
-        self._lastLoginTime = perf_counter()
+        self.lastLoginTime = perf_counter()
 
     def onReconnect(self, event, message):
         Logger().warning(f"[DofusClient] Reconnect requested for reason: {message}")
@@ -130,8 +127,8 @@ class DofusClient(threading.Thread):
         KernelEventsManager().once(KernelEvent.SHUTDOWN, self.onShutdown, originator=self)
         KernelEventsManager().once(KernelEvent.RESTART, self.onRestart, originator=self)
         KernelEventsManager().once(KernelEvent.RECONNECT, self.onReconnect, originator=self)
+        PlayedCharacterManager().instanceId = self.name
         if self._characterId:
-            PlayedCharacterManager().instanceId = self.name
             PlayerManager().allowAutoConnectCharacter = True
             PlayedCharacterManager().id = self._characterId
             PlayerManager().autoConnectOfASpecificCharacterId = self._characterId
@@ -144,8 +141,13 @@ class DofusClient(threading.Thread):
             if diff > 0:
                 Logger().info("[DofusClient] Login request too soon, will wait some time")
                 self.terminated.wait(diff)
-        self._lastLoginTime = perf_counter()
-        self.worker.process(LoginValidationWithTokenAction.create(self._serverId != 0, self._serverId))
+        self.lastLoginTime = perf_counter()
+        if not Kernel().authFrame:
+            self.worker.process(LoginValidationWithTokenAction.create(self._serverId != 0, self._serverId))
+        else:
+            Logger().error("Authentification frame not inside worker!")
+            Logger().error(f"Init frames : {self._registredInitFrames}")
+            
 
     def shutdown(self, reason=DisconnectionReasonEnum.WANTED_SHUTDOWN, msg=""):
         self._shutDownReason = reason
@@ -173,7 +175,7 @@ class DofusClient(threading.Thread):
             ):
                 Logger().info("[DofusClient] Login request too soon, will wait some time")
                 self._killSig.wait(DofusClient.minLoginInterval - (perf_counter() - DofusClient.lastLoginTime))
-            self._lastLoginTime = perf_counter()
+            self.lastLoginTime = perf_counter()
             if not self._loginToken:
                 if not self._apiKey:
                     raise Exception("No API key provided")

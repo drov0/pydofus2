@@ -32,12 +32,17 @@ class Singleton(type):
             Singleton.eventsHandler.send(SingletonEvent.THREAD_REGISTER, thrid, cls)
         return Singleton._instances[thrid][cls]
 
+    @staticmethod
+    def clearAll():
+        thrid = threading.current_thread().name
+        Singleton._instances[thrid].clear()
+
     def clear(cls):
         with LOCK:
             if cls in Singleton._instances[cls.threadName()]:
                 del Singleton._instances[cls.threadName()][cls]
 
-    def getAllChilds(cls: Type[T], thname=None) -> list[T]:
+    def getSubs(cls: Type[T], thname=None) -> list[T]:
         thname = thname if thname is not None else cls.threadName()
         for clz in Singleton._instances[thname]:
             if issubclass(clz, cls):

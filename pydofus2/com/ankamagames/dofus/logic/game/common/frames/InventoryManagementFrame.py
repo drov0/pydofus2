@@ -105,6 +105,7 @@ class InventoryManagementFrame(Frame):
             icmsg = msg
             InventoryManager().inventory.initializeFromObjectItems(icmsg.objects)
             InventoryManager().inventory.kamas = icmsg.kamas
+            
             equipmentView = InventoryManager().inventory.getView("equipment")
             if equipmentView and equipmentView.content:
                 if (

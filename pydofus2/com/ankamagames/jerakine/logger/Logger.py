@@ -81,7 +81,7 @@ class MyFormatter(logging.Formatter):
         self.max_module_length = max(len(module) for module in COLORS)
         self.max_level_length = max(len(levelname) for levelname in logging._nameToLevel)
         self.module_format = 12
-        self.levelname_format = 8
+        self.levelname_format = 6
 
     def format(self, record):
         if record.levelno == logging.ERROR:
@@ -93,7 +93,7 @@ class MyFormatter(logging.Formatter):
         else:
             color = COLORS.get(record.module, '')
         record.module = f"{record.module[:self.module_format]:{self.module_format}}"
-        record.levelname = f"{record.levelname:{self.levelname_format}}"
+        record.levelname = f"{record.levelname[:self.levelname_format]:{self.levelname_format}}"
         return f"{color}{super().format(record)}\033[0m"
 
 class Logger(logging.Logger, metaclass=LoggerSingleton):

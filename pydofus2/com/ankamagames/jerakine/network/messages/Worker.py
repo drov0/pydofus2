@@ -59,7 +59,7 @@ class Worker(MessageHandler):
             # with Worker.LOCK:
             #     Worker.LAST_TIME = current_time
             msg = self._queue.get()
-            Logger().debug(f"[RCV] {msg}")
+            # Logger().debug(f"[RCV] {msg}")
             if type(msg).__name__ == "TerminateWorkerMessage":
                 self._terminating.set()
                 break
@@ -141,9 +141,12 @@ class Worker(MessageHandler):
         self._framesToRemove.clear()
         self._currentFrameTypesCache.clear()
         self._processingMessage.clear()
-        self._processingMessage.clear()
-        self._queue = queue.Queue()
- 
+        while not self._queue.empty():
+            try:
+                self._queue.get_nowait()
+            except self._queue.Empty:
+                break
+    
 
     def pushFrame(self, frame: Frame) -> None:
         if str(frame) in [str(f) for f in self._framesList]:

@@ -1,8 +1,8 @@
 import threading
 from time import perf_counter
 from types import FunctionType
+
 from pydofus2.com.ankamagames.jerakine.logger.Logger import Logger
-import threading
 
 lock = threading.Lock()
 
@@ -50,7 +50,7 @@ class BenchmarkTimer(threading.Thread):
         self.finished.set()
 
     @classmethod
-    def clear(cls) -> None:
+    def reset(cls) -> None:
         thname = threading.current_thread().name
         if thname in cls._createdTimers:
             while cls._createdTimers[thname]:

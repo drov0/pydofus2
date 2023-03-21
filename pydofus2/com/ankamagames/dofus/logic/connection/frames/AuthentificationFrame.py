@@ -26,6 +26,7 @@ from pydofus2.com.ankamagames.dofus.network.messages.connection.IdentificationSu
     IdentificationSuccessWithLoginTokenMessage,
 )
 from pydofus2.com.ankamagames.jerakine.data.XmlConfig import XmlConfig
+from pydofus2.com.ankamagames.jerakine.logger.Logger import Logger
 from pydofus2.com.ankamagames.jerakine.messages.Frame import Frame
 from pydofus2.com.ankamagames.jerakine.messages.Message import Message
 from pydofus2.com.ankamagames.jerakine.network.messages.ServerConnectionFailedMessage import (
@@ -107,12 +108,10 @@ class AuthentificationFrame(Frame):
             ConnectionsHandler().closeConnection(
                 DisconnectionReasonEnum.EXCEPTION_THROWN, f"Identification failed for reason : {reasonName}"
             )
-            if not self._dispatchModuleHook:
-                self._dispatchModuleHook = True
-                self.pushed()
             return True
 
         elif isinstance(msg, LoginValidationAction):
+            Logger().info(f"Login to server {msg.serverId} called")
             connexionPorts = [int(_) for _ in XmlConfig().getEntry("config.connection.port").split(",")]
             connectionHostsEntry = XmlConfig().getEntry("config.connection.host")
             connexionHosts = (

@@ -1,16 +1,24 @@
-import ssl
-from time import sleep
+import json
+import os
+from urllib.parse import urlencode
+
+import pyppeteer
+import requests
+
+from pydofus2.com.ankamagames.atouin.BrowserRequests import BrowserRequests
+from pydofus2.com.ankamagames.atouin.HappiConfig import AUTH_STATES, ZAAP_CONFIG
+from pydofus2.com.ankamagames.atouin.ZaapError import ZaapError
 from pydofus2.com.ankamagames.jerakine.logger.Logger import Logger
-import cloudscraper
 from pydofus2.com.ankamagames.jerakine.metaclasses.Singleton import Singleton
 
 
 class HaapiException(Exception):
     pass
 
+
 class Haapi(metaclass=Singleton):
     MAX_CREATE_API_KAY_RETRIES = 5
-    
+
     def __init__(self, apikey=None) -> None:
         self.url = "https://haapi.ankama.com"
         self.APIKEY = apikey
@@ -18,125 +26,146 @@ class Haapi(metaclass=Singleton):
         self.password = None
         self.certId = None
         self.certHash = None
-    
+
     def setApiKey(self, apiKey):
         self.APIKEY = apiKey
-        
-    def getUrl(self, request):
-        return self.url + {
-            "CREATE_API_KEY": "/json/Ankama/v5/Api/CreateApiKey",
-            "GET_LOGIN_TOKEN": "/json/Ankama/v5/Account/CreateToken",
-        }[request]
 
-    @property
-    def clients(self):
-        for client in [cloudscraper.create_scraper()]:
-            yield client
-    
-    def createAPIKEY(self, login, password, certId, certHash, game_id=102) -> str:
+    def getUrl(self, request, params={}):
+        result = (
+            self.url
+            + {
+                "CREATE_API_KEY": "/json/Ankama/v5/Api/CreateApiKey",
+                "GET_LOGIN_TOKEN": "/json/Ankama/v5/Account/CreateToken",
+                "SIGN_ON": "/json/Ankama/v5/Account/SignOnWithApiKey",
+                "SET_NICKNAME": "/json/Ankama/v5/Account/SetNicknameWithApiKey",
+                "SEND_MAIL_VALIDATION": "/json/Ankama/v5/Account/SendMailValidation",
+                "SECURITY_CODE": "/json/Ankama/v5/Shield/SecurityCode",
+                "VALIDATE_CODE": "/json/Ankama/v5/Shield/ValidateCode",
+                "DELETE_API_KEY": "/json/Ankama/v5/Api/DeleteApiKey",
+                "CREATE_GUEST": "/json/Ankama/v2/Account/CreateGuest",
+            }[request]
+        )
+        if params:
+            result += "?" + urlencode(params)
+        return result
+
+    async def createAPIKEY(self, login, password, certId=None, certHash=None, game_id=102) -> str:
         Logger().debug("[HAAPI] Sending http call to Create APIKEY")
         data = {
             "login": login,
             "password": password,
             "game_id": game_id,
             "long_life_token": True,
-            "certificate_id": str(certId),
-            "certificate_hash": str(certHash),
             "shop_key": "ZAAP",
             "payment_mode": "OK",
-            "lang" : "fr"
+            "lang": "fr",
         }
-        
-        nbrtries = 0
-        while nbrtries < self.MAX_CREATE_API_KAY_RETRIES:
-            for client in self.clients:
-                response = client.post(
-                    self.getUrl("CREATE_API_KEY"),
-                    data=data,
-                    headers={
-                        "User-Agent": "Zaap 3.6.2",
-                        "Content-Type": "multipart/form-data",
-                        "cache-control": "no-cache",
-                    },
-                )
-                if response.headers["content-type"] == "application/json":
-                    Logger().debug("[HAAPI] APIKEY created")
-                    key = response.json().get("key")
-                    if key:
-                        self.APIKEY = key
-                        return response.json()
-                    else:
-                        if "reason" in response.json():
-                            if response.json()["reason"] == "BAN":
-                                raise HaapiException("[HAAPI] This account is banned definitively")
-                        Logger().debug("[HAAPI] Error while calling HAAPI to get Login Token : %s" % response.content)
-                        sleep(5)
-                else:
-                    Logger().debug(response.content.decode('UTF-8'))
-                    from lxml import html
-                    root = html.fromstring(response.content.decode('UTF-8'))
-                    try:
-                        error = root.xpath("//div[@class='cf-error-description']")[0].text
-                        errorCode = root.xpath('//span[@class="cf-code-label"]//span')[0].text
-                        Logger().debug(f"[HAAPI] error - {errorCode} : APIKEY creation for {login} failed for reason: {error}")
-                    except IndexError:
-                        Logger().debug(response.content.decode('UTF-8'))
-                    sleep(5)
-            Logger().debug("[HAAPI] Failed to create APIKEY, retrying in 10 seconds")
-            sleep(10)
-            nbrtries += 1
-        return None
-            
-    def regenLoginToken(self):
-        return self.getLoginToken(self.login, self.password, self.certId, self.certHash)
-    
-    def getLoginToken(self, certId, certHash, game_id=1, apiKey=None):
-        Logger().debug("[HAAPI] Sending http call to get Login Token")
-        self.APIKEY = apiKey
-        if not self.APIKEY:
-            raise HaapiException("[HAAPI] No haapi key found")
-        nbrtries = 0
-        while nbrtries < 5:
-            for client in self.clients:
-                try:
-                    response = client.get(
-                        self.getUrl("GET_LOGIN_TOKEN"),
-                        params={
-                            "game": game_id,
-                            "certificate_id": certId,
-                            "certificate_hash": certHash,
-                        },
-                        headers={
-                            "User-Agent": "Zaap1",
-                            "Content-Type": "multipart/form-data",
-                            "APIKEY": self.APIKEY,
-                        }
-                    )
-                    if response.headers["content-type"] == "application/json":
-                        token = response.json().get("token")
-                        if token:
-                            Logger().debug("[HAAPI] Login Token created")
-                            return token
-                        else:
-                            Logger().error("Error while calling HAAPI to get Login Token : %s" % response.json())
-                            sleep(5)
-                    else:
-                        from lxml import html
-                        root = html.fromstring(response.content.decode('UTF-8'))
-                        error = root.xpath('//div[@id="what-happened-section"]//p/@text')
-                        if error:
-                            Logger().debug("Login Token creation failed, reason: %s" % error)
-                        elif "The owner of this website (haapi.ankama.com) has banned you temporarily from accessing this website." in response.text:
-                            Logger().debug("Login Token creation failed, reason: haapi.ankama.com has banned you temporarily from accessing this website.")
-                        elif "Access denied | haapi.ankama.com used Cloudflare to restrict access" in response.text:
-                            Logger().debug("Login Token creation failed, reason: haapi.ankama.com used Cloudflare to restrict access")
-                        Logger().info("Login Token creation failed, retrying in 10 minutes")
-                        sleep(60 * 10 + 3)
-                except ssl.SSLError:
-                    Logger().debug("[HAAPI] SSL error while calling HAAPI to get Login Token")
-                    sleep(10)
-                except ConnectionError:
-                    Logger().error("No internet connection will try again in some seconds")
-                    sleep(10)
-                    
-        return None
+        if certId:
+            data["certificate_id"] = str(certId)
+            data["certificate_hash"] = str(certHash)
+        try:
+            response = await BrowserRequests.post(self.getUrl("CREATE_API_KEY"), data=data)
+            body = response["body"]
+            self.APIKEY = body.get("key")
+            return {
+                "key": body["key"],
+                "accountId": body["account_id"],
+                "refreshToken": body["refresh_token"],
+                "security": body["data"]["security_state"]
+                if "data" in body and "security_state" in body["data"]
+                else None,
+                "reason": body["data"]["security_detail"]
+                if "data" in body and "security_detail" in body["data"]
+                else None,
+                "expirationDate": body["expiration_date"],
+            }
+        except Exception as e:
+            if "body" in e and "reason" in e["body"]:
+                print(f"error while creating api key: {json.dumps(e['body'])}")
+                raise ZaapError({"codeError": f"haapi.{e['body']['reason']}", "error": e})
+            elif e["statusCode"] == 403:
+                raise ZaapError({"error": e})
+
+    async def getLoginToken(self, certId, certHash, game_id, apiKey):
+        Logger().debug("Sending http call to get Login Token")
+        url = self.getUrl(
+            "GET_LOGIN_TOKEN",
+            {
+                "game": game_id,
+                "certificate_id": certId,
+                "certificate_hash": certHash,
+            },
+        )
+        resp = await BrowserRequests.get(
+            url,
+            headers={
+                "APIKEY": apiKey,
+            },
+        )
+        token = resp["body"]["token"]
+        Logger().debug(f"Generated Login Token : {token}")
+        return resp["body"]["token"]
+
+    async def createGuest(self, gameId=17, lang="en"):
+        url = self.getUrl("CREATE_GUEST", {"game": gameId, "lang": lang})
+        resp = await BrowserRequests.get(url)
+        return resp["body"]
+
+    async def shieldSecurityCode(self, apikey, bySMS=False):
+        url = self.getUrl("SECURITY_CODE", {"transportType": "SMS" if bySMS else "EMAIL"})
+        resp = await BrowserRequests.get(url, {"apikey": apikey})
+        return resp["body"]["domain"]
+
+    async def shieldValidateCode(self, apikey, validationCode, hm1, hm2):
+        userName = f"launcher-{os.getlogin()}"
+        url = self.getUrl(
+            "VALIDATE_CODE",
+            {"game_id": ZAAP_CONFIG.ZAAP_GAME_ID, "code": validationCode, "hm1": hm1, "hm2": hm2, "name": userName},
+        )
+        try:
+            response = await BrowserRequests.get(url, {"apikey": apikey})
+            return response["body"]
+        except requests.exceptions.HTTPError as e:
+            if e.response and e.response.text:
+                error = json.loads(e.response.text)
+                if error["message"] == "ALREADYSECURED":
+                    raise Exception("ALREADYSECURED")
+                raise ZaapError({"codeError": f"haapi.{error['message']}", "error": e})
+            raise ZaapError({"codeError": "haapi.CODEPROBLEM", "complement": e})
+
+    async def signOnWithApikey(self, game_id, apikey):
+        result = await BrowserRequests.post(self.getUrl("SIGN_ON"), data={"game": game_id}, headers={"APIKEY": apikey})
+        body = result["body"]
+        if body["account"]["locked"] == ZAAP_CONFIG.USER_ACCOUNT_LOCKED.MAILNOVALID:
+            Logger().error("[AUTH] Mail not confirmed by user")
+            raise Exception(AUTH_STATES.USER_EMAIL_INVALID)
+        return {"id": str(body["id"]), "account": self.parseAccount(body["account"])}
+
+    async def setNickname(self, nickname, apikey, lang="en"):
+        url = self.getUrl("SET_NICKNAME")
+        res = await BrowserRequests.post(url, {"nickname": nickname, "lang": lang}, {"apikey": apikey})
+        return res["body"]
+
+    async def deleteApikey(self, apikey):
+        url = self.getUrl("DELETE_API_KEY")
+        try:
+            return await BrowserRequests.get(url, {"apikey": apikey})
+        except pyppeteer.errors.PageError:
+            return True
+
+    def parseAccount(self, body):
+        return {
+            "id": body["id"],
+            "type": body["type"],
+            "login": body["login"],
+            "nickname": body["nickname"],
+            "firstname": body["firstname"],
+            "lastname": body["lastname"],
+            "nicknameWithTag": f"{body['nickname']}#{body['tag']}",
+            "tag": body["tag"],
+            "security": body["security"],
+            "addedDate": body["added_date"],
+            "locked": body["locked"],
+            "parentEmailStatus": body["parent_email_status"],
+            "avatar": body["avatar_url"],
+        }

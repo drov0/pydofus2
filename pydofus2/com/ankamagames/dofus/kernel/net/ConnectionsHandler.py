@@ -100,13 +100,13 @@ class ConnectionsHandler(metaclass=Singleton):
         with self.sendMessageLock:
             if not self._conn:
                 return Logger().warning(f"Can't send message when no connection is established!, maybe we are shuting down?")
-            if self.MINTIME_BETWEEN_SENDS > 0 and self.last_send_time is not None:
-                minNextSendTime = self.last_send_time + self.MINTIME_BETWEEN_SENDS
-                diff = minNextSendTime - perf_counter()
-                if diff > 0:
-                    Kernel().worker.terminated.wait(diff)
+            # if self.MINTIME_BETWEEN_SENDS > 0 and self.last_send_time is not None:
+            #     minNextSendTime = self.last_send_time + self.MINTIME_BETWEEN_SENDS
+            #     diff = minNextSendTime - perf_counter()
+            #     if diff > 0:
+            #         Kernel().worker.terminated.wait(diff)
             self._conn.send(msg)
-            self.last_send_time = perf_counter()
+            # self.last_send_time = perf_counter()
 
     def inGameServer(self):
         return self._currentConnectionType == ConnectionType.TO_GAME_SERVER

@@ -1,7 +1,9 @@
 import threading
+from datetime import datetime
 from time import perf_counter
 from typing import TYPE_CHECKING
 
+from pyd2bot.thriftServer.pyd2botService.ttypes import DofusError
 from pydofus2.com.ankamagames.atouin.Haapi import Haapi
 from pydofus2.com.ankamagames.berilia.managers.EventsHandler import Listener
 from pydofus2.com.ankamagames.berilia.managers.KernelEventsManager import (
@@ -31,8 +33,11 @@ if TYPE_CHECKING:
 
 
 class DofusClient(threading.Thread):
+    APIKEY_NOT_FOUND = 36363
+    UNEXPECTED_CLIENT_ERROR = 36364
     lastLoginTime = None
     minLoginInterval = 10
+    LOGIN_TIMEOUT = 35
 
     def __init__(self, name="unknown"):
         super().__init__(name=name)
@@ -49,6 +54,9 @@ class DofusClient(threading.Thread):
         self._loginToken = None
         self.mule = False
         self._shutDownReason = None
+        self._crashed = False
+        self._crashMessage = ""
+        self._reconnectRecord = []
         self.terminated = threading.Event()
 
     @property
@@ -59,23 +67,7 @@ class DofusClient(threading.Thread):
         Logger().info("[DofusClient] initializing")
         Kernel().init()
         Kernel().isMule = self.mule
-        KernelEventsManager().once(
-            KernelEvent.CHARACTER_SELECTION_SUCCESS,
-            self.onCharacterSelectionSuccess,
-            originator=self,
-        )
-        KernelEventsManager().once(KernelEvent.IN_GAME, self.onInGame, originator=self)
-        KernelEventsManager().once(KernelEvent.CRASH, self.onCrash, originator=self)
-        KernelEventsManager().once(KernelEvent.SHUTDOWN, self.onShutdown, originator=self)
-        KernelEventsManager().once(KernelEvent.RESTART, self.onRestart, originator=self)
-        KernelEventsManager().once(KernelEvent.RECONNECT, self.onReconnect, originator=self)
-        if self._characterId:
-            PlayerManager().allowAutoConnectCharacter = True
-            PlayedCharacterManager().id = self._characterId
-            PlayerManager().autoConnectOfASpecificCharacterId = self._characterId
-        Logger().info("Adding game init frames")
-        for frame in self._registredInitFrames:
-            self.worker.addFrame(frame())
+        self.initListeners()
         Logger().info("[DofusClient] initialized")
 
     def registerInitFrame(self, frame):
@@ -93,7 +85,10 @@ class DofusClient(threading.Thread):
         Logger().info("Character entered game server successfully")
 
     def onCrash(self, event, message):
-        Logger().debug(f"[DofusClient] Crashed for reason: {message}")
+        Logger().debug()
+        self._crashed = True
+        self._crashMessage = message
+        self._shutDownReason = f"Crashed for reason: {message}"
         self.shutdown()
 
     def onShutdown(self, event, message):
@@ -108,9 +103,7 @@ class DofusClient(threading.Thread):
         listener.armTimer()
         self.lastLoginTime = perf_counter()
 
-    def onReconnect(self, event, message):
-        Logger().warning(f"[DofusClient] Reconnect requested for reason: {message}")
-        Kernel().reset(reloadData=True)
+    def initListeners(self):
         KernelEventsManager().once(
             KernelEvent.CHARACTER_SELECTION_SUCCESS,
             self.onCharacterSelectionSuccess,
@@ -119,40 +112,62 @@ class DofusClient(threading.Thread):
         KernelEventsManager().once(
             KernelEvent.IN_GAME,
             self.onInGame,
-            timeout=20,
+            timeout=self.LOGIN_TIMEOUT,
             ontimeout=self.onLoginTimeout,
             originator=self,
         )
+        KernelEventsManager().once(KernelEvent.IN_GAME, self.onInGame, originator=self)
         KernelEventsManager().once(KernelEvent.CRASH, self.onCrash, originator=self)
         KernelEventsManager().once(KernelEvent.SHUTDOWN, self.onShutdown, originator=self)
         KernelEventsManager().once(KernelEvent.RESTART, self.onRestart, originator=self)
         KernelEventsManager().once(KernelEvent.RECONNECT, self.onReconnect, originator=self)
+
+    def prepareLogin(self):
         PlayedCharacterManager().instanceId = self.name
         if self._characterId:
             PlayerManager().allowAutoConnectCharacter = True
             PlayedCharacterManager().id = self._characterId
             PlayerManager().autoConnectOfASpecificCharacterId = self._characterId
+        Logger().info("Adding game start frames")
         for frame in self._registredInitFrames:
             self.worker.addFrame(frame())
-        token = Haapi().getLoginToken(self._certId, self._certHash, apiKey=self._apiKey)
+        if self._loginToken:
+            token = self._loginToken
+            self._loginToken = None
+        else:
+            token = Haapi().getLoginToken(self._certId, self._certHash, 1, self._apiKey)
         AuthentificationManager().setToken(token)
+        self.waitNextLogin()
+        
+    def onReconnect(self, event, message):
+        Logger().warning(f"[DofusClient] Reconnect requested for reason: {message}")
+        now = datetime.now()
+        formatted_time = now.strftime("%Y-%m-%d %H:%M:%S")
+        self._reconnectRecord.append({
+            "restartTime": formatted_time,
+            "reason": message
+        })
+        Kernel().reset(reloadData=True)
+        self.prepareLogin()
+        if Kernel().authFrame:
+            self.worker.process(LoginValidationWithTokenAction.create(self._serverId != 0, self._serverId))
+        else:
+            Logger().error(f"Init frames : {self._registredInitFrames}")
+            raise DofusError(self.UNEXPECTED_CLIENT_ERROR, "Authentification frame not inside worker while reconnecting!")
+    
+    def waitNextLogin(self):
         if DofusClient.lastLoginTime is not None:
             diff = DofusClient.minLoginInterval - (perf_counter() - DofusClient.lastLoginTime)
             if diff > 0:
-                Logger().info("[DofusClient] Login request too soon, will wait some time")
+                Logger().info(f"[DofusClient] Have to wail {diff}sec before reconnecting")
                 self.terminated.wait(diff)
         self.lastLoginTime = perf_counter()
-        if not Kernel().authFrame:
-            self.worker.process(LoginValidationWithTokenAction.create(self._serverId != 0, self._serverId))
-        else:
-            Logger().error("Authentification frame not inside worker!")
-            Logger().error(f"Init frames : {self._registredInitFrames}")
-            
 
     def shutdown(self, reason=DisconnectionReasonEnum.WANTED_SHUTDOWN, msg=""):
         self._shutDownReason = reason
-        Kernel.getInstance(self.name).worker.process(TerminateWorkerMessage())
-        return self.terminated.wait(5)
+        if Kernel.getInstance(self.name):
+            Kernel.getInstance(self.name).worker.process(TerminateWorkerMessage())
+        return self.terminated.wait(20)
 
     @property
     def connection(self) -> "ServerConnection":
@@ -169,24 +184,16 @@ class DofusClient(threading.Thread):
     def run(self):
         try:
             self.init()
-            if (
-                DofusClient.lastLoginTime is not None
-                and perf_counter() - DofusClient.lastLoginTime < DofusClient.minLoginInterval
-            ):
-                Logger().info("[DofusClient] Login request too soon, will wait some time")
-                self._killSig.wait(DofusClient.minLoginInterval - (perf_counter() - DofusClient.lastLoginTime))
-            self.lastLoginTime = perf_counter()
-            if not self._loginToken:
-                if not self._apiKey:
-                    raise Exception("No API key provided")
-                self._loginToken = Haapi().getLoginToken(self._certId, self._certHash, apiKey=self._apiKey)
-            AuthentificationManager().setToken(self._loginToken)
+            self.prepareLogin()
             self.worker.process(LoginValidationWithTokenAction.create(self._serverId != 0, self._serverId))
             self.worker.run()
         except Exception as e:
-            Logger().error(f"[DofusClient] Error in main: {e}", exc_info=True)
+            Logger().error(f"Error in main: {e}", exc_info=True)
+            self._crashMessage = str(e)
+            self._crashed = True
+            self._shutDownReason = f"Error in main : {str(e)}"
         if self._shutDownReason:
             Logger().info(f"Wanted shutdown for reason : {self._shutDownReason}")
         Kernel().reset()
-        Logger().info("[DofusClient] Stopped")
+        Logger().info("goodby crual world")
         self.terminated.set()

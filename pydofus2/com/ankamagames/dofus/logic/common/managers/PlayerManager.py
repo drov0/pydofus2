@@ -1,6 +1,7 @@
 import math
 import time
 from pydofus2.com.ankamagames.dofus.datacenter.servers.Server import Server
+from pydofus2.com.ankamagames.dofus.internalDatacenter.connection.BasicCharacterWrapper import BasicCharacterWrapper
 from pydofus2.com.ankamagames.jerakine.metaclasses.Singleton import Singleton
 from typing import TYPE_CHECKING
 
@@ -19,69 +20,37 @@ class PlayerManager(IDestroyable, metaclass=Singleton):
 
     def __init__(self):
         self.havenbagAvailableThemes = list[int]()
-
         self._subscriptionEndDateUpdateTime: float = 0
-
         self._subscriptionDurationElapsed: float = 0
-
         self._server: Server = Server()
-
         self.serversList: list[int] = list[int]()
-
         self.accountId: int = None
-
         self.communityId: int = None
-
         self.hasRights: bool = None
-
         self.hasConsoleRight: bool = None
-
         self.nickname: str = None
-
         self.tag: str = None
-
         self.subscriptionEndDate: float = None
-
         self.secretQuestion: str = None
-
         self.adminStatus: int = None
-
         self.passkey: str = None
-
         self.accountCreation: float = None
-
         self.isSafe: bool = False
-
         self.canCreateNewCharacter: bool = True
-
         self._gameServerPort: int = None
-
         self._kisServerPort: int = 0
-
         self.serverCommunityId: int = -1
-
         self.serverLang: str = None
-
         self.serverGameType: int = -1
-
         self.serverIsMonoAccount: bool = None
-
         self.serversList = list[int]()
-
         self.charactersList = list["BasicCharacterWrapper"]()
-
         self.allowAutoConnectCharacter = False
-
         self.autoConnectOfASpecificCharacterId: float = -1
-
         self.wasAlreadyConnected: bool = False
-
         self.havenbagAvailableRooms = list[HavenBagRoomPreviewInformation]()
-
         self.havenbagAvailableThemes = list[int]()
-
         self.arenaLeaveBanTime: int = -1
-
         self.hasFreeAutopilot: bool = False
 
         if not self._subscriptionEndDateUpdateTime:

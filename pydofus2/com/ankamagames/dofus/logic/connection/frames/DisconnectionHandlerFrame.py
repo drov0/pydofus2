@@ -114,7 +114,7 @@ class DisconnectionHandlerFrame(Frame):
             return True
 
         elif isinstance(msg, UnexpectedSocketClosureMessage):
-            Logger().debug("got hook UnexpectedSocketClosure")
+            Logger().debug("Got hook UnexpectedSocketClosure")
             gsaF.GameServerApproachFrame.authenticationTicketAccepted = False
             KernelEventsManager().send(KernelEvent.CRASH, message="Unexpected socket closure")
             return True
@@ -122,7 +122,8 @@ class DisconnectionHandlerFrame(Frame):
         elif isinstance(msg, ConnectionProcessCrashedMessage):
             Logger().debug("Connection process crashed with error : " + msg.err)
             gsaF.GameServerApproachFrame.authenticationTicketAccepted = False
-            raise Exception(msg.err)
+            KernelEventsManager().send(KernelEvent.CRASH, message=msg.err)
+            return True
 
     def reconnect(self) -> None:
         Logger().debug("Reconnecting ...")

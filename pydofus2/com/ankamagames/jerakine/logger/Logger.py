@@ -1,6 +1,7 @@
 import datetime
 import logging
 import os
+import sys
 import threading
 from pathlib import Path
 
@@ -98,23 +99,28 @@ class MyFormatter(logging.Formatter):
 
 class Logger(logging.Logger, metaclass=LoggerSingleton):
     
-    def __init__(self, name="DofusLogger", consoleOut=True):
+    def __init__(self, name="DofusLogger", consoleOut=False):
         self.name = name
         self.prefix = threading.current_thread().name
         super().__init__(self.prefix)
         self.setLevel(logging.DEBUG)
-        formatter = MyFormatter(
+        self.formatter = MyFormatter(
             "%(asctime)s.%(msecs)03d | %(levelname)s | [%(module)s] %(message)s", datefmt="%H:%M:%S"
         )
         now = datetime.datetime.now()
         fileHandler = logging.FileHandler(LOGS_PATH / f"{self.prefix}_{now.strftime('%Y-%m-%d')}.log")
-        fileHandler.setFormatter(formatter)
+        fileHandler.setFormatter(self.formatter)
         self.addHandler(fileHandler)
-        # if consoleOut:
-        #     streamHandler = logging.StreamHandler(sys.stdout)
-        #     streamHandler.setFormatter(formatter)
-        #     self.addHandler(streamHandler)
-    
+        if consoleOut:
+            streamHandler = logging.StreamHandler(sys.stdout)
+            streamHandler.setFormatter(self.formatter)
+            self.addHandler(streamHandler)
+            
+    def activateConsolLogging(self):
+        streamHandler = logging.StreamHandler(sys.stdout)
+        streamHandler.setFormatter(self.formatter)
+        self.addHandler(streamHandler)
+        
     def separator(self, msg, separator="="):
         format_row = "\n{:<50} {:^30} {:>70}\n"
         text = format_row.format(separator * 50, msg, separator * 70)
@@ -137,7 +143,7 @@ class TraceLoggerSingleton(type):
 
 class TraceLogger(logging.Logger, metaclass=TraceLoggerSingleton):
     
-    def __init__(self, name="TraceLogger", consoleOut=True):
+    def __init__(self, name="TraceLogger", consoleOut=False):
         self.name = name
         self.prefix = "TraceLogger_" + threading.current_thread().name
         super().__init__(self.prefix)
@@ -147,10 +153,10 @@ class TraceLogger(logging.Logger, metaclass=TraceLoggerSingleton):
         fileHandler = logging.FileHandler(LOGS_PATH / f"{self.prefix}_{now.strftime('%Y-%m-%d')}.log")
         fileHandler.setFormatter(formatter)
         self.addHandler(fileHandler)
-        # if consoleOut:
-        #     streamHandler = logging.StreamHandler(sys.stdout)
-        #     streamHandler.setFormatter(formatter)
-        #     self.addHandler(streamHandler)
+        if consoleOut:
+            streamHandler = logging.StreamHandler(sys.stdout)
+            streamHandler.setFormatter(formatter)
+            self.addHandler(streamHandler)
     
     def separator(self, msg, separator="="):
         format_row = "\n{:<50} {:^30} {:>70}\n"

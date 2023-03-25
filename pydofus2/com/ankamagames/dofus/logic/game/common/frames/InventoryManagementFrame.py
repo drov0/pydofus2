@@ -157,6 +157,7 @@ class InventoryManagementFrame(Frame):
             kumsg = msg
             InventoryManager().inventory.kamas = kumsg.kamasTotal
             InventoryManager().inventory.releaseHooks()
+            KernelEventsManager().send(KernelEvent.KAMAS_UPDATE, kumsg.kamasTotal)
             return True
 
         if isinstance(msg, InventoryWeightMessage):

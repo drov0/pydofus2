@@ -7,7 +7,8 @@ from pydofus2.com.ankamagames.dofus.network.types.game.context.fight.FightCommon
     FightCommonInformations
 from pydofus2.com.ankamagames.dofus.network.types.game.context.roleplay.GameRolePlayHumanoidInformations import \
     GameRolePlayHumanoidInformations
-from pydofus2.com.ankamagames.dofus.network.types.game.context.roleplay.party.PartyMemberInformations import PartyMemberInformations
+from pydofus2.com.ankamagames.dofus.network.types.game.context.roleplay.party.PartyMemberInformations import \
+    PartyMemberInformations
 from pydofus2.com.ankamagames.jerakine.logger.Logger import Logger
 from pydofus2.com.ankamagames.jerakine.metaclasses.Singleton import Singleton
 from pydofus2.com.ankamagames.jerakine.types.positions.MovementPath import \
@@ -54,7 +55,7 @@ class KernelEvent(Enum):
     RELOGIN_TOKEN = 37
     CHARACTER_NAME_SUGGESTION = 38
     CHARACTER_NAME_SUGGESTION_FAILED = 46
-    CHARACTER_CRATION_RESULT = 39
+    CHARACTER_CREATION_RESULT = 39
     NPC_DIALOG_OPEN = 40
     NPC_QUESTION = 41
     NPC_DIALOG_LEFT = 43
@@ -67,7 +68,6 @@ class KernelEvent(Enum):
     FIGHT_SWORD_SHOWED = 50
     CURRENT_MAP = 51
     MULE_FIGHT_CONTEXT = 52
-    
     I_JOINED_PARTY = 53
     MEMBER_JOINED_PARTY = 54
     MEMBER_LEFT_PARTY = 55
@@ -76,6 +76,7 @@ class KernelEvent(Enum):
     PARTY_MEMBER_IN_FIGHT = 58
     PARTY_JOIN_FAILED = 59
     PARTY_INVITE_CANCEL_NOTIF = 60
+    KAMAS_UPDATE = 61
 
 class KernelEventsManager(EventsHandler, metaclass=Singleton):
     def __init__(self):

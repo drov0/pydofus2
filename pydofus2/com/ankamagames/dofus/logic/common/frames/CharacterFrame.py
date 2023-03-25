@@ -1,15 +1,25 @@
 from pydofus2.com.ankamagames.berilia.managers.KernelEventsManager import (
     KernelEvent, KernelEventsManager)
-from pydofus2.com.ankamagames.dofus.kernel.net.ConnectionsHandler import ConnectionsHandler
-from pydofus2.com.ankamagames.dofus.kernel.net.DisconnectionReasonEnum import DisconnectionReasonEnum
-from pydofus2.com.ankamagames.dofus.logic.common.actions.ChangeServerAction import ChangeServerAction
-from pydofus2.com.ankamagames.dofus.logic.connection.managers.AuthentificationManager import AuthentificationManager
-from pydofus2.com.ankamagames.dofus.network.messages.game.approach.ReloginTokenRequestMessage import ReloginTokenRequestMessage
-from pydofus2.com.ankamagames.dofus.network.messages.game.approach.ReloginTokenStatusMessage import ReloginTokenStatusMessage
-from pydofus2.com.ankamagames.dofus.network.messages.game.character.creation.CharacterNameSuggestionFailureMessage import CharacterNameSuggestionFailureMessage
-from pydofus2.com.ankamagames.dofus.network.messages.game.character.creation.CharacterCreationResultMessage import CharacterCreationResultMessage
-from pydofus2.com.ankamagames.dofus.network.messages.game.character.creation.CharacterNameSuggestionSuccessMessage import CharacterNameSuggestionSuccessMessage
-from pydofus2.com.ankamagames.dofus.network.messages.game.character.deletion.CharacterDeletionPrepareMessage import CharacterDeletionPrepareMessage
+from pydofus2.com.ankamagames.dofus.kernel.net.ConnectionsHandler import \
+    ConnectionsHandler
+from pydofus2.com.ankamagames.dofus.kernel.net.DisconnectionReasonEnum import \
+    DisconnectionReasonEnum
+from pydofus2.com.ankamagames.dofus.logic.common.actions.ChangeServerAction import \
+    ChangeServerAction
+from pydofus2.com.ankamagames.dofus.logic.connection.managers.AuthentificationManager import \
+    AuthentificationManager
+from pydofus2.com.ankamagames.dofus.network.messages.game.approach.ReloginTokenRequestMessage import \
+    ReloginTokenRequestMessage
+from pydofus2.com.ankamagames.dofus.network.messages.game.approach.ReloginTokenStatusMessage import \
+    ReloginTokenStatusMessage
+from pydofus2.com.ankamagames.dofus.network.messages.game.character.creation.CharacterCreationResultMessage import \
+    CharacterCreationResultMessage
+from pydofus2.com.ankamagames.dofus.network.messages.game.character.creation.CharacterNameSuggestionFailureMessage import \
+    CharacterNameSuggestionFailureMessage
+from pydofus2.com.ankamagames.dofus.network.messages.game.character.creation.CharacterNameSuggestionSuccessMessage import \
+    CharacterNameSuggestionSuccessMessage
+from pydofus2.com.ankamagames.dofus.network.messages.game.character.deletion.CharacterDeletionPrepareMessage import \
+    CharacterDeletionPrepareMessage
 from pydofus2.com.ankamagames.jerakine.messages.Frame import Frame
 from pydofus2.com.ankamagames.jerakine.types.enums.Priority import Priority
 
@@ -42,7 +52,7 @@ class CharacterFrame(Frame):
             return True
 
         elif isinstance(msg, CharacterCreationResultMessage):
-            KernelEventsManager().send(KernelEvent.CHARACTER_CRATION_RESULT, msg.result, msg.reason)
+            KernelEventsManager().send(KernelEvent.CHARACTER_CREATION_RESULT, msg.result, msg.reason)
             return True
         
         elif isinstance(msg, CharacterNameSuggestionSuccessMessage):

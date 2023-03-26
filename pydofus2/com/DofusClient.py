@@ -1,4 +1,6 @@
+import asyncio
 import threading
+from concurrent.futures import ProcessPoolExecutor
 from datetime import datetime
 from time import perf_counter
 from typing import TYPE_CHECKING
@@ -43,6 +45,7 @@ class DofusClient(threading.Thread):
         super().__init__(name=name)
         self._killSig = threading.Event()
         self._registredInitFrames = []
+        self._shutDownListeners = []
         self._registredGameStartFrames = []
         self._stopReason: DisconnectionReason = None
         self._lock = None
@@ -85,7 +88,7 @@ class DofusClient(threading.Thread):
         Logger().info("Character entered game server successfully")
 
     def onCrash(self, event, message):
-        Logger().debug()
+        Logger().debug(f"Client crashed for reason : {message}")
         self._crashed = True
         self._crashMessage = message
         self._shutDownReason = f"Crashed for reason: {message}"
@@ -121,23 +124,21 @@ class DofusClient(threading.Thread):
         KernelEventsManager().once(KernelEvent.SHUTDOWN, self.onShutdown, originator=self)
         KernelEventsManager().once(KernelEvent.RESTART, self.onRestart, originator=self)
         KernelEventsManager().once(KernelEvent.RECONNECT, self.onReconnect, originator=self)
-
+    
     def prepareLogin(self):
         PlayedCharacterManager().instanceId = self.name
         if self._characterId:
             PlayerManager().allowAutoConnectCharacter = True
-            PlayedCharacterManager().id = self._characterId
-            PlayerManager().autoConnectOfASpecificCharacterId = self._characterId
+            PlayedCharacterManager().id = int(self._characterId)
+            PlayerManager().autoConnectOfASpecificCharacterId = int(self._characterId)
         Logger().info("Adding game start frames")
         for frame in self._registredInitFrames:
             self.worker.addFrame(frame())
-        if self._loginToken:
-            token = self._loginToken
-            self._loginToken = None
-        else:
-            token = Haapi().getLoginToken(self._certId, self._certHash, 1, self._apiKey)
-        AuthentificationManager().setToken(token)
+        if not self._loginToken:
+            self._loginToken = Haapi.getLoginTokenCloudScraper(self._certId, self._certHash, 1, self._apiKey)
+        AuthentificationManager().setToken(self._loginToken)
         self.waitNextLogin()
+        self._loginToken = None
         
     def onReconnect(self, event, message):
         Logger().warning(f"[DofusClient] Reconnect requested for reason: {message}")

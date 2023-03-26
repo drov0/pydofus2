@@ -51,12 +51,12 @@ class Kernel(metaclass=Singleton):
 
     def init(self) -> None:
         if self._reseted:
-            Logger().info("[KERNEL] Initializing ...")
+            Logger().info("Initializing ...")
             self._worker.reset()
             self.addInitialFrames()
             self._reseted = False
-            Logger().info(f"[KERNEL] Using protocole #{Metadata.PROTOCOL_BUILD}, built on {Metadata.PROTOCOL_DATE}")
-            Logger().info("[KERNEL] Initialized")
+            Logger().info(f"Using protocole #{Metadata.PROTOCOL_BUILD}, built on {Metadata.PROTOCOL_DATE}")
+            Logger().info("Initialized")
 
     def reset(
         self,
@@ -70,7 +70,7 @@ class Kernel(metaclass=Singleton):
         from pydofus2.com.ankamagames.jerakine.benchmark.BenchmarkTimer import \
             BenchmarkTimer
 
-        Logger().debug("[KERNEL] Resetting ...")
+        Logger().debug("Resetting ...")
         BenchmarkTimer.reset()
         KernelEventsManager().reset()
         if not reloadData:
@@ -86,7 +86,7 @@ class Kernel(metaclass=Singleton):
             self.addInitialFrames()
         else:
             self._reseted = True
-        Logger().debug("[KERNEL] Reseted")
+        Logger().debug("Reseted")
 
     def addInitialFrames(self) -> None:
         from pydofus2.com.ankamagames.dofus.logic.common.frames.CleanupCrewFrame import \
@@ -100,14 +100,14 @@ class Kernel(metaclass=Singleton):
         from pydofus2.com.ankamagames.dofus.logic.connection.frames.DisconnectionHandlerFrame import \
             DisconnectionHandlerFrame
 
-        Logger().info("[KERNEL] Adding initial frames ...")
+        Logger().info("Adding initial frames ...")
         self._worker.addFrame(LatencyFrame())
         self._worker.addFrame(AuthentificationFrame())
         self._worker.addFrame(QueueFrame())
         self._worker.addFrame(DisconnectionHandlerFrame())
         self._worker.addFrame(CleanupCrewFrame())
         self._worker.addFrame(ChatFrame())
-        Logger().info("[KERNEL] Initial frames added.")
+        Logger().info("Initial frames added.")
 
     @property
     def movementFrame(self) -> "RoleplayMovementFrame":

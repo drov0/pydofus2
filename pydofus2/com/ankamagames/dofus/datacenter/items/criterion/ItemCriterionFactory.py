@@ -62,9 +62,10 @@ from pydofus2.com.ankamagames.dofus.datacenter.items.criterion.UnusableItemCrite
 
 
 class ItemCriterionFactory:
+
     def create(pServerCriterionForm: str) -> IItemCriterion:
         criterion = None
-        s: str = pServerCriterionForm[0:2]
+        s = pServerCriterionForm[0:2]
 
         if s == "BI":
             criterion = UnusableItemCriterion(pServerCriterionForm)

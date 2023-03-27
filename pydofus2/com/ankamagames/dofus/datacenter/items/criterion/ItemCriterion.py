@@ -1,23 +1,24 @@
-from pydofus2.com.ankamagames.dofus.logic.game.common.managers.PlayedCharacterManager import (
-    PlayedCharacterManager,
-)
-from pydofus2.com.ankamagames.dofus.datacenter.items.criterion.IItemCriterion import (
-    IItemCriterion,
-)
-from pydofus2.com.ankamagames.dofus.datacenter.items.criterion.ItemCriterionOperator import (
-    ItemCriterionOperator,
-)
-from pydofus2.com.ankamagames.dofus.internalDatacenter.stats.EntityStats import EntityStats
-from pydofus2.com.ankamagames.dofus.logic.common.managers.StatsManager import StatsManager
-from pydofus2.com.ankamagames.jerakine.data import I18n
+from pydofus2.com.ankamagames.dofus.datacenter.items.criterion.IItemCriterion import \
+    IItemCriterion
+from pydofus2.com.ankamagames.dofus.internalDatacenter.stats.EntityStats import \
+    EntityStats
+from pydofus2.com.ankamagames.dofus.logic.common.managers.StatsManager import \
+    StatsManager
+from pydofus2.com.ankamagames.dofus.logic.game.common.managers.PlayedCharacterManager import \
+    PlayedCharacterManager
+from pydofus2.com.ankamagames.jerakine.data.I18n import I18n
+from pydofus2.com.ankamagames.jerakine.logger.Logger import Logger
 from pydofus2.damageCalculation.tools.StatIds import StatIds
-
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from pydofus2.com.ankamagames.dofus.datacenter.items.criterion.ItemCriterionOperator import \
+    ItemCriterionOperator
 
 class ItemCriterion(IItemCriterion):
 
     _serverCriterionForm: str
 
-    _operator: ItemCriterionOperator
+    _operator: "ItemCriterionOperator"
 
     _criterionRef: str
 
@@ -45,12 +46,12 @@ class ItemCriterion(IItemCriterion):
         return self._operator.text if not self._operator else None
 
     @property
-    def operator(self) -> ItemCriterionOperator:
+    def operator(self) -> "ItemCriterionOperator":
         return self._operator
 
     @property
     def isRespected(self) -> bool:
-        player: PlayedCharacterManager = PlayedCharacterManager()
+        player = PlayedCharacterManager()
         if not player or not player.characteristics:
             return True
         return self._operator.compare(self.getCriterion(), self._criterionValue)
@@ -71,9 +72,7 @@ class ItemCriterion(IItemCriterion):
         return ItemCriterion(self.basicText)
 
     def buildText(self, forTooltip: bool = False) -> str:
-        readableCriterionRef: str = None
-        knownCriteriaList: list = None
-        index: int = 0
+        readableCriterionRef = None
 
         if self._criterionRef == "CM":
             readableCriterionRef = I18n.getUiText("ui.stats.movementPoints")
@@ -136,12 +135,15 @@ class ItemCriterion(IItemCriterion):
                 "cw",
                 "Pl",
             ]
-            knownCriteriaList.index(self._criterionRef)
-
-        return readableCriterionRef + " " + self._operator.text + " " + self._criterionValue
+            if self._criterionRef in knownCriteriaList:
+                index = knownCriteriaList.index(self._criterionRef)
+                readableCriterionRef = I18n.getUiText("ui.item.characteristics").split(",")[index]
+            else:
+                Logger().warn(f"Unknown criteria \'{self._criterionRef}\'")
+        return f"{readableCriterionRef} {self._operator.text} {self._criterionValue}"
 
     def getInfos(self) -> None:
-        operator: str = None
+        from pydofus2.com.ankamagames.dofus.datacenter.items.criterion.ItemCriterionOperator import ItemCriterionOperator
         for operator in ItemCriterionOperator.OPERATORS_LIST:
             if self._serverCriterionForm.find(operator) == 2:
                 self._operator = ItemCriterionOperator(operator)
@@ -151,9 +153,8 @@ class ItemCriterion(IItemCriterion):
 
     def getCriterion(self) -> int:
         criterion: int = 0
-        player: PlayedCharacterManager = PlayedCharacterManager()
-
-        stats: EntityStats = StatsManager().getStats(player.id)
+        player = PlayedCharacterManager()
+        stats = StatsManager().getStats(player.id)
 
         if stats is None:
             return 0

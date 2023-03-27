@@ -8,6 +8,7 @@ from pydofus2.com.ankamagames.jerakine.interfaces.IDataCenter import IDataCenter
 
 
 class BreedItemCriterion(ItemCriterion, IDataCenter):
+
     def __init__(self, pCriterion: str):
         super().__init__(pCriterion)
 

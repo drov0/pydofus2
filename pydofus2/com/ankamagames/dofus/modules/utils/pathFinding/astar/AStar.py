@@ -1,17 +1,26 @@
 import heapq
 from time import perf_counter
-from pydofus2.com.ankamagames.jerakine.metaclasses.Singleton import Singleton
-from pydofus2.com.ankamagames.jerakine.pathfinding.Pathfinding import Pathfinding
-from pydofus2.com.ankamagames.jerakine.types.positions.MapPoint import MapPoint
+
 from whistle import Event
-from pydofus2.com.ankamagames.dofus.datacenter.world.MapPosition import MapPosition
+
+from pydofus2.com.ankamagames.dofus.datacenter.world.MapPosition import \
+    MapPosition
 from pydofus2.com.ankamagames.dofus.datacenter.world.SubArea import SubArea
-from pydofus2.com.ankamagames.dofus.misc.utils.GameDataQuery import GameDataQuery
-from pydofus2.com.ankamagames.dofus.modules.utils.pathFinding.world.Edge import Edge
-from pydofus2.com.ankamagames.dofus.modules.utils.pathFinding.world.Node import Node
-from pydofus2.com.ankamagames.dofus.modules.utils.pathFinding.world.Vertex import Vertex
-from pydofus2.com.ankamagames.dofus.modules.utils.pathFinding.world.WorldGraph import WorldGraph
+from pydofus2.com.ankamagames.dofus.misc.utils.GameDataQuery import \
+    GameDataQuery
+from pydofus2.com.ankamagames.dofus.modules.utils.pathFinding.world.Edge import \
+    Edge
+from pydofus2.com.ankamagames.dofus.modules.utils.pathFinding.world.Node import \
+    Node
+from pydofus2.com.ankamagames.dofus.modules.utils.pathFinding.world.Vertex import \
+    Vertex
+from pydofus2.com.ankamagames.dofus.modules.utils.pathFinding.world.WorldGraph import \
+    WorldGraph
 from pydofus2.com.ankamagames.jerakine.logger.Logger import Logger
+from pydofus2.com.ankamagames.jerakine.metaclasses.Singleton import Singleton
+from pydofus2.com.ankamagames.jerakine.pathfinding.Pathfinding import \
+    Pathfinding
+from pydofus2.com.ankamagames.jerakine.types.positions.MapPoint import MapPoint
 
 
 class AStar(metaclass=Singleton):
@@ -43,7 +52,7 @@ class AStar(metaclass=Singleton):
         if self.running:
             raise Exception("Pathfinding already in progress")
         if src == dst:
-            return None
+            return Logger().info("Destination is the Source so nothing to do")
         self.initForbiddenSubareaList()
         self.worldGraph = worldGraph
         self.dst = dst
@@ -80,6 +89,8 @@ class AStar(metaclass=Singleton):
                 return result
             edges = self.worldGraph.getOutgoingEdgesFromVertex(current.vertex)
             for edge in edges:
+                if self.DEBUG:
+                    Logger().debug(f"Testing edge {edge}")
                 if (
                     edge not in self._forbidenEdges
                     and self.hasValidTransition(edge)
@@ -90,6 +101,16 @@ class AStar(metaclass=Singleton):
                         node = Node(self, edge.dst, current)
                         self.openDic[edge.dst] = node
                         heapq.heappush(self.openList, (node.totalCost, id(node), node))
+                else:
+                    if self.DEBUG:
+                        reasons = []
+                        if edge in self._forbidenEdges:
+                            reasons.append("Edge is in forbiden edges list")
+                        if not self.hasValidTransition(edge):
+                            reasons.append("\Edge has a non valid transition")
+                        if not self.hasValidDestinationSubarea(edge):
+                            reasons.append("\Edge has a non valid destination subarea")
+                        Logger().debug(f"Edge dismissed for reason {', '.join(reasons)}")
         Logger().info(f"Goal not reached within {self.iterations} iterations")
         self.running = False
         return None
@@ -107,9 +128,8 @@ class AStar(metaclass=Singleton):
 
     @staticmethod
     def hasValidTransition(edge: Edge) -> bool:
-        from pydofus2.com.ankamagames.dofus.datacenter.items.criterion.GroupItemCriterion import (
-            GroupItemCriterion,
-        )
+        from pydofus2.com.ankamagames.dofus.datacenter.items.criterion.GroupItemCriterion import \
+            GroupItemCriterion
 
         criterionWhiteList: list = [
             "Ad",
@@ -122,6 +142,7 @@ class AStar(metaclass=Singleton):
             "Qo",
             "Qs",
             "Sv",
+            "PG"
         ]
         valid = False
         for transition in edge.transitions:
@@ -131,6 +152,8 @@ class AStar(metaclass=Singleton):
                     and "|" not in transition.criterion
                     and transition.criterion[0:2] not in criterionWhiteList
                 ):
+                    if AStar.DEBUG:
+                        Logger().debug(f"Edge {edge}, tr {transition} criterion is not composite and is not white listed")
                     return False
                 criterion = GroupItemCriterion(transition.criterion)
                 return criterion.isRespected

@@ -92,18 +92,20 @@ class Transition:
 
     def __str__(self) -> str:
         res = f"{TransitionTypeEnum(self._type).name}("
+        attribs = []
         if self._direction != -1:
-            res += f"direction={DirectionsEnum(self._direction).name}"
+            attribs.append(f"direction={DirectionsEnum(self._direction).name}")
         if self._skillId != -1:
-            res += f", skillId={self._skillId}"
+            attribs.append(f"skillId={self._skillId}")
         if self._criterion:
-            res += f", criterion={self._criterion}"
+            attribs.append(f"criterion={self._criterion} ({self.isValid})")
         if self._transitionMapId:
-            res += f", transitionMapId={self._transitionMapId}"
+            attribs.append(f"transitionMapId={self._transitionMapId}")
         if self._cell:
-            res += f", cell={self._cell}"
+            attribs.append(f"cell={self._cell}")
         if int(self._id) != -1:
-            res += f", id={self._id}"
+            attribs.append(f"id={self._id}")
+        res += ", ".join(attribs)
         res += ")"
         return res
 

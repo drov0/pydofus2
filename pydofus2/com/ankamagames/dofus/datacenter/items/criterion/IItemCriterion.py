@@ -1,4 +1,5 @@
 class IItemCriterion:
+
     @property
     def inlineCriteria(self) -> list["IItemCriterion"]:
         pass

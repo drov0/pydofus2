@@ -60,7 +60,6 @@ class Kernel(metaclass=Singleton):
 
     def reset(
         self,
-        autoRetry: bool = False,
         reloadData: bool = False,
     ) -> None:
         from pydofus2.com.ankamagames.berilia.managers.KernelEventsManager import \

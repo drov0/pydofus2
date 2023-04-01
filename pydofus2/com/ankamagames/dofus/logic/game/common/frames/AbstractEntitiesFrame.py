@@ -93,6 +93,7 @@ class AbstractEntitiesFrame(Frame):
             self._entities = dict[int, GameContextActorInformations]()
         if actorId not in self._entities:
             self._entities[actorId] = infos
+            Logger().info(f"Registred Actor {actorId}")
         if isinstance(infos, GameFightFighterInformations):
             StatsManager().addRawStats(actorId, infos.stats.characteristics.characteristics)
 
@@ -100,7 +101,7 @@ class AbstractEntitiesFrame(Frame):
         actorId = float(actorId)
         if self._entities.get(actorId):
             del self._entities[actorId]
-            # Logger().debug(f"[EntitiesManager] Actor {actorId} removed from the scene")
+            Logger().warning(f"Actor {actorId} removed from the scene")
         StatsManager().deleteStats(actorId)
 
     def addOrUpdateActor(self, infos: GameContextActorInformations) -> AnimatedCharacter:

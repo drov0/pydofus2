@@ -59,7 +59,7 @@ class Worker(MessageHandler):
             # with Worker.LOCK:
             #     Worker.LAST_TIME = current_time
             msg = self._queue.get()
-            # Logger().debug(f"[RCV] {msg}")
+            Logger().debug(f"[RCV] {msg}")
             if type(msg).__name__ == "TerminateWorkerMessage":
                 self._terminating.set()
                 break

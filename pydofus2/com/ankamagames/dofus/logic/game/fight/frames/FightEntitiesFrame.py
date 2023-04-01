@@ -544,7 +544,7 @@ class FightEntitiesFrame(AbstractEntitiesFrame, Frame):
     def getEntityTeamId(self, entityId: float) -> float:
         if (entityId not in self._entities) or not isinstance(self._entities[entityId], GameFightFighterInformations):
             return -1
-        entitiesInfo: GameContextActorPositionInformations = self._entities[entityId]
+        entitiesInfo = self._entities[entityId]
         if not isinstance(entitiesInfo, GameFightFighterInformations):
             return -1
         return entitiesInfo.spawnInfo.teamId

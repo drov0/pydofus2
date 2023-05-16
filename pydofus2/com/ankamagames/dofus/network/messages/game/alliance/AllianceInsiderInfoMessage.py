@@ -4,7 +4,7 @@ if TYPE_CHECKING:
     from pydofus2.com.ankamagames.dofus.network.types.game.social.AllianceFactSheetInformation import AllianceFactSheetInformation
     from pydofus2.com.ankamagames.dofus.network.types.game.alliance.AllianceMemberInfo import AllianceMemberInfo
     from pydofus2.com.ankamagames.dofus.network.types.game.prism.PrismGeolocalizedInformation import PrismGeolocalizedInformation
-    from pydofus2.com.ankamagames.dofus.network.types.game.guild.tax.TaxCollectorInformations import TaxCollectorInformations
+    from pydofus2.com.ankamagames.dofus.network.types.game.collector.tax.TaxCollectorInformations import TaxCollectorInformations
     
 
 class AllianceInsiderInfoMessage(NetworkMessage):

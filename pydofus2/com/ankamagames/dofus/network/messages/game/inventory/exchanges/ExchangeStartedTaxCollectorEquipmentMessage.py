@@ -1,7 +1,7 @@
 from pydofus2.com.ankamagames.jerakine.network.NetworkMessage import NetworkMessage
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
-    from pydofus2.com.ankamagames.dofus.network.types.game.guild.tax.TaxCollectorInformations import TaxCollectorInformations
+    from pydofus2.com.ankamagames.dofus.network.types.game.collector.tax.TaxCollectorInformations import TaxCollectorInformations
     
 
 class ExchangeStartedTaxCollectorEquipmentMessage(NetworkMessage):

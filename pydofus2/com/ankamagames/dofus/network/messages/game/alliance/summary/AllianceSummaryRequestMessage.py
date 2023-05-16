@@ -1,16 +1,31 @@
 from pydofus2.com.ankamagames.dofus.network.messages.game.PaginationRequestAbstractMessage import PaginationRequestAbstractMessage
 
 class AllianceSummaryRequestMessage(PaginationRequestAbstractMessage):
-    nameFilter: str
-    tagFilter: str
-    playerNameFilter: str
+    filterType: int
+    textFilter: str
+    criterionFilter: list[int]
     sortType: int
+    languagesFilter: list[int]
+    recruitmentTypeFilter: list[int]
+    minPlayerLevelFilter: int
+    maxPlayerLevelFilter: int
+    hideFullFilter: bool
+    followingAllianceCriteria: bool
     sortDescending: bool
-    def init(self, nameFilter_: str, tagFilter_: str, playerNameFilter_: str, sortType_: int, sortDescending_: bool, offset_: int, count_: int):
-        self.nameFilter = nameFilter_
-        self.tagFilter = tagFilter_
-        self.playerNameFilter = playerNameFilter_
+    hideFullFilter: bool
+    followingAllianceCriteria: bool
+    sortDescending: bool
+    def init(self, filterType_: int, textFilter_: str, criterionFilter_: list[int], sortType_: int, languagesFilter_: list[int], recruitmentTypeFilter_: list[int], minPlayerLevelFilter_: int, maxPlayerLevelFilter_: int, hideFullFilter_: bool, followingAllianceCriteria_: bool, sortDescending_: bool, offset_: int, count_: int):
+        self.filterType = filterType_
+        self.textFilter = textFilter_
+        self.criterionFilter = criterionFilter_
         self.sortType = sortType_
+        self.languagesFilter = languagesFilter_
+        self.recruitmentTypeFilter = recruitmentTypeFilter_
+        self.minPlayerLevelFilter = minPlayerLevelFilter_
+        self.maxPlayerLevelFilter = maxPlayerLevelFilter_
+        self.hideFullFilter = hideFullFilter_
+        self.followingAllianceCriteria = followingAllianceCriteria_
         self.sortDescending = sortDescending_
         
         super().init(offset_, count_)

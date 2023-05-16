@@ -1,14 +1,14 @@
 from pydofus2.com.ankamagames.dofus.network.types.game.context.roleplay.HumanOption import HumanOption
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
-    from pydofus2.com.ankamagames.dofus.network.types.game.context.roleplay.AllianceInformations import AllianceInformations
+    from pydofus2.com.ankamagames.dofus.network.types.game.context.roleplay.AllianceInformation import AllianceInformation
     
 
 class HumanOptionAlliance(HumanOption):
-    allianceInformations: 'AllianceInformations'
+    allianceInformation: 'AllianceInformation'
     aggressable: int
-    def init(self, allianceInformations_: 'AllianceInformations', aggressable_: int):
-        self.allianceInformations = allianceInformations_
+    def init(self, allianceInformation_: 'AllianceInformation', aggressable_: int):
+        self.allianceInformation = allianceInformation_
         self.aggressable = aggressable_
         
         super().init()

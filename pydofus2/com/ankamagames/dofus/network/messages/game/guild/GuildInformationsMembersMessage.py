@@ -1,12 +1,12 @@
 from pydofus2.com.ankamagames.jerakine.network.NetworkMessage import NetworkMessage
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
-    from pydofus2.com.ankamagames.dofus.network.types.game.guild.GuildMember import GuildMember
+    from pydofus2.com.ankamagames.dofus.network.types.game.guild.GuildMemberInfo import GuildMemberInfo
     
 
 class GuildInformationsMembersMessage(NetworkMessage):
-    members: list['GuildMember']
-    def init(self, members_: list['GuildMember']):
+    members: list['GuildMemberInfo']
+    def init(self, members_: list['GuildMemberInfo']):
         self.members = members_
         
         super().__init__()

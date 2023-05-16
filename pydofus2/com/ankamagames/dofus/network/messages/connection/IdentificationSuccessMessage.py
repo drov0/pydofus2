@@ -13,14 +13,12 @@ class IdentificationSuccessMessage(NetworkMessage):
     subscriptionEndDate: int
     havenbagAvailableRoom: int
     hasRights: bool
-    hasConsoleRight: bool
+    hasForceRight: bool
     wasAlreadyConnected: bool
-    isAccountForced: bool
     hasRights: bool
-    hasConsoleRight: bool
+    hasForceRight: bool
     wasAlreadyConnected: bool
-    isAccountForced: bool
-    def init(self, login_: str, accountTag_: 'AccountTagInformation', accountId_: int, communityId_: int, accountCreation_: int, subscriptionEndDate_: int, havenbagAvailableRoom_: int, hasRights_: bool, hasConsoleRight_: bool, wasAlreadyConnected_: bool, isAccountForced_: bool):
+    def init(self, login_: str, accountTag_: 'AccountTagInformation', accountId_: int, communityId_: int, accountCreation_: int, subscriptionEndDate_: int, havenbagAvailableRoom_: int, hasRights_: bool, hasForceRight_: bool, wasAlreadyConnected_: bool):
         self.login = login_
         self.accountTag = accountTag_
         self.accountId = accountId_
@@ -29,9 +27,8 @@ class IdentificationSuccessMessage(NetworkMessage):
         self.subscriptionEndDate = subscriptionEndDate_
         self.havenbagAvailableRoom = havenbagAvailableRoom_
         self.hasRights = hasRights_
-        self.hasConsoleRight = hasConsoleRight_
+        self.hasForceRight = hasForceRight_
         self.wasAlreadyConnected = wasAlreadyConnected_
-        self.isAccountForced = isAccountForced_
         
         super().__init__()
     

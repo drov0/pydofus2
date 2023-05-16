@@ -1,13 +1,13 @@
 from pydofus2.com.ankamagames.jerakine.network.NetworkMessage import NetworkMessage
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
-    from pydofus2.com.ankamagames.dofus.network.types.game.context.roleplay.BasicGuildInformations import BasicGuildInformations
+    from pydofus2.com.ankamagames.dofus.network.types.game.context.roleplay.BasicAllianceInformations import BasicAllianceInformations
     
 
 class TaxCollectorDialogQuestionBasicMessage(NetworkMessage):
-    guildInfo: 'BasicGuildInformations'
-    def init(self, guildInfo_: 'BasicGuildInformations'):
-        self.guildInfo = guildInfo_
+    allianceInfo: 'BasicAllianceInformations'
+    def init(self, allianceInfo_: 'BasicAllianceInformations'):
+        self.allianceInfo = allianceInfo_
         
         super().__init__()
     

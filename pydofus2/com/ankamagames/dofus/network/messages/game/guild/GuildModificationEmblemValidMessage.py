@@ -1,12 +1,12 @@
 from pydofus2.com.ankamagames.jerakine.network.NetworkMessage import NetworkMessage
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
-    from pydofus2.com.ankamagames.dofus.network.types.game.guild.GuildEmblem import GuildEmblem
+    from pydofus2.com.ankamagames.dofus.network.types.game.social.SocialEmblem import SocialEmblem
     
 
 class GuildModificationEmblemValidMessage(NetworkMessage):
-    guildEmblem: 'GuildEmblem'
-    def init(self, guildEmblem_: 'GuildEmblem'):
+    guildEmblem: 'SocialEmblem'
+    def init(self, guildEmblem_: 'SocialEmblem'):
         self.guildEmblem = guildEmblem_
         
         super().__init__()

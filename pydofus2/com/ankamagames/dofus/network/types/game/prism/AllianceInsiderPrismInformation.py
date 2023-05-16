@@ -2,20 +2,23 @@ from pydofus2.com.ankamagames.dofus.network.types.game.prism.PrismInformation im
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from pydofus2.com.ankamagames.dofus.network.types.game.data.items.ObjectItem import ObjectItem
+    from pydofus2.com.ankamagames.dofus.network.types.game.data.items.ObjectItem import ObjectItem
     
 
 class AllianceInsiderPrismInformation(PrismInformation):
-    lastTimeSlotModificationDate: int
-    lastTimeSlotModificationAuthorGuildId: int
-    lastTimeSlotModificationAuthorId: int
-    lastTimeSlotModificationAuthorName: str
-    modulesObjects: list['ObjectItem']
-    def init(self, lastTimeSlotModificationDate_: int, lastTimeSlotModificationAuthorGuildId_: int, lastTimeSlotModificationAuthorId_: int, lastTimeSlotModificationAuthorName_: str, modulesObjects_: list['ObjectItem'], typeId_: int, state_: int, nextVulnerabilityDate_: int, placementDate_: int, rewardTokenCount_: int):
-        self.lastTimeSlotModificationDate = lastTimeSlotModificationDate_
-        self.lastTimeSlotModificationAuthorGuildId = lastTimeSlotModificationAuthorGuildId_
-        self.lastTimeSlotModificationAuthorId = lastTimeSlotModificationAuthorId_
-        self.lastTimeSlotModificationAuthorName = lastTimeSlotModificationAuthorName_
-        self.modulesObjects = modulesObjects_
+    moduleObject: 'ObjectItem'
+    moduleType: int
+    cristalObject: 'ObjectItem'
+    cristalType: int
+    cristalEndDate: int
+    cristalNumberLeft: int
+    def init(self, moduleObject_: 'ObjectItem', moduleType_: int, cristalObject_: 'ObjectItem', cristalType_: int, cristalEndDate_: int, cristalNumberLeft_: int, state_: int, placementDate_: int, nuggetsCount_: int, durability_: int):
+        self.moduleObject = moduleObject_
+        self.moduleType = moduleType_
+        self.cristalObject = cristalObject_
+        self.cristalType = cristalType_
+        self.cristalEndDate = cristalEndDate_
+        self.cristalNumberLeft = cristalNumberLeft_
         
-        super().init(typeId_, state_, nextVulnerabilityDate_, placementDate_, rewardTokenCount_)
+        super().init(state_, placementDate_, nuggetsCount_, durability_)
     

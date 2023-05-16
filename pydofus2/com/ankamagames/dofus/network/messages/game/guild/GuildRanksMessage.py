@@ -1,12 +1,12 @@
 from pydofus2.com.ankamagames.jerakine.network.NetworkMessage import NetworkMessage
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
-    from pydofus2.com.ankamagames.dofus.network.types.game.guild.GuildRankInformation import GuildRankInformation
+    from pydofus2.com.ankamagames.dofus.network.types.game.rank.RankInformation import RankInformation
     
 
 class GuildRanksMessage(NetworkMessage):
-    ranks: list['GuildRankInformation']
-    def init(self, ranks_: list['GuildRankInformation']):
+    ranks: list['RankInformation']
+    def init(self, ranks_: list['RankInformation']):
         self.ranks = ranks_
         
         super().__init__()

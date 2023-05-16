@@ -10,9 +10,9 @@ if TYPE_CHECKING:
 class GameRolePlayGroupMonsterWaveInformations(GameRolePlayGroupMonsterInformations):
     nbWaves: int
     alternatives: list['GroupMonsterStaticInformations']
-    def init(self, nbWaves_: int, alternatives_: list['GroupMonsterStaticInformations'], staticInfos_: 'GroupMonsterStaticInformations', lootShare_: int, alignmentSide_: int, keyRingBonus_: bool, hasHardcoreDrop_: bool, hasAVARewardToken_: bool, look_: 'EntityLook', contextualId_: int, disposition_: 'EntityDispositionInformations'):
+    def init(self, nbWaves_: int, alternatives_: list['GroupMonsterStaticInformations'], staticInfos_: 'GroupMonsterStaticInformations', lootShare_: int, alignmentSide_: int, hasHardcoreDrop_: bool, look_: 'EntityLook', contextualId_: int, disposition_: 'EntityDispositionInformations'):
         self.nbWaves = nbWaves_
         self.alternatives = alternatives_
         
-        super().init(staticInfos_, lootShare_, alignmentSide_, keyRingBonus_, hasHardcoreDrop_, hasAVARewardToken_, look_, contextualId_, disposition_)
+        super().init(staticInfos_, lootShare_, alignmentSide_, hasHardcoreDrop_, look_, contextualId_, disposition_)
     

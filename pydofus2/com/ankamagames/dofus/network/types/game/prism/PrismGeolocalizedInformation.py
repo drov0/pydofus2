@@ -1,19 +1,23 @@
-from pydofus2.com.ankamagames.dofus.network.types.game.prism.PrismSubareaEmptyInfo import PrismSubareaEmptyInfo
+from pydofus2.com.ankamagames.jerakine.network.NetworkMessage import NetworkMessage
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from pydofus2.com.ankamagames.dofus.network.types.game.prism.PrismInformation import PrismInformation
     
 
-class PrismGeolocalizedInformation(PrismSubareaEmptyInfo):
+class PrismGeolocalizedInformation(NetworkMessage):
+    subAreaId: int
+    allianceId: int
     worldX: int
     worldY: int
     mapId: int
     prism: 'PrismInformation'
-    def init(self, worldX_: int, worldY_: int, mapId_: int, prism_: 'PrismInformation', subAreaId_: int, allianceId_: int):
+    def init(self, subAreaId_: int, allianceId_: int, worldX_: int, worldY_: int, mapId_: int, prism_: 'PrismInformation'):
+        self.subAreaId = subAreaId_
+        self.allianceId = allianceId_
         self.worldX = worldX_
         self.worldY = worldY_
         self.mapId = mapId_
         self.prism = prism_
         
-        super().init(subAreaId_, allianceId_)
+        super().__init__()
     

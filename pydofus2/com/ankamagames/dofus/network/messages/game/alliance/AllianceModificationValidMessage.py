@@ -1,17 +1,17 @@
 from pydofus2.com.ankamagames.jerakine.network.NetworkMessage import NetworkMessage
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
-    from pydofus2.com.ankamagames.dofus.network.types.game.guild.GuildEmblem import GuildEmblem
+    from pydofus2.com.ankamagames.dofus.network.types.game.social.SocialEmblem import SocialEmblem
     
 
 class AllianceModificationValidMessage(NetworkMessage):
     allianceName: str
     allianceTag: str
-    Alliancemblem: 'GuildEmblem'
-    def init(self, allianceName_: str, allianceTag_: str, Alliancemblem_: 'GuildEmblem'):
+    allianceEmblem: 'SocialEmblem'
+    def init(self, allianceName_: str, allianceTag_: str, allianceEmblem_: 'SocialEmblem'):
         self.allianceName = allianceName_
         self.allianceTag = allianceTag_
-        self.Alliancemblem = Alliancemblem_
+        self.allianceEmblem = allianceEmblem_
         
         super().__init__()
     

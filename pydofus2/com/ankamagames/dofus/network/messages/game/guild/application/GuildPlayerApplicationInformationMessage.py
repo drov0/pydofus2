@@ -2,13 +2,13 @@ from pydofus2.com.ankamagames.dofus.network.messages.game.guild.application.Guil
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from pydofus2.com.ankamagames.dofus.network.types.game.context.roleplay.GuildInformations import GuildInformations
-    from pydofus2.com.ankamagames.dofus.network.types.game.guild.application.GuildApplicationInformation import GuildApplicationInformation
+    from pydofus2.com.ankamagames.dofus.network.types.game.social.application.SocialApplicationInformation import SocialApplicationInformation
     
 
 class GuildPlayerApplicationInformationMessage(GuildPlayerApplicationAbstractMessage):
     guildInformation: 'GuildInformations'
-    apply: 'GuildApplicationInformation'
-    def init(self, guildInformation_: 'GuildInformations', apply_: 'GuildApplicationInformation'):
+    apply: 'SocialApplicationInformation'
+    def init(self, guildInformation_: 'GuildInformations', apply_: 'SocialApplicationInformation'):
         self.guildInformation = guildInformation_
         self.apply = apply_
         

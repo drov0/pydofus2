@@ -7,8 +7,8 @@ if TYPE_CHECKING:
 
 class CharactersListWithRemodelingMessage(CharactersListMessage):
     charactersToRemodel: list['CharacterToRemodelInformations']
-    def init(self, charactersToRemodel_: list['CharacterToRemodelInformations'], hasStartupActions_: bool, characters_: list['CharacterBaseInformations']):
+    def init(self, charactersToRemodel_: list['CharacterToRemodelInformations'], characters_: list['CharacterBaseInformations']):
         self.charactersToRemodel = charactersToRemodel_
         
-        super().init(hasStartupActions_, characters_)
+        super().init(characters_)
     

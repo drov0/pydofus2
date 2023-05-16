@@ -5,11 +5,9 @@ if TYPE_CHECKING:
     
 
 class GuildInvitedMessage(NetworkMessage):
-    recruterId: int
     recruterName: str
     guildInfo: 'GuildInformations'
-    def init(self, recruterId_: int, recruterName_: str, guildInfo_: 'GuildInformations'):
-        self.recruterId = recruterId_
+    def init(self, recruterName_: str, guildInfo_: 'GuildInformations'):
         self.recruterName = recruterName_
         self.guildInfo = guildInfo_
         

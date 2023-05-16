@@ -3,14 +3,12 @@ from pydofus2.com.ankamagames.dofus.network.types.game.context.fight.FightTeamMe
 class FightTeamMemberTaxCollectorInformations(FightTeamMemberInformations):
     firstNameId: int
     lastNameId: int
-    level: int
-    guildId: int
+    groupId: int
     uid: int
-    def init(self, firstNameId_: int, lastNameId_: int, level_: int, guildId_: int, uid_: int, id_: int):
+    def init(self, firstNameId_: int, lastNameId_: int, groupId_: int, uid_: int, id_: int):
         self.firstNameId = firstNameId_
         self.lastNameId = lastNameId_
-        self.level = level_
-        self.guildId = guildId_
+        self.groupId = groupId_
         self.uid = uid_
         
         super().init(id_)

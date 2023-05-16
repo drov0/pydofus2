@@ -8,11 +8,9 @@ if TYPE_CHECKING:
 
 class GameRolePlayTaxCollectorInformations(GameRolePlayActorInformations):
     identification: 'TaxCollectorStaticInformations'
-    guildLevel: int
     taxCollectorAttack: int
-    def init(self, identification_: 'TaxCollectorStaticInformations', guildLevel_: int, taxCollectorAttack_: int, look_: 'EntityLook', contextualId_: int, disposition_: 'EntityDispositionInformations'):
+    def init(self, identification_: 'TaxCollectorStaticInformations', taxCollectorAttack_: int, look_: 'EntityLook', contextualId_: int, disposition_: 'EntityDispositionInformations'):
         self.identification = identification_
-        self.guildLevel = guildLevel_
         self.taxCollectorAttack = taxCollectorAttack_
         
         super().init(look_, contextualId_, disposition_)

@@ -1,16 +1,24 @@
+from pydofus2.com.ankamagames.berilia.managers.KernelEventsManager import (
+    KernelEvent, KernelEventsManager)
 from pydofus2.com.ankamagames.dofus.kernel.Kernel import Kernel
-from pydofus2.com.ankamagames.dofus.kernel.net.ConnectionsHandler import ConnectionsHandler
-from pydofus2.com.ankamagames.berilia.managers.KernelEventsManager import KernelEventsManager, KernelEvent
-from pydofus2.com.ankamagames.dofus.network.messages.common.basic.BasicPingMessage import BasicPingMessage
-from pydofus2.com.ankamagames.dofus.network.messages.handshake.ProtocolRequired import ProtocolRequired
+from pydofus2.com.ankamagames.dofus.kernel.net.ConnectionsHandler import \
+    ConnectionsHandler
+from pydofus2.com.ankamagames.dofus.network.messages.common.basic.BasicPingMessage import \
+    BasicPingMessage
+from pydofus2.com.ankamagames.dofus.network.messages.handshake.ProtocolRequired import \
+    ProtocolRequired
 from pydofus2.com.ankamagames.dofus.network.Metadata import Metadata
-from pydofus2.com.ankamagames.jerakine.benchmark.BenchmarkTimer import BenchmarkTimer
+from pydofus2.com.ankamagames.jerakine.benchmark.BenchmarkTimer import \
+    BenchmarkTimer
 from pydofus2.com.ankamagames.jerakine.logger.Logger import Logger
-from pydofus2.com.ankamagames.jerakine.messages.ConnectedMessage import ConnectedMessage
+from pydofus2.com.ankamagames.jerakine.messages.ConnectedMessage import \
+    ConnectedMessage
 from pydofus2.com.ankamagames.jerakine.messages.Frame import Frame
 from pydofus2.com.ankamagames.jerakine.messages.Message import Message
-from pydofus2.com.ankamagames.jerakine.network.INetworkMessage import INetworkMessage
+from pydofus2.com.ankamagames.jerakine.network.INetworkMessage import \
+    INetworkMessage
 from pydofus2.com.ankamagames.jerakine.types.enums.Priority import Priority
+
 
 class HandshakeFrame(Frame):
     
@@ -23,29 +31,11 @@ class HandshakeFrame(Frame):
 
     def checkProtocolVersions(self, serverVersion: str) -> None:
         Logger().info(
-            f"[HandShake] Server protocol version {serverVersion}. Client version {Metadata.PROTOCOL_BUILD}."
+            f"[HandShake] Server version is {serverVersion}. Client version is {Metadata.PROTOCOL_BUILD}."
         )
-        if not serverVersion or not Metadata.PROTOCOL_BUILD:
+        if serverVersion != Metadata.PROTOCOL_BUILD:
             KernelEventsManager().send(
-                KernelEvent.CRASH, "MALFORMED_PROTOCOL: A protocol version is empty or None. What happened ?"
-            )
-            return
-        clientHash = self.extractHashFromProtocolVersion(Metadata.PROTOCOL_BUILD)
-        if not clientHash:
-            Logger().debug(f"[HandShake] The client protocol version is malformed: {Metadata.PROTOCOL_BUILD}")
-            KernelEventsManager().send(
-                KernelEvent.CRASH, "MALFORMED_PROTOCOL: The client protocol version is malformed"
-            )
-            return
-        serverHash = self.extractHashFromProtocolVersion(serverVersion)
-        if not serverHash:
-            KernelEventsManager().send(
-                KernelEvent.CRASH, "MALFORMED_PROTOCOL: The server protocol version is malformed"
-            )
-            return
-        if clientHash != serverHash:
-            KernelEventsManager().send(
-                KernelEvent.CRASH, "PROTOCOL_MISMATCH: The server protocol is different from the client protocol"
+                KernelEvent.CRASH, "Protocol mismatch between the client and the server."
             )
             return
 

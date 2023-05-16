@@ -1,17 +1,15 @@
 from pydofus2.com.ankamagames.jerakine.network.NetworkMessage import NetworkMessage
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
-    from pydofus2.com.ankamagames.dofus.network.types.game.context.roleplay.AllianceInformations import AllianceInformations
+    from pydofus2.com.ankamagames.dofus.network.types.game.context.roleplay.AllianceInformation import AllianceInformation
     
 
 class AllianceJoinedMessage(NetworkMessage):
-    allianceInfo: 'AllianceInformations'
-    enabled: bool
-    leadingGuildId: int
-    def init(self, allianceInfo_: 'AllianceInformations', enabled_: bool, leadingGuildId_: int):
+    allianceInfo: 'AllianceInformation'
+    rankId: int
+    def init(self, allianceInfo_: 'AllianceInformation', rankId_: int):
         self.allianceInfo = allianceInfo_
-        self.enabled = enabled_
-        self.leadingGuildId = leadingGuildId_
+        self.rankId = rankId_
         
         super().__init__()
     

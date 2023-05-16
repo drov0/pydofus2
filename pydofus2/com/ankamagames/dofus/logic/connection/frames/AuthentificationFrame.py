@@ -1,37 +1,39 @@
 import random
-from pydofus2.com.ankamagames.dofus.logic.common.frames.CharacterFrame import CharacterFrame
 
 import pydofus2.com.ankamagames.dofus.logic.connection.frames.ServerSelectionFrame as ssfrm
-from pydofus2.com.ankamagames.berilia.managers.KernelEventsManager import KernelEvent, KernelEventsManager
+from pydofus2.com.ankamagames.berilia.managers.KernelEventsManager import (
+    KernelEvent, KernelEventsManager)
 from pydofus2.com.ankamagames.dofus.kernel.Kernel import Kernel
-from pydofus2.com.ankamagames.dofus.kernel.net.ConnectionsHandler import ConnectionsHandler
-from pydofus2.com.ankamagames.dofus.kernel.net.DisconnectionReasonEnum import DisconnectionReasonEnum
-from pydofus2.com.ankamagames.dofus.logic.common.managers.PlayerManager import PlayerManager
-from pydofus2.com.ankamagames.dofus.logic.connection.actions.LoginValidationAction import LoginValidationAction
-from pydofus2.com.ankamagames.dofus.logic.connection.managers.AuthentificationManager import AuthentificationManager
-from pydofus2.com.ankamagames.dofus.network.enums.IdentificationFailureReasonsEnum import (
-    IdentificationFailureReasonEnum,
-)
-from pydofus2.com.ankamagames.dofus.network.messages.connection.HelloConnectMessage import HelloConnectMessage
-from pydofus2.com.ankamagames.dofus.network.messages.connection.IdentificationAccountForceMessage import (
-    IdentificationAccountForceMessage,
-)
-from pydofus2.com.ankamagames.dofus.network.messages.connection.IdentificationFailedMessage import (
-    IdentificationFailedMessage,
-)
-from pydofus2.com.ankamagames.dofus.network.messages.connection.IdentificationSuccessMessage import (
-    IdentificationSuccessMessage,
-)
-from pydofus2.com.ankamagames.dofus.network.messages.connection.IdentificationSuccessWithLoginTokenMessage import (
-    IdentificationSuccessWithLoginTokenMessage,
-)
+from pydofus2.com.ankamagames.dofus.kernel.net.ConnectionsHandler import \
+    ConnectionsHandler
+from pydofus2.com.ankamagames.dofus.kernel.net.DisconnectionReasonEnum import \
+    DisconnectionReasonEnum
+from pydofus2.com.ankamagames.dofus.logic.common.frames.CharacterFrame import \
+    CharacterFrame
+from pydofus2.com.ankamagames.dofus.logic.common.managers.PlayerManager import \
+    PlayerManager
+from pydofus2.com.ankamagames.dofus.logic.connection.actions.LoginValidationAction import \
+    LoginValidationAction
+from pydofus2.com.ankamagames.dofus.logic.connection.managers.AuthentificationManager import \
+    AuthentificationManager
+from pydofus2.com.ankamagames.dofus.network.enums.IdentificationFailureReasonsEnum import \
+    IdentificationFailureReasonEnum
+from pydofus2.com.ankamagames.dofus.network.messages.connection.HelloConnectMessage import \
+    HelloConnectMessage
+from pydofus2.com.ankamagames.dofus.network.messages.connection.IdentificationAccountForceMessage import \
+    IdentificationAccountForceMessage
+from pydofus2.com.ankamagames.dofus.network.messages.connection.IdentificationFailedMessage import \
+    IdentificationFailedMessage
+from pydofus2.com.ankamagames.dofus.network.messages.connection.IdentificationSuccessMessage import \
+    IdentificationSuccessMessage
+from pydofus2.com.ankamagames.dofus.network.messages.connection.IdentificationSuccessWithLoginTokenMessage import \
+    IdentificationSuccessWithLoginTokenMessage
 from pydofus2.com.ankamagames.jerakine.data.XmlConfig import XmlConfig
 from pydofus2.com.ankamagames.jerakine.logger.Logger import Logger
 from pydofus2.com.ankamagames.jerakine.messages.Frame import Frame
 from pydofus2.com.ankamagames.jerakine.messages.Message import Message
-from pydofus2.com.ankamagames.jerakine.network.messages.ServerConnectionFailedMessage import (
-    ServerConnectionFailedMessage,
-)
+from pydofus2.com.ankamagames.jerakine.network.messages.ServerConnectionFailedMessage import \
+    ServerConnectionFailedMessage
 from pydofus2.com.ankamagames.jerakine.types.DataStoreType import DataStoreType
 from pydofus2.com.ankamagames.jerakine.types.enums.Priority import Priority
 
@@ -51,12 +53,6 @@ class AuthentificationFrame(Frame):
     @property
     def priority(self) -> int:
         return Priority.NORMAL
-
-    def handleConnectionOpened(self) -> None:
-        pass
-
-    def handleConnectionClosed(self) -> None:
-        pass
 
     def process(self, msg: Message) -> bool:
 
@@ -112,36 +108,18 @@ class AuthentificationFrame(Frame):
 
         elif isinstance(msg, LoginValidationAction):
             Logger().info(f"Login to server {msg.serverId} called")
-            connexionPorts = [int(_) for _ in XmlConfig().getEntry("config.connection.port").split(",")]
             connectionHostsEntry = XmlConfig().getEntry("config.connection.host")
-            connexionHosts = (
-                [msg.host]
-                if msg.host
-                else (self._connexionHosts if len(self._connexionHosts) > 0 else connectionHostsEntry.split(","))
-            )
-            self._connexionHosts = connexionHosts
-            tmpHosts = []
-            for tmpHost in connexionHosts:
-                tmpHosts.append({"host": tmpHost, "random": random.random()})
-            tmpHosts.sort(key=lambda e: e["random"])
-            connexionHosts = []
-            for randomHost in tmpHosts:
-                connexionHosts.append(randomHost["host"])
-            defaultPort = self.HIDDEN_PORT
-            self._connexionSequence = list()
-            firstConnexionSequence = list()
-            for host in connexionHosts:
-                for port in connexionPorts:
-                    if defaultPort == port:
-                        firstConnexionSequence.append({"host": host, "port": port})
-                    else:
-                        self._connexionSequence.append({"host": host, "port": port})
-            if self.HIDDEN_PORT not in connexionPorts:
-                for host in connexionHosts:
-                    self._connexionSequence.append({"host": host, "port": self.HIDDEN_PORT})
-            self._connexionSequence = firstConnexionSequence + self._connexionSequence
+            allHostsInfos = self.parseHosts(connectionHostsEntry)
+            Logger().info(f"Hosts infos : {allHostsInfos}")
+            hostChosenByUser = msg.host
+            if not hostChosenByUser:
+                hostChosenByUser, foundHost = self.chooseHost(allHostsInfos)
+                if not foundHost:
+                    return KernelEventsManager().send(KernelEvent.CRASH, "No selectable host, aborting connection.")
+            self.connexionSequence = self.buildConnexionSequence(allHostsInfos, hostChosenByUser)
             AuthentificationManager().loginValidationAction = msg
-            connInfo = self._connexionSequence.pop(0)
+            connInfo = self.connexionSequence.pop(0)
+            Logger().info(f"connInfo: {connInfo}")
             ConnectionsHandler().connectToLoginServer(connInfo["host"], connInfo["port"])
             return True
 
@@ -157,7 +135,35 @@ class AuthentificationFrame(Frame):
                         DisconnectionReasonEnum.EXCEPTION_THROWN, DisconnectionReasonEnum.UNEXPECTED.name
                     )
             return True
+        
+    def parseHosts(self, connectionHostsEntry):
+        allHostsInfos = {}
+        for host in connectionHostsEntry.split('|'):
+            field = host.split(':')
+            if len(field) == 3:
+                allHostsInfos[field[0].strip()] = [field[1].strip(), field[2].strip()]
+            else:
+                Logger().error(f"Connection server has the wrong format. It won't be added to the list: {host}")
+        return allHostsInfos
 
+    def chooseHost(self, allHostsInfos: dict):
+        for strKey in allHostsInfos:
+            return strKey, True
+        return None, False
+
+    def buildConnexionSequence(self, allHostsInfos, hostKey):
+        connexionSequence = []
+        host = allHostsInfos[hostKey]
+        hostPorts = host[1].split(",")
+        hostName = host[0]
+        chosenPort = ""
+        for port in hostPorts:
+            if port == chosenPort:
+                connexionSequence.insert(0, {"host": hostName, "port": int(port)})
+            else:
+                connexionSequence.append({"host": hostName, "port": int(port)})
+        return connexionSequence
+    
     def pushed(self) -> bool:
         return True
 

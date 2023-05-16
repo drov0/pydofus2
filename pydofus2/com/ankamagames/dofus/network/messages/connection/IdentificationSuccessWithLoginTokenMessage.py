@@ -6,8 +6,8 @@ if TYPE_CHECKING:
 
 class IdentificationSuccessWithLoginTokenMessage(IdentificationSuccessMessage):
     loginToken: str
-    def init(self, loginToken_: str, login_: str, accountTag_: 'AccountTagInformation', accountId_: int, communityId_: int, accountCreation_: int, subscriptionEndDate_: int, havenbagAvailableRoom_: int, hasRights_: bool, hasConsoleRight_: bool, wasAlreadyConnected_: bool, isAccountForced_: bool):
+    def init(self, loginToken_: str, login_: str, accountTag_: 'AccountTagInformation', accountId_: int, communityId_: int, accountCreation_: int, subscriptionEndDate_: int, havenbagAvailableRoom_: int, hasRights_: bool, hasForceRight_: bool, wasAlreadyConnected_: bool):
         self.loginToken = loginToken_
         
-        super().init(login_, accountTag_, accountId_, communityId_, accountCreation_, subscriptionEndDate_, havenbagAvailableRoom_, hasRights_, hasConsoleRight_, wasAlreadyConnected_, isAccountForced_)
+        super().init(login_, accountTag_, accountId_, communityId_, accountCreation_, subscriptionEndDate_, havenbagAvailableRoom_, hasRights_, hasForceRight_, wasAlreadyConnected_)
     

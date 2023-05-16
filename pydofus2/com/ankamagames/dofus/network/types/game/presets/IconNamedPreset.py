@@ -7,9 +7,9 @@ if TYPE_CHECKING:
 class IconNamedPreset(PresetsContainerPreset):
     iconId: int
     name: str
-    def init(self, iconId_: int, name_: str, presets_: list['Preset'], id_: int):
+    def init(self, iconId_: int, name_: str, presets_: list['Preset']):
         self.iconId = iconId_
         self.name = name_
         
-        super().init(presets_, id_)
+        super().init(presets_)
     

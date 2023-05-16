@@ -2,7 +2,7 @@ from pydofus2.com.ankamagames.dofus.network.types.game.context.roleplay.GuildInf
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from pydofus2.com.ankamagames.dofus.network.types.game.guild.recruitment.GuildRecruitmentInformation import GuildRecruitmentInformation
-    from pydofus2.com.ankamagames.dofus.network.types.game.guild.GuildEmblem import GuildEmblem
+    from pydofus2.com.ankamagames.dofus.network.types.game.social.SocialEmblem import SocialEmblem
     
 
 class GuildFactSheetInformations(GuildInformations):
@@ -11,7 +11,7 @@ class GuildFactSheetInformations(GuildInformations):
     lastActivityDay: int
     recruitment: 'GuildRecruitmentInformation'
     nbPendingApply: int
-    def init(self, leaderId_: int, nbMembers_: int, lastActivityDay_: int, recruitment_: 'GuildRecruitmentInformation', nbPendingApply_: int, guildEmblem_: 'GuildEmblem', guildId_: int, guildName_: str, guildLevel_: int):
+    def init(self, leaderId_: int, nbMembers_: int, lastActivityDay_: int, recruitment_: 'GuildRecruitmentInformation', nbPendingApply_: int, guildEmblem_: 'SocialEmblem', guildId_: int, guildName_: str, guildLevel_: int):
         self.leaderId = leaderId_
         self.nbMembers = nbMembers_
         self.lastActivityDay = lastActivityDay_

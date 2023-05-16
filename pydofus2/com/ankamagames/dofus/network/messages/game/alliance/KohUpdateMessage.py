@@ -1,27 +1,16 @@
 from pydofus2.com.ankamagames.jerakine.network.NetworkMessage import NetworkMessage
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
-    from pydofus2.com.ankamagames.dofus.network.types.game.context.roleplay.AllianceInformations import AllianceInformations
-    from pydofus2.com.ankamagames.dofus.network.types.game.context.roleplay.BasicAllianceInformations import BasicAllianceInformations
+    from pydofus2.com.ankamagames.dofus.network.types.game.alliance.KohAllianceInfo import KohAllianceInfo
     
 
 class KohUpdateMessage(NetworkMessage):
-    alliances: list['AllianceInformations']
-    allianceNbMembers: list[int]
-    allianceRoundWeigth: list[int]
-    allianceMatchScore: list[int]
-    allianceMapWinners: list['BasicAllianceInformations']
-    allianceMapWinnerScore: int
-    allianceMapMyAllianceScore: int
+    kohAllianceInfo: list['KohAllianceInfo']
+    startingAvaTimestamp: int
     nextTickTime: int
-    def init(self, alliances_: list['AllianceInformations'], allianceNbMembers_: list[int], allianceRoundWeigth_: list[int], allianceMatchScore_: list[int], allianceMapWinners_: list['BasicAllianceInformations'], allianceMapWinnerScore_: int, allianceMapMyAllianceScore_: int, nextTickTime_: int):
-        self.alliances = alliances_
-        self.allianceNbMembers = allianceNbMembers_
-        self.allianceRoundWeigth = allianceRoundWeigth_
-        self.allianceMatchScore = allianceMatchScore_
-        self.allianceMapWinners = allianceMapWinners_
-        self.allianceMapWinnerScore = allianceMapWinnerScore_
-        self.allianceMapMyAllianceScore = allianceMapMyAllianceScore_
+    def init(self, kohAllianceInfo_: list['KohAllianceInfo'], startingAvaTimestamp_: int, nextTickTime_: int):
+        self.kohAllianceInfo = kohAllianceInfo_
+        self.startingAvaTimestamp = startingAvaTimestamp_
         self.nextTickTime = nextTickTime_
         
         super().__init__()

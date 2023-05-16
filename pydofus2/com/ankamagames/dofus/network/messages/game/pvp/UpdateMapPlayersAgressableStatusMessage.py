@@ -1,11 +1,13 @@
 from pydofus2.com.ankamagames.jerakine.network.NetworkMessage import NetworkMessage
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from pydofus2.com.ankamagames.dofus.network.types.game.pvp.AgressableStatusMessage import AgressableStatusMessage
+    
 
 class UpdateMapPlayersAgressableStatusMessage(NetworkMessage):
-    playerIds: list[int]
-    enable: list[int]
-    def init(self, playerIds_: list[int], enable_: list[int]):
-        self.playerIds = playerIds_
-        self.enable = enable_
+    playerAvAMessages: list['AgressableStatusMessage']
+    def init(self, playerAvAMessages_: list['AgressableStatusMessage']):
+        self.playerAvAMessages = playerAvAMessages_
         
         super().__init__()
     

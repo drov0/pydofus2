@@ -1,6 +1,4 @@
-import random
-
-import pydofus2.com.ankamagames.dofus.logic.connection.frames.ServerSelectionFrame as ssfrm
+from pydofus2.com.ankamagames.dofus.logic.connection.frames.ServerSelectionFrame import ServerSelectionFrame
 from pydofus2.com.ankamagames.berilia.managers.KernelEventsManager import (
     KernelEvent, KernelEventsManager)
 from pydofus2.com.ankamagames.dofus.kernel.Kernel import Kernel
@@ -85,7 +83,6 @@ class AuthentificationFrame(Frame):
             PlayerManager().accountId = ismsg.accountId
             PlayerManager().communityId = ismsg.communityId
             PlayerManager().hasRights = ismsg.hasRights
-            PlayerManager().hasConsoleRight = ismsg.hasConsoleRight
             PlayerManager().nickname = ismsg.accountTag.nickname
             PlayerManager().tag = ismsg.accountTag.tagNumber
             PlayerManager().subscriptionEndDate = ismsg.subscriptionEndDate
@@ -95,7 +92,7 @@ class AuthentificationFrame(Frame):
             KernelEventsManager().send(KernelEvent.LOGGED_IN, ismsg)
             Kernel().worker.removeFrame(self)
             Kernel().worker.addFrame(CharacterFrame())
-            Kernel().worker.addFrame(ssfrm.ServerSelectionFrame())
+            Kernel().worker.addFrame(ServerSelectionFrame())
             return True
 
         elif isinstance(msg, IdentificationFailedMessage):

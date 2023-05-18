@@ -8,7 +8,7 @@ from pydofus2.com.ankamagames.jerakine.network.parser.TypeEnum import TypeEnum
 
 
 class NetMsgDataField:
-    TRACE = False
+    TRACE = True
 
     dataReader = {
         TypeEnum.INT: "readInt",
@@ -32,68 +32,103 @@ class NetMsgDataField:
     def __init__(self, spec: dict, raw: ByteArray):
         self._spec = spec
         self._raw = raw
+        self._type = None
+        self._length = None
 
     @property
-    def isDynamicObj(self):
+    def name(self) -> str:
+        return self._spec.get("name")
+
+    @property
+    def type(self) -> str:
+        if not self._type:
+            self._type = self._spec.get("type")
+        return self._type
+
+    @type.setter
+    def type(self, newValue):
+        self._type = newValue
+
+    @property
+    def length(self) -> int:
+        if self._length is None:
+            self._length = self._spec.get("length")
+        return self._length
+    
+    @length.setter
+    def length(self, val):
+        if val < 0:
+            raise ValueError(f"Vector length can't be assigned a negative value '{val}'")
+        self._length = val
+    
+    @property
+    def lengthTypeId(self) -> int:
+        return self._spec.get("lengthTypeId")
+    
+    @property
+    def isVector(self) -> bool:
+        return self.length or self.lengthTypeId
+
+    @property
+    def hasDynamicType(self):
         return self._spec.get("dynamicType")
 
     @property
+    def typeId(self) -> int:
+        return self._spec.get("typeId")
+    
+    @property
     def isPrimitive(self):
-        return TypeEnum(self._spec["typeId"]) != TypeEnum.OBJECT
+        return TypeEnum(self.typeId) != TypeEnum.OBJECT
 
-    def getFieldTypeLength(self):
-        l = self._spec.get("length")
-        if l is None:
-            lTypeId = self._spec.get("lengthTypeId")
-            if lTypeId is not None:
-                if self.TRACE:
-                    TraceLogger().debug("field has length type id " + str(lTypeId))
-                return self.readPrimitive(TypeEnum(lTypeId))
-        return l
+    @property
+    def typename(self) -> str:
+        return self._spec.get("typename")
 
     def deserialize(self):
-        self.length = self.getFieldTypeLength()
-        if self.length is not None:
+        if self.isVector:
             return self.readVector()
         if self.isPrimitive:
-            return self.readPrimitive()
+            val = self.readPrimitive()
+            if self.TRACE:
+                TraceLogger().debug(f"Field {self.name} = {val}")
+            return val
         else:
             return self.readObject()
 
     def readPrimitive(self, typeId=None):
         if typeId is None:
-            typeId = TypeEnum(self._spec["typeId"])
+            typeId = TypeEnum(self.typeId)
         dataReader = NetMsgDataField.dataReader.get(typeId)
         if dataReader is None:
-            raise Exception(f"Type id {typeId} not found in known types ids")
-        ret = getattr(self._raw, dataReader)()
-        if self.TRACE:
-            TraceLogger().debug(f"{self._spec['name']} : {TypeEnum(self._spec['typeId']).name} =  value is {ret}")
-        return ret
+            raise Exception(f"TypeId '{typeId}' not found in known types ids")
+        return getattr(self._raw, dataReader)()
 
     def readObject(self):
-        className = self._spec["type"]
-        if self.isDynamicObj:
+        if self.hasDynamicType:
             typeId = self._raw.readUnsignedShort()
-            classSpec = ProtocolSpec.getTypeSpecById(typeId)
-            className = classSpec["name"]
-        if self.TRACE:
-            TraceLogger().debug(className + " {")
-        obj = nmcd.NetworkMessageClassDefinition(className, self._raw).deserialize()
-        if self.TRACE:
-            TraceLogger().debug("}")
+            self.type = ProtocolSpec.getTypeSpecById(typeId).get("name")
+            if self.type is None:
+                raise Exception("Unable to parse dynamic type of field")
+        obj = nmcd.NetworkMessageClassDefinition(self.type, self._raw).deserialize()
         return obj
 
     def readVector(self):
+        if self.length is None:
+            self.length = self.readPrimitive(TypeEnum(self.lengthTypeId))
+            if self.TRACE:
+                TraceLogger().debug(f"Read Vector length = {self.length}")
         if self.TRACE:
-            TraceLogger().debug("reading vector of length " + str(self.length))
+            TraceLogger().debug(f"==> Deserialising Vector<{self.typename}> of length {self.length}, remaining bytes {self._raw.remaining()}")
         ret = []
         for i in range(self.length):
-            if self.TRACE:
-                TraceLogger().debug("------------------------------------------------")
-                TraceLogger().debug("Reading vector element " + str(i))
             if self.isPrimitive:
-                ret.append(self.readPrimitive())
+                val = self.readPrimitive()
+                if self.TRACE:
+                    TraceLogger().debug(f"Vector value {i} = {val}")
+                ret.append(val)
             else:
+                if self.TRACE:
+                    TraceLogger().debug(f"Reading Vector Object {i}.")
                 ret.append(self.readObject())
         return ret

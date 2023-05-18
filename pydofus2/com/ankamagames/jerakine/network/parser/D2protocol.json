@@ -29525,23 +29525,23 @@
         }
     }, 
     "primitives": [
-        "VarUhLong", 
-        "ByteArray", 
-        "UnsignedShort", 
-        "UTF", 
-        "Boolean", 
-        "VarUhShort", 
+        "Int", 
         "VarLong", 
-        "Short", 
         "VarShort", 
+        "ByteArray", 
         "Double", 
-        "Byte", 
+        "UTF", 
         "VarUhInt", 
-        "UnsignedByte", 
+        "Boolean", 
         "UnsignedInt", 
         "VarInt", 
+        "UnsignedShort", 
         "Float", 
-        "Int"
+        "UnsignedByte", 
+        "VarUhShort", 
+        "Short", 
+        "VarUhLong", 
+        "Byte"
     ], 
     "type": {
         "AbstractCharacterInformation": {
@@ -30077,12 +30077,12 @@
             "boolfields": [], 
             "fields": [
                 {
-                    "dynamicType": false, 
+                    "dynamicType": true, 
                     "length": null, 
                     "lengthTypeId": null, 
                     "name": "houseInfos", 
                     "optional": false, 
-                    "type": "HouseInstanceInformations", 
+                    "type": null, 
                     "typeId": -1, 
                     "typename": "HouseInstanceInformations"
                 }, 
@@ -36229,12 +36229,12 @@
             "boolfields": [], 
             "fields": [
                 {
-                    "dynamicType": false, 
+                    "dynamicType": true, 
                     "length": null, 
                     "lengthTypeId": 6, 
                     "name": "characteristics", 
                     "optional": false, 
-                    "type": "CharacterCharacteristic", 
+                    "type": null, 
                     "typeId": -1, 
                     "typename": "CharacterCharacteristic"
                 }
@@ -36317,15 +36317,15 @@
                     "type": "VarUhShort", 
                     "typeId": 9, 
                     "typename": "int"
-                }, 
+                },
                 {
-                    "dynamicType": false, 
-                    "length": null, 
-                    "lengthTypeId": 6, 
-                    "name": "characteristics", 
-                    "optional": false, 
-                    "type": "CharacterCharacteristic", 
-                    "typeId": -1, 
+                    "dynamicType": true,
+                    "length": null,
+                    "lengthTypeId": 6,
+                    "name": "characteristics",
+                    "optional": false,
+                    "type": null,
+                    "typeId": -1,
                     "typename": "CharacterCharacteristic"
                 }, 
                 {
@@ -42523,12 +42523,12 @@
                     "typename": "int"
                 }, 
                 {
-                    "dynamicType": false, 
+                    "dynamicType": true, 
                     "length": null, 
                     "lengthTypeId": 6, 
                     "name": "fightTeams", 
                     "optional": false, 
-                    "type": "FightTeamInformations", 
+                    "type": null, 
                     "typeId": -1, 
                     "typename": "FightTeamInformations"
                 }, 
@@ -43103,12 +43103,12 @@
                     "typename": "int"
                 }, 
                 {
-                    "dynamicType": false, 
+                    "dynamicType": true, 
                     "length": null, 
                     "lengthTypeId": 6, 
                     "name": "additional", 
                     "optional": false, 
-                    "type": "FightResultAdditionalData", 
+                    "type": null, 
                     "typeId": -1, 
                     "typename": "FightResultAdditionalData"
                 }
@@ -43233,12 +43233,12 @@
             "boolfields": [], 
             "fields": [
                 {
-                    "dynamicType": false, 
+                    "dynamicType": true, 
                     "length": null, 
                     "lengthTypeId": 6, 
                     "name": "teamMembers", 
                     "optional": false, 
-                    "type": "FightTeamMemberInformations", 
+                    "type": null, 
                     "typeId": -1, 
                     "typename": "FightTeamMemberInformations"
                 }
@@ -46359,12 +46359,12 @@
                     "typename": "int"
                 }, 
                 {
-                    "dynamicType": false, 
+                    "dynamicType": true, 
                     "length": null, 
                     "lengthTypeId": null, 
                     "name": "disposition", 
                     "optional": false, 
-                    "type": "EntityDispositionInformations", 
+                    "type": null, 
                     "typeId": -1, 
                     "typename": "EntityDispositionInformations"
                 }
@@ -46665,12 +46665,12 @@
             "boolfields": [], 
             "fields": [
                 {
-                    "dynamicType": false, 
+                    "dynamicType": true, 
                     "length": null, 
                     "lengthTypeId": null, 
                     "name": "spawnInformation", 
                     "optional": false, 
-                    "type": "SpawnInformation", 
+                    "type": null, 
                     "typeId": -1, 
                     "typename": "SpawnInformation"
                 }, 
@@ -46695,22 +46695,22 @@
                     "typename": "EntityLook"
                 }, 
                 {
-                    "dynamicType": false, 
+                    "dynamicType": true, 
                     "length": null, 
                     "lengthTypeId": null, 
                     "name": "stats", 
                     "optional": false, 
-                    "type": "GameFightCharacteristics", 
+                    "type": null, 
                     "typeId": -1, 
                     "typename": "GameFightCharacteristics"
                 }, 
                 {
-                    "dynamicType": false, 
+                    "dynamicType": true, 
                     "length": null, 
                     "lengthTypeId": 6, 
                     "name": "summons", 
                     "optional": false, 
-                    "type": "GameContextBasicSpawnInformation", 
+                    "type": null, 
                     "typeId": -1, 
                     "typename": "GameContextBasicSpawnInformation"
                 }
@@ -47153,12 +47153,12 @@
                     "typename": "int"
                 }, 
                 {
-                    "dynamicType": false, 
+                    "dynamicType": true, 
                     "length": null, 
                     "lengthTypeId": null, 
                     "name": "stats", 
                     "optional": false, 
-                    "type": "GameFightCharacteristics", 
+                    "type": null, 
                     "typeId": -1, 
                     "typename": "GameFightCharacteristics"
                 }, 
@@ -49587,12 +49587,12 @@
             "boolfields": [], 
             "fields": [
                 {
-                    "dynamicType": false, 
+                    "dynamicType": true, 
                     "length": null, 
                     "lengthTypeId": null, 
                     "name": "staticInfos", 
                     "optional": false, 
-                    "type": "GroupMonsterStaticInformations", 
+                    "type": null, 
                     "typeId": -1, 
                     "typename": "GroupMonsterStaticInformations"
                 }, 
@@ -49647,12 +49647,12 @@
                     "typename": "int"
                 }, 
                 {
-                    "dynamicType": false, 
+                    "dynamicType": true, 
                     "length": null, 
                     "lengthTypeId": 6, 
                     "name": "alternatives", 
                     "optional": false, 
-                    "type": "GroupMonsterStaticInformations", 
+                    "type": null, 
                     "typeId": -1, 
                     "typename": "GroupMonsterStaticInformations"
                 }
@@ -49667,12 +49667,12 @@
             "boolfields": [], 
             "fields": [
                 {
-                    "dynamicType": false, 
+                    "dynamicType": true, 
                     "length": null, 
                     "lengthTypeId": null, 
                     "name": "humanoidInfo", 
                     "optional": false, 
-                    "type": "HumanInformations", 
+                    "type": null, 
                     "typeId": -1, 
                     "typename": "HumanInformations"
                 }, 
@@ -50346,12 +50346,12 @@
             "boolfields": [], 
             "fields": [
                 {
-                    "dynamicType": false, 
+                    "dynamicType": true, 
                     "length": null, 
                     "lengthTypeId": null, 
                     "name": "identification", 
                     "optional": false, 
-                    "type": "TaxCollectorStaticInformations", 
+                    "type": null, 
                     "typeId": -1, 
                     "typename": "TaxCollectorStaticInformations"
                 }, 
@@ -54481,12 +54481,12 @@
             "boolfields": [], 
             "fields": [
                 {
-                    "dynamicType": false, 
+                    "dynamicType": true, 
                     "length": null, 
                     "lengthTypeId": null, 
                     "name": "houseInfos", 
                     "optional": false, 
-                    "type": "HouseInstanceInformations", 
+                    "type": null, 
                     "typeId": -1, 
                     "typename": "HouseInstanceInformations"
                 }, 
@@ -55000,12 +55000,12 @@
                     "typename": "bool"
                 }, 
                 {
-                    "dynamicType": false, 
+                    "dynamicType": true, 
                     "length": null, 
                     "lengthTypeId": 6, 
                     "name": "options", 
                     "optional": false, 
-                    "type": "HumanOption", 
+                    "type": null, 
                     "typeId": -1, 
                     "typename": "HumanOption"
                 }
@@ -56352,22 +56352,22 @@
                     "typename": "int"
                 }, 
                 {
-                    "dynamicType": false, 
+                    "dynamicType": true, 
                     "length": null, 
                     "lengthTypeId": 6, 
                     "name": "enabledSkills", 
                     "optional": false, 
-                    "type": "InteractiveElementSkill", 
+                    "type": null, 
                     "typeId": -1, 
                     "typename": "InteractiveElementSkill"
                 }, 
                 {
-                    "dynamicType": false, 
+                    "dynamicType": true, 
                     "length": null, 
                     "lengthTypeId": 6, 
                     "name": "disabledSkills", 
                     "optional": false, 
-                    "type": "InteractiveElementSkill", 
+                    "type": null, 
                     "typeId": -1, 
                     "typename": "InteractiveElementSkill"
                 }, 
@@ -62935,12 +62935,12 @@
             "boolfields": [], 
             "fields": [
                 {
-                    "dynamicType": false, 
+                    "dynamicType": true, 
                     "length": null, 
                     "lengthTypeId": 6, 
                     "name": "paddocks", 
                     "optional": false, 
-                    "type": "PaddockBuyableInformations", 
+                    "type": null, 
                     "typeId": -1, 
                     "typename": "PaddockBuyableInformations"
                 }
@@ -65374,12 +65374,12 @@
             "boolfields": [], 
             "fields": [
                 {
-                    "dynamicType": false, 
+                    "dynamicType": true, 
                     "length": null, 
                     "lengthTypeId": 6, 
                     "name": "presets", 
                     "optional": false, 
-                    "type": "Preset", 
+                    "type": null, 
                     "typeId": -1, 
                     "typename": "Preset"
                 }
@@ -65552,12 +65552,12 @@
                     "typename": "int"
                 }, 
                 {
-                    "dynamicType": false, 
+                    "dynamicType": true, 
                     "length": null, 
                     "lengthTypeId": null, 
                     "name": "prism", 
                     "optional": false, 
-                    "type": "PrismInformation", 
+                    "type": null, 
                     "typeId": -1, 
                     "typename": "PrismInformation"
                 }
@@ -65821,12 +65821,12 @@
                     "typename": "int"
                 }, 
                 {
-                    "dynamicType": false, 
+                    "dynamicType": true, 
                     "length": null, 
                     "lengthTypeId": 6, 
                     "name": "objectives", 
                     "optional": false, 
-                    "type": "QuestObjectiveInformations", 
+                    "type": null, 
                     "typeId": -1, 
                     "typename": "QuestObjectiveInformations"
                 }
@@ -70530,12 +70530,12 @@
                     "typename": "EntityLook"
                 }, 
                 {
-                    "dynamicType": false, 
+                    "dynamicType": true, 
                     "length": null, 
                     "lengthTypeId": 6, 
                     "name": "complements", 
                     "optional": false, 
-                    "type": "TaxCollectorComplementaryInformations", 
+                    "type": null, 
                     "typeId": -1, 
                     "typename": "TaxCollectorComplementaryInformations"
                 }, 
@@ -73313,12 +73313,12 @@
                     "typename": "int"
                 }, 
                 {
-                    "dynamicType": false, 
+                    "dynamicType": true, 
                     "length": null, 
                     "lengthTypeId": 6, 
                     "name": "alternatives", 
                     "optional": false, 
-                    "type": "GroupMonsterStaticInformations", 
+                    "type": null, 
                     "typeId": -1, 
                     "typename": "GroupMonsterStaticInformations"
                 }
@@ -76487,12 +76487,12 @@
                     "typename": "EntityLook"
                 }, 
                 {
-                    "dynamicType": false, 
+                    "dynamicType": true, 
                     "length": null, 
                     "lengthTypeId": 6, 
                     "name": "complements", 
                     "optional": false, 
-                    "type": "TaxCollectorComplementaryInformations", 
+                    "type": null, 
                     "typeId": -1, 
                     "typename": "TaxCollectorComplementaryInformations"
                 }, 
@@ -76587,12 +76587,12 @@
             "boolfields": [], 
             "fields": [
                 {
-                    "dynamicType": false, 
+                    "dynamicType": true, 
                     "length": null, 
                     "lengthTypeId": null, 
                     "name": "staticInfos", 
                     "optional": false, 
-                    "type": "GroupMonsterStaticInformations", 
+                    "type": null, 
                     "typeId": -1, 
                     "typename": "GroupMonsterStaticInformations"
                 }, 
@@ -77096,12 +77096,12 @@
                     "typename": "int"
                 }, 
                 {
-                    "dynamicType": false, 
+                    "dynamicType": true, 
                     "length": null, 
                     "lengthTypeId": null, 
                     "name": "stats", 
                     "optional": false, 
-                    "type": "GameFightCharacteristics", 
+                    "type": null, 
                     "typeId": -1, 
                     "typename": "GameFightCharacteristics"
                 }, 
@@ -79196,12 +79196,12 @@
                     "typename": "int"
                 }, 
                 {
-                    "dynamicType": false, 
+                    "dynamicType": true, 
                     "length": null, 
                     "lengthTypeId": 6, 
                     "name": "additional", 
                     "optional": false, 
-                    "type": "FightResultAdditionalData", 
+                    "type": null, 
                     "typeId": -1, 
                     "typename": "FightResultAdditionalData"
                 }
@@ -79696,12 +79696,12 @@
             "boolfields": [], 
             "fields": [
                 {
-                    "dynamicType": false, 
+                    "dynamicType": true, 
                     "length": null, 
                     "lengthTypeId": null, 
                     "name": "houseInfos", 
                     "optional": false, 
-                    "type": "HouseInstanceInformations", 
+                    "type": null, 
                     "typeId": -1, 
                     "typename": "HouseInstanceInformations"
                 }, 
@@ -79846,12 +79846,12 @@
                     "typename": "int"
                 }, 
                 {
-                    "dynamicType": false, 
+                    "dynamicType": true, 
                     "length": null, 
                     "lengthTypeId": null, 
                     "name": "prism", 
                     "optional": false, 
-                    "type": "PrismInformation", 
+                    "type": null, 
                     "typeId": -1, 
                     "typename": "PrismInformation"
                 }
@@ -80816,22 +80816,22 @@
                     "typename": "int"
                 }, 
                 {
-                    "dynamicType": false, 
+                    "dynamicType": true, 
                     "length": null, 
                     "lengthTypeId": 6, 
                     "name": "enabledSkills", 
                     "optional": false, 
-                    "type": "InteractiveElementSkill", 
+                    "type": null, 
                     "typeId": -1, 
                     "typename": "InteractiveElementSkill"
                 }, 
                 {
-                    "dynamicType": false, 
+                    "dynamicType": true, 
                     "length": null, 
                     "lengthTypeId": 6, 
                     "name": "disabledSkills", 
                     "optional": false, 
-                    "type": "InteractiveElementSkill", 
+                    "type": null, 
                     "typeId": -1, 
                     "typename": "InteractiveElementSkill"
                 }, 
@@ -80866,12 +80866,12 @@
                     "typename": "int"
                 }, 
                 {
-                    "dynamicType": false, 
+                    "dynamicType": true, 
                     "length": null, 
                     "lengthTypeId": null, 
                     "name": "disposition", 
                     "optional": false, 
-                    "type": "EntityDispositionInformations", 
+                    "type": null, 
                     "typeId": -1, 
                     "typename": "EntityDispositionInformations"
                 }
@@ -82378,12 +82378,12 @@
                     "typename": "int"
                 }, 
                 {
-                    "dynamicType": false, 
+                    "dynamicType": true, 
                     "length": null, 
                     "lengthTypeId": 6, 
                     "name": "fightTeams", 
                     "optional": false, 
-                    "type": "FightTeamInformations", 
+                    "type": null, 
                     "typeId": -1, 
                     "typename": "FightTeamInformations"
                 }, 
@@ -82558,12 +82558,12 @@
             "boolfields": [], 
             "fields": [
                 {
-                    "dynamicType": false, 
+                    "dynamicType": true, 
                     "length": null, 
                     "lengthTypeId": null, 
                     "name": "spawnInformation", 
                     "optional": false, 
-                    "type": "SpawnInformation", 
+                    "type": null, 
                     "typeId": -1, 
                     "typename": "SpawnInformation"
                 }, 
@@ -82588,22 +82588,22 @@
                     "typename": "EntityLook"
                 }, 
                 {
-                    "dynamicType": false, 
+                    "dynamicType": true, 
                     "length": null, 
                     "lengthTypeId": null, 
                     "name": "stats", 
                     "optional": false, 
-                    "type": "GameFightCharacteristics", 
+                    "type": null, 
                     "typeId": -1, 
                     "typename": "GameFightCharacteristics"
                 }, 
                 {
-                    "dynamicType": false, 
+                    "dynamicType": true, 
                     "length": null, 
                     "lengthTypeId": 6, 
                     "name": "summons", 
                     "optional": false, 
-                    "type": "GameContextBasicSpawnInformation", 
+                    "type": null, 
                     "typeId": -1, 
                     "typename": "GameContextBasicSpawnInformation"
                 }
@@ -82618,12 +82618,12 @@
             "boolfields": [], 
             "fields": [
                 {
-                    "dynamicType": false, 
+                    "dynamicType": true, 
                     "length": null, 
                     "lengthTypeId": null, 
                     "name": "humanoidInfo", 
                     "optional": false, 
-                    "type": "HumanInformations", 
+                    "type": null, 
                     "typeId": -1, 
                     "typename": "HumanInformations"
                 }, 
@@ -82767,12 +82767,12 @@
             "boolfields": [], 
             "fields": [
                 {
-                    "dynamicType": false, 
+                    "dynamicType": true, 
                     "length": null, 
                     "lengthTypeId": 6, 
                     "name": "characteristics", 
                     "optional": false, 
-                    "type": "CharacterCharacteristic", 
+                    "type": null, 
                     "typeId": -1, 
                     "typename": "CharacterCharacteristic"
                 }
@@ -83248,12 +83248,12 @@
                     "typename": "int"
                 }, 
                 {
-                    "dynamicType": false, 
+                    "dynamicType": true, 
                     "length": null, 
                     "lengthTypeId": 6, 
                     "name": "characteristics", 
                     "optional": false, 
-                    "type": "CharacterCharacteristic", 
+                    "type": null, 
                     "typeId": -1, 
                     "typename": "CharacterCharacteristic"
                 }, 
@@ -83817,12 +83817,12 @@
             "boolfields": [], 
             "fields": [
                 {
-                    "dynamicType": false, 
+                    "dynamicType": true, 
                     "length": null, 
                     "lengthTypeId": 6, 
                     "name": "paddocks", 
                     "optional": false, 
-                    "type": "PaddockBuyableInformations", 
+                    "type": null, 
                     "typeId": -1, 
                     "typename": "PaddockBuyableInformations"
                 }
@@ -84788,12 +84788,12 @@
             "boolfields": [], 
             "fields": [
                 {
-                    "dynamicType": false, 
+                    "dynamicType": true, 
                     "length": null, 
                     "lengthTypeId": null, 
                     "name": "identification", 
                     "optional": false, 
-                    "type": "TaxCollectorStaticInformations", 
+                    "type": null, 
                     "typeId": -1, 
                     "typename": "TaxCollectorStaticInformations"
                 }, 
@@ -84998,12 +84998,12 @@
             "boolfields": [], 
             "fields": [
                 {
-                    "dynamicType": false, 
+                    "dynamicType": true, 
                     "length": null, 
                     "lengthTypeId": 6, 
                     "name": "teamMembers", 
                     "optional": false, 
-                    "type": "FightTeamMemberInformations", 
+                    "type": null, 
                     "typeId": -1, 
                     "typename": "FightTeamMemberInformations"
                 }
@@ -85656,12 +85656,12 @@
             "boolfields": [], 
             "fields": [
                 {
-                    "dynamicType": false, 
+                    "dynamicType": true, 
                     "length": null, 
                     "lengthTypeId": null, 
                     "name": "houseInfos", 
                     "optional": false, 
-                    "type": "HouseInstanceInformations", 
+                    "type": null, 
                     "typeId": -1, 
                     "typename": "HouseInstanceInformations"
                 }, 
@@ -85836,12 +85836,12 @@
             "boolfields": [], 
             "fields": [
                 {
-                    "dynamicType": false, 
+                    "dynamicType": true, 
                     "length": null, 
                     "lengthTypeId": 6, 
                     "name": "presets", 
                     "optional": false, 
-                    "type": "Preset", 
+                    "type": null, 
                     "typeId": -1, 
                     "typename": "Preset"
                 }
@@ -86126,12 +86126,12 @@
                     "typename": "bool"
                 }, 
                 {
-                    "dynamicType": false, 
+                    "dynamicType": true, 
                     "length": null, 
                     "lengthTypeId": 6, 
                     "name": "options", 
                     "optional": false, 
-                    "type": "HumanOption", 
+                    "type": null, 
                     "typeId": -1, 
                     "typename": "HumanOption"
                 }
@@ -86537,12 +86537,12 @@
                     "typename": "int"
                 }, 
                 {
-                    "dynamicType": false, 
+                    "dynamicType": true, 
                     "length": null, 
                     "lengthTypeId": 6, 
                     "name": "objectives", 
                     "optional": false, 
-                    "type": "QuestObjectiveInformations", 
+                    "type": null, 
                     "typeId": -1, 
                     "typename": "QuestObjectiveInformations"
                 }

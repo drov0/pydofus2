@@ -1,5 +1,4 @@
 import threading
-
 from pydofus2.com.ankamagames.dofus.internalDatacenter.stats.DetailedStats import \
     DetailedStat
 from pydofus2.com.ankamagames.dofus.internalDatacenter.stats.EntityStats import \
@@ -17,7 +16,6 @@ from pydofus2.com.ankamagames.dofus.network.types.game.character.characteristic.
     CharacterUsableCharacteristicDetailed
 from pydofus2.com.ankamagames.jerakine.logger.Logger import Logger
 from pydofus2.com.ankamagames.jerakine.metaclasses.Singleton import Singleton
-
 
 class StatsManager(metaclass=Singleton):
     DEFAULT_IS_VERBOSE = True
@@ -66,11 +64,10 @@ class StatsManager(metaclass=Singleton):
                         alignGiftBonusValue=rawStat.alignGiftBonus,
                         contextModifValue=rawStat.contextModif,
                     )
-                elif isinstance(rawStat, CharacterCharacteristicValue):
-                    entityStat = Stat(rawStat.characteristicId, rawStat.total)
                 else:
-                    Logger().error(f"[StatsManager] Unknown raw stat type: {type(rawStat).__name__}")
-                    continue
+                    if not isinstance(rawStat, CharacterCharacteristicValue):
+                        continue
+                    entityStat = Stat(rawStat.characteristicId, rawStat.total)
                 entityStats.setStat(entityStat, False)
 
     def deleteStats(self, entityId: float) -> bool:

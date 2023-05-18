@@ -1,5 +1,4 @@
 from pydofus2.com.ankamagames.dofus.datacenter.quest.NpcMessage import NpcMessage
-from pydofus2.com.ankamagames.dofus.datacenter.quest.QuestStepRewards import QuestStepRewards
 from pydofus2.com.ankamagames.dofus.logic.game.common.managers.PlayedCharacterManager import PlayedCharacterManager
 from pydofus2.com.ankamagames.dofus.types.IdAccessors import IdAccessors
 from pydofus2.com.ankamagames.jerakine.data.GameData import GameData
@@ -8,6 +7,7 @@ from pydofus2.com.ankamagames.jerakine.interfaces.IDataCenter import IDataCenter
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
+    from pydofus2.com.ankamagames.dofus.datacenter.quest.QuestStepRewards import QuestStepRewards
     from pydofus2.com.ankamagames.dofus.datacenter.quest.QuestObjective import QuestObjective
 
 
@@ -29,7 +29,7 @@ class QuestStep(IDataCenter):
 
     duration: float
 
-    _currentLevelRewards: QuestStepRewards = None
+    _currentLevelRewards: 'QuestStepRewards' = None
 
     objectiveIds: list[int]
 
@@ -139,8 +139,7 @@ class QuestStep(IDataCenter):
         )
 
     def initCurrentLevelRewards(self) -> None:
-        rewardsId: int = 0
-        rewards: QuestStepRewards = None
+        from pydofus2.com.ankamagames.dofus.datacenter.quest.QuestStepRewards import QuestStepRewards
         playerLvl: int = PlayedCharacterManager().limitedLevel
         if (
             self._currentLevelRewards == None

@@ -163,7 +163,6 @@ class InventoryManagementFrame(Frame):
         if isinstance(msg, InventoryWeightMessage):
             iwmsg = msg
             PlayedCharacterManager().inventoryWeight = iwmsg.inventoryWeight
-            PlayedCharacterManager().shopWeight = iwmsg.shopWeight
             PlayedCharacterManager().inventoryWeightMax = iwmsg.weightMax
             if iwmsg.inventoryWeight / iwmsg.weightMax > 0.95:
                 KernelEventsManager().send(KernelEvent.FULL_PODS)

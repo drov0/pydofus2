@@ -13,11 +13,9 @@ from pydofus2.com.ankamagames.jerakine.network.parser.ProtocolSpec import \
 
 
 class NetworkMessageClassDefinition:
-    TRACE = False
+    TRACE = True
     
     def __init__(self, className: str, raw: ByteArray) -> None:
-        if self.TRACE:
-            TraceLogger().debug("Getting spec for {}".format(className))
         classSpec = ProtocolSpec.getClassSpecByName(className)
         self._parent = classSpec["parent"]
         self._fields = classSpec["fields"]
@@ -41,16 +39,16 @@ class NetworkMessageClassDefinition:
 
         if self._parent is not None:
             if self.TRACE:
-                TraceLogger().debug("Class has parent {}".format(self._parent))
+                TraceLogger().debug(f"Class has parent {self._parent}")
             inst = NetworkMessageClassDefinition(self._parent, self.raw).deserialize(inst)
             if self.TRACE:
                 TraceLogger().debug("End of parent deserialization")
-                TraceLogger().debug("BytesArray positon: {}".format(self.raw.position))
+                TraceLogger().debug(f"BytesArray positon: {self.raw.position}")
 
         try:
             for field, value in self.readBooleans(self._boolfields, self.raw).items():
                 if self.TRACE:
-                    TraceLogger().debug("{} = {}".format(field, value))
+                    TraceLogger().debug(f"{field} = {value}")
                 setattr(inst, field, value)
         except Exception as e:
             TraceLogger().debug(f"Remaining bytes in raw: {self.raw.remaining()}")
@@ -59,12 +57,14 @@ class NetworkMessageClassDefinition:
 
         for field in self._fields:
             attrib = field["name"]
+            if self.TRACE:
+                TraceLogger().debug(f"Deserializing field '{attrib}', remaining bytes '{self.raw.remaining()}'.")
             if field["optional"]:
                 isProvided = self.raw.readByte()
                 if not isProvided:
+                    if self.TRACE:
+                        TraceLogger().debug(f"Field '{attrib}' is optional and was not provided.")
                     continue
-            if self.TRACE:
-                TraceLogger().debug(f"deserializing field {attrib}")
             try:
                 value = nmdf.NetMsgDataField(field, self.raw).deserialize()
             except Exception as e:
@@ -72,8 +72,6 @@ class NetworkMessageClassDefinition:
                 TraceLogger().debug(self._fields)
                 TraceLogger().error(str(e), exc_info=True)
                 raise KeyboardInterrupt
-            if self.TRACE:
-                TraceLogger().debug(f"found value : {value}")
             setattr(inst, attrib, value)
         if self.TRACE:
             TraceLogger().debug("------------------ Deserializing {} ENDED---------------------".format(self._cls.__name__))

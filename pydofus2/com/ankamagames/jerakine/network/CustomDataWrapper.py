@@ -1,8 +1,7 @@
 import base64
 import math
-from zlib import decompress
 import struct
-
+from zlib import decompress
 
 
 class ByteArray(bytearray):
@@ -16,9 +15,9 @@ class ByteArray(bytearray):
 
     UNSIGNED_SHORT_MAX_VALUE: int = 65536
 
-    CHUNCK_BIT_SIZE: int = 7
+    CHUNK_BIT_SIZE: int = 7
 
-    MAX_ENCODING_LENGTH: int = math.ceil(INT_SIZE / CHUNCK_BIT_SIZE)
+    MAX_ENCODING_LENGTH: int = math.ceil(INT_SIZE / CHUNK_BIT_SIZE)
 
     MASK_10000000: int = 128
 
@@ -220,19 +219,29 @@ class ByteArray(bytearray):
         self.writeVarLong(i)
 
     def readVarShort(self):
-        ans = 0
-        for i in range(0, 16, 7):
+        b = 0
+        value = 0
+        offset = 0
+        hasNext = False
+        while offset < self.SHORT_SIZE:
             b = self.readByte()
-            ans += (b & 0b01111111) << i
-            if not b & 0b10000000:
-                return ans
-        raise Exception("Too much data")
+            hasNext = (b & self.MASK_10000000) == self.MASK_10000000
+            if offset > 0:
+                value += (b & self.MASK_01111111) << offset
+            else:
+                value += b & self.MASK_01111111
+            offset += self.CHUNK_BIT_SIZE
+            if not hasNext:
+                if value > self.SHORT_MAX_VALUE:
+                    value -= self.UNSIGNED_SHORT_MAX_VALUE
+                return value
+        raise ValueError("Too much data")
 
     def writeVarShort(self, i):
         assert i.bit_length() <= 16
         self._writeVar(i)
 
-    def readVarUhShort(self):
+    def readVarUhShort(self) -> int:
         return self.readVarShort()
 
     def writeVarUhShort(self, i):

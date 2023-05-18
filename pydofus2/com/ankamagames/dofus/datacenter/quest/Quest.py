@@ -1,18 +1,21 @@
-from pydofus2.com.ankamagames.dofus.datacenter.items.criterion.GroupItemCriterion import GroupItemCriterion
-import pydofus2.com.ankamagames.dofus.datacenter.quest.QuestCategory as qstcat
-from pydofus2.com.ankamagames.dofus.logic.game.common.managers.PlayedCharacterManager import PlayedCharacterManager
-from pydofus2.com.ankamagames.dofus.network.types.game.context.roleplay.quest.GameRolePlayNpcQuestFlag import (
-    GameRolePlayNpcQuestFlag,
-)
-from pydofus2.com.ankamagames.dofus.types.IdAccessors import IdAccessors
-from pydofus2.com.ankamagames.jerakine.data.GameData import GameData
-
-from pydofus2.com.ankamagames.jerakine.data.I18n import I18n
-from pydofus2.com.ankamagames.jerakine.interfaces.IDataCenter import IDataCenter
 from typing import TYPE_CHECKING
 
+import pydofus2.com.ankamagames.dofus.datacenter.quest.QuestCategory as qstcat
+from pydofus2.com.ankamagames.dofus.datacenter.items.criterion.GroupItemCriterion import \
+    GroupItemCriterion
+from pydofus2.com.ankamagames.dofus.logic.game.common.managers.PlayedCharacterManager import \
+    PlayedCharacterManager
+from pydofus2.com.ankamagames.dofus.network.types.game.context.roleplay.quest.GameRolePlayNpcQuestFlag import \
+    GameRolePlayNpcQuestFlag
+from pydofus2.com.ankamagames.dofus.types.IdAccessors import IdAccessors
+from pydofus2.com.ankamagames.jerakine.data.GameData import GameData
+from pydofus2.com.ankamagames.jerakine.data.I18n import I18n
+from pydofus2.com.ankamagames.jerakine.interfaces.IDataCenter import \
+    IDataCenter
+
 if TYPE_CHECKING:
-    from pydofus2.com.ankamagames.dofus.datacenter.quest.QuestStep import QuestStep
+    from pydofus2.com.ankamagames.dofus.datacenter.quest.QuestStep import \
+        QuestStep
 
 
 class Quest(IDataCenter):
@@ -43,7 +46,7 @@ class Quest(IDataCenter):
 
     followable: bool
 
-    _name: str
+    _name: str = None
 
     _steps: list["QuestStep"] = None
 
@@ -91,7 +94,8 @@ class Quest(IDataCenter):
 
     @property
     def steps(self) -> list["QuestStep"]:
-        from pydofus2.com.ankamagames.dofus.datacenter.quest.QuestStep import QuestStep
+        from pydofus2.com.ankamagames.dofus.datacenter.quest.QuestStep import \
+            QuestStep
 
         if not self._steps:
             self._steps = [QuestStep.getQuestStepById(s) for s in self.stepIds]

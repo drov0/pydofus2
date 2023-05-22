@@ -77,6 +77,7 @@ class KernelEvent(Enum):
     PARTY_JOIN_FAILED = 59
     PARTY_INVITE_CANCEL_NOTIF = 60
     KAMAS_UPDATE = 61
+    INTERACTIVE_ELEM_UPDATE = 62
 
 class KernelEventsManager(EventsHandler, metaclass=Singleton):
     def __init__(self):

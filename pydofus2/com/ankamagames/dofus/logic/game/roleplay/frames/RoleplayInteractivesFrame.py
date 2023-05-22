@@ -149,6 +149,7 @@ class RoleplayInteractivesFrame(Frame):
                 )
             else:
                 self.removeInteractive(ieumsg.interactiveElement)
+            KernelEventsManager().send(KernelEvent.INTERACTIVE_ELEM_UPDATE, ieumsg)
             return True
 
         if isinstance(msg, InteractiveUsedMessage):
@@ -160,15 +161,16 @@ class RoleplayInteractivesFrame(Frame):
                     self.usingInteractive = True
             else:
                 if msg.entityId == PlayedCharacterManager().id:    
-                    Logger().info(f"[RolePlayInteractives] Player is used element {msg.elemId}")
+                    Logger().info(f"[RolePlayInteractives] Player used element {msg.elemId}")
                 KernelEventsManager().send(KernelEvent.INTERACTIVE_ELEMENT_USED, msg.entityId, msg.elemId)
             return True
         
         if isinstance(msg, InteractiveUseEndedMessage):
             Logger().info(f"[RolePlayInteractives] Interactive element {msg.elemId} used.")
-            if msg.entityId == PlayedCharacterManager().id:
+            entityId = self._enityUsingElement.get(msg.elemId)
+            if entityId == PlayedCharacterManager().id:
                 self.usingInteractive = False
-            KernelEventsManager().send(KernelEvent.INTERACTIVE_ELEMENT_USED, self._enityUsingElement[msg.elemId], msg.elemId)            
+            KernelEventsManager().send(KernelEvent.INTERACTIVE_ELEMENT_USED, entityId, msg.elemId)            
             del self._enityUsingElement[msg.elemId]
             del self._collectableIe[msg.elemId]
             return True

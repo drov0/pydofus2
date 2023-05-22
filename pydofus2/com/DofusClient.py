@@ -154,7 +154,9 @@ class DofusClient(threading.Thread):
         if Kernel().authFrame:
             self.worker.process(LoginValidationWithTokenAction.create(self._serverId != 0, self._serverId))
         else:
-            raise DofusError(self.UNEXPECTED_CLIENT_ERROR, "Authentification frame not inside worker while reconnecting!")
+            Kernel().addInitialFrames()
+            Logger().warning("Authentification frame not inside worker while reconnecting!")
+            self.worker.process(LoginValidationWithTokenAction.create(self._serverId != 0, self._serverId))
     
     def waitNextLogin(self):
         if DofusClient.lastLoginTime is not None:

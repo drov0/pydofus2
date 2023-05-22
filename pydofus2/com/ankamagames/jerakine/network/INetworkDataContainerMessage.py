@@ -4,8 +4,8 @@ from pydofus2.com.ankamagames.jerakine.network.CustomDataWrapper import ByteArra
 class INetworkDataContainerMessage:
     @property
     def content() -> ByteArray:
-        pass
+        raise NotImplementedError("This method must be overriden")
 
     @content.setter
     def content(self, value: ByteArray):
-        pass
+        raise NotImplementedError("This method must be overriden")

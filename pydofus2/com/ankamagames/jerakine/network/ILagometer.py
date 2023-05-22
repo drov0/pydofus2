@@ -3,10 +3,10 @@ from pydofus2.com.ankamagames.jerakine.network.INetworkMessage import INetworkMe
 
 class ILagometer:
     def ping(self, param1: INetworkMessage = None) -> None:
-        pass
+        raise NotImplementedError("This method must be overriden")
 
     def pong(self, param1: INetworkMessage = None) -> None:
-        pass
+        raise NotImplementedError("This method must be overriden")
 
     def stop(self) -> None:
-        pass
+        raise NotImplementedError("This method must be overriden")

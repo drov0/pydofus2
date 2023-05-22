@@ -1,5 +1,7 @@
-from pydofus2.com.ankamagames.dofus.modules.utils.pathFinding.world.Transition import Transition
-from pydofus2.com.ankamagames.dofus.modules.utils.pathFinding.world.Vertex import Vertex
+from pydofus2.com.ankamagames.dofus.modules.utils.pathFinding.world.Transition import \
+    Transition
+from pydofus2.com.ankamagames.dofus.modules.utils.pathFinding.world.Vertex import \
+    Vertex
 
 
 class Edge:
@@ -41,3 +43,6 @@ class Edge:
 
     def __str__(self):
         return "Edge(src={}, dst={}, transitions={})".format(self.src, self.dst, self.transitions)
+
+    def __repr__(self) -> str:
+        return self.__str__()

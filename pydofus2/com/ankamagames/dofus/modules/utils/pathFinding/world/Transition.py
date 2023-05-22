@@ -109,6 +109,9 @@ class Transition:
         res += ")"
         return res
 
+    def __repr__(self) -> str:
+        return self.__str__()
+    
     def to_json(self):
         return {
             "type": self._type,

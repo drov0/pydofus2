@@ -33,7 +33,10 @@ class Vertex:
     
     def __str__(self) -> str:
         return f"Vertex(mapId={self._mapId}, zoneId={self._zoneId}, uid={self._uid})"
-
+    
+    def __repr__(self) -> str:
+        return self.__str__()
+        
     def to_json(self) -> dict:
         return {
             "mapId": self._mapId,

@@ -3,4 +3,4 @@ from pydofus2.com.ankamagames.jerakine.network.INetworkMessage import INetworkMe
 
 class IMessageRouter:
     def getConnectionId(param1: INetworkMessage) -> str:
-        pass
+        raise NotImplementedError("This method must be overriden")

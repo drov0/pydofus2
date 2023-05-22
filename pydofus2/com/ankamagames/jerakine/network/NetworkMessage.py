@@ -126,3 +126,6 @@ class NetworkMessage(INetworkMessage):
     def __str__(self) -> str:
         className: str = self.__class__.__name__
         return className.split(".")[-1] + " @" + str(self._instance_id)
+    
+    def __repr__(self) -> str:
+        return self.__str__()

@@ -8,7 +8,7 @@ from pydofus2.com.ankamagames.jerakine.network.parser.TypeEnum import TypeEnum
 
 
 class NetMsgDataField:
-    TRACE = True
+    TRACE = False
 
     dataReader = {
         TypeEnum.INT: "readInt",

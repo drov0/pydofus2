@@ -4,7 +4,7 @@ from pydofus2.com.ankamagames.jerakine.network.INetworkMessage import INetworkMe
 
 class IConnectionProxy:
     def processAndSend(self, param1: INetworkMessage, param2: ByteArray) -> None:
-        pass
+        raise NotImplementedError("This method must be overriden")
 
     def processAndReceive(self, param1: ByteArray) -> INetworkMessage:
-        pass
+        raise NotImplementedError("This method must be overriden")

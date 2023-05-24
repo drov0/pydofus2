@@ -14,6 +14,10 @@ if TYPE_CHECKING:
     from pyd2bot.logic.roleplay.behaviors.FarmFights import FarmFights
     from pydofus2.com.ankamagames.dofus.logic.connection.frames.AuthentificationFrame import \
         AuthentificationFrame
+    from pydofus2.com.ankamagames.dofus.logic.game.common.frames.CommonExchangeManagementFrame import \
+        CommonExchangeManagementFrame
+    from pydofus2.com.ankamagames.dofus.logic.game.common.frames.ExchangeManagementFrame import \
+        ExchangeManagementFrame
     from pydofus2.com.ankamagames.dofus.logic.game.fight.frames.FightBattleFrame import \
         FightBattleFrame
     from pydofus2.com.ankamagames.dofus.logic.game.fight.frames.FightContextFrame import \
@@ -24,6 +28,8 @@ if TYPE_CHECKING:
         FightTurnFrame
     from pydofus2.com.ankamagames.dofus.logic.game.roleplay.frames.PartyFrame import \
         PartyFrame
+    from pydofus2.com.ankamagames.dofus.logic.game.roleplay.frames.RoleplayContextFrame import \
+        RoleplayContextFrame
     from pydofus2.com.ankamagames.dofus.logic.game.roleplay.frames.RoleplayEntitiesFrame import \
         RoleplayEntitiesFrame
     from pydofus2.com.ankamagames.dofus.logic.game.roleplay.frames.RoleplayInteractivesFrame import \
@@ -32,7 +38,6 @@ if TYPE_CHECKING:
         RoleplayMovementFrame
     from pydofus2.com.ankamagames.dofus.logic.game.roleplay.frames.RoleplayWorldFrame import \
         RoleplayWorldFrame
-
 
 class Kernel(metaclass=Singleton):
     def __init__(self) -> None:
@@ -153,5 +158,21 @@ class Kernel(metaclass=Singleton):
         return self._worker.getFrameByName("FightContextFrame")
 
     @property
+    def roleplayContextFrame(self) -> "RoleplayContextFrame":
+        return self._worker.getFrameByName("RoleplayContextFrame")
+    
+    @property
     def authFrame(self) -> "AuthentificationFrame":
         return self._worker.getFrameByName("AuthentificationFrame")
+    
+    @property
+    def commonExchangeManagementFrame(self) -> "CommonExchangeManagementFrame":
+        return self._worker.getFrameByName("CommonExchangeManagementFrame")
+    
+    @property
+    def craftFrame(self):
+        return self._worker.getFrameByName("CraftFrame")
+    
+    @property
+    def exchangeManagementFrame(self) -> "ExchangeManagementFrame":
+        return self.roleplayContextFrame._exchangeManagementFrame

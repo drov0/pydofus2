@@ -115,7 +115,7 @@ class Recipe(IDataCenter):
             self._words = I18nFileAccessor().getUnDiacriticalText(self.resultNameId)
             for ingredient in self.ingredients:
                 self._words += " " + I18nFileAccessor().getUnDiacriticalText(ingredient.nameId)
-            self._words = self._words.toLowerCase()
+            self._words = self._words.lower()
         return self._words
 
     @property

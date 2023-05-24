@@ -1,10 +1,15 @@
 from pydofus2.com.ankamagames.berilia.managers.KernelEventsManager import (
     KernelEvent, KernelEventsManager)
-from pydofus2.com.ankamagames.dofus.network.messages.game.context.roleplay.npc.NpcDialogCreationMessage import NpcDialogCreationMessage
-from pydofus2.com.ankamagames.dofus.network.messages.game.context.roleplay.npc.NpcDialogQuestionMessage import NpcDialogQuestionMessage
-from pydofus2.com.ankamagames.dofus.network.messages.game.dialog.LeaveDialogMessage import LeaveDialogMessage
-from pydofus2.com.ankamagames.dofus.network.messages.game.inventory.exchanges.ExchangeLeaveMessage import ExchangeLeaveMessage
-from pydofus2.com.ankamagames.dofus.network.messages.game.inventory.exchanges.ExchangeStartedMessage import ExchangeStartedMessage
+from pydofus2.com.ankamagames.dofus.kernel.Kernel import Kernel
+from pydofus2.com.ankamagames.dofus.network.messages.game.context.roleplay.npc.NpcDialogCreationMessage import \
+    NpcDialogCreationMessage
+from pydofus2.com.ankamagames.dofus.network.messages.game.context.roleplay.npc.NpcDialogQuestionMessage import \
+    NpcDialogQuestionMessage
+from pydofus2.com.ankamagames.dofus.network.messages.game.dialog.LeaveDialogMessage import \
+    LeaveDialogMessage
+from pydofus2.com.ankamagames.dofus.network.messages.game.inventory.exchanges.ExchangeLeaveMessage import \
+    ExchangeLeaveMessage
+from pydofus2.com.ankamagames.jerakine.logger.Logger import Logger
 from pydofus2.com.ankamagames.jerakine.messages.Frame import Frame
 from pydofus2.com.ankamagames.jerakine.types.enums.Priority import Priority
 
@@ -36,11 +41,7 @@ class NpcFrame(Frame):
         
         elif isinstance(msg, LeaveDialogMessage):
             if isinstance(msg, ExchangeLeaveMessage):
-                KernelEventsManager().send(KernelEvent.EXCHANGE_CLOSE, msg)
+                Kernel().exchangeManagementFrame.processExchangeLeave(msg)
                 return True
-            KernelEventsManager().send(KernelEvent.NPC_DIALOG_LEFT)
-            return True
-        
-        elif isinstance(msg, ExchangeStartedMessage):
-            KernelEventsManager().send(KernelEvent.EXCHANGE_OPEN, msg)
+            KernelEventsManager().send(KernelEvent.DIALOG_LEFT)
             return True

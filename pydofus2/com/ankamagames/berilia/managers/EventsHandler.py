@@ -1,10 +1,13 @@
-from datetime import timedelta
 import operator
 import threading
-from whistle import EventDispatcher
-from pydofus2.com.ankamagames.jerakine.benchmark.BenchmarkTimer import BenchmarkTimer
-from pydofus2.com.ankamagames.jerakine.logger.Logger import Logger
+from datetime import timedelta
 from typing import Any
+
+from whistle import EventDispatcher
+
+from pydofus2.com.ankamagames.jerakine.benchmark.BenchmarkTimer import \
+    BenchmarkTimer
+from pydofus2.com.ankamagames.jerakine.logger.Logger import Logger
 
 lock = threading.RLock()
 
@@ -44,6 +47,7 @@ class Listener:
         self.manager = manager
         self.thname = threading.current_thread().name
         self.originator = originator
+        self.nbrTimeouts = 0
 
     def call(self, event: Event, *args, **kwargs):
         if self._deleted:
@@ -73,7 +77,7 @@ class Listener:
     def cancelTimer(self):
         if self.timeoutTimer:
             self.timeoutTimer.cancel()
-    
+
     def __str__(self):
         summary = f"Listener(event_id={self.event_id}, priority={self.priority}, callback={self.callback.__name__}, "
         if self.timeoutTimer and not self.timeoutTimer.finished.is_set():
@@ -111,12 +115,35 @@ class EventsHandler(EventDispatcher):
             raise TimeoutError(f"wait event {event} timed out")
         return ret[0]
 
-    def on(self, event_id, callback, priority=0, timeout=None, ontimeout=None, once=False, originator=None):
+    def on(
+        self,
+        event_id,
+        callback,
+        priority=0,
+        timeout=None,
+        ontimeout=None,
+        once=False,
+        originator=None,
+        retryNbr=None,
+        retryAction=None,
+    ):
         if event_id not in self._listeners:
             self._listeners[event_id] = {}
         if priority not in self._listeners[event_id]:
             self._listeners[event_id][priority] = []
-        listener = Listener(self, event_id, callback, timeout, ontimeout, once, priority, originator)
+
+        def onListenerTimeout(listener: Listener):
+            if retryNbr:
+                listener.nbrTimeouts += 1
+                if listener.nbrTimeouts > retryNbr:
+                    return ontimeout()
+            listener.armTimer()
+            if retryAction:
+                retryAction()
+            elif retryNbr:
+                raise Exception("Retry nbr provided but no action to retry!")
+
+        listener = Listener(self, event_id, callback, timeout, onListenerTimeout, once, priority, originator)
         if event_id not in self._listeners:
             return
         self._listeners[event_id][priority].append(listener)
@@ -124,8 +151,32 @@ class EventsHandler(EventDispatcher):
             del self._sorted[event_id]
         return listener
 
-    def once(self, event_id, callback, priority=0, timeout=None, ontimeout=None, originator=None):
-        return self.on(event_id, callback, priority, timeout, ontimeout, once=True, originator=originator)
+    def onMultiple(self, listeners, originator=None):
+        for event_id, callback in listeners:
+            self.on(event_id, callback, originator=originator)
+
+    def once(
+        self,
+        event_id,
+        callback,
+        priority=0,
+        timeout=None,
+        ontimeout=None,
+        originator=None,
+        retryNbr=None,
+        retryAction=None,
+    ):
+        return self.on(
+            event_id,
+            callback,
+            priority,
+            timeout,
+            ontimeout,
+            once=True,
+            originator=originator,
+            retryNbr=retryNbr,
+            retryAction=retryAction,
+        )
 
     def sort_listeners(self, event_id):
         self._sorted[event_id] = []
@@ -204,7 +255,7 @@ class EventsHandler(EventDispatcher):
             listeners = list(filter(lambda l: l.callback != callback, listeners))
         if event_id in self._sorted:
             del self._sorted[event_id]
-    
+
     def getListenersByOrigin(self, origin):
         result = list[Listener]()
         for listenersByPrio in self._listeners.values():

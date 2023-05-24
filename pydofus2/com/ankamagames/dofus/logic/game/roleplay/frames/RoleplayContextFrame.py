@@ -1,24 +1,37 @@
-from pydofus2.com.ankamagames.berilia.managers.KernelEventsManager import KernelEventsManager, KernelEvent
 import pydofus2.com.ankamagames.dofus.logic.game.roleplay.frames.RoleplayEntitiesFrame as ref
 import pydofus2.com.ankamagames.dofus.logic.game.roleplay.frames.RoleplayInteractivesFrame as rif
 import pydofus2.com.ankamagames.dofus.logic.game.roleplay.frames.RoleplayWorldFrame as rplWF
-from pydofus2.com.ankamagames.atouin.managers.MapDisplayManager import MapDisplayManager
-from pydofus2.com.ankamagames.atouin.messages.MapLoadedMessage import MapLoadedMessage
+from pydofus2.com.ankamagames.atouin.managers.MapDisplayManager import \
+    MapDisplayManager
+from pydofus2.com.ankamagames.atouin.messages.MapLoadedMessage import \
+    MapLoadedMessage
+from pydofus2.com.ankamagames.berilia.managers.KernelEventsManager import (
+    KernelEvent, KernelEventsManager)
 from pydofus2.com.ankamagames.dofus.datacenter.world.SubArea import SubArea
-from pydofus2.com.ankamagames.dofus.internalDatacenter.world.WorldPointWrapper import WorldPointWrapper
+from pydofus2.com.ankamagames.dofus.internalDatacenter.world.WorldPointWrapper import \
+    WorldPointWrapper
 from pydofus2.com.ankamagames.dofus.kernel.Kernel import Kernel
-from pydofus2.com.ankamagames.dofus.logic.game.common.managers.PlayedCharacterManager import PlayedCharacterManager
-from pydofus2.com.ankamagames.dofus.logic.game.roleplay.frames.RoleplayMovementFrame import RoleplayMovementFrame
-from pydofus2.com.ankamagames.dofus.network.messages.game.context.GameContextDestroyMessage import (
-    GameContextDestroyMessage,
-)
-from pydofus2.com.ankamagames.dofus.network.messages.game.context.roleplay.CurrentMapInstanceMessage import (
-    CurrentMapInstanceMessage,
-)
-from pydofus2.com.ankamagames.dofus.network.messages.game.context.roleplay.CurrentMapMessage import CurrentMapMessage
-from pydofus2.com.ankamagames.dofus.network.messages.game.inventory.items.ObtainedItemMessage import (
-    ObtainedItemMessage,
-)
+from pydofus2.com.ankamagames.dofus.logic.game.common.frames.CommonExchangeManagementFrame import \
+    CommonExchangeManagementFrame
+from pydofus2.com.ankamagames.dofus.logic.game.common.frames.ExchangeManagementFrame import \
+    ExchangeManagementFrame
+from pydofus2.com.ankamagames.dofus.logic.game.common.managers.PlayedCharacterManager import \
+    PlayedCharacterManager
+from pydofus2.com.ankamagames.dofus.logic.game.roleplay.frames.RoleplayMovementFrame import \
+    RoleplayMovementFrame
+from pydofus2.com.ankamagames.dofus.network.enums.ExchangeTypeEnum import \
+    ExchangeTypeEnum
+from pydofus2.com.ankamagames.dofus.network.messages.game.context.GameContextDestroyMessage import \
+    GameContextDestroyMessage
+from pydofus2.com.ankamagames.dofus.network.messages.game.context.roleplay.CurrentMapInstanceMessage import \
+    CurrentMapInstanceMessage
+from pydofus2.com.ankamagames.dofus.network.messages.game.context.roleplay.CurrentMapMessage import \
+    CurrentMapMessage
+from pydofus2.com.ankamagames.dofus.network.messages.game.inventory.exchanges.ExchangeRequestedTradeMessage import \
+    ExchangeRequestedTradeMessage
+from pydofus2.com.ankamagames.dofus.network.messages.game.inventory.exchanges.ExchangeStartedMessage import ExchangeStartedMessage
+from pydofus2.com.ankamagames.dofus.network.messages.game.inventory.items.ObtainedItemMessage import \
+    ObtainedItemMessage
 from pydofus2.com.ankamagames.jerakine.logger.Logger import Logger
 from pydofus2.com.ankamagames.jerakine.messages.Frame import Frame
 from pydofus2.com.ankamagames.jerakine.messages.Message import Message
@@ -62,13 +75,14 @@ class RoleplayContextFrame(Frame):
         self._worldFrame = rplWF.RoleplayWorldFrame()
         self._entitiesFrame = ref.RoleplayEntitiesFrame()
         self._interactivesFrame = rif.RoleplayInteractivesFrame()
+        self._exchangeManagementFrame = ExchangeManagementFrame()
         return True
 
     def process(self, msg: Message) -> bool:
 
         if isinstance(msg, CurrentMapMessage):
             KernelEventsManager().send(KernelEvent.CURRENT_MAP, msg.mapId)
-            Logger().debug(f"[RoleplayContext] Loading roleplay map {msg.mapId}")
+            Logger().debug(f"Loading roleplay map {msg.mapId}")
             self._newCurrentMapIsReceived = True
             newSubArea = SubArea.getSubAreaByMapId(msg.mapId)
             PlayedCharacterManager().currentSubArea = newSubArea
@@ -117,8 +131,34 @@ class RoleplayContextFrame(Frame):
 
         elif isinstance(msg, ObtainedItemMessage):
             return True
+        
+        if isinstance(msg, ExchangeRequestedTradeMessage):
+            self.addCommonExchangeFrame(ExchangeTypeEnum.PLAYER_TRADE)
+            if not Kernel().exchangeManagementFrame:
+                Kernel().worker.addFrame(self._exchangeManagementFrame)
+                Kernel().exchangeManagementFrame.processExchangeRequestedTradeMessage(msg)
+            return True
+        
+        if isinstance(msg, ExchangeStartedMessage):
+            commonExchangeFrame = Kernel().commonExchangeManagementFrame
+            if commonExchangeFrame:
+                commonExchangeFrame.resetEchangeSequence()
+            if msg.exchangeType in [ExchangeTypeEnum.CRAFT, ExchangeTypeEnum.MULTICRAFT_CRAFTER, ExchangeTypeEnum.MULTICRAFT_CUSTOMER, ExchangeTypeEnum.RUNES_TRADE]:
+                self.addCraftFrame()
+            elif msg.exchangeType in [ExchangeTypeEnum.BIDHOUSE_BUY, ExchangeTypeEnum.BIDHOUSE_SELL, ExchangeTypeEnum.PLAYER_TRADE, ExchangeTypeEnum.RECYCLE_TRADE]:
+                pass  # Placeholder for the remaining cases
+            self.addCommonExchangeFrame(msg.exchangeType)
+            if not Kernel().exchangeManagementFrame:
+                Kernel().worker.addFrame(self._exchangeManagementFrame)
+            self._exchangeManagementFrame.process(msg)
+            return True
 
         return False
+
+    def addCommonExchangeFrame(self, exchangeType):
+        if not Kernel().commonExchangeManagementFrame:
+            self._commonExchangeFrame = CommonExchangeManagementFrame(exchangeType)
+            Kernel().worker.addFrame(self._commonExchangeFrame)
 
     def pulled(self) -> bool:
         self._interactivesFrame.clear()

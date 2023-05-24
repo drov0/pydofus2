@@ -155,7 +155,7 @@ class ItemWrapper(Item, ISlotData, ICellZoneProvider, IDataCenter):
         refItem: Item = Item.getItemById(objectGID)
         cachedItem: ItemWrapper = cls._cache.get(objectUID) if objectUID > 0 else cls._cacheGId.get(objectGID)
         with lock:
-            if not cachedItem or not useCache:
+            if not cachedItem:
                 if refItem.isWeapon:
                     from pydofus2.com.ankamagames.dofus.internalDatacenter.items.WeaponWrapper import (
                         WeaponWrapper,

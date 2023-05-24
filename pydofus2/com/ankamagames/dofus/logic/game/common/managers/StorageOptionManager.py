@@ -291,7 +291,7 @@ class StorageOptionManager(metaclass=Singleton):
             self.inventory.removeView("storageSmithMagicFilter")
 
     def enableCraftFilter(self, skill: Skill, jobLevel: int) -> None:
-        craftFrame: CraftFrame = None
+        craftFrame: "CraftFrame" = None
         self.disableCraftFilter()
         if not skill:
             craftFrame = Kernel().worker.getFrameByName("CraftFrame")

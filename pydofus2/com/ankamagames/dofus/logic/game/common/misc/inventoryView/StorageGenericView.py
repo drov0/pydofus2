@@ -31,7 +31,6 @@ class StorageGenericView(IStorageView):
         super().__init__()
 
     def initialize(self, items: list[ItemWrapper]) -> None:
-        item: ItemWrapper = None
         if not self._content:
             self._content = list[ItemWrapper]()
         else:

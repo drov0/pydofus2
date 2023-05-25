@@ -1,33 +1,27 @@
+import pydofus2.com.ankamagames.dofus.logic.game.common.managers.StorageOptionManager as storageoptmgr
 from pydofus2.com.ankamagames.dofus.datacenter.items.Item import Item
 from pydofus2.com.ankamagames.dofus.internalDatacenter.DataEnum import DataEnum
-from pydofus2.com.ankamagames.dofus.internalDatacenter.items.ItemWrapper import ItemWrapper
+from pydofus2.com.ankamagames.dofus.internalDatacenter.items.ItemWrapper import \
+    ItemWrapper
 from pydofus2.com.ankamagames.dofus.kernel.Kernel import Kernel
-from pydofus2.com.ankamagames.dofus.logic.game.common.frames.AveragePricesFrame import (
-    AveragePricesFrame,
-)
-import pydofus2.com.ankamagames.dofus.logic.game.common.managers.StorageOptionManager as storageoptmgr
-from pydofus2.com.ankamagames.dofus.logic.game.common.misc.IStorageView import IStorageView
+from pydofus2.com.ankamagames.dofus.logic.game.common.frames.AveragePricesFrame import \
+    AveragePricesFrame
+from pydofus2.com.ankamagames.dofus.logic.game.common.misc.IStorageView import \
+    IStorageView
 
 
 class StorageGenericView(IStorageView):
 
-    _content: list[ItemWrapper] = None
-
-    _sortedContent: list[ItemWrapper] = None
-
-    _sorted: bool = False
-
-    _sortFieldsCache: list = None
+    _sortFieldsCache = list()
 
     _sortRevertCache: bool = False
 
-    _typesQty: dict = None
-
-    _types: dict = None
-
     def __init__(self):
-        self._typesQty = dict()
-        self._types = dict()
+        self._content = list[ItemWrapper]()
+        self._sortedContent = list[ItemWrapper]()
+        self._sorted = False
+        self._typesQty = dict[int, int]()
+        self._types = dict[int, int]()
         super().__init__()
 
     def initialize(self, items: list[ItemWrapper]) -> None:
@@ -46,7 +40,7 @@ class StorageGenericView(IStorageView):
 
     @property
     def name(self) -> str:
-        raise Exception("StorageGenericView class must be extended")
+        raise Exception("StorageGenericView class must be extended.")
 
     @property
     def content(self) -> list[ItemWrapper]:

@@ -1,29 +1,29 @@
-from pydofus2.com.ankamagames.berilia.managers.KernelEventsManager import KernelEventsManager, KernelEvent
-from pydofus2.com.ankamagames.jerakine.benchmark.BenchmarkTimer import BenchmarkTimer
 from time import perf_counter
+
+import pydofus2.com.ankamagames.dofus.logic.game.approach.frames.GameServerApproachFrame as gsaF
+from pydofus2.com.ankamagames.berilia.managers.KernelEventsManager import (
+    KernelEvent, KernelEventsManager)
 from pydofus2.com.ankamagames.dofus.kernel.Kernel import Kernel
-from pydofus2.com.ankamagames.dofus.kernel.net.ConnectionsHandler import ConnectionsHandler
-from pydofus2.com.ankamagames.dofus.kernel.net.DisconnectionReasonEnum import (
-    DisconnectionReasonEnum as Reason,
-)
+from pydofus2.com.ankamagames.dofus.kernel.net.ConnectionsHandler import \
+    ConnectionsHandler
+from pydofus2.com.ankamagames.dofus.kernel.net.DisconnectionReasonEnum import \
+    DisconnectionReasonEnum as Reason
+from pydofus2.com.ankamagames.jerakine.benchmark.BenchmarkTimer import \
+    BenchmarkTimer
 from pydofus2.com.ankamagames.jerakine.logger.Logger import Logger
-from pydofus2.com.ankamagames.jerakine.messages.ConnectionProcessCrashedMessage import ConnectionProcessCrashedMessage
+from pydofus2.com.ankamagames.jerakine.messages.ConnectionProcessCrashedMessage import \
+    ConnectionProcessCrashedMessage
 from pydofus2.com.ankamagames.jerakine.messages.Frame import Frame
 from pydofus2.com.ankamagames.jerakine.messages.Message import Message
-from pydofus2.com.ankamagames.jerakine.messages.WrongSocketClosureReasonMessage import (
-    WrongSocketClosureReasonMessage,
-)
-from pydofus2.com.ankamagames.jerakine.network.ServerConnectionClosedMessage import (
-    ServerConnectionClosedMessage,
-)
-from pydofus2.com.ankamagames.jerakine.network.messages.ExpectedSocketClosureMessage import (
-    ExpectedSocketClosureMessage,
-)
-from pydofus2.com.ankamagames.jerakine.network.messages.UnexpectedSocketClosureMessage import (
-    UnexpectedSocketClosureMessage,
-)
+from pydofus2.com.ankamagames.jerakine.messages.WrongSocketClosureReasonMessage import \
+    WrongSocketClosureReasonMessage
+from pydofus2.com.ankamagames.jerakine.network.messages.ExpectedSocketClosureMessage import \
+    ExpectedSocketClosureMessage
+from pydofus2.com.ankamagames.jerakine.network.messages.UnexpectedSocketClosureMessage import \
+    UnexpectedSocketClosureMessage
+from pydofus2.com.ankamagames.jerakine.network.ServerConnectionClosedMessage import \
+    ServerConnectionClosedMessage
 from pydofus2.com.ankamagames.jerakine.types.enums.Priority import Priority
-import pydofus2.com.ankamagames.dofus.logic.game.approach.frames.GameServerApproachFrame as gsaF
 
 
 class DisconnectionHandlerFrame(Frame):
@@ -97,7 +97,7 @@ class DisconnectionHandlerFrame(Frame):
                             Logger().info("[DisconnectionHandler] Expected socket closure")
                             Kernel().worker.process(ExpectedSocketClosureMessage(reason.reason))
             else:
-                Logger().warning("The connection hasn't even start.")
+                Logger().warning("The connection hasn't even start or already closed.")
             return True
 
         elif isinstance(msg, WrongSocketClosureReasonMessage):

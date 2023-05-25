@@ -1,4 +1,3 @@
-from pydofus2.com.ankamagames.dofus.logic.connection.frames.ServerSelectionFrame import ServerSelectionFrame
 from pydofus2.com.ankamagames.berilia.managers.KernelEventsManager import (
     KernelEvent, KernelEventsManager)
 from pydofus2.com.ankamagames.dofus.kernel.Kernel import Kernel
@@ -12,6 +11,8 @@ from pydofus2.com.ankamagames.dofus.logic.common.managers.PlayerManager import \
     PlayerManager
 from pydofus2.com.ankamagames.dofus.logic.connection.actions.LoginValidationAction import \
     LoginValidationAction
+from pydofus2.com.ankamagames.dofus.logic.connection.frames.ServerSelectionFrame import \
+    ServerSelectionFrame
 from pydofus2.com.ankamagames.dofus.logic.connection.managers.AuthentificationManager import \
     AuthentificationManager
 from pydofus2.com.ankamagames.dofus.network.enums.IdentificationFailureReasonsEnum import \
@@ -162,7 +163,9 @@ class AuthentificationFrame(Frame):
         return connexionSequence
     
     def pushed(self) -> bool:
+        Logger().info("Auth frame pushed")
         return True
 
     def pulled(self) -> bool:
+        Logger().info("Auth frame pulled")
         return True

@@ -4,8 +4,7 @@ import json
 import pydofus2.com.ankamagames.dofus.Constants as Constants
 from pydofus2.com.ankamagames.dofus.kernel.Kernel import Kernel
 from pydofus2.com.ankamagames.jerakine.logger.Logger import Logger
-from pydofus2.com.ankamagames.jerakine.metaclasses.Singleton import \
-    Singleton
+from pydofus2.com.ankamagames.jerakine.metaclasses.Singleton import Singleton
 from pydofus2.com.ankamagames.jerakine.network.CustomDataWrapper import \
     ByteArray
 from pydofus2.com.ankamagames.jerakine.network.INetworkMessage import \
@@ -30,8 +29,7 @@ _messages_to_discard = {
     "ListMapNpcsQuestStatusUpdateMessage",
     "GameMapChangeOrientationMessage",
     "HousePropertiesMessage",
-    "KnownZaapListMessage" "GuildGetInformationsMessage",
-    "KnownZaapListMessage",
+    "GuildGetInformationsMessage",
     "PrismsListMessage",
     "ChatCommunityChannelCommunityMessage",
     "FriendWarnOnConnectionStateMessage",
@@ -56,7 +54,6 @@ _messages_to_discard = {
     "ServerOptionalFeaturesMessage",
     "ServerSessionConstantsMessage",
     "AccountCapabilitiesMessage",
-    "AlignmentRankUpdateMessage",
     "GameRolePlayArenaUpdatePlayerInfosAllQueuesMessage",
     "FollowedQuestsMessage",
     "CharacterExperienceGainMessage",
@@ -65,7 +62,6 @@ _messages_to_discard = {
     "PrismsListUpdateMessage",
     "TrustStatusMessage",
     "NotificationListMessage",
-    "AchievementListMessage",
     "ChallengeInfoMessage",
     "ChallengeTargetUpdateMessage",
     "ChallengeResultMessage",
@@ -77,12 +73,16 @@ _messages_to_discard = {
     "PartyUpdateLightMessage",
     "PartyRestrictedMessage",
     "PartyLeaderUpdateMessage",
-    "LifePointsRegenBeginMessage",
     "MapFightCountMessage",
     "PartyUpdateMessage",
-    "LifePointsRegenEndMessage",
     "CredentialsAcknowledgementMessage",
     "IdolFightPreparationUpdateMessage",
+    "SubareaRewardRateMessage",
+    "LifePointsRegenEndMessage",
+    "LifePointsRegenBeginMessage",
+    "TitlesAndOrnamentsListMessage",
+    "GameRolePlayArenaRegistrationStatusMessage",
+    "PrismAddOrUpdateMessage"
 }
 
 _mule_fight_messages_to_discard = {

@@ -141,16 +141,16 @@ class Worker(MessageHandler):
         self._framesToRemove.clear()
         self._currentFrameTypesCache.clear()
         self._processingMessage.clear()
-        while not self._queue.empty():
-            try:
-                self._queue.get_nowait()
-            except self._queue.Empty:
-                break
+        # while not self._queue.empty():
+        #     try:
+        #         self._queue.get_nowait()
+        #     except self._queue.Empty:
+        #         break
     
 
     def pushFrame(self, frame: Frame) -> None:
         if str(frame) in [str(f) for f in self._framesList]:
-            Logger().warn(f"[WORKER] Frame '{frame}' is already in the list.")
+            Logger().warn(f"Frame '{frame}' is already in the list.")
             return
         if frame.pushed():
             self._framesList.append(frame)
@@ -158,7 +158,7 @@ class Worker(MessageHandler):
             self._currentFrameTypesCache[str(frame)] = frame
             KernelEventsManager().send(KernelEvent.FRAME_PUSHED, frame)
         else:
-            Logger().warn(f"[WORKER] Frame '{frame}' refused to be pushed.")
+            Logger().warn(f"Frame '{frame}' refused to be pushed.")
 
     def pullFrame(self, frame: Frame) -> None:
         if frame.pulled():
@@ -187,13 +187,14 @@ class Worker(MessageHandler):
                 return
             if frame.process(msg):
                 processed = True
+                # Logger().debug(f"Message '{msg}' processed in frame '{type(frame).__name__}'.")
                 break
         self._processingMessage.clear()
         if not processed and not isinstance(msg, DiscardableMessage):
             if self._terminating.is_set() or self._terminated.is_set():
                 return
             if type(msg).__name__ != "ServerConnectionClosedMessage":
-                Logger().error(f"[WORKER] Discarded message: {msg}!")
+                Logger().error(f"Discarded message: {msg}!")
 
     def processFramesInAndOut(self) -> None:        
         if self._terminating.is_set() or self._terminated.is_set():

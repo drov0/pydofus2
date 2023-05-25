@@ -232,6 +232,7 @@ class ExchangeManagementFrame(Frame):
             ConnectionsHandler().send(eotlwqtoimsg)
 
     def processExchangeLeave(self, msg: ExchangeLeaveMessage):
+        Logger().debug(f"Exchange closed")
         if msg.dialogType == DialogTypeEnum.DIALOG_EXCHANGE:
             PlayedCharacterManager().isInExchange = False
             self._success = msg.success

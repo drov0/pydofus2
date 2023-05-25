@@ -101,7 +101,7 @@ class InventoryManagementFrame(Frame):
             InventoryManager().inventory.kamas = wicmsg.kamas
             return True
 
-        if isinstance(msg, InventoryContentMessage):
+        if type(msg) is InventoryContentMessage:
             icmsg = msg
             InventoryManager().inventory.initializeFromObjectItems(icmsg.objects)
             InventoryManager().inventory.kamas = icmsg.kamas

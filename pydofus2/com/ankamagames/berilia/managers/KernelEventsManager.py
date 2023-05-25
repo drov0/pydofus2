@@ -103,8 +103,13 @@ class KernelEvent(Enum):
     ExchangeIsReady = 85
     ExchangeKamaModified = 86
     ExchangePodsModified = 87
-
-
+    # teleport events
+    TeleportDestinationList = 88
+    # pvp
+    AlignmentRankUpdate = 89
+    CharacterAlignmentWarEffortProgressionHook = 90
+    UpdateWarEffortHook = 91
+    AlignmentWarEffortProgressionMessageHook = 92
 class KernelEventsManager(EventsHandler, metaclass=Singleton):
     def __init__(self):
         super().__init__()

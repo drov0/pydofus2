@@ -1,39 +1,8 @@
-from typing import TYPE_CHECKING, Tuple
-from pydofus2.com.ankamagames.atouin.managers.MapDisplayManager import \
-    MapDisplayManager
-from pydofus2.com.ankamagames.atouin.utils.DataMapProvider import \
-    DataMapProvider
-from pydofus2.com.ankamagames.dofus.datacenter.jobs.Skill import Skill
-from pydofus2.com.ankamagames.dofus.internalDatacenter.DataEnum import DataEnum
-from pydofus2.com.ankamagames.dofus.kernel.Kernel import Kernel
-from pydofus2.com.ankamagames.dofus.kernel.net.ConnectionsHandler import \
-    ConnectionsHandler
-from pydofus2.com.ankamagames.dofus.logic.game.common.managers.PlayedCharacterManager import \
-    PlayedCharacterManager
-from pydofus2.com.ankamagames.dofus.network.types.game.interactive.InteractiveElement import \
-    InteractiveElement
-if TYPE_CHECKING:
-    from pydofus2.com.ankamagames.dofus.logic.game.roleplay.frames.RoleplayContextFrame import (
-        RoleplayContextFrame,
-    )
-from pydofus2.com.ankamagames.dofus.logic.game.roleplay.frames.RoleplayMovementFrame import \
-    RoleplayMovementFrame
-from pydofus2.com.ankamagames.dofus.network.messages.game.context.roleplay.MapComplementaryInformationsDataMessage import \
-    MapComplementaryInformationsDataMessage
-from pydofus2.com.ankamagames.dofus.network.messages.game.context.roleplay.MapFightStartPositionsUpdateMessage import \
-    MapFightStartPositionsUpdateMessage
-from pydofus2.com.ankamagames.dofus.network.messages.game.inventory.exchanges.ExchangeOnHumanVendorRequestMessage import \
-    ExchangeOnHumanVendorRequestMessage
-from pydofus2.com.ankamagames.dofus.network.types.game.context.fight.FightStartingPositions import \
-    FightStartingPositions
 from pydofus2.com.ankamagames.dofus.types.entities.AnimatedCharacter import \
     AnimatedCharacter
-from pydofus2.com.ankamagames.jerakine.messages.events.FramePushedEvent import \
-    FramePushedEvent
 from pydofus2.com.ankamagames.jerakine.messages.Frame import Frame
 from pydofus2.com.ankamagames.jerakine.messages.Message import Message
 from pydofus2.com.ankamagames.jerakine.types.enums.Priority import Priority
-from pydofus2.com.ankamagames.jerakine.types.positions.MapPoint import MapPoint
 
 
 class RoleplayWorldFrame(Frame):
@@ -45,142 +14,20 @@ class RoleplayWorldFrame(Frame):
     _playerEntity: AnimatedCharacter
     _playerName: str
     _allowOnlyCharacterInteraction: bool
-    _fightPositions: FightStartingPositions
-    _fightPositionsVisible: bool
     pivotingCharacter: bool
 
     def __init__(self):
         super().__init__()
 
     @property
-    def mouseOverEntityId(self) -> float:
-        return self._mouseOverEntityId
-
-    @property
-    def allowOnlyCharacterInteraction(self) -> bool:
-        return self._allowOnlyCharacterInteraction
-
-    @allowOnlyCharacterInteraction.setter
-    def allowOnlyCharacterInteraction(self, pAllow: bool) -> None:
-        self._allowOnlyCharacterInteraction = pAllow
-
-    @property
     def priority(self) -> int:
         return Priority.NORMAL
 
-    @property
-    def roleplayContextFrame(self) -> "RoleplayContextFrame":
-        return Kernel().worker.getFrameByName("RoleplayContextFrame")
-
-    @property
-    def roleplayMovementFrame(self) -> RoleplayMovementFrame:
-        return Kernel().worker.getFrameByName("RoleplayMovementFrame")
-
     def pushed(self) -> bool:
-        self._allowOnlyCharacterInteraction = False
-        self.cellClickEnabled = True
         return True
 
     def process(self, msg: Message) -> bool:
-
-        if isinstance(msg, MapComplementaryInformationsDataMessage):
-            mcidmsg = msg
-            self._fightPositions = mcidmsg.fightStartPositions
-            return False
-
-        elif isinstance(msg, MapFightStartPositionsUpdateMessage):
-            mfspmsg = msg
-            if PlayedCharacterManager().currentMap and mfspmsg.mapId == PlayedCharacterManager().currentMap.mapId:
-                self._fightPositions = mfspmsg.fightStartPositions
-            return True
-
         return False
 
     def pulled(self) -> bool:
         return True
-
-    def onFramePushed(self, pEvent: FramePushedEvent) -> None:
-        from pydofus2.com.ankamagames.dofus.logic.game.roleplay.frames.RoleplayEntitiesFrame import \
-            RoleplayEntitiesFrame
-
-        if isinstance(pEvent.frame, RoleplayEntitiesFrame):
-            pEvent.currentTarget.removeEventListener(FramePushedEvent.EVENT_FRAME_PUSHED, self.onFramePushed)
-
-    def onMerchantPlayerBuyClick(self, vendorId: float, vendorCellId: int) -> None:
-        eohvrmsg: ExchangeOnHumanVendorRequestMessage = ExchangeOnHumanVendorRequestMessage()
-        eohvrmsg.init(vendorId, vendorCellId)
-        ConnectionsHandler().send(eohvrmsg)
-
-    def getNearestCellToIe(self, ie: InteractiveElement, iePos: MapPoint) -> Tuple[MapPoint, bool]:
-        forbiddenCellsIds = list()
-        cells = MapDisplayManager().dataMap.cells
-        dmp = DataMapProvider()
-        sendInteractiveUseRequest = True
-        for i in range(8):
-            mp = iePos.getNearestCellInDirection(i)
-            if mp:
-                cellData = cells[mp.cellId]
-                forbidden = not cellData.mov or cellData.farmCell
-                if not forbidden:
-                    numWalkableCells = 8
-                    for j in range(8):
-                        mp2 = mp.getNearestCellInDirection(j)
-                        if mp2 and (
-                            not dmp.pointMov(mp2.x, mp2.y, True, mp.cellId)
-                            or not dmp.pointMov(mp2.x - 1, mp2.y, True, mp.cellId)
-                            and not dmp.pointMov(mp2.x, mp2.y - 1, True, mp.cellId)
-                        ):
-                            numWalkableCells -= 1
-                    if not numWalkableCells:
-                        forbidden = True
-                if forbidden:
-                    if not forbiddenCellsIds:
-                        forbiddenCellsIds = []
-                    forbiddenCellsIds.append(mp.cellId)
-        ieCellData = cells[iePos.cellId]
-
-        if ie:
-            minimalRange = 63
-            skills = ie.enabledSkills
-            for skillForRange in skills:
-                skillData = Skill.getSkillById(skillForRange.skillId)
-                if skillData:
-                    if not skillData.useRangeInClient:
-                        minimalRange = 1
-                    elif skillData.range < minimalRange:
-                        minimalRange = skillData.range
-        else:
-            minimalRange = 1
-        distanceElementToPlayer = iePos.distanceToCell(PlayedCharacterManager().entity.position)
-        if distanceElementToPlayer <= minimalRange and (not ieCellData.mov or ieCellData.farmCell):
-            nearestCell = PlayedCharacterManager().entity.position
-        else:
-            orientationToCell = iePos.advancedOrientationTo(PlayedCharacterManager().entity.position)
-            nearestCell = iePos.getNearestFreeCellInDirection(
-                orientationToCell,
-                DataMapProvider(),
-                True,
-                True,
-                False,
-                forbiddenCellsIds,
-            )
-            if minimalRange > 1:
-                for _ in range(minimalRange - 1):
-                    forbiddenCellsIds.append(nearestCell.cellId)
-                    nearestCell = nearestCell.getNearestFreeCellInDirection(
-                        nearestCell.advancedOrientationTo(PlayedCharacterManager().entity.position, False),
-                        DataMapProvider(),
-                        True,
-                        True,
-                        False,
-                        forbiddenCellsIds,
-                    )
-                    if not nearestCell or nearestCell.cellId == PlayedCharacterManager().entity.position.cellId:
-                        break
-        if ie:
-            if len(skills) == 1 and skills[0].skillId == DataEnum.SKILL_POINT_OUT_EXIT:
-                nearestCell.cellId = PlayedCharacterManager().entity.position.cellId
-                sendInteractiveUseRequest = False
-        if not nearestCell or nearestCell.cellId in forbiddenCellsIds:
-            nearestCell = iePos
-        return nearestCell, sendInteractiveUseRequest

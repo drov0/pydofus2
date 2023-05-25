@@ -1,12 +1,12 @@
 from pydofus2.com.ankamagames.dofus.datacenter.effects.Effect import Effect
-from pydofus2.com.ankamagames.dofus.datacenter.effects.instances.EffectInstanceDice import (
-    EffectInstanceDice,
-)
-from pydofus2.com.ankamagames.dofus.logic.game.fight.types.BasicBuff import BasicBuff
-from pydofus2.com.ankamagames.dofus.logic.game.fight.types.CastingSpell import CastingSpell
-from pydofus2.com.ankamagames.dofus.network.types.game.actions.fight.FightTriggeredEffect import (
-    FightTriggeredEffect,
-)
+from pydofus2.com.ankamagames.dofus.datacenter.effects.instances.EffectInstanceDice import \
+    EffectInstanceDice
+from pydofus2.com.ankamagames.dofus.logic.game.fight.types.BasicBuff import \
+    BasicBuff
+from pydofus2.com.ankamagames.dofus.logic.game.fight.types.CastingSpell import \
+    CastingSpell
+from pydofus2.com.ankamagames.dofus.network.types.game.actions.fight.FightTriggeredEffect import \
+    FightTriggeredEffect
 
 
 class TriggeredBuff(BasicBuff):
@@ -37,7 +37,7 @@ class TriggeredBuff(BasicBuff):
 
     @property
     def param1(self):
-        return self._effect.setP
+        return self._effect.parameter0
 
     @param1.setter
     def param1(self, value: int):

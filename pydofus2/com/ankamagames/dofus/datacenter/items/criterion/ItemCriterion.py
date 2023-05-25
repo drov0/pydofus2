@@ -1,3 +1,5 @@
+from typing import TYPE_CHECKING
+
 from pydofus2.com.ankamagames.dofus.datacenter.items.criterion.IItemCriterion import \
     IItemCriterion
 from pydofus2.com.ankamagames.dofus.internalDatacenter.stats.EntityStats import \
@@ -9,10 +11,10 @@ from pydofus2.com.ankamagames.dofus.logic.game.common.managers.PlayedCharacterMa
 from pydofus2.com.ankamagames.jerakine.data.I18n import I18n
 from pydofus2.com.ankamagames.jerakine.logger.Logger import Logger
 from pydofus2.damageCalculation.tools.StatIds import StatIds
-from typing import TYPE_CHECKING
+
 if TYPE_CHECKING:
     from pydofus2.com.ankamagames.dofus.datacenter.items.criterion.ItemCriterionOperator import \
-    ItemCriterionOperator
+        ItemCriterionOperator
 
 class ItemCriterion(IItemCriterion):
 
@@ -54,7 +56,7 @@ class ItemCriterion(IItemCriterion):
         player = PlayedCharacterManager()
         if not player or not player.characteristics:
             return True
-        return self._operator.compare(self.getCriterion(), self._criterionValue)
+        return self._operator.compare(self.getCriterion(), float(self._criterionValue))
 
     @property
     def text(self) -> str:
@@ -143,7 +145,8 @@ class ItemCriterion(IItemCriterion):
         return f"{readableCriterionRef} {self._operator.text} {self._criterionValue}"
 
     def getInfos(self) -> None:
-        from pydofus2.com.ankamagames.dofus.datacenter.items.criterion.ItemCriterionOperator import ItemCriterionOperator
+        from pydofus2.com.ankamagames.dofus.datacenter.items.criterion.ItemCriterionOperator import \
+            ItemCriterionOperator
         for operator in ItemCriterionOperator.OPERATORS_LIST:
             if self._serverCriterionForm.find(operator) == 2:
                 self._operator = ItemCriterionOperator(operator)

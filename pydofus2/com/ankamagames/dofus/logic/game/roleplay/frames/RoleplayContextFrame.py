@@ -11,6 +11,8 @@ from pydofus2.com.ankamagames.dofus.datacenter.world.SubArea import SubArea
 from pydofus2.com.ankamagames.dofus.internalDatacenter.world.WorldPointWrapper import \
     WorldPointWrapper
 from pydofus2.com.ankamagames.dofus.kernel.Kernel import Kernel
+from pydofus2.com.ankamagames.dofus.kernel.net.ConnectionsHandler import \
+    ConnectionsHandler
 from pydofus2.com.ankamagames.dofus.logic.game.common.frames.CommonExchangeManagementFrame import \
     CommonExchangeManagementFrame
 from pydofus2.com.ankamagames.dofus.logic.game.common.frames.ExchangeManagementFrame import \
@@ -19,6 +21,8 @@ from pydofus2.com.ankamagames.dofus.logic.game.common.managers.PlayedCharacterMa
     PlayedCharacterManager
 from pydofus2.com.ankamagames.dofus.logic.game.roleplay.frames.RoleplayMovementFrame import \
     RoleplayMovementFrame
+from pydofus2.com.ankamagames.dofus.logic.game.roleplay.frames.ZaapFrame import \
+    ZaapFrame
 from pydofus2.com.ankamagames.dofus.network.enums.ExchangeTypeEnum import \
     ExchangeTypeEnum
 from pydofus2.com.ankamagames.dofus.network.messages.game.context.GameContextDestroyMessage import \
@@ -27,9 +31,18 @@ from pydofus2.com.ankamagames.dofus.network.messages.game.context.roleplay.Curre
     CurrentMapInstanceMessage
 from pydofus2.com.ankamagames.dofus.network.messages.game.context.roleplay.CurrentMapMessage import \
     CurrentMapMessage
+from pydofus2.com.ankamagames.dofus.network.messages.game.context.roleplay.havenbag.EnterHavenBagRequestMessage import \
+    EnterHavenBagRequestMessage
+from pydofus2.com.ankamagames.dofus.network.messages.game.dialog.LeaveDialogMessage import \
+    LeaveDialogMessage
+from pydofus2.com.ankamagames.dofus.network.messages.game.interactive.zaap.TeleportDestinationsMessage import \
+    TeleportDestinationsMessage
+from pydofus2.com.ankamagames.dofus.network.messages.game.interactive.zaap.ZaapDestinationsMessage import \
+    ZaapDestinationsMessage
 from pydofus2.com.ankamagames.dofus.network.messages.game.inventory.exchanges.ExchangeRequestedTradeMessage import \
     ExchangeRequestedTradeMessage
-from pydofus2.com.ankamagames.dofus.network.messages.game.inventory.exchanges.ExchangeStartedMessage import ExchangeStartedMessage
+from pydofus2.com.ankamagames.dofus.network.messages.game.inventory.exchanges.ExchangeStartedMessage import \
+    ExchangeStartedMessage
 from pydofus2.com.ankamagames.dofus.network.messages.game.inventory.items.ObtainedItemMessage import \
     ObtainedItemMessage
 from pydofus2.com.ankamagames.jerakine.logger.Logger import Logger
@@ -72,11 +85,19 @@ class RoleplayContextFrame(Frame):
 
     def pushed(self) -> bool:
         self.movementFrame = RoleplayMovementFrame()
-        self._worldFrame = rplWF.RoleplayWorldFrame()
+        # self._worldFrame = rplWF.RoleplayWorldFrame()
         self._entitiesFrame = ref.RoleplayEntitiesFrame()
         self._interactivesFrame = rif.RoleplayInteractivesFrame()
         self._exchangeManagementFrame = ExchangeManagementFrame()
+        self._zaapFrame = ZaapFrame()
         return True
+
+    def havenbagEnter(self, ownerId=None):
+        if ownerId is None:
+            ownerId = PlayedCharacterManager().id
+        enterhbrmsg = EnterHavenBagRequestMessage();
+        enterhbrmsg.init(int(ownerId))
+        ConnectionsHandler().send(enterhbrmsg)
 
     def process(self, msg: Message) -> bool:
 
@@ -94,8 +115,8 @@ class RoleplayContextFrame(Frame):
             Kernel().worker.pause()
             if self._entitiesFrame:
                 Kernel().worker.removeFrame(self._entitiesFrame)
-            if self._worldFrame:
-                Kernel().worker.removeFrame(self._worldFrame)
+            # if self._worldFrame:
+            #     Kernel().worker.removeFrame(self._worldFrame)
             if self._interactivesFrame:
                 Kernel().worker.removeFrame(self._interactivesFrame)
             if self.movementFrame:
@@ -117,7 +138,7 @@ class RoleplayContextFrame(Frame):
 
         elif isinstance(msg, MapLoadedMessage):
             Kernel().worker.addFrame(self._entitiesFrame)
-            Kernel().worker.addFrame(self._worldFrame)
+            # Kernel().worker.addFrame(self._worldFrame)
             Kernel().worker.addFrame(self.movementFrame)
             Kernel().worker.addFrame(self._interactivesFrame)
             Kernel().worker.resume()
@@ -132,14 +153,14 @@ class RoleplayContextFrame(Frame):
         elif isinstance(msg, ObtainedItemMessage):
             return True
         
-        if isinstance(msg, ExchangeRequestedTradeMessage):
+        elif isinstance(msg, ExchangeRequestedTradeMessage):
             self.addCommonExchangeFrame(ExchangeTypeEnum.PLAYER_TRADE)
             if not Kernel().exchangeManagementFrame:
                 Kernel().worker.addFrame(self._exchangeManagementFrame)
                 Kernel().exchangeManagementFrame.processExchangeRequestedTradeMessage(msg)
             return True
         
-        if isinstance(msg, ExchangeStartedMessage):
+        elif isinstance(msg, ExchangeStartedMessage):
             commonExchangeFrame = Kernel().commonExchangeManagementFrame
             if commonExchangeFrame:
                 commonExchangeFrame.resetEchangeSequence()
@@ -148,13 +169,22 @@ class RoleplayContextFrame(Frame):
             elif msg.exchangeType in [ExchangeTypeEnum.BIDHOUSE_BUY, ExchangeTypeEnum.BIDHOUSE_SELL, ExchangeTypeEnum.PLAYER_TRADE, ExchangeTypeEnum.RECYCLE_TRADE]:
                 pass  # Placeholder for the remaining cases
             self.addCommonExchangeFrame(msg.exchangeType)
-            if not Kernel().exchangeManagementFrame:
+            if not Kernel().worker.contains("ExchangeManagementFrame"):
                 Kernel().worker.addFrame(self._exchangeManagementFrame)
             self._exchangeManagementFrame.process(msg)
             return True
+        
+        elif isinstance(msg, (ZaapDestinationsMessage, TeleportDestinationsMessage)):
+            if not Kernel().worker.contains("ZaapFrame"):
+                Kernel().worker.addFrame(self._zaapFrame);
+                Kernel().worker.process(msg);
+            return False;
 
+        elif isinstance(msg, LeaveDialogMessage):
+            KernelEventsManager().send(KernelEvent.DIALOG_LEFT)
+            return False
+        
         return False
-
     def addCommonExchangeFrame(self, exchangeType):
         if not Kernel().commonExchangeManagementFrame:
             self._commonExchangeFrame = CommonExchangeManagementFrame(exchangeType)
@@ -163,7 +193,7 @@ class RoleplayContextFrame(Frame):
     def pulled(self) -> bool:
         self._interactivesFrame.clear()
         Kernel().worker.removeFrame(self._entitiesFrame)
-        Kernel().worker.removeFrame(self._worldFrame)
+        # Kernel().worker.removeFrame(self._worldFrame)
         Kernel().worker.removeFrame(self.movementFrame)
         Kernel().worker.removeFrame(self._interactivesFrame)
         return True

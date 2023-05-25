@@ -47,7 +47,7 @@ class AStar(metaclass=Singleton):
         self._forbidenEdges.clear()
 
     def search(
-        self, worldGraph: WorldGraph, src: Vertex, dst: Vertex
+        self, worldGraph: WorldGraph, src: Vertex, dst: Vertex, maxPathLength=None
     ) -> list["Edge"]:
         if self.running:
             raise Exception("Pathfinding already in progress")
@@ -60,6 +60,7 @@ class AStar(metaclass=Singleton):
         self.running = True
         self.openList = list[tuple[int, int, Node, MapPoint]]()
         self.openDic = dict[Vertex, Node]()
+        self.maxPathLength = maxPathLength
         self.iterations = 0
         node = Node(self, src)
         heapq.heappush(self.openList, (0, id(node), node))
@@ -82,6 +83,8 @@ class AStar(metaclass=Singleton):
             if current.closed:
                 continue
             current.closed = True
+            if self.maxPathLength and current.moveCost > self.maxPathLength:
+                continue
             if current.vertex == self.dst:
                 Logger().info(f"Goal reached within {self.iterations} iterations and {perf_counter() - s} seconds")
                 result = self.buildResultPath(self.worldGraph, current)

@@ -2,8 +2,6 @@ from typing import TYPE_CHECKING
 
 from pydofus2.com.ankamagames.dofus.kernel.net.DisconnectionReasonEnum import \
     DisconnectionReasonEnum
-from pydofus2.com.ankamagames.dofus.logic.common.frames.ChatFrame import \
-    ChatFrame
 from pydofus2.com.ankamagames.dofus.network.Metadata import Metadata
 from pydofus2.com.ankamagames.jerakine.logger.Logger import Logger
 from pydofus2.com.ankamagames.jerakine.metaclasses.Singleton import Singleton
@@ -12,6 +10,12 @@ from pydofus2.com.ankamagames.jerakine.network.messages.Worker import Worker
 if TYPE_CHECKING:
     from pyd2bot.logic.common.frames.BotRPCFrame import BotRPCFrame
     from pyd2bot.logic.roleplay.behaviors.FarmFights import FarmFights
+    from pydofus2.com.ankamagames.dofus.logic.common.frames.AlignmentFrame import \
+        AlignmentFrame
+    from pydofus2.com.ankamagames.dofus.logic.common.frames.ChatFrame import \
+        ChatFrame
+    from pydofus2.com.ankamagames.dofus.logic.common.frames.QuestFrame import \
+        QuestFrame
     from pydofus2.com.ankamagames.dofus.logic.connection.frames.AuthentificationFrame import \
         AuthentificationFrame
     from pydofus2.com.ankamagames.dofus.logic.game.common.frames.CommonExchangeManagementFrame import \
@@ -38,6 +42,8 @@ if TYPE_CHECKING:
         RoleplayMovementFrame
     from pydofus2.com.ankamagames.dofus.logic.game.roleplay.frames.RoleplayWorldFrame import \
         RoleplayWorldFrame
+    from pydofus2.com.ankamagames.dofus.logic.game.roleplay.frames.ZaapFrame import \
+        ZaapFrame
 
 class Kernel(metaclass=Singleton):
     def __init__(self) -> None:
@@ -93,6 +99,8 @@ class Kernel(metaclass=Singleton):
         Logger().debug("Reseted")
 
     def addInitialFrames(self) -> None:
+        from pydofus2.com.ankamagames.dofus.logic.common.frames.ChatFrame import \
+            ChatFrame
         from pydofus2.com.ankamagames.dofus.logic.common.frames.CleanupCrewFrame import \
             CleanupCrewFrame
         from pydofus2.com.ankamagames.dofus.logic.common.frames.LatencyFrame import \
@@ -103,7 +111,6 @@ class Kernel(metaclass=Singleton):
             AuthentificationFrame
         from pydofus2.com.ankamagames.dofus.logic.connection.frames.DisconnectionHandlerFrame import \
             DisconnectionHandlerFrame
-
         Logger().info("Adding initial frames ...")
         self._worker.addFrame(LatencyFrame())
         self._worker.addFrame(AuthentificationFrame())
@@ -176,3 +183,20 @@ class Kernel(metaclass=Singleton):
     @property
     def exchangeManagementFrame(self) -> "ExchangeManagementFrame":
         return self.roleplayContextFrame._exchangeManagementFrame
+    
+    @property
+    def zaapFrame(self) -> "ZaapFrame":
+        return self.roleplayContextFrame._zaapFrame
+    
+    @property
+    def questFrame(self) -> "QuestFrame":
+        return self._worker.getFrameByName("QuestFrame")
+    
+    @property
+    def alignmentFrame(self) -> "AlignmentFrame":
+        return self._worker.getFrameByName("AlignmentFrame")
+
+    @property
+    def chatFrame(self) -> "ChatFrame":
+        return self._worker.getFrameByName("ChatFrame")
+    

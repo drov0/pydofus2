@@ -1,16 +1,20 @@
 import math
 import time
-from pydofus2.com.ankamagames.dofus.datacenter.servers.Server import Server
-from pydofus2.com.ankamagames.dofus.internalDatacenter.connection.BasicCharacterWrapper import BasicCharacterWrapper
-from pydofus2.com.ankamagames.jerakine.metaclasses.Singleton import Singleton
 from typing import TYPE_CHECKING
+
+from pydofus2.com.ankamagames.dofus.datacenter.houses.HavenbagTheme import \
+    HavenbagTheme
+from pydofus2.com.ankamagames.dofus.datacenter.servers.Server import Server
+from pydofus2.com.ankamagames.dofus.internalDatacenter.connection.BasicCharacterWrapper import \
+    BasicCharacterWrapper
+from pydofus2.com.ankamagames.jerakine.metaclasses.Singleton import Singleton
 
 if TYPE_CHECKING:
     pass
-from pydofus2.com.ankamagames.dofus.network.types.game.havenbag.HavenBagRoomPreviewInformation import (
-    HavenBagRoomPreviewInformation,
-)
-from pydofus2.com.ankamagames.jerakine.interfaces.IDestroyable import IDestroyable
+from pydofus2.com.ankamagames.dofus.network.types.game.havenbag.HavenBagRoomPreviewInformation import \
+    HavenBagRoomPreviewInformation
+from pydofus2.com.ankamagames.jerakine.interfaces.IDestroyable import \
+    IDestroyable
 
 
 class PlayerManager(IDestroyable, metaclass=Singleton):
@@ -92,8 +96,6 @@ class PlayerManager(IDestroyable, metaclass=Singleton):
 
     @property
     def subscriptionDurationElapsed(self) -> float:
-        now: float = None
-        subscriptionSinceConnection: float = None
         if self.subscriptionEndDate > self._subscriptionEndDateUpdateTime:
             now = time.time()
             subscriptionSinceConnection = min(self.subscriptionEndDate, now) - self._subscriptionEndDateUpdateTime

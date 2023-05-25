@@ -2,6 +2,7 @@ from typing import TYPE_CHECKING
 
 from pydofus2.com.ankamagames.atouin.managers.MapDisplayManager import \
     MapDisplayManager
+from pydofus2.com.ankamagames.dofus.datacenter.jobs.Job import Job
 from pydofus2.com.ankamagames.dofus.datacenter.world.MapPosition import \
     MapPosition
 from pydofus2.com.ankamagames.dofus.logic.game.common.misc.DofusEntities import \
@@ -137,7 +138,7 @@ class PlayedCharacterManager(IDestroyable, metaclass=Singleton):
     @property
     def currVertex(self) -> Vertex:
         from pydofus2.com.ankamagames.dofus.modules.utils.pathFinding.world.WorldGraph import \
-    WorldGraph
+            WorldGraph
         if self.currentZoneRp is None or self.currentMap is None:
             return None
         return WorldGraph().getVertex(self.currentMap.mapId, self.currentZoneRp)
@@ -424,6 +425,17 @@ class PlayedCharacterManager(IDestroyable, metaclass=Singleton):
             jobsLevel += job.jobLevel
         return jobsLevel
 
+    def distanceFromCell(self, mp) -> int:
+        return self.entity.position.distanceToCell(mp)
+    
+    def joblevel(self, jobId) -> int:
+        if jobId not in self.jobs:
+            if jobId != 1: # base
+                job = Job.getJobById(jobId)
+                Logger().warn(f"Job '{job.name}' not in player Jobs : {self.jobs}")
+            return -1
+        return self.jobs[jobId].jobLevel
+
     def jobsfloat(self, onlyLevelOne: bool = False) -> int:
         job: "KnownJobWrapper" = None
         length: int = 0
@@ -441,7 +453,6 @@ class PlayedCharacterManager(IDestroyable, metaclass=Singleton):
         return mapId in self._knownZaapMapIds
 
     def jobsNumber(self, onlyLevelOne: bool = False) -> int:
-        job: KnownJobWrapper = None
         length: int = 0
         for job in self.jobs.values():
             if not (job.jobLevel != 1 and onlyLevelOne):
@@ -452,3 +463,7 @@ class PlayedCharacterManager(IDestroyable, metaclass=Singleton):
         for spellw in self.playerSpellList:
             if spellw.id == spellId:
                 return spellw
+    
+    def inSameRpZone(self, cellId:int) -> bool:
+        tgtRpZone = MapDisplayManager().dataMap.cells[cellId].linkedZoneRP
+        return tgtRpZone == self.currentZoneRp

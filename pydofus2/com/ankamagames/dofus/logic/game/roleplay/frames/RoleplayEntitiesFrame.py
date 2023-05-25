@@ -362,7 +362,7 @@ class RoleplayEntitiesFrame(AbstractEntitiesFrame, Frame):
             self.mcidm_processed = True
             self.processingMapData.set()
             KernelEventsManager().send(KernelEvent.MAPPROCESSED, msg.mapId)
-            return False
+            return True
 
         if isinstance(msg, GameRolePlayShowActorMessage):
             # Logger().debug(f"Actor {msg.informations.contextualId} showed")

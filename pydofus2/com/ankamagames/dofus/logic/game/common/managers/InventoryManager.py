@@ -1,76 +1,62 @@
-from pydofus2.com.ankamagames.dofus.logic.game.common.misc.Inventory import Inventory
-from pydofus2.com.ankamagames.dofus.logic.game.common.misc.PlayerInventory import PlayerInventory
-from pydofus2.com.ankamagames.dofus.logic.game.common.misc.inventoryView.BankConsumablesView import (
-    BankConsumablesView,
-)
-from pydofus2.com.ankamagames.dofus.logic.game.common.misc.inventoryView.BankCosmeticsView import (
-    BankCosmeticsView,
-)
-from pydofus2.com.ankamagames.dofus.logic.game.common.misc.inventoryView.BankEquipementView import (
-    BankEquipementView,
-)
-from pydofus2.com.ankamagames.dofus.logic.game.common.misc.inventoryView.BankFilteredView import (
-    BankFilteredView,
-)
-from pydofus2.com.ankamagames.dofus.logic.game.common.misc.inventoryView.BankMinoukiFilteredView import (
-    BankMinoukiFilteredView,
-)
-from pydofus2.com.ankamagames.dofus.logic.game.common.misc.inventoryView.BankMinoukiView import (
-    BankMinoukiView,
-)
-from pydofus2.com.ankamagames.dofus.logic.game.common.misc.inventoryView.BankQuestView import (
-    BankQuestView,
-)
-from pydofus2.com.ankamagames.dofus.logic.game.common.misc.inventoryView.BankRessourcesView import (
-    BankRessourcesView,
-)
-from pydofus2.com.ankamagames.dofus.logic.game.common.misc.inventoryView.BankView import BankView
-from pydofus2.com.ankamagames.dofus.logic.game.common.misc.inventoryView.CertificateView import (
-    CertificateView,
-)
-from pydofus2.com.ankamagames.dofus.logic.game.common.misc.inventoryView.EquipmentView import (
-    EquipmentView,
-)
-from pydofus2.com.ankamagames.dofus.logic.game.common.misc.inventoryView.RealView import RealView
-from pydofus2.com.ankamagames.dofus.logic.game.common.misc.inventoryView.RoleplayBuffView import (
-    RoleplayBuffView,
-)
-from pydofus2.com.ankamagames.dofus.logic.game.common.misc.inventoryView.StorageConsumablesView import (
-    StorageConsumablesView,
-)
-from pydofus2.com.ankamagames.dofus.logic.game.common.misc.inventoryView.StorageCosmeticsView import (
-    StorageCosmeticsView,
-)
-from pydofus2.com.ankamagames.dofus.logic.game.common.misc.inventoryView.StorageEquipmentView import (
-    StorageEquipmentView,
-)
-from pydofus2.com.ankamagames.dofus.logic.game.common.misc.inventoryView.StorageFilteredView import (
-    StorageFilteredView,
-)
-from pydofus2.com.ankamagames.dofus.logic.game.common.misc.inventoryView.StorageMinoukiFilteredView import (
-    StorageMinoukiFilteredView,
-)
-from pydofus2.com.ankamagames.dofus.logic.game.common.misc.inventoryView.StorageMinoukiView import (
-    StorageMinoukiView,
-)
-from pydofus2.com.ankamagames.dofus.logic.game.common.misc.inventoryView.StorageQuestCategory import (
-    StorageQuestCategory,
-)
-from pydofus2.com.ankamagames.dofus.logic.game.common.misc.inventoryView.StorageResourcesView import (
-    StorageResourcesView,
-)
-from pydofus2.com.ankamagames.dofus.logic.game.common.misc.inventoryView.StorageView import (
-    StorageView,
-)
-from pydofus2.com.ankamagames.dofus.network.ProtocolConstantsEnum import ProtocolConstantsEnum
-from pydofus2.com.ankamagames.dofus.network.enums.CharacterInventoryPositionEnum import (
-    CharacterInventoryPositionEnum,
-)
-from pydofus2.com.ankamagames.jerakine.metaclasses.Singleton import Singleton
 from typing import TYPE_CHECKING
 
+from pydofus2.com.ankamagames.dofus.logic.game.common.misc.Inventory import \
+    Inventory
+from pydofus2.com.ankamagames.dofus.logic.game.common.misc.inventoryView.BankConsumablesView import \
+    BankConsumablesView
+from pydofus2.com.ankamagames.dofus.logic.game.common.misc.inventoryView.BankCosmeticsView import \
+    BankCosmeticsView
+from pydofus2.com.ankamagames.dofus.logic.game.common.misc.inventoryView.BankEquipementView import \
+    BankEquipementView
+from pydofus2.com.ankamagames.dofus.logic.game.common.misc.inventoryView.BankFilteredView import \
+    BankFilteredView
+from pydofus2.com.ankamagames.dofus.logic.game.common.misc.inventoryView.BankMinoukiFilteredView import \
+    BankMinoukiFilteredView
+from pydofus2.com.ankamagames.dofus.logic.game.common.misc.inventoryView.BankMinoukiView import \
+    BankMinoukiView
+from pydofus2.com.ankamagames.dofus.logic.game.common.misc.inventoryView.BankQuestView import \
+    BankQuestView
+from pydofus2.com.ankamagames.dofus.logic.game.common.misc.inventoryView.BankRessourcesView import \
+    BankRessourcesView
+from pydofus2.com.ankamagames.dofus.logic.game.common.misc.inventoryView.BankView import \
+    BankView
+from pydofus2.com.ankamagames.dofus.logic.game.common.misc.inventoryView.CertificateView import \
+    CertificateView
+from pydofus2.com.ankamagames.dofus.logic.game.common.misc.inventoryView.EquipmentView import \
+    EquipmentView
+from pydofus2.com.ankamagames.dofus.logic.game.common.misc.inventoryView.RealView import \
+    RealView
+from pydofus2.com.ankamagames.dofus.logic.game.common.misc.inventoryView.RoleplayBuffView import \
+    RoleplayBuffView
+from pydofus2.com.ankamagames.dofus.logic.game.common.misc.inventoryView.StorageConsumablesView import \
+    StorageConsumablesView
+from pydofus2.com.ankamagames.dofus.logic.game.common.misc.inventoryView.StorageCosmeticsView import \
+    StorageCosmeticsView
+from pydofus2.com.ankamagames.dofus.logic.game.common.misc.inventoryView.StorageEquipmentView import \
+    StorageEquipmentView
+from pydofus2.com.ankamagames.dofus.logic.game.common.misc.inventoryView.StorageFilteredView import \
+    StorageFilteredView
+from pydofus2.com.ankamagames.dofus.logic.game.common.misc.inventoryView.StorageMinoukiFilteredView import \
+    StorageMinoukiFilteredView
+from pydofus2.com.ankamagames.dofus.logic.game.common.misc.inventoryView.StorageMinoukiView import \
+    StorageMinoukiView
+from pydofus2.com.ankamagames.dofus.logic.game.common.misc.inventoryView.StorageQuestCategory import \
+    StorageQuestCategory
+from pydofus2.com.ankamagames.dofus.logic.game.common.misc.inventoryView.StorageResourcesView import \
+    StorageResourcesView
+from pydofus2.com.ankamagames.dofus.logic.game.common.misc.inventoryView.StorageView import \
+    StorageView
+from pydofus2.com.ankamagames.dofus.logic.game.common.misc.PlayerInventory import \
+    PlayerInventory
+from pydofus2.com.ankamagames.dofus.network.enums.CharacterInventoryPositionEnum import \
+    CharacterInventoryPositionEnum
+from pydofus2.com.ankamagames.dofus.network.ProtocolConstantsEnum import \
+    ProtocolConstantsEnum
+from pydofus2.com.ankamagames.jerakine.metaclasses.Singleton import Singleton
+
 if TYPE_CHECKING:
-    from pydofus2.com.ankamagames.dofus.internalDatacenter.items.ItemWrapper import ItemWrapper
+    from pydofus2.com.ankamagames.dofus.internalDatacenter.items.ItemWrapper import \
+        ItemWrapper
 
 
 class InventoryManager(metaclass=Singleton):
@@ -145,15 +131,15 @@ class InventoryManager(metaclass=Singleton):
     def bankInventory(self) -> Inventory:
         if not self._bankInventory:
             self._bankInventory = Inventory()
-            self._bankInventory.addView(BankView(self._bankInventory.hookLock))
-            self._bankInventory.addView(BankEquipementView(self._bankInventory.hookLock))
-            self._bankInventory.addView(BankConsumablesView(self._bankInventory.hookLock))
-            self._bankInventory.addView(BankRessourcesView(self._bankInventory.hookLock))
-            self._bankInventory.addView(BankCosmeticsView(self._bankInventory.hookLock))
-            self._bankInventory.addView(BankQuestView(self._bankInventory.hookLock))
-            self._bankInventory.addView(BankMinoukiView(self._bankInventory.hookLock))
-            self._bankInventory.addView(BankMinoukiFilteredView(self._bankInventory.hookLock))
-            self._bankInventory.addView(BankFilteredView(self._bankInventory.hookLock))
+            self._bankInventory.addView(BankView())
+            self._bankInventory.addView(BankEquipementView())
+            self._bankInventory.addView(BankConsumablesView())
+            self._bankInventory.addView(BankRessourcesView())
+            self._bankInventory.addView(BankCosmeticsView())
+            self._bankInventory.addView(BankQuestView())
+            self._bankInventory.addView(BankMinoukiView())
+            self._bankInventory.addView(BankMinoukiFilteredView())
+            self._bankInventory.addView(BankFilteredView())
         return self._bankInventory
 
     @property

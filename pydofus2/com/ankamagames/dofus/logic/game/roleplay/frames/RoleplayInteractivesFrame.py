@@ -1,12 +1,15 @@
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Tuple
 
 from pydofus2.com.ankamagames.atouin.managers.MapDisplayManager import \
     MapDisplayManager
+from pydofus2.com.ankamagames.atouin.utils.DataMapProvider import \
+    DataMapProvider
 from pydofus2.com.ankamagames.berilia.managers.KernelEventsManager import (
     KernelEvent, KernelEventsManager)
 from pydofus2.com.ankamagames.dofus.datacenter.interactives.Interactive import \
     Interactive
 from pydofus2.com.ankamagames.dofus.datacenter.jobs.Skill import Skill
+from pydofus2.com.ankamagames.dofus.internalDatacenter.DataEnum import DataEnum
 from pydofus2.com.ankamagames.dofus.kernel.Kernel import Kernel
 from pydofus2.com.ankamagames.dofus.logic.game.common.managers.PlayedCharacterManager import \
     PlayedCharacterManager
@@ -43,13 +46,8 @@ from pydofus2.com.ankamagames.jerakine.types.enums.Priority import Priority
 from pydofus2.com.ankamagames.jerakine.types.positions.MapPoint import MapPoint
 
 if TYPE_CHECKING:
-    from pydofus2.com.ankamagames.dofus.logic.game.roleplay.frames.RoleplayEntitiesFrame import \
-        RoleplayEntitiesFrame
     from pydofus2.com.ankamagames.dofus.logic.game.roleplay.frames.RoleplayMovementFrame import \
         RoleplayMovementFrame
-    from pydofus2.com.ankamagames.dofus.logic.game.roleplay.frames.RoleplayWorldFrame import \
-        RoleplayWorldFrame
-
 
 class CollectableElement:
     def __init__(self, id: int, interactiveSkill: InteractiveElementSkill, enabled: bool):
@@ -77,20 +75,22 @@ class InteractiveElementData:
 
 class RoleplayInteractivesFrame(Frame):
 
-    COLLECTABLE_COLLECTING_STATE_ID: int = 2
+    COLLECTABLE_COLLECTING_STATE_ID = 2
 
-    COLLECTABLE_CUT_STATE_ID: int = 1
+    COLLECTABLE_CUT_STATE_ID = 1
 
-    ACTION_COLLECTABLE_RESOURCES: int = 1
+    ACTION_COLLECTABLE_RESOURCES = 1
 
     REVIVE_SKILL_ID = 211
+    
+    ZAAP_TYPEID = 16
     
     REQUEST_TIMEOUT = 10
 
     def __init__(self):
         self._usingInteractive: bool = False
         self._ie = dict[int, InteractiveElementData]()
-        self._collectableIe = dict[int, CollectableElement]()
+        self._collectableResource = dict[int, CollectableElement]()
         self._currentUsages = list()
         self._enityUsingElement = dict()
         self._interactiveActionTimers = dict()
@@ -104,10 +104,6 @@ class RoleplayInteractivesFrame(Frame):
         return Priority.HIGH
 
     @property
-    def roleplayWorldFrame(self) -> "RoleplayWorldFrame":
-        return Kernel().worker.getFrameByName("RoleplayWorldFrame")
-
-    @property
     def movementFrame(self) -> "RoleplayMovementFrame":
         return Kernel().worker.getFrameByName("RoleplayMovementFrame")
     
@@ -117,7 +113,7 @@ class RoleplayInteractivesFrame(Frame):
 
     @property
     def collectables(self) -> dict[int, CollectableElement]:
-        return self._collectableIe
+        return self._collectableResource
 
     def pushed(self) -> bool:
         Logger().debug("RoleplayInteractivesFrame pushed")
@@ -137,12 +133,12 @@ class RoleplayInteractivesFrame(Frame):
 
         if isinstance(msg, InteractiveElementUpdatedMessage):
             ieumsg = msg
-            if len(ieumsg.interactiveElement.enabledSkills):
+            if len(ieumsg.interactiveElement.enabledSkills) > 0:
                 self.registerInteractive(
                     ieumsg.interactiveElement,
                     ieumsg.interactiveElement.enabledSkills[0].skillInstanceUid,
                 )
-            elif len(ieumsg.interactiveElement.disabledSkills):
+            elif len(ieumsg.interactiveElement.disabledSkills) > 0:
                 self.registerInteractive(
                     ieumsg.interactiveElement,
                     ieumsg.interactiveElement.disabledSkills[0].skillInstanceUid,
@@ -157,22 +153,22 @@ class RoleplayInteractivesFrame(Frame):
                 self._enityUsingElement[msg.elemId] = msg.entityId
                 KernelEventsManager().send(KernelEvent.INTERACTIVE_ELEMENT_BEING_USED, msg.entityId, msg.elemId)
                 if msg.entityId == PlayedCharacterManager().id:                
-                    Logger().info(f"[RolePlayInteractives] Player is using element {msg.elemId} ...")
+                    Logger().info(f"Player is using element {msg.elemId} ...")
                     self.usingInteractive = True
             else:
                 if msg.entityId == PlayedCharacterManager().id:    
-                    Logger().info(f"[RolePlayInteractives] Player used element {msg.elemId}")
+                    Logger().info(f"Player used element {msg.elemId}")
                 KernelEventsManager().send(KernelEvent.INTERACTIVE_ELEMENT_USED, msg.entityId, msg.elemId)
             return True
         
         if isinstance(msg, InteractiveUseEndedMessage):
-            Logger().info(f"[RolePlayInteractives] Interactive element {msg.elemId} used.")
+            Logger().info(f"Interactive element {msg.elemId} used.")
             entityId = self._enityUsingElement.get(msg.elemId)
             if entityId == PlayedCharacterManager().id:
                 self.usingInteractive = False
             KernelEventsManager().send(KernelEvent.INTERACTIVE_ELEMENT_USED, entityId, msg.elemId)            
             del self._enityUsingElement[msg.elemId]
-            del self._collectableIe[msg.elemId]
+            del self._collectableResource[msg.elemId]
             return True
         
         if isinstance(msg, InteractiveUseErrorMessage):
@@ -212,12 +208,12 @@ class RoleplayInteractivesFrame(Frame):
         self._ie.clear()
         self._currentUsages.clear()
         self._interactiveActionTimers.clear()
-        self._collectableIe.clear()
+        self._collectableResource.clear()
         return True
 
     def clear(self) -> None:
         self._ie.clear()
-        self._collectableIe.clear()
+        self._collectableResource.clear()
 
     def getInteractiveElementsCells(self) -> list[int]:
         cells = [cellObj.position.cellId for cellObj in self._ie.values() if cellObj is not None]
@@ -234,15 +230,17 @@ class RoleplayInteractivesFrame(Frame):
     def registerInteractive(self, ie: InteractiveElement, firstSkill: int) -> None:
         if not MapDisplayManager().isIdentifiedElement(ie.elementId):
             return
-        entitiesFrame: "RoleplayEntitiesFrame" = Kernel().worker.getFrameByName("RoleplayEntitiesFrame")
-        if entitiesFrame:
+        if Kernel().entitiesFrame:
             found = False
-            for s, cie in enumerate(entitiesFrame.interactiveElements):
+            for s, cie in enumerate(Kernel().entitiesFrame.interactiveElements):
                 if cie.elementId == ie.elementId:
                     found = True
-                    entitiesFrame.interactiveElements[int(s)] = ie
+                    Kernel().entitiesFrame.interactiveElements[int(s)] = ie
+                    break
             if not found:
-                entitiesFrame.interactiveElements.append(ie)
+                Kernel().entitiesFrame.interactiveElements.append(ie)
+        else:
+            Logger().error("Received interactiveElem register but no entities frame found")
         worldPos: MapPoint = MapDisplayManager().getIdentifiedElementPosition(ie.elementId)
         self._ie[ie.elementId] = InteractiveElementData(ie, worldPos, firstSkill)
 
@@ -250,7 +248,7 @@ class RoleplayInteractivesFrame(Frame):
         if self._ie.get(ie.elementId):
             del self._ie[ie.elementId]
 
-    def isCollectable(self, ie: InteractiveElement) -> CollectableElement:
+    def isCollectableResource(self, ie: InteractiveElement) -> CollectableElement:
         interactive = Interactive.getInteractiveById(ie.elementTypeId)
         if interactive is not None:
             for interactiveSkill in ie.enabledSkills:
@@ -266,6 +264,14 @@ class RoleplayInteractivesFrame(Frame):
     def getReviveIe(self) -> InteractiveElementData:
         return self.getIeBySkillId(self.REVIVE_SKILL_ID)
 
+    def getZaapIe(self) -> InteractiveElementData:
+        return self.getIeByTypeId(self.ZAAP_TYPEID)
+
+    def getIeByTypeId(self, typeId: int) -> InteractiveElementData:
+        for ie in self._ie.values():
+            if ie.element.elementTypeId == typeId:
+                return ie
+
     def getIeBySkillId(self, skillId: int) -> InteractiveElementData:
         for ie in self._ie.values():
             if ie.element.enabledSkills:
@@ -278,9 +284,84 @@ class RoleplayInteractivesFrame(Frame):
         if se.elementId == self._currentUsedElementId:
             self._usingInteractive = True
         if se.elementId in self._ie and self._ie[se.elementId].element.onCurrentMap:
-            collectable = self.isCollectable(self._ie[se.elementId].element)
+            collectable = self.isCollectableResource(self._ie[se.elementId].element)
             if collectable is not None:
-                self._collectableIe[collectable.id] = collectable
+                self._collectableResource[collectable.id] = collectable
 
     def canBeCollected(self, elementId: int) -> CollectableElement:
-        return self._collectableIe.get(elementId)
+        return self._collectableResource.get(elementId)
+
+    @classmethod
+    def getNearestCellToIe(cls, ie: InteractiveElement, iePos: MapPoint) -> Tuple[MapPoint, bool]:
+        forbiddenCellsIds = list()
+        cells = MapDisplayManager().dataMap.cells
+        dmp = DataMapProvider()
+        sendInteractiveUseRequest = True
+        for i in range(8):
+            mp = iePos.getNearestCellInDirection(i)
+            if mp:
+                cellData = cells[mp.cellId]
+                forbidden = not cellData.mov or cellData.farmCell
+                if not forbidden:
+                    numWalkableCells = 8
+                    for j in range(8):
+                        mp2 = mp.getNearestCellInDirection(j)
+                        if mp2 and (
+                            not dmp.pointMov(mp2.x, mp2.y, True, mp.cellId)
+                            or not dmp.pointMov(mp2.x - 1, mp2.y, True, mp.cellId)
+                            and not dmp.pointMov(mp2.x, mp2.y - 1, True, mp.cellId)
+                        ):
+                            numWalkableCells -= 1
+                    if not numWalkableCells:
+                        forbidden = True
+                if forbidden:
+                    if not forbiddenCellsIds:
+                        forbiddenCellsIds = []
+                    forbiddenCellsIds.append(mp.cellId)
+        ieCellData = cells[iePos.cellId]
+
+        if ie:
+            minimalRange = 63
+            skills = ie.enabledSkills
+            for skillForRange in skills:
+                skillData = Skill.getSkillById(skillForRange.skillId)
+                if skillData:
+                    if not skillData.useRangeInClient:
+                        minimalRange = 1
+                    elif skillData.range < minimalRange:
+                        minimalRange = skillData.range
+        else:
+            minimalRange = 1
+        distanceElementToPlayer = iePos.distanceToCell(PlayedCharacterManager().entity.position)
+        if distanceElementToPlayer <= minimalRange and (not ieCellData.mov or ieCellData.farmCell):
+            nearestCell = PlayedCharacterManager().entity.position
+        else:
+            orientationToCell = iePos.advancedOrientationTo(PlayedCharacterManager().entity.position)
+            nearestCell = iePos.getNearestFreeCellInDirection(
+                orientationToCell,
+                DataMapProvider(),
+                True,
+                True,
+                False,
+                forbiddenCellsIds,
+            )
+            if minimalRange > 1:
+                for _ in range(minimalRange - 1):
+                    forbiddenCellsIds.append(nearestCell.cellId)
+                    nearestCell = nearestCell.getNearestFreeCellInDirection(
+                        nearestCell.advancedOrientationTo(PlayedCharacterManager().entity.position, False),
+                        DataMapProvider(),
+                        True,
+                        True,
+                        False,
+                        forbiddenCellsIds,
+                    )
+                    if not nearestCell or nearestCell.cellId == PlayedCharacterManager().entity.position.cellId:
+                        break
+        if ie:
+            if len(skills) == 1 and skills[0].skillId == DataEnum.SKILL_POINT_OUT_EXIT:
+                nearestCell.cellId = PlayedCharacterManager().entity.position.cellId
+                sendInteractiveUseRequest = False
+        if not nearestCell or nearestCell.cellId in forbiddenCellsIds:
+            nearestCell = iePos
+        return nearestCell, sendInteractiveUseRequest

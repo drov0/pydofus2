@@ -17,7 +17,9 @@ from pydofus2.com.ankamagames.jerakine.network.RawDataParser import \
 with open(Constants.PROTOCOL_MSG_SHUFFLE_PATH, "r") as fp:
     msgShuffle: dict = json.load(fp)
 
-_discardMessages = True
+class UnknownMessageId(Exception):
+    pass
+
 _messages_to_discard = {
     "ServerSettingsMessage",
     "SetCharacterRestrictionsMessage",
@@ -88,7 +90,8 @@ _messages_to_discard = {
     "HavenBagFurnituresMessage",
     "PaddockPropertiesMessage",
     "GameDataPaddockObjectListAddMessage",
-    "GameRolePlayMonsterNotAngryAtPlayerMessage"
+    "GameRolePlayMonsterNotAngryAtPlayerMessage",
+    "GameRolePlayMonsterAngryAtPlayerMessage"
 }
 
 _mule_fight_messages_to_discard = {
@@ -132,17 +135,16 @@ _mule_fight_messages_to_discard = {
 
 class MessageReceiver(RawDataParser, metaclass=Singleton):
 
-            
-    def __init__(self, discard=True):
+    def __init__(self, optimise=True):
         self.infight = False
-        self.discard = discard
+        self.discard = optimise
         self.msgLenLen = None
         self.msgLen = None
         self.msgId = None
         self.msgCount = None
         self.messagesTypes = dict[int, type[NetworkMessage]]()
         for cls_name, cls_infos in msgShuffle.items():
-            if self.discard and cls_name not in _messages_to_discard:
+            if not self.discard or cls_name not in _messages_to_discard:
                 cls = self.getMessageClass(cls_infos["module"], cls_name)
                 self.messagesTypes[cls_infos["id"]] = cls
         super().__init__()
@@ -158,9 +160,11 @@ class MessageReceiver(RawDataParser, metaclass=Singleton):
         if not from_client:
             messageType = self.messagesTypes.get(messageId)
         else:
-            clsSpec = ProtocolSpec.getClassSpecById(messageId)
-            messageType = self.getMessageClass(clsSpec.package, clsSpec.name)
-            
+            try:
+                clsSpec = ProtocolSpec.getClassSpecById(messageId)
+            except:
+                raise UnknownMessageId(f"Message {messageId}, from client {from_client} : not found in knowon message Ids!")
+            messageType = clsSpec.cls
         if self.discard:
             if not messageType or (
                 Kernel().isMule
@@ -172,7 +176,7 @@ class MessageReceiver(RawDataParser, metaclass=Singleton):
                 input.position += messageLength
                 return message
         if messageType is None:
-            raise Exception(f"Message {messageId} not found in knwon message Ids")
+            raise UnknownMessageId(f"Message {messageId}, from client {from_client} : not found in knowon message Ids!")
         if messageType.__name__ == "GameFightJoinMessage":
             self.infight = True
             Logger().separator("Fight started", "+")
@@ -183,7 +187,7 @@ class MessageReceiver(RawDataParser, metaclass=Singleton):
         message.unpacked = True
         return message
 
-    def parse(self, buffer: ByteArray, callback, from_client=False):
+    def parse(self, buffer: ByteArray, callback, from_client=False) -> None:
         while buffer.remaining():
             if self.msgLenLen is None:
                 if buffer.remaining() < 2:
@@ -207,8 +211,8 @@ class MessageReceiver(RawDataParser, metaclass=Singleton):
             self.msgLenLen = None
             self.msgLen = None
             self.msgCount = None
-            buffer.trim()
             callback(msg, from_client)
+        buffer.trim()
 
     def getMsgNameById(self, messageId: int) -> str:
         messageType = self.messagesTypes.get(messageId)

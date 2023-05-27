@@ -40,7 +40,6 @@ def sendTrace(func):
 
     return wrapped
 
-
 class ServerConnection(mp.Thread):
 
     DEBUG_VERBOSE: bool = False
@@ -51,7 +50,7 @@ class ServerConnection(mp.Thread):
     MESSAGE_SIZE_ASYNC_THRESHOLD: int = 300 * 1024
     CONNECTION_TIMEOUT = 7
 
-    def __init__(self, id: str = "ServerConnection", receptionQueue: queue.Queue = None):
+    def __init__(self, id: str = "ServerConnection", receptionQueue: queue.Queue = None, mitm_socket=None, MITM=False):
         super().__init__(name=mp.current_thread().name)
         self.id = id
         self._latencyBuffer = []
@@ -78,9 +77,14 @@ class ServerConnection(mp.Thread):
             self.receptionQueue = queue.Queue(200)
         else:
             self.receptionQueue = receptionQueue
-        self.socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        if MITM and mitm_socket:
+            self.socket = mitm_socket
+        else:
+            self.socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.connectionTimeout = None
         self.nbrSendFails = 0
+        
+        self.MITM = MITM
 
     @property
     def latencyAvg(self) -> float:
@@ -277,7 +281,8 @@ class ServerConnection(mp.Thread):
         self._remoteSrvHost = host
         self._remoteSrvPort = port
         Logger().info(f"[{self.id}] Connecting to {host}:{port}...")
-        self.socket.connect((host, port))
+        if self.MITM:
+            self.socket.connect((host, port))
 
     def handleMessage(self, msg: NetworkMessage, from_client=False):
         if type(msg).__name__ == "BasicPongMessage" and self._lastSentPingTime:

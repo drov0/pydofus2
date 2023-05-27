@@ -7,9 +7,10 @@ from pydofus2.com.ankamagames.dofus.logic.game.common.actions.GameContextQuitAct
     GameContextQuitAction
 from pydofus2.com.ankamagames.dofus.network.enums.GameContextEnum import \
     GameContextEnum
-from pydofus2.com.ankamagames.dofus.network.messages.game.context.GameContextDestroyMessage import GameContextDestroyMessage
 from pydofus2.com.ankamagames.dofus.network.messages.game.context.GameContextCreateMessage import \
     GameContextCreateMessage
+from pydofus2.com.ankamagames.dofus.network.messages.game.context.GameContextDestroyMessage import \
+    GameContextDestroyMessage
 from pydofus2.com.ankamagames.dofus.network.messages.game.context.GameContextQuitMessage import \
     GameContextQuitMessage
 from pydofus2.com.ankamagames.jerakine.messages.Frame import Frame
@@ -42,6 +43,7 @@ class ContextChangeFrame(Frame):
                 from pydofus2.com.ankamagames.dofus.logic.game.roleplay.frames.RoleplayContextFrame import \
                     RoleplayContextFrame
                 Kernel().worker.addFrame(RoleplayContextFrame())
+                KernelEventsManager().send(KernelEvent.ROLEPLAY_STARTED)
 
             elif self.currentContext == GameContextEnum.FIGHT:
                 from pydofus2.com.ankamagames.dofus.logic.game.fight.frames.FightContextFrame import \

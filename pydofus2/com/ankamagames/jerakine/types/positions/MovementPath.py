@@ -1,4 +1,6 @@
+import random
 from typing import Iterator
+from pydofus2.com.ankamagames.dofus.logic.game.common.managers.PlayedCharacterManager import PlayedCharacterManager
 
 from pydofus2.com.ankamagames.jerakine.types.enums.DirectionsEnum import \
     DirectionsEnum
@@ -11,14 +13,73 @@ class MovementPath:
 
     MAX_PATH_LENGTH: int = 100.0
     
-    WALK_HORIZONTAL_DIAG_DURATION = 510.0
-    WALK_VERTICAL_DIAG_DURATION = 425.0
-    WALK_LINEAR_DURATION = 480.0
+    WALK_HORIZONTAL_DIAG_DURATION_MEAN = 0.5390895873608917
+    WALK_HORIZONTAL_DIAG_DURATION_VAR = 0.001067391740768872
     
-    RUN_HORIZONTAL_DIAG_DURATION = 255
-    RUN_VERTICAL_DIAG_DURATION = 150
-    RUN_LINEAR_DURATION = 170
+    WALK_VERTICAL_DIAG_DURATION_MEAN = 0.5497773144868948
+    WALK_VERTICAL_DIAG_DURATION_VAR = 0.002915269054054996
+    
+    WALK_LINEAR_DURATION_MEAN = 0.41758097349105827
+    WALK_LINEAR_DURATION_VAR = 7.474874375074591e-05
+    
+    RUN_HORIZONTAL_DIAG_DURATION_MEAN = 0.45367340545271156
+    RUN_HORIZONTAL_DIAG_DURATION_VAR = 0.00034615919722585025
+    
+    RUN_VERTICAL_DIAG_DURATION_MEAN = 0.17209191803287516
+    RUN_VERTICAL_DIAG_DURATION_VAR = 8.024245923248129e-05
+    
+    RUN_LINEAR_DURATION_MEAN = 0.1426003061828884
+    RUN_LINEAR_DURATION_VAR = 7.64093133014606e-06
 
+    @property
+    def walkHorizontalDiagDuration(self):
+        return random.gauss(self.WALK_HORIZONTAL_DIAG_DURATION_MEAN, self.WALK_HORIZONTAL_DIAG_DURATION_VAR)
+    
+    @property
+    def walkVerticalDiagDuration(self):
+        return random.gauss(self.WALK_VERTICAL_DIAG_DURATION_MEAN, self.WALK_VERTICAL_DIAG_DURATION_VAR)
+    
+    @property
+    def walkLinearDuration(self):
+        return random.gauss(self.WALK_LINEAR_DURATION_MEAN, self.WALK_LINEAR_DURATION_VAR)
+    
+    @property
+    def runHorizontalDiagDuration(self):
+        return random.gauss(self.RUN_HORIZONTAL_DIAG_DURATION_MEAN, self.RUN_HORIZONTAL_DIAG_DURATION_VAR)
+    
+    @property
+    def runVerticalDiagDuration(self):
+        return random.gauss(self.RUN_VERTICAL_DIAG_DURATION_MEAN, self.RUN_VERTICAL_DIAG_DURATION_VAR)
+    
+    @property
+    def runLinearDuration(self):
+        return random.gauss(self.RUN_LINEAR_DURATION_MEAN, self.RUN_LINEAR_DURATION_VAR)
+        
+    def getStepDuration(self, orientation) -> float:
+        if PlayedCharacterManager().inventoryWeightMax != 0:
+            weightCoef = PlayedCharacterManager().inventoryWeight / PlayedCharacterManager().inventoryWeightMax
+        else:
+            weightCoef = 0
+        canRun = weightCoef < 1.0 and len(self.path) > 2
+        if isinstance(orientation, DirectionsEnum):
+            orientation = orientation.value
+        if not canRun:
+            if orientation % 2 == 0:
+                if orientation % 4 == 0:
+                    return self.walkHorizontalDiagDuration
+                else:
+                    return self.walkVerticalDiagDuration
+            else:
+                return self.walkLinearDuration
+        else:
+            if orientation % 2 == 0:
+                if orientation % 4 == 0:
+                    return self.runHorizontalDiagDuration
+                else:
+                    return self.runVerticalDiagDuration
+            else:
+                return self.runLinearDuration
+            
     def __init__(self):
         super().__init__()
         self._oEnd = MapPoint()

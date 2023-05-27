@@ -467,3 +467,9 @@ class PlayedCharacterManager(IDestroyable, metaclass=Singleton):
     def inSameRpZone(self, cellId:int) -> bool:
         tgtRpZone = MapDisplayManager().dataMap.cells[cellId].linkedZoneRP
         return tgtRpZone == self.currentZoneRp
+    
+    def isDead(self) -> bool:
+        return PlayerLifeStatusEnum(self.state) != PlayerLifeStatusEnum.STATUS_ALIVE_AND_KICKING
+    
+    def isPodsFull(self, pourcent=0.95):
+        return PlayedCharacterManager().inventoryWeightMax > 0 and PlayedCharacterManager().inventoryWeight / PlayedCharacterManager().inventoryWeightMax > pourcent

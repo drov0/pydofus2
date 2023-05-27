@@ -1,65 +1,53 @@
 from pydofus2.com.ankamagames.dofus.datacenter.jobs.Job import Job
-from pydofus2.com.ankamagames.dofus.internalDatacenter.jobs.KnownJobWrapper import KnownJobWrapper
+from pydofus2.com.ankamagames.dofus.internalDatacenter.jobs.KnownJobWrapper import \
+    KnownJobWrapper
 from pydofus2.com.ankamagames.dofus.kernel.Kernel import Kernel
-from pydofus2.com.ankamagames.dofus.kernel.net.ConnectionsHandler import ConnectionsHandler
-from pydofus2.com.ankamagames.dofus.logic.game.common.actions.craft.JobBookSubscribeRequestAction import (
-    JobBookSubscribeRequestAction,
-)
-from pydofus2.com.ankamagames.dofus.logic.game.common.actions.craft.JobCrafterContactLookRequestAction import (
-    JobCrafterContactLookRequestAction,
-)
-from pydofus2.com.ankamagames.dofus.logic.game.common.actions.craft.JobCrafterDirectoryDefineSettingsAction import (
-    JobCrafterDirectoryDefineSettingsAction,
-)
-from pydofus2.com.ankamagames.dofus.logic.game.common.actions.craft.JobCrafterDirectoryListRequestAction import (
-    JobCrafterDirectoryListRequestAction,
-)
-from pydofus2.com.ankamagames.dofus.logic.game.common.managers.PlayedCharacterManager import PlayedCharacterManager
-from pydofus2.com.ankamagames.dofus.network.enums.SocialContactCategoryEnum import SocialContactCategoryEnum
-from pydofus2.com.ankamagames.dofus.network.messages.game.context.roleplay.job.JobBookSubscriptionMessage import (
-    JobBookSubscriptionMessage,
-)
-from pydofus2.com.ankamagames.dofus.network.messages.game.context.roleplay.job.JobCrafterDirectoryDefineSettingsMessage import (
-    JobCrafterDirectoryDefineSettingsMessage,
-)
-from pydofus2.com.ankamagames.dofus.network.messages.game.context.roleplay.job.JobCrafterDirectoryListRequestMessage import (
-    JobCrafterDirectoryListRequestMessage,
-)
-from pydofus2.com.ankamagames.dofus.network.messages.game.context.roleplay.job.JobCrafterDirectorySettingsMessage import (
-    JobCrafterDirectorySettingsMessage,
-)
-from pydofus2.com.ankamagames.dofus.network.messages.game.context.roleplay.job.JobDescriptionMessage import (
-    JobDescriptionMessage,
-)
-from pydofus2.com.ankamagames.dofus.network.messages.game.context.roleplay.job.JobExperienceMultiUpdateMessage import (
-    JobExperienceMultiUpdateMessage,
-)
-from pydofus2.com.ankamagames.dofus.network.messages.game.context.roleplay.job.JobExperienceOtherPlayerUpdateMessage import (
-    JobExperienceOtherPlayerUpdateMessage,
-)
-from pydofus2.com.ankamagames.dofus.network.messages.game.context.roleplay.job.JobExperienceUpdateMessage import (
-    JobExperienceUpdateMessage,
-)
-from pydofus2.com.ankamagames.dofus.network.messages.game.context.roleplay.job.JobLevelUpMessage import (
-    JobLevelUpMessage,
-)
-from pydofus2.com.ankamagames.dofus.network.messages.game.inventory.exchanges.ExchangeStartOkJobIndexMessage import (
-    ExchangeStartOkJobIndexMessage,
-)
-from pydofus2.com.ankamagames.dofus.network.messages.game.inventory.exchanges.JobBookSubscribeRequestMessage import (
-    JobBookSubscribeRequestMessage,
-)
-from pydofus2.com.ankamagames.dofus.network.messages.game.social.ContactLookRequestByIdMessage import (
-    ContactLookRequestByIdMessage,
-)
-from pydofus2.com.ankamagames.dofus.network.types.game.context.roleplay.job.JobBookSubscription import (
-    JobBookSubscription,
-)
-from pydofus2.com.ankamagames.dofus.network.types.game.context.roleplay.job.JobCrafterDirectorySettings import (
-    JobCrafterDirectorySettings,
-)
-from pydofus2.com.ankamagames.dofus.network.types.game.context.roleplay.job.JobDescription import JobDescription
-from pydofus2.com.ankamagames.dofus.network.types.game.context.roleplay.job.JobExperience import JobExperience
+from pydofus2.com.ankamagames.dofus.kernel.net.ConnectionsHandler import \
+    ConnectionsHandler
+from pydofus2.com.ankamagames.dofus.logic.game.common.actions.craft.JobBookSubscribeRequestAction import \
+    JobBookSubscribeRequestAction
+from pydofus2.com.ankamagames.dofus.logic.game.common.actions.craft.JobCrafterContactLookRequestAction import \
+    JobCrafterContactLookRequestAction
+from pydofus2.com.ankamagames.dofus.logic.game.common.actions.craft.JobCrafterDirectoryDefineSettingsAction import \
+    JobCrafterDirectoryDefineSettingsAction
+from pydofus2.com.ankamagames.dofus.logic.game.common.actions.craft.JobCrafterDirectoryListRequestAction import \
+    JobCrafterDirectoryListRequestAction
+from pydofus2.com.ankamagames.dofus.logic.game.common.managers.PlayedCharacterManager import \
+    PlayedCharacterManager
+from pydofus2.com.ankamagames.dofus.network.enums.SocialContactCategoryEnum import \
+    SocialContactCategoryEnum
+from pydofus2.com.ankamagames.dofus.network.messages.game.context.roleplay.job.JobBookSubscriptionMessage import \
+    JobBookSubscriptionMessage
+from pydofus2.com.ankamagames.dofus.network.messages.game.context.roleplay.job.JobCrafterDirectoryDefineSettingsMessage import \
+    JobCrafterDirectoryDefineSettingsMessage
+from pydofus2.com.ankamagames.dofus.network.messages.game.context.roleplay.job.JobCrafterDirectoryListRequestMessage import \
+    JobCrafterDirectoryListRequestMessage
+from pydofus2.com.ankamagames.dofus.network.messages.game.context.roleplay.job.JobCrafterDirectorySettingsMessage import \
+    JobCrafterDirectorySettingsMessage
+from pydofus2.com.ankamagames.dofus.network.messages.game.context.roleplay.job.JobDescriptionMessage import \
+    JobDescriptionMessage
+from pydofus2.com.ankamagames.dofus.network.messages.game.context.roleplay.job.JobExperienceMultiUpdateMessage import \
+    JobExperienceMultiUpdateMessage
+from pydofus2.com.ankamagames.dofus.network.messages.game.context.roleplay.job.JobExperienceOtherPlayerUpdateMessage import \
+    JobExperienceOtherPlayerUpdateMessage
+from pydofus2.com.ankamagames.dofus.network.messages.game.context.roleplay.job.JobExperienceUpdateMessage import \
+    JobExperienceUpdateMessage
+from pydofus2.com.ankamagames.dofus.network.messages.game.context.roleplay.job.JobLevelUpMessage import \
+    JobLevelUpMessage
+from pydofus2.com.ankamagames.dofus.network.messages.game.inventory.exchanges.ExchangeStartOkJobIndexMessage import \
+    ExchangeStartOkJobIndexMessage
+from pydofus2.com.ankamagames.dofus.network.messages.game.inventory.exchanges.JobBookSubscribeRequestMessage import \
+    JobBookSubscribeRequestMessage
+from pydofus2.com.ankamagames.dofus.network.messages.game.social.ContactLookRequestByIdMessage import \
+    ContactLookRequestByIdMessage
+from pydofus2.com.ankamagames.dofus.network.types.game.context.roleplay.job.JobBookSubscription import \
+    JobBookSubscription
+from pydofus2.com.ankamagames.dofus.network.types.game.context.roleplay.job.JobCrafterDirectorySettings import \
+    JobCrafterDirectorySettings
+from pydofus2.com.ankamagames.dofus.network.types.game.context.roleplay.job.JobDescription import \
+    JobDescription
+from pydofus2.com.ankamagames.dofus.network.types.game.context.roleplay.job.JobExperience import \
+    JobExperience
 from pydofus2.com.ankamagames.jerakine.data.I18n import I18n
 from pydofus2.com.ankamagames.jerakine.logger.Logger import Logger
 from pydofus2.com.ankamagames.jerakine.messages.Frame import Frame
@@ -184,9 +172,8 @@ class JobsFrame(Frame):
             kj.jobLevel = jlumsg.newLevel
             newJobLevel = PlayedCharacterManager().jobsLevel()
             newJobLevel -= jobsNumber
-            podsBonus = self.jobLevelupPodsBonus(newJobLevel, lastJobLevel)
-            levelUpTextMessage = I18n.getUiText("ui.craft.newJobLevel", [jobName, jlumsg.newLevel, podsBonus])
-            Logger().info(levelUpTextMessage)
+            # podsBonus = self.jobLevelupPodsBonus(newJobLevel, lastJobLevel)
+            Logger().info(f"Job {jobName} leveled Up to {jlumsg.newLevel}")
             return True
         if isinstance(msg, JobBookSubscribeRequestAction):
             jbsra = msg
@@ -220,7 +207,7 @@ class JobsFrame(Frame):
         if isinstance(msg, JobCrafterDirectoryListRequestAction):
             jcdlra = msg
             jcdlrmsg = JobCrafterDirectoryListRequestMessage()
-            jcdlrmsg.initJobCrafterDirectoryListRequestMessage(jcdlra.jobId)
+            jcdlrmsg.init(jcdlra.jobId)
             ConnectionsHandler().send(jcdlrmsg)
             return True
         if isinstance(msg, JobCrafterContactLookRequestAction):

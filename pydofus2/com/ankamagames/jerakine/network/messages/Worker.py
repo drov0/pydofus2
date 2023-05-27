@@ -141,11 +141,11 @@ class Worker(MessageHandler):
         self._framesToRemove.clear()
         self._currentFrameTypesCache.clear()
         self._processingMessage.clear()
-        # while not self._queue.empty():
-        #     try:
-        #         self._queue.get_nowait()
-        #     except self._queue.Empty:
-        #         break
+        while self._queue.qsize() != 0:
+            try:
+                self._queue.get_nowait()
+            except self._queue.Empty:
+                break
     
 
     def pushFrame(self, frame: Frame) -> None:

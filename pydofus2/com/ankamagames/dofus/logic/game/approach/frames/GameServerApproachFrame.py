@@ -112,7 +112,6 @@ class GameServerApproachFrame(Frame):
         self._giftList = []
         self._charaListMinusDeadPeople = []
         self._cssmsg = None
-        self.authenticationTicketAccepted = False
         self._charactersList = list[BasicCharacterWrapper]()
         self._waitingMessages = list[NetworkMessage]()
         self._loadingStart = False
@@ -134,19 +133,16 @@ class GameServerApproachFrame(Frame):
     def process(self, msg: Message) -> bool:
 
         if isinstance(msg, HelloGameMessage):
-            self.authenticationTicketAccepted = False
             atmsg = AuthenticationTicketMessage()
             atmsg.init("fr", AuthentificationManager().gameServerTicket)
             ConnectionsHandler().send(atmsg)
             return True
 
         elif isinstance(msg, AuthenticationTicketAcceptedMessage):
-            self.authenticationTicketAccepted = True
             self.requestCharactersList()
             return True
 
         elif isinstance(msg, AuthenticationTicketRefusedMessage):
-            self.authenticationTicketAccepted = False
             return True
 
         elif isinstance(msg, CharactersListMessage):
@@ -197,7 +193,6 @@ class GameServerApproachFrame(Frame):
             return True
 
         elif isinstance(msg, ServerConnectionFailedMessage):
-            self.authenticationTicketAccepted = False
             PlayerManager().destroy()
             return True
 

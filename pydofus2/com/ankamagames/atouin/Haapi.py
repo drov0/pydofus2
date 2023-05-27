@@ -2,7 +2,7 @@ import json
 import os
 import ssl
 from urllib.parse import urlencode
-from anyio import sleep
+from time import sleep
 import pyppeteer
 import requests
 from pydofus2.com.ankamagames.atouin.BrowserRequests import BrowserRequests

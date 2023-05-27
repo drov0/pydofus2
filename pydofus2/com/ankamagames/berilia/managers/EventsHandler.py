@@ -228,6 +228,7 @@ class EventsHandler(EventDispatcher):
             listener.delete()
         self._listeners.clear()
         self._sorted.clear()
+        Logger().debug("Events manager reseted")
 
     def iterListeners(self):
         for listenersByPrio in self._listeners.values():

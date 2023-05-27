@@ -57,6 +57,7 @@ class BenchmarkTimer(threading.Thread):
                 timer = cls._createdTimers[thname].pop()
                 if timer:
                     timer.cancel()
+        Logger().debug("BenchmarTimer reseted")
 
     def run(self):
         if not self.finished.wait(self.interval):

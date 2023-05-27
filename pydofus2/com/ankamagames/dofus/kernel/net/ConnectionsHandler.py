@@ -74,7 +74,7 @@ class ConnectionsHandler(metaclass=Singleton):
         return reason
 
     def closeConnection(self, reason: DisconnectionReasonEnum, message: str = ""):
-        Logger().debug(f"[ConnHandler] Close connection : {reason.name}, {message}")
+        Logger().debug(f"Close connection : {reason.name}, {message}")
         self._wantedSocketLostReason = reason
         self._wantedSocketLost = True
         self._disconnectMessage = message

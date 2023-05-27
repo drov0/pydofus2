@@ -53,7 +53,8 @@ from pydofus2.com.ankamagames.dofus.network.messages.game.character.spell.forget
     ForgettableSpellListUpdateMessage
 from pydofus2.com.ankamagames.dofus.network.messages.game.character.stats.CharacterExperienceGainMessage import \
     CharacterExperienceGainMessage
-from pydofus2.com.ankamagames.dofus.network.messages.game.character.stats.CharacterLevelUpInformationMessage import CharacterLevelUpInformationMessage
+from pydofus2.com.ankamagames.dofus.network.messages.game.character.stats.CharacterLevelUpInformationMessage import \
+    CharacterLevelUpInformationMessage
 from pydofus2.com.ankamagames.dofus.network.messages.game.character.stats.CharacterStatsListMessage import \
     CharacterStatsListMessage
 from pydofus2.com.ankamagames.dofus.network.messages.game.context.GameMapSpeedMovementMessage import \
@@ -122,6 +123,7 @@ class PlayedCharacterUpdatesFrame(Frame):
     _giftListInitialized: bool
 
     def __init__(self):
+        self._phenixMapId = None
         super().__init__()
 
     @property
@@ -263,8 +265,8 @@ class PlayedCharacterUpdatesFrame(Frame):
         if isinstance(msg, GameRolePlayPlayerLifeStatusMessage):
             state = PlayerLifeStatusEnum(msg.state)
             pcm.PlayedCharacterManager().state = state
-            Logger().debug(f"[PlayerUpdates] Player state is {state.name}")
-            KernelEventsManager().send(KernelEvent.PLAYER_STATE_CHANGED, PlayerLifeStatusEnum(msg.state))
+            self._phenixMapId = msg.phenixMapId
+            KernelEventsManager().send(KernelEvent.PLAYER_STATE_CHANGED, PlayerLifeStatusEnum(msg.state), msg.phenixMapId)
             return True
 
         if isinstance(msg, GameRolePlayGameOverMessage):

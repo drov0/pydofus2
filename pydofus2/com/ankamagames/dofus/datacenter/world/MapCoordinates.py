@@ -1,8 +1,10 @@
 import sys
-from pydofus2.com.ankamagames.dofus.datacenter.world.MapPosition import MapPosition
-from pydofus2.com.ankamagames.jerakine.data.GameData import GameData
 
-from pydofus2.com.ankamagames.jerakine.interfaces.IDataCenter import IDataCenter
+from pydofus2.com.ankamagames.dofus.datacenter.world.MapPosition import \
+    MapPosition
+from pydofus2.com.ankamagames.jerakine.data.GameData import GameData
+from pydofus2.com.ankamagames.jerakine.interfaces.IDataCenter import \
+    IDataCenter
 
 
 class MapCoordinates(IDataCenter):
@@ -29,20 +31,20 @@ class MapCoordinates(IDataCenter):
         return GameData().getObject(cls.MODULE, compressedCoords)
 
     @classmethod
-    def getMapCoordinatesByCoords(cls, x: int, y: int) -> "MapCoordinates":
-        xCompressed: int = cls.getCompressedValue(x)
-        yCompressed: int = cls.getCompressedValue(y)
+    def getMapCoordinatesByCoords(cls, x, y):
+        xCompressed = cls.getCompressedValue(x)
+        yCompressed = cls.getCompressedValue(y)
         return cls.getMapCoordinatesByCompressedCoords((xCompressed << 16) + yCompressed)
 
     @classmethod
-    def getSignedValue(cls, v: int) -> int:
+    def getSignedValue(v):
         isNegative = (v & 32768) > 0
-        TrueValue = v & 32767
-        return int(0 - TrueValue) if not isNegative else int(TrueValue)
+        trueValue = v & 32767
+        return -trueValue if isNegative else trueValue
 
-    @staticmethod
-    def getCompressedValue(v: int) -> int:
-        return int(32768 | v & 32767) if v < 0 else int(v & 32767)
+    @classmethod
+    def getCompressedValue(cls, v):
+        return 32768 | (v & 32767) if v < 0 else v & 32767
 
     @property
     def x(self) -> int:

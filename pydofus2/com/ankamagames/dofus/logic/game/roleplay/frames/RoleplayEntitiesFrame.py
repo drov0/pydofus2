@@ -113,7 +113,7 @@ class LastMCIDM(metaclass=Singleton):
         self.msg: MapComplementaryInformationsDataMessage = None
 class RoleplayEntitiesFrame(AbstractEntitiesFrame, Frame):
     MAX_MAPDATA_REQ_FAILS = 3
-    MAPDATA_REQ_TIMEOUT = 10
+    MAPDATA_REQ_TIMEOUT = 20
 
     def __init__(self):
         self._fights = dict[int, Fight]()
@@ -172,7 +172,7 @@ class RoleplayEntitiesFrame(AbstractEntitiesFrame, Frame):
         self.sendMapDataRequest()
 
     def ontimeout(self):
-        Logger().warning("[ChangeMap] Map data request timeout")
+        Logger().warning("Map data request timeout")
         pingMsg = BasicPingMessage()
         pingMsg.init(True)
         ConnectionsHandler().send(pingMsg)
@@ -182,60 +182,14 @@ class RoleplayEntitiesFrame(AbstractEntitiesFrame, Frame):
         self.sendMapDataRequest()
     
     def sendMapDataRequest(self):
+        if self.mapDataRequestTimer:
+            self.mapDataRequestTimer.cancel()
         Logger().info(f"Requesting data for map {MapDisplayManager().currentMapPoint.mapId}")
         self.mapDataRequestTimer = BenchmarkTimer(self.MAPDATA_REQ_TIMEOUT, self.ontimeout)
         self.mapDataRequestTimer.start()
         msg = MapInformationsRequestMessage()
         msg.init(MapDisplayManager().currentMapPoint.mapId)
         ConnectionsHandler().send(msg)
-    
-    def replicateMcidm(self, instId, msg: MapComplementaryInformationsDataMessage):
-        instWorker = Kernel.getInstance(instId).worker
-        instRef: "RoleplayEntitiesFrame" = instWorker.getFrameByName("RoleplayEntitiesFrame")
-        if not instRef.mcidm_processed:
-            Logger().info(f"Waiting for {instId} to finish processing Map to replicate ...")
-            instRef.processingMapData.wait()
-        instRif: "RoleplayInteractivesFrame" = instWorker.getFrameByName("RoleplayInteractivesFrame")
-        instPlayer = PlayedCharacterManager.getInstance(instId)
-        if self.mapDataRequestTimer:
-            self.mapDataRequestTimer.cancel()
-        DataMapProvider()._updatedCell = DataMapProvider.getInstance(instId)._updatedCell
-        self._fightfloat = instRef._fightfloat
-        self._fights = instRef._fights
-        self._merchantsList = instRef._merchantsList
-        self._entities = instRef._entities
-        self.mapWithNoMonsters = instRef.mapWithNoMonsters
-        PlayedCharacterManager().currentMap = instRef._worldPoint
-        self._worldPoint = instRef._worldPoint
-        self._playersId = instRef._playersId
-        self._monstersIds = instRef._monstersIds
-        self._fightNumber = instRef._fightNumber
-        self._interactiveElements = instRef._interactiveElements
-        PlayedCharacterManager().isInAnomaly = self._isInAnomaly = instRef._isInAnomaly
-        PlayedCharacterManager().isIndoor = self._isIndoor = instRef._isIndoor
-        PlayedCharacterManager().currentSubArea = instPlayer.currentSubArea                
-        EntitiesManager()._entities = EntitiesManager.getInstance(instId)._entities
-        StatsManager()._entityStats = StatsManager.getInstance(instId)._entityStats 
-        for actor in msg.actors:
-            if actor.contextualId == PlayedCharacterManager().id and isinstance(actor, GameRolePlayHumanoidInformations):
-                PlayedCharacterManager().restrictions = actor.humanoidInfo.restrictions   
-        if self.rif:
-            imumsg = InteractiveMapUpdateMessage()
-            imumsg.init(msg.interactiveElements)
-            self.rif.process(imumsg)
-            smumsg = StatedMapUpdateMessage()
-            smumsg.init(msg.statedElements)
-            self.rif.process(smumsg)
-        self.mcidm_processed = True
-        Logger().info("Map data processed")
-        KernelEventsManager().send(KernelEvent.MAPPROCESSED, msg.mapId)
-
-    def checkExistMCIDM(self, mapId):
-        for instId, lmcidm in LastMCIDM.getInstances():
-            if instId != PlayedCharacterManager().instanceId and lmcidm.msg.mapId == mapId:
-                Logger().info(f"Player {instId} already loaded map {mapId}")
-                return instId, lmcidm.msg
-        return None, None
 
     @property
     def rif(self) -> "RoleplayInteractivesFrame":

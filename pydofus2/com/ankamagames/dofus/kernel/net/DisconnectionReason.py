@@ -10,7 +10,7 @@ class DisconnectionReason:
         return self._expected
 
     @property
-    def reason(self) -> int:
+    def type(self) -> int:
         return self._reason
 
     @property
@@ -22,4 +22,4 @@ class DisconnectionReason:
         return self._exception
 
     def __str__(self) -> str:
-        return f"DisconnectionReason(expected={self.expected}, reason={self.reason}, msg={self.message})"
+        return f"DisconnectionReason(expected={self.expected}, reason={self.type}, msg={self.message})"

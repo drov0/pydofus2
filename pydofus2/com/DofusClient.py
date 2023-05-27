@@ -44,8 +44,9 @@ class DofusClient(threading.Thread):
     APIKEY_NOT_FOUND = 36363
     UNEXPECTED_CLIENT_ERROR = 36364
     lastLoginTime = None
-    minLoginInterval = 10
+    minLoginInterval = 30
     LOGIN_TIMEOUT = 35
+    MAX_CONN_TRIES = 3
 
     def __init__(self, name="unknown"):
         super().__init__(name=name)
@@ -63,7 +64,6 @@ class DofusClient(threading.Thread):
         self._loginToken = None
         self._conxTries = 0
         self._connectionUnexpectedFailureTimes = []
-        self.MAX_CONN_TRIES = 3
         self.mule = False
         self._shutDownReason = None
         self._crashed = False
@@ -97,7 +97,7 @@ class DofusClient(threading.Thread):
         Logger().info("Character entered game server successfully")
 
     def onCrash(self, event, message):
-        Logger().debug(f"Client crashed for reason : {message}")
+        Logger().error(f"Client crashed for reason : {message}")
         self._crashed = True
         self._crashMessage = message
         self._shutDownReason = f"Crashed for reason: {message}"
@@ -144,7 +144,7 @@ class DofusClient(threading.Thread):
                 and self._conxTries < self.MAX_CONN_TRIES
             ):
                 Logger().error(
-                    f"The connection was closed unexpectedly. Reconnection attempt {self._conxTries}/{self.MAX_TRIES} will start in 4s."
+                    f"The connection was closed unexpectedly. Reconnection attempt {self._conxTries}/{self.MAX_CONN_TRIES}."
                 )                
                 self._conxTries += 1
                 self._connectionUnexpectedFailureTimes.append(perf_counter())
@@ -221,7 +221,7 @@ class DofusClient(threading.Thread):
         if DofusClient.lastLoginTime is not None:
             diff = DofusClient.minLoginInterval - (perf_counter() - DofusClient.lastLoginTime)
             if diff > 0:
-                Logger().info(f"[DofusClient] Have to wait {diff}sec before reconnecting")
+                Logger().info(f"ave to wait {diff}sec before reconnecting again")
                 self.terminated.wait(diff)
         self.lastLoginTime = perf_counter()
 

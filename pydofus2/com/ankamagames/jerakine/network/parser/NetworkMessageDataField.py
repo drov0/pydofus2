@@ -2,8 +2,7 @@ import pydofus2.com.ankamagames.jerakine.network.parser.NetworkMessageClassDefin
 from pydofus2.com.ankamagames.jerakine.logger.Logger import TraceLogger
 from pydofus2.com.ankamagames.jerakine.network.CustomDataWrapper import \
     ByteArray
-from pydofus2.com.ankamagames.jerakine.network.parser.ProtocolSpec import \
-    ProtocolSpec
+from pydofus2.com.ankamagames.jerakine.network.parser.ProtocolSpec import FieldSpec, ProtocolSpec
 from pydofus2.com.ankamagames.jerakine.network.parser.TypeEnum import TypeEnum
 
 
@@ -29,7 +28,7 @@ class NetMsgDataField:
         TypeEnum.VARUHLONG: "readVarUhLong",
     }
 
-    def __init__(self, spec: dict, raw: ByteArray):
+    def __init__(self, spec: FieldSpec, raw: ByteArray):
         self._spec = spec
         self._raw = raw
         self._type = None
@@ -37,12 +36,12 @@ class NetMsgDataField:
 
     @property
     def name(self) -> str:
-        return self._spec.get("name")
+        return self._spec.name
 
     @property
     def type(self) -> str:
         if not self._type:
-            self._type = self._spec.get("type")
+            self._type = self._spec. type
         return self._type
 
     @type.setter
@@ -52,7 +51,7 @@ class NetMsgDataField:
     @property
     def length(self) -> int:
         if self._length is None:
-            self._length = self._spec.get("length")
+            self._length = self._spec.length
         return self._length
     
     @length.setter
@@ -63,32 +62,16 @@ class NetMsgDataField:
     
     @property
     def lengthTypeId(self) -> int:
-        return self._spec.get("lengthTypeId")
-    
-    @property
-    def isVector(self) -> bool:
-        return self.length or self.lengthTypeId
-
-    @property
-    def hasDynamicType(self):
-        return self._spec.get("dynamicType")
-
-    @property
-    def typeId(self) -> int:
-        return self._spec.get("typeId")
-    
-    @property
-    def isPrimitive(self):
-        return TypeEnum(self.typeId) != TypeEnum.OBJECT
+        return self._spec.lengthTypeId
 
     @property
     def typename(self) -> str:
-        return self._spec.get("typename")
+        return self._spec.typename
 
     def deserialize(self):
-        if self.isVector:
+        if self._spec.isVector():
             return self.readVector()
-        if self.isPrimitive:
+        if self._spec.isPrimitive():
             val = self.readPrimitive()
             if self.TRACE:
                 TraceLogger().debug(f"Field {self.name} = {val}")
@@ -98,18 +81,18 @@ class NetMsgDataField:
 
     def readPrimitive(self, typeId=None):
         if typeId is None:
-            typeId = TypeEnum(self.typeId)
+            typeId = self._spec.typeId
         dataReader = NetMsgDataField.dataReader.get(typeId)
         if dataReader is None:
             raise Exception(f"TypeId '{typeId}' not found in known types ids")
         return getattr(self._raw, dataReader)()
 
     def readObject(self):
-        if self.hasDynamicType:
+        if self._spec.dynamicType:
             typeId = self._raw.readUnsignedShort()
-            self.type = ProtocolSpec.getTypeSpecById(typeId).get("name")
+            self.type = ProtocolSpec.getTypeSpecById(typeId).name
             if self.type is None:
-                raise Exception("Unable to parse dynamic type of field")
+                raise Exception(f"Unable to parse dynamic type name of typeid '{typeId}'.")
         obj = nmcd.NetworkMessageClassDefinition(self.type, self._raw).deserialize()
         return obj
 
@@ -122,7 +105,7 @@ class NetMsgDataField:
             TraceLogger().debug(f"==> Deserialising Vector<{self.typename}> of length {self.length}, remaining bytes {self._raw.remaining()}")
         ret = []
         for i in range(self.length):
-            if self.isPrimitive:
+            if self._spec.isPrimitive():
                 val = self.readPrimitive()
                 if self.TRACE:
                     TraceLogger().debug(f"Vector value {i} = {val}")

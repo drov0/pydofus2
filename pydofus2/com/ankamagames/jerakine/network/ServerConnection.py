@@ -9,9 +9,9 @@ import traceback
 from time import perf_counter
 from typing import TYPE_CHECKING
 
-from pydofus2.com.ankamagames.dofus.network.MessageReceiver import (
-    MessageReceiver, _messagesTypes)
-from pydofus2.com.ankamagames.jerakine.logger.Logger import Logger, TraceLogger
+from pydofus2.com.ankamagames.dofus.network.MessageReceiver import \
+    MessageReceiver
+from pydofus2.com.ankamagames.jerakine.logger.Logger import Logger
 from pydofus2.com.ankamagames.jerakine.messages.ConnectedMessage import \
     ConnectedMessage
 from pydofus2.com.ankamagames.jerakine.messages.ConnectionProcessCrashedMessage import \
@@ -155,7 +155,7 @@ class ServerConnection(mp.Thread):
         self._closing.set()
 
     @sendTrace
-    def send(self, msg: "INetworkMessage") -> None:
+    def send(self, msg: "NetworkMessage") -> None:
         if not self.open:
             if self.connecting:
                 self.sendingQueue.append(msg)
@@ -180,7 +180,6 @@ class ServerConnection(mp.Thread):
                 if self.nbrSendFails > 3:
                     return self.close()
                 self.send(msg)
-            # self.close()
         self.nbrSendFails = 0
         self._latestSent = perf_counter()
         self._lastSent = perf_counter()
@@ -280,11 +279,10 @@ class ServerConnection(mp.Thread):
         Logger().info(f"[{self.id}] Connecting to {host}:{port}...")
         self.socket.connect((host, port))
 
-    def handleMessage(self, msg: NetworkMessage):
-        if type(msg).__name__ == "BasicPongMessage":
-            if self._lastSentPingTime:
-                latency = round(1000 * (perf_counter() - self._lastSentPingTime), 2)
-                Logger().info(f"Latency : {latency}ms, average {self.latencyAvg}, var {self.latencyVar}")
+    def handleMessage(self, msg: NetworkMessage, from_client=False):
+        if type(msg).__name__ == "BasicPongMessage" and self._lastSentPingTime:
+            latency = round(1000 * (perf_counter() - self._lastSentPingTime), 2)
+            Logger().info(f"Latency : {latency}ms, average {self.latencyAvg}, var {self.latencyVar}")
         if msg.unpacked:
             msg.receptionTime = perf_counter()
             msg.sourceConnection = self.id

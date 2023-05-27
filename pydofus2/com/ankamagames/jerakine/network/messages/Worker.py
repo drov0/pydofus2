@@ -179,7 +179,7 @@ class Worker(MessageHandler):
     def processMessage(self, msg: Message) -> None:
         if self._terminating.is_set() or self._terminated.is_set():
             return Logger().warning(f"Can't process message if the worker is terminated")
-        processed: bool = False
+        processed = False
         self._processingMessage.set()
         for frame in self._framesList:
             if self._terminating.is_set() or self._terminated.is_set():

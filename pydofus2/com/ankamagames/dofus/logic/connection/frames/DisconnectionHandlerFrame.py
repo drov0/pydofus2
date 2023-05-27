@@ -62,7 +62,6 @@ class DisconnectionHandlerFrame(Frame):
             return True
 
         elif isinstance(msg, ConnectionProcessCrashedMessage):
-            Logger().debug("Connection process crashed with error : " + msg.err)
             KernelEventsManager().send(KernelEvent.CRASH, message=msg.err)
             return True
 

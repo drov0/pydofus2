@@ -106,11 +106,6 @@ if TYPE_CHECKING:
     from pydofus2.com.ankamagames.dofus.logic.game.roleplay.frames.RoleplayInteractivesFrame import \
         RoleplayInteractivesFrame
 
-
-class LastMCIDM(metaclass=Singleton):
-
-    def __init__(self) -> None:
-        self.msg: MapComplementaryInformationsDataMessage = None
 class RoleplayEntitiesFrame(AbstractEntitiesFrame, Frame):
     MAX_MAPDATA_REQ_FAILS = 3
     MAPDATA_REQ_TIMEOUT = 20
@@ -137,7 +132,6 @@ class RoleplayEntitiesFrame(AbstractEntitiesFrame, Frame):
         self._npcList.clear()
         self._housesList.clear()
         self.mcidm_processed = False
-        LastMCIDM.clear()
         return super().pulled()
 
     def pushed(self) -> bool:

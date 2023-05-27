@@ -7,8 +7,7 @@ from pydofus2.com.ankamagames.jerakine.network.CustomDataWrapper import \
     ByteArray
 from pydofus2.com.ankamagames.jerakine.network.INetworkMessage import \
     INetworkMessage
-from pydofus2.com.ankamagames.jerakine.network.parser.ProtocolSpec import \
-    ProtocolSpec
+from pydofus2.com.ankamagames.jerakine.network.parser.ProtocolSpec import ClassSpec, ProtocolSpec
 from pydofus2.com.ankamagames.jerakine.network.utils.FuncTree import FuncTree
 
 
@@ -72,7 +71,7 @@ class NetworkMessage(INetworkMessage):
     def getMessageId(self) -> int:
         return ProtocolSpec.getProtocolIdByName(self.__class__.__name__)
 
-    def getSpec(self) -> dict:
+    def getSpec(self) -> ClassSpec:
         return ProtocolSpec.getClassSpecByName(self.__class__.__name__)
 
     def reset(self) -> None:

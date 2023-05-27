@@ -7,4 +7,4 @@ class ConnectionProcessCrashedMessage(Message):
         self.err = err
 
     def __str__(self):
-        return f"ConnectionProcessCrashedMessage(err={self.err})"
+        return f"ConnectionProcessCrashedMessage"

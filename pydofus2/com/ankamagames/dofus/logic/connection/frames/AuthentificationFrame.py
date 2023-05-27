@@ -27,6 +27,8 @@ from pydofus2.com.ankamagames.dofus.network.messages.connection.IdentificationSu
     IdentificationSuccessMessage
 from pydofus2.com.ankamagames.dofus.network.messages.connection.IdentificationSuccessWithLoginTokenMessage import \
     IdentificationSuccessWithLoginTokenMessage
+from pydofus2.com.ankamagames.dofus.network.messages.subscription.AccountSubscriptionElapsedDurationMessage import \
+    AccountSubscriptionElapsedDurationMessage
 from pydofus2.com.ankamagames.jerakine.data.XmlConfig import XmlConfig
 from pydofus2.com.ankamagames.jerakine.logger.Logger import Logger
 from pydofus2.com.ankamagames.jerakine.messages.Frame import Frame
@@ -63,6 +65,10 @@ class AuthentificationFrame(Frame):
                     ConnectionsHandler().connectToLoginServer(retryConnInfo.host, retryConnInfo.port)
                 else:
                     PlayerManager().destroy()
+            return True
+    
+        elif isinstance(msg, AccountSubscriptionElapsedDurationMessage):
+            PlayerManager().subscriptionDurationElapsed = msg.subscriptionElapsedDuration;
             return True
 
         elif isinstance(msg, HelloConnectMessage):

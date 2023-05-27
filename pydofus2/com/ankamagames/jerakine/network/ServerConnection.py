@@ -64,26 +64,22 @@ class ServerConnection(mp.Thread):
         self._paused = mp.Event()
         self.finished = mp.Event()
 
-        self.__packet_id = None
-        self.__msg_len_len = None
-        self.__msg_len = None
-
-        self.__receivedStream = ByteArray()
-        self.__pauseQueue = list["INetworkMessage"]()
-        self.__sendingQueue = list["INetworkMessage"]()
+        self.stream = ByteArray()
+        self.pauseQueue = list["INetworkMessage"]()
+        self.sendingQueue = list["INetworkMessage"]()
 
         self._sendSequenceId: int = 0
         self._latestSent: int = 0
         self._lastSent: int = None
-        self.lastSentPingTime = None
+        self._lastSentPingTime = None
 
         self._firstConnectionTry: bool = True
         if receptionQueue is None:
-            self.__receptionQueue = queue.Queue(200)
+            self.receptionQueue = queue.Queue(200)
         else:
-            self.__receptionQueue = receptionQueue
-        self.__socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        self.__connectionTimeout = None
+            self.receptionQueue = receptionQueue
+        self.socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        self.connectionTimeout = None
         self.nbrSendFails = 0
 
     @property
@@ -144,9 +140,9 @@ class ServerConnection(mp.Thread):
 
     def _put(self, msg):
         if not self._paused.is_set():
-            self.__receptionQueue.put(msg)
+            self.receptionQueue.put(msg)
         else:
-            self.__pauseQueue.append(msg)
+            self.pauseQueue.append(msg)
 
     @sendTrace
     def close(self) -> None:
@@ -154,15 +150,15 @@ class ServerConnection(mp.Thread):
             Logger().warn(f"[{self.id}] Tried to close a socket while it had already been disconnected.")
             return
         Logger().debug(f"[{self.id}] Closing connection...")
-        self.__socket.close()
-        self.__sendingQueue.clear()
+        self.socket.close()
+        self.sendingQueue.clear()
         self._closing.set()
 
     @sendTrace
     def send(self, msg: "INetworkMessage") -> None:
         if not self.open:
             if self.connecting:
-                self.__sendingQueue.append(msg)
+                self.sendingQueue.append(msg)
                 return Logger().warning(f"Message {msg} was queued")
             elif self._closing.is_set() or self.closed:
                 return Logger().warning(f"Discarded Message {msg}")
@@ -171,9 +167,9 @@ class ServerConnection(mp.Thread):
             data = msg.pack()
             total_sent = 0
             if type(msg).__name__ == "BasicPingMessage":
-                self.lastSentPingTime = perf_counter()
+                self._lastSentPingTime = perf_counter()
             while total_sent < len(data):
-                sent = self.__socket.send(data[total_sent:])
+                sent = self.socket.send(data[total_sent:])
                 if sent == 0:
                     raise RuntimeError("Socket connection broken")
                 total_sent += sent
@@ -196,50 +192,15 @@ class ServerConnection(mp.Thread):
     @sendTrace
     def resume(self) -> None:
         self._paused.clear()
-        while self.__pauseQueue and not self.paused:
-            msg = self.__pauseQueue.pop(0)
+        while self.pauseQueue and not self.paused:
+            msg = self.pauseQueue.pop(0)
             if self.DEBUG_DATA:
                 Logger().debug(f"[{self.id}] [RCV] (after Resume) {msg}")
-            self.__receptionQueue.put(msg)
-
-    def __parse(self):
-        with LOCK:
-            buffer = self.__receivedStream
-            while buffer.remaining() and not self._closing.is_set():
-                if self.__msg_len_len is None:
-                    if buffer.remaining() < 2:
-                        break
-                    staticHeader = buffer.readUnsignedShort()
-                    self.__packet_id = staticHeader >> NetworkMessage.BIT_RIGHT_SHIFT_LEN_PACKET_ID
-                    self.__msg_len_len = staticHeader & NetworkMessage.BIT_MASK
-                    # TraceLogger().debug(f"msgId : {self.__packet_id}, msg_len_len : {self.__msg_len_len}")
-                if self.__msg_len is None:
-                    if buffer.remaining() < self.__msg_len_len:
-                        break
-                    self.__msg_len = int.from_bytes(buffer.read(self.__msg_len_len), "big")
-                    # TraceLogger().debug(f"msg_len : {self.__msg_len}")
-                if buffer.remaining() < self.__msg_len:
-                    break
-                self.updateLatency()
-                # TraceLogger().debug("Parsing ...")
-                msg: NetworkMessage = MessageReceiver().parse(buffer, self.__packet_id, self.__msg_len)
-                # TraceLogger().debug(f"Parsed, got : {type(msg).__name__}")
-                if type(msg).__name__ == "BasicPongMessage":
-                    if self.lastSentPingTime:
-                        latency = round(1000 * (perf_counter() - self.lastSentPingTime), 2)
-                        Logger().info(f"Latency : {latency}ms, average {self.latencyAvg}, var {self.latencyVar}")
-                if msg.unpacked:
-                    msg.receptionTime = perf_counter()
-                    msg.sourceConnection = self.id
-                    self._put(msg)
-                self.__packet_id = None
-                self.__msg_len_len = None
-                self.__msg_len = None
-            buffer.trim()
+            self.receptionQueue.put(msg)
 
     @sendTrace
     def updateLatency(self) -> None:
-        if self._paused.is_set() or len(self.__pauseQueue) > 0 or self._latestSent == 0:
+        if self._paused.is_set() or len(self.pauseQueue) > 0 or self._latestSent == 0:
             return
         packetReceived = perf_counter()
         latency = packetReceived - self._latestSent
@@ -255,32 +216,32 @@ class ServerConnection(mp.Thread):
         return max(self._latencyBuffer)
 
     def stopConnectionTimeout(self) -> None:
-        if self.__connectionTimeout:
-            self.__connectionTimeout.cancel()
+        if self.connectionTimeout:
+            self.connectionTimeout.cancel()
 
-    def __onConnect(self) -> None:
+    def onConnect(self) -> None:
         Logger().debug(f"[{self.id}] Connection established.")
         self.stopConnectionTimeout()
         self._connecting.clear()
         self._connected.set()
-        for msg in self.__sendingQueue:
+        for msg in self.sendingQueue:
             self.send(msg)
-        self.__receivedStream = ByteArray()
-        self.__receptionQueue.put(ConnectedMessage())
+        self.stream = ByteArray()
+        self.receptionQueue.put(ConnectedMessage())
 
     @sendTrace
     def receive(self) -> "INetworkMessage":
-        return self.__receptionQueue.get()
+        return self.receptionQueue.get()
 
-    def __onClose(self, err) -> None:
+    def onClose(self, err) -> None:
         self.stopConnectionTimeout()
         Logger().debug(f"[{self.id}] Connection closed. {err}")
-        self.__socket.close()
+        self.socket.close()
         self._connected.clear()
         from pydofus2.com.ankamagames.jerakine.network.ServerConnectionClosedMessage import \
             ServerConnectionClosedMessage
 
-        self.__receptionQueue.put(ServerConnectionClosedMessage(self.id))
+        self.receptionQueue.put(ServerConnectionClosedMessage(self.id))
         self.finished.set()
         Logger().info(f"[{self.id}] Finished.")
         if err:
@@ -290,7 +251,7 @@ class ServerConnection(mp.Thread):
     def closed(self) -> bool:
         return self._closing.is_set()
 
-    def __onConnectionTimeout(self) -> None:
+    def onConnectionTimeout(self) -> None:
         from pydofus2.com.ankamagames.jerakine.network.messages.ServerConnectionFailedMessage import \
             ServerConnectionFailedMessage
 
@@ -303,7 +264,7 @@ class ServerConnection(mp.Thread):
             self._firstConnectionTry = False
             self.connect(self._remoteSrvHost, self._remoteSrvPort)
         else:
-            self.__receptionQueue.put(ServerConnectionFailedMessage(self.id, "Connection timeout!"))
+            self.receptionQueue.put(ServerConnectionFailedMessage(self.id, "Connection timeout!"))
 
     @sendTrace
     def connect(self, host: str, port: int, timeout=CONNECTION_TIMEOUT) -> None:
@@ -317,20 +278,30 @@ class ServerConnection(mp.Thread):
         self._remoteSrvHost = host
         self._remoteSrvPort = port
         Logger().info(f"[{self.id}] Connecting to {host}:{port}...")
-        self.__socket.connect((host, port))
+        self.socket.connect((host, port))
 
+    def handleMessage(self, msg: NetworkMessage):
+        if type(msg).__name__ == "BasicPongMessage":
+            if self._lastSentPingTime:
+                latency = round(1000 * (perf_counter() - self._lastSentPingTime), 2)
+                Logger().info(f"Latency : {latency}ms, average {self.latencyAvg}, var {self.latencyVar}")
+        if msg.unpacked:
+            msg.receptionTime = perf_counter()
+            msg.sourceConnection = self.id
+            self._put(msg)
+            
     @sendTrace
     def run(self):
         err = ""
         while not self._closing.is_set() and not self.finished.is_set():
             try:
-                rdata = self.__socket.recv(14000)
+                rdata = self.socket.recv(14000)
                 # TraceLogger().debug(f"receiver size {len(rdata)}")
                 if rdata:
                     if self._connecting.is_set():
-                        self.__onConnect()
-                    self.__receivedStream += rdata
-                    self.__parse()
+                        self.onConnect()
+                    self.stream += rdata
+                    MessageReceiver().parse(self.stream, self.handleMessage, False)
                 else:
                     Logger().debug(f"[{self.id}] Connection closed by remote host")
                     self._closing.set()
@@ -356,9 +327,9 @@ class ServerConnection(mp.Thread):
                 elif e.errno == errno.WSAETIMEDOUT:
                     Logger().debug(f"[{self.id}] Connection timed out.")
                     if self._connecting.is_set():
-                        self.__onConnectionTimeout()
+                        self.onConnectionTimeout()
                 else:
                     Logger().debug(f"{e.errno}, {errno.errorcode[e.errno]} OS error received")
                     err = e
                     self._closing.set()
-        self.__onClose(err)
+        self.onClose(err)

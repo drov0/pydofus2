@@ -7,8 +7,6 @@ from pydofus2.com.ankamagames.jerakine.logger.Logger import Logger
 from pydofus2.com.ankamagames.jerakine.metaclasses.Singleton import Singleton
 from pydofus2.com.ankamagames.jerakine.network.CustomDataWrapper import \
     ByteArray
-from pydofus2.com.ankamagames.jerakine.network.INetworkMessage import \
-    INetworkMessage
 from pydofus2.com.ankamagames.jerakine.network.NetworkMessage import \
     NetworkMessage
 from pydofus2.com.ankamagames.jerakine.network.RawDataParser import \
@@ -17,8 +15,9 @@ from pydofus2.com.ankamagames.jerakine.network.RawDataParser import \
 with open(Constants.PROTOCOL_MSG_SHUFFLE_PATH, "r") as fp:
     msgShuffle: dict = json.load(fp)
 
-# _messages_to_discard = {}
+_discardMessages = True
 _messages_to_discard = {
+    "ServerSettingsMessage",
     "SetCharacterRestrictionsMessage",
     "GameContextRefreshEntityLookMessage",
     "ChatServerMessage",
@@ -82,7 +81,11 @@ _messages_to_discard = {
     "LifePointsRegenBeginMessage",
     "TitlesAndOrnamentsListMessage",
     "GameRolePlayArenaRegistrationStatusMessage",
-    "PrismAddOrUpdateMessage"
+    "PrismAddOrUpdateMessage",
+    "HavenBagPermissionsUpdateMessage",
+    "HavenBagFurnituresMessage",
+    "PaddockPropertiesMessage",
+    "GameDataPaddockObjectListAddMessage",
 }
 
 _mule_fight_messages_to_discard = {
@@ -118,12 +121,12 @@ _mule_fight_messages_to_discard = {
     "GameFightRefreshFighterMessage",
     "GameActionFightDodgePointLossMessage",
     "GameActionFightLifePointsLostMessage",
-    "ChatSmileyMessage"
+    "ChatSmileyMessage",
 }
 
 _messagesTypes = dict[int, type[NetworkMessage]]()
 for cls_name, cls_infos in msgShuffle.items():
-    if cls_name not in _messages_to_discard:
+    if _discardMessages and cls_name not in _messages_to_discard:
         modulePath = cls_infos["module"]
         try:
             clsModule = globals()[modulePath]
@@ -134,22 +137,28 @@ for cls_name, cls_infos in msgShuffle.items():
 
 
 class MessageReceiver(RawDataParser, metaclass=Singleton):
-
-    def __init__(self):
+    
+    def __init__(self, discard=True):
         self.infight = False
+        self.discard = discard
+        self.msgLenLen = None
+        self.msgLen = None
+        self.msgId = None
         super().__init__()
 
-    def parse(self, input: ByteArray, messageId: int, messageLength: int) -> INetworkMessage:
+    def parseMessage(self, input: ByteArray, messageId: int, messageLength: int) -> NetworkMessage:
         messageType = _messagesTypes.get(messageId)
-        if messageType:
-            if messageType.__name__ == "GameFightJoinMessage":
-                self.infight = True
-                Logger().separator("Fight started", '+')
-            elif messageType.__name__ == "GameFightEndMessage":
-                self.infight = False
-                Logger().separator("Fight ended", '-')
+        if self.discard:
+            if messageType:
+                if messageType.__name__ == "GameFightJoinMessage":
+                    self.infight = True
+                    Logger().separator("Fight started", "+")
+                elif messageType.__name__ == "GameFightEndMessage":
+                    self.infight = False
+                    Logger().separator("Fight ended", "-")
         if not messageType or (
-            Kernel().isMule
+            self.discard
+            and Kernel().isMule
             and self.infight
             and messageType.__name__ in _mule_fight_messages_to_discard
         ):
@@ -161,6 +170,34 @@ class MessageReceiver(RawDataParser, metaclass=Singleton):
         message.unpacked = True
         return message
 
+    def parse(self, buffer: ByteArray, callback, from_client=False):
+        while buffer.remaining():
+            if self.msgLenLen is None:
+                if buffer.remaining() < 2:
+                    break
+                staticHeader = buffer.readUnsignedShort()
+                self.msgId = staticHeader >> NetworkMessage.PACKET_ID_RIGHT_SHIFT
+                self.msgLenLen = staticHeader & NetworkMessage.BIT_MASK
+            if from_client and self.msgCount is None:
+                if buffer.remaining() < 4:
+                    break
+                self.msgCount = buffer.readUnsignedInt()
+            if self.msgLen is None:
+                if buffer.remaining() < self.msgLenLen:
+                    break
+                self.msgLen = int.from_bytes(buffer.read(self.msgLenLen), "big")
+            if buffer.remaining() < self.msgLen:
+                break
+            msg_bytes = buffer.read(self.msgLen)
+            msg = self.parseMessage(msg_bytes, self.msgId, self.msgLen)
+            self.msgId = None
+            self.msgLenLen = None
+            self.msgLen = None
+            self.msgCount = None
+            buffer.trim()
+            callback(msg)
+        
+        
     @classmethod
     def getMsgNameById(cls, messageId: int) -> str:
         messageType = _messagesTypes.get(messageId)

@@ -131,7 +131,6 @@ class Worker(MessageHandler):
         if not self.terminated.is_set():
             self._terminating.set()
             self._queue.put(TerminateWorkerMessage())
-            self._terminated.wait(30)
 
     def reset(self) -> None:
         for f in self._framesList:

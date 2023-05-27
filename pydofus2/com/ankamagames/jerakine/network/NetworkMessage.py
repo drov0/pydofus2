@@ -15,7 +15,7 @@ from pydofus2.com.ankamagames.jerakine.network.utils.FuncTree import FuncTree
 class NetworkMessage(INetworkMessage):
 
     GLOBAL_INSTANCE_ID: int = 0
-    BIT_RIGHT_SHIFT_LEN_PACKET_ID: int = 2
+    PACKET_ID_RIGHT_SHIFT: int = 2
     BIT_MASK: int = 3
     HASH_FUNCTION: FunctionType
 
@@ -38,7 +38,7 @@ class NetworkMessage(INetworkMessage):
         return 0
 
     def subComputeStaticHeader(self, msgId: int, typeLen: int) -> int:
-        return msgId << self.BIT_RIGHT_SHIFT_LEN_PACKET_ID | typeLen
+        return msgId << self.PACKET_ID_RIGHT_SHIFT | typeLen
 
     @property
     def isInitialized(self) -> bool:

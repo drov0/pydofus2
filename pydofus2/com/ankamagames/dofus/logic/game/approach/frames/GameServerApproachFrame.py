@@ -146,7 +146,9 @@ class GameServerApproachFrame(Frame):
             return True
 
         elif isinstance(msg, CharactersListMessage):
+            import pydofus2.com.ankamagames.dofus.logic.game.common.frames.PlayedCharacterUpdatesFrame as pcuF
             clmsg = msg
+            Kernel().worker.addFrame(pcuF.PlayedCharacterUpdatesFrame())
             self._charactersList = clmsg.characters
             server = PlayerManager().server
             if (
@@ -210,8 +212,6 @@ class GameServerApproachFrame(Frame):
             return True
 
         elif isinstance(msg, CharacterSelectedSuccessMessage):
-            import pydofus2.com.ankamagames.dofus.logic.game.common.frames.PlayedCharacterUpdatesFrame as pcuF
-
             cssmsg = msg
             self._loadingStart = time.perf_counter()
             if Kernel().worker.getFrameByName("ServerSelectionFrame"):
@@ -221,7 +221,6 @@ class GameServerApproachFrame(Frame):
             Kernel().worker.addFrame(WorldFrame())
             Kernel().worker.addFrame(AlignmentFrame())
             Kernel().worker.addFrame(SynchronisationFrame())
-            Kernel().worker.addFrame(pcuF.PlayedCharacterUpdatesFrame())
             Kernel().worker.addFrame(SpellInventoryManagementFrame())
             Kernel().worker.addFrame(InventoryManagementFrame())
             Kernel().worker.addFrame(ContextChangeFrame())
@@ -231,9 +230,9 @@ class GameServerApproachFrame(Frame):
             Kernel().worker.addFrame(NpcFrame())
             Kernel().worker.addFrame(PartyFrame())
             KernelEventsManager().send(KernelEvent.CHARACTER_SELECTION_SUCCESS, return_value=cssmsg.infos)
-            if Kernel().beingInReconection and not self._reconnectMsgSend:
-                self._reconnectMsgSend = True
-                ConnectionsHandler().send(CharacterSelectedForceReadyMessage())
+            # if Kernel().beingInReconection and not self._reconnectMsgSend:
+            #     self._reconnectMsgSend = True
+            #     ConnectionsHandler().send(CharacterSelectedForceReadyMessage())
             self._cssmsg = cssmsg
             PlayedCharacterManager().infos = self._cssmsg.infos
             DataStoreType.CHARACTER_ID = str(self._cssmsg.infos.id)
@@ -250,6 +249,7 @@ class GameServerApproachFrame(Frame):
             ConnectionsHandler().send(flashKeyMsg)
             gccrmsg = GameContextCreateRequestMessage()
             ConnectionsHandler().send(gccrmsg)
+            return True
 
         elif isinstance(msg, ConnectionResumedMessage):
             return True

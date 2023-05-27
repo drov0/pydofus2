@@ -177,7 +177,7 @@ class RoleplayContextFrame(Frame):
         elif isinstance(msg, (ZaapDestinationsMessage, TeleportDestinationsMessage)):
             if not Kernel().worker.contains("ZaapFrame"):
                 Kernel().worker.addFrame(self._zaapFrame);
-                Kernel().worker.process(msg);
+                return Kernel().worker.process(msg);
             return False;
 
         elif isinstance(msg, LeaveDialogMessage):

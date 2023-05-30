@@ -36,7 +36,7 @@ class ContextChangeFrame(Frame):
     def process(self, msg: Message) -> bool:
 
         if isinstance(msg, GameContextDestroyMessage):
-            pass
+            return True
         
         elif isinstance(msg, GameContextCreateMessage):
             self.currentContext = msg.context

@@ -44,6 +44,8 @@ class KernelEvent(Enum):
     FIGHT_STARTED = 24
     FIGHT_ENDED = 30
     MULE_FIGHT_CONTEXT = 52
+    FIGHTER_SHOWED = -5
+    FIGHT_JOINED = -6
     # phenix
     PHENIX_AUTO_REVIVE_ENDED = 21
     AUTO_TRIP_ENDED = 22
@@ -54,15 +56,16 @@ class KernelEvent(Enum):
     INTERACTIVE_ELEMENT_USED = 26
     INTERACTIVE_USE_ERROR = 27
     # cell movement
-    
+
     # entities movement
-    ENTITY_MOVED = 29
+    ENTITY_MOVING = 29
     ENTITY_VANISHED = 31
     INACTIVITY_WARNING = 34
     ACTORSHOWED = 8
     CURRENT_MAP = 51
+    PLAYER_MOVEMENT_COMPLETED = -6
     # player updates
-    CHARACTER_STATS = 36    
+    CHARACTER_STATS = 36
     LEVEL_UP = 35
     FULL_PODS = 32
     PLAYER_STATE_CHANGED = 28
@@ -123,6 +126,8 @@ class KernelEvent(Enum):
     CharacterAlignmentWarEffortProgressionHook = 90
     UpdateWarEffortHook = 91
     AlignmentWarEffortProgressionMessageHook = 92
+
+
 class KernelEventsManager(EventsHandler, metaclass=Singleton):
     def __init__(self):
         super().__init__()
@@ -203,7 +208,7 @@ class KernelEventsManager(EventsHandler, metaclass=Singleton):
                     ontimeout(event.listener)
 
         return self.on(
-            KernelEvent.ENTITY_MOVED, onEntityMoved, timeout=timeout, ontimeout=ontimeout, originator=originator
+            KernelEvent.ENTITY_MOVING, onEntityMoved, timeout=timeout, ontimeout=ontimeout, originator=originator
         )
 
     def onceEntityMoved(self, entityId, callback, timeout=None, ontimeout=None, originator=None):
@@ -228,9 +233,16 @@ class KernelEventsManager(EventsHandler, metaclass=Singleton):
 
         return self.on(KernelEvent.FIGHT_SWORD_SHOWED, onFightSword, originator=originator)
 
-    def onceFightStarted(self, callback, timeout, ontimeout, originator=None):
+    def onceFightStarted(self, callback, timeout, ontimeout, retryNbr=None, retryAction=None, originator=None):
         return self.on(
-            KernelEvent.FIGHT_STARTED, callback, timeout=timeout, ontimeout=ontimeout, once=True, originator=originator
+            KernelEvent.FIGHT_STARTED,
+            callback,
+            timeout=timeout,
+            ontimeout=ontimeout,
+            once=True,
+            retryNbr=retryNbr,
+            retryAction=retryAction,
+            originator=originator,
         )
 
     def onceMemberJoinedParty(self, memberId, callback, args=[], timeout=None, ontimeout=None, originator=None):

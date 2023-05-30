@@ -3,6 +3,8 @@ from typing import TYPE_CHECKING
 from pydofus2.com.ankamagames.berilia.managers.KernelEventsManager import (
     KernelEvent, KernelEventsManager)
 from pydofus2.com.ankamagames.dofus.kernel.Kernel import Kernel
+from pydofus2.com.ankamagames.dofus.kernel.net.ConnectionsHandler import \
+    ConnectionsHandler
 from pydofus2.com.ankamagames.dofus.logic.game.common.managers.MapMovementAdapter import \
     MapMovementAdapter
 from pydofus2.com.ankamagames.dofus.logic.game.common.managers.PlayedCharacterManager import \
@@ -11,6 +13,8 @@ from pydofus2.com.ankamagames.dofus.logic.game.common.misc.DofusEntities import 
     DofusEntities
 from pydofus2.com.ankamagames.dofus.logic.game.roleplay.types.RequestTypeEnum import \
     RequestTypesEnum
+from pydofus2.com.ankamagames.dofus.network.messages.game.context.GameMapMovementConfirmMessage import \
+    GameMapMovementConfirmMessage
 from pydofus2.com.ankamagames.dofus.network.messages.game.context.GameMapMovementMessage import \
     GameMapMovementMessage
 from pydofus2.com.ankamagames.dofus.network.messages.game.context.GameMapNoMovementMessage import \
@@ -29,6 +33,8 @@ from pydofus2.com.ankamagames.dofus.network.messages.game.interactive.Interactiv
     InteractiveUseErrorMessage
 from pydofus2.com.ankamagames.dofus.network.messages.game.inventory.exchanges.ExchangeLeaveMessage import \
     ExchangeLeaveMessage
+from pydofus2.com.ankamagames.dofus.types.entities.AnimatedCharacter import \
+    AnimatedCharacter
 from pydofus2.com.ankamagames.jerakine.benchmark.BenchmarkTimer import \
     BenchmarkTimer
 from pydofus2.com.ankamagames.jerakine.logger.Logger import Logger
@@ -85,7 +91,8 @@ class RoleplayMovementFrame(Frame):
             newPos = MapPoint.fromCoords(msg.cellX, msg.cellY)
             self.isMoving = False
             self.canMove = True
-            player = DofusEntities().getEntity(PlayedCharacterManager().id)
+            player: AnimatedCharacter = DofusEntities().getEntity(PlayedCharacterManager().id)
+            player.isMoving = False
             if player:
                 player.position = newPos
                 self.entitiesFrame.updateEntityCellId(PlayedCharacterManager().id, newPos.cellId)            
@@ -100,13 +107,16 @@ class RoleplayMovementFrame(Frame):
             startCell = clientMovePath.start.cellId
             endCell = clientMovePath.end.cellId
             if msg.actorId == PlayedCharacterManager().id:
-                Logger().debug(f"Player '{msg.actorId}' moved from {startCell} to {endCell}.")
+                PlayedCharacterManager().entity.isMoving = True
+                Logger().debug(f"Player '{msg.actorId}' moving from {startCell} to {endCell}.")
             if movedEntity:
                 movedEntity.position.cellId = endCell
                 self.entitiesFrame.updateEntityCellId(msg.actorId, endCell)
             else:
                 Logger().error(f"Actor '{msg.actorId}' moved before it was added to the scene.")
-            KernelEventsManager().send(KernelEvent.ENTITY_MOVED, msg.actorId, clientMovePath)
+            if msg.actorId == PlayedCharacterManager().id:
+                PlayedCharacterManager().entity.move(clientMovePath, self.onPlayerMovementEnded)
+            KernelEventsManager().send(KernelEvent.ENTITY_MOVING, msg.actorId, clientMovePath)
             return True
 
         elif isinstance(msg, (InteractiveUseEndedMessage, InteractiveUseErrorMessage, LeaveDialogMessage, ExchangeLeaveMessage, EditHavenBagFinishedMessage)):
@@ -125,6 +135,12 @@ class RoleplayMovementFrame(Frame):
 
         else:
             return False
+
+    def onPlayerMovementEnded(self, success):
+        if success:
+            gmmcmsg = GameMapMovementConfirmMessage()
+            ConnectionsHandler().send(gmmcmsg)
+        KernelEventsManager().send(KernelEvent.PLAYER_MOVEMENT_COMPLETED, success)
 
     def pulled(self) -> bool:
         self.canMove = True

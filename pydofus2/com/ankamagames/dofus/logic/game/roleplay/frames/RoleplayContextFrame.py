@@ -185,6 +185,7 @@ class RoleplayContextFrame(Frame):
             return False
         
         return False
+    
     def addCommonExchangeFrame(self, exchangeType):
         if not Kernel().commonExchangeManagementFrame:
             self._commonExchangeFrame = CommonExchangeManagementFrame(exchangeType)

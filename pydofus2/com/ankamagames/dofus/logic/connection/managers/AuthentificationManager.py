@@ -1,17 +1,18 @@
 from argparse import ArgumentError
+
+from Cryptodome.PublicKey import RSA
+
 from pydofus2.com.ankamagames.dofus.BuildInfos import BuildInfos
-from pydofus2.com.ankamagames.dofus.logic.connection.actions.LoginValidationAction import (
-    LoginValidationAction,
-)
-from pydofus2.com.ankamagames.dofus.logic.connection.managers.AuthentificationManager__verifyKey import (
-    AuthentificationManager__verifyKey,
-)
-from pydofus2.com.ankamagames.dofus.network.messages.connection.IdentificationMessage import (
-    IdentificationMessage,
-)
+from pydofus2.com.ankamagames.dofus.logic.connection.actions.LoginValidationAction import \
+    LoginValidationAction
+from pydofus2.com.ankamagames.dofus.logic.connection.managers.AuthentificationManager__verifyKey import \
+    AuthentificationManager__verifyKey
+from pydofus2.com.ankamagames.dofus.network.messages.connection.IdentificationMessage import \
+    IdentificationMessage
 from pydofus2.com.ankamagames.jerakine.logger.Logger import Logger
 from pydofus2.com.ankamagames.jerakine.metaclasses.Singleton import Singleton
-from pydofus2.com.ankamagames.jerakine.network.CustomDataWrapper import ByteArray
+from pydofus2.com.ankamagames.jerakine.network.CustomDataWrapper import \
+    ByteArray
 from pydofus2.com.ankamagames.jerakine.types.Version import Version
 from pydofus2.com.hurlan.crypto.symmetric.AESKey import AESKey
 from pydofus2.com.hurlan.crypto.symmetric.CBCMode import CBCMode
@@ -19,7 +20,6 @@ from pydofus2.com.hurlan.crypto.symmetric.NullPAd import NullPad
 from pydofus2.com.hurlan.crypto.symmetric.PKCS1 import PKCS1
 from pydofus2.com.hurlan.crypto.symmetric.PSAKey import RSACipher
 from pydofus2.com.hurlan.crypto.symmetric.SimpleIVMode import SimpleIVMode
-from Cryptodome.PublicKey import RSA
 
 
 class AuthentificationManager(metaclass=Singleton):
@@ -97,6 +97,10 @@ class AuthentificationManager(metaclass=Singleton):
         )
         return imsg
 
+    @property
+    def rsaPubKey(self):
+        return RSA.importKey(bytes(self._publicKey, "utf"))
+    
     def getAuthCredentials(self) -> list[int]:
         baIn = ByteArray()
         baIn += bytes(self._salt, "utf")
@@ -104,7 +108,7 @@ class AuthentificationManager(metaclass=Singleton):
         baIn += len(self.username).to_bytes(1, "big")
         baIn += bytes(self.username, "utf")
         baIn += bytes(self._token, "utf")
-        rsa_key = RSA.importKey(bytes(self._publicKey, "utf"))
+        rsa_key = self.rsaPubKey
         rsacipher = RSACipher(rsa_key, PKCS1())
         baOut = rsacipher.encrypt(baIn)
         return baOut.to_int8Arr()
@@ -113,7 +117,6 @@ class AuthentificationManager(metaclass=Singleton):
         aescipher = SimpleIVMode(CBCMode(AESKey(self._AESKey), NullPad()))
         result = ByteArray()
         result.writeByteArray(self._AESKey, 0, 16)
-
         if type(byteArrayOrVector) == list:
             for i in byteArrayOrVector:
                 result.writeByte(i, signed=True)

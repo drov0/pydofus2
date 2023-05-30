@@ -50,7 +50,7 @@ class ServerConnection(mp.Thread):
     MESSAGE_SIZE_ASYNC_THRESHOLD: int = 300 * 1024
     CONNECTION_TIMEOUT = 7
 
-    def __init__(self, id: str = "ServerConnection", receptionQueue: queue.Queue = None, mitm_socket=None, MITM=False):
+    def __init__(self, id: str = "ServerConnection", receptionQueue: queue.Queue = None, MITM=False):
         super().__init__(name=mp.current_thread().name)
         self.id = id
         self._latencyBuffer = []
@@ -58,7 +58,7 @@ class ServerConnection(mp.Thread):
         self._remoteSrvPort = None
 
         self._connecting = mp.Event()
-        self._connected = mp.Event()
+        self.connected = mp.Event()
         self._closing = mp.Event()
         self._paused = mp.Event()
         self.finished = mp.Event()
@@ -77,14 +77,23 @@ class ServerConnection(mp.Thread):
             self.receptionQueue = queue.Queue(200)
         else:
             self.receptionQueue = receptionQueue
-        if MITM and mitm_socket:
-            self.socket = mitm_socket
-        else:
+        if not MITM:
             self.socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        else:
+            self.socket = None
+            self.mitm_socket_closed = mp.Event()
+            self.clientSocket: socket.socket = None
         self.connectionTimeout = None
         self.nbrSendFails = 0
-        
         self.MITM = MITM
+        
+
+    def setMITMSocket(self, socket, clientSocket):
+        if not self.MITM:
+            raise Exception("Cant set mitm socket when MITM flag is not set")
+        self.socket = socket
+        self.clientSocket = clientSocket
+        self.mitm_socket_closed.set()
 
     @property
     def latencyAvg(self) -> float:
@@ -132,7 +141,7 @@ class ServerConnection(mp.Thread):
 
     @property
     def open(self) -> bool:
-        return self._connected.is_set()
+        return self.connected.is_set()
 
     @property
     def connecting(self) -> bool:
@@ -226,7 +235,7 @@ class ServerConnection(mp.Thread):
         Logger().debug(f"[{self.id}] Connection established.")
         self.stopConnectionTimeout()
         self._connecting.clear()
-        self._connected.set()
+        self.connected.set()
         for msg in self.sendingQueue:
             self.send(msg)
         self.stream = ByteArray()
@@ -239,8 +248,7 @@ class ServerConnection(mp.Thread):
     def onClose(self, err) -> None:
         self.stopConnectionTimeout()
         Logger().debug(f"[{self.id}] Connection closed. {err}")
-        self.socket.close()
-        self._connected.clear()
+        self.connected.clear()
         from pydofus2.com.ankamagames.jerakine.network.ServerConnectionClosedMessage import \
             ServerConnectionClosedMessage
 
@@ -259,7 +267,7 @@ class ServerConnection(mp.Thread):
             ServerConnectionFailedMessage
 
         self.stopConnectionTimeout()
-        if self._connected.is_set() or self.finished.is_set() or self._closing.is_set():
+        if self.connected.is_set() or self.finished.is_set() or self._closing.is_set():
             return
         self._connecting.clear()
         if self._firstConnectionTry:
@@ -274,15 +282,14 @@ class ServerConnection(mp.Thread):
         if self.connecting:
             Logger().warn(f"[{self.id}] Tried to connect while already connecting.")
             return
-        self._connected.clear()
+        self.connected.clear()
         self._connecting.set()
         self._closing.clear()
         self._firstConnectionTry = True
         self._remoteSrvHost = host
         self._remoteSrvPort = port
         Logger().info(f"[{self.id}] Connecting to {host}:{port}...")
-        if self.MITM:
-            self.socket.connect((host, port))
+        self.socket.connect((host, port))
 
     def handleMessage(self, msg: NetworkMessage, from_client=False):
         if type(msg).__name__ == "BasicPongMessage" and self._lastSentPingTime:
@@ -298,8 +305,7 @@ class ServerConnection(mp.Thread):
         err = ""
         while not self._closing.is_set() and not self.finished.is_set():
             try:
-                rdata = self.socket.recv(14000)
-                # TraceLogger().debug(f"receiver size {len(rdata)}")
+                rdata = self.socket.recv(8900)                    
                 if rdata:
                     if self._connecting.is_set():
                         self.onConnect()
@@ -307,7 +313,7 @@ class ServerConnection(mp.Thread):
                     MessageReceiver().parse(self.stream, self.handleMessage, False)
                 else:
                     Logger().debug(f"[{self.id}] Connection closed by remote host")
-                    self._closing.set()
+                    self._closing.set()                
             except (KeyboardInterrupt, SystemExit) as e:
                 Logger().debug(f"[{self.id}] Interrupted suddenly!")
                 self._closing.set()

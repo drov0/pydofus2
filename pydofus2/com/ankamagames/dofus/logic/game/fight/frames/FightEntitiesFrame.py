@@ -1,4 +1,5 @@
 
+from pydofus2.com.ankamagames.berilia.managers.KernelEventsManager import KernelEvent, KernelEventsManager
 import pydofus2.com.ankamagames.dofus.kernel.Kernel as krnl
 import pydofus2.com.ankamagames.dofus.logic.game.common.managers.PlayedCharacterManager as pcm
 from pydofus2.com.ankamagames.atouin.managers.MapDisplayManager import \
@@ -218,7 +219,8 @@ class FightEntitiesFrame(AbstractEntitiesFrame, Frame):
             else:
                 self.addOrUpdateActor(gfsfmsg.informations)
                 self._illusionEntities[gfsfmsg.informations.contextualId] = False
-            return False
+            KernelEventsManager().send(KernelEvent.FIGHTER_SHOWED, gfsfmsg.informations.contextualId)
+            return True
 
         if isinstance(msg, GameFightHumanReadyStateMessage):
             gfhrsmsg = msg

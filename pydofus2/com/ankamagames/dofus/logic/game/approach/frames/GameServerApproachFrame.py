@@ -130,16 +130,21 @@ class GameServerApproachFrame(Frame):
     def charaListMinusDeadPeople(self) -> list:
         return self._charaListMinusDeadPeople
 
+    def sendAuthTicket(self):
+        atmsg = AuthenticationTicketMessage()
+        atmsg.init("fr", AuthentificationManager().gameServerTicket)
+        ConnectionsHandler().send(atmsg)
+        
     def process(self, msg: Message) -> bool:
 
         if isinstance(msg, HelloGameMessage):
-            atmsg = AuthenticationTicketMessage()
-            atmsg.init("fr", AuthentificationManager().gameServerTicket)
-            ConnectionsHandler().send(atmsg)
+            if not Kernel().mitm:
+                self.sendAuthTicket()
             return True
 
         elif isinstance(msg, AuthenticationTicketAcceptedMessage):
-            self.requestCharactersList()
+            if not Kernel().mitm:
+                self.requestCharactersList()
             return True
 
         elif isinstance(msg, AuthenticationTicketRefusedMessage):
@@ -244,11 +249,12 @@ class GameServerApproachFrame(Frame):
 
         elif isinstance(msg, CharacterLoadingCompleteMessage):
             Kernel().worker.removeFrame(self)
-            flashKeyMsg = ClientKeyMessage()
-            flashKeyMsg.init(InterClientManager().getFlashKey())
-            ConnectionsHandler().send(flashKeyMsg)
-            gccrmsg = GameContextCreateRequestMessage()
-            ConnectionsHandler().send(gccrmsg)
+            if not Kernel().mitm:
+                flashKeyMsg = ClientKeyMessage()
+                flashKeyMsg.init(InterClientManager().getFlashKey())
+                ConnectionsHandler().send(flashKeyMsg)
+                gccrmsg = GameContextCreateRequestMessage()
+                ConnectionsHandler().send(gccrmsg)
             return True
 
         elif isinstance(msg, ConnectionResumedMessage):

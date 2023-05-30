@@ -42,7 +42,6 @@ class ConnectionsHandler(metaclass=Singleton):
         self.sendMessageLock = threading.Lock() # to make sure only one portion of data is being sent at a time throught the socket
         self.last_send_time = None
 
-
     @property
     def connectionType(self) -> str:
         return self._currentConnectionType
@@ -80,7 +79,7 @@ class ConnectionsHandler(metaclass=Singleton):
         self._disconnectMessage = message
         if Kernel().worker.contains("HandshakeFrame"):
             Kernel().worker.removeFrameByName("HandshakeFrame")
-        if self.conn.open:
+        if not Kernel().mitm and self.conn.open:
             self.conn.close()
             self.conn.join()
         if self._currentConnectionType == ConnectionType.TO_GAME_SERVER:
@@ -92,26 +91,23 @@ class ConnectionsHandler(metaclass=Singleton):
     def etablishConnection(self, host: str, port: int, id: str) -> None:
         from pydofus2.com.ankamagames.dofus.logic.connection.frames.HandshakeFrame import \
             HandshakeFrame
-        self._conn = ServerConnection(id, self._receivedMsgsQueue)
+        self._conn = ServerConnection(id, self._receivedMsgsQueue, MITM=Kernel().mitm)
         Kernel().worker.addFrame(HandshakeFrame())
-        self._conn.start()
-        self._conn.connect(host, port)
+        if not Kernel().mitm:
+            self._conn.start()
+            self._conn.connect(host, port)
 
     def send(self, msg: INetworkMessage) -> None:
         with self.sendMessageLock:
             if not self._conn:
                 return Logger().warning(f"Can't send message when no connection is established!, maybe we are shuting down?")
-            mean_delay = 0.25
-            std_dev = 0.1
-            random_delay =  + random.gauss(mean_delay, std_dev)
             if self.last_send_time is not None:
-                minNextSendTime = self.last_send_time + random_delay
+                minNextSendTime = self.last_send_time + random.gauss(0.3, 0.1)
                 diff = minNextSendTime - perf_counter()
                 if diff > 0:
                     Kernel().worker.terminated.wait(diff)
             self.last_send_time = perf_counter()
             self._conn.send(msg)
-            
 
     def inGameServer(self):
         return self._currentConnectionType == ConnectionType.TO_GAME_SERVER

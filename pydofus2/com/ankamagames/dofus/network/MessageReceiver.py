@@ -91,7 +91,11 @@ _messages_to_discard = {
     "PaddockPropertiesMessage",
     "GameDataPaddockObjectListAddMessage",
     "GameRolePlayMonsterNotAngryAtPlayerMessage",
-    "GameRolePlayMonsterAngryAtPlayerMessage"
+    "GameRolePlayMonsterAngryAtPlayerMessage",
+    "MapFightStartPositionsUpdateMessage",
+    "GameDataPaddockObjectAddMessage",
+    "GameDataPlayFarmObjectAnimationMessage",
+    "AchievementRewardSuccessMessage"
 }
 
 _mule_fight_messages_to_discard = {
@@ -156,14 +160,14 @@ class MessageReceiver(RawDataParser, metaclass=Singleton):
             clsModule = importlib.import_module(modulePath)
         return getattr(clsModule, clsName)
         
-    def parseMessage(self, input: ByteArray, messageId: int, messageLength: int, from_client=False) -> NetworkMessage:
+    def parseMessage(self, input: ByteArray, messageId: int, messageLength: int, from_client=False, msgCount=None) -> NetworkMessage:
         if not from_client:
             messageType = self.messagesTypes.get(messageId)
         else:
             try:
                 clsSpec = ProtocolSpec.getClassSpecById(messageId)
             except:
-                raise UnknownMessageId(f"Message {messageId}, from client {from_client} : not found in knowon message Ids!")
+                raise UnknownMessageId(f"Message {messageId}, from client {from_client} : not found in known message Ids!")
             messageType = clsSpec.cls
         if self.discard:
             if not messageType or (
@@ -176,7 +180,7 @@ class MessageReceiver(RawDataParser, metaclass=Singleton):
                 input.position += messageLength
                 return message
         if messageType is None:
-            raise UnknownMessageId(f"Message {messageId}, from client {from_client} : not found in knowon message Ids!")
+            raise UnknownMessageId(f"Message {messageId}, from client {from_client} : not found in known message Ids!")
         if messageType.__name__ == "GameFightJoinMessage":
             self.infight = True
             Logger().separator("Fight started", "+")
@@ -185,6 +189,8 @@ class MessageReceiver(RawDataParser, metaclass=Singleton):
             Logger().separator("Fight ended", "-")
         message = messageType.unpack(input, messageLength)
         message.unpacked = True
+        if from_client:
+            message._instance_id = msgCount
         return message
 
     def parse(self, buffer: ByteArray, callback, from_client=False) -> None:
@@ -205,8 +211,8 @@ class MessageReceiver(RawDataParser, metaclass=Singleton):
                 self.msgLen = int.from_bytes(buffer.read(self.msgLenLen), "big")
             if buffer.remaining() < self.msgLen:
                 break
-            msg_bytes = buffer.read(self.msgLen)
-            msg = self.parseMessage(msg_bytes, self.msgId, self.msgLen, from_client)
+            msg_bytes = buffer.read(self.msgLen)            
+            msg = self.parseMessage(msg_bytes, self.msgId, self.msgLen, from_client, self.msgCount)
             self.msgId = None
             self.msgLenLen = None
             self.msgLen = None

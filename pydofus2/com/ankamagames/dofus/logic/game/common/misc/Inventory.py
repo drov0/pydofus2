@@ -23,8 +23,8 @@ class Inventory:
 
     def __init__(self):
         self._itemsDict = dict()
-        super().__init__()
         self._views = dict()
+        self._kamas = 0
 
     @property
     def kamas(self) -> float:

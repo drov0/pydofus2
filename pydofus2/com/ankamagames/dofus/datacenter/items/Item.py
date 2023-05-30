@@ -1,23 +1,22 @@
 import math
 from typing import TYPE_CHECKING
 
-
 if TYPE_CHECKING:
     from pydofus2.com.ankamagames.dofus.datacenter.effects.EffectInstance import EffectInstance
-from pydofus2.com.ankamagames.dofus.datacenter.items.criterion.GroupItemCriterion import (
-    GroupItemCriterion,
-)
+
+from pydofus2.com.ankamagames.dofus.datacenter.items.criterion.GroupItemCriterion import \
+    GroupItemCriterion
 from pydofus2.com.ankamagames.dofus.datacenter.items.ItemSet import ItemSet
 from pydofus2.com.ankamagames.dofus.datacenter.items.ItemType import ItemType
 from pydofus2.com.ankamagames.dofus.internalDatacenter.DataEnum import DataEnum
+from pydofus2.com.ankamagames.dofus.types.enums.ItemCategoryEnum import \
+    ItemCategoryEnum
 from pydofus2.com.ankamagames.dofus.types.IdAccessors import IdAccessors
-from pydofus2.com.ankamagames.dofus.types.enums.ItemCategoryEnum import ItemCategoryEnum
-from pydofus2.com.ankamagames.jerakine.data.IPostInit import IPostInit
+from pydofus2.com.ankamagames.jerakine.data.GameData import GameData
 from pydofus2.com.ankamagames.jerakine.data.I18n import I18n
-from pydofus2.com.ankamagames.jerakine.data.GameData import GameData
-
-from pydofus2.com.ankamagames.jerakine.data.GameData import GameData
-from pydofus2.com.ankamagames.jerakine.interfaces.IDataCenter import IDataCenter
+from pydofus2.com.ankamagames.jerakine.data.IPostInit import IPostInit
+from pydofus2.com.ankamagames.jerakine.interfaces.IDataCenter import \
+    IDataCenter
 from pydofus2.com.ankamagames.jerakine.logger.Logger import Logger
 
 
@@ -282,8 +281,8 @@ class Item(IPostInit, IDataCenter):
         Logger().error(f"Impossible de trouver l'objet {id}, remplacement par l'objet 666")
         return GameData().getObject(cls.MODULE, 666)
 
-    @staticmethod
-    def getItems(cls) -> list:
+    @classmethod
+    def getItems(cls) -> list["Item"]:
         return GameData().getObjects(cls.MODULE)
 
     idAccessors: IdAccessors = IdAccessors(getItemById, getItems)
@@ -360,7 +359,8 @@ class Item(IPostInit, IDataCenter):
 
     @property
     def recipes(self) -> list:
-        from pydofus2.com.ankamagames.dofus.datacenter.jobs.Recipe import Recipe
+        from pydofus2.com.ankamagames.dofus.datacenter.jobs.Recipe import \
+            Recipe
 
         if not self._recipes:
             numRecipes = len(self.recipeIds)

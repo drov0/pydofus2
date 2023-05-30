@@ -1,32 +1,28 @@
 from types import FunctionType
-from pydofus2.com.ankamagames.berilia.managers.KernelEventsManager import KernelEvent, KernelEventsManager
+
 import pydofus2.com.ankamagames.dofus.datacenter.quest.Quest as qst
-from pydofus2.com.ankamagames.dofus.network.messages.game.achievement.AchievementListMessage import (
-    AchievementListMessage,
-)
-from pydofus2.com.ankamagames.dofus.network.messages.game.context.roleplay.quest.QuestListMessage import (
-    QuestListMessage,
-)
-from pydofus2.com.ankamagames.dofus.network.messages.game.context.roleplay.quest.QuestStartedMessage import QuestStartedMessage
-from pydofus2.com.ankamagames.dofus.network.messages.game.context.roleplay.quest.QuestStepInfoMessage import (
-    QuestStepInfoMessage,
-)
-from pydofus2.com.ankamagames.dofus.network.messages.game.context.roleplay.quest.QuestValidatedMessage import (
-    QuestValidatedMessage,
-)
-from pydofus2.com.ankamagames.dofus.network.types.game.achievement.AchievementAchieved import AchievementAchieved
-from pydofus2.com.ankamagames.dofus.network.types.game.achievement.AchievementAchievedRewardable import (
-    AchievementAchievedRewardable,
-)
-from pydofus2.com.ankamagames.dofus.network.types.game.context.roleplay.quest.QuestActiveDetailedInformations import (
-    QuestActiveDetailedInformations,
-)
-from pydofus2.com.ankamagames.dofus.network.types.game.context.roleplay.quest.QuestActiveInformations import (
-    QuestActiveInformations,
-)
-from pydofus2.com.ankamagames.dofus.network.types.game.context.roleplay.quest.QuestObjectiveInformationsWithCompletion import (
-    QuestObjectiveInformationsWithCompletion,
-)
+from pydofus2.com.ankamagames.berilia.managers.KernelEventsManager import (
+    KernelEvent, KernelEventsManager)
+from pydofus2.com.ankamagames.dofus.network.messages.game.achievement.AchievementListMessage import \
+    AchievementListMessage
+from pydofus2.com.ankamagames.dofus.network.messages.game.context.roleplay.quest.QuestListMessage import \
+    QuestListMessage
+from pydofus2.com.ankamagames.dofus.network.messages.game.context.roleplay.quest.QuestStartedMessage import \
+    QuestStartedMessage
+from pydofus2.com.ankamagames.dofus.network.messages.game.context.roleplay.quest.QuestStepInfoMessage import \
+    QuestStepInfoMessage
+from pydofus2.com.ankamagames.dofus.network.messages.game.context.roleplay.quest.QuestValidatedMessage import \
+    QuestValidatedMessage
+from pydofus2.com.ankamagames.dofus.network.types.game.achievement.AchievementAchieved import \
+    AchievementAchieved
+from pydofus2.com.ankamagames.dofus.network.types.game.achievement.AchievementAchievedRewardable import \
+    AchievementAchievedRewardable
+from pydofus2.com.ankamagames.dofus.network.types.game.context.roleplay.quest.QuestActiveDetailedInformations import \
+    QuestActiveDetailedInformations
+from pydofus2.com.ankamagames.dofus.network.types.game.context.roleplay.quest.QuestActiveInformations import \
+    QuestActiveInformations
+from pydofus2.com.ankamagames.dofus.network.types.game.context.roleplay.quest.QuestObjectiveInformationsWithCompletion import \
+    QuestObjectiveInformationsWithCompletion
 from pydofus2.com.ankamagames.jerakine.messages.Frame import Frame
 from pydofus2.com.ankamagames.jerakine.messages.Message import Message
 from pydofus2.com.ankamagames.jerakine.types.enums.Priority import Priority
@@ -186,31 +182,31 @@ class QuestFrame(Frame):
             return True
 
         elif isinstance(msg, QuestListMessage):
-            qlmsg = msg
-            self._activeQuests = qlmsg.activeQuests
-            self._completedQuests = qlmsg.finishedQuestsIds
-            self._completedQuests = self._completedQuests + qlmsg.reinitDoneQuestsIds
-            self._reinitDoneQuests = qlmsg.reinitDoneQuestsIds
-            self._activeObjectives = list[int]()
-            self._completedObjectives = list[int]()
-            for questInfosDetailed in self._activeQuests:
-                if questInfosDetailed:
-                    for obj in questInfosDetailed["objectives"]:
-                        if obj["objectiveStatus"]:
-                            if obj["objectiveId"] not in self._activeObjectives:
-                                if obj["objectiveId"] in self._completedObjectives:
-                                    self._completedObjectives.remove(obj["objectiveId"])
-                                self._activeObjectives.append(obj["objectiveId"])
-                        elif obj["objectiveId"] not in self._completedObjectives:
-                            if obj["objectiveId"] in self._activeObjectives:
-                                self._activeObjectives.remove(obj["objectiveId"])
-                            self._completedObjectives.append(obj["objectiveId"])
-            for id in self._completedQuests:
-                quest = qst.Quest.getQuestById(id)
-                if quest:
-                    steps = quest.steps
-                    for qs in steps:
-                        self._completedObjectives = self._completedObjectives.extend(qs.objectiveIds)
+            # qlmsg = msg
+            # self._activeQuests = qlmsg.activeQuests
+            # self._completedQuests = qlmsg.finishedQuestsIds
+            # self._completedQuests = self._completedQuests + qlmsg.reinitDoneQuestsIds
+            # self._reinitDoneQuests = qlmsg.reinitDoneQuestsIds
+            # self._activeObjectives = list[int]()
+            # self._completedObjectives = list[int]()
+            # for questInfosDetailed in self._activeQuests:
+            #     if questInfosDetailed:
+            #         for obj in questInfosDetailed.objectives:
+            #             if obj.objectiveStatus:
+            #                 if obj.objectiveId not in self._activeObjectives:
+            #                     if obj.objectiveId in self._completedObjectives:
+            #                         self._completedObjectives.remove(obj["objectiveId"])
+            #                     self._activeObjectives.append(obj["objectiveId"])
+            #             elif obj.objectiveId not in self._completedObjectives:
+            #                 if obj.objectiveId in self._activeObjectives:
+            #                     self._activeObjectives.remove(obj["objectiveId"])
+            #                 self._completedObjectives.append(obj["objectiveId"])
+            # for id in self._completedQuests:
+            #     quest = qst.Quest.getQuestById(id)
+            #     if quest:
+            #         steps = quest.steps
+            #         for qs in steps:
+            #             self._completedObjectives = self._completedObjectives.extend(qs.objectiveIds)
             return True
 
         elif isinstance(msg, QuestStepInfoMessage):

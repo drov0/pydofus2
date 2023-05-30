@@ -40,9 +40,9 @@ class ItemType(IDataCenter):
 
     evolutiveTypeId: int
 
-    _name: str
+    _name: str = None
 
-    _evolutiveType: EvolutiveItemType
+    _evolutiveType: EvolutiveItemType = None
 
     def __init__(self):
         super().__init__()

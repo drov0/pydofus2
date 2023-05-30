@@ -77,8 +77,8 @@ class AuthentificationFrame(Frame):
             AuthentificationManager().initAESKey()
             iMsg = AuthentificationManager().getIdentificationMessage()
             self._currentLogIsForced = isinstance(iMsg, IdentificationAccountForceMessage)
-            ConnectionsHandler().send(iMsg)
-            KernelEventsManager().send(KernelEvent.IN_GAME, msg)
+            if not Kernel().mitm:
+                ConnectionsHandler().send(iMsg)
             return True
 
         elif isinstance(msg, IdentificationSuccessMessage):
@@ -100,6 +100,7 @@ class AuthentificationFrame(Frame):
             Kernel().worker.removeFrame(self)
             Kernel().worker.addFrame(CharacterFrame())
             Kernel().worker.addFrame(ServerSelectionFrame())
+            KernelEventsManager().send(KernelEvent.IN_GAME, msg)
             return True
 
         elif isinstance(msg, IdentificationFailedMessage):

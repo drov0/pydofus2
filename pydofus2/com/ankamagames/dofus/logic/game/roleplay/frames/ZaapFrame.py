@@ -75,40 +75,38 @@ class ZaapFrame(Frame):
     def process(self, msg):
 
         if isinstance(msg, ZaapDestinationsMessage):
-            zdmsg = msg
             self._zaapsList = []
-            for dest in zdmsg.destinations:
+            for dest in msg.destinations:
                 self._zaapsList.append(
                     TeleportDestinationWrapper(
-                        zdmsg.type,
+                        msg.type,
                         dest.mapId,
                         dest.subAreaId,
                         dest.type,
                         dest.level,
                         dest.cost,
-                        zdmsg.spawnMapId == dest.mapId,
+                        msg.spawnMapId == dest.mapId,
                     )
                 )
-            self._spawnMapId = zdmsg.spawnMapId
+            self._spawnMapId = msg.spawnMapId
             KernelEventsManager().send(
                 KernelEvent.TeleportDestinationList,
                 self._zaapsList,
                 TeleporterTypeEnum.TELEPORTER_HAVENBAG
-                if zdmsg.type == TeleporterTypeEnum.TELEPORTER_HAVENBAG
+                if msg.type == TeleporterTypeEnum.TELEPORTER_HAVENBAG
                 else TeleporterTypeEnum.TELEPORTER_ZAAP,
             )
             return True
 
         elif isinstance(msg, TeleportDestinationsMessage):
-            tdmsg = msg
             destinations = []
-            if tdmsg.type == TeleporterTypeEnum.TELEPORTER_SUBWAY:
-                for dest in tdmsg.destinations:
+            if msg.type == TeleporterTypeEnum.TELEPORTER_SUBWAY:
+                for dest in msg.destinations:
                     hints = TeleportDestinationWrapper.getHintsFromMapId(dest.mapId)
                     for hint in hints:
                         destinations.append(
                             TeleportDestinationWrapper(
-                                tdmsg.type,
+                                msg.type,
                                 dest.mapId,
                                 dest.subAreaId,
                                 TeleporterTypeEnum.TELEPORTER_SUBWAY,
@@ -119,20 +117,19 @@ class ZaapFrame(Frame):
                             )
                         )
             else:
-                for dest in tdmsg.destinations:
+                for dest in msg.destinations:
                     destinations.append(
                         TeleportDestinationWrapper(
-                            tdmsg.type, dest.mapId, dest.subAreaId, dest.type, dest.level, dest.cost
+                            msg.type, dest.mapId, dest.subAreaId, dest.type, dest.level, dest.cost
                         )
                     )
-            KernelEventsManager().send(KernelEvent.TeleportDestinationList, destinations, tdmsg.type)
+            KernelEventsManager().send(KernelEvent.TeleportDestinationList, destinations, msg.type)
             return True
 
         elif isinstance(msg, ZaapRespawnUpdatedMessage):
-            zrumsg = msg
             for zaap in self._zaapsList:
-                zaap.spawn = zaap.mapId == zrumsg.mapId
-            self._spawnMapId = zrumsg.mapId
+                zaap.spawn = zaap.mapId == msg.mapId
+            self._spawnMapId = msg.mapId
             KernelEventsManager().send(
                 KernelEvent.TeleportDestinationList, self._zaapsList, TeleporterTypeEnum.TELEPORTER_ZAAP
             )

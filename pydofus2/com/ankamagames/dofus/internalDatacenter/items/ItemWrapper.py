@@ -112,6 +112,7 @@ class ItemWrapper(Item, ISlotData, ICellZoneProvider, IDataCenter):
         self.livingobjectId: int = None
 
         self.livingobjectMood: int = None
+        
         self.livingobjectSkin: int = None
 
         self.livingobjectCategory: int = None
@@ -357,8 +358,6 @@ class ItemWrapper(Item, ISlotData, ICellZoneProvider, IDataCenter):
 
     @property
     def spellZoneEffects(self) -> list[IZoneShape]:
-        i: "EffectInstance" = None
-        zone: ZoneEffect = None
         spellEffects: list[IZoneShape] = list[IZoneShape]()
         for i in self.effects:
             zone = ZoneEffect(int(i.zoneSize), i.zoneShape)

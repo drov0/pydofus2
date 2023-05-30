@@ -414,23 +414,23 @@ class FightContextFrame(Frame):
             return True
 
         elif isinstance(msg, GameFightJoinMessage):
-            gfjmsg = msg
-            preFightIsActive = not gfjmsg.isFightStarted
-            self.fightType = gfjmsg.fightType
+            preFightIsActive = not msg.isFightStarted
+            self.fightType = msg.fightType
             Kernel().worker.addFrame(self._entitiesFrame)
             if preFightIsActive:
                 Kernel().worker.addFrame(self._preparationFrame)
-                self.onlyTheOtherTeamCanPlace = not gfjmsg.isTeamPhase
+                self.onlyTheOtherTeamCanPlace = not msg.isTeamPhase
             else:
                 Kernel().worker.removeFrame(self._preparationFrame)
                 Kernel().worker.addFrame(self._battleFrame)
                 self.onlyTheOtherTeamCanPlace = False
             PlayedCharacterManager().isSpectator = False
             PlayedCharacterManager().isFighting = True
-            timeBeforeStart = gfjmsg.timeMaxBeforeFightStart * 100
+            timeBeforeStart = msg.timeMaxBeforeFightStart * 100
             if timeBeforeStart == 0 and preFightIsActive:
                 timeBeforeStart = -1
-            return False
+            KernelEventsManager().send(KernelEvent.FIGHT_JOINED, msg.isFightStarted, msg.fightType, msg.isTeamPhase, msg.timeMaxBeforeFightStart)
+            return True
 
         elif isinstance(msg, GameFightStartMessage):
             gfsm = msg

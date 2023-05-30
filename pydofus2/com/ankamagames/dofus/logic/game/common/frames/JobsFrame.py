@@ -57,7 +57,6 @@ from pydofus2.com.ankamagames.jerakine.types.enums.Priority import Priority
 
 class JobsFrame(Frame):
 
-    # _jobCrafterDirectoryListDialogFrame: JobCrafterDirectoryListDialogFrame
 
     _settings: dict
 
@@ -95,103 +94,69 @@ class JobsFrame(Frame):
         return True
 
     def process(self, msg: Message) -> bool:
-        jdmsg: JobDescriptionMessage = None
-        jcdsmsg: JobCrafterDirectorySettingsMessage = None
-        jcddsa: JobCrafterDirectoryDefineSettingsAction = None
-        jcddsmsg: JobCrafterDirectoryDefineSettingsMessage = None
-        jeopumsg: JobExperienceOtherPlayerUpdateMessage = None
-        jeumsg: JobExperienceUpdateMessage = None
-        jemumsg: JobExperienceMultiUpdateMessage = None
-        jlumsg: JobLevelUpMessage = None
-        jobsNumber: int = 0
-        lastJobLevel: int = 0
-        jobName: str = None
-        kj: KnownJobWrapper = None
-        newJobLevel: int = 0
-        podsBonus: int = 0
-        levelUpTextMessage: str = None
-        jbsra: JobBookSubscribeRequestAction = None
-        exmsg: JobBookSubscribeRequestMessage = None
-        jbsmsg: JobBookSubscriptionMessage = None
-        jobSub: JobBookSubscription = None
-        allTheSame: bool = False
-        subscriptionState: bool = False
-        text: str = None
-        jcdlra: JobCrafterDirectoryListRequestAction = None
-        jcdlrmsg: JobCrafterDirectoryListRequestMessage = None
-        jcclra: JobCrafterContactLookRequestAction = None
-        esokimsg: ExchangeStartOkJobIndexMessage = None
-        array: list = None
-        jd: JobDescription = None
-        kj2: KnownJobWrapper = None
-        setting: JobCrafterDirectorySettings = None
-        je: JobExperience = None
-        kjw: KnownJobWrapper = None
-        job: Job = None
-        clrbimsg: ContactLookRequestByIdMessage = None
-        esojijob: int = 0
+        
         if isinstance(msg, JobDescriptionMessage):
-            jdmsg = msg
             PlayedCharacterManager().jobs = dict()
-            for jd in jdmsg.jobsDescription:
+            for jd in msg.jobsDescription:
                 if jd:
                     kj2 = KnownJobWrapper.create(jd.jobId)
                     kj2.jobDescription = jd
                     PlayedCharacterManager().jobs[jd.jobId] = kj2
             return True
+        
         if isinstance(msg, JobCrafterDirectorySettingsMessage):
-            jcdsmsg = msg
-            for setting in jcdsmsg.craftersSettings:
+            for setting in msg.craftersSettings:
                 self._settings[setting.jobId] = self.createCrafterDirectorySettings(setting)
             return True
+        
         if isinstance(msg, JobCrafterDirectoryDefineSettingsAction):
-            jcddsa = msg
             jcddsmsg = JobCrafterDirectoryDefineSettingsMessage()
-            jcddsmsg.init(jcddsa.settings)
+            jcddsmsg.init(msg.settings)
             ConnectionsHandler().send(jcddsmsg)
             return True
+        
         if isinstance(msg, JobExperienceOtherPlayerUpdateMessage):
             return True
+        
         if isinstance(msg, JobExperienceUpdateMessage):
-            jeumsg = msg
-            self.updateJobExperience(jeumsg.experiencesUpdate)
+            self.updateJobExperience(msg.experiencesUpdate)
             return True
+        
         if isinstance(msg, JobExperienceMultiUpdateMessage):
-            jemumsg = msg
-            for je in jemumsg.experiencesUpdate:
+            for je in msg.experiencesUpdate:
                 self.updateJobExperience(je)
             return True
+        
         if isinstance(msg, JobLevelUpMessage):
-            jlumsg = msg
             jobsNumber = PlayedCharacterManager().jobsNumber()
             lastJobLevel = PlayedCharacterManager().jobsLevel()
             lastJobLevel -= jobsNumber
-            jobName = Job.getJobById(jlumsg.jobsDescription.jobId).name
-            kj = PlayedCharacterManager().jobs[jlumsg.jobsDescription.jobId]
-            kj.jobDescription = jlumsg.jobsDescription
-            kj.jobLevel = jlumsg.newLevel
+            jobName = Job.getJobById(msg.jobsDescription.jobId).name
+            kj = PlayedCharacterManager().jobs[msg.jobsDescription.jobId]
+            kj.jobDescription = msg.jobsDescription
+            kj.jobLevel = msg.newLevel
             newJobLevel = PlayedCharacterManager().jobsLevel()
             newJobLevel -= jobsNumber
             # podsBonus = self.jobLevelupPodsBonus(newJobLevel, lastJobLevel)
-            Logger().info(f"Job {jobName} leveled Up to {jlumsg.newLevel}")
+            Logger().info(f"Job {jobName} leveled Up to {msg.newLevel}")
             return True
+        
         if isinstance(msg, JobBookSubscribeRequestAction):
-            jbsra = msg
             exmsg = JobBookSubscribeRequestMessage()
-            exmsg.init(jbsra.jobIds)
+            exmsg.init(msg.jobIds)
             ConnectionsHandler().send(exmsg)
             return True
+        
         if isinstance(msg, JobBookSubscriptionMessage):
-            jbsmsg = msg
-            for jobSub in jbsmsg.subscriptions:
+            for jobSub in msg.subscriptions:
                 PlayedCharacterManager().jobs[jobSub.jobId].jobBookSubscriber = jobSub.subscribed
             allTheSame = True
-            subscriptionState = jbsmsg.subscriptions[0].subscribed
+            subscriptionState = msg.subscriptions[0].subscribed
             for kjw in PlayedCharacterManager().jobs:
                 if kjw.jobBookSubscriber != subscriptionState:
                     allTheSame = False
             if not allTheSame:
-                for jobSub in jbsmsg.subscriptions:
+                for jobSub in msg.subscriptions:
                     job = Job.getJobById(jobSub.jobId)
                     if jobSub.subscribed:
                         text = I18n.getUiText("ui.craft.referenceAdd", [job.name])
@@ -204,28 +169,29 @@ class JobsFrame(Frame):
                     text = I18n.getUiText("ui.craft.referenceRemoveAll")
             Logger().info(text)
             return True
+        
         if isinstance(msg, JobCrafterDirectoryListRequestAction):
-            jcdlra = msg
             jcdlrmsg = JobCrafterDirectoryListRequestMessage()
-            jcdlrmsg.init(jcdlra.jobId)
+            jcdlrmsg.init(msg.jobId)
             ConnectionsHandler().send(jcdlrmsg)
             return True
+        
         if isinstance(msg, JobCrafterContactLookRequestAction):
-            jcclra = msg
-            if jcclra.crafterId == PlayedCharacterManager().id:
+            if msg.crafterId == PlayedCharacterManager().id:
                 pass
             else:
                 clrbimsg = ContactLookRequestByIdMessage()
-                clrbimsg.init(0, SocialContactCategoryEnum.SOCIAL_CONTACT_CRAFTER, jcclra.crafterId)
+                clrbimsg.init(0, SocialContactCategoryEnum.SOCIAL_CONTACT_CRAFTER, msg.crafterId)
                 ConnectionsHandler().send(clrbimsg)
             return True
+        
         if isinstance(msg, ExchangeStartOkJobIndexMessage):
-            esokimsg = msg
             array = list()
-            for esojijob in esokimsg.jobs:
+            for esojijob in msg.jobs:
                 array.append(esojijob)
             Kernel().worker.addFrame(self._jobCrafterDirectoryListDialogFrame)
             return True
+        
         else:
             return False
 
@@ -238,6 +204,3 @@ class JobsFrame(Frame):
         paramsNewJob["sum_of_jobs_earned_levels"] = newJobsLevel
         paramsLastJob["sum_of_jobs_earned_levels"] = lastJobsLevel
         return 0
-        # return (LuaScriptManager().executeLuaFormula(LuaFormulasEnum.JOBLEVELUP_PODSBONUS, paramsNewJob)) - (
-        #     LuaScriptManager().executeLuaFormula(LuaFormulasEnum.JOBLEVELUP_PODSBONUS, paramsLastJob)
-        # )

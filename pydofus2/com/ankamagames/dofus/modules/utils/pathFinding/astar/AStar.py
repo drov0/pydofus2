@@ -86,7 +86,7 @@ class AStar(metaclass=Singleton):
             if self.maxPathLength and current.moveCost > self.maxPathLength:
                 continue
             if current.vertex == self.dst:
-                Logger().info(f"Goal reached within {self.iterations} iterations and {perf_counter() - s} seconds")
+                # Logger().info(f"Goal reached within {self.iterations} iterations and {perf_counter() - s} seconds")
                 result = self.buildResultPath(self.worldGraph, current)
                 self.running = False
                 return result
@@ -114,7 +114,7 @@ class AStar(metaclass=Singleton):
                         if not self.hasValidDestinationSubarea(edge):
                             reasons.append("\Edge has a non valid destination subarea")
                         Logger().debug(f"Edge dismissed for reason {', '.join(reasons)}")
-        Logger().info(f"Goal not reached within {self.iterations} iterations")
+        # Logger().info(f"Goal not reached within {self.iterations} iterations")
         self.running = False
         return None
 

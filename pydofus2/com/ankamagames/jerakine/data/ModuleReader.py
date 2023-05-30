@@ -3,10 +3,13 @@ from collections import OrderedDict
 from functools import lru_cache
 from typing import Any
 
-from pydofus2.com.ankamagames.jerakine.benchmark.BenchmarkTimer import BenchmarkTimer
+from pydofus2.com.ankamagames.jerakine.benchmark.BenchmarkTimer import \
+    BenchmarkTimer
 from pydofus2.com.ankamagames.jerakine.data.BinaryStream import BinaryStream
-from pydofus2.com.ankamagames.jerakine.data.GameDataClassDefinition import GameDataClassDefinition
-from pydofus2.com.ankamagames.jerakine.data.GameDataProcess import GameDataProcess
+from pydofus2.com.ankamagames.jerakine.data.GameDataClassDefinition import \
+    GameDataClassDefinition
+from pydofus2.com.ankamagames.jerakine.data.GameDataProcess import \
+    GameDataProcess
 from pydofus2.com.ankamagames.jerakine.logger.Logger import Logger
 from pydofus2.com.hurlan.crypto.Signature import Signature
 
@@ -18,6 +21,8 @@ class InvalidD2OFile(Exception):
 
 
 class ModuleReader:
+    _clearObjectsCache = False
+    
     def __init__(self, filepath: str, name: str) -> None:
         self.filepath = filepath
         self.name = name
@@ -75,7 +80,8 @@ class ModuleReader:
                     classId = stream.readInt()
                     instance = self._classes[classId].from_stream(stream)
                     objects.append(instance)
-            BenchmarkTimer(60, self.clearObjectsCache).start()
+            if ModuleReader._clearObjectsCache:
+                BenchmarkTimer(60, self.clearObjectsCache).start()
             return objects
 
     def __readClassDefinition(self, classId, stream: BinaryStream):

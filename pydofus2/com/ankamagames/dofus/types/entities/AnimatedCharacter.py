@@ -1,3 +1,5 @@
+from pydofus2.com.ankamagames.atouin.entities.behaviours.MovementBehavior import \
+    MovementBehavior
 from pydofus2.com.ankamagames.atouin.managers.EntitiesManager import \
     EntitiesManager
 from pydofus2.com.ankamagames.jerakine.entities.interfaces.IDisplayable import \
@@ -23,6 +25,7 @@ class AnimatedCharacter(IMovable, IEntity, IObstacle, IDisplayable):
         self.speedAdjust: float = 0.0
         self.cantWalk8Directions: bool = False
         self._carriedEntity = None
+        self._movementBehavior: MovementBehavior = None
         super().__init__()
 
     @property
@@ -95,4 +98,8 @@ class AnimatedCharacter(IMovable, IEntity, IObstacle, IDisplayable):
     
     def show(self) -> None:
         self._canSeeThrough = False
-        EntitiesManager().addEntity(self.id, self);
+        EntitiesManager().addEntity(self.id, self)
+    
+    def move(self, path, callback):
+        self._movementAnimation = MovementBehavior(path, callback)
+        self._movementAnimation.start()

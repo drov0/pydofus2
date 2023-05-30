@@ -34,6 +34,7 @@ if TYPE_CHECKING:
     )
     from pydofus2.com.ankamagames.atouin.data.map.Cell import Cell
     from pydofus2.com.ankamagames.dofus.internalDatacenter.spells.SpellWrapper import SpellWrapper
+    from pydofus2.com.ankamagames.dofus.types.entities.AnimatedCharacter import AnimatedCharacter
 
 from pydofus2.com.ankamagames.dofus.internalDatacenter.DataEnum import DataEnum
 from pydofus2.com.ankamagames.dofus.logic.common.managers.StatsManager import \
@@ -271,7 +272,7 @@ class PlayedCharacterManager(IDestroyable, metaclass=Singleton):
         return -1
 
     @property
-    def entity(self) -> "IEntity":
+    def entity(self) -> "AnimatedCharacter":
         return DofusEntities().getEntity(self.id)
 
     @property

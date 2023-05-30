@@ -7,7 +7,8 @@ from pydofus2.com.ankamagames.jerakine.network.CustomDataWrapper import \
     ByteArray
 from pydofus2.com.ankamagames.jerakine.network.INetworkMessage import \
     INetworkMessage
-from pydofus2.com.ankamagames.jerakine.network.parser.ProtocolSpec import ClassSpec, ProtocolSpec
+from pydofus2.com.ankamagames.jerakine.network.parser.ProtocolSpec import (
+    ClassSpec, ProtocolSpec)
 from pydofus2.com.ankamagames.jerakine.network.utils.FuncTree import FuncTree
 
 
@@ -25,6 +26,7 @@ class NetworkMessage(INetworkMessage):
         self.sourceConnection: str = None
         self._name = None
         self._unpacked: bool = False
+        self._raw = None
         super().__init__()
 
     def computeTypeLen(self, length: int) -> int:
@@ -84,13 +86,14 @@ class NetworkMessage(INetworkMessage):
             length = data.remaining()
         return nmcd.NetworkMessageClassDefinition(cls.__name__, data.read(length)).deserialize()
 
-    def pack(self) -> ByteArray:
+    def pack(self, from_client=True) -> ByteArray:
         data = nmencoder.NetworkMessageEncoder.encode(self)
         typelen = self.computeTypeLen(len(data))
         header = 4 * self.getMessageId() + typelen
         packed = ByteArray()
         packed.writeUnsignedShort(header)
-        packed.writeUnsignedInt(self._instance_id)
+        if from_client:
+            packed.writeUnsignedInt(self._instance_id)
         packed += len(data).to_bytes(typelen, "big")
         packed += data
         return packed

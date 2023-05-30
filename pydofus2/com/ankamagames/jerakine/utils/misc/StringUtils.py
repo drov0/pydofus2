@@ -114,9 +114,6 @@ class StringUtils:
             r = [pFirstDelimiter + _ + pSecondDelimiter for _ in r]
         return r
 
-    # def getAllIndexOf(pc: str, pText: str) -> list[int]:
-    #     return [i for i, c in enumerate(pText) if c == pc]
-
     def noAccent(src: str) -> str:
         if StringUtils.pattern is None:
             StringUtils.initPatterns()
@@ -140,11 +137,9 @@ class StringUtils:
         exit: bool = False
         text: str = pText
         while not exit:
-            # print(text)
             delimitedText = StringUtils.getSingleDelimitedText(
                 text, pFirstDelimiter, pSecondDelimiter, pIncludeDelimiter
             )
-            # print(delimitedText)
             if delimitedText == "":
                 exit = True
             else:
@@ -152,7 +147,6 @@ class StringUtils:
                 if not pIncludeDelimiter:
                     delimitedText = pFirstDelimiter + delimitedText + pSecondDelimiter
                 firstPart = text[: text.index(delimitedText)]
-                # print(firstPart)
                 while pFirstDelimiter in firstPart:
                     firstPart = firstPart.replace(pFirstDelimiter, "")
                 secondPart = text[text.index(delimitedText) + len(delimitedText) :]
@@ -179,7 +173,6 @@ class StringUtils:
         while not exit:
             nextFirstDelimiterIndex = pStringEntry.find(pFirstDelimiter, currentIndex)
             nextSecondDelimiterIndex = pStringEntry.find(pSecondDelimiter, currentIndex)
-            # print("ext :", pStringEntry[nextFirstDelimiterIndex : nextSecondDelimiterIndex + 1])
             if nextSecondDelimiterIndex == -1:
                 exit = True
             if nextFirstDelimiterIndex < nextSecondDelimiterIndex and nextFirstDelimiterIndex != -1:
@@ -187,9 +180,7 @@ class StringUtils:
                     pFirstDelimiter,
                     pStringEntry[nextFirstDelimiterIndex + len(pFirstDelimiter) : nextSecondDelimiterIndex],
                 )
-                # print(allIndexes)
                 secondDelimiterToSkip += len(allIndexes)
-                # print(secondDelimiterToSkip)
                 currentIndex = nextSecondDelimiterIndex + len(pFirstDelimiter)
             elif secondDelimiterToSkip > 1:
                 currentIndex = nextSecondDelimiterIndex + len(pSecondDelimiter)

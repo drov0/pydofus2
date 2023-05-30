@@ -51,20 +51,17 @@ class Worker(MessageHandler):
 
     def run(self) -> None:
         while not self._terminating.is_set():
-            # current_time = time.perf_counter()
-            # with Worker.LOCK:
-            #     time_delta = Worker.WANTED_GAP - (current_time - Worker.LAST_TIME)
-            # if time_delta > 0:
-            #     self._terminating.wait(time_delta)
-            # with Worker.LOCK:
-            #     Worker.LAST_TIME = current_time
             msg = self._queue.get()
             Logger().debug(f"[RCV] {msg}")
+            if type(msg).__name__ == "AccountLoggingKickedMessage":
+                from tkinter import Tk, messagebox
+                Tk().withdraw()
+                messagebox.showinfo("Account banned", "Bot has ben kicked!")
+                KernelEventsManager().send(KernelEvent.SHUTDOWN, "Account banned")
+                break
             if type(msg).__name__ == "TerminateWorkerMessage":
                 self._terminating.set()
                 break
-            # if self.paused.is_set():
-            #     self.resumed.wait()
             self.processFramesInAndOut()
             self.processMessage(msg)
         self.reset()

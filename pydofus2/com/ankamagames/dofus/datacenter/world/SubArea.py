@@ -14,9 +14,9 @@ from pydofus2.flash.geom.Rectangle import Rectangle
 class SubArea(IDataCenter, IPostInit):
 
     MODULE: str = "SubAreas"
-
+    _allSubAreas = list["SubArea"]()
+    
     def __init__(self):
-        self._allSubAreas = list[SubArea]()
 
         self.id: int = None
 
@@ -90,11 +90,11 @@ class SubArea(IDataCenter, IPostInit):
         return None
 
     @classmethod
-    def getAllSubArea(cls) -> list:
+    def getAllSubArea(cls) -> list["SubArea"]:
         if cls._allSubAreas:
             return cls._allSubAreas
-        _allSubAreas = GameData().getObjects(cls.MODULE)
-        return _allSubAreas
+        cls._allSubAreas = GameData().getObjects(cls.MODULE)
+        return cls._allSubAreas
 
     idAccessors: IdAccessors = IdAccessors(getSubAreaById, getAllSubArea)
 

@@ -31,6 +31,7 @@ from pydofus2.com.ankamagames.dofus.logic.game.approach.frames.GameServerApproac
     GameServerApproachFrame
 from pydofus2.com.ankamagames.dofus.logic.game.common.managers.PlayedCharacterManager import \
     PlayedCharacterManager
+from pydofus2.com.ankamagames.jerakine.data.ModuleReader import ModuleReader
 from pydofus2.com.ankamagames.jerakine.logger.Logger import Logger
 from pydofus2.com.ankamagames.jerakine.network.messages.TerminateWorkerMessage import \
     TerminateWorkerMessage
@@ -65,6 +66,7 @@ class DofusClient(threading.Thread):
         self._conxTries = 0
         self._connectionUnexpectedFailureTimes = []
         self.mule = False
+        self.mitm = False
         self._shutDownReason = None
         self._crashed = False
         self._crashMessage = ""
@@ -79,6 +81,8 @@ class DofusClient(threading.Thread):
         Logger().info("[DofusClient] initializing")
         Kernel().init()
         Kernel().isMule = self.mule
+        Kernel().mitm = self.mitm
+        ModuleReader._clearObjectsCache = True
         self.initListeners()
         Logger().info("[DofusClient] initialized")
 
@@ -145,10 +149,11 @@ class DofusClient(threading.Thread):
             ):
                 Logger().error(
                     f"The connection was closed unexpectedly. Reconnection attempt {self._conxTries}/{self.MAX_CONN_TRIES}."
-                )                
-                self._conxTries += 1
-                self._connectionUnexpectedFailureTimes.append(perf_counter())
-                self.onReconnect(None, reason.message)
+                )
+                if not Kernel().mitm:      
+                    self._conxTries += 1
+                    self._connectionUnexpectedFailureTimes.append(perf_counter())
+                    self.onReconnect(None, reason.message)
             else:
                 if not reason.expected:
                     Logger().debug(f"The connection was closed unexpectedly.")
@@ -229,7 +234,7 @@ class DofusClient(threading.Thread):
         self._shutDownReason = reason
         if Kernel.getInstance(self.name):
             Kernel.getInstance(self.name).worker.process(TerminateWorkerMessage())
-        return self.terminated.wait(20)
+        return
 
     @property
     def connection(self) -> "ServerConnection":

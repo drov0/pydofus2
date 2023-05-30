@@ -1,4 +1,5 @@
 from types import FunctionType
+
 from pydofus2.com.ankamagames.berilia.managers.KernelEventsManager import (
     KernelEvent, KernelEventsManager)
 from pydofus2.com.ankamagames.dofus.datacenter.servers.Server import Server
@@ -9,6 +10,8 @@ from pydofus2.com.ankamagames.dofus.kernel.net.DisconnectionReasonEnum import \
     DisconnectionReasonEnum
 from pydofus2.com.ankamagames.dofus.logic.common.managers.PlayerManager import \
     PlayerManager
+from pydofus2.com.ankamagames.dofus.logic.connection.actions.LoginValidationWithTokenAction import \
+    LoginValidationWithTokenAction
 from pydofus2.com.ankamagames.dofus.logic.connection.actions.ServerSelectionAction import \
     ServerSelectionAction
 from pydofus2.com.ankamagames.dofus.logic.connection.managers.AuthentificationManager import \
@@ -32,12 +35,11 @@ from pydofus2.com.ankamagames.jerakine.benchmark.BenchmarkTimer import \
 from pydofus2.com.ankamagames.jerakine.logger.Logger import Logger
 from pydofus2.com.ankamagames.jerakine.messages.Frame import Frame
 from pydofus2.com.ankamagames.jerakine.messages.Message import Message
-from pydofus2.com.ankamagames.dofus.logic.connection.actions.LoginValidationWithTokenAction import \
-    LoginValidationWithTokenAction
 from pydofus2.com.ankamagames.jerakine.network.messages.ExpectedSocketClosureMessage import \
     ExpectedSocketClosureMessage
 from pydofus2.com.ankamagames.jerakine.network.messages.Worker import Worker
 from pydofus2.com.ankamagames.jerakine.types.enums.Priority import Priority
+
 
 class ServerSelectionFrame(Frame):
     def __init__(self):
@@ -162,8 +164,10 @@ class ServerSelectionFrame(Frame):
                 if not AuthentificationManager()._lva or AuthentificationManager()._lva.serverId is None:
                     Logger().error(f"Closed connection to change server but no serverId is specified in Auth Manager")
                 else:
-                    from pydofus2.com.ankamagames.dofus.logic.connection.frames.AuthentificationFrame import AuthentificationFrame
-                    from pydofus2.com.ankamagames.dofus.logic.common.frames.QueueFrame import QueueFrame
+                    from pydofus2.com.ankamagames.dofus.logic.common.frames.QueueFrame import \
+                        QueueFrame
+                    from pydofus2.com.ankamagames.dofus.logic.connection.frames.AuthentificationFrame import \
+                        AuthentificationFrame
 
                     Logger().info(f"Connection closed to change server to {AuthentificationManager()._lva.serverId}, will reconnect")
                     Kernel().worker.addFrame(AuthentificationFrame())
@@ -173,9 +177,10 @@ class ServerSelectionFrame(Frame):
 
         if isinstance(msg, (SelectedServerDataMessage, SelectedServerDataExtendedMessage)):
             self._selectedServer = msg
-            AuthentificationManager().gameServerTicket = (
-                AuthentificationManager().decodeWithAES(msg.ticket).decode()
-            )
+            if not Kernel().mitm:
+                AuthentificationManager().gameServerTicket = (
+                    AuthentificationManager().decodeWithAES(msg.ticket).decode()
+                )
             PlayerManager().server = Server.getServerById(msg.serverId)
             PlayerManager().kisServerPort = 0
             self._connexionPorts = msg.ports

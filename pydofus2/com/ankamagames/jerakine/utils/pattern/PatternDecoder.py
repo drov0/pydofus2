@@ -1,11 +1,14 @@
 class PatternDecoder:
+    
     def __init__(self):
-        super().__init__()
+        pass
 
-    def getDescription(self, sText: str, aParams: list) -> str:
-        return self.decodeDescription(sText, aParams)
+    @classmethod
+    def getDescription(cls, sText: str, aParams: list) -> str:
+        return cls.decodeDescription(sText, aParams)
 
-    def combine(self, str: str, gender: str, singular: bool, zero: bool = False) -> str:
+    @classmethod
+    def combine(cls, str: str, gender: str, singular: bool, zero: bool = False) -> str:
         if not str:
             return ""
         oParams = {
@@ -16,7 +19,7 @@ class PatternDecoder:
             "p": not singular and not zero,
             "s": singular and not zero,
         }
-        return self.decodeCombine(str, oParams)
+        return cls.decodeCombine(str, oParams)
 
     @classmethod
     def decode(cls, str: str, params: dict = {}) -> str:
@@ -73,7 +76,8 @@ class PatternDecoder:
                 returnValue = aStrCopyFirstPart + aStrCopySecondPart
         return returnValue
 
-    def decodeDescription(self, aStr: str, aParams: list) -> str:
+    @classmethod
+    def decodeDescription(cls, aStr: str, aParams: list) -> str:
         nextSharp: int = 0
         nextTilde: int = 0
         nextBrace: int = 0
@@ -85,7 +89,7 @@ class PatternDecoder:
         rstr: str = None
         pos2: int = 0
         n2: float = None
-        aStr = self.findOptionnalDices(aStr, aParams)
+        aStr = cls.findOptionnalDices(aStr, aParams)
         actualIndex: int = 0
         while True:
             nextSharp = aStr.find("#", actualIndex)
@@ -118,7 +122,7 @@ class PatternDecoder:
                 aStr = aStr[0:nextTilde] + aStr[: nextTilde + 2]
                 actualIndex = nextTilde
             elif nextBrace != -1 and (nextBracket == -1 or nextBrace < nextBracket):
-                rstr = self.decodeDescription(aStr[nextBrace + 1 : pos], aParams)
+                rstr = cls.decodeDescription(aStr[nextBrace + 1 : pos], aParams)
                 aStr = aStr[0:nextBrace] + rstr + aStr[: pos + 1]
                 actualIndex = nextBrace
             elif nextBracket != -1:
@@ -130,7 +134,7 @@ class PatternDecoder:
             if not (nextSharp != -1 or nextTilde != -1 or nextBrace != -1 or nextBracket != -1):
                 return aStr
         if len(aParams) > 5:
-            return self.combine(aStr, aParams[5], aParams[6], aParams[7])
+            return cls.combine(aStr, aParams[5], aParams[6], aParams[7])
         return ""
 
     @classmethod

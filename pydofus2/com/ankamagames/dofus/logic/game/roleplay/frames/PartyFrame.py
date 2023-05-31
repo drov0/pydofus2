@@ -1,7 +1,8 @@
 from typing import TYPE_CHECKING
 
-from pydofus2.com.ankamagames.berilia.managers.KernelEventsManager import (
-    KernelEvent, KernelEventsManager)
+from pydofus2.com.ankamagames.berilia.managers.KernelEvent import KernelEvent
+from pydofus2.com.ankamagames.berilia.managers.KernelEventsManager import \
+    KernelEventsManager
 from pydofus2.com.ankamagames.dofus.kernel.net.ConnectionsHandler import \
     ConnectionsHandler
 from pydofus2.com.ankamagames.dofus.network.enums.PartyJoinErrorEnum import \
@@ -126,14 +127,14 @@ class PartyFrame(Frame):
             member = self.getMemberById(msg.leavingPlayerId)
             if member:
                 del self.partyMembers[msg.leavingPlayerId]
-            KernelEventsManager().send(KernelEvent.MEMBER_LEFT_PARTY, member)
+            KernelEventsManager().send(KernelEvent.MemberLeftParty, member)
             return True
 
         elif isinstance(msg, PartyDeletedMessage):
             Logger().debug(f"party deleted")
             self.currentPartyId = None
             self.partyMembers.clear()
-            KernelEventsManager().send(KernelEvent.PARTY_DELETED, msg.partyId)
+            KernelEventsManager().send(KernelEvent.PartyDeleted, msg.partyId)
             return True
 
         elif isinstance(msg, PartyInvitationMessage):
@@ -143,7 +144,7 @@ class PartyFrame(Frame):
                 + I18n.getUiText("ui.party.playerInvitation", [f"player,{msg.fromId}::{msg.fromName}"])
             )
             Logger().debug(f"{notifText}.")
-            KernelEventsManager().send(KernelEvent.PARTY_INVITATION, msg.partyId, msg.partyType, msg.fromId, msg.fromName)
+            KernelEventsManager().send(KernelEvent.PartyInvitation, msg.partyId, msg.partyType, msg.fromId, msg.fromName)
             return True
 
         elif isinstance(msg, PartyNewMemberMessage):
@@ -151,7 +152,7 @@ class PartyFrame(Frame):
             Logger().info(f"Member ({member.name}) joined the party.")
             self.currentPartyId = msg.partyId
             self.partyMembers[member.id] = member
-            KernelEventsManager().send(KernelEvent.MEMBER_JOINED_PARTY, msg.partyId, msg.memberInformations)
+            KernelEventsManager().send(KernelEvent.MemberJoinedParty, msg.partyId, msg.memberInformations)
             return True
 
         elif isinstance(msg, PartyJoinMessage):
@@ -160,7 +161,7 @@ class PartyFrame(Frame):
             self.currentPartyId = msg.partyId
             for member in msg.members:
                 self.partyMembers[member.id] = member
-            KernelEventsManager().send(KernelEvent.I_JOINED_PARTY, msg.partyId, msg.members)
+            KernelEventsManager().send(KernelEvent.IJoinedParty, msg.partyId, msg.members)
             return True
 
         elif isinstance(msg, CompassUpdatePartyMemberMessage):
@@ -176,7 +177,7 @@ class PartyFrame(Frame):
 
         elif isinstance(msg, PartyMemberInStandardFightMessage):
             Logger().info(f"member {msg.memberId} started fight {msg.fightId}")
-            KernelEventsManager().send(KernelEvent.PARTY_MEMBER_IN_FIGHT, msg.memberId, msg.fightId)
+            KernelEventsManager().send(KernelEvent.PartyMemberStartedFight, msg.memberId, msg.fightId)
             return True
 
         if isinstance(msg, PartyCannotJoinErrorMessage):
@@ -208,7 +209,7 @@ class PartyFrame(Frame):
             ):
                 reasonText = I18n.getUiText("ui.party.cantInvit")
             Logger().warning(f"Can't join party: {reasonText}")
-            KernelEventsManager().send(KernelEvent.PARTY_JOIN_FAILED, msg.reason, reasonText)
+            KernelEventsManager().send(KernelEvent.PartyJoinFailed, msg.reason, reasonText)
             return True
 
         elif isinstance(msg, PartyCancelInvitationNotificationMessage):
@@ -226,5 +227,5 @@ class PartyFrame(Frame):
                     del self.partyMembers[guestRefusingId]
                 pcinText = I18n().getUiText("ui.party.invitationCancelled",[pcinCancelerName,pcinGuestName])
                 Logger().warning(f"{pcinText}")
-                KernelEventsManager().send(KernelEvent.PARTY_INVITE_CANCEL_NOTIF, msg.partyId, msg.guestId, msg.cancelerId, pcinText)
+                KernelEventsManager().send(KernelEvent.PartyInviteCancel, msg.partyId, msg.guestId, msg.cancelerId, pcinText)
                 return True

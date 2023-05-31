@@ -1,4 +1,5 @@
 import asyncio
+import locale
 import threading
 from concurrent.futures import ProcessPoolExecutor
 from datetime import datetime
@@ -8,8 +9,9 @@ from typing import TYPE_CHECKING
 from pyd2bot.thriftServer.pyd2botService.ttypes import DofusError
 from pydofus2.com.ankamagames.atouin.Haapi import Haapi
 from pydofus2.com.ankamagames.berilia.managers.EventsHandler import Listener
-from pydofus2.com.ankamagames.berilia.managers.KernelEventsManager import (
-    KernelEvent, KernelEventsManager)
+from pydofus2.com.ankamagames.berilia.managers.KernelEvent import KernelEvent
+from pydofus2.com.ankamagames.berilia.managers.KernelEventsManager import \
+    KernelEventsManager
 from pydofus2.com.ankamagames.dofus.kernel.Kernel import Kernel
 from pydofus2.com.ankamagames.dofus.kernel.net.ConnectionsHandler import \
     ConnectionsHandler
@@ -32,6 +34,7 @@ from pydofus2.com.ankamagames.dofus.logic.game.approach.frames.GameServerApproac
 from pydofus2.com.ankamagames.dofus.logic.game.common.managers.PlayedCharacterManager import \
     PlayedCharacterManager
 from pydofus2.com.ankamagames.jerakine.data.ModuleReader import ModuleReader
+from pydofus2.com.ankamagames.jerakine.data.XmlConfig import XmlConfig
 from pydofus2.com.ankamagames.jerakine.logger.Logger import Logger
 from pydofus2.com.ankamagames.jerakine.network.messages.TerminateWorkerMessage import \
     TerminateWorkerMessage
@@ -40,6 +43,9 @@ if TYPE_CHECKING:
     from pydofus2.com.ankamagames.jerakine.network.ServerConnection import \
         ServerConnection
 
+# Set the locale to the locale identifier associated with the current language
+# The '.UTF-8' suffix specifies the character encoding
+locale.setlocale(locale.LC_ALL, Kernel().getLocaleLang() + '.UTF-8')
 
 class DofusClient(threading.Thread):
     APIKEY_NOT_FOUND = 36363

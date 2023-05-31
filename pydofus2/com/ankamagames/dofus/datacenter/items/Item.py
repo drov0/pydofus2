@@ -4,6 +4,8 @@ from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from pydofus2.com.ankamagames.dofus.datacenter.effects.EffectInstance import EffectInstance
 
+from typing import TYPE_CHECKING
+
 from pydofus2.com.ankamagames.dofus.datacenter.items.criterion.GroupItemCriterion import \
     GroupItemCriterion
 from pydofus2.com.ankamagames.dofus.datacenter.items.ItemSet import ItemSet
@@ -18,6 +20,9 @@ from pydofus2.com.ankamagames.jerakine.data.IPostInit import IPostInit
 from pydofus2.com.ankamagames.jerakine.interfaces.IDataCenter import \
     IDataCenter
 from pydofus2.com.ankamagames.jerakine.logger.Logger import Logger
+
+if TYPE_CHECKING:
+    from pydofus2.com.ankamagames.dofus.datacenter.jobs.Recipe import Recipe
 
 
 class Item(IPostInit, IDataCenter):
@@ -187,7 +192,7 @@ class Item(IPostInit, IDataCenter):
 
         self.level: int = None
 
-        self.realWeight: int = None
+        self.realWeight: int
 
         self.cursed: bool = None
 
@@ -358,7 +363,7 @@ class Item(IPostInit, IDataCenter):
         return self._itemSet
 
     @property
-    def recipes(self) -> list:
+    def recipes(self) -> list["Recipe"]:
         from pydofus2.com.ankamagames.dofus.datacenter.jobs.Recipe import \
             Recipe
 
@@ -369,7 +374,7 @@ class Item(IPostInit, IDataCenter):
                 recipe = Recipe.getRecipeByResultId(self.recipeIds[i])
                 if recipe:
                     it = Item.getItemById(recipe.resultId)
-                    gic = it.craftVisibleConditions if not not it else None
+                    gic = it.craftVisibleConditions if it else None
                     if not gic or gic.isRespected:
                         self._recipes.append(recipe)
         return self._recipes
@@ -464,8 +469,6 @@ class Item(IPostInit, IDataCenter):
         to.descriptionId = src.descriptionId
         to.iconId = src.iconId
         to.level = src.level
-        to.realWeight = src.realWeight
-        to.weight = src.weight
         to.cursed = src.cursed
         to.useAnimationId = src.useAnimationId
         to.usable = src.usable
@@ -507,6 +510,8 @@ class Item(IPostInit, IDataCenter):
         to.importantNoticeId = src.importantNoticeId
         to.changeVersion = src.changeVersion
         to.tooltipExpirationDate = src.tooltipExpirationDate
+        to.weight = src.weight
+        to.realWeight = src.realWeight
 
     def postInit(self) -> None:
         pass

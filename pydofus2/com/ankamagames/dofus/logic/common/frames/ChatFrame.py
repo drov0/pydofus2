@@ -1,5 +1,6 @@
-from pydofus2.com.ankamagames.berilia.managers.KernelEventsManager import (
-    KernelEvent, KernelEventsManager)
+from pydofus2.com.ankamagames.berilia.managers.KernelEvent import KernelEvent
+from pydofus2.com.ankamagames.berilia.managers.KernelEventsManager import \
+    KernelEventsManager
 from pydofus2.com.ankamagames.dofus.datacenter.communication.InfoMessage import \
     InfoMessage
 from pydofus2.com.ankamagames.dofus.misc.utils.ParamsDecoder import \

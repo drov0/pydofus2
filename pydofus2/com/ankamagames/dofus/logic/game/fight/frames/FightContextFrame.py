@@ -1,11 +1,12 @@
 import math
 
 import pydofus2.com.ankamagames.atouin.managers.MapDisplayManager as mdm
+from pydofus2.com.ankamagames.berilia.managers.KernelEvent import KernelEvent
 import pydofus2.com.ankamagames.dofus.datacenter.spells.Spell as spellmod
 from pydofus2.com.ankamagames.atouin.managers.EntitiesManager import EntitiesManager
 from pydofus2.com.ankamagames.atouin.messages.MapLoadedMessage import MapLoadedMessage
 from pydofus2.com.ankamagames.atouin.utils.DataMapProvider import DataMapProvider
-from pydofus2.com.ankamagames.berilia.managers.KernelEventsManager import KernelEvent, KernelEventsManager
+from pydofus2.com.ankamagames.berilia.managers.KernelEventsManager import KernelEventsManager
 from pydofus2.com.ankamagames.dofus.datacenter.monsters.Companion import Companion
 from pydofus2.com.ankamagames.dofus.datacenter.monsters.Monster import Monster
 from pydofus2.com.ankamagames.dofus.datacenter.npcs.TaxCollectorFirstname import TaxCollectorFirstname

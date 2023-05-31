@@ -4,8 +4,9 @@ from pydofus2.com.ankamagames.atouin.managers.MapDisplayManager import \
     MapDisplayManager
 from pydofus2.com.ankamagames.atouin.utils.DataMapProvider import \
     DataMapProvider
-from pydofus2.com.ankamagames.berilia.managers.KernelEventsManager import (
-    KernelEvent, KernelEventsManager)
+from pydofus2.com.ankamagames.berilia.managers.KernelEvent import KernelEvent
+from pydofus2.com.ankamagames.berilia.managers.KernelEventsManager import \
+    KernelEventsManager
 from pydofus2.com.ankamagames.dofus.datacenter.interactives.Interactive import \
     Interactive
 from pydofus2.com.ankamagames.dofus.datacenter.jobs.Skill import Skill
@@ -145,7 +146,7 @@ class RoleplayInteractivesFrame(Frame):
                 )
             else:
                 self.removeInteractive(ieumsg.interactiveElement)
-            KernelEventsManager().send(KernelEvent.INTERACTIVE_ELEM_UPDATE, ieumsg)
+            KernelEventsManager().send(KernelEvent.IinteractiveElemUpdate, ieumsg)
             return True
 
         if isinstance(msg, InteractiveUsedMessage):

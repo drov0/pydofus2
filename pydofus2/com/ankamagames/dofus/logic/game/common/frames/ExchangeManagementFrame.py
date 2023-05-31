@@ -1,5 +1,6 @@
-from pydofus2.com.ankamagames.berilia.managers.KernelEventsManager import (
-    KernelEvent, KernelEventsManager)
+from pydofus2.com.ankamagames.berilia.managers.KernelEvent import KernelEvent
+from pydofus2.com.ankamagames.berilia.managers.KernelEventsManager import \
+    KernelEventsManager
 from pydofus2.com.ankamagames.dofus.datacenter.items.criterion.GroupItemCriterion import \
     GroupItemCriterion
 from pydofus2.com.ankamagames.dofus.datacenter.npcs.Npc import Npc
@@ -106,12 +107,14 @@ class ExchangeManagementFrame(Frame):
         return Priority.NORMAL
 
     def pushed(self) -> bool:
+        self._success = None
         return True
 
     def pulled(self) -> bool:
         if Kernel().commonExchangeManagementFrame:
             Kernel().worker.removeFrameByName("CommonExchangeManagementFrame")
-        KernelEventsManager().send(KernelEvent.ExchangeLeave, self._success);
+        if self._success is not None:
+            KernelEventsManager().send(KernelEvent.ExchangeLeave, self._success)
         return True
 
     def initBankStock(self, objectsInfos):
@@ -230,6 +233,8 @@ class ExchangeManagementFrame(Frame):
             eotlwqtoimsg = ExchangeObjectTransfertListWithQuantityToInvMessage()
             eotlwqtoimsg.init(ids[:ProtocolConstantsEnum.MAX_OBJ_COUNT_BY_XFERT // 2], qtys[:ProtocolConstantsEnum.MAX_OBJ_COUNT_BY_XFERT // 2])
             ConnectionsHandler().send(eotlwqtoimsg)
+        else:
+            raise ValueError(f"Invalid ids and qtys : {ids}, {qtys}")
 
     def processExchangeLeave(self, msg: ExchangeLeaveMessage):
         Logger().debug(f"Exchange closed")
@@ -311,7 +316,7 @@ class ExchangeManagementFrame(Frame):
         elif isinstance(msg, StorageInventoryContentMessage):
             InventoryManager().bankInventory.kamas = msg.kamas
             InventoryManager().bankInventory.initializeFromObjectItems(msg.objects)
-            InventoryManager().bankInventory.releaseHooks()
+            KernelEventsManager().send(KernelEvent.InventoryContent, msg.objects, msg.kamas)
             return True
 
         elif isinstance(msg, StorageObjectUpdateMessage):

@@ -10,8 +10,9 @@ from pydofus2.com.ankamagames.atouin.messages.MapLoadedMessage import \
     MapLoadedMessage
 from pydofus2.com.ankamagames.atouin.utils.DataMapProvider import \
     DataMapProvider
-from pydofus2.com.ankamagames.berilia.managers.KernelEventsManager import (
-    KernelEvent, KernelEventsManager)
+from pydofus2.com.ankamagames.berilia.managers.KernelEvent import KernelEvent
+from pydofus2.com.ankamagames.berilia.managers.KernelEventsManager import \
+    KernelEventsManager
 from pydofus2.com.ankamagames.dofus.datacenter.monsters.Monster import Monster
 from pydofus2.com.ankamagames.dofus.datacenter.world.SubArea import SubArea
 from pydofus2.com.ankamagames.dofus.internalDatacenter.world.WorldPointWrapper import \

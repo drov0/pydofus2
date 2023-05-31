@@ -40,6 +40,7 @@ from pydofus2.com.ankamagames.dofus.datacenter.items.criterion.QuestObjectiveIte
 from pydofus2.com.ankamagames.dofus.datacenter.items.criterion.RuneByBreakingItemCriterion import (
     RuneByBreakingItemCriterion,
 )
+from pydofus2.com.ankamagames.dofus.datacenter.items.criterion.ServerSeasonTemporisCriterion import ServerSeasonTemporisCriterion
 from pydofus2.com.ankamagames.dofus.datacenter.items.criterion.ServerTypeItemCriterion import ServerTypeItemCriterion
 from pydofus2.com.ankamagames.dofus.datacenter.items.criterion.SkillItemCriterion import SkillItemCriterion
 from pydofus2.com.ankamagames.dofus.datacenter.items.criterion.SpecializationItemCriterion import (

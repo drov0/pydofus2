@@ -7,8 +7,9 @@ import pydofus2.com.ankamagames.dofus.logic.game.fight.frames.FightSequenceFrame
 import pydofus2.com.ankamagames.dofus.logic.game.fight.managers.BuffManager as bffm
 from pydofus2.com.ankamagames.atouin.utils.DataMapProvider import \
     DataMapProvider
-from pydofus2.com.ankamagames.berilia.managers.KernelEventsManager import (
-    KernelEvent, KernelEventsManager)
+from pydofus2.com.ankamagames.berilia.managers.KernelEvent import KernelEvent
+from pydofus2.com.ankamagames.berilia.managers.KernelEventsManager import \
+    KernelEventsManager
 from pydofus2.com.ankamagames.dofus.internalDatacenter.spells.SpellWrapper import \
     SpellWrapper
 from pydofus2.com.ankamagames.dofus.kernel.Kernel import Kernel

@@ -1,6 +1,5 @@
 import random
 from typing import Iterator
-from pydofus2.com.ankamagames.dofus.logic.game.common.managers.PlayedCharacterManager import PlayedCharacterManager
 
 from pydofus2.com.ankamagames.jerakine.types.enums.DirectionsEnum import \
     DirectionsEnum
@@ -56,6 +55,8 @@ class MovementPath:
         return random.gauss(self.RUN_LINEAR_DURATION_MEAN, self.RUN_LINEAR_DURATION_VAR)
         
     def getStepDuration(self, orientation) -> float:
+        from pydofus2.com.ankamagames.dofus.logic.game.common.managers.PlayedCharacterManager import PlayedCharacterManager
+
         if PlayedCharacterManager().inventoryWeightMax != 0:
             weightCoef = PlayedCharacterManager().inventoryWeight / PlayedCharacterManager().inventoryWeightMax
         else:

@@ -2,8 +2,9 @@ import queue
 import threading
 import time
 
-from pydofus2.com.ankamagames.berilia.managers.KernelEventsManager import (
-    KernelEvent, KernelEventsManager)
+from pydofus2.com.ankamagames.berilia.managers.KernelEvent import KernelEvent
+from pydofus2.com.ankamagames.berilia.managers.KernelEventsManager import \
+    KernelEventsManager
 from pydofus2.com.ankamagames.jerakine.logger.Logger import Logger
 from pydofus2.com.ankamagames.jerakine.messages.DiscardableMessage import \
     DiscardableMessage
@@ -91,10 +92,10 @@ class Worker(MessageHandler):
 
         if self._processingMessage.is_set():
             if frame in self._framesToAdd:
-                Logger().error(f"[WORKER] Tried to queue Frame '{frame}' but it's already in the queue!")
+                Logger().error(f"Tried to queue Frame '{frame}' but it's already in the queue!")
                 return
             if self.DEBUG_FRAMES:
-                Logger().debug(f"[WORKER] >>> Queuing Frame {frame} for addition...")
+                Logger().debug(f">>> Queuing Frame {frame} for addition...")
             self._framesToAdd.add(frame)
 
         else:
@@ -108,7 +109,7 @@ class Worker(MessageHandler):
             if frame not in self._framesToRemove:
                 self._framesToRemove.add(frame)
                 if self.DEBUG_FRAMES:
-                    Logger().debug(f"[WORKER] >>> Frame {frame} remove queued...")
+                    Logger().debug(f">>> Frame {frame} remove queued...")
                     
         elif frame not in self._framesBeingDeleted:
             self._framesBeingDeleted.add(frame)
@@ -143,7 +144,6 @@ class Worker(MessageHandler):
             except self._queue.Empty:
                 break
     
-
     def pushFrame(self, frame: Frame) -> None:
         if str(frame) in [str(f) for f in self._framesList]:
             Logger().warn(f"Frame '{frame}' is already in the list.")
@@ -171,7 +171,7 @@ class Worker(MessageHandler):
                 self._framesBeingDeleted.remove(frame)
             KernelEventsManager().send(KernelEvent.FRAME_PULLED, frame)
         else:
-            Logger().warn(f"[WORKER] Frame {frame} refused to be pulled.")
+            Logger().warn(f"Frame {frame} refused to be pulled.")
 
     def processMessage(self, msg: Message) -> None:
         if self._terminating.is_set() or self._terminated.is_set():
@@ -183,7 +183,6 @@ class Worker(MessageHandler):
                 return
             if frame.process(msg):
                 processed = True
-                # Logger().debug(f"Message '{msg}' processed in frame '{type(frame).__name__}'.")
                 break
         self._processingMessage.clear()
         if not processed and not isinstance(msg, DiscardableMessage):
@@ -205,5 +204,5 @@ class Worker(MessageHandler):
     def removeFrameByName(self, frameName: str) -> None:
         frame = self.getFrameByName(frameName)
         if not frame:
-            return Logger().warn(f"[WORKER] Tried to remove frame '{frameName}' but it doesn't exist in cache.")
+            return Logger().warn(f"Tried to remove frame '{frameName}' but it doesn't exist in cache.")
         self.removeFrame(frame)

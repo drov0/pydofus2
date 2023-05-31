@@ -1,5 +1,6 @@
-from pydofus2.com.ankamagames.berilia.managers.KernelEventsManager import (
-    KernelEvent, KernelEventsManager)
+from pydofus2.com.ankamagames.berilia.managers.KernelEvent import KernelEvent
+from pydofus2.com.ankamagames.berilia.managers.KernelEventsManager import \
+    KernelEventsManager
 from pydofus2.com.ankamagames.dofus.internalDatacenter.DataEnum import DataEnum
 from pydofus2.com.ankamagames.dofus.internalDatacenter.items.ItemWrapper import \
     ItemWrapper
@@ -10,8 +11,6 @@ from pydofus2.com.ankamagames.dofus.logic.game.common.managers.InventoryManager 
     InventoryManager
 from pydofus2.com.ankamagames.dofus.logic.game.common.managers.PlayedCharacterManager import \
     PlayedCharacterManager
-from pydofus2.com.ankamagames.dofus.logic.game.common.misc.DofusEntities import \
-    DofusEntities
 from pydofus2.com.ankamagames.dofus.logic.game.roleplay.actions.DeleteObjectAction import \
     DeleteObjectAction
 from pydofus2.com.ankamagames.dofus.network.enums.CharacterInventoryPositionEnum import \
@@ -103,16 +102,14 @@ class InventoryManagementFrame(Frame):
 
         if isinstance(msg, WatchInventoryContentMessage):
             InventoryManager().init()
-            wicmsg = msg
-            InventoryManager().inventory.initializeFromObjectItems(wicmsg.objects)
-            InventoryManager().inventory.kamas = wicmsg.kamas
+            InventoryManager().inventory.initializeFromObjectItems(msg.objects)
+            InventoryManager().inventory.kamas = msg.kamas
             return True
 
         if type(msg) is InventoryContentMessage:
-            icmsg = msg
-            InventoryManager().inventory.initializeFromObjectItems(icmsg.objects)
-            InventoryManager().inventory.kamas = icmsg.kamas
-            KernelEventsManager().send(KernelEvent.KAMAS_UPDATE, icmsg.kamas)
+            InventoryManager().inventory.initializeFromObjectItems(msg.objects)
+            InventoryManager().inventory.kamas = msg.kamas
+            KernelEventsManager().send(KernelEvent.KamasUpdate, msg.kamas)
             equipmentView = InventoryManager().inventory.getView("equipment")
             if equipmentView and equipmentView.content:
                 if (
@@ -129,18 +126,19 @@ class InventoryManagementFrame(Frame):
             playerCharacterManager = PlayedCharacterManager()
             playerCharacterManager.inventory = InventoryManager().realInventory
             if playerCharacterManager.characteristics:
-                playerCharacterManager.characteristics.kamas = icmsg.kamas
+                playerCharacterManager.characteristics.kamas = msg.kamas
+            KernelEventsManager().send(KernelEvent.InventoryContent, msg.objects, msg.kamas)
             return True
 
         if isinstance(msg, ObjectAddedMessage):
-            oam = msg
-            InventoryManager().inventory.addObjectItem(oam.object)
+            iw = InventoryManager().inventory.addObjectItem(msg.object)
+            KernelEventsManager().send(KernelEvent.ObjectAdded, iw)
             return True
 
         if isinstance(msg, ObjectsAddedMessage):
-            osam = msg
-            for osait in osam.object:
-                InventoryManager().inventory.addObjectItem(osait)
+            for osait in msg.object:
+                iw = InventoryManager().inventory.addObjectItem(osait)
+                KernelEventsManager().send(KernelEvent.ObjectAdded, iw)
             return True
 
         if isinstance(msg, ObjectQuantityMessage):
@@ -164,7 +162,7 @@ class InventoryManagementFrame(Frame):
             kumsg = msg
             InventoryManager().inventory.kamas = kumsg.kamasTotal
             InventoryManager().inventory.releaseHooks()
-            KernelEventsManager().send(KernelEvent.KAMAS_UPDATE, kumsg.kamasTotal)
+            KernelEventsManager().send(KernelEvent.KamasUpdate, kumsg.kamasTotal)
             return True
 
         if isinstance(msg, InventoryWeightMessage):
@@ -221,9 +219,6 @@ class InventoryManagementFrame(Frame):
         self._dropPopup = None
         
     def useItem(self, objectUID, quantity, useOnCell, iw: ItemWrapper):
-        oumsg = None
-        playerEntity = None
-        roleplayMovementFrame = None
         if useOnCell and iw.targetable:
             if Kernel().battleFrame:
                 return
@@ -236,8 +231,6 @@ class InventoryManagementFrame(Frame):
                 oumsg.init(objectUID)
             playerEntity = PlayedCharacterManager().entity
             if playerEntity and playerEntity.isMoving:
-                roleplayMovementFrame = Kernel.movementFrame
-                roleplayMovementFrame.setFollowingMessage(oumsg)
                 playerEntity.stop()
             else:
                 ConnectionsHandler().send(oumsg)

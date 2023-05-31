@@ -1,3 +1,6 @@
+from pydofus2.com.ankamagames.berilia.managers.KernelEvent import KernelEvent
+from pydofus2.com.ankamagames.berilia.managers.KernelEventsManager import \
+    KernelEventsManager
 from pydofus2.com.ankamagames.dofus.datacenter.jobs.Job import Job
 from pydofus2.com.ankamagames.dofus.internalDatacenter.jobs.KnownJobWrapper import \
     KnownJobWrapper
@@ -14,6 +17,10 @@ from pydofus2.com.ankamagames.dofus.logic.game.common.actions.craft.JobCrafterDi
     JobCrafterDirectoryListRequestAction
 from pydofus2.com.ankamagames.dofus.logic.game.common.managers.PlayedCharacterManager import \
     PlayedCharacterManager
+from pydofus2.com.ankamagames.dofus.misc.utils.enums.LuaFormulasEnum import \
+    LuaFormulasEnum
+from pydofus2.com.ankamagames.dofus.misc.utils.LuaScriptManager import \
+    LuaScriptManager
 from pydofus2.com.ankamagames.dofus.network.enums.SocialContactCategoryEnum import \
     SocialContactCategoryEnum
 from pydofus2.com.ankamagames.dofus.network.messages.game.context.roleplay.job.JobBookSubscriptionMessage import \
@@ -57,7 +64,6 @@ from pydofus2.com.ankamagames.jerakine.types.enums.Priority import Priority
 
 class JobsFrame(Frame):
 
-
     _settings: dict
 
     def __init__(self):
@@ -65,7 +71,7 @@ class JobsFrame(Frame):
         super().__init__()
 
     def updateJobExperience(self, je: JobExperience) -> None:
-        kj: KnownJobWrapper = PlayedCharacterManager().jobs[je.jobId]
+        kj: KnownJobWrapper = PlayedCharacterManager().jobs.get(je.jobId)
         if not kj:
             kj = KnownJobWrapper.create(je.jobId)
             PlayedCharacterManager().jobs[je.jobId] = kj
@@ -94,7 +100,7 @@ class JobsFrame(Frame):
         return True
 
     def process(self, msg: Message) -> bool:
-        
+
         if isinstance(msg, JobDescriptionMessage):
             PlayedCharacterManager().jobs = dict()
             for jd in msg.jobsDescription:
@@ -103,30 +109,31 @@ class JobsFrame(Frame):
                     kj2.jobDescription = jd
                     PlayedCharacterManager().jobs[jd.jobId] = kj2
             return True
-        
+
         if isinstance(msg, JobCrafterDirectorySettingsMessage):
             for setting in msg.craftersSettings:
                 self._settings[setting.jobId] = self.createCrafterDirectorySettings(setting)
             return True
-        
+
         if isinstance(msg, JobCrafterDirectoryDefineSettingsAction):
             jcddsmsg = JobCrafterDirectoryDefineSettingsMessage()
             jcddsmsg.init(msg.settings)
             ConnectionsHandler().send(jcddsmsg)
             return True
-        
+
         if isinstance(msg, JobExperienceOtherPlayerUpdateMessage):
             return True
-        
+
         if isinstance(msg, JobExperienceUpdateMessage):
             self.updateJobExperience(msg.experiencesUpdate)
             return True
-        
+
         if isinstance(msg, JobExperienceMultiUpdateMessage):
             for je in msg.experiencesUpdate:
                 self.updateJobExperience(je)
+            Logger().debug(f"Player jobs : {[f'{{ name: {j.name}, lvl: {j.jobLevel} }}' for id, j in PlayedCharacterManager().jobs.items()]}")
             return True
-        
+
         if isinstance(msg, JobLevelUpMessage):
             jobsNumber = PlayedCharacterManager().jobsNumber()
             lastJobLevel = PlayedCharacterManager().jobsLevel()
@@ -137,16 +144,19 @@ class JobsFrame(Frame):
             kj.jobLevel = msg.newLevel
             newJobLevel = PlayedCharacterManager().jobsLevel()
             newJobLevel -= jobsNumber
-            # podsBonus = self.jobLevelupPodsBonus(newJobLevel, lastJobLevel)
-            Logger().info(f"Job {jobName} leveled Up to {msg.newLevel}")
+            podsBonus = self.jobLevelupPodsBonus(newJobLevel, lastJobLevel)
+            Logger().info(f"Job {jobName} leveled Up to {msg.newLevel} you gained {podsBonus} extra pods")
+            KernelEventsManager().send(
+                KernelEvent.JobLevelUp, msg.jobsDescription.jobI, jobName, msg.newLevel, podsBonus
+            )
             return True
-        
+
         if isinstance(msg, JobBookSubscribeRequestAction):
             exmsg = JobBookSubscribeRequestMessage()
             exmsg.init(msg.jobIds)
             ConnectionsHandler().send(exmsg)
             return True
-        
+
         if isinstance(msg, JobBookSubscriptionMessage):
             for jobSub in msg.subscriptions:
                 PlayedCharacterManager().jobs[jobSub.jobId].jobBookSubscriber = jobSub.subscribed
@@ -169,13 +179,13 @@ class JobsFrame(Frame):
                     text = I18n.getUiText("ui.craft.referenceRemoveAll")
             Logger().info(text)
             return True
-        
+
         if isinstance(msg, JobCrafterDirectoryListRequestAction):
             jcdlrmsg = JobCrafterDirectoryListRequestMessage()
             jcdlrmsg.init(msg.jobId)
             ConnectionsHandler().send(jcdlrmsg)
             return True
-        
+
         if isinstance(msg, JobCrafterContactLookRequestAction):
             if msg.crafterId == PlayedCharacterManager().id:
                 pass
@@ -184,14 +194,14 @@ class JobsFrame(Frame):
                 clrbimsg.init(0, SocialContactCategoryEnum.SOCIAL_CONTACT_CRAFTER, msg.crafterId)
                 ConnectionsHandler().send(clrbimsg)
             return True
-        
+
         if isinstance(msg, ExchangeStartOkJobIndexMessage):
             array = list()
             for esojijob in msg.jobs:
                 array.append(esojijob)
             Kernel().worker.addFrame(self._jobCrafterDirectoryListDialogFrame)
             return True
-        
+
         else:
             return False
 
@@ -203,4 +213,6 @@ class JobsFrame(Frame):
         paramsLastJob: dict = dict()
         paramsNewJob["sum_of_jobs_earned_levels"] = newJobsLevel
         paramsLastJob["sum_of_jobs_earned_levels"] = lastJobsLevel
-        return 0
+        return LuaScriptManager().executeLuaFormula(
+            LuaFormulasEnum.JOBLEVELUP_PODSBONUS, paramsNewJob
+        ) - LuaScriptManager().executeLuaFormula(LuaFormulasEnum.JOBLEVELUP_PODSBONUS, paramsLastJob)

@@ -156,8 +156,6 @@ class ItemWrapper(Item, ISlotData, ICellZoneProvider, IDataCenter):
         useCache: bool = True,
         dropPriotrity: int = 0,
     ) -> "ItemWrapper":
-        item: ItemWrapper = None
-        effect: "EffectInstance" = None
         refItem: Item = Item.getItemById(objectGID)
         cachedItem: ItemWrapper = cls._cache.get(objectUID) if objectUID > 0 else cls._cacheGId.get(objectGID)
         with lock:
@@ -183,7 +181,7 @@ class ItemWrapper(Item, ISlotData, ICellZoneProvider, IDataCenter):
         if item.objectGID != objectGID:
             item._uri = None
             item._uriPngMode = None
-        refItem.copy(refItem, item)
+        Item.copy(refItem, item)
         item.position = position
         item.objectGID = objectGID
         item.quantity = quantity
@@ -630,6 +628,8 @@ class ItemWrapper(Item, ISlotData, ICellZoneProvider, IDataCenter):
                 zoneMinSize = itemType.zoneMinSize
         self.exchangeAllowed = True
         multiUseCheck: int = 0
+        if updateEffects is None:
+            updateEffects = []
         for effect in updateEffects:
             effectInstance = ObjectEffectAdapter.fromNetwork(effect)
             if shape and effectInstance.category == DataEnum.ACTION_TYPE_DAMAGES:

@@ -7,6 +7,9 @@ from pydofus2.com.ankamagames.dofus.internalDatacenter.items.ItemWrapper import 
 from pydofus2.com.ankamagames.dofus.kernel.net.DisconnectionReasonEnum import \
     DisconnectionReasonEnum
 from pydofus2.com.ankamagames.dofus.network.Metadata import Metadata
+from pydofus2.com.ankamagames.dofus.types.enums.LanguageEnum import \
+    LanguageEnum
+from pydofus2.com.ankamagames.jerakine.data.XmlConfig import XmlConfig
 from pydofus2.com.ankamagames.jerakine.logger.Logger import Logger
 from pydofus2.com.ankamagames.jerakine.metaclasses.Singleton import Singleton
 from pydofus2.com.ankamagames.jerakine.network.messages.Worker import Worker
@@ -28,6 +31,8 @@ if TYPE_CHECKING:
         CommonExchangeManagementFrame
     from pydofus2.com.ankamagames.dofus.logic.game.common.frames.ExchangeManagementFrame import \
         ExchangeManagementFrame
+    from pydofus2.com.ankamagames.dofus.logic.game.common.frames.InventoryManagementFrame import \
+        InventoryManagementFrame
     from pydofus2.com.ankamagames.dofus.logic.game.common.frames.PlayedCharacterUpdatesFrame import \
         PlayedCharacterUpdatesFrame
     from pydofus2.com.ankamagames.dofus.logic.game.fight.frames.FightBattleFrame import \
@@ -52,7 +57,6 @@ if TYPE_CHECKING:
         RoleplayWorldFrame
     from pydofus2.com.ankamagames.dofus.logic.game.roleplay.frames.ZaapFrame import \
         ZaapFrame
-
 
 class Kernel(metaclass=Singleton):
 
@@ -92,6 +96,8 @@ class Kernel(metaclass=Singleton):
             PlayerManager
         from pydofus2.com.ankamagames.dofus.logic.common.managers.StatsManager import \
             StatsManager
+        from pydofus2.com.ankamagames.dofus.logic.game.common.frames.AveragePricesFrame import \
+            AveragePricesFrame
         from pydofus2.com.ankamagames.dofus.logic.game.common.managers.PlayedCharacterManager import \
             PlayedCharacterManager
         from pydofus2.com.ankamagames.dofus.logic.game.common.misc.DofusEntities import \
@@ -131,7 +137,23 @@ class Kernel(metaclass=Singleton):
             Singleton.clearAll()
             self._reseted = True
         Logger().debug("Reseted")
-
+        
+    def getLocaleLang(self):
+        current_lang = XmlConfig().getEntry("config.lang.current")
+        binds = XmlConfig().getEntry("config.binds.current")
+        switcher = {
+            LanguageEnum.LANG_FR: 'fr_FR' if binds == 'frFR' else 'fr_CA',
+            LanguageEnum.LANG_EN: 'en_US' if binds == 'enUS' else 'en_GB',
+            LanguageEnum.LANG_ES: 'es_ES',
+            LanguageEnum.LANG_DE: 'de_DE',
+            LanguageEnum.LANG_IT: 'it_IT',
+            LanguageEnum.LANG_JA: 'ja_JP',
+            LanguageEnum.LANG_PT: 'pt_PT' if binds == 'ptPT' else 'pt_BR',
+            LanguageEnum.LANG_RU: 'ru_RU',
+            LanguageEnum.LANG_NL: 'nl_NL'
+        }
+        return switcher.get(current_lang, 'fr_FR')
+    
     def addInitialFrames(self) -> None:
         from pydofus2.com.ankamagames.dofus.logic.common.frames.ChatFrame import \
             ChatFrame
@@ -242,3 +264,11 @@ class Kernel(metaclass=Singleton):
     @property
     def playedCharacterUpdatesFrame(self) -> "PlayedCharacterUpdatesFrame":
         return self._worker.getFrameByName("PlayedCharacterUpdatesFrame")
+    
+    @property
+    def inventoryManagementFrame(self) -> "InventoryManagementFrame":
+        return self._worker.getFrameByName("InventoryManagementFrame")
+
+    @property
+    def averagePricesFrame(self) -> "AveragePricesFrame":
+        return self._worker.getFrameByName("AveragePricesFrame")

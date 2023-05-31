@@ -91,6 +91,7 @@ class Inventory:
             False,
         )
         self.addItem(iw)
+        return iw
 
     def addItem(self, item: ItemWrapper) -> None:
         itemSet: ItemSet = self._itemsDict.get(item.objectUID)

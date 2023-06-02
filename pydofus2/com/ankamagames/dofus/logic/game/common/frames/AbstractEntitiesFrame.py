@@ -115,10 +115,10 @@ class AbstractEntitiesFrame(Frame):
                 characterEntity.speedAdjust = Monster.getMonsterById(infos.creatureGenericId).speedAdjust
             EntitiesManager().addEntity(infos.contextualId, characterEntity)
             if infos.contextualId == pcm.PlayedCharacterManager().id:
-                Logger().info(f"[MapMove] Current Player {infos.contextualId} added to the sceene")
+                Logger().info(f"Current Player added to the sceene")
         else:
             if infos.contextualId == pcm.PlayedCharacterManager().id:
-                Logger().info(f"[MapMove] Current Player {infos.contextualId} updated on the sceene")
+                Logger().info(f"Current Player updated on the sceene")
             pass
         if isinstance(infos, GameRolePlayHumanoidInformations):
             if infos.contextualId == pcm.PlayedCharacterManager().id:

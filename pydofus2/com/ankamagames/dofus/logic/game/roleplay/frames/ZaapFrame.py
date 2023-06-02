@@ -134,6 +134,7 @@ class ZaapFrame(Frame):
             KernelEventsManager().send(
                 KernelEvent.TeleportDestinationList, self._zaapsList, TeleporterTypeEnum.TELEPORTER_ZAAP
             )
+            return True
             
         elif isinstance(msg, LeaveDialogMessage):
             if msg.dialogType == DialogTypeEnum.DIALOG_TELEPORTER:

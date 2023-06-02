@@ -314,24 +314,15 @@ class MapPoint:
         mapChangeData = currentMap.cells[self.cellId].mapChangeData
         
         if direction == DirectionsEnum.RIGHT:
-            isOnRightEdge = (self.cellId + 1) % (AtouinConstants.MAP_WIDTH * 2) == 0
-            canChangeMapWith = (mapChangeData & 1) or (isOnRightEdge and ((mapChangeData & 2) or (mapChangeData & 128)))
-            
-        elif direction == DirectionsEnum.DOWN:
-            isOnBottomEdge = self.cellId >= AtouinConstants.MAP_CELLS_COUNT - AtouinConstants.MAP_WIDTH
-            canChangeMapWith = (mapChangeData & 4) or (isOnBottomEdge and ((mapChangeData & 2) or (mapChangeData & 8)))
-            
-        elif direction == DirectionsEnum.LEFT:        
-            isOnLeftEdge = self.cellId % (AtouinConstants.MAP_WIDTH * 2) == 0
-            canChangeMapWith = (mapChangeData & 16) or (isOnLeftEdge and ((mapChangeData & 8) or (mapChangeData & 32)))
-            
+            return bool(mapChangeData & 1) or ((self.cellId + 1) % (AtouinConstants.MAP_WIDTH * 2) == 0 and bool(mapChangeData & 2)) or ((self.cellId + 1) % (AtouinConstants.MAP_WIDTH * 2) == 0 and bool(mapChangeData & 128))
+        elif direction == DirectionsEnum.LEFT:
+            return (self.x == -self.y and bool(mapChangeData & 8)) or bool(mapChangeData & 16) or (self.x == -self.y and bool(mapChangeData & 32))
         elif direction == DirectionsEnum.UP:
-            isOnTopEdge = self.cellId < AtouinConstants.MAP_WIDTH
-            canChangeMapWith = (mapChangeData & 64) or (isOnTopEdge and ((mapChangeData & 32) or (mapChangeData & 128)))
-            
-        else:
-            canChangeMapWith = False
-        return canChangeMapWith
+            return (self.cellId < AtouinConstants.MAP_WIDTH and bool(mapChangeData & 32)) or bool(mapChangeData & 64) or (self.cellId < AtouinConstants.MAP_WIDTH and bool(mapChangeData & 128))
+        elif direction == DirectionsEnum.DOWN:
+            return (self.cellId >= AtouinConstants.MAP_CELLS_COUNT - AtouinConstants.MAP_WIDTH and bool(mapChangeData & 2)) or bool(mapChangeData & 4) or (self.cellId >= AtouinConstants.MAP_CELLS_COUNT - AtouinConstants.MAP_WIDTH and bool(mapChangeData & 8))
+        
+        return False
     
     def iterChilds(self, changeMap=True):
         for y in range(self.y - 1, self.y + 2):

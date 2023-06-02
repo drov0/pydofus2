@@ -10,7 +10,6 @@ from pydofus2.com.ankamagames.berilia.enums.SelectMethodEnum import \
 from pydofus2.com.ankamagames.berilia.managers.KernelEvent import KernelEvent
 from pydofus2.com.ankamagames.berilia.managers.KernelEventsManager import \
     KernelEventsManager
-from pydofus2.com.ankamagames.dofus.datacenter.jobs.Job import Job
 from pydofus2.com.ankamagames.dofus.datacenter.jobs.Recipe import Recipe
 from pydofus2.com.ankamagames.dofus.internalDatacenter.items.ItemWrapper import \
     ItemWrapper
@@ -93,7 +92,6 @@ class Recipes:
                 JobsApi.sortRecipesByCriteria(self._recipes, self._sortCriteria, False)
             typeNames = []
             listedTypeIds = []
-            selectionIndex = 0
             i = 1
             typeNames.append({"label": self.uiApi.getText("ui.common.allTypesForObject"), "id": 0})
             self._recipeTypes.sort(key=lambda x: x.name)
@@ -101,11 +99,6 @@ class Recipes:
                 if recipeType.id not in listedTypeIds:
                     typeNames.append({"label": recipeType.name, "id": recipeType.id})
                     listedTypeIds.append(recipeType.id)
-                    if recipeType.id == self._currentRecipesFilter.typeId:
-                        selectionIndex = i
-                    i += 1
-            # self.cb_type.dataProvider = typeNames
-            # self.cb_type.selectedIndex = selectionIndex
         visibleRecipes = []
         okRecipes = []
         if self.chk_showConditionnalRecipes:

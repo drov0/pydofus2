@@ -132,7 +132,7 @@ class DofusClient(threading.Thread):
             originator=self,
         )
         KernelEventsManager().once(
-            KernelEvent.IN_GAME,
+            KernelEvent.MAPPROCESSED,
             self.onInGame,
             timeout=self.LOGIN_TIMEOUT,
             ontimeout=self.onLoginTimeout,
@@ -162,9 +162,8 @@ class DofusClient(threading.Thread):
                     self.onReconnect(None, reason.message)
             else:
                 if not reason.expected:
-                    Logger().debug(f"The connection was closed unexpectedly.")
                     self._connectionUnexpectedFailureTimes.append(perf_counter())
-                    self.onReconnect(None, reason.message)
+                    self.onReconnect(None, "The connection was closed unexpectedly.")
                 else:
                     if reason.type == DisconnectionReasonEnum.EXCEPTION_THROWN:
                         self.onCrash(None, reason.message)
@@ -219,7 +218,7 @@ class DofusClient(threading.Thread):
         self._loginToken = None
 
     def onReconnect(self, event, message):
-        Logger().warning(f"[DofusClient] Reconnect requested for reason: {message}")
+        Logger().warning(f"Reconnect requested for reason: {message}")
         now = datetime.now()
         formatted_time = now.strftime("%Y-%m-%d %H:%M:%S")
         self._reconnectRecord.append({"restartTime": formatted_time, "reason": message})

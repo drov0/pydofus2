@@ -31,7 +31,7 @@ class KernelEvent(Enum):
     FIGHT_ENDED = 30
     MULE_FIGHT_CONTEXT = 52
     FIGHTER_SHOWED = -5
-    FIGHT_JOINED = -6
+    FIGHT_JOINED = -65
     # phenix
     PHENIX_AUTO_REVIVE_ENDED = 21
     AUTO_TRIP_ENDED = 22

@@ -2,21 +2,16 @@ from time import perf_counter
 
 import pydofus2.com.ankamagames.atouin.utils.DataMapProvider as dmpm
 from pydofus2.com.ankamagames.atouin.data.map.Layer import Layer
-from pydofus2.com.ankamagames.atouin.enums.ElementTypesEnum import \
-    ElementTypesEnum
-from pydofus2.com.ankamagames.atouin.messages.MapLoadedMessage import \
-    MapLoadedMessage
+from pydofus2.com.ankamagames.atouin.enums.ElementTypesEnum import ElementTypesEnum
+from pydofus2.com.ankamagames.atouin.messages.MapLoadedMessage import MapLoadedMessage
 from pydofus2.com.ankamagames.jerakine.logger.Logger import Logger
 from pydofus2.com.ankamagames.jerakine.metaclasses.Singleton import Singleton
-from pydofus2.com.ankamagames.jerakine.resources.loaders.MapLoader import \
-    MapLoader
+from pydofus2.com.ankamagames.jerakine.resources.loaders.MapLoader import MapLoader
 from pydofus2.com.ankamagames.jerakine.types.positions.MapPoint import MapPoint
-from pydofus2.com.ankamagames.jerakine.types.positions.WorldPoint import \
-    WorldPoint
+from pydofus2.com.ankamagames.jerakine.types.positions.WorldPoint import WorldPoint
 
 
 class MapDisplayManager(metaclass=Singleton):
-    
     def __init__(self) -> None:
         self._currentMapRendered = True
         self._currentMap = None
@@ -25,7 +20,7 @@ class MapDisplayManager(metaclass=Singleton):
         self._nMapLoadStart = 0
         self._nMapLoadEnd = 0
         self._forceReloadWithoutCache = False
-        self._identifiedElementPosition = dict[int, MapPoint]()
+        self._identifiedElement = dict[int, MapPoint]()
 
     @property
     def dataMap(self):
@@ -50,7 +45,7 @@ class MapDisplayManager(metaclass=Singleton):
         self._lastMap = None
 
     def initIdentifiedElements(self):
-        self._identifiedElementPosition = dict()
+        self._identifiedElement = dict[int, dict]()
         for layer in self.dataMap.layers:
             if layer.layerId == Layer.LAYER_GROUND:
                 continue
@@ -58,16 +53,21 @@ class MapDisplayManager(metaclass=Singleton):
                 for element in cell.elements:
                     if element.elementType == ElementTypesEnum.GRAPHICAL:
                         if element.identifier > 0:
-                            self._identifiedElementPosition[element.identifier] = MapPoint.fromCellId(cell.cellId)
+                            self._identifiedElement[element.identifier] = {
+                                "elementId": element.identifier,
+                                "typeId": element.elementId,
+                                "position": MapPoint.fromCellId(cell.cellId),
+                            }
 
     def isIdentifiedElement(self, identifier: int) -> bool:
-        return self._identifiedElementPosition.get(identifier)
+        return self._identifiedElement.get(identifier)
 
     def getIdentifiedElementPosition(self, identifier: int) -> MapPoint:
-        return self._identifiedElementPosition.get(identifier)
-
+        return self._identifiedElement.get(identifier).get("position")
+    
     def loadMap(self, mapId: int, forceReloadWithoutCache: bool = False, decryptionKey=None) -> None:
         from pydofus2.com.ankamagames.dofus.kernel.Kernel import Kernel
+
         self.currentDataMap = None
         self._forceReloadWithoutCache = forceReloadWithoutCache
         self._currentMapRendered = False

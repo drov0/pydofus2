@@ -53,7 +53,7 @@ class Worker(MessageHandler):
     def run(self) -> None:
         while not self._terminating.is_set():
             msg = self._queue.get()
-            Logger().debug(f"[RCV] {msg}")
+            # Logger().debug(f"[RCV] {msg}")
             if type(msg).__name__ == "AccountLoggingKickedMessage":
                 from tkinter import Tk, messagebox
                 Tk().withdraw()

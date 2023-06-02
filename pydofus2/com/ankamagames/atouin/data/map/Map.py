@@ -1,12 +1,16 @@
 from pydofus2.com.ankamagames.atouin.AtouinConstants import AtouinConstants
+from pydofus2.com.ankamagames.atouin.data.elements.Elements import Elements
+from pydofus2.com.ankamagames.atouin.data.elements.subtypes.NormalGraphicalElementData import NormalGraphicalElementData
 from pydofus2.com.ankamagames.atouin.data.map.Cell import Cell
 from pydofus2.com.ankamagames.atouin.data.map.Fixture import Fixture
 from pydofus2.com.ankamagames.atouin.data.map.Layer import Layer
+from pydofus2.com.ankamagames.atouin.data.map.elements.GraphicalElement import GraphicalElement
+from pydofus2.com.ankamagames.atouin.enums.ElementTypesEnum import ElementTypesEnum
 from pydofus2.com.ankamagames.jerakine.data.BinaryStream import BinaryStream
 from pydofus2.com.ankamagames.jerakine.logger.Logger import Logger
 from pydofus2.com.ankamagames.jerakine.types.enums.DirectionsEnum import DirectionsEnum
 from pydofus2.com.ankamagames.jerakine.types.positions.MapPoint import MapPoint
-
+from typing import List, cast
 
 class Map:
     def __init__(self, raw: BinaryStream, id, version: int):
@@ -204,6 +208,16 @@ class Map:
             print(format_row.format(" ", *row, " "))
         print(format_row.format(*[" "] * (AtouinConstants.MAP_WIDTH + 2)))
 
+    def getGfxList(self, skipBackground: bool = False) -> List[NormalGraphicalElementData]:
+        if self._gfxList is None:
+            self.computeGfxList(skipBackground)
+        return self._gfxList
+
+    def getGfxCount(self, gfxId: int) -> int:
+        if self._gfxList is None:
+            self.computeGfxList()
+        return self._gfxCount.get(gfxId, 0)
+    
     def getBorderCells(self, direction: DirectionsEnum):
         currentlyCheckedCellX = None
         currentlyCheckedCellY = None
@@ -286,3 +300,33 @@ class Map:
                     currentlyCheckedCellY += 1
 
         return res
+
+    def computeGfxList(self, skipBackground=False):
+        gfxList = {}
+        self._gfxCount = {}
+        numLayer = len(self.layers)
+        for l in range(numLayer):
+            layer = self.layers[l]
+            if not(skipBackground and l == 0):
+                lsCell = layer.cells
+                numCell = len(lsCell)
+                for c in range(numCell):
+                    cell = lsCell[c]
+                    lsElement = cell.elements
+                    numElement = len(lsElement)
+                    for e in range(numElement):
+                        element = lsElement[e]
+                        if element.elementType == ElementTypesEnum.GRAPHICAL:
+                            element = cast(GraphicalElement, element)
+                            elementId = element.elementId
+                            elementData = Elements().getElementData(elementId)
+                            if elementData is None:
+                                Logger().error("Error: Unknown graphical element ID " + str(elementId))
+                            elif isinstance(elementData, NormalGraphicalElementData):
+                                graphicalElementData = elementData
+                                gfxList[graphicalElementData.gfxId] = graphicalElementData
+                                if graphicalElementData.gfxId in self._gfxCount:
+                                    self._gfxCount[graphicalElementData.gfxId] += 1
+                                else:
+                                    self._gfxCount[graphicalElementData.gfxId] = 1
+        self._gfxList = list(gfxList.values())

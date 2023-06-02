@@ -1,5 +1,6 @@
 import heapq
 from time import perf_counter
+from typing import List, Union
 
 from whistle import Event
 
@@ -37,7 +38,7 @@ class AStar(metaclass=Singleton):
         self.openDic = dict()
         self.iterations: int = 0
         self.worldGraph: WorldGraph = None
-        self.dst: Vertex = None
+        self.dstinations: set[Vertex] = None
         self.running = None
 
     def addForbidenEdge(self, edge: Edge) -> None:
@@ -47,16 +48,17 @@ class AStar(metaclass=Singleton):
         self._forbidenEdges.clear()
 
     def search(
-        self, worldGraph: WorldGraph, src: Vertex, dst: Vertex, maxPathLength=None
+        self, worldGraph: WorldGraph, src: Vertex, dst: Union[Vertex, List[Vertex]], maxPathLength=None
     ) -> list["Edge"]:
         if self.running:
             raise Exception("Pathfinding already in progress")
-        if src == dst:
-            return Logger().info("Destination is the Source so nothing to do")
         self.initForbiddenSubareaList()
         self.worldGraph = worldGraph
-        self.dst = dst
-        self.dstMap = MapPosition.getMapPositionById(self.dst.mapId)
+        if not isinstance(dst, list):
+            dst = [dst]
+        if src in dst:
+            return Logger().info("Destination is the Source so nothing to do")
+        self.destinations = set(dst)
         self.running = True
         self.openList = list[tuple[int, int, Node, MapPoint]]()
         self.openDic = dict[Vertex, Node]()
@@ -85,8 +87,7 @@ class AStar(metaclass=Singleton):
             current.closed = True
             if self.maxPathLength and current.moveCost > self.maxPathLength:
                 continue
-            if current.vertex == self.dst:
-                # Logger().info(f"Goal reached within {self.iterations} iterations and {perf_counter() - s} seconds")
+            if current.vertex in self.destinations:
                 result = self.buildResultPath(self.worldGraph, current)
                 self.running = False
                 return result
@@ -114,7 +115,6 @@ class AStar(metaclass=Singleton):
                         if not self.hasValidDestinationSubarea(edge):
                             reasons.append("\Edge has a non valid destination subarea")
                         Logger().debug(f"Edge dismissed for reason {', '.join(reasons)}")
-        # Logger().info(f"Goal not reached within {self.iterations} iterations")
         self.running = False
         return None
 

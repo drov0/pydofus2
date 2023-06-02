@@ -54,6 +54,7 @@ COLORS = {
     "FarmPath": GREEN_COLOR,
     "BotPartyFrame": GREEN_COLOR,
     "PlayedCharacterUpdatesFrame": MAGNETA_COLOR,
+    "AbstractFarmBehavior": MAGNETA_COLOR,
     "Kernel": ORANGE_COLOR,
     "Haapi": ORANGE_COLOR,
     "WorldGraph": ORANGE_COLOR,

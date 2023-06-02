@@ -99,7 +99,7 @@ class RoleplayMovementFrame(Frame):
                 self.entitiesFrame.updateEntityCellId(PlayedCharacterManager().id, newPos.cellId)            
                 KernelEventsManager().send(KernelEvent.MOVE_REQUEST_REJECTED)
             else:
-                Logger().error("Movement reject received but player data not loaded yet, maybe map changed after a map move request that was rejected")
+                Logger().error("Movement reject received but player data not loaded yet, maybe map changed after a map move request that was rejected.")
             return True
 
         if isinstance(msg, GameMapMovementMessage):
@@ -108,8 +108,7 @@ class RoleplayMovementFrame(Frame):
             startCell = clientMovePath.start.cellId
             endCell = clientMovePath.end.cellId
             if msg.actorId == PlayedCharacterManager().id:
-                PlayedCharacterManager().entity.isMoving = True
-                Logger().debug(f"Player '{msg.actorId}' moving from {startCell} to {endCell}.")
+                Logger().debug(f"Current Player moving from {startCell} to {endCell}.")
             if movedEntity:
                 movedEntity.position.cellId = endCell
                 self.entitiesFrame.updateEntityCellId(msg.actorId, endCell)
@@ -141,6 +140,8 @@ class RoleplayMovementFrame(Frame):
         if success:
             gmmcmsg = GameMapMovementConfirmMessage()
             ConnectionsHandler().send(gmmcmsg)
+        else:
+            Logger().error("Player didnt complete movement")
         KernelEventsManager().send(KernelEvent.PLAYER_MOVEMENT_COMPLETED, success)
 
     def pulled(self) -> bool:

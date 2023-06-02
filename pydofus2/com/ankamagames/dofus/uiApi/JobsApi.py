@@ -88,17 +88,14 @@ class JobsApi(IApi):
         okForType = False
         okForSearch = False
         recipesResult = []
-
         if search:
             search = ''.join(c for c in unicodedata.normalize('NFD', search) 
                             if unicodedata.category(c) != 'Mn').lower()
-
         for recipe in recipes:
             if recipe:
                 okForLevel = False
                 okForType = False
                 okForSearch = False
-
                 if minLevel > 1 or maxLevel < ProtocolConstantsEnum.MAX_JOB_LEVEL:
                     if minLevel <= recipe.resultLevel <= maxLevel:
                         okForLevel = True
@@ -106,7 +103,6 @@ class JobsApi(IApi):
                         okForLevel = False
                 else:
                     okForLevel = True
-
                 if typeId > 0:
                     if recipe.resultTypeId == typeId:
                         okForType = True
@@ -114,7 +110,6 @@ class JobsApi(IApi):
                         okForType = False
                 else:
                     okForType = True
-
                 if okForLevel and okForType and search:
                     if search in recipe.words:
                         okForSearch = True
@@ -122,7 +117,6 @@ class JobsApi(IApi):
                         okForSearch = False
                 else:
                     okForSearch = True
-
                 if okForLevel and okForSearch:
                     if recipe.result.type not in resultTypes:
                         resultTypes.append(recipe.result.type)
@@ -233,10 +227,8 @@ class JobsApi(IApi):
         details = {}
         if fromBank:
             resourceItems = InventoryManager().bankInventory.getView("bank").content
-            Logger().debug(f"Bank inventory contains {len(resourceItems)} elements")
         else:
             resourceItems = InventoryManager().inventory.getView("storage").content
-
         for ingredient in resourceItems:
             if not ingredient.linked:
                 if ingredient.objectGID not in details:
@@ -254,7 +246,6 @@ class JobsApi(IApi):
                     details[ingredient.objectGID]['stackQtyList'].append(ingredient.quantity)
                     details[ingredient.objectGID]['fromBag'].append(False)
                     details[ingredient.objectGID]['storageTotalQuantity'] += ingredient.quantity
-
         if fromBank:
             bagItems = InventoryManager().inventory.getView("storage").content
             for ingredient in bagItems:
@@ -272,5 +263,4 @@ class JobsApi(IApi):
                         details[ingredient.objectGID]['stackUidList'].append(ingredient.objectUID)
                         details[ingredient.objectGID]['stackQtyList'].append(ingredient.quantity)
                         details[ingredient.objectGID]['fromBag'].append(True)
-
         return details

@@ -1,10 +1,15 @@
 import heapq
-from pydofus2.com.ankamagames.atouin.utils.DataMapProvider import DataMapProvider
-from pydofus2.com.ankamagames.jerakine.metaclasses.Singleton import Singleton
+
 import pydofus2.mapTools.MapTools as MapTools
+from pydofus2.com.ankamagames.atouin.utils.DataMapProvider import \
+    DataMapProvider
+from pydofus2.com.ankamagames.jerakine.logger.Logger import Logger
+from pydofus2.com.ankamagames.jerakine.metaclasses.Singleton import Singleton
 from pydofus2.com.ankamagames.jerakine.types.positions.MapPoint import MapPoint
-from pydofus2.com.ankamagames.jerakine.types.positions.MovementPath import MovementPath
-from pydofus2.com.ankamagames.jerakine.types.positions.PathElement import PathElement
+from pydofus2.com.ankamagames.jerakine.types.positions.MovementPath import \
+    MovementPath
+from pydofus2.com.ankamagames.jerakine.types.positions.PathElement import \
+    PathElement
 
 
 class Pathfinding(metaclass=Singleton):
@@ -196,6 +201,8 @@ class Pathfinding(metaclass=Singleton):
             self._isCellClosed.add(parentId)
             for x, y in self.iterChilds(parentId):
                 cellId = MapTools.getCellIdByCoord(x, y)
+                # if cellId != end.cellId and MapPoint.fromCellId(cellId).allowsMapChange():
+                #     continue
                 moveCost = self.moveCost(x, y, parentId)
                 if self._allowTroughEntity:
                     distTmpToEnd = self.distFromEnd(cellId)

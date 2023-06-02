@@ -1,14 +1,18 @@
 import threading
+from typing import TYPE_CHECKING
 
 from pydofus2.com.ankamagames.jerakine.logger.Logger import Logger
-from pydofus2.com.ankamagames.jerakine.types.positions.MovementPath import \
-    MovementPath
 
-
+if TYPE_CHECKING:
+    from pydofus2.com.ankamagames.dofus.types.entities.AnimatedCharacter import \
+        AnimatedCharacter
+    from pydofus2.com.ankamagames.jerakine.types.positions.MovementPath import \
+        MovementPath
 class MovementBehavior(threading.Thread):
     
-    def __init__(self, clientMovePath: MovementPath, callback):
+    def __init__(self, clientMovePath: 'MovementPath', callback, parent: 'AnimatedCharacter'=None):
         super().__init__(name=threading.currentThread().name)
+        self.parent = parent
         self.movePath = clientMovePath
         self.currStep = self.movePath.path[0]
         self.stopEvt = threading.Event()
@@ -21,19 +25,25 @@ class MovementBehavior(threading.Thread):
     def isRunning(self):
         return self.running.is_set()
 
+    def tearDown(self, success):
+        if not success:
+            Logger().warning(f"Movement animation interrupted")
+        else:
+            Logger().info(f"Movement animation completed")
+        self.parent.isMoving = False
+        self.running.clear()
+        return self.callback(success)
+
     def run(self):
-        from pydofus2.com.ankamagames.dofus.logic.game.common.managers.PlayedCharacterManager import PlayedCharacterManager
         Logger().info(f"Movement animation started")
+        self.parent.isMoving = True
         self.running.set()
         for pe in self.movePath.path[1:] + [self.movePath.end]:
-            if not PlayedCharacterManager().entity.isMoving:
-                return self.callback(False)
             stepDuration = self.movePath.getStepDuration(self.currStep.orientation)
+            if not self.parent.isMoving:
+                return self.tearDown(False)
             if self.stopEvt.wait(stepDuration):
-                Logger().warning(f"Movement animation stopped")
-                self.running.clear()
-                return self.callback(False)
+                return self.tearDown(False)
             self.currStep = pe
-        Logger().info(f"Movement animation completed")
-        self.callback(True)
+        self.tearDown(True)
 

@@ -23,12 +23,12 @@ class Cell:
 
     @staticmethod
     def getId(x: int, y: int) -> int:
-        return x + y * 14
+        return x + y * AtouinConstants.MAP_WIDTH
 
     @staticmethod
     def getCoords(cell_id):
-        x = cell_id % 14
-        y = cell_id // 14
+        x = cell_id % AtouinConstants.MAP_WIDTH
+        y = cell_id // AtouinConstants.MAP_WIDTH
         return Point(x, y)
 
     def read(self, raw: BinaryStream):

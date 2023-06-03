@@ -3,7 +3,7 @@ import locale
 import threading
 from concurrent.futures import ProcessPoolExecutor
 from datetime import datetime
-from time import perf_counter
+from time import perf_counter, sleep
 from typing import TYPE_CHECKING
 
 from pyd2bot.thriftServer.pyd2botService.ttypes import DofusError
@@ -221,12 +221,14 @@ class DofusClient(threading.Thread):
         self.waitNextLogin()
         self._loginToken = None
 
-    def onReconnect(self, event, message):
+    def onReconnect(self, event, message, afterTime=0):
         Logger().warning(f"Reconnect requested for reason: {message}")
         now = datetime.now()
         formatted_time = now.strftime("%Y-%m-%d %H:%M:%S")
         self._reconnectRecord.append({"restartTime": formatted_time, "reason": message})
         Kernel().reset(reloadData=True)
+        if afterTime:
+            sleep(afterTime)
         self.initListeners()
         self.prepareLogin()
         self.worker.process(LoginValidationWithTokenAction.create(self._serverId != 0, self._serverId))

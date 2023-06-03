@@ -102,7 +102,7 @@ class ConnectionsHandler(metaclass=Singleton):
             if not self._conn:
                 return Logger().warning(f"Can't send message when no connection is established!, maybe we are shuting down?")
             if self.last_send_time is not None:
-                minNextSendTime = self.last_send_time + random.gauss(0.3, 0.1)
+                minNextSendTime = self.last_send_time + random.gauss(0.5, 0.1)
                 diff = minNextSendTime - perf_counter()
                 if diff > 0:
                     Kernel().worker.terminated.wait(diff)

@@ -63,7 +63,6 @@ _messages_to_discard = {
     "AccountHouseMessage",
     "EnabledChannelsMessage",
     "PrismsListUpdateMessage",
-    "TrustStatusMessage",
     "NotificationListMessage",
     "ChallengeInfoMessage",
     "ChallengeTargetUpdateMessage",
@@ -193,13 +192,15 @@ class MessageReceiver(RawDataParser, metaclass=Singleton):
             message._instance_id = msgCount
         return message
 
-    def parse(self, buffer: ByteArray, callback, from_client=False) -> None:
+    def parse(self, buffer: ByteArray, callback, from_client=False, from_dataContainer=False) -> None:
         while buffer.remaining():
             if self.msgLenLen is None:
                 if buffer.remaining() < 2:
                     break
                 staticHeader = buffer.readUnsignedShort()
                 self.msgId = staticHeader >> NetworkMessage.PACKET_ID_RIGHT_SHIFT
+                if from_dataContainer:
+                    Logger().debug(f"Found mdg with id {self.msgId} inside data container")
                 self.msgLenLen = staticHeader & NetworkMessage.BIT_MASK
             if from_client and self.msgCount is None:
                 if buffer.remaining() < 4:
@@ -213,6 +214,8 @@ class MessageReceiver(RawDataParser, metaclass=Singleton):
                 break
             msg_bytes = buffer.read(self.msgLen)            
             msg = self.parseMessage(msg_bytes, self.msgId, self.msgLen, from_client, self.msgCount)
+            if from_dataContainer:
+                Logger().debug(f"Received {msg} from data container")
             self.msgId = None
             self.msgLenLen = None
             self.msgLen = None

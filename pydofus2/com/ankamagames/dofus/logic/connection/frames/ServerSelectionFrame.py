@@ -99,12 +99,13 @@ class ServerSelectionFrame(Frame):
             if not serverHasBeenUpdated:
                 self._serversList.append(ssumsg.server)
                 self._serversList.sort(key=lambda x: x.date)
+            serverStatus = ServerStatusEnum(ssumsg.server.status)
             Logger().info(
-                f"Server {ssumsg.server.id} status changed to {ServerStatusEnum(ssumsg.server.status).name}."
+                f"Server {ssumsg.server.id} status changed to {serverStatus.name}."
             )
             Logger().info(f"My server id {AuthentificationManager()._lva.serverId}.")
             if int(ssumsg.server.id) == int(AuthentificationManager()._lva.serverId):
-                if ServerStatusEnum(ssumsg.server.status) != ServerStatusEnum.ONLINE:
+                if serverStatus != ServerStatusEnum.ONLINE:
                     Logger().debug(
                         f"Waiting for my server {ssumsg.server.id} to be online current status {ServerStatusEnum(ssumsg.server.status)}."
                     )

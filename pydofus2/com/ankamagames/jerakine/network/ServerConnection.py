@@ -11,6 +11,8 @@ from typing import TYPE_CHECKING
 
 from pydofus2.com.ankamagames.dofus.network.MessageReceiver import \
     MessageReceiver
+from pydofus2.com.ankamagames.dofus.network.messages.common.NetworkDataContainerMessage import \
+    NetworkDataContainerMessage
 from pydofus2.com.ankamagames.jerakine.logger.Logger import Logger
 from pydofus2.com.ankamagames.jerakine.messages.ConnectedMessage import \
     ConnectedMessage
@@ -86,6 +88,7 @@ class ServerConnection(mp.Thread):
         self.connectionTimeout = None
         self.nbrSendFails = 0
         self.MITM = MITM
+        self._asyncNetworkDataContainerMessage: NetworkDataContainerMessage = None
         
 
     def setMITMSocket(self, socket, clientSocket):
@@ -292,6 +295,8 @@ class ServerConnection(mp.Thread):
         self.socket.connect((host, port))
 
     def handleMessage(self, msg: NetworkMessage, from_client=False):
+        if self.closed or not self.connected:
+            return
         if type(msg).__name__ == "BasicPongMessage" and self._lastSentPingTime:
             latency = round(1000 * (perf_counter() - self._lastSentPingTime), 2)
             Logger().info(f"Latency : {latency}ms, average {self.latencyAvg}, var {self.latencyVar}")
@@ -299,6 +304,9 @@ class ServerConnection(mp.Thread):
             msg.receptionTime = perf_counter()
             msg.sourceConnection = self.id
             self._put(msg)
+            if type(msg).__name__ == "NetworkDataContainerMessage":
+                Logger().debug(f"Received networK Datacontainer with content of size : {len(msg.content)}")
+                MessageReceiver().parse(msg.content, self.handleMessage, from_dataContainer=True)
             
     @sendTrace
     def run(self):
@@ -310,7 +318,7 @@ class ServerConnection(mp.Thread):
                     if self._connecting.is_set():
                         self.onConnect()
                     self.stream += rdata
-                    MessageReceiver().parse(self.stream, self.handleMessage, False)
+                    MessageReceiver().parse(self.stream, self.handleMessage)
                 else:
                     Logger().debug(f"[{self.id}] Connection closed by remote host")
                     self._closing.set()                

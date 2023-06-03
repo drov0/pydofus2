@@ -27,4 +27,6 @@ class DisconnectionReasonEnum(Enum):
     
     CHANGING_SERVER = 10
     
+    CONNECTION_PROCESS_CRASHED = 11
+    
     

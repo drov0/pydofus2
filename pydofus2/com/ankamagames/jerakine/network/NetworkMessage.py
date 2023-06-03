@@ -1,4 +1,6 @@
+import zlib
 from types import FunctionType
+from typing import TYPE_CHECKING
 
 import pydofus2.com.ankamagames.jerakine.network.parser.NetworkMessageClassDefinition as nmcd
 import pydofus2.com.ankamagames.jerakine.network.parser.NetworkMessageEncoder as nmencoder
@@ -11,6 +13,9 @@ from pydofus2.com.ankamagames.jerakine.network.parser.ProtocolSpec import (
     ClassSpec, ProtocolSpec)
 from pydofus2.com.ankamagames.jerakine.network.utils.FuncTree import FuncTree
 
+if TYPE_CHECKING:
+    from pydofus2.com.ankamagames.dofus.network.messages.common.NetworkDataContainerMessage import \
+        NetworkDataContainerMessage
 
 class NetworkMessage(INetworkMessage):
 
@@ -81,11 +86,24 @@ class NetworkMessage(INetworkMessage):
 
     @classmethod
     def unpack(cls, data: ByteArray, length: int = None) -> "NetworkMessage":
-        # Logger().debug(f"unpacking message of length {length}")
         if length is None:
             length = data.remaining()
+        if cls.__name__ == "NetworkDataContainerMessage":
+            return cls.deserializeAs_NetworkDataContainerMessage(data)
         return nmcd.NetworkMessageClassDefinition(cls.__name__, data.read(length)).deserialize()
+    
+    def deserializeAs_NetworkDataContainerMessage(input: ByteArray) -> "NetworkDataContainerMessage":
+        from pydofus2.com.ankamagames.dofus.network.messages.common.NetworkDataContainerMessage import \
+            NetworkDataContainerMessage
 
+        msg = NetworkDataContainerMessage()
+        _contentLen = input.readVarInt()
+        tmpBuffer = input.readBytes(0, _contentLen)
+        tmpBuffer = zlib.decompress(tmpBuffer)
+        msg.content = tmpBuffer
+        msg.unpacked = True
+        return msg
+        
     def pack(self, from_client=True) -> ByteArray:
         data = nmencoder.NetworkMessageEncoder.encode(self)
         typelen = self.computeTypeLen(len(data))

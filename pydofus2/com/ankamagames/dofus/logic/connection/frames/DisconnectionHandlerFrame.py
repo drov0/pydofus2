@@ -5,12 +5,8 @@ from pydofus2.com.ankamagames.berilia.managers.KernelEvent import KernelEvent
 from pydofus2.com.ankamagames.berilia.managers.KernelEventsManager import \
     KernelEventsManager
 from pydofus2.com.ankamagames.dofus.kernel.Kernel import Kernel
-from pydofus2.com.ankamagames.dofus.kernel.net.ConnectionsHandler import \
-    ConnectionsHandler
 from pydofus2.com.ankamagames.dofus.kernel.net.DisconnectionReasonEnum import \
-    DisconnectionReasonEnum as Reason
-from pydofus2.com.ankamagames.jerakine.benchmark.BenchmarkTimer import \
-    BenchmarkTimer
+    DisconnectionReasonEnum
 from pydofus2.com.ankamagames.jerakine.logger.Logger import Logger
 from pydofus2.com.ankamagames.jerakine.messages.ConnectionProcessCrashedMessage import \
     ConnectionProcessCrashedMessage
@@ -18,8 +14,6 @@ from pydofus2.com.ankamagames.jerakine.messages.Frame import Frame
 from pydofus2.com.ankamagames.jerakine.messages.Message import Message
 from pydofus2.com.ankamagames.jerakine.messages.WrongSocketClosureReasonMessage import \
     WrongSocketClosureReasonMessage
-from pydofus2.com.ankamagames.jerakine.network.messages.ExpectedSocketClosureMessage import \
-    ExpectedSocketClosureMessage
 from pydofus2.com.ankamagames.jerakine.network.messages.UnexpectedSocketClosureMessage import \
     UnexpectedSocketClosureMessage
 from pydofus2.com.ankamagames.jerakine.network.ServerConnectionClosedMessage import \
@@ -59,11 +53,11 @@ class DisconnectionHandlerFrame(Frame):
 
         elif isinstance(msg, UnexpectedSocketClosureMessage):
             Logger().debug("Got hook UnexpectedSocketClosure")
-            KernelEventsManager().send(KernelEvent.CRASH, message="Unexpected socket closure")
+            KernelEventsManager().send(KernelEvent.CRASH, message="Unexpected socket closure", reason=DisconnectionReasonEnum.UNEXPECTED)
             return True
 
         elif isinstance(msg, ConnectionProcessCrashedMessage):
-            KernelEventsManager().send(KernelEvent.CRASH, message=msg.err)
+            KernelEventsManager().send(KernelEvent.CRASH, message=msg.err, reason=DisconnectionReasonEnum.CONNECTION_PROCESS_CRASHED)
             return True
 
     def pulled(self) -> bool:

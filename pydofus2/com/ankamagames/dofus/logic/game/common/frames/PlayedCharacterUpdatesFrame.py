@@ -466,9 +466,9 @@ class PlayedCharacterUpdatesFrame(Frame):
         playerId = player.id
         StatsManager().addRawStats(playerId, stats.characteristics)
         SpellModifiersManager().setRawSpellsModifiers(playerId, stats.spellModifications)
-        if playerInventory:
-            if stats.kamas != playerInventory.inventory.kamas:
-                playerInventory.inventory.kamas = stats.kamas
+        if playerInventory and stats.kamas != playerInventory.inventory.kamas:
+            playerInventory.inventory.kamas = stats.kamas
+            KernelEventsManager().send(KernelEvent.KamasUpdate, stats.kamas)
         player.characteristics = stats
         if player.isFighting:
             swmod.SpellWrapper.refreshAllPlayerSpellHolder(playerId)

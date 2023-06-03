@@ -267,7 +267,8 @@ class GameServerApproachFrame(Frame):
                 self.characterId = msg.id
                 self._reconnectMsgSend = True
                 ConnectionsHandler().send(CharacterSelectedForceReadyMessage())
-
+            return True
+        
         elif isinstance(msg, BasicTimeMessage):
             btmsg = msg
             TimeManager().serverTimeLag = float(

@@ -106,16 +106,16 @@ class DofusClient(threading.Thread):
     def onInGame(self, event, msg):
         Logger().info("Character entered game server successfully")
 
-    def onCrash(self, event, message):
+    def onCrash(self, event, message, reason=DisconnectionReasonEnum.EXCEPTION_THROWN):
         Logger().error(f"Client crashed for reason : {message}")
         self._crashed = True
         self._crashMessage = message
         self._shutDownReason = f"Crashed for reason: {message}"
-        self.shutdown()
+        self.onShutdown(event, message, reason)
 
-    def onShutdown(self, event, message):
+    def onShutdown(self, event, message, reason=None):
         Logger().debug(f"[DofusClient] Shutdown requested for reason: {message}")
-        self.shutdown()
+        self.shutdown(reason, message)
 
     def onRestart(self, event, message):
         self.onReconnect(event, message)
@@ -143,6 +143,7 @@ class DofusClient(threading.Thread):
         KernelEventsManager().on(KernelEvent.RESTART, self.onRestart, originator=self)
         KernelEventsManager().on(KernelEvent.RECONNECT, self.onReconnect, originator=self)
         KernelEventsManager().on(KernelEvent.CONNECTION_CLOSED, self.onConnectionClosed, originator=self)
+        KernelEventsManager().on(KernelEvent.FIGHT_STARTED, self.onFight)
 
     def onConnectionClosed(self, event, connId):
         reason = ConnectionsHandler().handleDisconnection()
@@ -166,7 +167,7 @@ class DofusClient(threading.Thread):
                     self.onReconnect(None, "The connection was closed unexpectedly.")
                 else:
                     if reason.type == DisconnectionReasonEnum.EXCEPTION_THROWN:
-                        self.onCrash(None, reason.message)
+                        self.onCrash(None, reason.message, reason.type)
                     elif reason.type == DisconnectionReasonEnum.WANTED_SHUTDOWN:
                         self.shutdown(reason.type, reason.message)
                     elif reason.type in [DisconnectionReasonEnum.RESTARTING, DisconnectionReasonEnum.DISCONNECTED_BY_POPUP, DisconnectionReasonEnum.CONNECTION_LOST]:
@@ -202,6 +203,9 @@ class DofusClient(threading.Thread):
         else:
             Logger().warning("The connection hasn't even start or already closed.")
 
+    def onFight(self):
+        Logger().debug("Fight started")
+        
     def prepareLogin(self):
         PlayedCharacterManager().instanceId = self.name
         if self._characterId:
@@ -266,6 +270,7 @@ class DofusClient(threading.Thread):
             self._shutDownReason = f"Error in main : {str(e)}"
         if self._shutDownReason:
             Logger().info(f"Wanted shutdown for reason : {self._shutDownReason}")
+            self.onShutdown(None, f"Wanted shutdown for reason : {self._shutDownReason}", DisconnectionReasonEnum.EXCEPTION_THROWN)
         Kernel().reset()
         Logger().info("goodby crual world")
         self.terminated.set()

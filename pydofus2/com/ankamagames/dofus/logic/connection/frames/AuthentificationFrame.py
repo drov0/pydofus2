@@ -141,7 +141,7 @@ class AuthentificationFrame(Frame):
                         DisconnectionReasonEnum.EXCEPTION_THROWN, DisconnectionReasonEnum.UNEXPECTED.name
                     )
             return True
-        
+
     def parseHosts(self, connectionHostsEntry):
         allHostsInfos = {}
         for host in connectionHostsEntry.split('|'):

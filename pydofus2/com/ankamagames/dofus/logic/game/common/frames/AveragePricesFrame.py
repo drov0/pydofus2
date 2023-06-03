@@ -19,6 +19,7 @@ from pydofus2.com.ankamagames.dofus.network.messages.game.inventory.ObjectAverag
     ObjectAveragePricesMessage
 from pydofus2.com.ankamagames.jerakine.benchmark.BenchmarkTimer import \
     BenchmarkTimer
+from pydofus2.com.ankamagames.jerakine.logger.Logger import Logger
 from pydofus2.com.ankamagames.jerakine.messages.Frame import Frame
 from pydofus2.com.ankamagames.jerakine.messages.Message import Message
 from pydofus2.com.ankamagames.jerakine.types.enums.Priority import Priority
@@ -28,7 +29,22 @@ class PricesData(object):
     def __init__(self):
         self.lastUpdate: datetime = datetime.now()
         self.items = dict[int, float]()
-
+    
+    def __json__(self):
+        return {
+            "lastUpdate": self.lastUpdate.isoformat(),
+            "items": self.items
+        }
+    
+    def __dict__(self):
+        return {
+            "lastUpdate": self.lastUpdate.isoformat(),
+            "items": self.items
+        }
+    
+    def clear(self):
+        self.items = None
+        self.lastUpdate = None
 
 class AveragePricesFrame(Frame):
     def __init__(self):
@@ -38,6 +54,7 @@ class AveragePricesFrame(Frame):
         self.averagePricesPath = Constants.AVERAGE_PRICES_PATH
         self.askDataTimer: BenchmarkTimer = None
         self.nbrAsked = 0
+        self.pricesDataAsked = False
 
     @property
     def priority(self) -> int:
@@ -53,7 +70,13 @@ class AveragePricesFrame(Frame):
 
     def pushed(self) -> bool:
         if os.path.exists(self.averagePricesPath):
-            self._pricesData = json.load(open(self.averagePricesPath, "r"))
+            try:
+                self._pricesData = json.load(open(self.averagePricesPath, "r"))
+            except json.JSONDecodeError as e:
+                Logger().error("Error loading JSON data:", str(e))
+                with open(self.averagePricesPath, "w") as file:
+                    json.dump({}, file)
+                self._pricesData = {}
         return True
 
     def pulled(self) -> bool:
@@ -65,7 +88,7 @@ class AveragePricesFrame(Frame):
     def process(self, msg: Message) -> bool:
         
         if isinstance(msg, GameContextCreateMessage):
-            if msg.context == GameContextEnum.ROLE_PLAY and self.updateAllowed():
+            if msg.context == GameContextEnum.ROLE_PLAY and not self.pricesDataAsked:
                 self.askPricesData()
             return False
         
@@ -87,7 +110,8 @@ class AveragePricesFrame(Frame):
             self._pricesData.items[itemId] = averagePrice
         if not os.path.exists(os.path.dirname(self.averagePricesPath)):
             os.makedirs(os.path.dirname(self.averagePricesPath))
-        json.dump(self._pricesData, open(self.averagePricesPath, "w"))
+        json.dump(self._pricesData.__json__(), open(self.averagePricesPath, "w"))
+        Logger().debug("Average prices data received")
 
     def updateAllowed(self) -> bool:
         if self.dataAvailable:
@@ -101,6 +125,7 @@ class AveragePricesFrame(Frame):
         return True
 
     def askPricesData(self) -> None:
+        self.pricesDataAsked = True
         oapgm: ObjectAveragePricesGetMessage = ObjectAveragePricesGetMessage()
         oapgm.init()
-        # ConnectionsHandler().send(oapgm)
+        ConnectionsHandler().send(oapgm)

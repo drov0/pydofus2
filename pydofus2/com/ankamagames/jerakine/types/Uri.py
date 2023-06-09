@@ -70,7 +70,7 @@ class Uri:
     @path.setter
     def path(self, value: str):
         path_obj = Path(value)
-        self._path = str(path_obj)
+        self._path = str(path_obj.resolve())
         if platform.system() == "Windows":
             if self._path.startswith("/"):
                 for i in range(1, len(self._path)):
@@ -136,6 +136,21 @@ class Uri:
                 if self._subPath and "." in self._subPath
                 else Path(self._path)
             )
-            self._fileType = path_obj.suffix.split("?")[0] if path_obj.suffix else None
+            file_suffix = path_obj.suffix.split("?")[0]
+            self._fileType = file_suffix[1:] if file_suffix.startswith(".") else file_suffix
             self._fileTypeChanged = False
         return self._fileType
+
+    def normalizedUri(self) -> str:
+        supported_protocols = ["http", "https", "file", "zip", "mod", "theme", "d2p", "d2pOld", "pak", "pak2"]
+        if self._protocol in supported_protocols:
+            return self._uri.replace("/\\/g", "/")
+        else:
+            raise ValueError(f"Unsupported protocol {self._protocol} for normalization.")
+    
+    def normalizedUriWithoutSubPath(self) -> str:
+        supported_protocols = ["http", "https", "file", "zip", "mod", "theme", "d2p", "d2pOld", "pak", "pak2"]
+        if self._protocol in supported_protocols:
+            return self.toString().replace("/\\/g", "/")
+        else:
+            raise ValueError(f"Unsupported protocol {self._protocol} for normalization.")

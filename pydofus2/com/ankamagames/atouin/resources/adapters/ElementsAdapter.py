@@ -9,9 +9,10 @@ from pydofus2.com.ankamagames.atouin.resources.ResourceErrorCode import \
     ResourceErrorCode
 from pydofus2.com.ankamagames.jerakine.data.BinaryStream import BinaryStream
 from pydofus2.com.ankamagames.jerakine.resources.adapters.AbstractUrlLoaderAdapter import AbstractUrlLoaderAdapter
+from pydofus2.com.ankamagames.jerakine.resources.adapters.IAdapter import IAdapter
 
 
-class ElementsAdapter(AbstractUrlLoaderAdapter):
+class ElementsAdapter(AbstractUrlLoaderAdapter, IAdapter):
     
     def __init__(self):
         super().__init__()

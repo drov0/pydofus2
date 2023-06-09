@@ -33,7 +33,7 @@ class AdapterFactory:
         else:
             if uri.subPath and FileUtils.getExtension(uri.path) == 'swf':
                 return AdvancedSwfAdapter()
-            
+            print(AdapterFactory._customAdapters, uriFileType)
             customAdapter = AdapterFactory._customAdapters.get(uriFileType)
             if customAdapter:
                 ca = customAdapter()

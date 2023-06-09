@@ -89,7 +89,7 @@ class DofusClient(threading.Thread):
         Logger().info("[DofusClient] initializing")
         Kernel().init()
         AdapterFactory.addAdapter("ele", ElementsAdapter)
-        AdapterFactory.addAdapter("dlm", MapsAdapter)
+        # AdapterFactory.addAdapter("dlm", MapsAdapter)
         Kernel().isMule = self.mule
         Kernel().mitm = self.mitm
         ModuleReader._clearObjectsCache = True

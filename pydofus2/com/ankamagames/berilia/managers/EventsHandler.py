@@ -17,7 +17,7 @@ class PrioritizedItem:
 class PriorityQueueWithRemove(PriorityQueue):
     def __init__(self):
         super().__init__()
-        self.entry_finder = dict[Any, PrioritizedItem]  # mapping of tasks to entries
+        self.entry_finder = dict[Any, PrioritizedItem]()  # mapping of tasks to entries
         self.counter = 0  # unique sequence count
 
     def put(self, item: Listener):
@@ -161,7 +161,7 @@ class EventsHandler:
         
     def send(self, event_id, *args, **kwargs):
         if event_id not in self._listeners:
-            return event
+            return
         event = Event()
         event.sender = self
         event.name = event_id

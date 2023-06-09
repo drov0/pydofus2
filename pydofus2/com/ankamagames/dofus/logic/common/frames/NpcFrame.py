@@ -27,10 +27,10 @@ class NpcFrame(Frame):
     def process(self, msg) -> bool:
 
         if isinstance(msg, NpcDialogCreationMessage):
-            KernelEventsManager().send(KernelEvent.NPC_DIALOG_OPEN, msg.mapId, msg.npcId)
+            KernelEventsManager().send(KernelEvent.NpcDialogOpen, msg.mapId, msg.npcId)
             return True
 
         elif isinstance(msg, NpcDialogQuestionMessage):
-            KernelEventsManager().send(KernelEvent.NPC_QUESTION, msg.messageId, msg.dialogParams, msg.visibleReplies)
+            KernelEventsManager().send(KernelEvent.NpcQuestion, msg.messageId, msg.dialogParams, msg.visibleReplies)
             return True
 

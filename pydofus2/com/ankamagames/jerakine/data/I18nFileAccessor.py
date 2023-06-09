@@ -3,6 +3,7 @@ import threading
 from time import perf_counter
 from pydofus2.com.ankamagames.dofus import Constants
 from pydofus2.com.ankamagames.jerakine.logger.Logger import Logger
+from pydofus2.com.ankamagames.jerakine.managers.LangManager import LangManager
 from pydofus2.com.ankamagames.jerakine.metaclasses.ThreadSharedSingleton import ThreadSharedSingleton
 from pydofus2.com.ankamagames.jerakine.data.BinaryStream import BinaryStream
 
@@ -71,6 +72,8 @@ class I18nFileAccessor(metaclass=ThreadSharedSingleton):
             textKeys: list = []
             for textKey in self.textIndexes:
                 textKeys.append(textKey)
+        for textKey in textKeys:
+            self.setEntries(textKey)
         self._initializing.clear()
         self._initialized.set()
         Logger().info(f"Loaded {keyCount} keys and {self.textCount} texts. in {perf_counter() - s}s")

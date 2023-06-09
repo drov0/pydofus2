@@ -173,7 +173,7 @@ class RoleplayEntitiesFrame(AbstractEntitiesFrame, Frame):
         ConnectionsHandler().send(pingMsg)
         self.nbrFails += 1
         if self.nbrFails > self.MAX_MAPDATA_REQ_FAILS:
-            return KernelEventsManager().send(KernelEvent.RESTART, "map data request timeout")
+            return KernelEventsManager().send(KernelEvent.ClientRestart, "map data request timeout")
         self.sendMapDataRequest()
     
     def sendMapDataRequest(self):
@@ -310,7 +310,7 @@ class RoleplayEntitiesFrame(AbstractEntitiesFrame, Frame):
             self._isInAnomaly = PlayedCharacterManager().isInAnomaly
             self.mcidm_processed = True
             self.processingMapData.set()
-            KernelEventsManager().send(KernelEvent.MAPPROCESSED, msg.mapId)
+            KernelEventsManager().send(KernelEvent.MapDataProcessed, msg.mapId)
             return True
 
         if isinstance(msg, GameRolePlayShowActorMessage):
@@ -327,7 +327,7 @@ class RoleplayEntitiesFrame(AbstractEntitiesFrame, Frame):
                 self._merchantsList.append(msg.informations)
                 self._merchantsList.sort(key=lambda e: e.name)
             if isinstance(msg.informations, GameRolePlayHumanoidInformations):
-                KernelEventsManager().send(KernelEvent.ACTORSHOWED, msg.informations)
+                KernelEventsManager().send(KernelEvent.ActorShowed, msg.informations)
             return True
 
         if isinstance(msg, GameRolePlayShowMultipleActorsMessage):
@@ -350,6 +350,7 @@ class RoleplayEntitiesFrame(AbstractEntitiesFrame, Frame):
 
         elif isinstance(msg, GameRolePlayRemoveChallengeMessage):
             self.removeFight(msg.fightId)
+            return True
 
         elif isinstance(msg, GameContextRemoveElementMessage):
             if msg.id in self._playersId:
@@ -368,7 +369,7 @@ class RoleplayEntitiesFrame(AbstractEntitiesFrame, Frame):
                 self._monstersIds.remove(msg.id)
 
             self.removeActor(msg.id)
-            KernelEventsManager().send(KernelEvent.ENTITY_VANISHED, msg.id)
+            KernelEventsManager().send(KernelEvent.EntityVanished, msg.id)
             return True
 
         elif isinstance(msg, GameContextRemoveMultipleElementsMessage):
@@ -449,7 +450,7 @@ class RoleplayEntitiesFrame(AbstractEntitiesFrame, Frame):
             teams.append(fightTeam)
         self._fights[infos.fightId] = fight
         Logger().info(f"Fight({infos.fightId}) appeared with team entities {['leader : ' + str(ft.leaderId) + ', cell: ' + str(infos.fightTeamsPositions[ft.teamId]) for ft in infos.fightTeams]}.")
-        KernelEventsManager().send(KernelEvent.FIGHT_SWORD_SHOWED, infos)
+        KernelEventsManager().send(KernelEvent.FightSwordShowed, infos)
 
     def updateMonstersGroup(self, pMonstersInfo: GameRolePlayGroupMonsterInformations) -> None:
         monstersGroup: list[MonsterInGroupLightInformations] = self.getMonsterGroup(pMonstersInfo.staticInfos)

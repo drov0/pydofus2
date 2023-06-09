@@ -242,7 +242,7 @@ class ExchangeManagementFrame(Frame):
             PlayedCharacterManager().isInExchange = False
             self._success = msg.success
             Kernel().worker.removeFrame(self)
-        KernelEventsManager().send(KernelEvent.EXCHANGE_CLOSE, msg.success)
+        KernelEventsManager().send(KernelEvent.ExchangeClose, msg.success)
         
     def process(self, msg: Message) -> bool:
 

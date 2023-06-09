@@ -400,7 +400,7 @@ class FightContextFrame(Frame):
                     durationPool[buff.effect.spellId] = castingSpell
                 buffTmp = BuffManager.makeBuffFromEffect(buff.effect, castingSpell, buff.actionId)
                 BuffManager().addBuff(buffTmp)
-            KernelEventsManager().send(KernelEvent.FIGHT_RESUMED)
+            KernelEventsManager().send(KernelEvent.FightResumed)
             return True
 
         elif isinstance(msg, GameFightUpdateTeamMessage):
@@ -430,7 +430,7 @@ class FightContextFrame(Frame):
             timeBeforeStart = msg.timeMaxBeforeFightStart * 100
             if timeBeforeStart == 0 and preFightIsActive:
                 timeBeforeStart = -1
-            KernelEventsManager().send(KernelEvent.FIGHT_JOINED, msg.isFightStarted, msg.fightType, msg.isTeamPhase, msg.timeMaxBeforeFightStart)
+            KernelEventsManager().send(KernelEvent.FightJoined, msg.isFightStarted, msg.fightType, msg.isTeamPhase, msg.timeMaxBeforeFightStart)
             return True
 
         elif isinstance(msg, GameFightStartMessage):

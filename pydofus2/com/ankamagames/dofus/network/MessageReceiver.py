@@ -21,6 +21,8 @@ class UnknownMessageId(Exception):
     pass
 
 _messages_to_discard = {
+    "AnomalyStateMessage",
+    "AnomalyOpenedMessage",
     "ServerSettingsMessage",
     "SetCharacterRestrictionsMessage",
     "GameContextRefreshEntityLookMessage",

@@ -97,7 +97,7 @@ class RoleplayMovementFrame(Frame):
             if player:
                 player.position = newPos
                 self.entitiesFrame.updateEntityCellId(PlayedCharacterManager().id, newPos.cellId)            
-                KernelEventsManager().send(KernelEvent.MOVE_REQUEST_REJECTED)
+                KernelEventsManager().send(KernelEvent.MovementRequestRejected)
             else:
                 Logger().error("Movement reject received but player data not loaded yet, maybe map changed after a map move request that was rejected.")
             return True
@@ -116,7 +116,7 @@ class RoleplayMovementFrame(Frame):
                 Logger().error(f"Actor '{msg.actorId}' moved before it was added to the scene.")
             if msg.actorId == PlayedCharacterManager().id:
                 PlayedCharacterManager().entity.move(clientMovePath, self.onPlayerMovementEnded)
-            KernelEventsManager().send(KernelEvent.ENTITY_MOVING, msg.actorId, clientMovePath)
+            KernelEventsManager().send(KernelEvent.EntityMoving, msg.actorId, clientMovePath)
             return True
 
         elif isinstance(msg, (InteractiveUseEndedMessage, InteractiveUseErrorMessage, LeaveDialogMessage, ExchangeLeaveMessage, EditHavenBagFinishedMessage)):
@@ -142,7 +142,7 @@ class RoleplayMovementFrame(Frame):
             ConnectionsHandler().send(gmmcmsg)
         else:
             Logger().error("Player didnt complete movement")
-        KernelEventsManager().send(KernelEvent.PLAYER_MOVEMENT_COMPLETED, success)
+        KernelEventsManager().send(KernelEvent.PlayerMovementCompleted, success)
 
     def pulled(self) -> bool:
         self.canMove = True

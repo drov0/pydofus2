@@ -46,14 +46,14 @@ class ContextChangeFrame(Frame):
                 from pydofus2.com.ankamagames.dofus.logic.game.roleplay.frames.RoleplayContextFrame import \
                     RoleplayContextFrame
                 Kernel().worker.addFrame(RoleplayContextFrame())
-                KernelEventsManager().send(KernelEvent.ROLEPLAY_STARTED)
+                KernelEventsManager().send(KernelEvent.RoleplayStarted)
 
             elif self.currentContext == GameContextEnum.FIGHT:
                 from pydofus2.com.ankamagames.dofus.logic.game.fight.frames.FightContextFrame import \
                     FightContextFrame
                 if not Kernel().isMule:
                     Kernel().worker.addFrame(FightContextFrame())
-                KernelEventsManager().send(KernelEvent.FIGHT_STARTED)
+                KernelEventsManager().send(KernelEvent.FightStarted)
             return True
 
         elif isinstance(msg, GameContextQuitAction):

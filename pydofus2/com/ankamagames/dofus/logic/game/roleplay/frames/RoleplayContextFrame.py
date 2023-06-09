@@ -103,7 +103,7 @@ class RoleplayContextFrame(Frame):
     def process(self, msg: Message) -> bool:
 
         if isinstance(msg, CurrentMapMessage):
-            KernelEventsManager().send(KernelEvent.CURRENT_MAP, msg.mapId)
+            KernelEventsManager().send(KernelEvent.CurrentMap, msg.mapId)
             Logger().debug(f"Loading roleplay map {msg.mapId}")
             self._newCurrentMapIsReceived = True
             newSubArea = SubArea.getSubAreaByMapId(msg.mapId)
@@ -143,7 +143,7 @@ class RoleplayContextFrame(Frame):
             Kernel().worker.addFrame(self.movementFrame)
             Kernel().worker.addFrame(self._interactivesFrame)
             Kernel().worker.resume()
-            KernelEventsManager().send(KernelEvent.MAPLOADED, msg.id)
+            KernelEventsManager().send(KernelEvent.MapLoaded, msg.id)
             self._listMapNpcsMsg = None
             return True
 
@@ -182,7 +182,7 @@ class RoleplayContextFrame(Frame):
             return False;
 
         elif isinstance(msg, LeaveDialogMessage):
-            KernelEventsManager().send(KernelEvent.DIALOG_LEFT)
+            KernelEventsManager().send(KernelEvent.DialogLeft)
             return False
         
         return False

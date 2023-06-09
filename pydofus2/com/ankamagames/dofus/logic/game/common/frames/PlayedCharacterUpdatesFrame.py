@@ -176,7 +176,7 @@ class PlayedCharacterUpdatesFrame(Frame):
             if krnl.Kernel().worker.getFrameByName("QuestFrame"):
                 if krnl.Kernel().worker.getFrameByName("QuestFrame").achievmentsListProcessed == False:
                     krnl.Kernel().worker.getFrameByName("QuestFrame")
-            KernelEventsManager().send(KernelEvent.CHARACTER_STATS)
+            KernelEventsManager().send(KernelEvent.CharacterStats)
             return True
 
         if isinstance(msg, MapComplementaryInformationsDataMessage):
@@ -219,6 +219,7 @@ class PlayedCharacterUpdatesFrame(Frame):
                 statUpgradeErrorText = "ui.popup.statboostFailed.notEnoughPoint"
             if statUpgradeErrorText:
                 Logger().info(I18n.getUiText(statUpgradeErrorText))
+            KernelEventsManager().send(KernelEvent.StatsUpgradeResult, surmsg.result, surmsg.nbCharacBoost)
             return True
 
         if isinstance(msg, CharacterLevelUpInformationMessage):
@@ -257,7 +258,7 @@ class PlayedCharacterUpdatesFrame(Frame):
                         for option in entityInfos.humanoidInfo.options:
                             if isinstance(option, HumanOptionOrnament):
                                 option.level = newLevel
-                KernelEventsManager().send(KernelEvent.LEVEL_UP, previousLevel, msg.newLevel)
+                KernelEventsManager().send(KernelEvent.PlayerLeveledUp, previousLevel, msg.newLevel)
             return True
 
         if isinstance(msg, CharacterExperienceGainMessage):
@@ -267,7 +268,7 @@ class PlayedCharacterUpdatesFrame(Frame):
             state = PlayerLifeStatusEnum(msg.state)
             pcm.PlayedCharacterManager().state = state
             self._phenixMapId = msg.phenixMapId
-            KernelEventsManager().send(KernelEvent.PLAYER_STATE_CHANGED, PlayerLifeStatusEnum(msg.state), msg.phenixMapId)
+            KernelEventsManager().send(KernelEvent.PlayerStateChanged, PlayerLifeStatusEnum(msg.state), msg.phenixMapId)
             return True
 
         if isinstance(msg, GameRolePlayGameOverMessage):

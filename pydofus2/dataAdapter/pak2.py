@@ -8,6 +8,8 @@ from collections import OrderedDict
 from pydofus2.com.ankamagames.jerakine.data.BinaryStream import BinaryStream
 from pathlib import Path
 
+from pydofus2.com.ankamagames.jerakine.logger.Logger import Logger
+
 
 class InvalidD2PFile(Exception):
     def __init__(self, message):
@@ -35,7 +37,7 @@ class PakProtocol2:
     """Read D2P files"""
 
     def __init__(self, filePath: Path):
-        """Init the class with the informations about files in the D2P"""
+        """Init the class with the informations about files in the pak2"""
         # Attributes
         self.dataOffset = None
         self.dataCount = None
@@ -47,15 +49,12 @@ class PakProtocol2:
         self.indexes = None
         self.streams = None
         self._loaded = False
-        # Load the D2P
-        print("-------------------------------------------------")
-        print("working on file {}".format(filePath))
+        # Load the PAK file
         fs = BinaryStream(filePath.open("rb"), True)
         vMax = fs.readUnsignedByte()
         vMin = fs.readUnsignedByte()
         if vMax != 2 or vMin != 1:
-            raise InvalidD2PFile("Invalid d2p file header.")
-        print("vMin: ", vMin, "vMax : ", vMax)
+            raise InvalidD2PFile("Invalid Pak2 file header.")
         fs.seek(-24, 2)  # Set position to end - 24 bytes
 
         self.dataOffset = fs.readUnsignedInt()
@@ -64,9 +63,10 @@ class PakProtocol2:
         self.indexCount = fs.readUnsignedInt()
         self.propertiesOffset = fs.readUnsignedInt()
         self.propertiesCount = fs.readUnsignedInt()
-        print("dataOffset: ", self.dataOffset, "dataCount : ", self.dataCount)
-        print("indexOffset: ", self.indexOffset, "indexCount : ", self.indexCount)
-        print("propertiesOffset: ", self.propertiesOffset, "propertiesCount : ", self.propertiesCount)
+        Logger().debug(f"dataOffset: {self.dataOffset}, dataCount : {self.dataCount}")
+        Logger().debug(f"indexOffset: {self.indexOffset}, indexCount : {self.indexCount}")
+        Logger().debug(f"propertiesOffset: {self.propertiesOffset}, propertiesCount : {self.propertiesCount}")
+
         if (
             self.dataOffset == b""
             or self.dataCount == b""
@@ -78,18 +78,16 @@ class PakProtocol2:
             raise InvalidD2PFile("The file doesn't match the D2P pattern.")
 
         # Read properties
-        print("reading properties")
         fs.seek(self.propertiesOffset, 0)
         self.properties = OrderedDict()
-        filePath = filePath
-        filePath = None
+
         for _ in range(self.propertiesCount):
             try:
                 propertyName = fs.readUTF()
                 propertyValue = fs.readUTF()
                 self.properties[propertyName] = propertyValue
             except Exception as e:
-                print("Error while reading properties: ", e)
+                raise InvalidD2PFile("Error while reading properties!")
 
         # Read indexes
         fs.seek(self.indexOffset, 0)
@@ -107,9 +105,6 @@ class PakProtocol2:
             yield filePath, index.getStream()
 
     # Accessors
-
-    def _get_stream(self):
-        return self.fs
 
     def _get_properties(self):
         return self.properties

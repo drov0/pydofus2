@@ -216,7 +216,7 @@ class ServerSelectionFrame(Frame):
                 self._serversUsedList.append(server)
                 PlayerManager().serversList.append(server.id)
         KernelEventsManager().send(
-            KernelEvent.SERVERS_LIST,
+            KernelEvent.ServersList,
             return_value={
                 "all": self._serversList,
                 "used": self._serversUsedList,

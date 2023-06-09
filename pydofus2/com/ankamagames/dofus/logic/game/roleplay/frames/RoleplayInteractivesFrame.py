@@ -9,6 +9,7 @@ from pydofus2.com.ankamagames.berilia.managers.KernelEventsManager import \
     KernelEventsManager
 from pydofus2.com.ankamagames.dofus.datacenter.interactives.Interactive import \
     Interactive
+from pydofus2.com.ankamagames.dofus.datacenter.interactives.Sign import Sign
 from pydofus2.com.ankamagames.dofus.datacenter.jobs.Skill import Skill
 from pydofus2.com.ankamagames.dofus.internalDatacenter.DataEnum import DataEnum
 from pydofus2.com.ankamagames.dofus.kernel.Kernel import Kernel
@@ -87,6 +88,8 @@ class RoleplayInteractivesFrame(Frame):
     ZAAP_TYPEID = 16
     
     REQUEST_TIMEOUT = 10
+    
+    BANK_GFX = 401
 
     def __init__(self):
         self._usingInteractive: bool = False
@@ -152,14 +155,14 @@ class RoleplayInteractivesFrame(Frame):
         if isinstance(msg, InteractiveUsedMessage):
             if msg.duration > 0:
                 self._enityUsingElement[msg.elemId] = msg.entityId
-                KernelEventsManager().send(KernelEvent.INTERACTIVE_ELEMENT_BEING_USED, msg.entityId, msg.elemId)
+                KernelEventsManager().send(KernelEvent.InteractiveElementBeingUsed, msg.entityId, msg.elemId)
                 if msg.entityId == PlayedCharacterManager().id:                
                     Logger().info(f"Player is using element {msg.elemId} ...")
                     self.usingInteractive = True
             else:
                 if msg.entityId == PlayedCharacterManager().id:    
                     Logger().info(f"Player used element {msg.elemId}")
-                KernelEventsManager().send(KernelEvent.INTERACTIVE_ELEMENT_USED, msg.entityId, msg.elemId)
+                KernelEventsManager().send(KernelEvent.InteractiveElementUsed, msg.entityId, msg.elemId)
             return True
         
         if isinstance(msg, InteractiveUseEndedMessage):
@@ -167,7 +170,7 @@ class RoleplayInteractivesFrame(Frame):
             entityId = self._enityUsingElement.get(msg.elemId)
             if entityId == PlayedCharacterManager().id:
                 self.usingInteractive = False
-            KernelEventsManager().send(KernelEvent.INTERACTIVE_ELEMENT_USED, entityId, msg.elemId)            
+            KernelEventsManager().send(KernelEvent.InteractiveElementUsed, entityId, msg.elemId)            
             del self._enityUsingElement[msg.elemId]
             del self._collectableResource[msg.elemId]
             return True
@@ -176,7 +179,7 @@ class RoleplayInteractivesFrame(Frame):
             iuem = msg
             if iuem.elemId == self.currentRequestedElementId:
                 self.currentRequestedElementId = -1
-            KernelEventsManager().send(KernelEvent.INTERACTIVE_USE_ERROR, msg.elemId)
+            KernelEventsManager().send(KernelEvent.InteractiveUseError, msg.elemId)
             return True
 
         if isinstance(msg, StatedMapUpdateMessage):
@@ -264,7 +267,17 @@ class RoleplayInteractivesFrame(Frame):
 
     def getReviveIe(self) -> InteractiveElementData:
         return self.getIeBySkillId(self.REVIVE_SKILL_ID)
-
+    
+    def getBankDoorIe(self) -> InteractiveElementData:
+        ie = self.getIeBySkillId(DataEnum.SKILL_SIGN_HINT)
+        if ie:
+            sign = Sign.getSignById(ie.element.elementId)
+            if sign:
+                Logger().debug(f"Found sign with text : {sign.signText}")
+                if sign._hint.gfx == self.BANK_GFX:
+                    return ie
+        return None
+    
     def getZaapIe(self) -> InteractiveElementData:
         return self.getIeByTypeId(self.ZAAP_TYPEID)
 

@@ -49,19 +49,19 @@ class CharacterFrame(Frame):
                 AuthentificationManager().setToken(msg.token)
                 ConnectionsHandler().closeConnection(DisconnectionReasonEnum.CHANGING_SERVER)
                 self._changeToServerId = None
-            KernelEventsManager().send(KernelEvent.RELOGIN_TOKEN, msg.validToken, msg.token)
+            KernelEventsManager().send(KernelEvent.ReloginToken, msg.validToken, msg.token)
             return True
 
         elif isinstance(msg, CharacterCreationResultMessage):
-            KernelEventsManager().send(KernelEvent.CHARACTER_CREATION_RESULT, msg.result, msg.reason)
+            KernelEventsManager().send(KernelEvent.CharacterCreationResult, msg.result, msg.reason)
             return True
         
         elif isinstance(msg, CharacterNameSuggestionSuccessMessage):
-            KernelEventsManager().send(KernelEvent.CHARACTER_NAME_SUGGESTION, msg.suggestion)
+            KernelEventsManager().send(KernelEvent.CharacterNameSuggestion, msg.suggestion)
             return True
         
         elif isinstance(msg, CharacterNameSuggestionFailureMessage):
-            KernelEventsManager().send(KernelEvent.CHARACTER_NAME_SUGGESTION_FAILED)
+            KernelEventsManager().send(KernelEvent.CharacterNameSuggestionFailed)
             return True
 
         elif isinstance(msg, ChangeServerAction):
@@ -72,5 +72,5 @@ class CharacterFrame(Frame):
             return True
 
         elif isinstance(msg, CharacterDeletionPrepareMessage):
-            KernelEventsManager().send(KernelEvent.CHAR_DEL_PREP, msg)
+            KernelEventsManager().send(KernelEvent.CharacterDelPrepare, msg)
             return True

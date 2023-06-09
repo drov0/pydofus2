@@ -36,7 +36,7 @@ class DisconnectionHandlerFrame(Frame):
     def process(self, msg: Message) -> bool:
 
         if isinstance(msg, ServerConnectionClosedMessage):
-            KernelEventsManager().send(KernelEvent.CONNECTION_CLOSED, msg.closedConnection)
+            KernelEventsManager().send(KernelEvent.ClientClosed, msg.closedConnection)
             return True
 
         elif isinstance(msg, WrongSocketClosureReasonMessage):
@@ -53,11 +53,11 @@ class DisconnectionHandlerFrame(Frame):
 
         elif isinstance(msg, UnexpectedSocketClosureMessage):
             Logger().debug("Got hook UnexpectedSocketClosure")
-            KernelEventsManager().send(KernelEvent.CRASH, message="Unexpected socket closure", reason=DisconnectionReasonEnum.UNEXPECTED)
+            KernelEventsManager().send(KernelEvent.ClientCrashed, message="Unexpected socket closure", reason=DisconnectionReasonEnum.UNEXPECTED)
             return True
 
         elif isinstance(msg, ConnectionProcessCrashedMessage):
-            KernelEventsManager().send(KernelEvent.CRASH, message=msg.err, reason=DisconnectionReasonEnum.CONNECTION_PROCESS_CRASHED)
+            KernelEventsManager().send(KernelEvent.ClientCrashed, message=msg.err, reason=DisconnectionReasonEnum.CONNECTION_PROCESS_CRASHED)
             return True
 
     def pulled(self) -> bool:

@@ -58,7 +58,7 @@ class Worker(MessageHandler):
                 from tkinter import Tk, messagebox
                 Tk().withdraw()
                 messagebox.showinfo("Account banned", "Bot has ben kicked!")
-                KernelEventsManager().send(KernelEvent.SHUTDOWN, "Account banned")
+                KernelEventsManager().send(KernelEvent.ClientShutdown, "Account banned")
                 break
             if type(msg).__name__ == "TerminateWorkerMessage":
                 self._terminating.set()
@@ -152,7 +152,7 @@ class Worker(MessageHandler):
             self._framesList.append(frame)
             self._framesList.sort()
             self._currentFrameTypesCache[str(frame)] = frame
-            KernelEventsManager().send(KernelEvent.FRAME_PUSHED, frame)
+            KernelEventsManager().send(KernelEvent.FramePushed, frame)
         else:
             Logger().warn(f"Frame '{frame}' refused to be pushed.")
 
@@ -169,7 +169,7 @@ class Worker(MessageHandler):
                 del self._currentFrameTypesCache[str(frame)]
             if frame in self._framesBeingDeleted:
                 self._framesBeingDeleted.remove(frame)
-            KernelEventsManager().send(KernelEvent.FRAME_PULLED, frame)
+            KernelEventsManager().send(KernelEvent.FramePulled, frame)
         else:
             Logger().warn(f"Frame {frame} refused to be pulled.")
 

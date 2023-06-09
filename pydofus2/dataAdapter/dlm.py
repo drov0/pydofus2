@@ -27,7 +27,9 @@ class DLM:
 
         header = dlm_raw.readByte()
         if header != 77:
-            raise Exception("Unknown file format.")
+            raise InvalidDLMFile("Unknown file format.")
+        
+        
         map_version = dlm_raw.readByte()
         id = dlm_raw.readUnsignedInt()
 

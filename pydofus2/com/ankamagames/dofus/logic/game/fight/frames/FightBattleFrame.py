@@ -356,7 +356,7 @@ class FightBattleFrame(Frame):
         self._slaveId = 0
         self._skipTurnTimer = None
         self._destroyed = True
-        KernelEventsManager().send(KernelEvent.FIGHT_ENDED)
+        KernelEventsManager().send(KernelEvent.FightEnded)
         return True
 
     def getSequencesStack(self) -> list[fseqf.FightSequenceFrame]:
@@ -432,7 +432,7 @@ class FightBattleFrame(Frame):
                 self.gameFightSynchronize(self._synchroniseFighters)
                 self._synchroniseFighters = None
             self.applyDelayedStats()
-            KernelEventsManager().send(KernelEvent.SEQUENCE_EXEC_FINISHED)
+            KernelEventsManager().send(KernelEvent.SequenceExecFinished)
         return function
 
     def sendAutoEndTurn(self, e) -> None:

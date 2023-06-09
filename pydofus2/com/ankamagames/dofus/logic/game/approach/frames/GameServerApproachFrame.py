@@ -194,7 +194,7 @@ class GameServerApproachFrame(Frame):
                         cbi.id, cbi.name, cbi.level, cbi.entityLook, cbi.breed, cbi.sex, 0, 0, 0, bonusXp, False
                     )
                     PlayerManager().charactersList.append(o)
-            KernelEventsManager().send(KernelEvent.CHARACTERS_LIST, return_value=PlayerManager().charactersList)
+            KernelEventsManager().send(KernelEvent.CharactersList, return_value=PlayerManager().charactersList)
             if PlayerManager().allowAutoConnectCharacter:
                 characterId = PlayerManager().autoConnectOfASpecificCharacterId
                 Kernel().worker.process(CharacterSelectionAction.create(characterId, False))
@@ -235,7 +235,7 @@ class GameServerApproachFrame(Frame):
             Kernel().worker.addFrame(AveragePricesFrame())
             Kernel().worker.addFrame(NpcFrame())
             Kernel().worker.addFrame(PartyFrame())
-            KernelEventsManager().send(KernelEvent.CHARACTER_SELECTION_SUCCESS, return_value=cssmsg.infos)
+            KernelEventsManager().send(KernelEvent.CharacterSelectedSuccessfully, return_value=cssmsg.infos)
             # if Kernel().beingInReconection and not self._reconnectMsgSend:
             #     self._reconnectMsgSend = True
             #     ConnectionsHandler().send(CharacterSelectedForceReadyMessage())

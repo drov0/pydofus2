@@ -97,11 +97,11 @@ class AuthentificationFrame(Frame):
             PlayerManager().accountCreation = ismsg.accountCreation
             PlayerManager().wasAlreadyConnected = ismsg.wasAlreadyConnected
             DataStoreType.ACCOUNT_ID = str(ismsg.accountId)
-            KernelEventsManager().send(KernelEvent.LOGGED_IN, ismsg)
+            KernelEventsManager().send(KernelEvent.PlayerLoggedIn, ismsg)
             Kernel().worker.removeFrame(self)
             Kernel().worker.addFrame(CharacterFrame())
             Kernel().worker.addFrame(ServerSelectionFrame())
-            KernelEventsManager().send(KernelEvent.IN_GAME, msg)
+            KernelEventsManager().send(KernelEvent.PlayerInGameReady, msg)
             return True
 
         elif isinstance(msg, IdentificationFailedMessage):
@@ -121,7 +121,7 @@ class AuthentificationFrame(Frame):
             if not hostChosenByUser:
                 hostChosenByUser, foundHost = self.chooseHost(allHostsInfos)
                 if not foundHost:
-                    return KernelEventsManager().send(KernelEvent.CRASH, "No selectable host, aborting connection.")
+                    return KernelEventsManager().send(KernelEvent.ClientCrashed, "No selectable host, aborting connection.")
             self.connexionSequence = self.buildConnexionSequence(allHostsInfos, hostChosenByUser)
             AuthentificationManager().loginValidationAction = msg
             connInfo = self.connexionSequence.pop(0)

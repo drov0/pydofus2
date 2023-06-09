@@ -220,7 +220,7 @@ class FightEntitiesFrame(AbstractEntitiesFrame, Frame):
             else:
                 self.addOrUpdateActor(gfsfmsg.informations)
                 self._illusionEntities[gfsfmsg.informations.contextualId] = False
-            KernelEventsManager().send(KernelEvent.FIGHTER_SHOWED, gfsfmsg.informations.contextualId)
+            KernelEventsManager().send(KernelEvent.FighterShowed, gfsfmsg.informations.contextualId)
             return True
 
         if isinstance(msg, GameFightHumanReadyStateMessage):

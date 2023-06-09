@@ -661,7 +661,7 @@ class FightSequenceFrame(Frame, ISpellCastProvider):
                         ts.y = cellPos.y
             self._castingSpells.append(self._castingSpell)
             KernelEventsManager().send(
-                KernelEvent.FIGHTER_CASTED_SPELL,
+                KernelEvent.FighterCastedSpell,
                 gafscmsg.sourceId,
                 gafscmsg.destinationCellId,
                 sourceCellId,

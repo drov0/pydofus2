@@ -25,7 +25,7 @@ class KernelEventsManager(EventsHandler, metaclass=Singleton):
             if str(frame) == frameName:
                 callback(*args)
 
-        return self.on(KernelEvent.FRAME_PUSHED, onEvt, originator=originator)
+        return self.on(KernelEvent.FramePushed, onEvt, originator=originator)
 
     def onceFramePushed(self, frameName, callback, args=[], originator=None):
         def onEvt(evt: Event, frame):
@@ -33,7 +33,7 @@ class KernelEventsManager(EventsHandler, metaclass=Singleton):
                 evt.listener.delete()
                 callback(*args)
 
-        return self.on(KernelEvent.FRAME_PUSHED, onEvt, originator=originator)
+        return self.on(KernelEvent.FramePushed, onEvt, originator=originator)
 
     def onceFramePulled(self, frameName, callback, args=[], originator=None):
         def onEvt(e: Event, frame):
@@ -41,7 +41,7 @@ class KernelEventsManager(EventsHandler, metaclass=Singleton):
                 e.listener.delete()
                 callback(*args)
 
-        return self.on(KernelEvent.FRAME_PULLED, onEvt, originator=originator)
+        return self.on(KernelEvent.FramePulled, onEvt, originator=originator)
 
     def onceMapProcessed(
         self, callback, args=[], mapId=None, timeout=None, ontimeout=None, originator=None
@@ -64,11 +64,11 @@ class KernelEventsManager(EventsHandler, metaclass=Singleton):
                 callback(*args)
 
         return self.on(
-            KernelEvent.MAPPROCESSED, onEvt, once=once, timeout=timeout, ontimeout=ontimeout, originator=originator
+            KernelEvent.MapDataProcessed, onEvt, once=once, timeout=timeout, ontimeout=ontimeout, originator=originator
         )
 
     def send(self, event_id: KernelEvent, *args, **kwargs):
-        if event_id == KernelEvent.CRASH:
+        if event_id == KernelEvent.ClientCrashed:
             self._crashMessage = kwargs.get("message", None)
         super().send(event_id, *args, **kwargs)
 
@@ -78,7 +78,7 @@ class KernelEventsManager(EventsHandler, metaclass=Singleton):
                 event.listener.delete()
                 callback(*args)
 
-        return self.on(KernelEvent.ACTORSHOWED, onActorShowed, originator=originator)
+        return self.on(KernelEvent.ActorShowed, onActorShowed, originator=originator)
 
     def onEntityMoved(self, entityId, callback, timeout=None, ontimeout=None, once=False, originator=None):
         startTime = perf_counter()
@@ -96,7 +96,7 @@ class KernelEventsManager(EventsHandler, metaclass=Singleton):
                     ontimeout(event.listener)
 
         return self.on(
-            KernelEvent.ENTITY_MOVING, onEntityMoved, timeout=timeout, ontimeout=ontimeout, originator=originator
+            KernelEvent.EntityMoving, onEntityMoved, timeout=timeout, ontimeout=ontimeout, originator=originator
         )
 
     def onceEntityMoved(self, entityId, callback, timeout=None, ontimeout=None, originator=None):
@@ -110,7 +110,7 @@ class KernelEventsManager(EventsHandler, metaclass=Singleton):
                 event.listener.delete()
                 callback(*args)
 
-        return self.on(KernelEvent.ENTITY_VANISHED, onEntityVanished, originator=originator)
+        return self.on(KernelEvent.EntityVanished, onEntityVanished, originator=originator)
 
     def onceFightSword(self, entityId, entityCell, callback, args=[], originator=None):
         def onFightSword(event: Event, infos: FightCommonInformations):
@@ -119,11 +119,11 @@ class KernelEventsManager(EventsHandler, metaclass=Singleton):
                     event.listener.delete()
                     callback(*args)
 
-        return self.on(KernelEvent.FIGHT_SWORD_SHOWED, onFightSword, originator=originator)
+        return self.on(KernelEvent.FightSwordShowed, onFightSword, originator=originator)
 
     def onceFightStarted(self, callback, timeout, ontimeout, retryNbr=None, retryAction=None, originator=None):
         return self.on(
-            KernelEvent.FIGHT_STARTED,
+            KernelEvent.FightStarted,
             callback,
             timeout=timeout,
             ontimeout=ontimeout,

@@ -2,14 +2,18 @@ from collections import OrderedDict
 import xml.etree.ElementTree as ET
 import re
 from pydofus2.com.ankamagames.dofus import Constants
+from pydofus2.com.ankamagames.jerakine import JerakineConstants
+from pydofus2.com.ankamagames.jerakine.data.I18n import I18n
+from pydofus2.com.ankamagames.jerakine.managers.StoreDataManager import StoreDataManager
 from pydofus2.com.ankamagames.jerakine.metaclasses.ThreadSharedSingleton import ThreadSharedSingleton
 import threading
 
 lock = threading.Lock()
-
+KEY_LANG_INDEX = "langIndex"
 
 class XmlConfig(metaclass=ThreadSharedSingleton):
     _constants = OrderedDict[str, object]()
+    _aLang = OrderedDict[str, str]()
 
     def __init__(self) -> None:
         config_file_path = Constants.DOFUS_ROOTDIR / "config.xml"
@@ -50,3 +54,4 @@ class XmlConfig(metaclass=ThreadSharedSingleton):
     @property
     def entries(self):
         return self._constants
+

@@ -172,7 +172,7 @@ class PartyFrame(Frame):
                 legend = I18n.getUiText("ui.cartography.positionof",[member.name]) + f" ({msg.coords.worldX}, {msg.coords.worldY})"
                 Logger().info(legend)
             else:
-                KernelEventsManager().send(KernelEvent.RESTART, f"Seems ig we are in party but not modeled yet in party frame")
+                KernelEventsManager().send(KernelEvent.ClientRestart, f"Seems ig we are in party but not modeled yet in party frame")
             return True
 
         elif isinstance(msg, PartyMemberInStandardFightMessage):

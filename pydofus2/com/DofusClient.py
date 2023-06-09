@@ -8,6 +8,7 @@ from typing import TYPE_CHECKING
 
 from pyd2bot.thriftServer.pyd2botService.ttypes import DofusError
 from pydofus2.com.ankamagames.atouin.Haapi import Haapi
+from pydofus2.com.ankamagames.atouin.resources.adapters.ElementsAdapter import ElementsAdapter
 from pydofus2.com.ankamagames.berilia.managers.EventsHandler import Listener
 from pydofus2.com.ankamagames.berilia.managers.KernelEvent import KernelEvent
 from pydofus2.com.ankamagames.berilia.managers.KernelEventsManager import \
@@ -38,6 +39,7 @@ from pydofus2.com.ankamagames.jerakine.data.XmlConfig import XmlConfig
 from pydofus2.com.ankamagames.jerakine.logger.Logger import Logger
 from pydofus2.com.ankamagames.jerakine.network.messages.TerminateWorkerMessage import \
     TerminateWorkerMessage
+from pydofus2.com.ankamagames.jerakine.resources.adapters.AdapterFactory import AdapterFactory
 
 if TYPE_CHECKING:
     from pydofus2.com.ankamagames.jerakine.network.ServerConnection import \
@@ -51,7 +53,7 @@ class DofusClient(threading.Thread):
     APIKEY_NOT_FOUND = 36363
     UNEXPECTED_CLIENT_ERROR = 36364
     lastLoginTime = None
-    minLoginInterval = 30
+    minLoginInterval = 60 * 3
     LOGIN_TIMEOUT = 35
     MAX_CONN_TRIES = 3
 
@@ -86,6 +88,8 @@ class DofusClient(threading.Thread):
     def init(self):
         Logger().info("[DofusClient] initializing")
         Kernel().init()
+        AdapterFactory.addAdapter("ele", ElementsAdapter)
+        AdapterFactory.addAdapter("dlm", MapsAdapter)
         Kernel().isMule = self.mule
         Kernel().mitm = self.mitm
         ModuleReader._clearObjectsCache = True
@@ -127,23 +131,23 @@ class DofusClient(threading.Thread):
 
     def initListeners(self):
         KernelEventsManager().once(
-            KernelEvent.CHARACTER_SELECTION_SUCCESS,
+            KernelEvent.CharacterSelectedSuccessfully,
             self.onCharacterSelectionSuccess,
             originator=self,
         )
         KernelEventsManager().once(
-            KernelEvent.MAPPROCESSED,
+            KernelEvent.MapDataProcessed,
             self.onInGame,
             timeout=self.LOGIN_TIMEOUT,
             ontimeout=self.onLoginTimeout,
             originator=self,
         )
-        KernelEventsManager().on(KernelEvent.CRASH, self.onCrash, originator=self)
-        KernelEventsManager().on(KernelEvent.SHUTDOWN, self.onShutdown, originator=self)
-        KernelEventsManager().on(KernelEvent.RESTART, self.onRestart, originator=self)
-        KernelEventsManager().on(KernelEvent.RECONNECT, self.onReconnect, originator=self)
-        KernelEventsManager().on(KernelEvent.CONNECTION_CLOSED, self.onConnectionClosed, originator=self)
-        KernelEventsManager().on(KernelEvent.FIGHT_STARTED, self.onFight)
+        KernelEventsManager().on(KernelEvent.ClientCrashed, self.onCrash, originator=self)
+        KernelEventsManager().on(KernelEvent.ClientShutdown, self.onShutdown, originator=self)
+        KernelEventsManager().on(KernelEvent.ClientRestart, self.onRestart, originator=self)
+        KernelEventsManager().on(KernelEvent.ClientReconnect, self.onReconnect, originator=self)
+        KernelEventsManager().on(KernelEvent.ClientClosed, self.onConnectionClosed, originator=self)
+        KernelEventsManager().on(KernelEvent.FightStarted, self.onFight)
 
     def onConnectionClosed(self, event, connId):
         reason = ConnectionsHandler().handleDisconnection()

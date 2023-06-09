@@ -169,8 +169,8 @@ class InventoryManagementFrame(Frame):
             PlayedCharacterManager().inventoryWeight = iwmsg.inventoryWeight
             PlayedCharacterManager().inventoryWeightMax = iwmsg.weightMax
             if iwmsg.inventoryWeight / iwmsg.weightMax > 0.95:
-                KernelEventsManager().send(KernelEvent.FULL_PODS)
-            KernelEventsManager().send(KernelEvent.INVENTORY_WEIGHT_UPDATE, iwmsg.inventoryWeight, iwmsg.weightMax)
+                KernelEventsManager().send(KernelEvent.PlayerPodsFull)
+            KernelEventsManager().send(KernelEvent.InventoryWeightUpdate, iwmsg.inventoryWeight, iwmsg.weightMax)
             return True
 
         if isinstance(msg, ObjectMovementMessage):

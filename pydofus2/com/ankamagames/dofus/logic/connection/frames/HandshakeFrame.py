@@ -36,7 +36,7 @@ class HandshakeFrame(Frame):
         )
         if serverVersion != Metadata.PROTOCOL_BUILD:
             KernelEventsManager().send(
-                KernelEvent.CRASH, "Protocol mismatch between the client and the server."
+                KernelEvent.ClientCrashed, "Protocol mismatch between the client and the server."
             )
             return
 

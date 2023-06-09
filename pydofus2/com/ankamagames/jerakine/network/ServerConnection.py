@@ -282,6 +282,7 @@ class ServerConnection(mp.Thread):
 
     @sendTrace
     def connect(self, host: str, port: int, timeout=CONNECTION_TIMEOUT) -> None:
+        self.stream = ByteArray()
         if self.connecting:
             Logger().warn(f"[{self.id}] Tried to connect while already connecting.")
             return
@@ -316,6 +317,7 @@ class ServerConnection(mp.Thread):
                 rdata = self.socket.recv(8900)                    
                 if rdata:
                     if self._connecting.is_set():
+                        Logger().debug(f"Received {len(rdata)}bytes from server!")
                         self.onConnect()
                     self.stream += rdata
                     MessageReceiver().parse(self.stream, self.handleMessage)

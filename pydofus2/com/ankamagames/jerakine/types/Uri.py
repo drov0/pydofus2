@@ -6,46 +6,40 @@ from pydofus2.com.ankamagames.dofus import Constants
 from pydofus2.com.ankamagames.jerakine.managers.LangManager import LangManager
 import platform
 
-_osIsWindows = platform.system() == "Windows"
+
 class Uri:
+    subPathDelimiter = "|"
+
     def __init__(self, uri=None):
         self._protocol = None
-        self._path:str = None
-        self._subPath:str = None 
+        self._path: str = None
+        self._subPath: str = None
         self._secureMode = False  # Assuming secure mode to be False initially
         self._useSecureURI = False  # Assuming use secure URI to be False initially
-        self._uri = uri        
+        self._uri = uri
         self._uriChanged = True
         self._fileNameChanged = True
         self._fileTypeChanged = True
         self.parseUri(uri)
 
-    def parseUri(self, uri:str):
+    def parseUri(self, uri: str):
         if not uri:
             return
-        signPos = uri.find('://')
-        pathWithoutProtocol = None
-        if signPos != -1:
-            protocolStart = uri.rfind('://', 0, signPos)
-            if protocolStart == -1:
-                self._protocol = uri[0:signPos]
-            else:
-                self._protocol = uri[protocolStart+3:signPos]
-            pathWithoutProtocol = uri[signPos + 3:]
+        url = urlparse(uri)
+        self._protocol = url.scheme if url.scheme else "file"
+        path = Path(url.netloc + url.path)
+        str_path = str(path)
+        if self.subPathDelimiter in str_path:
+            self.path, self.subPath = str_path.split(self.subPathDelimiter, 1)
         else:
-            self._protocol = 'file'
-            pathWithoutProtocol = uri
-
-        signPos = pathWithoutProtocol.find('|')
-        if signPos == -1:
-            self.path = pathWithoutProtocol
-        else:
-            self.path = pathWithoutProtocol[0:signPos]
-        if signPos != -1 and len(pathWithoutProtocol) > signPos + 1:
-            self.subPath = pathWithoutProtocol[signPos + 1:]
-        else:
+            self.path = str_path
             self.subPath = None
-        if self._secureMode and self._useSecureURI and self._protocol == 'file' and not self.isSecure():
+        if (
+            self._secureMode
+            and self._useSecureURI
+            and self._protocol == "file"
+            and not self.isSecure()
+        ):
             raise ValueError(f"'{uri}' is an insecure URI.")
 
     def isSecure(self):
@@ -53,7 +47,9 @@ class Uri:
         return True
 
     def toString(self):
-        return f"{self._protocol}://{self._path}" + (f"|{self._subPath}" if self._subPath else "")
+        return f"{self._protocol}://{self._path}" + (
+            f"|{self._subPath}" if self._subPath else ""
+        )
 
     def toSum(self):
         return hashlib.md5(self.toString().encode()).hexdigest()
@@ -72,13 +68,10 @@ class Uri:
         return self._path
 
     @path.setter
-    def path(self, value:str):
-        i = 0
-        if "\\" in value:
-            self._path = value.replace("\\", "/")
-        else:
-            self._path = value
-        if _osIsWindows:
+    def path(self, value: str):
+        path_obj = Path(value)
+        self._path = str(path_obj)
+        if platform.system() == "Windows":
             if self._path.startswith("/"):
                 for i in range(1, len(self._path)):
                     if self._path[i] != "/":
@@ -90,14 +83,19 @@ class Uri:
         self._uriChanged = True
         self._fileNameChanged = True
         self._fileTypeChanged = True
-        
+
     @property
     def subPath(self):
         return self._subPath
 
     @subPath.setter
     def subPath(self, value):
-        if (not self.subPath and not value) or (self.subPath and value and len(self.subPath) == len(value) and self.subPath.startswith(value)):
+        if (not self.subPath and not value) or (
+            self.subPath
+            and value
+            and len(self.subPath) == len(value)
+            and self.subPath.startswith(value)
+        ):
             return
         if value is None or value == "":
             self._subpath = None
@@ -118,38 +116,26 @@ class Uri:
 
     def toFile(self) -> Path:
         if not self._path:
-            tmp = "null"
+            tmp = Path("null")
         else:
-            tmp = self._path
-
-        if _osIsWindows and (tmp.startswith("\\\\") or tmp[1] == ":"):
-            return Path(tmp)
-
-        if not _osIsWindows and tmp[0] == "/":
-            return Path("/" + tmp)
-
+            tmp = Path(self._path)
+        if tmp.is_absolute():
+            return tmp
         if self._protocol == "mod":
-            uiRoot = LangManager().getEntry("config.mod.path")
-
-            if not (uiRoot.startswith("\\\\") or uiRoot[1:3] == ":/"):
-                return Constants.DOFUS_ROOTDIR / Path(uiRoot) / Path(tmp)
-            
-            return Path(uiRoot) / Path(tmp)
-
-        return Constants.DOFUS_ROOTDIR / Path(tmp)
+            uiRoot = Path(LangManager().getEntry("config.mod.path"))
+            if not uiRoot.is_absolute():
+                return Constants.DOFUS_ROOTDIR / uiRoot / tmp
+            return uiRoot / tmp
+        return Constants.DOFUS_ROOTDIR / tmp
 
     @property
     def fileType(self):
         if self._fileTypeChanged:
-            if not self._subPath or not "." in self._subPath:
-                pointPos = self._path.rfind(".")
-                paramPos = self._path.find("?")
-                self._fileType = self._path[pointPos + 1 : paramPos if paramPos != -1 else float("inf")]
-            else:
-                self._fileType = self._subPath[self._subPath.rfind(".") + 1 : self._subPath.find("?") if self._subPath.find("?") != -1 else float("inf")]
-
+            path_obj = (
+                Path(self._subPath)
+                if self._subPath and "." in self._subPath
+                else Path(self._path)
+            )
+            self._fileType = path_obj.suffix.split("?")[0] if path_obj.suffix else None
             self._fileTypeChanged = False
         return self._fileType
-
-
-

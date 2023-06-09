@@ -1,8 +1,10 @@
 import threading
-from pydofus2.com.ankamagames.berilia.managers.EventsHandler import EventsHandler
 from pydofus2.com.ankamagames.jerakine.benchmark.BenchmarkTimer import BenchmarkTimer
 from pydofus2.com.ankamagames.jerakine.logger.Logger import Logger
 
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from pydofus2.com.ankamagames.berilia.managers.EventsHandler import EventsHandler
 
 class Listener:
     def __init__(
@@ -16,7 +18,7 @@ class Listener:
         priority=0,
         originator=None,
     ):
-        self._deleted = False
+        self.deleted = False
         self.event_id = event_id
         self.callback = callback
         self.timeout = timeout
@@ -32,24 +34,17 @@ class Listener:
         self.nbrTimeouts = 0
 
     def call(self, event_id, *args, **kwargs):
-        if self._deleted:
+        if self.deleted:
             return Logger().warning(f"Callback of a deleted listener for event {event_id.name}")
         self.cancelTimer()
         self.callback(event_id, *args, **kwargs)
 
     def delete(self):
-        self._deleted = True
+        self.deleted = True
         self.cancelTimer()
-        if self.event_id not in self.manager._listeners:
-            return Logger().warning("Trying to delete Event not registred")
-        listeners = self.manager._listeners[self.event_id][self.priority]
-        if self in listeners:
-            listeners.remove(self)
-            if self.event_id in self.manager._sorted:
-                del self.manager._sorted[self.event_id]
 
     def armTimer(self, newTimeout=None):
-        if self._deleted:
+        if self.deleted:
             return Logger().warning("arm timer of a deleted listener")
         if newTimeout:
             self.timeout = newTimeout

@@ -1,6 +1,5 @@
-import operator
 import threading
-from typing import Any
+from typing import Any, List
 from pydofus2.com.ankamagames.berilia.managers.Listener import Listener
 from pydofus2.com.ankamagames.jerakine.logger.Logger import Logger
 
@@ -10,12 +9,10 @@ from queue import PriorityQueue
 from typing import Any
 from dataclasses import dataclass, field
 
-REMOVED = '<removed-task>'
-
 @dataclass(order=True)
 class PrioritizedItem:
     priority: int
-    item: Any=field(compare=False)
+    item: Listener=field(compare=False)
 
 class PriorityQueueWithRemove(PriorityQueue):
     def __init__(self):
@@ -23,24 +20,21 @@ class PriorityQueueWithRemove(PriorityQueue):
         self.entry_finder = dict[Any, PrioritizedItem]  # mapping of tasks to entries
         self.counter = 0  # unique sequence count
 
-    def put(self, item, priority=0):
-        'Add a new task or update the priority of an existing task'
+    def put(self, item: Listener):
         if item in self.entry_finder:
             self.remove(item)
-        entry = PrioritizedItem(priority, item)
+        entry = PrioritizedItem(-item.priority, item)
         self.entry_finder[item] = entry
         super().put(entry)
 
     def remove(self, item):
-        'Mark an existing task as REMOVED.  Raise KeyError if not found.'
-        entry = self.entry_finder.pop(item)
-        entry.item = REMOVED
+        entry: Listener = self.entry_finder.pop(item)
+        entry.deleted = True
 
     def get(self, block=True, timeout=None):
-        'Remove and return the lowest priority task. Raise KeyError if empty.'
         while True:
-            entry = super().get(block, timeout)
-            if entry.item is not REMOVED:
+            entry: PrioritizedItem = super().get(block, timeout)
+            if not entry.item.deleted:
                 del self.entry_finder[entry.item]
                 return entry.item
 
@@ -58,9 +52,9 @@ class EventsHandler:
     
     def __init__(self):
         super().__init__()
-        self._listeners = dict[str, dict[int, list[Listener]]]()
+        self._listeners = dict[str, PriorityQueueWithRemove]()
         self._sorted = {}
-        self.__waiting_evts = list[threading.Event]()
+        self.waitingEvts = list[threading.Event]()
         self._crashMessage = None
 
     def wait(self, event, timeout: float = None, originator=None):
@@ -72,18 +66,18 @@ class EventsHandler:
             ret[0] = kwargs.get("return_value", None)
 
         self.once(event, onReceived, originator=originator)
-        self.__waiting_evts.append(received)
+        self.waitingEvts.append(received)
         wait_result = received.wait(timeout)
-        if received in self.__waiting_evts:
-            self.__waiting_evts.remove(received)
+        if received in self.waitingEvts:
+            self.waitingEvts.remove(received)
         if self._crashMessage:
             raise Exception(self._crashMessage)
         if not wait_result:
             raise TimeoutError(f"wait event {event} timed out")
         return ret[0]
     
-    def hasListeners(self, event_id=None):
-        return bool(len(self.getSortedListeners(event_id)))
+    def hasListener(self, event_id=None):
+        return event_id in self._listeners
     
     def on(
         self,
@@ -98,10 +92,7 @@ class EventsHandler:
         retryAction=None,
     ):
         if event_id not in self._listeners:
-            self._listeners[event_id] = {}
-        if priority not in self._listeners[event_id]:
-            self._listeners[event_id][priority] = []
-
+            self._listeners[event_id] =  PriorityQueueWithRemove()
         def onListenerTimeout(listener: Listener):
             if retryNbr:
                 listener.nbrTimeouts += 1
@@ -112,13 +103,11 @@ class EventsHandler:
                 retryAction()
             elif retryNbr:
                 raise Exception("Retry nbr provided but no action to retry!")
-
         listener = Listener(self, event_id, callback, timeout, onListenerTimeout, once, priority, originator)
         if event_id not in self._listeners:
+            Logger().debug(f"Something weird happened, event_id disappeared while installing a listener")
             return
-        self._listeners[event_id][priority].append(listener)
-        if event_id in self._sorted:
-            del self._sorted[event_id]
+        self._listeners[event_id].put(listener)
         return listener
 
     def onMultiple(self, listeners, originator=None):
@@ -139,105 +128,94 @@ class EventsHandler:
         return self.on(
             event_id,
             callback,
-            priority,
-            timeout,
-            ontimeout,
+            priority=priority,
+            timeout=timeout,
+            ontimeout=ontimeout,
             once=True,
             originator=originator,
             retryNbr=retryNbr,
             retryAction=retryAction,
         )
 
-    def sortListeners(self, event_id):
-        self._sorted[event_id] = []
-        if event_id in self._listeners:
-            self._sorted[event_id] = [
-                listener
-                for listeners in sorted(self._listeners[event_id].items(), key=operator.itemgetter(0))
-                for listener in listeners[1]
-            ]
-
-    def getSortedListeners(self, event_id=None) -> list[Listener]:
+    def getListeners(self, event_id=None) -> List[Listener]:
         if event_id is not None:
-            if event_id not in self._sorted:
-                self.sortListeners(event_id)
-            return self._sorted[event_id]
+            return self._getListenersForEvent(event_id)
+        else:
+            all_listeners = []
+            for event_id in self._listeners:
+                all_listeners.extend(self._getListenersForEvent(event_id))
+            return all_listeners
 
-        for event_id in self._listeners:
-            if not event_id in self._sorted:
-                self.sortListeners(event_id)
-        return list(self.iterListeners())
-
+    def _getListenersForEvent(self, event_id):
+        if event_id in self._listeners:
+            temp_queue = PriorityQueueWithRemove()
+            listeners = []
+            while not self._listeners[event_id].empty():
+                listener = self._listeners[event_id].get()
+                listeners.append(listener)
+                temp_queue.put(listener)
+            self._listeners[event_id] = temp_queue
+            return listeners
+        else:
+            return []
+        
     def send(self, event_id, *args, **kwargs):
+        if event_id not in self._listeners:
+            return event
         event = Event()
         event.sender = self
         event.name = event_id
-        if not self._listeners.get(event_id):
-            return event
-        event_listeners = self.getSortedListeners(event_id)
-        to_remove = list[Listener]()
-        for listener in event_listeners:
+        temp_queue = PriorityQueueWithRemove()
+        while not self._listeners[event_id].empty():
+            listener = self._listeners[event_id].get()
             event = Event()
             event.sender = self
             event.name = event_id
             event.listener = listener
             listener.call(event, *args, **kwargs)
             if listener.once:
-                to_remove.append(listener)
+                listener.delete()
+            else:
+                temp_queue.put(listener)
             if event.propagation_stopped:
                 break
-            if to_remove:
-                with lock:
-                    if event_id in self._sorted:
-                        del self._sorted[event_id]
-                    for listener in to_remove:
-                        listener.delete()
+        self._listeners[event_id] = temp_queue
 
     def reset(self):
         self.stopAllwaiting()
-        for listener in self.iterListeners():
-            listener.delete()
+        for queue in self._listeners.values():
+            while not queue.empty():
+                queue.get().delete()
         self._listeners.clear()
-        self._sorted.clear()
         Logger().debug("Events manager reseted")
 
-    def iterListeners(self):
-        for listenersByPrio in self._listeners.values():
-            for listeners in listenersByPrio.values():
-                for listener in listeners:
-                    yield listener
-    
     def stopAllwaiting(self):
-        for evt in self.__waiting_evts:
+        for evt in self.waitingEvts:
             evt.set()
-        self.__waiting_evts.clear()
-
-    def removeListeners(self, event_id, callbacks) -> list:
-        if event_id not in self._listeners:
-            return Logger().warning(f"Event {event_id} not found")
-        for priority, listeners in self._listeners[event_id].items():
-            listeners = list(filter(lambda l: l.callback not in callbacks, listeners))
-        if event_id in self._sorted:
-            del self._sorted[event_id]
-
+        self.waitingEvts.clear()
+        
     def removeListener(self, event_id, callback):
         if event_id not in self._listeners:
             return Logger().warning(f"Event {event_id} not found")
-        for priority, listeners in self._listeners[event_id].items():
-            listeners = list(filter(lambda l: l.callback != callback, listeners))
-        if event_id in self._sorted:
-            del self._sorted[event_id]
+        new_queue = PriorityQueueWithRemove()
+        queue = self._listeners[event_id]
+        while not queue.empty():
+            listener = queue.get()
+            if listener.callback != callback:
+                new_queue.put(listener)
+        self._listeners[event_id] = new_queue
 
     def getListenersByOrigin(self, origin):
-        result = list[Listener]()
-        for listenersByPrio in self._listeners.values():
-            for listeners in listenersByPrio.values():
-                for listener in listeners:
-                    if listener.origin and listener.origin == origin:
-                        result.append(listener)
-        return result
+        return [l for l in self.getListeners() if l.origin == origin]
 
     def clearAllByOrigin(self, origin):
-        toBeDeleted = self.getListenersByOrigin(origin)
-        for listener in toBeDeleted:
-            listener.delete()
+        for event_id, queue in self._listeners.items():
+            new_queue = PriorityQueueWithRemove()
+            while not queue.empty():
+                listener = queue.get()
+                if listener.origin != origin:
+                    new_queue.put(listener)
+                else:
+                    listener.delete()
+            self._listeners[event_id] = new_queue
+

@@ -1,9 +1,13 @@
 import re
 from pydofus2.com.ankamagames.jerakine import JerakineConstants
+from pydofus2.com.ankamagames.jerakine.logger.Logger import Logger
 from pydofus2.com.ankamagames.jerakine.managers.StoreDataManager import StoreDataManager
 from pydofus2.com.ankamagames.jerakine.metaclasses.ThreadSharedSingleton import (
     ThreadSharedSingleton,
 )
+from pydofus2.com.ankamagames.jerakine.resources.events.ResourceEvent import ResourceEvent
+from pydofus2.com.ankamagames.jerakine.resources.loaders.ResourceLoaderFactory import ResourceLoaderFactory
+from pydofus2.com.ankamagames.jerakine.resources.loaders.ResourceLoaderType import ResourceLoaderType
 
 
 class LangManager(metaclass=ThreadSharedSingleton):
@@ -27,6 +31,9 @@ class LangManager(metaclass=ThreadSharedSingleton):
         self._aVersion = StoreDataManager().getSetData(
             JerakineConstants.DATASTORE_LANG_VERSIONS, self.KEY_LANG_VERSION, list()
         )
+        self._loader = ResourceLoaderFactory.getLoader(ResourceLoaderType.SERIAL_LOADER)
+        self._loader.on(ResourceEvent.LOADED, self.onFileLoader)
+        self._loader.on(ResourceEvent.ERROR, self.onFileError)
 
     def replaceKey(self, sTxt: str, bReplaceDynamicReference=False):
         from pydofus2.com.ankamagames.jerakine.data.I18n import I18n
@@ -57,9 +64,9 @@ class LangManager(metaclass=ThreadSharedSingleton):
                         sNewVal = "[" + sKey + "]"
                         aFind = self.getCategory(sKey)
                         if len(aFind) > 0:
-                            print("Incorrect reference to the key [" + sKey + "] in : " + sTxt + " (could be " + " or ".join(aFind) + ")")
+                            Logger().error(f"Incorrect reference to the key [{sKey}] in : {sTxt} (could be {' or '.join(aFind)})")
                         else:
-                            print("Unknown reference to the key [" + sKey + "] in : " + sTxt)
+                            Logger().error(f"Unknown reference to the key [{sKey}] in : {sTxt}")
                 sTxt = sTxt.replace(key, sNewVal)
         return sTxt
     
@@ -67,7 +74,7 @@ class LangManager(metaclass=ThreadSharedSingleton):
         langData = StoreDataManager().getData(JerakineConstants.DATASTORE_LANG, self.KEY_LANG_INDEX)
         sEntry = langData.get(sKey, None)
         if sEntry is None:
-            print("[Warning] LangManager : " + sKey + " is unknown")
+            Logger().warning(f"[Warning] LangManager : {sKey} is unknown")
             sEntry = "!" + sKey
         if sEntry is not None and isinstance(sEntry, str) and "[" in sEntry:
             sEntry = self.replaceKey(sEntry, True)
@@ -101,3 +108,17 @@ class LangManager(metaclass=ThreadSharedSingleton):
                 self._aLang[sKey] = sValue.split(",")
             else:
                 self._aLang[sKey] = globals()[sType](sValue)
+
+    def findCategory(self, s_key: str) -> list:
+        s_k = s_key.split(".")[0]
+        a_cat = []
+        
+        for s in self._aCategory:
+            if f"{s}.{s_k}" in self._aLang:
+                a_cat.append(f"{s}.{s_k}")
+
+        for s in self._aCategory:
+            if f"{s}.{s_key}" in self._aLang:
+                a_cat.append(f"{s}.{s_key}")
+
+        return a_cat

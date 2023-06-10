@@ -40,6 +40,7 @@ class PriorityQueueWithRemove(PriorityQueue):
 
 
 class Event(object):
+    COMPLETE = "event_complete"
     propagation_stopped = False
     sender: "EventsHandler"
     name: Any

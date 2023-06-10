@@ -50,7 +50,13 @@ class Uri:
         return f"{self._protocol}://{self._path}" + (
             f"|{self._subPath}" if self._subPath else ""
         )
-
+        
+    def __str__(self) -> str:
+        return self.toString()
+    
+    def __repr__(self) -> str:
+        return self.toString()
+    
     def toSum(self):
         return hashlib.md5(self.toString().encode()).hexdigest()
 

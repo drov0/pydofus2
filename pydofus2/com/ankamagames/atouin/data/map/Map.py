@@ -24,6 +24,7 @@ class Map:
         self.oldMvtSystem = False
         self.isUsingNewMovementSystem = False
         self._parser = False
+        self._gfxList = None
         self.fromRaw(raw)
 
     def fromRaw(self, raw: BinaryStream):

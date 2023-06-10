@@ -1,3 +1,4 @@
+import tempfile
 import zlib
 from io import BytesIO
 from typing import Optional, Union
@@ -20,16 +21,17 @@ class ElementsAdapter(AbstractUrlLoaderAdapter, IAdapter):
     def getResource(self, dataFormat: str, data: Union[bytes, bytearray]) -> Optional[Elements]:
         if not isinstance(data, (bytes, bytearray)):
             raise TypeError("Expected bytes or bytearray")
-        ba = BinaryStream(BytesIO(data), True)
+        try:
+            ele_uncompressed = tempfile.TemporaryFile()
+            ele_uncompressed.write(zlib.decompress(data))
+            ele_uncompressed.seek(0)
+            ba = BinaryStream(ele_uncompressed, True)
+        except IOError as ioe:
+            self.dispatchFailure("Wrong header and non-compressed file.", ResourceErrorCode.MALFORMED_ELE_FILE)
+            return None        
         header = ba.readByte()
         if header != 69:
             ba.position = 0
-            try:
-                ba = zlib.decompress(data)
-                ba = BinaryStream(BytesIO(data), True)
-            except IOError as ioe:
-                self.dispatchFailure("Wrong header and non-compressed file.", ResourceErrorCode.MALFORMED_ELE_FILE)
-                return None
             header = ba.readByte()
             if header != 69:
                 self.dispatchFailure("Wrong header file.", ResourceErrorCode.MALFORMED_ELE_FILE)

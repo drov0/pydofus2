@@ -73,7 +73,7 @@ class FileProtocol(AbstractFileProtocol):
         waiting = self.loadingFile.get(url, [])
         self.loadingFile.pop(url, None)
 
-        Logger().warn("onFailed " + uri)
+        Logger().warn("onFailed " + str(uri))
 
         if self.singleFileObserver:
             self.singleFileObserver.onFailed(uri, errorMsg, errorCode)

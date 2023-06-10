@@ -1,6 +1,8 @@
 import abc
+from typing import Any
 
 import requests
+from pydofus2.com.ankamagames.jerakine.pools.PoolsManager import PoolsManager
 
 from pydofus2.com.ankamagames.jerakine.resources.IResourceObserver import IResourceObserver
 from pydofus2.com.ankamagames.jerakine.types.Uri import Uri
@@ -44,12 +46,28 @@ class AbstractUrlLoaderAdapter(metaclass=abc.ABCMeta):
         self._observer.onLoaded(self._uri, self.getResourceType(), resource)
         self.free()
 
-    def getResource(self, dataFormat:str, data):
-        pass
+    def dispatchSuccess(self, dataFormat: str, data: Any) -> None:
+        res = self.getResource(dataFormat, data)
+        self.releaseLoader()
+        self._observer.onLoaded(self._uri, self.getResourceType(), res)
 
+    def dispatchFailure(self, errorMsg: str, errorCode: int) -> None:
+        self.releaseLoader()
+        self._observer.onFailed(self._uri, errorMsg, errorCode)
+
+    def getDataFormat(self) -> str:
+        return "text/plain"
+
+    def getUri(self) -> Uri:
+        return self._uri
+    
+    @abc.abstractmethod
+    def getResource(self):
+        pass
+    
+    @abc.abstractmethod
     def getResourceType(self):
         pass
     
-    def dispatchFailure(self, err, code):
+    def releaseLoader(self) -> None:
         pass
-        

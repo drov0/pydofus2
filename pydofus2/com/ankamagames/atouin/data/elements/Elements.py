@@ -1,5 +1,6 @@
 
 
+from pydofus2.com.ankamagames.atouin.data.elements.GraphicalElementData import GraphicalElementData
 from pydofus2.com.ankamagames.atouin.data.elements.GraphicalElementFactory import \
     GraphicalElementFactory
 from pydofus2.com.ankamagames.jerakine.data.BinaryStream import BinaryStream
@@ -71,7 +72,7 @@ class Elements(metaclass=Singleton):
             self._failed = True
             raise e
 
-    def readElement(self, edId):
+    def readElement(self, edId) -> GraphicalElementData:
         self._rawData.position = self._elementsIndex[edId]
         edType = self._rawData.readByte()
         ed = GraphicalElementFactory.getGraphicalElementData(edId, edType)

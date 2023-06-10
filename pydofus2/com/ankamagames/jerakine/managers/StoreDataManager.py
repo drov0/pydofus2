@@ -29,14 +29,15 @@ class StoreDataManager(metaclass=ThreadSharedSingleton):
         self._aRegisteredClassAlias = dict()
         self._self = None
         aClass = self.getData(JerakineConstants.DATASTORE_CLASS_ALIAS, "classAliasList")
-        Logger().debug("Class alias list : " + str(aClass))
+        # Logger().debug("Class alias list : " + str(aClass))
         for s in aClass:
             className = base64.b64decode(s).decode()
             try:
                 oClass = getattr(sys.modules[__package__], className)
                 globals().update({aClass[s]: oClass})
             except Exception as e:
-                Logger().warn("Impossible de trouver la classe " + className)
+                # Logger().warn("Impossible de trouver la class " + className)
+                pass
             self._aRegisteredClassAlias[className] = True
 
     def getSharedObject(self, sName: str) -> "CustomSharedObject":

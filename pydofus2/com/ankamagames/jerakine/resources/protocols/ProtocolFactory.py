@@ -13,7 +13,6 @@ class ProtocolFactory:
 
     @staticmethod
     def getProtocol(uri: Uri) -> IProtocol:
-        print(uri._uri)
         customProtocol = ProtocolFactory._customProtocols.get(uri.protocol)
         if customProtocol:
             cp = customProtocol()

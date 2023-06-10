@@ -3,14 +3,13 @@ from pathlib import Path
 from urllib.parse import urlparse, unquote
 import hashlib
 from pydofus2.com.ankamagames.dofus import Constants
-from pydofus2.com.ankamagames.jerakine.managers.LangManager import LangManager
 import platform
 
 
 class Uri:
     subPathDelimiter = "|"
 
-    def __init__(self, uri=None):
+    def __init__(self, uri=None, tag=None):
         self._protocol = None
         self._path: str = None
         self._subPath: str = None
@@ -20,7 +19,7 @@ class Uri:
         self._uriChanged = True
         self._fileNameChanged = True
         self._fileTypeChanged = True
-        self.tag = None
+        self.tag = tag
         self.parseUri(uri)
 
     def parseUri(self, uri: str):
@@ -130,6 +129,8 @@ class Uri:
         if tmp.is_absolute():
             return tmp
         if self._protocol == "mod":
+            from pydofus2.com.ankamagames.jerakine.managers.LangManager import LangManager
+
             uiRoot = Path(LangManager().getEntry("config.mod.path"))
             if not uiRoot.is_absolute():
                 return Constants.DOFUS_ROOTDIR / uiRoot / tmp

@@ -31,9 +31,7 @@ class LangManager(metaclass=ThreadSharedSingleton):
         self._aVersion = StoreDataManager().getSetData(
             JerakineConstants.DATASTORE_LANG_VERSIONS, self.KEY_LANG_VERSION, list()
         )
-        self._loader = ResourceLoaderFactory.getLoader(ResourceLoaderType.SERIAL_LOADER)
-        self._loader.on(ResourceEvent.LOADED, self.onFileLoader)
-        self._loader.on(ResourceEvent.ERROR, self.onFileError)
+
 
     def replaceKey(self, sTxt: str, bReplaceDynamicReference=False):
         from pydofus2.com.ankamagames.jerakine.data.I18n import I18n

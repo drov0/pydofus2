@@ -30,10 +30,10 @@ class ElementsAdapter(AbstractUrlLoaderAdapter, IAdapter):
             self.dispatchFailure("Wrong header and non-compressed file.", ResourceErrorCode.MALFORMED_ELE_FILE)
             return None        
         header = ba.readByte()
-        if header != 69:
+        if header != ord('E'):
             ba.position = 0
             header = ba.readByte()
-            if header != 69:
+            if header != ord('E'):
                 self.dispatchFailure("Wrong header file.", ResourceErrorCode.MALFORMED_ELE_FILE)
                 return None
         ba.position = 0

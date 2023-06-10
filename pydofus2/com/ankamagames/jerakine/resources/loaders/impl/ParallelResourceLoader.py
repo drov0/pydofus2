@@ -16,7 +16,7 @@ class ParallelResourceLoader(AbstractResourceLoader, IResourceLoader, IResourceO
         self._uris = []
         self._currentlyLoading = 0
         self._loadDictionary = {}
-        self._loadLock = threading.Lock()
+        self._loadLock = threading.RLock()
 
     def load(self, uris: Union[Uri, List[Uri]], cache: ICache = None, forcedAdapter: Any = None, singleFile: bool = False) -> None:
         newUris = [uris] if isinstance(uris, Uri) else uris
@@ -63,7 +63,7 @@ class ParallelResourceLoader(AbstractResourceLoader, IResourceLoader, IResourceO
                 if not self.checkCache(loadData["uri"]):
                     p = ProtocolFactory.getProtocol(loadData["uri"])
                     self._loadDictionary[loadData["uri"]] = p
-                    thread = threading.Thread(target=self.loadUriWorker, args=(p, loadData))
+                    thread = threading.Thread(name=threading.current_thread().name,target=self.loadUriWorker, args=(p, loadData))
                     thread.start()
                 else:
                     self.decrementLoads()
@@ -81,6 +81,7 @@ class ParallelResourceLoader(AbstractResourceLoader, IResourceLoader, IResourceO
                 self.loadNextUris()
 
     def onLoaded(self, uri: Uri, resourceType: int, resource: Any) -> None:
+        print(f"Resource : {uri.toFile()} loaded")
         super().onLoaded(uri, resourceType, resource)
         with self._loadLock:
             del self._loadDictionary[uri]

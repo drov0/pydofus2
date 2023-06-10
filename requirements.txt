@@ -1,4 +1,7 @@
 pycryptodomex
-whistle
 Py3AMF
 lupa
+pillow
+
+
+

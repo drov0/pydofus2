@@ -43,14 +43,14 @@ class PakProtocol2(AbstractProtocol):
             if observer:
                 observer.onFailed(uri, "UnableVisible to find the file in the container.", 'FILE_NOT_FOUND_IN_PAK')
             return
-        fileStream: BufferedReader = index['stream']
-        data = bytearray(index['l'])
+        fileStream: BinaryStream = index['stream']
         fileStream.seek(index['o'])
-        fileStream.readinto(data)
+        data = fileStream.readBytes(index['l'])
         self.getAdapter(uri, forcedAdapter)
         try:
             self._adapter.loadFromData(uri, data, observer, dispatchProgress)
         except Exception as e:
+            print(e)
             observer.onFailed(uri, "Can't load byte array from this adapter.", 'INCOMPATIBLE_ADAPTER')
             return
 
@@ -76,43 +76,38 @@ class PakProtocol2(AbstractProtocol):
         properties = defaultdict(dict)
         self._indexes[uri.path] = indexes
         self._properties[uri.path] = properties
-
-        # Read and parse the file
         while file and file.exists():
-            with open(file, 'rb') as fs:
-                fs = BinaryStream(fs)
-                vMax = fs.readUnsignedByte()
-                vMin = fs.readUnsignedByte()
-                if vMax != 2 or vMin != 1:
-                    return None
-                fs.seek(-24, os.SEEK_END)
-                dataOffset = fs.readUnsignedInt()
-                dataCount = fs.readUnsignedInt()
-                indexOffset = fs.readUnsignedInt()
-                indexCount = fs.readUnsignedInt()
-                propertiesOffset = fs.readUnsignedInt()
-                propertiesCount = fs.readUnsignedInt()
-                fs.seek(propertiesOffset)
-                file = None
-                for _ in range(propertiesCount):
-                    propertyName = fs.readUTF()
-                    propertyValue = fs.readUTF()
-                    properties[propertyName] = propertyValue
-                    if propertyName == "link":
-                        idx = fileUri.path.rfind("/")
-                        if idx != -1:
-                            fileUri = Uri(fileUri.path[:idx] + "/" + propertyValue)
-                        else:
-                            fileUri = Uri(propertyValue)
-                        file = Path(fileUri.toFile())
-                fs.seek(indexOffset)
-                for _ in range(indexCount):
-                    filePath = fs.readUTF()
-                    fileOffset = fs.readUnsignedInt()
-                    fileLength = fs.readUnsignedInt()
-                    indexes[filePath] = {
-                        "o": fileOffset + dataOffset,
-                        "l": fileLength,
-                        "stream": fs
-                    }
+            fs = BinaryStream(file.open('rb'), True)
+            vMax = fs.readUnsignedByte()
+            vMin = fs.readUnsignedByte()
+            if vMax != 2 or vMin != 1:
+                return None
+            fs.seek(-24, os.SEEK_END)
+            dataOffset = fs.readUnsignedInt()
+            dataCount = fs.readUnsignedInt()
+            indexOffset = fs.readUnsignedInt()
+            indexCount = fs.readUnsignedInt()
+            propertiesOffset = fs.readUnsignedInt()
+            propertiesCount = fs.readUnsignedInt()
+            fs.position = propertiesOffset
+            file = None
+            for _ in range(propertiesCount):
+                propertyName = fs.readUTF()
+                propertyValue = fs.readUTF()
+                properties[propertyName] = propertyValue
+                if propertyName == "link":
+                    file = fileUri.toFile().parent / propertyValue
+            fs.seek(indexOffset)
+            for _ in range(indexCount):
+                filePath = fs.readUTF()
+                fileOffset = fs.readUnsignedInt()
+                fileLength = fs.readUnsignedInt()
+                indexes[filePath] = {
+                    "o": fileOffset + dataOffset,
+                    "l": fileLength,
+                    "stream": fs
+                }
         return fs
+
+    def release(self):
+        pass

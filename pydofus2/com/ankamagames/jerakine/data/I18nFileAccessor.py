@@ -20,7 +20,8 @@ class I18nFileAccessor(metaclass=ThreadSharedSingleton):
             return
         if I18nFileAccessor._initializing.is_set():
             Logger().info("I18n file is already loading.")
-            I18nFileAccessor._initialized.wait()
+            if not I18nFileAccessor._initialized.wait(10):
+                raise RuntimeError("Wait for holder to initialise timedout")
             return
         self.initI18n()
 

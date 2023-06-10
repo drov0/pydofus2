@@ -20,6 +20,7 @@ class Uri:
         self._uriChanged = True
         self._fileNameChanged = True
         self._fileTypeChanged = True
+        self.tag = None
         self.parseUri(uri)
 
     def parseUri(self, uri: str):
@@ -104,9 +105,10 @@ class Uri:
         ):
             return
         if value is None or value == "":
-            self._subpath = None
+            self._subPath = None
         else:
-            self._subpath = value[1:] if value[0] == "/" else value
+            value = Path(value).as_posix()
+            self._subPath = value[1:] if value[0] == "/" else value
         self._sum = ""
         self._uriChanged = True
         self._fileNameChanged = True

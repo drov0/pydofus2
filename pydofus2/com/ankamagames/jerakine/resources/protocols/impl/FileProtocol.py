@@ -1,4 +1,3 @@
-import logging
 from pathlib import Path
 import platform
 from typing import Any, Dict, List, Optional
@@ -8,9 +7,6 @@ from pydofus2.com.ankamagames.jerakine.newCache.ICache import ICache
 from pydofus2.com.ankamagames.jerakine.resources.IResourceObserver import IResourceObserver
 from pydofus2.com.ankamagames.jerakine.resources.protocols.AbstractFileProtocol import AbstractFileProtocol
 from pydofus2.com.ankamagames.jerakine.types.Uri import Uri
-from enum import Enum
-import os
-
 
 class FileProtocol(AbstractFileProtocol):
     localDirectory: Optional[str] = None

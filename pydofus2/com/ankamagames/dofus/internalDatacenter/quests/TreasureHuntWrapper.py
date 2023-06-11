@@ -51,7 +51,7 @@ class TreasureHuntWrapper(IDataCenter):
         item.checkPointTotal = checkPointTotal
         item.totalStepCount = totalStepCount
         item.availableRetryCount = availableRetryCount
-        startStep = cls.create(TreasureHuntStepTypeEnum.START, 0, 0, startMapId, 0)
+        startStep = TreasureHuntStepWrapper.create(TreasureHuntStepTypeEnum.START, 0, 0, startMapId, 0)
         item.stepList.append(startStep)
         for i, step in enumerate(stepList):
             mapId = 0

@@ -202,7 +202,7 @@ class MessageReceiver(RawDataParser, metaclass=Singleton):
                 staticHeader = buffer.readUnsignedShort()
                 self.msgId = staticHeader >> NetworkMessage.PACKET_ID_RIGHT_SHIFT
                 if from_dataContainer:
-                    Logger().debug(f"Found mdg with id {self.msgId} inside data container")
+                    Logger().debug(f"Found msg with id {self.msgId} inside data container")
                 self.msgLenLen = staticHeader & NetworkMessage.BIT_MASK
             if from_client and self.msgCount is None:
                 if buffer.remaining() < 4:

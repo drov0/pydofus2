@@ -23,6 +23,9 @@ class EventsHandler:
         self.__waiting_evts = list[threading.Event]()
         self._crashMessage = None
 
+    def hasListener(self, event_id):
+        return event_id in self._listeners
+    
     def wait(self, event, timeout: float = None, originator=None):
         received = threading.Event()
         ret = [None]

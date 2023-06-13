@@ -1,17 +1,13 @@
-import sys
-
-from pydofus2.com.ankamagames.dofus.datacenter.world.MapPosition import \
-    MapPosition
+from pydofus2.com.ankamagames.dofus.datacenter.world.MapPosition import MapPosition
 from pydofus2.com.ankamagames.jerakine.data.GameData import GameData
-from pydofus2.com.ankamagames.jerakine.interfaces.IDataCenter import \
-    IDataCenter
+from pydofus2.com.ankamagames.jerakine.interfaces.IDataCenter import IDataCenter
 
 
 class MapCoordinates(IDataCenter):
 
     MODULE: str = "MapCoordinates"
 
-    UNDEFINED_COORD: int = -sys.maxsize - 1
+    UNDEFINED_COORD: int = -2147483648
 
     compressedCoords: int
 
@@ -34,28 +30,34 @@ class MapCoordinates(IDataCenter):
     def getMapCoordinatesByCoords(cls, x, y):
         xCompressed = cls.getCompressedValue(x)
         yCompressed = cls.getCompressedValue(y)
-        return cls.getMapCoordinatesByCompressedCoords((xCompressed << 16) + yCompressed)
+        compressedCoords = (xCompressed << 16) | yCompressed
+        # convert the result to signed 32-bit int
+        compressedCoords = compressedCoords if compressedCoords < (1 << 31) else compressedCoords - (1 << 32)
+        return cls.getMapCoordinatesByCompressedCoords(compressedCoords)
 
     @classmethod
-    def getSignedValue(v):
-        isNegative = (v & 32768) > 0
-        trueValue = v & 32767
-        return -trueValue if isNegative else trueValue
+    def getSignedValue(cls, v):
+        if v & (1 << (16 - 1)):  # if sign bit is set
+            v -= 1 << 16  # compute negative value
+        return v
 
     @classmethod
     def getCompressedValue(cls, v):
-        return 32768 | (v & 32767) if v < 0 else v & 32767
+        return v if v >= 0 else (v + (1 << 16))  # Convert negative values to 2's complement
 
     @property
     def x(self) -> int:
         if self._x == self.UNDEFINED_COORD:
-            self._x = self.getSignedValue((self.compressedCoords & 4294901760) >> 16)
+            maskedCompressedCoords = (
+                (self.compressedCoords + 2**32) if self.compressedCoords < 0 else self.compressedCoords
+            )
+            self._x = MapCoordinates.getSignedValue((maskedCompressedCoords & 0xFFFF0000) >> 16)
         return self._x
 
     @property
     def y(self) -> int:
         if self._y == self.UNDEFINED_COORD:
-            self._y = self.getSignedValue(self.compressedCoords & 65535)
+            self._y = MapCoordinates.getSignedValue(self.compressedCoords & 0xFFFF)
         return self._y
 
     @property

@@ -57,6 +57,7 @@ class MapDisplayManager(metaclass=Singleton):
                                 "elementId": element.identifier,
                                 "typeId": element.elementId,
                                 "position": MapPoint.fromCellId(cell.cellId),
+                                "elementType": element.elementType
                             }
 
     def isIdentifiedElement(self, identifier: int) -> bool:

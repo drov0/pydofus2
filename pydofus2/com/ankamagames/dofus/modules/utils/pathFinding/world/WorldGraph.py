@@ -10,6 +10,7 @@ from pydofus2.com.ankamagames.jerakine.metaclasses.ThreadSharedSingleton import 
     ThreadSharedSingleton
 from pydofus2.com.ankamagames.jerakine.network.CustomDataWrapper import \
     ByteArray
+from pydofus2.com.ankamagames.jerakine.types.enums.DirectionsEnum import DirectionsEnum
 
 
 class WorldGraph(metaclass=ThreadSharedSingleton):
@@ -96,3 +97,16 @@ class WorldGraph(metaclass=ThreadSharedSingleton):
         self._edges.clear()
         self._outgoingEdges.clear()
         self._vertexUid: float = 0
+
+    def canChangeMap(self, mapId, direction):
+        if not self.getVertices(mapId):
+            return False
+        for vertex in self.getVertices(mapId).values():
+            for edge in WorldGraph().getOutgoingEdgesFromVertex(vertex):
+                for transition in edge.transitions:
+                    if (
+                        transition.direction
+                        and DirectionsEnum(transition.direction) == direction
+                    ):
+                        return True
+        return False

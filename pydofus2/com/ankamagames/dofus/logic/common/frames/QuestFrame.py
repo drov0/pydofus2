@@ -2,45 +2,38 @@ from types import FunctionType
 
 import pydofus2.com.ankamagames.dofus.datacenter.quest.Quest as qst
 from pydofus2.com.ankamagames.berilia.managers.KernelEvent import KernelEvent
-from pydofus2.com.ankamagames.berilia.managers.KernelEventsManager import (
-    KernelEventsManager,
-)
-from pydofus2.com.ankamagames.dofus.internalDatacenter.quests.TreasureHuntWrapper import (
-    TreasureHuntWrapper,
-)
-from pydofus2.com.ankamagames.dofus.network.messages.game.achievement.AchievementListMessage import (
-    AchievementListMessage,
-)
-from pydofus2.com.ankamagames.dofus.network.messages.game.context.roleplay.quest.QuestListMessage import (
-    QuestListMessage,
-)
-from pydofus2.com.ankamagames.dofus.network.messages.game.context.roleplay.quest.QuestStartedMessage import (
-    QuestStartedMessage,
-)
-from pydofus2.com.ankamagames.dofus.network.messages.game.context.roleplay.quest.QuestStepInfoMessage import (
-    QuestStepInfoMessage,
-)
-from pydofus2.com.ankamagames.dofus.network.messages.game.context.roleplay.quest.QuestValidatedMessage import (
-    QuestValidatedMessage,
-)
-from pydofus2.com.ankamagames.dofus.network.messages.game.context.roleplay.treasureHunt.TreasureHuntMessage import (
-    TreasureHuntMessage,
-)
-from pydofus2.com.ankamagames.dofus.network.types.game.achievement.AchievementAchieved import (
-    AchievementAchieved,
-)
-from pydofus2.com.ankamagames.dofus.network.types.game.achievement.AchievementAchievedRewardable import (
-    AchievementAchievedRewardable,
-)
-from pydofus2.com.ankamagames.dofus.network.types.game.context.roleplay.quest.QuestActiveDetailedInformations import (
-    QuestActiveDetailedInformations,
-)
-from pydofus2.com.ankamagames.dofus.network.types.game.context.roleplay.quest.QuestActiveInformations import (
-    QuestActiveInformations,
-)
-from pydofus2.com.ankamagames.dofus.network.types.game.context.roleplay.quest.QuestObjectiveInformationsWithCompletion import (
-    QuestObjectiveInformationsWithCompletion,
-)
+from pydofus2.com.ankamagames.berilia.managers.KernelEventsManager import \
+    KernelEventsManager
+from pydofus2.com.ankamagames.dofus.internalDatacenter.quests.TreasureHuntWrapper import \
+    TreasureHuntWrapper
+from pydofus2.com.ankamagames.dofus.network.enums.TreasureHuntRequestEnum import \
+    TreasureHuntRequestEnum
+from pydofus2.com.ankamagames.dofus.network.messages.game.achievement.AchievementListMessage import \
+    AchievementListMessage
+from pydofus2.com.ankamagames.dofus.network.messages.game.context.roleplay.quest.QuestListMessage import \
+    QuestListMessage
+from pydofus2.com.ankamagames.dofus.network.messages.game.context.roleplay.quest.QuestStartedMessage import \
+    QuestStartedMessage
+from pydofus2.com.ankamagames.dofus.network.messages.game.context.roleplay.quest.QuestStepInfoMessage import \
+    QuestStepInfoMessage
+from pydofus2.com.ankamagames.dofus.network.messages.game.context.roleplay.quest.QuestValidatedMessage import \
+    QuestValidatedMessage
+from pydofus2.com.ankamagames.dofus.network.messages.game.context.roleplay.treasureHunt.TreasureHuntMessage import \
+    TreasureHuntMessage
+from pydofus2.com.ankamagames.dofus.network.messages.game.context.roleplay.treasureHunt.TreasureHuntRequestAnswerMessage import \
+    TreasureHuntRequestAnswerMessage
+from pydofus2.com.ankamagames.dofus.network.types.game.achievement.AchievementAchieved import \
+    AchievementAchieved
+from pydofus2.com.ankamagames.dofus.network.types.game.achievement.AchievementAchievedRewardable import \
+    AchievementAchievedRewardable
+from pydofus2.com.ankamagames.dofus.network.types.game.context.roleplay.quest.QuestActiveDetailedInformations import \
+    QuestActiveDetailedInformations
+from pydofus2.com.ankamagames.dofus.network.types.game.context.roleplay.quest.QuestActiveInformations import \
+    QuestActiveInformations
+from pydofus2.com.ankamagames.dofus.network.types.game.context.roleplay.quest.QuestObjectiveInformationsWithCompletion import \
+    QuestObjectiveInformationsWithCompletion
+from pydofus2.com.ankamagames.jerakine.data.I18n import I18n
+from pydofus2.com.ankamagames.jerakine.logger.Logger import Logger
 from pydofus2.com.ankamagames.jerakine.messages.Frame import Frame
 from pydofus2.com.ankamagames.jerakine.messages.Message import Message
 from pydofus2.com.ankamagames.jerakine.types.enums.Priority import Priority
@@ -253,9 +246,7 @@ class QuestFrame(Frame):
                 }
                 self._questsInformations[stepsInfos.questId]["objectives"] = dict()
                 self._questsInformations[stepsInfos.questId]["objectivesData"] = list()
-                self._questsInformations[stepsInfos.questId][
-                    "objectivesDialogParams"
-                ] = list()
+                self._questsInformations[stepsInfos.questId]["objectivesDialogParams"] = list()
                 for objective in stepsInfos.objectives:
                     if objective.objectiveStatus:
                         if objective.objectiveId not in self._activeObjectives:
@@ -277,9 +268,10 @@ class QuestFrame(Frame):
                         else []
                     )
                     if isinstance(objective, QuestObjectiveInformationsWithCompletion):
-                        compl = {}
-                        compl["current"] = objective.curCompletion
-                        compl["max"] = objective.maxCompletion
+                        compl = {
+                            "current": objective.curCompletion,
+                            "max": objective.maxCompletion
+                        }
                         self._questsInformations[stepsInfos.questId]["objectivesData"][
                             objective.objectiveId
                         ] = compl
@@ -302,6 +294,24 @@ class QuestFrame(Frame):
                 msg.flags,
             )
             KernelEventsManager().send(KernelEvent.TreasureHuntUpdate, msg.questType)
+            return True
+        
+        if isinstance(msg, TreasureHuntRequestAnswerMessage):
+            thramsg = msg
+            treasureHuntRequestAnswerText = None
+            if thramsg.result == TreasureHuntRequestEnum.TREASURE_HUNT_ERROR_ALREADY_HAVE_QUEST:
+                treasureHuntRequestAnswerText = I18n.getUiText("ui.treasureHunt.alreadyHaveQuest")
+            elif thramsg.result == TreasureHuntRequestEnum.TREASURE_HUNT_ERROR_NO_QUEST_FOUND:
+                treasureHuntRequestAnswerText = I18n.getUiText("ui.treasureHunt.noQuestFound")
+            elif thramsg.result == TreasureHuntRequestEnum.TREASURE_HUNT_ERROR_UNDEFINED:
+                treasureHuntRequestAnswerText = I18n.getUiText("ui.popup.impossible_action")
+            elif thramsg.result == TreasureHuntRequestEnum.TREASURE_HUNT_ERROR_NOT_AVAILABLE:
+                treasureHuntRequestAnswerText = I18n.getUiText("ui.treasureHunt.huntNotAvailable")
+            elif thramsg.result == TreasureHuntRequestEnum.TREASURE_HUNT_ERROR_DAILY_LIMIT_EXCEEDED:
+                treasureHuntRequestAnswerText = I18n.getUiText("ui.treasureHunt.huntLimitExceeded")
+            if treasureHuntRequestAnswerText:
+                Logger().warning(treasureHuntRequestAnswerText)
+            KernelEventsManager().send(KernelEvent.TreasureHuntRequestAnswer, thramsg.result, treasureHuntRequestAnswerText)
             return True
 
     def pulled(self) -> bool:

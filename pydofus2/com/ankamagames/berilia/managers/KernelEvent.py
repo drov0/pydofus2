@@ -21,6 +21,8 @@ class KernelEvent(Enum):
     FramePulled = auto()
     ClientReconnect = auto()
     ClientClosed = auto()
+    TextInformation = auto()
+
     
     # Fight
     FightSwordShowed = auto()
@@ -101,7 +103,6 @@ class KernelEvent(Enum):
     ExchangeBankStartedWithMultiTabStorage = auto()
     ExchangeStarted = auto()
     ExchangeBankStarted = auto()
-    TextInformation = auto()
     ExchangeStartOkNpcShop = auto()
     RecycleResult = auto()
     GuildChestTabContribution = auto()
@@ -129,3 +130,4 @@ class KernelEvent(Enum):
     
     # quest
     TreasureHuntUpdate = auto()
+    TreasureHuntRequestAnswer = auto()

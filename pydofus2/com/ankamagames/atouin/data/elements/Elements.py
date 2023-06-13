@@ -1,6 +1,7 @@
 
 
-from pydofus2.com.ankamagames.atouin.data.elements.GraphicalElementData import GraphicalElementData
+from pydofus2.com.ankamagames.atouin.data.elements.GraphicalElementData import \
+    GraphicalElementData
 from pydofus2.com.ankamagames.atouin.data.elements.GraphicalElementFactory import \
     GraphicalElementFactory
 from pydofus2.com.ankamagames.jerakine.data.BinaryStream import BinaryStream
@@ -48,13 +49,13 @@ class Elements(metaclass=Singleton):
             Logger().debug(f"File version : {self.fileVersion}")
             self.elementsCount = raw.readUnsignedInt()
             Logger().debug(f"Elements count : {self.elementsCount}")
-            self._elementsMap = {}
-            self._elementsIndex = {}
+            self._elementsMap = dict()
+            self._elementsIndex = dict()
             skypLen = 0
             for _ in range(self.elementsCount):
                 if self.fileVersion >= 9:
                     skypLen = raw.readUnsignedShort()
-                edId = raw.readInt()
+                edId = int(raw.readInt())
                 if self.fileVersion <= 8:
                     self._elementsIndex[edId] = raw.position
                     self.readElement(edId)
@@ -63,7 +64,7 @@ class Elements(metaclass=Singleton):
                     raw.position = raw.position + skypLen - 4
             if self.fileVersion >= 8:
                 gfxCount = raw.readInt()
-                self._jpgMap = {}
+                self._jpgMap = dict()
                 for _ in range(gfxCount):
                     gfxId = raw.readInt()
                     self._jpgMap[gfxId] = True
@@ -73,6 +74,8 @@ class Elements(metaclass=Singleton):
             raise e
 
     def readElement(self, edId) -> GraphicalElementData:
+        if edId not in self._elementsIndex:
+            raise Exception(f"Element not found in elementsIndex")
         self._rawData.position = self._elementsIndex[edId]
         edType = self._rawData.readByte()
         ed = GraphicalElementFactory.getGraphicalElementData(edId, edType)

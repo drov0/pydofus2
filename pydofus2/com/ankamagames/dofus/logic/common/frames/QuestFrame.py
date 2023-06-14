@@ -6,6 +6,8 @@ from pydofus2.com.ankamagames.berilia.managers.KernelEventsManager import \
     KernelEventsManager
 from pydofus2.com.ankamagames.dofus.internalDatacenter.quests.TreasureHuntWrapper import \
     TreasureHuntWrapper
+from pydofus2.com.ankamagames.dofus.kernel.net.ConnectionsHandler import \
+    ConnectionsHandler
 from pydofus2.com.ankamagames.dofus.network.enums.TreasureHuntRequestEnum import \
     TreasureHuntRequestEnum
 from pydofus2.com.ankamagames.dofus.network.messages.game.achievement.AchievementListMessage import \
@@ -18,6 +20,10 @@ from pydofus2.com.ankamagames.dofus.network.messages.game.context.roleplay.quest
     QuestStepInfoMessage
 from pydofus2.com.ankamagames.dofus.network.messages.game.context.roleplay.quest.QuestValidatedMessage import \
     QuestValidatedMessage
+from pydofus2.com.ankamagames.dofus.network.messages.game.context.roleplay.treasureHunt.TreasureHuntDigRequestMessage import \
+    TreasureHuntDigRequestMessage
+from pydofus2.com.ankamagames.dofus.network.messages.game.context.roleplay.treasureHunt.TreasureHuntFlagRequestMessage import \
+    TreasureHuntFlagRequestMessage
 from pydofus2.com.ankamagames.dofus.network.messages.game.context.roleplay.treasureHunt.TreasureHuntMessage import \
     TreasureHuntMessage
 from pydofus2.com.ankamagames.dofus.network.messages.game.context.roleplay.treasureHunt.TreasureHuntRequestAnswerMessage import \
@@ -96,6 +102,16 @@ class QuestFrame(Frame):
         self._treasureHunts = dict()
         self._flagColors = list()
         super().__init__()
+
+    def treasureHuntFlagRequest(self, questType, index):
+        thfrmsg = TreasureHuntFlagRequestMessage();
+        thfrmsg.init(questType, index)
+        ConnectionsHandler().send(thfrmsg)
+    
+    def treasureHuntDigRequest(self, questType):
+        thdrmsg = TreasureHuntDigRequestMessage()
+        thdrmsg.init(questType)
+        ConnectionsHandler().send(thdrmsg)
 
     @property
     def achievmentsList(self) -> AchievementListMessage:

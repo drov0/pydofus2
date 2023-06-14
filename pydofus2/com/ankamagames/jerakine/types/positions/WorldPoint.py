@@ -1,4 +1,5 @@
-from pydofus2.com.ankamagames.jerakine.interfaces.IDataCenter import IDataCenter
+from pydofus2.com.ankamagames.jerakine.interfaces.IDataCenter import \
+    IDataCenter
 from pydofus2.com.ankamagames.jerakine.types.DataStoreType import JerakineError
 from pydofus2.flash.geom.Point import Point
 
@@ -80,7 +81,7 @@ class WorldPoint(IDataCenter):
             self._x = -(self._x & 255)
         if (self._y & 256) == 256:
             self._y = -(self._y & 255)
-
+            
     def setFromCoords(self) -> None:
         if self._x > self.MAP_COORDS_MAX or self._y > self.MAP_COORDS_MAX or self._worldId > self.WORLD_ID_MAX:
             raise JerakineError("Coordinates or world identifier out of range.")
@@ -91,4 +92,4 @@ class WorldPoint(IDataCenter):
         yValue: int = abs(self._y) & 255
         if self._y < 0:
             yValue |= 256
-        self._mapId = worldValue << 18 | (xValue << 9 | yValue)
+        self._mapId = (worldValue << 18) | (xValue << 9) | yValue

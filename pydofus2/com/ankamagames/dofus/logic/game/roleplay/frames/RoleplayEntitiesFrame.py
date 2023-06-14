@@ -199,7 +199,7 @@ class RoleplayEntitiesFrame(AbstractEntitiesFrame, Frame):
             return False
 
         elif isinstance(msg, MapComplementaryInformationsDataMessage):
-            Logger().info("[MapMove] Map data received")
+            Logger().info("Map data received")
             if self.mapDataRequestTimer:
                 self.mapDataRequestTimer.cancel()
             self.processingMapData.clear()

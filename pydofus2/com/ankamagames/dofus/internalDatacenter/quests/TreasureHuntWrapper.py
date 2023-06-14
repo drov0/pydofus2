@@ -1,27 +1,29 @@
 from typing import List, Type, Union
-from pydofus2.com.ankamagames.dofus.internalDatacenter.quests.TreasureHuntStepWrapper import TreasureHuntStepWrapper
-from pydofus2.com.ankamagames.dofus.network.types.game.context.roleplay.treasureHunt.TreasureHuntFlag import (
-    TreasureHuntFlag,
-)
-from pydofus2.com.ankamagames.dofus.network.types.game.context.roleplay.treasureHunt.TreasureHuntStep import (
-    TreasureHuntStep,
-)
-from pydofus2.com.ankamagames.dofus.network.types.game.context.roleplay.treasureHunt.TreasureHuntStepFight import (
-    TreasureHuntStepFight,
-)
-from pydofus2.com.ankamagames.dofus.network.types.game.context.roleplay.treasureHunt.TreasureHuntStepFollowDirection import (
-    TreasureHuntStepFollowDirection,
-)
-from pydofus2.com.ankamagames.dofus.network.types.game.context.roleplay.treasureHunt.TreasureHuntStepFollowDirectionToHint import (
-    TreasureHuntStepFollowDirectionToHint,
-)
-from pydofus2.com.ankamagames.dofus.network.types.game.context.roleplay.treasureHunt.TreasureHuntStepFollowDirectionToPOI import (
-    TreasureHuntStepFollowDirectionToPOI,
-)
-from pydofus2.com.ankamagames.dofus.types.enums.TreasureHuntStepTypeEnum import (
-    TreasureHuntStepTypeEnum,
-)
-from pydofus2.com.ankamagames.jerakine.interfaces.IDataCenter import IDataCenter
+
+from pydofus2.com.ankamagames.dofus.internalDatacenter.quests.TreasureHuntStepWrapper import \
+    TreasureHuntStepWrapper
+from pydofus2.com.ankamagames.dofus.network.enums.TreasureHuntFlagStateEnum import \
+    TreasureHuntFlagStateEnum
+from pydofus2.com.ankamagames.dofus.network.enums.TreasureHuntTypeEnum import \
+    TreasureHuntTypeEnum
+from pydofus2.com.ankamagames.dofus.network.types.game.context.roleplay.treasureHunt.TreasureHuntFlag import \
+    TreasureHuntFlag
+from pydofus2.com.ankamagames.dofus.network.types.game.context.roleplay.treasureHunt.TreasureHuntStep import \
+    TreasureHuntStep
+from pydofus2.com.ankamagames.dofus.network.types.game.context.roleplay.treasureHunt.TreasureHuntStepFight import \
+    TreasureHuntStepFight
+from pydofus2.com.ankamagames.dofus.network.types.game.context.roleplay.treasureHunt.TreasureHuntStepFollowDirection import \
+    TreasureHuntStepFollowDirection
+from pydofus2.com.ankamagames.dofus.network.types.game.context.roleplay.treasureHunt.TreasureHuntStepFollowDirectionToHint import \
+    TreasureHuntStepFollowDirectionToHint
+from pydofus2.com.ankamagames.dofus.network.types.game.context.roleplay.treasureHunt.TreasureHuntStepFollowDirectionToPOI import \
+    TreasureHuntStepFollowDirectionToPOI
+from pydofus2.com.ankamagames.dofus.types.enums.TreasureHuntStepTypeEnum import \
+    TreasureHuntStepTypeEnum
+from pydofus2.com.ankamagames.jerakine.interfaces.IDataCenter import \
+    IDataCenter
+from pydofus2.com.ankamagames.jerakine.types.enums.DirectionsEnum import \
+    DirectionsEnum
 
 
 class TreasureHuntWrapper(IDataCenter):
@@ -95,14 +97,8 @@ class TreasureHuntWrapper(IDataCenter):
                     )
                 )
         while len(item.stepList) <= totalStepCount:
-            item.stepList.append(
-                TreasureHuntStepWrapper.create(
-                    TreasureHuntStepTypeEnum.UNKNOWN, 63, 0, 0, 0
-                )
-            )
-        item.stepList.append(
-            TreasureHuntStepWrapper.create(TreasureHuntStepTypeEnum.FIGHT, 63, 0, 0, 0)
-        )
+            item.stepList.append(TreasureHuntStepWrapper.create(TreasureHuntStepTypeEnum.UNKNOWN, 63, 0, 0, 0))
+        item.stepList.append(TreasureHuntStepWrapper.create(TreasureHuntStepTypeEnum.FIGHT, 63, 0, 0, 0))
         return item
 
     def update(
@@ -121,9 +117,7 @@ class TreasureHuntWrapper(IDataCenter):
         self.totalStepCount = checkPointTotal
         self.availableRetryCount = availableRetryCount
         self.stepList = list[TreasureHuntStep]()
-        startStep = TreasureHuntStepWrapper.create(
-            TreasureHuntStepTypeEnum.START, 0, 0, startMapId, 0
-        )
+        startStep = TreasureHuntStepWrapper.create(TreasureHuntStepTypeEnum.START, 0, 0, startMapId, 0)
         self.stepList.append(startStep)
         for i, step in enumerate(stepList):
             mapId = 0
@@ -154,8 +148,27 @@ class TreasureHuntWrapper(IDataCenter):
                     )
                 )
             elif isinstance(step, TreasureHuntStepFight):
-                self.stepList.append(
-                    TreasureHuntStepWrapper.create(
-                        TreasureHuntStepTypeEnum.FIGHT, 63, 0, 0, 0
-                    )
-                )
+                self.stepList.append(TreasureHuntStepWrapper.create(TreasureHuntStepTypeEnum.FIGHT, 63, 0, 0, 0))
+
+    def __repr__(self) -> str:
+        from prettytable import PrettyTable
+        summaryTable = PrettyTable()
+        summaryTable.field_names = ["questType", "checkPointCurrent", "checkPointTotal", "totalStepCount", "availableRetryCount"]
+        summaryTable.add_row([TreasureHuntTypeEnum.to_string(self.questType), self.checkPointCurrent, self.checkPointTotal, self.totalStepCount, self.availableRetryCount])
+        stepsTable = PrettyTable()
+        stepsTable.field_names = ["Type", "Index", "Direction", "Map ID", "POI Label", "Flag State", "Count"]
+        for step in self.stepList:
+            stepsTable.add_row(
+                [
+                    TreasureHuntStepTypeEnum.to_string(step.type),
+                    step.index,
+                    DirectionsEnum(step.direction).name,
+                    step.mapId,
+                    step.poiLabel,
+                    TreasureHuntFlagStateEnum.to_string(step.flagState),
+                    step.count,
+                ]
+            )
+        return (
+            f"{summaryTable}\n{stepsTable}"
+        )

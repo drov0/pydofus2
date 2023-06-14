@@ -38,7 +38,7 @@ class KernelEvent(Enum):
     RoleplayStarted = auto()
     
     # Interactives
-    InteractiveElementBeingUsed = auto()
+    IElemBeingUsed = auto()
     InteractiveElementUsed = auto()
     InteractiveUseError = auto()
     
@@ -84,7 +84,7 @@ class KernelEvent(Enum):
     PartyJoinFailed = auto()
     PartyInviteCancel = auto()
     KamasUpdate = auto()
-    IinteractiveElemUpdate = auto()
+    InteractiveElemUpdate = auto()
     
     # exchange events
     ExchangeRequestFromMe = auto()

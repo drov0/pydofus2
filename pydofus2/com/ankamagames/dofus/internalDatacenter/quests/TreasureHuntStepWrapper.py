@@ -1,15 +1,22 @@
-from pydofus2.com.ankamagames.dofus.datacenter.quest.treasureHunt.PointOfInterest import PointOfInterest
-from pydofus2.com.ankamagames.dofus.internalDatacenter.world.WorldPointWrapper import WorldPointWrapper
-from pydofus2.com.ankamagames.jerakine.interfaces.IDataCenter import IDataCenter
-from pydofus2.com.ankamagames.dofus.types.enums.TreasureHuntStepTypeEnum import TreasureHuntStepTypeEnum
-from pydofus2.com.ankamagames.dofus.datacenter.world.MapPosition import MapPosition
-from pydofus2.com.ankamagames.dofus.datacenter.world.WorldMap import WorldMap
 from pydofus2.com.ankamagames.dofus.datacenter.npcs.Npc import Npc
-from pydofus2.com.ankamagames.dofus.datacenter.world.SubArea import SubArea
+from pydofus2.com.ankamagames.dofus.datacenter.quest.treasureHunt.PointOfInterest import \
+    PointOfInterest
 from pydofus2.com.ankamagames.dofus.datacenter.world.Area import Area
+from pydofus2.com.ankamagames.dofus.datacenter.world.MapPosition import \
+    MapPosition
+from pydofus2.com.ankamagames.dofus.datacenter.world.SubArea import SubArea
+from pydofus2.com.ankamagames.dofus.datacenter.world.WorldMap import WorldMap
+from pydofus2.com.ankamagames.dofus.internalDatacenter.world.WorldPointWrapper import \
+    WorldPointWrapper
+from pydofus2.com.ankamagames.dofus.types.enums.TreasureHuntStepTypeEnum import \
+    TreasureHuntStepTypeEnum
 from pydofus2.com.ankamagames.jerakine.data.I18n import I18n
-from pydofus2.com.ankamagames.jerakine.types.enums.DirectionsEnum import DirectionsEnum
-from pydofus2.com.ankamagames.jerakine.utils.pattern.PatternDecoder import PatternDecoder
+from pydofus2.com.ankamagames.jerakine.interfaces.IDataCenter import \
+    IDataCenter
+from pydofus2.com.ankamagames.jerakine.types.enums.DirectionsEnum import \
+    DirectionsEnum
+from pydofus2.com.ankamagames.jerakine.utils.pattern.PatternDecoder import \
+    PatternDecoder
 
 
 class TreasureHuntStepWrapper(IDataCenter):
@@ -85,3 +92,14 @@ class TreasureHuntStepWrapper(IDataCenter):
         self.poiLabel = poiLabel
         self.flagState = flagState
         self.count = count
+
+    def __repr__(self) -> str:
+        return (
+            f"TreasureHuntStepWrapper(type={self.type}, "
+            f"index={self.index}, "
+            f"direction={self.direction}, "
+            f"mapId={self.mapId}, "
+            f"poiLabel={self.poiLabel}, "
+            f"flagState={self.flagState}, "
+            f"count={self.count})"
+        )

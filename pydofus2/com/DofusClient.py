@@ -8,11 +8,12 @@ from typing import TYPE_CHECKING
 
 from pyd2bot.thriftServer.pyd2botService.ttypes import DofusError
 from pydofus2.com.ankamagames.atouin.Haapi import Haapi
-from pydofus2.com.ankamagames.atouin.resources.adapters.ElementsAdapter import ElementsAdapter
-from pydofus2.com.ankamagames.berilia.managers.Listener import Listener
+from pydofus2.com.ankamagames.atouin.resources.adapters.ElementsAdapter import \
+    ElementsAdapter
 from pydofus2.com.ankamagames.berilia.managers.KernelEvent import KernelEvent
 from pydofus2.com.ankamagames.berilia.managers.KernelEventsManager import \
     KernelEventsManager
+from pydofus2.com.ankamagames.berilia.managers.Listener import Listener
 from pydofus2.com.ankamagames.dofus.kernel.Kernel import Kernel
 from pydofus2.com.ankamagames.dofus.kernel.net.ConnectionsHandler import \
     ConnectionsHandler
@@ -39,7 +40,8 @@ from pydofus2.com.ankamagames.jerakine.data.XmlConfig import XmlConfig
 from pydofus2.com.ankamagames.jerakine.logger.Logger import Logger
 from pydofus2.com.ankamagames.jerakine.network.messages.TerminateWorkerMessage import \
     TerminateWorkerMessage
-from pydofus2.com.ankamagames.jerakine.resources.adapters.AdapterFactory import AdapterFactory
+from pydofus2.com.ankamagames.jerakine.resources.adapters.AdapterFactory import \
+    AdapterFactory
 
 if TYPE_CHECKING:
     from pydofus2.com.ankamagames.jerakine.network.ServerConnection import \
@@ -86,7 +88,7 @@ class DofusClient(threading.Thread):
         return Kernel().worker
 
     def init(self):
-        Logger().info("[DofusClient] initializing")
+        Logger().info("Initializing ...")
         Kernel().init()
         AdapterFactory.addAdapter("ele", ElementsAdapter)
         # AdapterFactory.addAdapter("dlm", MapsAdapter)
@@ -94,7 +96,7 @@ class DofusClient(threading.Thread):
         Kernel().mitm = self.mitm
         ModuleReader._clearObjectsCache = True
         self.initListeners()
-        Logger().info("[DofusClient] initialized")
+        Logger().info("Initialized")
 
     def registerInitFrame(self, frame):
         self._registredInitFrames.append(frame)
@@ -118,7 +120,7 @@ class DofusClient(threading.Thread):
         self.onShutdown(event, message, reason)
 
     def onShutdown(self, event, message, reason=None):
-        Logger().debug(f"[DofusClient] Shutdown requested for reason: {message}")
+        Logger().debug(f"Shutdown requested for reason: {message}")
         self.shutdown(reason, message)
 
     def onRestart(self, event, message):

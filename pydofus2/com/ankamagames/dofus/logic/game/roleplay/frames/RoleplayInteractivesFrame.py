@@ -73,6 +73,7 @@ class InteractiveElementData:
         self.element = element
         self.position = position
         self.skillUID = skillUID
+        self.skillId = None
 
 
 class RoleplayInteractivesFrame(Frame):
@@ -95,10 +96,8 @@ class RoleplayInteractivesFrame(Frame):
         self._usingInteractive: bool = False
         self._ie = dict[int, InteractiveElementData]()
         self._collectableResource = dict[int, CollectableElement]()
-        self._currentUsages = list()
         self._enityUsingElement = dict()
-        self._interactiveActionTimers = dict()
-        self._statedElementsTargetAnimation = dict()
+        self._statedElm = []
         self.currentRequestedElementId: int = -1
         self._currentUsedElementId: int = -1
         super().__init__()
@@ -149,13 +148,13 @@ class RoleplayInteractivesFrame(Frame):
                 )
             else:
                 self.removeInteractive(ieumsg.interactiveElement)
-            KernelEventsManager().send(KernelEvent.IinteractiveElemUpdate, ieumsg)
+            KernelEventsManager().send(KernelEvent.InteractiveElemUpdate, ieumsg)
             return True
 
         if isinstance(msg, InteractiveUsedMessage):
             if msg.duration > 0:
                 self._enityUsingElement[msg.elemId] = msg.entityId
-                KernelEventsManager().send(KernelEvent.InteractiveElementBeingUsed, msg.entityId, msg.elemId)
+                KernelEventsManager().send(KernelEvent.IElemBeingUsed, msg.entityId, msg.elemId)
                 if msg.entityId == PlayedCharacterManager().id:                
                     Logger().info(f"Player is using element {msg.elemId} ...")
                     self.usingInteractive = True
@@ -210,9 +209,8 @@ class RoleplayInteractivesFrame(Frame):
     def pulled(self) -> bool:
         self._enityUsingElement.clear()
         self._ie.clear()
-        self._currentUsages.clear()
-        self._interactiveActionTimers.clear()
         self._collectableResource.clear()
+        self._statedElm.clear()
         return True
 
     def clear(self) -> None:
@@ -225,10 +223,14 @@ class RoleplayInteractivesFrame(Frame):
 
     def getInteractiveElement(self, elementId: int, skillId=None) -> InteractiveElementData:
         ie = self._ie.get(elementId)
+        interactive = Interactive.getInteractiveById(ie.element.elementTypeId)
+        if interactive:
+            Logger().debug(f"Found interactive {interactive.name}")
         if skillId is not None and ie is not None:
             for skill in ie.element.enabledSkills:
                 if skill.skillId == skillId:
                     ie.skillUID = skill.skillInstanceUid
+                    ie.skillId = skill.skillId
         return ie
 
     def registerInteractive(self, ie: InteractiveElement, firstSkill: int) -> None:
@@ -264,7 +266,7 @@ class RoleplayInteractivesFrame(Frame):
                 if skill.elementActionId == self.ACTION_COLLECTABLE_RESOURCES:
                     return CollectableElement(ie.elementId, interactiveSkill, False)
         return None
-
+    
     def getReviveIe(self) -> InteractiveElementData:
         return self.getIeBySkillId(self.REVIVE_SKILL_ID)
     
@@ -295,6 +297,7 @@ class RoleplayInteractivesFrame(Frame):
                         return ie
 
     def updateStatedElement(self, se: StatedElement, globalv: bool = False) -> None:
+        self._statedElm.append(se.elementId)
         if se.elementId == self._currentUsedElementId:
             self._usingInteractive = True
         if se.elementId in self._ie and self._ie[se.elementId].element.onCurrentMap:

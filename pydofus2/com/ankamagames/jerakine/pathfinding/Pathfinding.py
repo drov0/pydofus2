@@ -3,6 +3,12 @@ import heapq
 import pydofus2.mapTools.MapTools as MapTools
 from pydofus2.com.ankamagames.atouin.utils.DataMapProvider import \
     DataMapProvider
+from pydofus2.com.ankamagames.dofus.logic.game.common.managers.PlayedCharacterManager import \
+    PlayedCharacterManager
+from pydofus2.com.ankamagames.dofus.modules.utils.pathFinding.world.TransitionTypeEnum import \
+    TransitionTypeEnum
+from pydofus2.com.ankamagames.dofus.modules.utils.pathFinding.world.WorldGraph import \
+    WorldGraph
 from pydofus2.com.ankamagames.jerakine.logger.Logger import Logger
 from pydofus2.com.ankamagames.jerakine.metaclasses.Singleton import Singleton
 from pydofus2.com.ankamagames.jerakine.types.positions.MapPoint import MapPoint
@@ -183,6 +189,15 @@ class Pathfinding(metaclass=Singleton):
         movPath.path.reverse()
         return movPath
 
+    def getCurrentMapActionCells(self):
+        res = {}
+        currVertex = PlayedCharacterManager().currVertex
+        for edge in WorldGraph().getOutgoingEdgesFromVertex(currVertex):
+            for tr in edge.transitions:
+                if TransitionTypeEnum(tr.type) == TransitionTypeEnum.MAP_ACTION:
+                    res[tr.cell] = tr.direction
+        return res
+                    
     def findPath(
         self,
         start: MapPoint,
@@ -190,7 +205,12 @@ class Pathfinding(metaclass=Singleton):
         allowDiag: bool = True,
         bAllowTroughEntity: bool = True,
         avoidObstacles: bool = True,
+        forMapChange=False,
+        mapChangeDirection=-1
     ) -> MovementPath:
+        self.mapActionCells = self.getCurrentMapActionCells()
+        self.forMapChange = forMapChange
+        self.mapChangeDirection = mapChangeDirection
         self.initAlgo(start, end, allowDiag, bAllowTroughEntity, avoidObstacles)
         open_list = []
         heapq.heappush(open_list, (0, start.cellId))
@@ -200,9 +220,14 @@ class Pathfinding(metaclass=Singleton):
                 continue
             self._isCellClosed.add(parentId)
             for x, y in self.iterChilds(parentId):
-                cellId = MapTools.getCellIdByCoord(x, y)
-                # if cellId != end.cellId and MapPoint.fromCellId(cellId).allowsMapChange():
-                #     continue
+                mp = MapPoint.fromCoords(x, y)
+                cellId = mp.cellId
+                # if cellId in self.mapActionCells:
+                #     if self.mapActionCells[cellId] == self.mapChangeDirection:
+                #         self._parentOfCell[cellId] = parentId
+                #         return self.buildPath()
+                #     else:
+                #         continue
                 moveCost = self.moveCost(x, y, parentId)
                 if self._allowTroughEntity:
                     distTmpToEnd = self.distFromEnd(cellId)

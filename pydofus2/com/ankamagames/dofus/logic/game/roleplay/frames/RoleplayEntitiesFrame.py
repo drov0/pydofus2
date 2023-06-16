@@ -84,6 +84,8 @@ from pydofus2.com.ankamagames.dofus.network.types.game.context.roleplay.GameRole
     GameRolePlayHumanoidInformations
 from pydofus2.com.ankamagames.dofus.network.types.game.context.roleplay.GameRolePlayMerchantInformations import \
     GameRolePlayMerchantInformations
+from pydofus2.com.ankamagames.dofus.network.types.game.context.roleplay.GameRolePlayTreasureHintInformations import \
+    GameRolePlayTreasureHintInformations
 from pydofus2.com.ankamagames.dofus.network.types.game.context.roleplay.HumanInformations import \
     HumanInformations
 from pydofus2.com.ankamagames.dofus.network.types.game.context.roleplay.HumanOptionObjectUse import \
@@ -123,6 +125,7 @@ class RoleplayEntitiesFrame(AbstractEntitiesFrame, Frame):
         self._monstersIds = list[float]()
         self.mcidm_processed: bool = False
         self.mapDataRequestTimer = None
+        self._hasTreasureHuntInfo = False
         self.nbrFails = 0
         self.processingMapData = threading.Event()
         super().__init__()
@@ -160,6 +163,7 @@ class RoleplayEntitiesFrame(AbstractEntitiesFrame, Frame):
         self._isIndoor = None
         self._worldPoint = None
         self._housesList = []
+        self._hasTreasureHuntInfo = False
 
     def requestMapData(self):
         self.mcidm_processed = False
@@ -252,6 +256,9 @@ class RoleplayEntitiesFrame(AbstractEntitiesFrame, Frame):
                     self._playersId.append(actor.contextualId)
                 elif isinstance(actor, GameRolePlayGroupMonsterInformations):
                     self._monstersIds.append(actor.contextualId)
+                elif isinstance(actor, GameRolePlayTreasureHintInformations):
+                    self._hasTreasureHuntInfo = True
+                    Kernel().questFrame.process(actor)
 
             self.mapWithNoMonsters = True
             for actor1 in msg.actors:

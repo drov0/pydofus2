@@ -1,6 +1,6 @@
 import math
-from pydofus2.com.ankamagames.atouin.AtouinConstants import AtouinConstants
 
+from pydofus2.com.ankamagames.atouin.AtouinConstants import AtouinConstants
 from pydofus2.com.ankamagames.atouin.managers.EntitiesManager import \
     EntitiesManager
 from pydofus2.com.ankamagames.jerakine.interfaces.IObstacle import IObstacle
@@ -238,8 +238,8 @@ class MapPoint:
     def inDiag(self, mp: "MapPoint") -> bool:
         return abs(self.x - mp.x) == abs(self.y - mp.y)
 
-    def pointMov(self, provider: IDataMapProvider, dest: "MapPoint", allowThoughEntity: bool) -> bool:
-        return provider.pointMov(dest.x, dest.y, allowThoughEntity, self.cellId)
+    def pointMov(self, provider: IDataMapProvider, dest: "MapPoint", allowThoughEntity: bool=True) -> bool:
+        return provider.pointMov(self.x, self.y, allowThoughEntity, dest.cellId)
 
     def getNearestFreeCellInDirection(
         self,
@@ -307,7 +307,8 @@ class MapPoint:
         return False
 
     def allowsMapChangeToDirection(self, direction: int):
-        from pydofus2.com.ankamagames.atouin.managers.MapDisplayManager import MapDisplayManager
+        from pydofus2.com.ankamagames.atouin.managers.MapDisplayManager import \
+            MapDisplayManager
 
         currentMap = MapDisplayManager().dataMap 
         direction = DirectionsEnum(direction)
@@ -331,8 +332,9 @@ class MapPoint:
                     yield x, y
 
     def isChild(self, x, y, allowDiag=True, allowTroughEntity=True):
+        from pydofus2.com.ankamagames.atouin.utils.DataMapProvider import \
+            DataMapProvider
         from pydofus2.mapTools import MapTools
-        from pydofus2.com.ankamagames.atouin.utils.DataMapProvider import DataMapProvider
         parentId = self.cellId
         cellId = MapTools.getCellIdByCoord(x, y)
         parentX = MapTools.getCellIdXCoord(parentId)
@@ -349,7 +351,33 @@ class MapPoint:
                 and (DataMapProvider().pointMov(parentX, y, allowTroughEntity, parentId) or DataMapProvider().pointMov(x, parentY, allowTroughEntity, parentId)))
             )
         )
-
+            
+    def getForbidenCellsInVicinity(self):
+        from pydofus2.com.ankamagames.atouin.managers.MapDisplayManager import \
+            MapDisplayManager
+        from pydofus2.com.ankamagames.atouin.utils.DataMapProvider import \
+            DataMapProvider
+        forbiddenCellsIds = []
+        for i in range(8):
+            mp = self.getNearestCellInDirection(i)
+            if mp:
+                cellData = MapDisplayManager().dataMap.cells[mp.cellId]
+                forbidden = (not cellData.mov) or cellData.farmCell
+                if not forbidden:
+                    numWalkableCells = 8
+                    for j in range(8):
+                        mp2 = mp.getNearestCellInDirection(j)
+                        if mp2 and (
+                            not mp2.pointMov(mp, True)
+                            or not mp2.getNearestCellInDirection(DirectionsEnum.UP_LEFT).pointMov(DataMapProvider(), mp, True)
+                            and not mp2.getNearestCellInDirection(DirectionsEnum.DOWN_LEFT).pointMov(DataMapProvider(), mp, True)
+                        ):
+                            numWalkableCells -= 1
+                    if not numWalkableCells:
+                        forbidden = True
+                else:
+                    forbiddenCellsIds.append(mp.cellId)
+        return forbiddenCellsIds
     
     def __eq__(self, mp: "MapPoint") -> bool:
         if not isinstance(mp, MapPoint):
@@ -359,5 +387,8 @@ class MapPoint:
     def __str__(self):
         return f"MapPoint(x: {self.x}, y: {self.y}, id: {self.cellId})"
 
+    def __repr__(self):
+        return str(self)
+    
     def __hash__(self) -> int:
         return self._nCellId

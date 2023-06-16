@@ -131,3 +131,6 @@ class KernelEvent(Enum):
     # quest
     TreasureHuntUpdate = auto()
     TreasureHuntRequestAnswer = auto()
+    TreasureHuntFinished = auto()
+    TreasureHuntDigAnswer = auto()
+    TreasureHintInformation = auto()

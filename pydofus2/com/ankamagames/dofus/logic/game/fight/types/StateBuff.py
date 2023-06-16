@@ -20,7 +20,7 @@ class StateBuff(BasicBuff):
 
     _isVisibleInFightLog: bool = False
 
-    stateId: int
+    stateId: int = None
 
     delta: int
 

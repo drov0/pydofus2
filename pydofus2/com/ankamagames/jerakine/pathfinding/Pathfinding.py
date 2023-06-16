@@ -1,4 +1,5 @@
 import heapq
+import math
 
 import pydofus2.mapTools.MapTools as MapTools
 from pydofus2.com.ankamagames.atouin.utils.DataMapProvider import \
@@ -42,13 +43,14 @@ class Pathfinding(metaclass=Singleton):
                 y == parentY
                 or x == parentX
                 or self._allowDiag
-                and (self._mapData.pointMov(parentX, y, self._allowTroughEntity, parentId) or self._mapData.pointMov(x, parentY, self._allowTroughEntity, parentId))
+                and (
+                    self._mapData.pointMov(parentX, y, self._allowTroughEntity, parentId)
+                    or self._mapData.pointMov(x, parentY, self._allowTroughEntity, parentId)
+                )
             )
         )
 
-    def initAlgo(
-        self, start: MapPoint, end: MapPoint, allowDiag, bAllowTroughEntity, avoidObstacles
-    ):
+    def initAlgo(self, start: MapPoint, end: MapPoint, allowDiag, bAllowTroughEntity, avoidObstacles):
         self._allowDiag = allowDiag
         self._allowTroughEntity = bAllowTroughEntity
         self._avoidObstacles = avoidObstacles
@@ -65,10 +67,10 @@ class Pathfinding(metaclass=Singleton):
         self._mapData.fillEntityOnCellArray(self._isEntityOnCell, bAllowTroughEntity)
 
     def distFromStart(self, cellId):
-        return MapTools.getDistance(cellId, self._start.cellId)
+        return self._start.distanceToCellId(cellId)
 
     def distFromEnd(self, cellId):
-        return MapTools.getDistance(cellId, self._end.cellId)
+        return self._end.distanceToCellId(cellId)
 
     def moveCost(self, x, y, parentId):
         cellId = MapTools.getCellIdByCoord(x, y)
@@ -197,7 +199,7 @@ class Pathfinding(metaclass=Singleton):
                 if TransitionTypeEnum(tr.type) == TransitionTypeEnum.MAP_ACTION:
                     res[tr.cell] = tr.direction
         return res
-                    
+
     def findPath(
         self,
         start: MapPoint,
@@ -206,9 +208,9 @@ class Pathfinding(metaclass=Singleton):
         bAllowTroughEntity: bool = True,
         avoidObstacles: bool = True,
         forMapChange=False,
-        mapChangeDirection=-1
+        mapChangeDirection=-1,
     ) -> MovementPath:
-        self.mapActionCells = self.getCurrentMapActionCells()
+        # self.mapActionCells = self.getCurrentMapActionCells()
         self.forMapChange = forMapChange
         self.mapChangeDirection = mapChangeDirection
         self.initAlgo(start, end, allowDiag, bAllowTroughEntity, avoidObstacles)
@@ -221,6 +223,7 @@ class Pathfinding(metaclass=Singleton):
             self._isCellClosed.add(parentId)
             for x, y in self.iterChilds(parentId):
                 mp = MapPoint.fromCoords(x, y)
+                moveCost = self.moveCost(x, y, parentId)
                 cellId = mp.cellId
                 # if cellId in self.mapActionCells:
                 #     if self.mapActionCells[cellId] == self.mapChangeDirection:
@@ -228,9 +231,8 @@ class Pathfinding(metaclass=Singleton):
                 #         return self.buildPath()
                 #     else:
                 #         continue
-                moveCost = self.moveCost(x, y, parentId)
                 if self._allowTroughEntity:
-                    distTmpToEnd = self.distFromEnd(cellId)
+                    distTmpToEnd = self.distFromEnd(mp.cellId)
                     if distTmpToEnd < self._distToEnd:
                         self._endCellAuxId = cellId
                         self._distToEnd = distTmpToEnd

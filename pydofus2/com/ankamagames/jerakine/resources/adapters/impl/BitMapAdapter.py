@@ -1,11 +1,10 @@
-import io
-from typing import Any
-from PIL import Image
-from pydofus2.com.ankamagames.jerakine.resources.IResourceObserver import IResourceObserver
+from pydofus2.com.ankamagames.jerakine.resources.adapters.IAdapter import \
+    IAdapter
+from pydofus2.com.ankamagames.jerakine.resources.IResourceObserver import \
+    IResourceObserver
+from pydofus2.com.ankamagames.jerakine.resources.ResourceType import \
+    ResourceType
 
-from pydofus2.com.ankamagames.jerakine.resources.ResourceType import ResourceType
-from pydofus2.com.ankamagames.jerakine.resources.adapters.IAdapter import IAdapter
-from PyQt5.QtGui import QImage
 
 class BitmapAdapter(IAdapter):
     
@@ -20,10 +19,10 @@ class BitmapAdapter(IAdapter):
         self._observer = observer
         self._uri = uri
         self._dispatchProgress = dispatchProgress
-        image = QImage(path)
-        self.process(image)
+        with open(path, "rb") as fp:
+            self.process(fp.read())
         
-    def process(self, image: Image) -> None:
+    def process(self, image: bytes) -> None:
         self._observer.onLoaded(self._uri, self.getResourceType(), image)
         
     def loadFromData(self, uri, data, observer, dispatchProgress):
@@ -32,8 +31,7 @@ class BitmapAdapter(IAdapter):
         self._observer = observer
         self._uri = uri
         self._dispatchProgress = dispatchProgress
-        image = QImage.fromData(data)
-        self.process(image)
+        self.process(data)
     
     def getResourceType(self) -> int:
         return ResourceType.RESOURCE_BITMAP

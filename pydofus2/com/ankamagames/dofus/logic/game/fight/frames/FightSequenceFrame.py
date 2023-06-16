@@ -123,6 +123,8 @@ from pydofus2.com.ankamagames.dofus.network.enums.GameActionFightInvisibilitySta
     GameActionFightInvisibilityStateEnum
 from pydofus2.com.ankamagames.dofus.network.enums.GameActionMarkTypeEnum import \
     GameActionMarkTypeEnum
+from pydofus2.com.ankamagames.dofus.network.messages.game.context.GameContextRefreshEntityLookMessage import \
+    GameContextRefreshEntityLookMessage
 from pydofus2.com.ankamagames.jerakine.entities.interfaces.IMovable import \
     IMovable
 from pydofus2.com.ankamagames.jerakine.logger.Logger import Logger
@@ -767,6 +769,9 @@ class FightSequenceFrame(Frame, ISpellCastProvider):
             return True
 
         if isinstance(msg, GameActionFightChangeLookMessage):
+            entity = Kernel().fightEntitiesFrame.getEntityInfos(msg.targetId)
+            Logger().debug(f"Fighter {msg.targetId} changed look from {entity.look.bonesId} to {msg.entityLook.bonesId}")
+            entity.look = msg.entityLook
             return True
 
         if isinstance(msg, GameActionFightInvisibilityMessage):

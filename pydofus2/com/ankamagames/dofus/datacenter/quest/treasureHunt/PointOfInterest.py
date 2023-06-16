@@ -31,7 +31,7 @@ class PointOfInterest(IDataCenter):
     @property
     def name(self) -> str:
         if not self._name:
-            self._name = I18n.getText(self.nameId)
+            self._name = I18n.getUnDiacriticalText(self.nameId)
         return self._name
 
     @property

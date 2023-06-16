@@ -55,7 +55,6 @@ class FightersStateManager(metaclass=Singleton):
         from pydofus2.com.ankamagames.dofus.datacenter.spells.SpellState import SpellState
 
         targetKey = float(targetId)
-        stateId = None
         fighterstatus: FighterStatus = FighterStatus()
         for stateId in self._entityStates.get(targetKey, {}):
             state = SpellState.getSpellStateById(stateId)

@@ -4,12 +4,18 @@ import pydofus2.com.ankamagames.dofus.datacenter.quest.Quest as qst
 from pydofus2.com.ankamagames.berilia.managers.KernelEvent import KernelEvent
 from pydofus2.com.ankamagames.berilia.managers.KernelEventsManager import \
     KernelEventsManager
+from pydofus2.com.ankamagames.dofus.datacenter.world.MapPosition import \
+    MapPosition
 from pydofus2.com.ankamagames.dofus.internalDatacenter.quests.TreasureHuntWrapper import \
     TreasureHuntWrapper
 from pydofus2.com.ankamagames.dofus.kernel.net.ConnectionsHandler import \
     ConnectionsHandler
+from pydofus2.com.ankamagames.dofus.network.enums.TreasureHuntDigRequestEnum import \
+    TreasureHuntDigRequestEnum
 from pydofus2.com.ankamagames.dofus.network.enums.TreasureHuntRequestEnum import \
     TreasureHuntRequestEnum
+from pydofus2.com.ankamagames.dofus.network.enums.TreasureHuntTypeEnum import \
+    TreasureHuntTypeEnum
 from pydofus2.com.ankamagames.dofus.network.messages.game.achievement.AchievementListMessage import \
     AchievementListMessage
 from pydofus2.com.ankamagames.dofus.network.messages.game.context.roleplay.quest.QuestListMessage import \
@@ -20,8 +26,12 @@ from pydofus2.com.ankamagames.dofus.network.messages.game.context.roleplay.quest
     QuestStepInfoMessage
 from pydofus2.com.ankamagames.dofus.network.messages.game.context.roleplay.quest.QuestValidatedMessage import \
     QuestValidatedMessage
+from pydofus2.com.ankamagames.dofus.network.messages.game.context.roleplay.treasureHunt.TreasureHuntDigRequestAnswerFailedMessage import \
+    TreasureHuntDigRequestAnswerFailedMessage
 from pydofus2.com.ankamagames.dofus.network.messages.game.context.roleplay.treasureHunt.TreasureHuntDigRequestMessage import \
     TreasureHuntDigRequestMessage
+from pydofus2.com.ankamagames.dofus.network.messages.game.context.roleplay.treasureHunt.TreasureHuntFinishedMessage import \
+    TreasureHuntFinishedMessage
 from pydofus2.com.ankamagames.dofus.network.messages.game.context.roleplay.treasureHunt.TreasureHuntFlagRequestMessage import \
     TreasureHuntFlagRequestMessage
 from pydofus2.com.ankamagames.dofus.network.messages.game.context.roleplay.treasureHunt.TreasureHuntMessage import \
@@ -32,6 +42,7 @@ from pydofus2.com.ankamagames.dofus.network.types.game.achievement.AchievementAc
     AchievementAchieved
 from pydofus2.com.ankamagames.dofus.network.types.game.achievement.AchievementAchievedRewardable import \
     AchievementAchievedRewardable
+from pydofus2.com.ankamagames.dofus.network.types.game.context.roleplay.GameRolePlayTreasureHintInformations import GameRolePlayTreasureHintInformations
 from pydofus2.com.ankamagames.dofus.network.types.game.context.roleplay.quest.QuestActiveDetailedInformations import \
     QuestActiveDetailedInformations
 from pydofus2.com.ankamagames.dofus.network.types.game.context.roleplay.quest.QuestActiveInformations import \
@@ -184,6 +195,7 @@ class QuestFrame(Frame):
         return True
 
     def process(self, msg: Message) -> bool:
+        
         if isinstance(msg, QuestValidatedMessage):
             qvmsg = msg
             if not self._completedQuests:
@@ -312,7 +324,7 @@ class QuestFrame(Frame):
             KernelEventsManager().send(KernelEvent.TreasureHuntUpdate, msg.questType)
             return True
         
-        if isinstance(msg, TreasureHuntRequestAnswerMessage):
+        elif isinstance(msg, TreasureHuntRequestAnswerMessage):
             thramsg = msg
             treasureHuntRequestAnswerText = None
             if thramsg.result == TreasureHuntRequestEnum.TREASURE_HUNT_ERROR_ALREADY_HAVE_QUEST:
@@ -329,7 +341,50 @@ class QuestFrame(Frame):
                 Logger().warning(treasureHuntRequestAnswerText)
             KernelEventsManager().send(KernelEvent.TreasureHuntRequestAnswer, thramsg.result, treasureHuntRequestAnswerText)
             return True
+        
+        elif isinstance(msg, TreasureHuntFinishedMessage):
+            thfmsg = msg
+            if thfmsg.questType in self._treasureHunts:
+                del self._treasureHunts[thfmsg.questType]
+                KernelEventsManager().send(
+                    KernelEvent.TreasureHuntFinished, thfmsg.questType
+                )
+            return True
+        
+        elif isinstance(msg, TreasureHuntDigRequestAnswerFailedMessage):
+            wrongFlagCount = int(msg.wrongFlagCount)
+            msg.result = TreasureHuntDigRequestEnum(msg.result)
+            if msg.result == TreasureHuntDigRequestEnum.TREASURE_HUNT_DIG_ERROR_IMPOSSIBLE:
+                treasureHuntDigAnswerText = I18n.getUiText("ui.fight.wrongMap")
+            elif msg.result == TreasureHuntDigRequestEnum.TREASURE_HUNT_DIG_ERROR_UNDEFINED:
+                treasureHuntDigAnswerText = I18n.getUiText("ui.popup.impossible_action")
+            elif msg.result == TreasureHuntDigRequestEnum.TREASURE_HUNT_DIG_LOST:
+                treasureHuntDigAnswerText = I18n.getUiText("ui.treasureHunt.huntFail")
+            elif msg.result == TreasureHuntDigRequestEnum.TREASURE_HUNT_DIG_NEW_HINT:
+                treasureHuntDigAnswerText = I18n.getUiText("ui.treasureHunt.stepSuccess")
+            elif msg.result == TreasureHuntDigRequestEnum.TREASURE_HUNT_DIG_WRONG:
+                if wrongFlagCount > 1:
+                    treasureHuntDigAnswerText = I18n.getUiText("ui.treasureHunt.digWrongFlags", [wrongFlagCount])
+                elif wrongFlagCount > 0:
+                    treasureHuntDigAnswerText = I18n.getUiText("ui.treasureHunt.digWrongFlag")
+                else:
+                    treasureHuntDigAnswerText = I18n.getUiText("ui.treasureHunt.digFail")
+            elif msg.result == TreasureHuntDigRequestEnum.TREASURE_HUNT_DIG_WRONG_AND_YOU_KNOW_IT:
+                treasureHuntDigAnswerText = I18n.getUiText("ui.treasureHunt.noNewFlag")
+            elif msg.result == TreasureHuntDigRequestEnum.TREASURE_HUNT_DIG_FINISHED:
+                if msg.questType == TreasureHuntTypeEnum.TREASURE_HUNT_CLASSIC:
+                    treasureHuntDigAnswerText = I18n.getUiText("ui.treasureHunt.huntSuccess")
 
+            if treasureHuntDigAnswerText:
+                Logger().info(treasureHuntDigAnswerText)
+                KernelEventsManager().send(KernelEvent.TreasureHuntDigAnswer, wrongFlagCount, msg.result, treasureHuntDigAnswerText)
+            return True
+
+        elif isinstance(msg, GameRolePlayTreasureHintInformations):
+            KernelEventsManager().send(KernelEvent.TreasureHintInformation, msg.npcId)
+            return True
+        
+        return False  # or whatever the default return value should be
     def pulled(self) -> bool:
         return True
 

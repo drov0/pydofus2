@@ -1,4 +1,5 @@
 import threading
+from pydofus2.com.ankamagames.jerakine.logger.Logger import Logger
 from pydofus2.com.ankamagames.jerakine.newCache.ICache import ICache
 from pydofus2.com.ankamagames.jerakine.resources.IResourceObserver import IResourceObserver
 from pydofus2.com.ankamagames.jerakine.resources.events.ResourceEvent import ResourceEvent
@@ -63,8 +64,7 @@ class ParallelResourceLoader(AbstractResourceLoader, IResourceLoader, IResourceO
                 if not self.checkCache(loadData["uri"]):
                     p = ProtocolFactory.getProtocol(loadData["uri"])
                     self._loadDictionary[loadData["uri"]] = p
-                    thread = threading.Thread(name=threading.current_thread().name,target=self.loadUriWorker, args=(p, loadData))
-                    thread.start()
+                    self.loadUriWorker(p, loadData)
                 else:
                     self.decrementLoads()
 
@@ -81,7 +81,7 @@ class ParallelResourceLoader(AbstractResourceLoader, IResourceLoader, IResourceO
                 self.loadNextUris()
 
     def onLoaded(self, uri: Uri, resourceType: int, resource: Any) -> None:
-        print(f"Resource : {uri.toFile()} loaded")
+        Logger().debug(f"Resource : {uri.toFile()} loaded")
         super().onLoaded(uri, resourceType, resource)
         with self._loadLock:
             del self._loadDictionary[uri]

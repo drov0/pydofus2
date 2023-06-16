@@ -1,15 +1,16 @@
-from io import BufferedReader
 import os
-from typing import Dict, Union, Optional
 from collections import defaultdict
+from io import BufferedReader
 from pathlib import Path
+from typing import Dict, Optional, Union
+
 from pydofus2.com.ankamagames.jerakine.data.BinaryStream import BinaryStream
 from pydofus2.com.ankamagames.jerakine.newCache.ICache import ICache
-from pydofus2.com.ankamagames.jerakine.resources.IResourceObserver import IResourceObserver
-
-from pydofus2.com.ankamagames.jerakine.resources.protocols.AbstractProtocol import AbstractProtocol
+from pydofus2.com.ankamagames.jerakine.resources.IResourceObserver import \
+    IResourceObserver
+from pydofus2.com.ankamagames.jerakine.resources.protocols.AbstractProtocol import \
+    AbstractProtocol
 from pydofus2.com.ankamagames.jerakine.types.Uri import Uri
-
 
 
 class PakProtocol2(AbstractProtocol):
@@ -28,6 +29,21 @@ class PakProtocol2(AbstractProtocol):
                 return None
         return self._indexes[uri.path]
 
+    def loadDirectly(self, uri: Uri) -> bytes:
+        index = None
+        data = bytearray()
+        fileStream = None
+        if not self._indexes.get(uri.path):
+            fileStream = self.initStream(uri)
+            if not fileStream:
+                return
+        index = self._indexes[uri.path].get(uri.subPath)
+        if not index:
+            return
+        fileStream: BinaryStream = index['stream']
+        fileStream.seek(index['o'])
+        return fileStream.readBytes(index['l'])
+        
     def load(self, uri: Uri, observer: 'IResourceObserver', dispatchProgress: bool, cache: 'ICache', forcedAdapter: 'type', uniqueFile: bool) -> None:
         index = None
         data = bytearray()
@@ -72,6 +88,8 @@ class PakProtocol2(AbstractProtocol):
         fileUri = uri
         # Replace `Path` with the correct method for getting a `Path` object in your environment
         file = Path(fileUri.toFile())
+        if not file.exists():
+            raise FileNotFoundError(file)
         indexes = defaultdict(dict)
         properties = defaultdict(dict)
         self._indexes[uri.path] = indexes

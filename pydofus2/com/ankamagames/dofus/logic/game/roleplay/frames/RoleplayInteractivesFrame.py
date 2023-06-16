@@ -44,6 +44,7 @@ from pydofus2.com.ankamagames.dofus.network.types.game.interactive.StatedElement
 from pydofus2.com.ankamagames.jerakine.logger.Logger import Logger
 from pydofus2.com.ankamagames.jerakine.messages.Frame import Frame
 from pydofus2.com.ankamagames.jerakine.messages.Message import Message
+from pydofus2.com.ankamagames.jerakine.types.enums.DirectionsEnum import DirectionsEnum
 from pydofus2.com.ankamagames.jerakine.types.enums.Priority import Priority
 from pydofus2.com.ankamagames.jerakine.types.positions.MapPoint import MapPoint
 
@@ -309,17 +310,20 @@ class RoleplayInteractivesFrame(Frame):
         return self._collectableResource.get(elementId)
 
     @classmethod
-    def getNearestCellToIe(cls, ie: InteractiveElement, iePos: MapPoint) -> Tuple[MapPoint, bool]:
+    def getNearestCellToIe(cls, ie: InteractiveElement, iePos: MapPoint, playerPos: MapPoint=None) -> Tuple[MapPoint, bool]:
         forbiddenCellsIds = list()
         cells = MapDisplayManager().dataMap.cells
         dmp = DataMapProvider()
         sendInteractiveUseRequest = True
+        if not playerPos:
+            playerPos = PlayedCharacterManager().entity.position
         for i in range(8):
             mp = iePos.getNearestCellInDirection(i)
             if mp:
                 cellData = cells[mp.cellId]
-                forbidden = not cellData.mov or cellData.farmCell
+                forbidden = (not cellData.mov) or cellData.farmCell
                 if not forbidden:
+                    print(mp.cellId, DirectionsEnum(i), mp.distanceToCell(iePos))
                     numWalkableCells = 8
                     for j in range(8):
                         mp2 = mp.getNearestCellInDirection(j)
@@ -335,8 +339,8 @@ class RoleplayInteractivesFrame(Frame):
                     if not forbiddenCellsIds:
                         forbiddenCellsIds = []
                     forbiddenCellsIds.append(mp.cellId)
+        print(forbiddenCellsIds)
         ieCellData = cells[iePos.cellId]
-
         if ie:
             minimalRange = 63
             skills = ie.enabledSkills
@@ -349,11 +353,11 @@ class RoleplayInteractivesFrame(Frame):
                         minimalRange = skillData.range
         else:
             minimalRange = 1
-        distanceElementToPlayer = iePos.distanceToCell(PlayedCharacterManager().entity.position)
-        if distanceElementToPlayer <= minimalRange and (not ieCellData.mov or ieCellData.farmCell):
-            nearestCell = PlayedCharacterManager().entity.position
+        distanceElementToPlayer = iePos.distanceToCell(playerPos)
+        if distanceElementToPlayer <= minimalRange and ((not ieCellData.mov) or ieCellData.farmCell):
+            nearestCell = playerPos
         else:
-            orientationToCell = iePos.advancedOrientationTo(PlayedCharacterManager().entity.position)
+            orientationToCell = iePos.advancedOrientationTo(playerPos)
             nearestCell = iePos.getNearestFreeCellInDirection(
                 orientationToCell,
                 DataMapProvider(),
@@ -366,18 +370,18 @@ class RoleplayInteractivesFrame(Frame):
                 for _ in range(minimalRange - 1):
                     forbiddenCellsIds.append(nearestCell.cellId)
                     nearestCell = nearestCell.getNearestFreeCellInDirection(
-                        nearestCell.advancedOrientationTo(PlayedCharacterManager().entity.position, False),
+                        nearestCell.advancedOrientationTo(playerPos, False),
                         DataMapProvider(),
                         True,
                         True,
                         False,
                         forbiddenCellsIds,
                     )
-                    if not nearestCell or nearestCell.cellId == PlayedCharacterManager().entity.position.cellId:
+                    if not nearestCell or nearestCell.cellId == playerPos.cellId:
                         break
         if ie:
             if len(skills) == 1 and skills[0].skillId == DataEnum.SKILL_POINT_OUT_EXIT:
-                nearestCell.cellId = PlayedCharacterManager().entity.position.cellId
+                nearestCell.cellId = playerPos.cellId
                 sendInteractiveUseRequest = False
         if not nearestCell or nearestCell.cellId in forbiddenCellsIds:
             nearestCell = iePos

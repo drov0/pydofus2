@@ -170,7 +170,7 @@ class AStar(metaclass=Singleton):
         toMapId: float = edge.dst.mapId
         toMapPos = MapPosition.getMapPositionById(toMapId)
         if not toMapPos:
-            raise ValueError(f'Unable to retrieve MapPos data of map {toMapId}')
+            return False
         if fromSubareaId ==  toMapPos.subAreaId:
             return True
         return  toMapPos.subAreaId not in self._forbiddenSubareaIds

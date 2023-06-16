@@ -1,16 +1,22 @@
+from typing import List, cast
+
 from pydofus2.com.ankamagames.atouin.AtouinConstants import AtouinConstants
 from pydofus2.com.ankamagames.atouin.data.elements.Elements import Elements
-from pydofus2.com.ankamagames.atouin.data.elements.subtypes.NormalGraphicalElementData import NormalGraphicalElementData
+from pydofus2.com.ankamagames.atouin.data.elements.subtypes.NormalGraphicalElementData import \
+    NormalGraphicalElementData
 from pydofus2.com.ankamagames.atouin.data.map.Cell import Cell
+from pydofus2.com.ankamagames.atouin.data.map.elements.GraphicalElement import \
+    GraphicalElement
 from pydofus2.com.ankamagames.atouin.data.map.Fixture import Fixture
 from pydofus2.com.ankamagames.atouin.data.map.Layer import Layer
-from pydofus2.com.ankamagames.atouin.data.map.elements.GraphicalElement import GraphicalElement
-from pydofus2.com.ankamagames.atouin.enums.ElementTypesEnum import ElementTypesEnum
+from pydofus2.com.ankamagames.atouin.enums.ElementTypesEnum import \
+    ElementTypesEnum
 from pydofus2.com.ankamagames.jerakine.data.BinaryStream import BinaryStream
 from pydofus2.com.ankamagames.jerakine.logger.Logger import Logger
-from pydofus2.com.ankamagames.jerakine.types.enums.DirectionsEnum import DirectionsEnum
+from pydofus2.com.ankamagames.jerakine.types.enums.DirectionsEnum import \
+    DirectionsEnum
 from pydofus2.com.ankamagames.jerakine.types.positions.MapPoint import MapPoint
-from typing import List, cast
+
 
 class Map:
     def __init__(self, raw: BinaryStream, id, version: int):
@@ -24,7 +30,8 @@ class Map:
         self.oldMvtSystem = False
         self.isUsingNewMovementSystem = False
         self._parser = False
-        self._gfxList = None
+        self._gfxList: list[NormalGraphicalElementData] = None
+        self._gfxCell = dict[int, int]()
         self.fromRaw(raw)
 
     def fromRaw(self, raw: BinaryStream):
@@ -167,7 +174,8 @@ class Map:
         raise Exception("Invalid direction.")
 
     def getCellNeighbours(self, cellId: int, allowThrought: bool = True) -> set["Cell"]:
-        from pydofus2.com.ankamagames.atouin.utils.DataMapProvider import DataMapProvider
+        from pydofus2.com.ankamagames.atouin.utils.DataMapProvider import \
+            DataMapProvider
 
         currMp = MapPoint.fromCellId(cellId)
         neighbours = set[Cell]()
@@ -302,12 +310,18 @@ class Map:
 
         return res
 
-    def computeGfxList(self, skipBackground=False):
+    def getGfxCell(self, gfxId):
+        return self._gfxCell.get(gfxId)
+    
+    def computeGfxList(self, skipBackground=False, layersFilter=[]) -> list[NormalGraphicalElementData]:
         gfxList = {}
         self._gfxCount = {}
         numLayer = len(self.layers)
         for l in range(numLayer):
-            layer = self.layers[l]
+            layer = self.layers[l]            
+            if layersFilter and layer.layerId not in layersFilter:
+                continue
+            layer.layerId 
             if not(skipBackground and l == 0):
                 lsCell = layer.cells
                 numCell = len(lsCell)
@@ -325,9 +339,11 @@ class Map:
                                 Logger().error("Error: Unknown graphical element ID " + str(elementId))
                             elif isinstance(elementData, NormalGraphicalElementData):
                                 graphicalElementData = elementData
+                                self._gfxCell[graphicalElementData.gfxId] = cell.cellId
                                 gfxList[graphicalElementData.gfxId] = graphicalElementData
                                 if graphicalElementData.gfxId in self._gfxCount:
                                     self._gfxCount[graphicalElementData.gfxId] += 1
                                 else:
                                     self._gfxCount[graphicalElementData.gfxId] = 1
         self._gfxList = list(gfxList.values())
+        return self._gfxList

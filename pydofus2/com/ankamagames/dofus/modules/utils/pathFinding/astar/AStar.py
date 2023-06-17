@@ -57,7 +57,8 @@ class AStar(metaclass=Singleton):
         if not isinstance(dst, list):
             dst = [dst]
         if src in dst:
-            return Logger().info("Destination is the Source so nothing to do")
+            Logger().info("Destination is the Source so nothing to do")
+            return []
         self.destinations = set(dst)
         self.running = True
         self.openList = list[tuple[int, int, Node, MapPoint]]()
@@ -93,8 +94,6 @@ class AStar(metaclass=Singleton):
                 return result
             edges = self.worldGraph.getOutgoingEdgesFromVertex(current.vertex)
             for edge in edges:
-                if self.DEBUG:
-                    Logger().debug(f"Testing edge {edge}")
                 if (
                     edge not in self._forbidenEdges
                     and self.hasValidTransition(edge)

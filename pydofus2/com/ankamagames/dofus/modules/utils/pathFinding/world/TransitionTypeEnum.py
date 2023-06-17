@@ -1,4 +1,4 @@
-from enum import Enum
+from enum import Enum, auto
 
 
 class TransitionTypeEnum(Enum):
@@ -18,3 +18,7 @@ class TransitionTypeEnum(Enum):
     INTERACTIVE = 32
 
     NPC_ACTION = 64
+    
+    ITEM_TELEPORT = auto()
+    
+    ZAAP = auto()

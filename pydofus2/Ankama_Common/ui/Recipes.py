@@ -63,7 +63,6 @@ class Recipes:
         if ingredientsToleranceFilter is not None:
             self._ingredientsToleranceFilter = ingredientsToleranceFilter
         self._inventoryDataByGID = JobsApi.getInventoryData(self._lookBankInventory)
-        Logger().debug(self._inventoryDataByGID)
         self.onJobSelected(jobId, skillId, uiName)
 
     def updateRecipes(self, newSearch=True):

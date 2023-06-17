@@ -110,12 +110,19 @@ class MapPosition(IDataCenter):
         return GameData().getObjects(MapPosition.MODULE)
 
     @staticmethod
-    def getMapIdByCoord(x: int, y: int) -> list[float]:
+    def getMapIdByCoord(x: int, y: int, woldId=None) -> list[float]:
         from pydofus2.com.ankamagames.dofus.datacenter.world.MapCoordinates import \
             MapCoordinates
 
         mc: MapCoordinates = MapCoordinates.getMapCoordinatesByCoords(x, y)
         if mc:
+            if woldId:
+                for mapId in mc.mapIds:
+                    mp = MapPosition.getMapPositionById(mapId)
+                    if mp.worldMap == woldId:
+                        return mapId
+                else:
+                    return None
             return mc.mapIds
         return None
 

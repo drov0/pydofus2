@@ -275,6 +275,8 @@ class Item(IPostInit, IDataCenter):
         self.changeVersion: str = None
 
         self.tooltipExpirationDate: float = None
+        
+        self._description = None
 
     @classmethod
     def getItemById(cls, id: int, returnDefaultItemIfNull: bool = True) -> "Item":

@@ -47,6 +47,7 @@ from pydofus2.com.ankamagames.dofus.network.messages.game.inventory.items.WatchI
     WatchInventoryContentMessage
 from pydofus2.com.ankamagames.dofus.network.messages.game.inventory.KamasUpdateMessage import \
     KamasUpdateMessage
+from pydofus2.com.ankamagames.jerakine.logger.Logger import Logger
 from pydofus2.com.ankamagames.jerakine.messages.Frame import Frame
 from pydofus2.com.ankamagames.jerakine.messages.Message import Message
 from pydofus2.com.ankamagames.jerakine.types.DataStoreType import DataStoreType
@@ -132,6 +133,7 @@ class InventoryManagementFrame(Frame):
 
         if isinstance(msg, ObjectAddedMessage):
             iw = InventoryManager().inventory.addObjectItem(msg.object)
+            Logger().debug(f"Added object {iw.objectGID} x {iw.quantity}")
             KernelEventsManager().send(KernelEvent.ObjectAdded, iw)
             return True
 
@@ -143,10 +145,11 @@ class InventoryManagementFrame(Frame):
 
         if isinstance(msg, ObjectQuantityMessage):
             oqm = msg
-            InventoryManager().inventory.modifyItemQuantity(oqm.objectUID, oqm.quantity)
+            iw = InventoryManager().inventory.modifyItemQuantity(oqm.objectUID, oqm.quantity)
             for shortcutQty in InventoryManager().shortcutBarItems:
                 if shortcutQty and shortcutQty.id == oqm.objectUID:
                     shortcutQty.quantity = oqm.quantity
+            KernelEventsManager().send(KernelEvent.ObjectAdded, iw)
             return True
 
         if isinstance(msg, ObjectsQuantityMessage):
@@ -217,17 +220,17 @@ class InventoryManagementFrame(Frame):
     def onRefuseDrop(self) -> None:
         self._dropPopup = None
         
-    def useItem(self, objectUID, quantity, useOnCell, iw: ItemWrapper):
+    def useItem(self, iw: ItemWrapper, quantity=0, useOnCell=False):
         if useOnCell and iw.targetable:
             if Kernel().battleFrame:
                 return
         else:
             if quantity > 1:
                 oumsg = ObjectUseMultipleMessage()
-                oumsg.init(objectUID, quantity)
+                oumsg.init(iw.objectUID, quantity)
             else:
                 oumsg = ObjectUseMessage()
-                oumsg.init(objectUID)
+                oumsg.init(iw.objectUID)
             playerEntity = PlayedCharacterManager().entity
             if playerEntity and playerEntity.isMoving:
                 playerEntity.stop()

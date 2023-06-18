@@ -5,6 +5,7 @@ from pydofus2.com.ankamagames.dofus.network.messages.game.context.roleplay.npc.N
     NpcDialogCreationMessage
 from pydofus2.com.ankamagames.dofus.network.messages.game.context.roleplay.npc.NpcDialogQuestionMessage import \
     NpcDialogQuestionMessage
+from pydofus2.com.ankamagames.jerakine.logger.Logger import Logger
 from pydofus2.com.ankamagames.jerakine.messages.Frame import Frame
 from pydofus2.com.ankamagames.jerakine.types.enums.Priority import Priority
 
@@ -31,6 +32,7 @@ class NpcFrame(Frame):
             return True
 
         elif isinstance(msg, NpcDialogQuestionMessage):
+            Logger().debug(f"Received NPC question : {msg.messageId}")
             KernelEventsManager().send(KernelEvent.NpcQuestion, msg.messageId, msg.dialogParams, msg.visibleReplies)
             return True
 

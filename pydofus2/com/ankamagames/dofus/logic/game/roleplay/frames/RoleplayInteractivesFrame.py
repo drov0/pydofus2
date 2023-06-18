@@ -91,7 +91,7 @@ class RoleplayInteractivesFrame(Frame):
     
     REQUEST_TIMEOUT = 10
     
-    BANK_GFX = 401
+    BANK_HINT_GFX = 401
 
     def __init__(self):
         self._usingInteractive: bool = False
@@ -277,7 +277,7 @@ class RoleplayInteractivesFrame(Frame):
             sign = Sign.getSignById(ie.element.elementId)
             if sign:
                 Logger().debug(f"Found sign with text : {sign.signText}")
-                if sign._hint.gfx == self.BANK_GFX:
+                if sign._hint.gfx == self.BANK_HINT_GFX:
                     return ie
         return None
     

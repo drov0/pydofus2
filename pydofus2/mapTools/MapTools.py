@@ -292,3 +292,8 @@ def distanceBetweenTwoMaps(mapIdA, mapIdB):
     mpA = MapPosition.getMapPositionById(mapIdA)
     mpB = MapPosition.getMapPositionById(mapIdB)
     return abs(mpA.posX - mpB.posX) + abs(mpA.posY - mpB.posY)
+
+def distL2Maps(mapIdA, mapIdB):
+    mpA = MapPosition.getMapPositionById(mapIdA)
+    mpB = MapPosition.getMapPositionById(mapIdB)
+    return math.sqrt((mpA.posX - mpB.posX)**2 + (mpA.posY - mpB.posY)**2)

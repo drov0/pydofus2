@@ -2,69 +2,60 @@ from types import FunctionType
 
 import pydofus2.com.ankamagames.dofus.datacenter.quest.Quest as qst
 from pydofus2.com.ankamagames.berilia.managers.KernelEvent import KernelEvent
-from pydofus2.com.ankamagames.berilia.managers.KernelEventsManager import KernelEventsManager
-from pydofus2.com.ankamagames.dofus.datacenter.world.MapPosition import MapPosition
-from pydofus2.com.ankamagames.dofus.internalDatacenter.quests.TreasureHuntWrapper import TreasureHuntWrapper
-from pydofus2.com.ankamagames.dofus.kernel.net.ConnectionsHandler import ConnectionsHandler
-from pydofus2.com.ankamagames.dofus.network.enums.TreasureHuntDigRequestEnum import TreasureHuntDigRequestEnum
-from pydofus2.com.ankamagames.dofus.network.enums.TreasureHuntFlagRequestEnum import TreasureHuntFlagRequestEnum
-from pydofus2.com.ankamagames.dofus.network.enums.TreasureHuntRequestEnum import TreasureHuntRequestEnum
-from pydofus2.com.ankamagames.dofus.network.enums.TreasureHuntTypeEnum import TreasureHuntTypeEnum
-from pydofus2.com.ankamagames.dofus.network.messages.game.achievement.AchievementListMessage import (
-    AchievementListMessage,
-)
-from pydofus2.com.ankamagames.dofus.network.messages.game.context.roleplay.quest.QuestListMessage import (
-    QuestListMessage,
-)
-from pydofus2.com.ankamagames.dofus.network.messages.game.context.roleplay.quest.QuestStartedMessage import (
-    QuestStartedMessage,
-)
-from pydofus2.com.ankamagames.dofus.network.messages.game.context.roleplay.quest.QuestStepInfoMessage import (
-    QuestStepInfoMessage,
-)
-from pydofus2.com.ankamagames.dofus.network.messages.game.context.roleplay.quest.QuestValidatedMessage import (
-    QuestValidatedMessage,
-)
-from pydofus2.com.ankamagames.dofus.network.messages.game.context.roleplay.treasureHunt.TreasureHuntDigRequestAnswerFailedMessage import (
-    TreasureHuntDigRequestAnswerFailedMessage,
-)
-from pydofus2.com.ankamagames.dofus.network.messages.game.context.roleplay.treasureHunt.TreasureHuntDigRequestAnswerMessage import (
-    TreasureHuntDigRequestAnswerMessage,
-)
-from pydofus2.com.ankamagames.dofus.network.messages.game.context.roleplay.treasureHunt.TreasureHuntDigRequestMessage import (
-    TreasureHuntDigRequestMessage,
-)
-from pydofus2.com.ankamagames.dofus.network.messages.game.context.roleplay.treasureHunt.TreasureHuntFinishedMessage import (
-    TreasureHuntFinishedMessage,
-)
-from pydofus2.com.ankamagames.dofus.network.messages.game.context.roleplay.treasureHunt.TreasureHuntFlagRequestAnswerMessage import (
-    TreasureHuntFlagRequestAnswerMessage,
-)
-from pydofus2.com.ankamagames.dofus.network.messages.game.context.roleplay.treasureHunt.TreasureHuntFlagRequestMessage import (
-    TreasureHuntFlagRequestMessage,
-)
-from pydofus2.com.ankamagames.dofus.network.messages.game.context.roleplay.treasureHunt.TreasureHuntMessage import (
-    TreasureHuntMessage,
-)
-from pydofus2.com.ankamagames.dofus.network.messages.game.context.roleplay.treasureHunt.TreasureHuntRequestAnswerMessage import (
-    TreasureHuntRequestAnswerMessage,
-)
-from pydofus2.com.ankamagames.dofus.network.types.game.achievement.AchievementAchieved import AchievementAchieved
-from pydofus2.com.ankamagames.dofus.network.types.game.achievement.AchievementAchievedRewardable import (
-    AchievementAchievedRewardable,
-)
-from pydofus2.com.ankamagames.dofus.network.types.game.context.roleplay.GameRolePlayTreasureHintInformations import (
-    GameRolePlayTreasureHintInformations,
-)
-from pydofus2.com.ankamagames.dofus.network.types.game.context.roleplay.quest.QuestActiveDetailedInformations import (
-    QuestActiveDetailedInformations,
-)
-from pydofus2.com.ankamagames.dofus.network.types.game.context.roleplay.quest.QuestActiveInformations import (
-    QuestActiveInformations,
-)
-from pydofus2.com.ankamagames.dofus.network.types.game.context.roleplay.quest.QuestObjectiveInformationsWithCompletion import (
-    QuestObjectiveInformationsWithCompletion,
-)
+from pydofus2.com.ankamagames.berilia.managers.KernelEventsManager import \
+    KernelEventsManager
+from pydofus2.com.ankamagames.dofus.datacenter.world.MapPosition import \
+    MapPosition
+from pydofus2.com.ankamagames.dofus.internalDatacenter.quests.TreasureHuntWrapper import \
+    TreasureHuntWrapper
+from pydofus2.com.ankamagames.dofus.kernel.net.ConnectionsHandler import \
+    ConnectionsHandler
+from pydofus2.com.ankamagames.dofus.network.enums.TreasureHuntDigRequestEnum import \
+    TreasureHuntDigRequestEnum
+from pydofus2.com.ankamagames.dofus.network.enums.TreasureHuntFlagRequestEnum import \
+    TreasureHuntFlagRequestEnum
+from pydofus2.com.ankamagames.dofus.network.enums.TreasureHuntRequestEnum import \
+    TreasureHuntRequestEnum
+from pydofus2.com.ankamagames.dofus.network.enums.TreasureHuntTypeEnum import \
+    TreasureHuntTypeEnum
+from pydofus2.com.ankamagames.dofus.network.messages.game.achievement.AchievementListMessage import \
+    AchievementListMessage
+from pydofus2.com.ankamagames.dofus.network.messages.game.context.roleplay.quest.QuestListMessage import \
+    QuestListMessage
+from pydofus2.com.ankamagames.dofus.network.messages.game.context.roleplay.quest.QuestStartedMessage import \
+    QuestStartedMessage
+from pydofus2.com.ankamagames.dofus.network.messages.game.context.roleplay.quest.QuestStepInfoMessage import \
+    QuestStepInfoMessage
+from pydofus2.com.ankamagames.dofus.network.messages.game.context.roleplay.quest.QuestValidatedMessage import \
+    QuestValidatedMessage
+from pydofus2.com.ankamagames.dofus.network.messages.game.context.roleplay.treasureHunt.TreasureHuntDigRequestAnswerFailedMessage import \
+    TreasureHuntDigRequestAnswerFailedMessage
+from pydofus2.com.ankamagames.dofus.network.messages.game.context.roleplay.treasureHunt.TreasureHuntDigRequestAnswerMessage import \
+    TreasureHuntDigRequestAnswerMessage
+from pydofus2.com.ankamagames.dofus.network.messages.game.context.roleplay.treasureHunt.TreasureHuntDigRequestMessage import \
+    TreasureHuntDigRequestMessage
+from pydofus2.com.ankamagames.dofus.network.messages.game.context.roleplay.treasureHunt.TreasureHuntFinishedMessage import \
+    TreasureHuntFinishedMessage
+from pydofus2.com.ankamagames.dofus.network.messages.game.context.roleplay.treasureHunt.TreasureHuntFlagRequestAnswerMessage import \
+    TreasureHuntFlagRequestAnswerMessage
+from pydofus2.com.ankamagames.dofus.network.messages.game.context.roleplay.treasureHunt.TreasureHuntFlagRequestMessage import \
+    TreasureHuntFlagRequestMessage
+from pydofus2.com.ankamagames.dofus.network.messages.game.context.roleplay.treasureHunt.TreasureHuntMessage import \
+    TreasureHuntMessage
+from pydofus2.com.ankamagames.dofus.network.messages.game.context.roleplay.treasureHunt.TreasureHuntRequestAnswerMessage import \
+    TreasureHuntRequestAnswerMessage
+from pydofus2.com.ankamagames.dofus.network.types.game.achievement.AchievementAchieved import \
+    AchievementAchieved
+from pydofus2.com.ankamagames.dofus.network.types.game.achievement.AchievementAchievedRewardable import \
+    AchievementAchievedRewardable
+from pydofus2.com.ankamagames.dofus.network.types.game.context.roleplay.GameRolePlayTreasureHintInformations import \
+    GameRolePlayTreasureHintInformations
+from pydofus2.com.ankamagames.dofus.network.types.game.context.roleplay.quest.QuestActiveDetailedInformations import \
+    QuestActiveDetailedInformations
+from pydofus2.com.ankamagames.dofus.network.types.game.context.roleplay.quest.QuestActiveInformations import \
+    QuestActiveInformations
+from pydofus2.com.ankamagames.dofus.network.types.game.context.roleplay.quest.QuestObjectiveInformationsWithCompletion import \
+    QuestObjectiveInformationsWithCompletion
 from pydofus2.com.ankamagames.jerakine.data.I18n import I18n
 from pydofus2.com.ankamagames.jerakine.logger.Logger import Logger
 from pydofus2.com.ankamagames.jerakine.messages.Frame import Frame
@@ -331,7 +322,7 @@ class QuestFrame(Frame):
 
         elif isinstance(msg, TreasureHuntRequestAnswerMessage):
             thramsg = msg
-            treasureHuntRequestAnswerText = None
+            treasureHuntRequestAnswerText = ""
             if thramsg.result == TreasureHuntRequestEnum.TREASURE_HUNT_ERROR_ALREADY_HAVE_QUEST:
                 treasureHuntRequestAnswerText = I18n.getUiText("ui.treasureHunt.alreadyHaveQuest")
             elif thramsg.result == TreasureHuntRequestEnum.TREASURE_HUNT_ERROR_NO_QUEST_FOUND:
@@ -416,9 +407,8 @@ class QuestFrame(Frame):
             elif msg.result == TreasureHuntDigRequestEnum.TREASURE_HUNT_DIG_FINISHED:
                 if msg.questType == TreasureHuntTypeEnum.TREASURE_HUNT_CLASSIC:
                     treasureHuntDigAnswerText = I18n.getUiText("ui.treasureHunt.huntSuccess")
-
-            Logger().info(treasureHuntDigAnswerText)
-
+            if treasureHuntDigAnswerText:
+                Logger().info(treasureHuntDigAnswerText)
             KernelEventsManager().send(
                 KernelEvent.TreasureHuntDigAnswer, msg.questType, msg.result, treasureHuntDigAnswerText
             )
@@ -438,11 +428,11 @@ class QuestFrame(Frame):
                 TreasureHuntFlagRequestEnum.TREASURE_HUNT_FLAG_WRONG_INDEX,
                 TreasureHuntFlagRequestEnum.TREASURE_HUNT_FLAG_SAME_MAP,
             ]:
-                err = f"Flag set request failed for reason : {result.name}"
+                err = f"Flag put request failed for reason : {result.name}"
             if err:
                 Logger().error(err)
             KernelEventsManager().send(
-                KernelEvent.TreasureHuntFlagRequestAnswer, msg.result, err
+                KernelEvent.TreasureHuntFlagRequestAnswer, result, err
             )
             return True
         return False  # or whatever the default return value should be

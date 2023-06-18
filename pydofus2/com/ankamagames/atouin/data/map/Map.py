@@ -1,4 +1,4 @@
-from typing import List, cast
+from typing import List, Tuple, cast
 
 from pydofus2.com.ankamagames.atouin.AtouinConstants import AtouinConstants
 from pydofus2.com.ankamagames.atouin.data.elements.Elements import Elements
@@ -312,6 +312,19 @@ class Map:
 
     def getGfxCell(self, gfxId):
         return self._gfxCell.get(gfxId)
+    
+    def getIdentifiedElements(self) -> List[Tuple[MapPoint, GraphicalElement]]:
+        identifiedElements = list[Tuple[MapPoint, GraphicalElement]]()
+        for layer in self.layers:
+            if layer.layerId == Layer.LAYER_GROUND:
+                continue
+            for cell in layer.cells:
+                for element in cell.elements:
+                    if element.elementType == ElementTypesEnum.GRAPHICAL:
+                        element = cast(GraphicalElement, element)
+                        if element.identifier > 0:
+                            identifiedElements.append([MapPoint.fromCellId(cell.cellId), element])
+        return identifiedElements
     
     def computeGfxList(self, skipBackground=False, layersFilter=[]) -> list[NormalGraphicalElementData]:
         gfxList = {}

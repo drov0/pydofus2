@@ -35,6 +35,7 @@ if TYPE_CHECKING:
     from pydofus2.com.ankamagames.atouin.data.map.Cell import Cell
     from pydofus2.com.ankamagames.dofus.internalDatacenter.spells.SpellWrapper import SpellWrapper
     from pydofus2.com.ankamagames.dofus.types.entities.AnimatedCharacter import AnimatedCharacter
+    from pydofus2.com.ankamagames.dofus.internalDatacenter.items.ItemWrapper import ItemWrapper
 
 from pydofus2.com.ankamagames.dofus.internalDatacenter.DataEnum import DataEnum
 from pydofus2.com.ankamagames.dofus.logic.common.managers.StatsManager import \
@@ -286,16 +287,13 @@ class PlayedCharacterManager(IDestroyable, metaclass=Singleton):
     def isMutated(self) -> bool:
         from pydofus2.com.ankamagames.dofus.logic.game.common.managers.InventoryManager import \
             InventoryManager
-        l: int = 0
-        i: int = 0
         rpBuffs = InventoryManager().inventory.getView("roleplayBuff").content
         if rpBuffs:
-            l = len(rpBuffs)
-            for i in range(l):
+            for buff in rpBuffs:
                 if (
-                    rpBuffs[i]
-                    and rpBuffs[i].typeId == DataEnum.ITEM_TYPE_MUTATIONS
-                    and rpBuffs[i].position == CharacterInventoryPositionEnum.INVENTORY_POSITION_MUTATION
+                    buff
+                    and buff.typeId == DataEnum.ITEM_TYPE_MUTATIONS
+                    and buff.position == CharacterInventoryPositionEnum.INVENTORY_POSITION_MUTATION
                 ):
                     return True
         return False

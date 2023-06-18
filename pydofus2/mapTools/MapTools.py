@@ -1,7 +1,11 @@
 import heapq
 import math
 from functools import lru_cache
+from typing import TYPE_CHECKING
+
 from pydofus2.com.ankamagames.atouin.AtouinConstants import AtouinConstants
+from pydofus2.com.ankamagames.dofus.datacenter.world.MapPosition import \
+    MapPosition
 from pydofus2.com.ankamagames.dofus.logic.game.common.misc.DofusEntities import \
     DofusEntities
 from pydofus2.com.ankamagames.jerakine.types.enums.DirectionsEnum import \
@@ -10,7 +14,6 @@ from pydofus2.com.ankamagames.jerakine.types.positions.MapPoint import (
     MapPoint, Point)
 from pydofus2.mapTools.MapDirection import MapDirection
 
-from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from pydofus2.com.ankamagames.atouin.data.map.Map import Map
 
@@ -191,20 +194,6 @@ def getLookDirection4DiagExactByCoord(param1: int, param2: int, param3: int, par
     return -1
 
 
-def isLeftCol(cellId):
-    return cellId % 14 == 0
-def isRightCol(cellId):
-    return isLeftCol(cellId + 1)
-def isTopRow(cellId):
-    return cellId < 2 * MAP_GRID_WIDTH
-def isBottomRow(cellId):
-    return cellId > 531
-LEFT_COL_CELLS = set([i for i in range(CELLCOUNT) if isLeftCol(i)])
-RIGHT_COL_CELLS = set([i for i in range(CELLCOUNT) if isRightCol(i)])
-TOP_ROW_CELLS = set([i for i in range(CELLCOUNT) if isTopRow(i)])
-BOT_ROW_CELLS = set([i for i in range(CELLCOUNT) if isBottomRow(i)])
-
-
 def iterChilds(cell):
     for x, y in MapPoint.fromCellId(cell).iterChilds():
         yield getCellIdByCoord(x, y)
@@ -229,10 +218,16 @@ def getZone(direction):
     
 def isLeftCol(cellId):
     return cellId % MAP_GRID_WIDTH == 0
+
+
 def isRightCol(cellId):
     return isLeftCol(cellId + 1)
+
+
 def isTopRow(cellId):
     return cellId < 2 * MAP_GRID_WIDTH
+
+
 def isBottomRow(cellId):
     return cellId > 531
 
@@ -267,7 +262,7 @@ def allowsMapChange(currentMap: "Map", cellId, direction: int):
     
 def iterMapChangeCells(direction):
     from pydofus2.com.ankamagames.atouin.managers.MapDisplayManager import \
-    MapDisplayManager
+        MapDisplayManager
     from pydofus2.com.ankamagames.dofus.logic.game.common.managers.PlayedCharacterManager import \
         PlayedCharacterManager
 
@@ -292,3 +287,8 @@ def iterMapChangeCells(direction):
         for child in iterChilds(cellId):
             if not visited[child]:
                 heapq.heappush(queue, (cost + 1, child))
+
+def distanceBetweenTwoMaps(mapIdA, mapIdB):
+    mpA = MapPosition.getMapPositionById(mapIdA)
+    mpB = MapPosition.getMapPositionById(mapIdB)
+    return abs(mpA.posX - mpB.posX) + abs(mpA.posY - mpB.posY)

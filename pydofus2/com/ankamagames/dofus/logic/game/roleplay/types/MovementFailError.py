@@ -1,17 +1,18 @@
-from enum import Enum
+from enum import Enum, auto
 
 
 class MovementFailError(Enum):
-    PLAYER_IS_DEAD = 1
-    CANT_REACH_DEST_CELL = 2
-    ALREADY_REQUESTING_MOVEMENT = 3
-    ALREADY_MOVING = 3
-    PLAYER_NOT_FOUND = 4
-    MAP_NOT_LOADED = 5
-    PLAYER_CANT_MOVE = 6
-    MOVE_REQUEST_TIMEOUT = 7
-    MOVE_REQUEST_REJECTED = 8
-    MAPCHANGE_TIMEOUT = 9
-    INTERACTIVE_USE_ERROR = 10
-    NO_PATH_FOUND = 11
-    NOMORE_SCROLL_CELL = 12
+    PLAYER_IS_DEAD = auto()
+    CANT_REACH_DEST_CELL = auto()
+    ALREADY_REQUESTING_MOVEMENT = auto()
+    ALREADY_MOVING = auto()
+    PLAYER_NOT_FOUND = auto()
+    MAP_NOT_LOADED = auto()
+    PLAYER_CANT_MOVE = auto()
+    MOVE_REQUEST_TIMEOUT = auto()
+    MOVE_REQUEST_REJECTED = auto()
+    MAPCHANGE_TIMEOUT = auto()
+    INTERACTIVE_USE_ERROR = auto()
+    NO_PATH_FOUND = auto()
+    NOMORE_SCROLL_CELL = auto()
+    INVALID_TRANSITION = auto()

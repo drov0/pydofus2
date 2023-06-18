@@ -31,15 +31,11 @@ from pydofus2.com.ankamagames.jerakine.types.enums.Priority import Priority
 
 
 class ZaapFrame(Frame):
-    _spawnMapId = 0
+    spawnMapId = 0
     _zaapsList = []
 
     def __init__(self):
         super().__init__()
-
-    @property
-    def spawnMapId(self):
-        return self._spawnMapId
 
     @property
     def priority(self) -> int:
@@ -89,7 +85,7 @@ class ZaapFrame(Frame):
                         msg.spawnMapId == dest.mapId,
                     )
                 )
-            self._spawnMapId = msg.spawnMapId
+            ZaapFrame.spawnMapId = msg.spawnMapId
             KernelEventsManager().send(
                 KernelEvent.TeleportDestinationList,
                 self._zaapsList,
@@ -130,7 +126,7 @@ class ZaapFrame(Frame):
         elif isinstance(msg, ZaapRespawnUpdatedMessage):
             for zaap in self._zaapsList:
                 zaap.spawn = zaap.mapId == msg.mapId
-            self._spawnMapId = msg.mapId
+            ZaapFrame.spawnMapId = msg.mapId
             KernelEventsManager().send(
                 KernelEvent.TeleportDestinationList, self._zaapsList, TeleporterTypeEnum.TELEPORTER_ZAAP
             )

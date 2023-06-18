@@ -125,7 +125,7 @@ class RoleplayEntitiesFrame(AbstractEntitiesFrame, Frame):
         self._monstersIds = list[float]()
         self.mcidm_processed: bool = False
         self.mapDataRequestTimer = None
-        self._hasTreasureHuntInfo = False
+        self.treasureHuntNpc = None
         self.nbrFails = 0
         self.processingMapData = threading.Event()
         super().__init__()
@@ -163,7 +163,7 @@ class RoleplayEntitiesFrame(AbstractEntitiesFrame, Frame):
         self._isIndoor = None
         self._worldPoint = None
         self._housesList = []
-        self._hasTreasureHuntInfo = False
+        self.treasureHuntNpc = False
 
     def requestMapData(self):
         self.mcidm_processed = False
@@ -257,7 +257,7 @@ class RoleplayEntitiesFrame(AbstractEntitiesFrame, Frame):
                 elif isinstance(actor, GameRolePlayGroupMonsterInformations):
                     self._monstersIds.append(actor.contextualId)
                 elif isinstance(actor, GameRolePlayTreasureHintInformations):
-                    self._hasTreasureHuntInfo = True
+                    self.treasureHuntNpc = actor
                     Kernel().questFrame.process(actor)
 
             self.mapWithNoMonsters = True

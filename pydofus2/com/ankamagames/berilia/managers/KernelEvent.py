@@ -134,3 +134,4 @@ class KernelEvent(Enum):
     TreasureHuntFinished = auto()
     TreasureHuntDigAnswer = auto()
     TreasureHintInformation = auto()
+    TreasureHuntFlagRequestAnswer = auto()

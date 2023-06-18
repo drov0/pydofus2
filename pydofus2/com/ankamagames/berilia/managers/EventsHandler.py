@@ -66,12 +66,12 @@ class EventsHandler:
             if retryNbr:
                 listener.nbrTimeouts += 1
                 if listener.nbrTimeouts > retryNbr:
-                    return ontimeout()
-            listener.armTimer()
-            if retryAction:
-                retryAction()
-            elif retryNbr:
-                raise Exception("Retry nbr provided but no action to retry!")
+                    return ontimeout(listener)
+                listener.armTimer()
+                if retryAction:
+                    retryAction()
+            else:
+                ontimeout(listener)
 
         listener = Listener(self, event_id, callback, timeout, onListenerTimeout, once, priority, originator)
         if event_id not in self._listeners:

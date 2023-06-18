@@ -123,6 +123,9 @@ class AveragePricesFrame(Frame):
             ):
                 return False
         return True
+    
+    def getItemAveragePrice(self, guid):
+        return self._pricesData.items[guid]
 
     def askPricesData(self) -> None:
         self.pricesDataAsked = True

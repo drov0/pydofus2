@@ -57,6 +57,8 @@ if TYPE_CHECKING:
         RoleplayWorldFrame
     from pydofus2.com.ankamagames.dofus.logic.game.roleplay.frames.ZaapFrame import \
         ZaapFrame
+    from pydofus2.com.ankamagames.dofus.logic.game.common.frames.AveragePricesFrame import AveragePricesFrame
+
 
 class Kernel(metaclass=Singleton):
 

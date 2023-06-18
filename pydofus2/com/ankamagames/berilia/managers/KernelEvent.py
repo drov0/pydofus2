@@ -59,6 +59,7 @@ class KernelEvent(Enum):
     PlayerStateChanged = auto()
     InventoryWeightUpdate = auto()
     StatsUpgradeResult = auto()
+    ObtainedItem = auto()
     
     # NPC
     NpcDialogOpen = auto()

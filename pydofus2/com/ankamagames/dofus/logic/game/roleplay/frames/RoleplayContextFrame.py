@@ -9,6 +9,8 @@ from pydofus2.com.ankamagames.berilia.managers.KernelEvent import KernelEvent
 from pydofus2.com.ankamagames.berilia.managers.KernelEventsManager import \
     KernelEventsManager
 from pydofus2.com.ankamagames.dofus.datacenter.world.SubArea import SubArea
+from pydofus2.com.ankamagames.dofus.internalDatacenter.items.ItemWrapper import \
+    ItemWrapper
 from pydofus2.com.ankamagames.dofus.internalDatacenter.world.WorldPointWrapper import \
     WorldPointWrapper
 from pydofus2.com.ankamagames.dofus.kernel.Kernel import Kernel
@@ -46,6 +48,8 @@ from pydofus2.com.ankamagames.dofus.network.messages.game.inventory.exchanges.Ex
     ExchangeStartedMessage
 from pydofus2.com.ankamagames.dofus.network.messages.game.inventory.items.ObtainedItemMessage import \
     ObtainedItemMessage
+from pydofus2.com.ankamagames.dofus.network.messages.game.inventory.items.ObtainedItemWithBonusMessage import \
+    ObtainedItemWithBonusMessage
 from pydofus2.com.ankamagames.jerakine.logger.Logger import Logger
 from pydofus2.com.ankamagames.jerakine.messages.Frame import Frame
 from pydofus2.com.ankamagames.jerakine.messages.Message import Message
@@ -152,6 +156,11 @@ class RoleplayContextFrame(Frame):
             return False
 
         elif isinstance(msg, ObtainedItemMessage):
+            bonusQty = msg.bonusQuantity if isinstance(msg, ObtainedItemWithBonusMessage) else 0
+            qty = msg.baseQuantity + bonusQty
+            iw = ItemWrapper.create(0, 0, msg.genericId, 1, None)
+            Logger().debug(f"Obtained item {iw.name} ({msg.genericId}) x {qty}")
+            KernelEventsManager().send(KernelEvent.ObtainedItem, msg.genericId, qty)
             return True
         
         elif isinstance(msg, ExchangeRequestedTradeMessage):

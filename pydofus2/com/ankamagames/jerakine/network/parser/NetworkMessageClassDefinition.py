@@ -75,10 +75,7 @@ class NetworkMessageClassDefinition:
             bnm.NetworkMessage.__init__(inst)
 
         return inst
-
-    def to_json(self):
-        pass
-
+    
     @classmethod
     def readBooleans(cls, boolfields: list[FieldSpec], raw: ByteArray):
         ans = {}

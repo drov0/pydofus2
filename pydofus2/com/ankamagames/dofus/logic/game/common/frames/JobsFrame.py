@@ -125,7 +125,9 @@ class JobsFrame(Frame):
             return True
 
         if isinstance(msg, JobExperienceUpdateMessage):
+            oldJobXp = PlayedCharacterManager().jobs[msg.experiencesUpdate.jobId].jobXP
             self.updateJobExperience(msg.experiencesUpdate)
+            KernelEventsManager().send(KernelEvent.JobExperienceUpdate, oldJobXp, msg.experiencesUpdate)
             return True
 
         if isinstance(msg, JobExperienceMultiUpdateMessage):

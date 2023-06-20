@@ -160,7 +160,7 @@ class RoleplayContextFrame(Frame):
             qty = msg.baseQuantity + bonusQty
             iw = ItemWrapper.create(0, 0, msg.genericId, 1, None)
             Logger().debug(f"Obtained item {iw.name} ({msg.genericId}) x {qty}")
-            KernelEventsManager().send(KernelEvent.ObtainedItem, msg.genericId, qty)
+            KernelEventsManager().send(KernelEvent.ObtainedItem, iw, qty)
             return True
         
         elif isinstance(msg, ExchangeRequestedTradeMessage):

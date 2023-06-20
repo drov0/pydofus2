@@ -109,7 +109,7 @@ class DofusClient(threading.Thread):
         for frame in self._registredGameStartFrames:
             self.worker.addFrame(frame())
 
-    def onInGame(self, event, msg):
+    def onInGame(self):
         Logger().info("Character entered game server successfully")
 
     def onCrash(self, event, message, reason=DisconnectionReasonEnum.EXCEPTION_THROWN):
@@ -137,8 +137,7 @@ class DofusClient(threading.Thread):
             self.onCharacterSelectionSuccess,
             originator=self,
         )
-        KernelEventsManager().once(
-            KernelEvent.MapDataProcessed,
+        KernelEventsManager().onceMapProcessed(
             self.onInGame,
             timeout=self.LOGIN_TIMEOUT,
             ontimeout=self.onLoginTimeout,

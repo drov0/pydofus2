@@ -1,7 +1,5 @@
 from typing import TYPE_CHECKING
 
-from pydofus2.com.ankamagames.atouin.managers.MapDisplayManager import \
-    MapDisplayManager
 from pydofus2.com.ankamagames.dofus.datacenter.jobs.Job import Job
 from pydofus2.com.ankamagames.dofus.datacenter.world.MapPosition import \
     MapPosition
@@ -402,6 +400,8 @@ class PlayedCharacterManager(IDestroyable, metaclass=Singleton):
 
     @property
     def currentCell(self) -> "Cell":
+        from pydofus2.com.ankamagames.atouin.managers.MapDisplayManager import \
+            MapDisplayManager
         if self.currentCellId is None:
             return None
         if MapDisplayManager().dataMap is None:
@@ -464,6 +464,8 @@ class PlayedCharacterManager(IDestroyable, metaclass=Singleton):
                 return spellw
     
     def inSameRpZone(self, cellId:int) -> bool:
+        from pydofus2.com.ankamagames.atouin.managers.MapDisplayManager import \
+            MapDisplayManager
         tgtRpZone = MapDisplayManager().dataMap.cells[cellId].linkedZoneRP
         return tgtRpZone == self.currentZoneRp
     

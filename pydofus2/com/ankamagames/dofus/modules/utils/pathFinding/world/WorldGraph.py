@@ -3,6 +3,8 @@ from time import perf_counter
 from pydofus2.com.ankamagames.dofus import Constants
 from pydofus2.com.ankamagames.dofus.modules.utils.pathFinding.world.Edge import \
     Edge
+from pydofus2.com.ankamagames.dofus.modules.utils.pathFinding.world.TransitionTypeEnum import \
+    TransitionTypeEnum
 from pydofus2.com.ankamagames.dofus.modules.utils.pathFinding.world.Vertex import \
     Vertex
 from pydofus2.com.ankamagames.jerakine.logger.Logger import Logger
@@ -10,7 +12,8 @@ from pydofus2.com.ankamagames.jerakine.metaclasses.ThreadSharedSingleton import 
     ThreadSharedSingleton
 from pydofus2.com.ankamagames.jerakine.network.CustomDataWrapper import \
     ByteArray
-from pydofus2.com.ankamagames.jerakine.types.enums.DirectionsEnum import DirectionsEnum
+from pydofus2.com.ankamagames.jerakine.types.enums.DirectionsEnum import \
+    DirectionsEnum
 
 
 class WorldGraph(metaclass=ThreadSharedSingleton):
@@ -110,3 +113,17 @@ class WorldGraph(metaclass=ThreadSharedSingleton):
                     ):
                         return True
         return False
+
+    def currMapActionCells(self):
+        from pydofus2.com.ankamagames.dofus.logic.game.common.managers.PlayedCharacterManager import \
+            PlayedCharacterManager
+
+        res = []
+        currVertex = PlayedCharacterManager().currVertex
+        if not currVertex:
+            return res
+        for edge in WorldGraph().getOutgoingEdgesFromVertex(currVertex):
+            for tr in edge.transitions:
+                if TransitionTypeEnum(tr.type) == TransitionTypeEnum.MAP_ACTION:
+                    res.append(tr.cell)
+        return res

@@ -323,7 +323,6 @@ class RoleplayInteractivesFrame(Frame):
                 cellData = cells[mp.cellId]
                 forbidden = (not cellData.mov) or cellData.farmCell
                 if not forbidden:
-                    print(mp.cellId, DirectionsEnum(i), mp.distanceToCell(iePos))
                     numWalkableCells = 8
                     for j in range(8):
                         mp2 = mp.getNearestCellInDirection(j)
@@ -339,7 +338,6 @@ class RoleplayInteractivesFrame(Frame):
                     if not forbiddenCellsIds:
                         forbiddenCellsIds = []
                     forbiddenCellsIds.append(mp.cellId)
-        print(forbiddenCellsIds)
         ieCellData = cells[iePos.cellId]
         if ie:
             minimalRange = 63

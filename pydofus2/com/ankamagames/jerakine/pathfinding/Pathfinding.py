@@ -202,6 +202,17 @@ class Pathfinding(metaclass=Singleton):
                     res.append(tr.cell)
         return res
 
+    def getCurrentMapActionCells(self):
+        res = []
+        currVertex = PlayedCharacterManager().currVertex
+        if not currVertex:
+            return res
+        for edge in WorldGraph().getOutgoingEdgesFromVertex(currVertex):
+            for tr in edge.transitions:
+                if TransitionTypeEnum(tr.type) == TransitionTypeEnum.MAP_ACTION:
+                    res.append(tr.cell)
+        return res
+    
     def findPath(
         self,
         start: MapPoint,
@@ -213,6 +224,7 @@ class Pathfinding(metaclass=Singleton):
         mapChangeDirection=-1,
     ) -> MovementPath:
         self.trInteractiveCells = self.getCurrentMapInteractiveTrCells()
+        self.mapActionCells = self.getCurrentMapActionCells()
         self.forMapChange = forMapChange
         self.mapChangeDirection = mapChangeDirection
         self.initAlgo(start, end, allowDiag, bAllowTroughEntity, avoidObstacles)
@@ -228,6 +240,8 @@ class Pathfinding(metaclass=Singleton):
                 moveCost = self.moveCost(x, y, parentId)
                 cellId = mp.cellId
                 if cellId in self.trInteractiveCells:
+                    continue
+                if cellId in self.mapActionCells and cellId != self._end.cellId:
                     continue
                 if self._allowTroughEntity:
                     distTmpToEnd = self.distFromEnd(mp.cellId)

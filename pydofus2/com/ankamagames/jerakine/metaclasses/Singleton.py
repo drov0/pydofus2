@@ -68,12 +68,10 @@ class Singleton(type):
         return [(thd, Singleton._instances[thd][cls]) for thd in Singleton._instances if cls in Singleton._instances[thd]]
     
     def onceThreadRegister(cls, thname: str, listener: object, args=[], kwargs={}, priority=0, timeout=None, ontimeout=None):
-        callerThname = cls.threadName()
         if thname in Singleton._instances and cls in Singleton._instances[thname]:
             return listener(*args, **kwargs)
         def onThreadRegister(evt: Event, thid, clazz):
             if thid == thname and clazz.__name__ == cls.__name__:
-                Logger.getInstance(callerThname).info(f"{thid} registred class {clazz.__name__}")
                 evt.listener.delete()
                 listener(*args, **kwargs)
         Singleton.eventsHandler.on(SingletonEvent.THREAD_REGISTER, onThreadRegister, priority, timeout, ontimeout)

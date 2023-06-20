@@ -6,6 +6,7 @@ from pydofus2.com.ankamagames.atouin.data.elements.subtypes.BoundingBoxGraphical
 from pydofus2.com.ankamagames.atouin.data.elements.subtypes.EntityGraphicalElementData import EntityGraphicalElementData
 from pydofus2.com.ankamagames.atouin.data.elements.subtypes.NormalGraphicalElementData import NormalGraphicalElementData
 from pydofus2.com.ankamagames.atouin.data.elements.subtypes.ParticlesGraphicalElementData import ParticlesGraphicalElementData
+from pydofus2.com.ankamagames.jerakine.logger.Logger import Logger
 
 
 class GraphicalElementFactory:
@@ -25,5 +26,5 @@ class GraphicalElementFactory:
         elif elementType == GraphicalElementTypes.BLENDED:
             return BlendedGraphicalElementData(elementId, elementType)
         else:
-            print(f"Unknown graphical element data type {elementType} for element {elementId}!")
+            Logger().error(f"Unknown graphical element data type {elementType} for element {elementId}!")
             return None

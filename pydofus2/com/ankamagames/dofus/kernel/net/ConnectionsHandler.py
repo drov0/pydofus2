@@ -1,41 +1,36 @@
 import random
 import threading
 from time import perf_counter
-from build.lib.pydofus2.com.ankamagames.dofus.network.messages.game.context.fight.GameFightTurnReadyMessage import (
-    GameFightTurnReadyMessage,
-)
 
 from pydofus2.com.ankamagames.dofus.kernel.Kernel import Kernel
-from pydofus2.com.ankamagames.dofus.kernel.net.ConnectionType import ConnectionType
-from pydofus2.com.ankamagames.dofus.kernel.net.DisconnectionReason import (
-    DisconnectionReason,
-)
-from pydofus2.com.ankamagames.dofus.kernel.net.DisconnectionReasonEnum import (
-    DisconnectionReasonEnum,
-)
-from pydofus2.com.ankamagames.dofus.kernel.net.PlayerDisconnectedMessage import (
-    PlayerDisconnectedMessage,
-)
-from pydofus2.com.ankamagames.dofus.logic.common.managers.PlayerManager import (
-    PlayerManager,
-)
-from pydofus2.com.ankamagames.dofus.network.messages.game.actions.GameActionAcknowledgementMessage import (
-    GameActionAcknowledgementMessage,
-)
-from pydofus2.com.ankamagames.dofus.network.messages.game.context.GameMapMovementConfirmMessage import (
-    GameMapMovementConfirmMessage,
-)
-from pydofus2.com.ankamagames.dofus.network.messages.game.context.fight.GameFightTurnFinishMessage import (
-    GameFightTurnFinishMessage,
-)
-from pydofus2.com.ankamagames.dofus.network.messages.game.context.roleplay.ChangeMapMessage import ChangeMapMessage
-from pydofus2.com.ankamagames.dofus.network.messages.game.context.roleplay.MapInformationsRequestMessage import (
-    MapInformationsRequestMessage,
-)
+from pydofus2.com.ankamagames.dofus.kernel.net.ConnectionType import \
+    ConnectionType
+from pydofus2.com.ankamagames.dofus.kernel.net.DisconnectionReason import \
+    DisconnectionReason
+from pydofus2.com.ankamagames.dofus.kernel.net.DisconnectionReasonEnum import \
+    DisconnectionReasonEnum
+from pydofus2.com.ankamagames.dofus.kernel.net.PlayerDisconnectedMessage import \
+    PlayerDisconnectedMessage
+from pydofus2.com.ankamagames.dofus.logic.common.managers.PlayerManager import \
+    PlayerManager
+from pydofus2.com.ankamagames.dofus.network.messages.game.actions.GameActionAcknowledgementMessage import \
+    GameActionAcknowledgementMessage
+from pydofus2.com.ankamagames.dofus.network.messages.game.context.fight.GameFightTurnFinishMessage import \
+    GameFightTurnFinishMessage
+from pydofus2.com.ankamagames.dofus.network.messages.game.context.fight.GameFightTurnReadyMessage import \
+    GameFightTurnReadyMessage
+from pydofus2.com.ankamagames.dofus.network.messages.game.context.GameMapMovementConfirmMessage import \
+    GameMapMovementConfirmMessage
+from pydofus2.com.ankamagames.dofus.network.messages.game.context.roleplay.ChangeMapMessage import \
+    ChangeMapMessage
+from pydofus2.com.ankamagames.dofus.network.messages.game.context.roleplay.MapInformationsRequestMessage import \
+    MapInformationsRequestMessage
 from pydofus2.com.ankamagames.jerakine.logger.Logger import Logger
 from pydofus2.com.ankamagames.jerakine.metaclasses.Singleton import Singleton
-from pydofus2.com.ankamagames.jerakine.network.INetworkMessage import INetworkMessage
-from pydofus2.com.ankamagames.jerakine.network.ServerConnection import ServerConnection
+from pydofus2.com.ankamagames.jerakine.network.INetworkMessage import \
+    INetworkMessage
+from pydofus2.com.ankamagames.jerakine.network.ServerConnection import \
+    ServerConnection
 
 
 class ConnectionsHandler(metaclass=Singleton):
@@ -113,9 +108,8 @@ class ConnectionsHandler(metaclass=Singleton):
         self._currentConnectionType = ConnectionType.DISCONNECTED
 
     def etablishConnection(self, host: str, port: int, id: str) -> None:
-        from pydofus2.com.ankamagames.dofus.logic.connection.frames.HandshakeFrame import (
-            HandshakeFrame,
-        )
+        from pydofus2.com.ankamagames.dofus.logic.connection.frames.HandshakeFrame import \
+            HandshakeFrame
 
         self._conn = ServerConnection(id, self._receivedMsgsQueue, MITM=Kernel().mitm)
         Kernel().worker.addFrame(HandshakeFrame())

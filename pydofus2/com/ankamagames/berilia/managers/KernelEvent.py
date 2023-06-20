@@ -22,7 +22,6 @@ class KernelEvent(Enum):
     ClientReconnect = auto()
     ClientClosed = auto()
     TextInformation = auto()
-
     
     # Fight
     FightSwordShowed = auto()
@@ -60,6 +59,7 @@ class KernelEvent(Enum):
     InventoryWeightUpdate = auto()
     StatsUpgradeResult = auto()
     ObtainedItem = auto()
+    JobExperienceUpdate = auto()
     
     # NPC
     NpcDialogOpen = auto()

@@ -223,8 +223,6 @@ class Pathfinding(metaclass=Singleton):
         forMapChange=False,
         mapChangeDirection=-1,
     ) -> MovementPath:
-        self.trInteractiveCells = self.getCurrentMapInteractiveTrCells()
-        self.mapActionCells = self.getCurrentMapActionCells()
         self.forMapChange = forMapChange
         self.mapChangeDirection = mapChangeDirection
         self.initAlgo(start, end, allowDiag, bAllowTroughEntity, avoidObstacles)
@@ -239,10 +237,6 @@ class Pathfinding(metaclass=Singleton):
                 mp = MapPoint.fromCoords(x, y)
                 moveCost = self.moveCost(x, y, parentId)
                 cellId = mp.cellId
-                if cellId in self.trInteractiveCells:
-                    continue
-                if cellId in self.mapActionCells and cellId != self._end.cellId:
-                    continue
                 if self._allowTroughEntity:
                     distTmpToEnd = self.distFromEnd(mp.cellId)
                     if distTmpToEnd < self._distToEnd:

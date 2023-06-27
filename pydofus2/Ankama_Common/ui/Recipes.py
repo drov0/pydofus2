@@ -251,7 +251,7 @@ class Recipes:
             self._inventoryDataByGID[int(index)] = invData[index]
         self.updateRecipes(True)
 
-    def onJobLevelUp(self, event, jobId, jobName, newLevel, podsBonus):
+    def onJobLevelUp(self, event, jobId, jobName, lastJobLevel, newLevel, podsBonus):
         if jobId in self._jobsLevel:
             self._jobsLevel[jobId] = newLevel
         if self._currentJob:

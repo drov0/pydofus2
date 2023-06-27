@@ -90,6 +90,9 @@ class WorldGraph(metaclass=ThreadSharedSingleton):
         return self._vertices.get(mapId)
 
     def getOutgoingEdgesFromVertex(self, src: Vertex) -> list[Edge]:
+        if src is None:
+            Logger().error("Got a None edge!")
+            return None
         return self._outgoingEdges.get(src.UID, [])
 
     def getEdge(self, src: Vertex, dest: Vertex) -> Edge:

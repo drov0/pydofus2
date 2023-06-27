@@ -93,10 +93,11 @@ class RoleplayMovementFrame(Frame):
             self.isMoving = False
             self.canMove = True
             player: AnimatedCharacter = DofusEntities().getEntity(PlayedCharacterManager().id)
-            player.isMoving = False
             if player:
+                player.isMoving = False
                 player.position = newPos
-                self.entitiesFrame.updateEntityCellId(PlayedCharacterManager().id, newPos.cellId)            
+                self.entitiesFrame.updateEntityCellId(PlayedCharacterManager().id, newPos.cellId)
+                Logger().debug(f"Movement reject : {newPos}") 
                 KernelEventsManager().send(KernelEvent.MovementRequestRejected)
             else:
                 Logger().error("Movement reject received but player data not loaded yet, maybe map changed after a map move request that was rejected.")

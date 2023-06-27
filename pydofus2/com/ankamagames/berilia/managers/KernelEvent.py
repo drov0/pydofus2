@@ -115,6 +115,7 @@ class KernelEvent(Enum):
     
     # teleport events
     TeleportDestinationList = auto()
+    InHavenBag = auto()
     
     # pvp
     AlignmentRankUpdate = auto()

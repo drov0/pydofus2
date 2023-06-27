@@ -196,10 +196,10 @@ class RoleplayInteractivesFrame(Frame):
 
         if isinstance(msg, MapObstacleUpdateMessage):
             moumsg = msg
-            for mo in moumsg.obstacles:
-                InteractiveCellManager().updateCell(
-                    mo.obstacleCellId, mo.state == MapObstacleStateEnum.OBSTACLE_OPENED
-                )
+            # for mo in moumsg.obstacles:
+            #     InteractiveCellManager().updateCell(
+            #         mo.obstacleCellId, mo.state == MapObstacleStateEnum.OBSTACLE_OPENED
+            #     )
             return True
 
         if isinstance(msg, GameContextDestroyMessage):
@@ -224,6 +224,8 @@ class RoleplayInteractivesFrame(Frame):
 
     def getInteractiveElement(self, elementId: int, skillId=None) -> InteractiveElementData:
         ie = self._ie.get(elementId)
+        if not ie:
+            return None
         interactive = Interactive.getInteractiveById(ie.element.elementTypeId)
         if interactive:
             Logger().debug(f"Found interactive {interactive.name}")

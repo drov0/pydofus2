@@ -227,4 +227,7 @@ class Haapi:
                 sleep(10)
             except ConnectionError:
                 Logger().error("No internet connection will try again in some seconds")
-                sleep(10)
+                sleep(30)
+            except Exception:
+                Logger().error("No internet connection will try again in some seconds")
+                sleep(30)

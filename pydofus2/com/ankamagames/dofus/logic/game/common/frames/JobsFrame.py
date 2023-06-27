@@ -149,7 +149,7 @@ class JobsFrame(Frame):
             podsBonus = self.jobLevelupPodsBonus(newJobLevel, lastJobLevel)
             Logger().info(f"Job {jobName} leveled Up to {msg.newLevel} you gained {podsBonus} extra pods")
             KernelEventsManager().send(
-                KernelEvent.JobLevelUp, msg.jobsDescription.jobId, jobName, msg.newLevel, podsBonus
+                KernelEvent.JobLevelUp, msg.jobsDescription.jobId, jobName, lastJobLevel, msg.newLevel, podsBonus
             )
             return True
 

@@ -141,7 +141,20 @@ class PlayedCharacterManager(IDestroyable, metaclass=Singleton):
             WorldGraph
         if self.currentZoneRp is None or self.currentMap is None:
             return None
-        return WorldGraph().getVertex(self.currentMap.mapId, self.currentZoneRp)
+        v = WorldGraph().getVertex(self.currentMap.mapId, self.currentZoneRp)
+        if v is None:
+            potentialVerticies = WorldGraph().getVertices(PlayedCharacterManager().currentMap.mapId)
+            if not potentialVerticies:
+                Logger().error(f"Weird that no vertex is found for map {PlayedCharacterManager().currentMap.mapId}!")
+            else:
+                Logger().debug(potentialVerticies)
+                for zoneId, v in potentialVerticies.items():
+                    if self.currentZoneRp and zoneId == self.currentZoneRp:
+                        return v
+                else:
+                    return potentialVerticies[1]
+        else:
+            return v
 
     @property
     def stats(self) -> "EntityStats":

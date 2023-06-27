@@ -180,6 +180,14 @@ class MapPoint:
         angle = (angle - 1) % 8 + 1
         return angle
 
+    def doesChangeZone(self, mp: 'MapPoint'):
+        from pydofus2.com.ankamagames.atouin.managers.MapDisplayManager import \
+            MapDisplayManager
+        cellData1 = MapDisplayManager().currentDataMap.cells[self.cellId]
+        cellData2 = MapDisplayManager().currentDataMap.cells[mp.cellId]
+        diff = abs(abs(cellData1.floor) - abs(cellData2.floor))
+        return cellData1.moveZone != cellData2.moveZone and diff == 0
+    
     def advancedOrientationTo2(self, target: "MapPoint", fourDir: bool = True) -> int:
         if target is None:
             return 0
@@ -241,7 +249,7 @@ class MapPoint:
         return None
 
     def inDiag(self, mp: "MapPoint") -> bool:
-        return abs(self.x - mp.x) == abs(self.y - mp.y)
+        return (self.x - mp.x) == (self.y - mp.y)
 
     def pointMov(self, provider: IDataMapProvider, dest: "MapPoint", allowThoughEntity: bool = True) -> bool:
         return provider.pointMov(self.x, self.y, allowThoughEntity, dest.cellId)

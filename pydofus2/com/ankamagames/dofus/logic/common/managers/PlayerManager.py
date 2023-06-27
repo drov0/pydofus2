@@ -7,6 +7,7 @@ from pydofus2.com.ankamagames.dofus.datacenter.houses.HavenbagTheme import \
 from pydofus2.com.ankamagames.dofus.datacenter.servers.Server import Server
 from pydofus2.com.ankamagames.dofus.internalDatacenter.connection.BasicCharacterWrapper import \
     BasicCharacterWrapper
+from pydofus2.com.ankamagames.jerakine.logger.Logger import Logger
 from pydofus2.com.ankamagames.jerakine.metaclasses.Singleton import Singleton
 
 if TYPE_CHECKING:
@@ -109,6 +110,7 @@ class PlayerManager(IDestroyable, metaclass=Singleton):
 
     def refreshSubscriptionEndDateUpdateTime(self) -> None:
         self._subscriptionEndDateUpdateTime = time.time()
+        Logger().debug(f"Player is subscribed untill : {self._subscriptionEndDateUpdateTime}")
 
     def isBasicAccount(self) -> bool:
         return self.subscriptionEndDate <= 0 and not self.hasRights

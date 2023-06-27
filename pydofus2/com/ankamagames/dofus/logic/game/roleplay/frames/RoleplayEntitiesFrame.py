@@ -46,6 +46,7 @@ from pydofus2.com.ankamagames.dofus.network.messages.game.context.GameContextRem
     GameContextRemoveElementMessage
 from pydofus2.com.ankamagames.dofus.network.messages.game.context.GameContextRemoveMultipleElementsMessage import \
     GameContextRemoveMultipleElementsMessage
+from pydofus2.com.ankamagames.dofus.network.messages.game.context.roleplay.MapComplementaryInformationsDataInHavenBagMessage import MapComplementaryInformationsDataInHavenBagMessage
 from pydofus2.com.ankamagames.dofus.network.messages.game.context.roleplay.anomaly.MapComplementaryInformationsAnomalyMessage import \
     MapComplementaryInformationsAnomalyMessage
 from pydofus2.com.ankamagames.dofus.network.messages.game.context.roleplay.fight.GameRolePlayRemoveChallengeMessage import \
@@ -318,6 +319,9 @@ class RoleplayEntitiesFrame(AbstractEntitiesFrame, Frame):
             self.mcidm_processed = True
             self.processingMapData.set()
             KernelEventsManager().send(KernelEvent.MapDataProcessed, msg.mapId)
+            if type(msg) is MapComplementaryInformationsDataInHavenBagMessage:
+                Logger().debug("Played entered haven bag")
+                KernelEventsManager().send(KernelEvent.InHavenBag)
             return True
 
         if isinstance(msg, GameRolePlayShowActorMessage):

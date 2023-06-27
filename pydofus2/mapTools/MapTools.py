@@ -268,6 +268,8 @@ def iterMapChangeCells(direction):
 
     currentMap = MapDisplayManager().dataMap
     playedEntity = DofusEntities().getEntity(PlayedCharacterManager().id)
+    if playedEntity is None:
+        return None
     playerCellId = playedEntity.position.cellId
     myLinkedZone = currentMap.cells[playerCellId].linkedZoneRP
     

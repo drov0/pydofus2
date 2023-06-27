@@ -168,12 +168,12 @@ class InventoryManagementFrame(Frame):
             return True
 
         if isinstance(msg, InventoryWeightMessage):
-            iwmsg = msg
-            PlayedCharacterManager().inventoryWeight = iwmsg.inventoryWeight
-            PlayedCharacterManager().inventoryWeightMax = iwmsg.weightMax
-            if iwmsg.inventoryWeight / iwmsg.weightMax > 0.95:
+            lastInventoryWeight = PlayedCharacterManager().inventoryWeight            
+            PlayedCharacterManager().inventoryWeight = msg.inventoryWeight
+            PlayedCharacterManager().inventoryWeightMax = msg.weightMax
+            if msg.inventoryWeight / msg.weightMax > 0.95:
                 KernelEventsManager().send(KernelEvent.PlayerPodsFull)
-            KernelEventsManager().send(KernelEvent.InventoryWeightUpdate, iwmsg.inventoryWeight, iwmsg.weightMax)
+            KernelEventsManager().send(KernelEvent.InventoryWeightUpdate, lastInventoryWeight, msg.inventoryWeight, msg.weightMax)
             return True
 
         if isinstance(msg, ObjectMovementMessage):

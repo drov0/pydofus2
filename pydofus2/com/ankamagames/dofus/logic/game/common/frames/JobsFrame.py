@@ -137,16 +137,12 @@ class JobsFrame(Frame):
             return True
 
         if isinstance(msg, JobLevelUpMessage):
-            jobsNumber = PlayedCharacterManager().jobsNumber()
-            lastJobLevel = PlayedCharacterManager().jobsLevel()
-            lastJobLevel -= jobsNumber
-            jobName = Job.getJobById(msg.jobsDescription.jobId).name
             kj = PlayedCharacterManager().jobs[msg.jobsDescription.jobId]
+            lastJobLevel = kj.jobLevel
+            jobName = Job.getJobById(msg.jobsDescription.jobId).name
             kj.jobDescription = msg.jobsDescription
             kj.jobLevel = msg.newLevel
-            newJobLevel = PlayedCharacterManager().jobsLevel()
-            newJobLevel -= jobsNumber
-            podsBonus = self.jobLevelupPodsBonus(newJobLevel, lastJobLevel)
+            podsBonus = self.jobLevelupPodsBonus(msg.newLevel, lastJobLevel)
             Logger().info(f"Job {jobName} leveled Up to {msg.newLevel} you gained {podsBonus} extra pods")
             KernelEventsManager().send(
                 KernelEvent.JobLevelUp, msg.jobsDescription.jobId, jobName, lastJobLevel, msg.newLevel, podsBonus

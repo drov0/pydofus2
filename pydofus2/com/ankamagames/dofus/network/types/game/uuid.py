@@ -1,6 +1,6 @@
 from pydofus2.com.ankamagames.jerakine.network.NetworkMessage import NetworkMessage
 
-class uuid(NetworkMessage):
+class Uuid(NetworkMessage):
     uuidString: str
     def init(self, uuidString_: str):
         self.uuidString = uuidString_

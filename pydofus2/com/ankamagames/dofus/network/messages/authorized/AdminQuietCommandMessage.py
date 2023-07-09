@@ -1,7 +1,11 @@
 from pydofus2.com.ankamagames.dofus.network.messages.authorized.AdminCommandMessage import AdminCommandMessage
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from pydofus2.com.ankamagames.dofus.network.types.game.Uuid import Uuid
+    
 
 class AdminQuietCommandMessage(AdminCommandMessage):
-    def init(self, content_: str):
+    def init(self, messageUuid_: 'Uuid', content_: str):
         
-        super().init(content_)
+        super().init(messageUuid_, content_)
     

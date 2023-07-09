@@ -466,7 +466,7 @@ class PlayedCharacterUpdatesFrame(Frame):
         playerInventory = InventoryManager.getInstance(player.instanceId)
         playerId = player.id
         StatsManager().addRawStats(playerId, stats.characteristics)
-        SpellModifiersManager().setRawSpellsModifiers(playerId, stats.spellModifications)
+        SpellModifiersManager().setRawSpellsModifiers(playerId, stats.spellModifiers)
         if playerInventory and stats.kamas != playerInventory.inventory.kamas:
             playerInventory.inventory.kamas = stats.kamas
             KernelEventsManager().send(KernelEvent.KamasUpdate, stats.kamas)

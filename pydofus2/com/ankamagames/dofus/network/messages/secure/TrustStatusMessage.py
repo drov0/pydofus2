@@ -1,12 +1,8 @@
 from pydofus2.com.ankamagames.jerakine.network.NetworkMessage import NetworkMessage
 
 class TrustStatusMessage(NetworkMessage):
-    trusted: bool
     certified: bool
-    trusted: bool
-    certified: bool
-    def init(self, trusted_: bool, certified_: bool):
-        self.trusted = trusted_
+    def init(self, certified_: bool):
         self.certified = certified_
         
         super().__init__()

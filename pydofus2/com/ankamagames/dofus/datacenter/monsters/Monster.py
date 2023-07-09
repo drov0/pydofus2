@@ -83,10 +83,6 @@ class Monster:
 
     fastAnimsFun: bool
 
-    incompatibleIdols: list[int]
-
-    allIdolsDisabled: bool
-
     incompatibleChallenges: list[int]
 
     useRaceValues: bool

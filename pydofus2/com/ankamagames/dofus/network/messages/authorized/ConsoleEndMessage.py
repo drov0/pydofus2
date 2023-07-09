@@ -4,12 +4,12 @@ if TYPE_CHECKING:
     from pydofus2.com.ankamagames.dofus.network.types.game.Uuid import Uuid
     
 
-class AdminCommandMessage(NetworkMessage):
-    messageUuid: 'Uuid'
-    content: str
-    def init(self, messageUuid_: 'Uuid', content_: str):
-        self.messageUuid = messageUuid_
-        self.content = content_
+class ConsoleEndMessage(NetworkMessage):
+    consoleUuid: 'Uuid'
+    isSuccess: bool
+    def init(self, consoleUuid_: 'Uuid', isSuccess_: bool):
+        self.consoleUuid = consoleUuid_
+        self.isSuccess = isSuccess_
         
         super().__init__()
     

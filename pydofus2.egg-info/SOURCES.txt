@@ -2031,6 +2031,7 @@ pydofus2/com/ankamagames/dofus/network/types/game/action/fight/FightDispellableE
 pydofus2/com/ankamagames/dofus/network/types/game/action/fight/__init__.py
 pydofus2/com/ankamagames/dofus/network/types/game/actions/__init__.py
 pydofus2/com/ankamagames/dofus/network/types/game/actions/fight/AbstractFightDispellableEffect.py
+pydofus2/com/ankamagames/dofus/network/types/game/actions/fight/FightDetailedTemporaryBoostEffect.py
 pydofus2/com/ankamagames/dofus/network/types/game/actions/fight/FightTemporaryBoostEffect.py
 pydofus2/com/ankamagames/dofus/network/types/game/actions/fight/FightTemporaryBoostStateEffect.py
 pydofus2/com/ankamagames/dofus/network/types/game/actions/fight/FightTemporaryBoostWeaponDamagesEffect.py

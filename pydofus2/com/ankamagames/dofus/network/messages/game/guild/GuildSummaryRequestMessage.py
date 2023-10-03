@@ -13,10 +13,12 @@ class GuildSummaryRequestMessage(PaginationRequestAbstractMessage):
     maxSuccessFilter: int
     sortType: int
     hideFullFilter: bool
+    followingGuildCriteria: bool
     sortDescending: bool
     hideFullFilter: bool
+    followingGuildCriteria: bool
     sortDescending: bool
-    def init(self, nameFilter_: str, criterionFilter_: list[int], languagesFilter_: list[int], recruitmentTypeFilter_: list[int], minLevelFilter_: int, maxLevelFilter_: int, minPlayerLevelFilter_: int, maxPlayerLevelFilter_: int, minSuccessFilter_: int, maxSuccessFilter_: int, sortType_: int, hideFullFilter_: bool, sortDescending_: bool, offset_: int, count_: int):
+    def init(self, nameFilter_: str, criterionFilter_: list[int], languagesFilter_: list[int], recruitmentTypeFilter_: list[int], minLevelFilter_: int, maxLevelFilter_: int, minPlayerLevelFilter_: int, maxPlayerLevelFilter_: int, minSuccessFilter_: int, maxSuccessFilter_: int, sortType_: int, hideFullFilter_: bool, followingGuildCriteria_: bool, sortDescending_: bool, offset_: int, count_: int):
         self.nameFilter = nameFilter_
         self.criterionFilter = criterionFilter_
         self.languagesFilter = languagesFilter_
@@ -29,6 +31,7 @@ class GuildSummaryRequestMessage(PaginationRequestAbstractMessage):
         self.maxSuccessFilter = maxSuccessFilter_
         self.sortType = sortType_
         self.hideFullFilter = hideFullFilter_
+        self.followingGuildCriteria = followingGuildCriteria_
         self.sortDescending = sortDescending_
         
         super().init(offset_, count_)

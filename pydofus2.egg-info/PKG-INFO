@@ -9,6 +9,10 @@ Classifier: Programming Language :: Python :: 3.9
 Classifier: License :: OSI Approved :: MIT License
 Classifier: Operating System :: Windows
 Requires-Python: >=3.9,<3.10
+Requires-Dist: pycryptodomex
+Requires-Dist: Py3AMF
+Requires-Dist: lupa
+Requires-Dist: pillow
 
 # pydofus2
 

@@ -1,7 +1,10 @@
-from pydofus2.com.ankamagames.dofus.datacenter.quest.QuestObjective import QuestObjective
+from pydofus2.com.ankamagames.dofus.datacenter.quest.QuestObjective import \
+    QuestObjective
 from pydofus2.com.ankamagames.jerakine.data.I18n import I18n
-from pydofus2.com.ankamagames.jerakine.interfaces.IDataCenter import IDataCenter
-from pydofus2.com.ankamagames.jerakine.utils.pattern.PatternDecoder import PatternDecoder
+from pydofus2.com.ankamagames.jerakine.interfaces.IDataCenter import \
+    IDataCenter
+from pydofus2.com.ankamagames.jerakine.utils.pattern.PatternDecoder import \
+    PatternDecoder
 
 
 class QuestObjectiveDuelSpecificPlayer(QuestObjective, IDataCenter):
@@ -17,7 +20,7 @@ class QuestObjectiveDuelSpecificPlayer(QuestObjective, IDataCenter):
     def specificPlayerTextId(self) -> int:
         if not self.parameters:
             return 0
-        return self.parameters[0]
+        return self.parameters.parameter0
 
     @property
     def specificPlayerText(self) -> str:

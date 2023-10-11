@@ -1,33 +1,64 @@
+import math
 from functools import lru_cache
-from typing import Any, TYPE_CHECKING
+from typing import TYPE_CHECKING, Any
+
+from build.lib.pydofus2.com.ankamagames.dofus.uiApi.PlayedCharacterApi import (
+    PlayedCharacterApi,
+)
+
 from pydofus2.com.ankamagames.berilia.types.messages.managers.SlotDataHolderManager import (
     SlotDataHolderManager,
 )
+from pydofus2.com.ankamagames.dofus.enums.ActionIds import ActionIds
+from pydofus2.com.ankamagames.dofus.logic.game.fight.miscs.ActionIdHelper import (
+    ActionIdHelper,
+)
+from pydofus2.com.ankamagames.dofus.network.enums.CharacterSpellModificationTypeEnum import (
+    CharacterSpellModificationTypeEnum,
+)
+from pydofus2.com.ankamagames.dofus.network.enums.SpellModifierActionTypeEnum import (
+    SpellModifierActionTypeEnum,
+)
+from pydofus2.com.ankamagames.dofus.network.enums.SpellModifierTypeEnum import (
+    SpellModifierTypeEnum,
+)
 
 if TYPE_CHECKING:
-    from pydofus2.com.ankamagames.dofus.datacenter.effects.EffectInstance import EffectInstance
+    from pydofus2.com.ankamagames.dofus.datacenter.effects.EffectInstance import (
+        EffectInstance,
+    )
     from pydofus2.com.ankamagames.dofus.logic.game.common.spell.SpellModifiers import (
         SpellModifiers,
     )
+
+import threading
+
+import pydofus2.com.ankamagames.dofus.logic.game.fight.managers.CurrentPlayedFighterManager as cpfm
+import pydofus2.com.ankamagames.dofus.logic.game.fight.managers.SpellModifiersManager as spellmm
 from pydofus2.com.ankamagames.dofus.datacenter.effects.instances.EffectInstanceDice import (
     EffectInstanceDice,
 )
+from pydofus2.com.ankamagames.dofus.datacenter.spells.EffectZone import EffectZone
 from pydofus2.com.ankamagames.dofus.datacenter.spells.Spell import Spell
 from pydofus2.com.ankamagames.dofus.datacenter.spells.SpellLevel import SpellLevel
 from pydofus2.com.ankamagames.dofus.internalDatacenter.DataEnum import DataEnum
-from pydofus2.com.ankamagames.dofus.internalDatacenter.items.ItemWrapper import ItemWrapper
-from pydofus2.com.ankamagames.dofus.internalDatacenter.items.WeaponWrapper import WeaponWrapper
-from pydofus2.com.ankamagames.dofus.datacenter.spells.EffectZone import EffectZone
-from pydofus2.com.ankamagames.dofus.internalDatacenter.stats.EntityStats import EntityStats
-from pydofus2.com.ankamagames.dofus.logic.common.managers.StatsManager import StatsManager
+from pydofus2.com.ankamagames.dofus.internalDatacenter.items.ItemWrapper import (
+    ItemWrapper,
+)
+from pydofus2.com.ankamagames.dofus.internalDatacenter.items.WeaponWrapper import (
+    WeaponWrapper,
+)
+from pydofus2.com.ankamagames.dofus.internalDatacenter.stats.EntityStats import (
+    EntityStats,
+)
+from pydofus2.com.ankamagames.dofus.logic.common.managers.StatsManager import (
+    StatsManager,
+)
+from pydofus2.com.ankamagames.dofus.logic.game.common.managers.InventoryManager import (
+    InventoryManager,
+)
 from pydofus2.com.ankamagames.dofus.logic.game.common.managers.PlayedCharacterManager import (
     PlayedCharacterManager,
-)
-from pydofus2.com.ankamagames.dofus.logic.game.common.spell.SpellModifier import SpellModifier
-import pydofus2.com.ankamagames.dofus.logic.game.fight.managers.CurrentPlayedFighterManager as cpfm
-import pydofus2.com.ankamagames.dofus.logic.game.fight.managers.SpellModifiersManager as spellmm
-from pydofus2.com.ankamagames.dofus.network.enums.CharacterSpellModificationTypeEnum import (
-    CharacterSpellModificationTypeEnum,
 )
 from pydofus2.com.ankamagames.jerakine.interfaces.IDataCenter import IDataCenter
 from pydofus2.com.ankamagames.jerakine.interfaces.ISlotData import ISlotData
@@ -35,14 +66,10 @@ from pydofus2.com.ankamagames.jerakine.interfaces.ISlotDataHolder import ISlotDa
 from pydofus2.com.ankamagames.jerakine.utils.display.spellZone.ICellZoneProvider import (
     ICellZoneProvider,
 )
-from pydofus2.com.ankamagames.jerakine.utils.display.spellZone.IZoneShape import IZoneShape
-from pydofus2.damageCalculation.tools.StatIds import StatIds
-from pydofus2.com.ankamagames.dofus.logic.game.common.managers.InventoryManager import (
-    InventoryManager,
+from pydofus2.com.ankamagames.jerakine.utils.display.spellZone.IZoneShape import (
+    IZoneShape,
 )
-
-
-import threading
+from pydofus2.damageCalculation.tools.StatIds import StatIds
 
 lock = threading.Lock()
 
@@ -54,20 +81,38 @@ class SpellWrapper(ISlotData, ICellZoneProvider, IDataCenter):
     _playersCache: dict = dict[int, dict]()
 
     BASE_DAMAGE_EFFECT_IDS: list = [
-        100,
-        96,
-        97,
-        98,
-        99,
-        92,
-        93,
-        94,
-        95,
-        1012,
-        1013,
-        1014,
-        1015,
-        1016,
+        ActionIds.ACTION_CHARACTER_LIFE_POINTS_LOST,
+        ActionIds.ACTION_CHARACTER_LIFE_POINTS_LOST_BASED_ON_MOVEMENT_POINTS_FROM_AIR,
+        ActionIds.ACTION_CHARACTER_LIFE_POINTS_LOST_BASED_ON_MOVEMENT_POINTS_FROM_EARTH,
+        ActionIds.ACTION_CHARACTER_LIFE_POINTS_LOST_BASED_ON_MOVEMENT_POINTS_FROM_FIRE,
+        ActionIds.ACTION_CHARACTER_LIFE_POINTS_LOST_BASED_ON_MOVEMENT_POINTS_FROM_WATER,
+        ActionIds.ACTION_CHARACTER_LIFE_POINTS_LOST_FROM_AIR,
+        ActionIds.ACTION_CHARACTER_LIFE_POINTS_LOST_FROM_BEST_ELEMENT,
+        ActionIds.ACTION_CHARACTER_LIFE_POINTS_LOST_FROM_EARTH,
+        ActionIds.ACTION_CHARACTER_LIFE_POINTS_LOST_FROM_FIRE,
+        ActionIds.ACTION_CHARACTER_LIFE_POINTS_LOST_FROM_WATER,
+        ActionIds.ACTION_CHARACTER_LIFE_POINTS_LOST_FROM_WORST_ELEMENT,
+        ActionIds.ACTION_CHARACTER_LIFE_POINTS_LOST_NO_BOOST,
+        ActionIds.ACTION_CHARACTER_LIFE_POINTS_LOST_NO_BOOST_FROM_AIR,
+        ActionIds.ACTION_CHARACTER_LIFE_POINTS_LOST_NO_BOOST_FROM_EARTH,
+        ActionIds.ACTION_CHARACTER_LIFE_POINTS_LOST_NO_BOOST_FROM_FIRE,
+        ActionIds.ACTION_CHARACTER_LIFE_POINTS_LOST_NO_BOOST_FROM_WATER,
+        ActionIds.ACTION_CHARACTER_LIFE_POINTS_STEAL,
+        ActionIds.ACTION_CHARACTER_LIFE_POINTS_STEAL_FROM_AIR,
+        ActionIds.ACTION_CHARACTER_LIFE_POINTS_STEAL_FROM_BEST_ELEMENT,
+        ActionIds.ACTION_CHARACTER_LIFE_POINTS_STEAL_FROM_EARTH,
+        ActionIds.ACTION_CHARACTER_LIFE_POINTS_STEAL_FROM_FIRE,
+        ActionIds.ACTION_CHARACTER_LIFE_POINTS_STEAL_FROM_WATER,
+        ActionIds.ACTION_CHARACTER_LIFE_POINTS_STEAL_FROM_WORST_ELEMENT,
+        ActionIds.ACTION_CHARACTER_LIFE_POINTS_STEAL_WITHOUT_BOOST,
+        ActionIds.ACTION_CHARACTER_MANA_USE_KILL_LIFE_AIR,
+        ActionIds.ACTION_CHARACTER_MANA_USE_KILL_LIFE_FIRE,
+        ActionIds.ACTION_CHARACTER_MANA_USE_KILL_LIFE_WATER,
+        ActionIds.ACTION_CHARACTER_MOVEMENT_USE_KILL_LIFE_AIR,
+        ActionIds.ACTION_CHARACTER_MOVEMENT_USE_KILL_LIFE_EARTH,
+        ActionIds.ACTION_CHARACTER_MOVEMENT_USE_KILL_LIFE_FIRE,
+        ActionIds.ACTION_CHARACTER_MOVEMENT_USE_KILL_LIFE_NEUTRAL,
+        ActionIds.ACTION_CHARACTER_MOVEMENT_USE_KILL_LIFE_WATER,
     ]
 
     def __init__(self):
@@ -146,7 +191,9 @@ class SpellWrapper(ISlotData, ICellZoneProvider, IDataCenter):
         return spell
 
     @classmethod
-    def getSpellWrapperById(cls, spellId: int, playerID: float, forceCreate: bool = False) -> "SpellWrapper":
+    def getSpellWrapperById(
+        cls, spellId: int, playerID: float, forceCreate: bool = False
+    ) -> "SpellWrapper":
         if forceCreate:
             return cls.create(spellId)
         if playerID != 0:
@@ -284,7 +331,9 @@ class SpellWrapper(ISlotData, ICellZoneProvider, IDataCenter):
     def active(self) -> bool:
         if not PlayedCharacterManager().isFighting:
             return True
-        canCast, reason = cpfm.CurrentPlayedFighterManager().canCastThisSpell(self.spellId, self.spellLevel)
+        canCast, reason = cpfm.CurrentPlayedFighterManager().canCastThisSpell(
+            self.spellId, self.spellLevel
+        )
         return canCast
 
     @property
@@ -299,60 +348,72 @@ class SpellWrapper(ISlotData, ICellZoneProvider, IDataCenter):
             return self.spell.id
         return 0
 
-    @property
-    def playerCriticalRate(self) -> int:
-        if self["isSpellWeapon"] and not self["isDefaultSpellWeapon"]:
-            weaponCriticalHit = self.getWeaponProperty("criticalHitProbability")
-            currentCriticalHitProbability = float(55 - weaponCriticalHit) if weaponCriticalHit > 0 else float(0)
-        else:
-            currentCriticalHitProbability = self.getCriticalHitProbability()
-        spellModifier: SpellModifier = spellmm.SpellModifiersManager().getSpellModifier(
-            self._entityId,
-            self.id,
-            CharacterSpellModificationTypeEnum.CRITICAL_HIT_BONUS,
-        )
-        if spellModifier is not None:
-            currentCriticalHitProbability = (
-                float(currentCriticalHitProbability - spellModifier.totalValue)
-                if currentCriticalHitProbability > 0
-                else float(0)
-            )
-        if currentCriticalHitProbability is not None:
-            entityId = self._entityId
-            stats = None
-            if entityId is not None:
-                stats = StatsManager().getStats(entityId)
-            if stats is not None:
-                totalCriticalHit = stats.getStatTotalValue(StatIds.CRITICAL_HIT) - stats.getStatAdditionalValue(
-                    StatIds.CRITICAL_HIT
-                )
-                criticalRate = currentCriticalHitProbability - totalCriticalHit
-                if criticalRate > 55:
-                    criticalRate = 55
-                return criticalRate
-            return currentCriticalHitProbability
-        return 0
+    def getEntityId(self):
+        if not math.isnan(self.playerId) and self.playerId != 0:
+            return self.playerId
+        if PlayedCharacterApi().isInFight():
+            return cpfm.CurrentPlayedFighterManager().currentFighterId
+        return PlayedCharacterManager().id
 
     @property
-    def maximalRangeWithBoosts(self) -> int:
-        rangeBonus: float = None
-        entityId: float = self._entityId
-        stats: EntityStats = StatsManager().getStats(entityId)
-        spellModifiers: "SpellModifiers" = spellmm.SpellModifiersManager().getSpellModifiers(entityId, self.id)
-        boostableRange: bool = self.spellLevelInfos.rangeCanBeBoosted
-        finalRange: float = self.maximalRange
+    def criticalHitProbability(self):
+        entityId = self.getEntityId()
+        criticalHitProbability = self.baseCriticalHitProbability
+        stats = None
+        if not math.isnan(entityId):
+            criticalHitProbability = spellmm.SpellModifiersManager().getModifiedInt(
+                entityId,
+                self.id,
+                SpellModifierTypeEnum.CRITICAL_HIT_BONUS,
+                criticalHitProbability,
+            )
+            if criticalHitProbability > 0:
+                stats = StatsManager().getStats(entityId)
+        if stats is not None:
+            criticalHitProbability += stats.getStatTotalValue(StatIds.CRITICAL_HIT)
+        criticalHitProbability = max(0, criticalHitProbability)
+        return min(criticalHitProbability, 100)
+
+    @property
+    def isMaxRangeModifiableWithStats(self):
+        return self.spellLevelInfos.rangeCanBeBoosted
+
+    @property
+    def isMaxRangeModifiableWithStatsWithModifiers(self):
+        return spellmm.SpellModifiersManager().getModifiedBool(
+            self.getEntityId(),
+            self.id,
+            SpellModifierTypeEnum.RANGEABLE,
+            self.isMaxRangeModifiableWithStats,
+        )
+
+    def maxRange(self):
+        entityId = self.getEntityId()
+        stats = StatsManager().getStats(entityId)
+        spellModifiers = spellmm.SpellModifiersManager().getSpellModifiers(
+            entityId, self.id
+        )
+        finalRange = self.maximalRange
+
         if spellModifiers is not None:
-            if not boostableRange:
-                if spellModifiers.hasModifier(CharacterSpellModificationTypeEnum.RANGEABLE):
-                    boostableRange = True
-            if spellModifiers.hasModifier(CharacterSpellModificationTypeEnum.RANGE_MAX):
-                finalRange += spellModifiers.getModifierValue(CharacterSpellModificationTypeEnum.RANGE_MAX)
-        if boostableRange and stats is not None:
-            rangeBonus = stats.getStatTotalValue(StatIds.RANGE) - stats.getStatAdditionalValue(StatIds.RANGE)
+            if spellModifiers.hasAction(
+                SpellModifierTypeEnum.RANGE_MAX, SpellModifierActionTypeEnum.ACTION_SET
+            ):
+                return spellModifiers.getModifiedInt(SpellModifierTypeEnum.RANGE_MAX)
+            finalRange = spellModifiers.getModifiedInt(
+                SpellModifierTypeEnum.RANGE_MAX, finalRange
+            )
+
+        if self.isMaxRangeModifiableWithStatsWithModifiers and stats is not None:
+            rangeBonus = stats.getStatTotalValue(
+                StatIds.RANGE
+            ) - stats.getStatAdditionalValue(StatIds.RANGE)
             finalRange += rangeBonus
+
         if finalRange < self.minimalRange:
             finalRange = self.minimalRange
-        return finalRange
+
+        return int(finalRange)
 
     @property
     def canTargetCasterOutOfZone(self) -> bool:
@@ -384,9 +445,6 @@ class SpellWrapper(ISlotData, ICellZoneProvider, IDataCenter):
                     return self.getWeaponProperty(name, iw)
         elif self.id == 0 and PlayedCharacterManager().currentWeapon != None:
             return self.getWeaponProperty(name)
-        spellModifier = None
-        numberToReturn = 0
-        booleanToReturn = False
         if str(name) in [
             "id",
             "nameId",
@@ -402,7 +460,8 @@ class SpellWrapper(ISlotData, ICellZoneProvider, IDataCenter):
             "name",
             "description",
             "variants",
-            "default_zone",
+            "defaultPreviewZone",
+            "effectZone",
         ]:
             return self.spell[name]
         elif str(name) in [
@@ -414,122 +473,72 @@ class SpellWrapper(ISlotData, ICellZoneProvider, IDataCenter):
             "globalCooldown",
         ]:
             return self.spellLevelInfos[str(name)]
-        if str(name) == "criticalHitProbability":
-            return self.getCriticalHitProbability()
         if str(name) == "maxCastPerTurn":
-            numberToReturn = self.spellLevelInfos.maxCastPerTurn
-            spellModifier = spellmm.SpellModifiersManager().getSpellModifier(
-                self._entityId,
+            return spellmm.SpellModifiersManager().getModifiedInt(
+                self.getEntityId(),
                 self.id,
-                CharacterSpellModificationTypeEnum.MAX_CAST_PER_TURN,
+                SpellModifierTypeEnum.MAX_CAST_PER_TURN,
+                self.spellLevelInfos["maxCastPerTurn"],
             )
-            if spellModifier is not None:
-                numberToReturn += spellModifier.contextModifValue + spellModifier.objectsAndMountBonusValue
-            return numberToReturn
-        if str(name) == "range":
-            numberToReturn = self.spellLevelInfos.range
-            spellModifier = spellmm.SpellModifiersManager().getSpellModifier(
-                self._entityId,
-                self.id,
-                CharacterSpellModificationTypeEnum.RANGE_MAX,
-            )
-            if spellModifier is not None:
-                numberToReturn += spellModifier.contextModifValue + spellModifier.objectsAndMountBonusValue
-            return numberToReturn
+        if str(name) in ["range", "maxRange"]:
+            return self.maxRange
         if str(name) == "minRange":
-            numberToReturn = self.spellLevelInfos.minRange
-            spellModifier = spellmm.SpellModifiersManager().getSpellModifier(
-                self._entityId,
+            return spellmm.SpellModifiersManager().getModifiedInt(
+                self.getEntityId(),
                 self.id,
-                CharacterSpellModificationTypeEnum.RANGE_MIN,
+                SpellModifierTypeEnum.RANGE_MIN,
+                self.spellLevelInfos["minRange"],
             )
-            if spellModifier is not None:
-                numberToReturn += spellModifier.contextModifValue + spellModifier.objectsAndMountBonusValue
-            return numberToReturn
         if str(name) == "maxCastPerTarget":
-            numberToReturn = self.spellLevelInfos.maxCastPerTarget
-            spellModifier = spellmm.SpellModifiersManager().getSpellModifier(
-                self._entityId,
+            return spellmm.SpellModifiersManager().getModifiedInt(
+                self.getEntityId(),
                 self.id,
-                CharacterSpellModificationTypeEnum.MAX_CAST_PER_TARGET,
+                SpellModifierTypeEnum.MAX_CAST_PER_TARGET,
+                self.spellLevelInfos["maxCastPerTarget"],
             )
-            if spellModifier is not None:
-                numberToReturn += spellModifier.contextModifValue + spellModifier.objectsAndMountBonusValue
-            return numberToReturn
         if str(name) == "castInLine":
-            booleanToReturn = self.spellLevelInfos.castInLine
-            spellModifier = spellmm.SpellModifiersManager().getSpellModifier(
-                self._entityId,
+            return spellmm.SpellModifiersManager().getModifiedBool(
+                self.getEntityId(),
                 self.id,
-                CharacterSpellModificationTypeEnum.CAST_LINE,
+                SpellModifierTypeEnum.CAST_LINE,
+                self.spellLevelInfos["castInLine"],
             )
-            if spellModifier is not None:
-                booleanToReturn = booleanToReturn and spellModifier.totalValue == 0
-            return booleanToReturn
         if str(name) == "castInDiagonal":
             return self.spellLevelInfos.castInDiagonal
         if str(name) == "castTestLos":
-            booleanToReturn = self.spellLevelInfos.castTestLos
-            spellModifier = spellmm.SpellModifiersManager().getSpellModifier(
-                self._entityId,
+            return spellmm.SpellModifiersManager().getModifiedBool(
+                self.getEntityId(),
                 self.id,
-                CharacterSpellModificationTypeEnum.LOS,
+                SpellModifierTypeEnum.LOS,
+                self.spellLevelInfos["castTestLos"],
             )
-            if spellModifier is not None:
-                booleanToReturn = booleanToReturn and spellModifier.totalValue == 0
-            return booleanToReturn
-        
         if str(name) == "rangeCanBeBoosted":
-            booleanToReturn = self.spellLevelInfos.rangeCanBeBoosted
-            spellModifier = spellmm.SpellModifiersManager().getSpellModifier(
-                self._entityId,
+            return spellmm.SpellModifiersManager().getModifiedBool(
+                self.getEntityId(),
                 self.id,
-                CharacterSpellModificationTypeEnum.RANGEABLE,
+                SpellModifierTypeEnum.RANGEABLE,
+                self.spellLevelInfos["rangeCanBeBoosted"],
             )
-            if spellModifier is not None:
-                booleanToReturn = booleanToReturn or spellModifier.totalValue > 0
-            return booleanToReturn
-        
         if str(name) == "apCost":
-            numberToReturn = self.spellLevelInfos.apCost
-            spellModifier = spellmm.SpellModifiersManager().getSpellModifier(
-                self._entityId,
+            return spellmm.SpellModifiersManager().getModifiedInt(
+                self.getEntityId(),
                 self.id,
-                CharacterSpellModificationTypeEnum.AP_COST,
+                SpellModifierTypeEnum.AP_COST,
+                self.spellLevelInfos["apCost"],
             )
-            if spellModifier is not None:
-                numberToReturn += -(
-                    spellModifier.contextModifValue
-                    + spellModifier.objectsAndMountBonusValue
-                    + spellModifier.baseValue
-                    + spellModifier.additionalValue
-                    + spellModifier.alignGiftBonusValue
-                )
-            return numberToReturn
         if str(name) == "minCastInterval":
-            numberToReturn = self.spellLevelInfos.minCastInterval
-            spellModifier = spellmm.SpellModifiersManager().getSpellModifier(
-                self._entityId,
+            return spellmm.SpellModifiersManager().getModifiedInt(
+                self.getEntityId(),
                 self.id,
-                CharacterSpellModificationTypeEnum.CAST_INTERVAL,
+                SpellModifierTypeEnum.CAST_INTERVAL,
+                self.spellLevelInfos["minCastInterval"],
             )
-            if spellModifier is not None:
-                numberToReturn += -(
-                    spellModifier.contextModifValue
-                    + spellModifier.objectsAndMountBonusValue
-                    + spellModifier.baseValue
-                    + spellModifier.additionalValue
-                    + spellModifier.alignGiftBonusValue
-                )
-            return numberToReturn
         if str(name) == "isSpellWeapon":
             return self.id == 0
         if str(name) == "isDefaultSpellWeapon":
             return self.id == 0 and not PlayedCharacterManager().currentWeapon
-        if str(name) == "statesRequired":
-            return self.spellLevelInfos.statesRequired
-        if str(name) == "statesForbidden":
-            return self.spellLevelInfos.statesForbidden
+        if str(name) == "statesCriterion":
+            return self.spellLevelInfos.stateCriterion
         else:
             return
 
@@ -546,6 +555,7 @@ class SpellWrapper(ISlotData, ICellZoneProvider, IDataCenter):
             "iconId",
             "name",
             "description",
+            "baseCriticalHitProbability",
             "criticalHitProbability",
             "castInLine",
             "castInDiagonal",
@@ -583,12 +593,19 @@ class SpellWrapper(ISlotData, ICellZoneProvider, IDataCenter):
         else:
             return
 
-    def getCriticalHitProbability(self) -> float:
-        criticalHitProbability: float = self.spellLevelInfos.criticalHitProbability
-        return float(55 - criticalHitProbability) if criticalHitProbability > 0 else None
+    @property
+    def baseCriticalHitProbability(self):
+        if self["isSpellWeapon"] and not self["isDefaultSpellWeapon"]:
+            toReturn = self.getWeaponProperty("criticalHitProbability")
+            if toReturn is None:
+                return 0
+            return toReturn
+        return self.spellLevelInfos["criticalHitProbability"]
 
     def clone(self) -> Any:
-        return SpellWrapper.create(self.id, self.spellLevel, False, self.playerId, self.variantActivated)
+        return SpellWrapper.create(
+            self.id, self.spellLevel, False, self.playerId, self.variantActivated
+        )
 
     def addHolder(self, h: ISlotDataHolder) -> None:
         self._slotDataHolderManager.addHolder(h)
@@ -616,62 +633,79 @@ class SpellWrapper(ISlotData, ICellZoneProvider, IDataCenter):
         self._spellLevel = spellLevels[index]
         self.spellLevel = index + 1
 
-    def setSpellEffects(self, areModifiers: bool = True) -> None:
-        self.effects = list["EffectInstance"]()
-        self.criticalEffect = list["EffectInstance"]()
+    def setSpellEffects(self, areModifiers=True):
+        entityId = self.getEntityId()
+        regularBaseDamageMod = 0
+        criticalBaseDamageMod = 0
+        self.effects = []
+        self.criticalEffect = []
+
         for effectInstance in self._spellLevel.effects:
             effectInstance = effectInstance.clone()
-            entityId = self._entityId
             if areModifiers and (
                 effectInstance.category == DataEnum.ACTION_TYPE_DAMAGES
-                and effectInstance.effectId in SpellWrapper.BASE_DAMAGE_EFFECT_IDS
+                and (
+                    effectInstance.effectId in self.BASE_DAMAGE_EFFECT_IDS
+                    or ActionIdHelper.isHeal(effectInstance.effectId)
+                )
             ):
-                damageBaseSpellModifier = spellmm.SpellModifiersManager().getSpellModifier(
-                    entityId,
-                    self.id,
-                    CharacterSpellModificationTypeEnum.BASE_DAMAGE,
-                )
-                if damageBaseSpellModifier and isinstance(effectInstance, EffectInstanceDice):
-                    modif = damageBaseSpellModifier.totalValue - damageBaseSpellModifier.additionalValue
-                    effectInstance.param1 += modif
-                    if effectInstance.param2 > 0:
-                        effectInstance.param2 += modif
-                damageSpellModifier = spellmm.SpellModifiersManager().getSpellModifier(
-                    entityId, self.id, CharacterSpellModificationTypeEnum.DAMAGE
-                )
-                healSpellModifier = spellmm.SpellModifiersManager().getSpellModifier(
-                    entityId, self.id, CharacterSpellModificationTypeEnum.HEAL_BONUS
-                )
-                if damageSpellModifier:
-                    effectInstance.modificator = damageSpellModifier.totalValue - damageSpellModifier.additionalValue
-                elif healSpellModifier:
-                    effectInstance.modificator = healSpellModifier.totalValue - healSpellModifier.additionalValue
+                if isinstance(effectInstance, EffectInstanceDice):
+                    regularBaseDamageMod = (
+                        spellmm.SpellModifiersManager().getModifiedInt(
+                            entityId, self.id, SpellModifierTypeEnum.BASE_DAMAGE
+                        )
+                    )
+                    effectInstance.diceNum += regularBaseDamageMod
+                    if effectInstance.diceSide > 0:
+                        effectInstance.diceSide += regularBaseDamageMod
+                if ActionIdHelper.isHeal(effectInstance.effectId):
+                    effectInstance.modificator = (
+                        spellmm.SpellModifiersManager().getModifiedInt(
+                            entityId,
+                            self.id,
+                            SpellModifierTypeEnum.HEAL_BONUS,
+                            effectInstance.modificator,
+                        )
+                    )
+                else:
+                    effectInstance.modificator = (
+                        spellmm.SpellModifiersManager().getModifiedInt(
+                            entityId, self.id, SpellModifierTypeEnum.DAMAGE
+                        )
+                    )
             self.effects.append(effectInstance)
+
         for effectInstance in self._spellLevel.criticalEffect:
             effectInstance = effectInstance.clone()
             if areModifiers and (
                 effectInstance.category == DataEnum.ACTION_TYPE_DAMAGES
-                and effectInstance.effectId in SpellWrapper.BASE_DAMAGE_EFFECT_IDS
+                and (
+                    effectInstance.effectId in self.BASE_DAMAGE_EFFECT_IDS
+                    or ActionIdHelper.isHeal(effectInstance.effectId)
+                )
             ):
-                damageBaseSpellModifier = spellmm.SpellModifiersManager().getSpellModifier(
-                    entityId,
-                    self.id,
-                    CharacterSpellModificationTypeEnum.BASE_DAMAGE,
-                )
-                if damageBaseSpellModifier and isinstance(effectInstance, EffectInstanceDice):
-                    effectInstanceDice = effectInstance
-                    modif = damageBaseSpellModifier.totalValue - damageBaseSpellModifier.additionalValue
-                    effectInstanceDice.diceNum += modif
-                    if effectInstanceDice.diceSide > 0:
-                        effectInstanceDice.diceSide += modif
-                damageSpellModifier = spellmm.SpellModifiersManager().getSpellModifier(
-                    entityId, self.id, CharacterSpellModificationTypeEnum.DAMAGE
-                )
-                healSpellModifier = spellmm.SpellModifiersManager().getSpellModifier(
-                    entityId, self.id, CharacterSpellModificationTypeEnum.HEAL_BONUS
-                )
-                if damageSpellModifier:
-                    effectInstance.modificator = damageSpellModifier.totalValue - damageSpellModifier.additionalValue
-                elif healSpellModifier:
-                    effectInstance.modificator = damageSpellModifier.totalValue - damageSpellModifier.additionalValue
+                if isinstance(effectInstance, EffectInstanceDice):
+                    criticalBaseDamageMod = (
+                        spellmm.SpellModifiersManager().getModifiedInt(
+                            entityId, self.id, SpellModifierTypeEnum.BASE_DAMAGE
+                        )
+                    )
+                    effectInstance.diceNum += criticalBaseDamageMod
+                    if effectInstance.diceSide > 0:
+                        effectInstance.diceSide += criticalBaseDamageMod
+                if ActionIdHelper.isHeal(effectInstance.effectId):
+                    effectInstance.modificator = (
+                        spellmm.SpellModifiersManager().getModifiedInt(
+                            entityId,
+                            self.id,
+                            SpellModifierTypeEnum.HEAL_BONUS,
+                            effectInstance.modificator,
+                        )
+                    )
+                else:
+                    effectInstance.modificator = (
+                        spellmm.SpellModifiersManager().getModifiedInt(
+                            entityId, self.id, SpellModifierTypeEnum.DAMAGE
+                        )
+                    )
             self.criticalEffect.append(effectInstance)

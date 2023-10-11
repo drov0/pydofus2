@@ -49,6 +49,8 @@ from pydofus2.com.ankamagames.dofus.network.messages.game.actions.sequence.Seque
     SequenceEndMessage
 from pydofus2.com.ankamagames.dofus.network.messages.game.actions.sequence.SequenceStartMessage import \
     SequenceStartMessage
+from pydofus2.com.ankamagames.dofus.network.messages.game.character.spellmodifier.ApplySpellModifierMessage import ApplySpellModifierMessage
+from pydofus2.com.ankamagames.dofus.network.messages.game.character.spellmodifier.RemoveSpellModifierMessage import RemoveSpellModifierMessage
 from pydofus2.com.ankamagames.dofus.network.messages.game.character.stats.CharacterStatsListMessage import \
     CharacterStatsListMessage
 from pydofus2.com.ankamagames.dofus.network.messages.game.character.stats.UpdateSpellModifierMessage import \
@@ -303,32 +305,33 @@ class FightBattleFrame(Frame):
             return False
 
         elif isinstance(msg, GameFightPauseMessage):
-            gfpmsg = msg
-            if gfpmsg.isPaused:
+            if msg.isPaused:
                 Logger().debug("The fight is paused.")
             else:
                 Logger().debug("The fight is resuming after pause.")
-            self._fightIsPaused = gfpmsg.isPaused
+            self._fightIsPaused = msg.isPaused
             return True
 
-        elif isinstance(msg, UpdateSpellModifierMessage):
-            usmmsg = msg
-            SpellModifiersManager().setRawSpellModifier(usmmsg.actorId, usmmsg.spellModifier)
+        elif isinstance(msg, ApplySpellModifierMessage):
+            SpellModifiersManager().setRawSpellModifier(msg.actorId, msg.modifier)
+            return True        
+        
+        elif isinstance(msg, RemoveSpellModifierMessage):
+            SpellModifiersManager().deleteSpellModifierAction(msg.actorId, msg.modifierType, msg.actionType)
             return True
         
         elif isinstance(msg, GameFightTurnEndMessage):
-            gftemsg = msg
             if not self._confirmTurnEnd:
-                self._lastPlayerId = gftemsg.id
+                self._lastPlayerId = msg.id
             else:
-                self._nextLastPlayerId = gftemsg.id
-            entityInfos = Kernel().fightEntitiesFrame.getEntityInfos(gftemsg.id)
-            if isinstance(entityInfos, GameFightFighterInformations) and not entityInfos:
-                bffm.BuffManager().markFinishingBuffs(gftemsg.id)
-                if gftemsg.id == CurrentPlayedFighterManager().currentFighterId:
+                self._nextLastPlayerId = msg.id
+            entityInfos = Kernel().fightEntitiesFrame.getEntityInfos(msg.id)
+            if isinstance(entityInfos, GameFightFighterInformations) and not entityInfos.spawnInfo.alive:
+                bffm.BuffManager().markFinishingBuffs(msg.id)
+                if msg.id == CurrentPlayedFighterManager().currentFighterId:
                     CurrentPlayedFighterManager().getSpellCastManager().nextTurn()
-                    SpellWrapper.refreshAllPlayerSpellHolder(gftemsg.id)
-            if gftemsg.id == CurrentPlayedFighterManager().currentFighterId:
+                    SpellWrapper.refreshAllPlayerSpellHolder(msg.id)
+            if msg.id == CurrentPlayedFighterManager().currentFighterId:
                 self._turnFrame.myTurn = False
             return True
         

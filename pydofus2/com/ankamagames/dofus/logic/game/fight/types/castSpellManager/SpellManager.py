@@ -1,19 +1,20 @@
-from pydofus2.com.ankamagames.dofus.datacenter.optionalFeatures.ForgettableSpell import ForgettableSpell
-from pydofus2.com.ankamagames.dofus.datacenter.spells.Spell import Spell
-from pydofus2.com.ankamagames.dofus.datacenter.spells.SpellLevel import SpellLevel
-import pydofus2.com.ankamagames.dofus.internalDatacenter.spells.SpellWrapper as spellw
 from typing import TYPE_CHECKING
-from pydofus2.com.ankamagames.dofus.logic.game.fight.managers.SpellModifiersManager import (
-    SpellModifiersManager,
-)
+
+import pydofus2.com.ankamagames.dofus.internalDatacenter.spells.SpellWrapper as spellw
+from pydofus2.com.ankamagames.dofus.datacenter.optionalFeatures.ForgettableSpell import \
+    ForgettableSpell
+from pydofus2.com.ankamagames.dofus.datacenter.spells.Spell import Spell
+from pydofus2.com.ankamagames.dofus.datacenter.spells.SpellLevel import \
+    SpellLevel
+from pydofus2.com.ankamagames.dofus.logic.game.fight.managers.SpellModifiersManager import \
+    SpellModifiersManager
+from pydofus2.com.ankamagames.dofus.network.enums.SpellModifierTypeEnum import \
+    SpellModifierTypeEnum
 
 if TYPE_CHECKING:
     from pydofus2.com.ankamagames.dofus.logic.game.fight.managers.SpellCastInFightManager import (
         SpellCastInFightManager,
     )
-from pydofus2.com.ankamagames.dofus.network.enums.CharacterSpellModificationTypeEnum import (
-    CharacterSpellModificationTypeEnum,
-)
 
 
 class SpellManager:
@@ -35,10 +36,6 @@ class SpellManager:
     _targetsThisTurn: dict = None
 
     _spellCastManager: "SpellCastInFightManager" = None
-
-    _castIntervalModificator: int = 0
-
-    _castIntervalSetModificator: int = 0
 
     def __init__(
         self,
@@ -72,7 +69,6 @@ class SpellManager:
         return Spell.getSpellById(self._spellId)
 
     def cast(self, pTurn: int, pTarget: list, pCountForCooldown: bool = True) -> None:
-        self._castIntervalModificator = self._castIntervalSetModificator = 0
         self._lastCastTurn = pTurn
         self._forcedCooldown = False
         self._spellHasBeenCast = True
@@ -100,33 +96,18 @@ class SpellManager:
 
     @property
     def cooldown(self) -> float:
-        interval: float = None
-        cooldown: int = 0
-        spell: Spell = Spell.getSpellById(self._spellId)
-        spellLevel: SpellLevel = spell.getSpellLevel(self._spellLevel)
-        spellModifiers = SpellModifiersManager().getSpellModifiers(self._spellCastManager.entityId, self._spellId)
-        castIntervalModifier: float = 0
-        castIntervalSetModifier: float = 0
-        if spellModifiers is not None:
-            castIntervalModifier = spellModifiers.getModifierValue(CharacterSpellModificationTypeEnum.CAST_INTERVAL)
-            castIntervalSetModifier = spellModifiers.getModifierValue(
-                CharacterSpellModificationTypeEnum.CAST_INTERVAL_SET
-            )
-        if castIntervalModifier:
-            self._castIntervalModificator = castIntervalModifier
-        else:
-            castIntervalModifier = self._castIntervalModificator
-        if castIntervalSetModifier:
-            self._castIntervalSetModificator = castIntervalSetModifier
-        else:
-            castIntervalSetModifier = self._castIntervalSetModificator
-        if castIntervalSetModifier:
-            interval = -castIntervalModifier + castIntervalSetModifier
-        else:
-            interval = spellLevel.minCastInterval - (0 if castIntervalModifier < 0 else castIntervalModifier)
+        cooldown = 0
+        spell = Spell.getSpellById(self._spellId)
+        spellLevel = spell.getSpellLevel(self._spellLevel)
+        interval = SpellModifiersManager().getModifiedInt(
+            self._spellCastManager.entityId,
+            self._spellId,
+            SpellModifierTypeEnum.CAST_INTERVAL,
+            spellLevel.minCastInterval
+        )
         if interval == 63:
             return 63
-        initialCooldown: int = (
+        initialCooldown = (
             self._lastInitialCooldownReset + spellLevel.initialCooldown - self._spellCastManager.currentTurn
         )
         if (
@@ -139,9 +120,7 @@ class SpellManager:
             cooldown = interval + self._lastCastTurn - self._spellCastManager.currentTurn
         else:
             cooldown = initialCooldown
-        if cooldown <= 0:
-            cooldown = 0
-        return cooldown
+        return min(cooldown, 0)
 
     def forceCooldown(self, cooldown: int, isBonusRefresh: bool = False) -> None:
         spell: Spell = Spell.getSpellById(self._spellId)
@@ -152,7 +131,7 @@ class SpellManager:
             self._spellId, self._spellCastManager.entityId
         )
         if isBonusRefresh:
-            cooldown -= self._castIntervalModificator
+            cooldown = SpellModifiersManager().getModifiedInt(self._spellCastManager.entityId, self._spellId, SpellModifierTypeEnum.CAST_INTERVAL, cooldown)
         spellW.actualCooldown = cooldown
 
     def forceLastCastTurn(self, pLastCastTurn: int) -> None:

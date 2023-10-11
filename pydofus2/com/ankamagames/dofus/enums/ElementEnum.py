@@ -17,188 +17,33 @@ class ElementEnum:
     ELEMENT_NONE: int = 5
 
     ELEMENT_BEST: int = 6
-
+    
+    _values_for_1 = {82, 89, 95, 100, 143, 144, 279, 671, 672, 1012, 1071, 1092, 1124, 1224, 3001}
+    _values_for_2 = {86, 92, 97, 276, 1016, 1063, 1070, 1096, 1128, 1228, 3000}
+    _values_for_3 = {88, 94, 99, 108, 278, 1015, 1037, 1066, 1069, 1094, 1126, 1226}
+    _values_for_4 = {87, 93, 98, 277, 1013, 1064, 1067, 1093, 1125, 1225, 2999}
+    _values_for_5 = {81}
+    _values_for_6 = {2822, 2828, 2829, 2830, 3002}
+    _values_for_7 = {2832, 2890, 2891}
+    
     def __init__(self):
         pass
 
-    def getElementFromActionId(self, param1: int) -> int:
-        _loc2_: int = param1
-        if _loc2_ == 81:
+    @classmethod
+    def getElementFromActionId(cls, actionId: int) -> int:
+        if actionId in cls._values_for_1:
+            return 1
+        elif actionId in cls._values_for_2:
+            return 2
+        elif actionId in cls._values_for_3:
+            return 3
+        elif actionId in cls._values_for_4:
+            return 4        
+        if actionId in cls._values_for_5:
             return 5
-        if _loc2_ != 82:
-            if _loc2_ != 89:
-                if _loc2_ != 95:
-                    if _loc2_ != 100:
-                        if _loc2_ != 143:
-                            if _loc2_ != 144:
-                                if _loc2_ != 279:
-                                    if _loc2_ != 671:
-                                        if _loc2_ != 672:
-                                            if _loc2_ != 1012:
-                                                if _loc2_ != 1071:
-                                                    if _loc2_ != 1092:
-                                                        if _loc2_ != 1124:
-                                                            if _loc2_ != 1224:
-                                                                if _loc2_ != 87:
-                                                                    if _loc2_ != 93:
-                                                                        if _loc2_ != 98:
-                                                                            if _loc2_ != 277:
-                                                                                if _loc2_ != 1013:
-                                                                                    if _loc2_ != 1064:
-                                                                                        if _loc2_ != 1067:
-                                                                                            if _loc2_ != 1093:
-                                                                                                if _loc2_ != 1125:
-                                                                                                    if _loc2_ != 1225:
-                                                                                                        if (
-                                                                                                            _loc2_
-                                                                                                            != 85
-                                                                                                        ):
-                                                                                                            if (
-                                                                                                                _loc2_
-                                                                                                                != 91
-                                                                                                            ):
-                                                                                                                if (
-                                                                                                                    _loc2_
-                                                                                                                    != 96
-                                                                                                                ):
-                                                                                                                    if (
-                                                                                                                        _loc2_
-                                                                                                                        != 275
-                                                                                                                    ):
-                                                                                                                        if (
-                                                                                                                            _loc2_
-                                                                                                                            != 1014
-                                                                                                                        ):
-                                                                                                                            if (
-                                                                                                                                _loc2_
-                                                                                                                                != 1065
-                                                                                                                            ):
-                                                                                                                                if (
-                                                                                                                                    _loc2_
-                                                                                                                                    != 1068
-                                                                                                                                ):
-                                                                                                                                    if (
-                                                                                                                                        _loc2_
-                                                                                                                                        != 1095
-                                                                                                                                    ):
-                                                                                                                                        if (
-                                                                                                                                            _loc2_
-                                                                                                                                            != 1127
-                                                                                                                                        ):
-                                                                                                                                            if (
-                                                                                                                                                _loc2_
-                                                                                                                                                != 1227
-                                                                                                                                            ):
-                                                                                                                                                if (
-                                                                                                                                                    _loc2_
-                                                                                                                                                    != 88
-                                                                                                                                                ):
-                                                                                                                                                    if (
-                                                                                                                                                        _loc2_
-                                                                                                                                                        != 94
-                                                                                                                                                    ):
-                                                                                                                                                        if (
-                                                                                                                                                            _loc2_
-                                                                                                                                                            != 99
-                                                                                                                                                        ):
-                                                                                                                                                            if (
-                                                                                                                                                                _loc2_
-                                                                                                                                                                != 108
-                                                                                                                                                            ):
-                                                                                                                                                                if (
-                                                                                                                                                                    _loc2_
-                                                                                                                                                                    != 278
-                                                                                                                                                                ):
-                                                                                                                                                                    if (
-                                                                                                                                                                        _loc2_
-                                                                                                                                                                        != 1015
-                                                                                                                                                                    ):
-                                                                                                                                                                        if (
-                                                                                                                                                                            _loc2_
-                                                                                                                                                                            != 1037
-                                                                                                                                                                        ):
-                                                                                                                                                                            if (
-                                                                                                                                                                                _loc2_
-                                                                                                                                                                                != 1066
-                                                                                                                                                                            ):
-                                                                                                                                                                                if (
-                                                                                                                                                                                    _loc2_
-                                                                                                                                                                                    != 1069
-                                                                                                                                                                                ):
-                                                                                                                                                                                    if (
-                                                                                                                                                                                        _loc2_
-                                                                                                                                                                                        != 1094
-                                                                                                                                                                                    ):
-                                                                                                                                                                                        if (
-                                                                                                                                                                                            _loc2_
-                                                                                                                                                                                            != 1126
-                                                                                                                                                                                        ):
-                                                                                                                                                                                            if (
-                                                                                                                                                                                                _loc2_
-                                                                                                                                                                                                != 1226
-                                                                                                                                                                                            ):
-                                                                                                                                                                                                if (
-                                                                                                                                                                                                    _loc2_
-                                                                                                                                                                                                    != 86
-                                                                                                                                                                                                ):
-                                                                                                                                                                                                    if (
-                                                                                                                                                                                                        _loc2_
-                                                                                                                                                                                                        != 92
-                                                                                                                                                                                                    ):
-                                                                                                                                                                                                        if (
-                                                                                                                                                                                                            _loc2_
-                                                                                                                                                                                                            != 97
-                                                                                                                                                                                                        ):
-                                                                                                                                                                                                            if (
-                                                                                                                                                                                                                _loc2_
-                                                                                                                                                                                                                != 276
-                                                                                                                                                                                                            ):
-                                                                                                                                                                                                                if (
-                                                                                                                                                                                                                    _loc2_
-                                                                                                                                                                                                                    != 1016
-                                                                                                                                                                                                                ):
-                                                                                                                                                                                                                    if (
-                                                                                                                                                                                                                        _loc2_
-                                                                                                                                                                                                                        != 1063
-                                                                                                                                                                                                                    ):
-                                                                                                                                                                                                                        if (
-                                                                                                                                                                                                                            _loc2_
-                                                                                                                                                                                                                            != 1070
-                                                                                                                                                                                                                        ):
-                                                                                                                                                                                                                            if (
-                                                                                                                                                                                                                                _loc2_
-                                                                                                                                                                                                                                != 1096
-                                                                                                                                                                                                                            ):
-                                                                                                                                                                                                                                if (
-                                                                                                                                                                                                                                    _loc2_
-                                                                                                                                                                                                                                    != 1128
-                                                                                                                                                                                                                                ):
-                                                                                                                                                                                                                                    if (
-                                                                                                                                                                                                                                        _loc2_
-                                                                                                                                                                                                                                        != 1228
-                                                                                                                                                                                                                                    ):
-                                                                                                                                                                                                                                        if (
-                                                                                                                                                                                                                                            _loc2_
-                                                                                                                                                                                                                                            != 2822
-                                                                                                                                                                                                                                        ):
-                                                                                                                                                                                                                                            if (
-                                                                                                                                                                                                                                                _loc2_
-                                                                                                                                                                                                                                                != 2828
-                                                                                                                                                                                                                                            ):
-                                                                                                                                                                                                                                                if (
-                                                                                                                                                                                                                                                    _loc2_
-                                                                                                                                                                                                                                                    != 2829
-                                                                                                                                                                                                                                                ):
-                                                                                                                                                                                                                                                    if (
-                                                                                                                                                                                                                                                        _loc2_
-                                                                                                                                                                                                                                                        != 2830
-                                                                                                                                                                                                                                                    ):
-                                                                                                                                                                                                                                                        return (
-                                                                                                                                                                                                                                                            -1
-                                                                                                                                                                                                                                                        )
-                                                                                                                                                                                                                                        return 6
-                                                                                                                                                                                                return 1
-                                                                                                                                                return 2
-                                                                                                        return 3
-                                                                return 4
-        return 0
+        elif actionId in cls._values_for_6:
+            return 6
+        elif actionId in cls._values_for_7:
+            return 7
+        else:
+            return -1

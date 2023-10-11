@@ -17,7 +17,7 @@ class QuestObjectiveDiscoverSubArea(QuestObjective, IDataCenter):
     def subAreaId(self) -> int:
         if not self.parameters:
             return 0
-        return self.parameters[0]
+        return self.parameters.parameter0
 
     @property
     def subArea(self) -> SubArea:

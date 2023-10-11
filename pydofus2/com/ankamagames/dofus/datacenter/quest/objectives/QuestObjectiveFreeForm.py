@@ -1,6 +1,8 @@
-from pydofus2.com.ankamagames.dofus.datacenter.quest.QuestObjective import QuestObjective
+from pydofus2.com.ankamagames.dofus.datacenter.quest.QuestObjective import \
+    QuestObjective
 from pydofus2.com.ankamagames.jerakine.data.I18n import I18n
-from pydofus2.com.ankamagames.jerakine.interfaces.IDataCenter import IDataCenter
+from pydofus2.com.ankamagames.jerakine.interfaces.IDataCenter import \
+    IDataCenter
 
 
 class QuestObjectiveFreeForm(QuestObjective, IDataCenter):
@@ -14,7 +16,7 @@ class QuestObjectiveFreeForm(QuestObjective, IDataCenter):
     def freeFormTextId(self) -> int:
         if not self.parameters:
             return 0
-        return self.parameters[0]
+        return self.parameters.parameter0
 
     @property
     def freeFormText(self) -> str:

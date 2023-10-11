@@ -95,6 +95,8 @@ class ItemWrapper(Item, ISlotData, ICellZoneProvider, IDataCenter):
 
         self._searchContent: str
 
+        self._possiblePositions:list[int] = None
+
         self.position: int = 63
 
         self.sortOrder: int = 0
@@ -197,6 +199,7 @@ class ItemWrapper(Item, ISlotData, ICellZoneProvider, IDataCenter):
             if effect.effectId == ActionIds.ACTION_SUPERFOOD_EXPERIENCE:
                 item.givenExperienceAsSuperFood += effect.value
         item.dropPriority = dropPriotrity
+        item.initPossiblePositions()
         return item
 
     def createFromServer(self, itemFromServer: ObjectItem, useCache: bool = True) -> "ItemWrapper":
@@ -240,6 +243,7 @@ class ItemWrapper(Item, ISlotData, ICellZoneProvider, IDataCenter):
         item.effects = list["EffectInstance"]()
         item.exchangeAllowed = True
         item.updateEffects(item.effectsList)
+        item.initPossiblePositions()
         return item
 
     @classmethod
@@ -525,6 +529,27 @@ class ItemWrapper(Item, ISlotData, ICellZoneProvider, IDataCenter):
     def displayedLevel(self) -> int:
         return self.evolutiveLevel - 1
 
+    @property
+    def possiblePositions(self):
+        if self._possiblePositions is None:
+            self.initPossiblePositions()
+        return self._possiblePositions
+
+    def initPossiblePositions(self):
+        cat = 0
+        superTypeId = int(self.type.superTypeId)
+        itemType = self.type  # assuming "type" is a class variable or attribute
+        if not isinstance(itemType, ItemType):
+            return
+
+        if self.isLivingObject or self.isWrapperObject:
+            cat = self.livingObjectCategory if self.isLivingObject else self.wrapperObjectCategory
+            itemType = ItemType.getItemTypeById(cat)
+
+        self._possiblePositions = itemType.possiblePositions
+        if not self._possiblePositions or len(self._possiblePositions) == 0:
+            self._possiblePositions = itemType.superType.possiblePositions
+
     def update(
         self,
         position: int,
@@ -574,6 +599,7 @@ class ItemWrapper(Item, ISlotData, ICellZoneProvider, IDataCenter):
         item.givenExperienceAsSuperFood = self.givenExperienceAsSuperFood
         item.experiencePoints = self.experiencePoints
         item.evolutiveLevel = self.evolutiveLevel
+        item.initPossiblePositions()
         return item
 
     def addHolder(self, h: ISlotDataHolder) -> None:
@@ -728,3 +754,7 @@ class ItemWrapper(Item, ISlotData, ICellZoneProvider, IDataCenter):
             if effect.effectId == ActionIds.ACTION_SELF_PILOTING:
                 return True
         return False
+
+    @property
+    def isEquippable(self):
+        return self.possiblePositions is not None and len(self.possiblePositions) > 0

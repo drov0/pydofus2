@@ -1,10 +1,13 @@
 import sys
-from pydofus2.com.ankamagames.dofus.datacenter.items.EvolutiveItemType import EvolutiveItemType
+
+from pydofus2.com.ankamagames.dofus.datacenter.items.EvolutiveItemType import \
+    EvolutiveItemType
+from pydofus2.com.ankamagames.dofus.datacenter.items.ItemSuperType import ItemSuperType
 from pydofus2.com.ankamagames.dofus.types.IdAccessors import IdAccessors
 from pydofus2.com.ankamagames.jerakine.data.GameData import GameData
-
 from pydofus2.com.ankamagames.jerakine.data.I18n import I18n
-from pydofus2.com.ankamagames.jerakine.interfaces.IDataCenter import IDataCenter
+from pydofus2.com.ankamagames.jerakine.interfaces.IDataCenter import \
+    IDataCenter
 from pydofus2.com.ankamagames.jerakine.logger.Logger import Logger
 
 
@@ -39,10 +42,14 @@ class ItemType(IDataCenter):
     craftXpRatio: int
 
     evolutiveTypeId: int
+    
+    possiblePositions: list[int]
 
     _name: str = None
 
     _evolutiveType: EvolutiveItemType = None
+    
+    _superType: ItemSuperType = None
 
     def __init__(self):
         super().__init__()
@@ -88,6 +95,11 @@ class ItemType(IDataCenter):
         if self._zoneMinSize == -sys.maxsize - 1:
             self.parseZone()
         return self._zoneMinSize
+
+    @property
+    def superType(self) -> ItemSuperType:
+        if self._superType is None:
+            self._superType = ItemSuperType.getItemSuperById(self.superTypeId)
 
     def parseZone(self) -> None:
         params: list = None

@@ -1,7 +1,10 @@
 from pydofus2.com.ankamagames.dofus.datacenter.monsters.Monster import Monster
-from pydofus2.com.ankamagames.dofus.datacenter.quest.QuestObjective import QuestObjective
-from pydofus2.com.ankamagames.jerakine.interfaces.IDataCenter import IDataCenter
-from pydofus2.com.ankamagames.jerakine.utils.pattern.PatternDecoder import PatternDecoder
+from pydofus2.com.ankamagames.dofus.datacenter.quest.QuestObjective import \
+    QuestObjective
+from pydofus2.com.ankamagames.jerakine.interfaces.IDataCenter import \
+    IDataCenter
+from pydofus2.com.ankamagames.jerakine.utils.pattern.PatternDecoder import \
+    PatternDecoder
 
 
 class QuestObjectiveMultiFightMonster(QuestObjective, IDataCenter):
@@ -17,7 +20,7 @@ class QuestObjectiveMultiFightMonster(QuestObjective, IDataCenter):
     def monsterId(self) -> int:
         if not self.parameters:
             return 0
-        return self.parameters[0]
+        return self.parameters.parameter0
 
     @property
     def monster(self) -> Monster:
@@ -29,7 +32,7 @@ class QuestObjectiveMultiFightMonster(QuestObjective, IDataCenter):
     def quantity(self) -> int:
         if not self.parameters:
             return 0
-        return self.parameters[1]
+        return self.parameters.parameter1
 
     @property
     def text(self) -> str:

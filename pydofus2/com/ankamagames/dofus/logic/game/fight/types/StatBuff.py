@@ -5,6 +5,7 @@ from pydofus2.com.ankamagames.dofus.datacenter.effects.instances.EffectInstanceD
 from pydofus2.com.ankamagames.dofus.logic.game.fight.miscs.ActionIdHelper import ActionIdHelper
 import pydofus2.com.ankamagames.dofus.logic.game.fight.types.BasicBuff as basicBuff
 from pydofus2.com.ankamagames.dofus.logic.game.fight.types.CastingSpell import CastingSpell
+from pydofus2.com.ankamagames.dofus.network.types.game.actions.fight.FightDetailedTemporaryBoostEffect import FightDetailedTemporaryBoostEffect
 from pydofus2.com.ankamagames.dofus.network.types.game.actions.fight.FightTemporaryBoostEffect import (
     FightTemporaryBoostEffect,
 )
@@ -26,7 +27,15 @@ class StatBuff(basicBuff.BasicBuff):
         isRecent: bool = False,
     ):
         if effect:
-            super().__init__(effect, castingSpell, actionId, effect.delta, None, None)
+            if isinstance(effect, FightDetailedTemporaryBoostEffect):
+                param1 = effect.param1
+                param2 = effect.param2
+                param3 = effect.param3
+            else:
+                param1 = effect.delta
+                param2 = None
+                param3 = None
+            super().__init__(effect, castingSpell, actionId, param1, param2, param3)
             self._statName = ActionIdHelper.getActionIdStatName(actionId)
             self._isABoost = ActionIdHelper.isBuff(actionId)
             self.isRecent = isRecent

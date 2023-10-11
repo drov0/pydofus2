@@ -110,6 +110,7 @@ from pydofus2.com.ankamagames.dofus.network.messages.game.context.roleplay.Curre
 from pydofus2.com.ankamagames.dofus.network.messages.game.context.roleplay.MapObstacleUpdateMessage import (
     MapObstacleUpdateMessage,
 )
+from pydofus2.com.ankamagames.dofus.network.types.game.context.GameContextActorInformations import GameContextActorInformations
 from pydofus2.com.ankamagames.dofus.network.types.game.context.fight.FightResultFighterListEntry import (
     FightResultFighterListEntry,
 )
@@ -184,7 +185,8 @@ class FightContextFrame(Frame):
         self._entitiesFrame: FightEntitiesFrame
         self._preparationFrame: FightPreparationFrame
         self._battleFrame: FightBattleFrame
-
+        self.isFightLeader = True
+        self.fightLeader: GameContextActorInformations = None
         super().__init__()
 
     def saveResults(self, resultsDescr: object) -> str:

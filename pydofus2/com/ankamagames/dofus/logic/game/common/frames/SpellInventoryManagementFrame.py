@@ -199,7 +199,7 @@ class SpellInventoryManagementFrame(Frame, metaclass=Singleton):
             PlayedCharacterManager().spellsInventory = self._fullSpellList[slaveId]
             CurrentPlayedFighterManager().setCharacteristicsInformations(slaveId, sscmsg.slaveStats)
             StatsManager().addRawStats(slaveId, sscmsg.slaveStats.characteristics)
-            SpellModifiersManager().setRawSpellsModifiers(slaveId, sscmsg.slaveStats.spellModifications)
+            SpellModifiersManager().setRawSpellsModifiers(slaveId, sscmsg.slaveStats.spellModifiers)
             if CurrentPlayedFighterManager().getSpellCastManagerById(slaveId).needCooldownUpdate:
                 CurrentPlayedFighterManager().getSpellCastManagerById(slaveId).updateCooldowns()
             sgcds = self._spellsGlobalCooldowns.get(slaveId)

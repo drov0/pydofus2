@@ -4,14 +4,8 @@ from pydofus2.com.ankamagames.dofus.kernel.Kernel import Kernel
 from pydofus2.com.ankamagames.dofus.logic.game.fight.managers.CurrentPlayedFighterManager import (
     CurrentPlayedFighterManager,
 )
-from pydofus2.com.ankamagames.dofus.logic.game.fight.managers.SpellModifiersManager import (
-    SpellModifiersManager,
-)
 from pydofus2.com.ankamagames.dofus.logic.game.fight.types.castSpellManager.SpellManager import (
     SpellManager,
-)
-from pydofus2.com.ankamagames.dofus.network.enums.CharacterSpellModificationTypeEnum import (
-    CharacterSpellModificationTypeEnum,
 )
 from typing import TYPE_CHECKING
 
@@ -78,22 +72,7 @@ class SpellCastInFightManager:
                 spellLevel = spellW.spell.getSpellLevel(spellW.spellLevel)
                 spellCastManager = playedFighterManager.getSpellCastManagerById(self.entityId)
                 spellCastManager.castSpell(spellW.id, spellW.spellLevel, [], False)
-                interval = spellLevel.minCastInterval
-                if spellCooldown.cooldown != 63:
-                    castInterval = 0
-                    castIntervalSet = 0
-                    spellModifiers = SpellModifiersManager().getSpellModifiers(self.entityId, spellW.id)
-                    if spellModifiers is not None:
-                        castInterval = spellModifiers.getModifierValue(
-                            CharacterSpellModificationTypeEnum.CAST_INTERVAL
-                        )
-                        castIntervalSet = spellModifiers.getModifierValue(
-                            CharacterSpellModificationTypeEnum.CAST_INTERVAL_SET
-                        )
-                    if castIntervalSet:
-                        interval = -castInterval + castIntervalSet
-                    else:
-                        interval -= castInterval
+                interval = int(spellLevel.minCastInterval)
                 spellCastManager.getSpellManagerBySpellId(spellW.id).forceLastCastTurn(
                     self.currentTurn + spellCooldown.cooldown - interval
                 )

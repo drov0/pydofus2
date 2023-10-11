@@ -1,8 +1,11 @@
 from pydofus2.com.ankamagames.dofus.datacenter.monsters.Monster import Monster
 from pydofus2.com.ankamagames.dofus.datacenter.npcs.Npc import Npc
-from pydofus2.com.ankamagames.dofus.datacenter.quest.QuestObjective import QuestObjective
-from pydofus2.com.ankamagames.jerakine.interfaces.IDataCenter import IDataCenter
-from pydofus2.com.ankamagames.jerakine.utils.pattern.PatternDecoder import PatternDecoder
+from pydofus2.com.ankamagames.dofus.datacenter.quest.QuestObjective import \
+    QuestObjective
+from pydofus2.com.ankamagames.jerakine.interfaces.IDataCenter import \
+    IDataCenter
+from pydofus2.com.ankamagames.jerakine.utils.pattern.PatternDecoder import \
+    PatternDecoder
 
 
 class QuestObjectiveBringSoulToNpc(QuestObjective, IDataCenter):
@@ -20,7 +23,7 @@ class QuestObjectiveBringSoulToNpc(QuestObjective, IDataCenter):
     def npcId(self) -> int:
         if not self.parameters:
             return 0
-        return self.parameters[0]
+        return self.parameters.parameter0
 
     @property
     def npc(self) -> Npc:
@@ -32,7 +35,7 @@ class QuestObjectiveBringSoulToNpc(QuestObjective, IDataCenter):
     def monsterId(self) -> int:
         if not self.parameters:
             return 0
-        return self.parameters[1]
+        return self.parameters.parameter1
 
     @property
     def monster(self) -> Monster:
@@ -44,7 +47,7 @@ class QuestObjectiveBringSoulToNpc(QuestObjective, IDataCenter):
     def quantity(self) -> int:
         if not self.parameters:
             return 0
-        return self.parameters[2]
+        return self.parameters.parameter2
 
     @property
     def text(self) -> str:

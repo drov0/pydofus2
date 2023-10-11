@@ -57,8 +57,6 @@ class PlayedCharacterManager(IDestroyable, metaclass=Singleton):
 
     def __init__(self):
         self._followingPlayerIds = list[float]()
-        self._soloIdols = list[int]()
-        self._partyIdols = list[int]()
         self._infosAvailableCallbacks = list[Callback]()
         self.playerForgettableSpelldict = dict()
         self.lastCoord = Point(0, 0)
@@ -364,22 +362,6 @@ class PlayedCharacterManager(IDestroyable, metaclass=Singleton):
     @followingPlayerIds.setter
     def followingPlayerIds(self, pPlayerIds: list[float]) -> None:
         self._followingPlayerIds = pPlayerIds
-
-    @property
-    def soloIdols(self) -> list[int]:
-        return self._soloIdols
-
-    @soloIdols.setter
-    def soloIdols(self, pIdols: list[int]) -> None:
-        self._soloIdols = pIdols
-
-    @property
-    def partyIdols(self) -> list[int]:
-        return self._partyIdols
-
-    @partyIdols.setter
-    def partyIdols(self, pIdols: list[int]) -> None:
-        self._partyIdols = pIdols
 
     @property
     def canBeAggressedByMonsters(self) -> bool:

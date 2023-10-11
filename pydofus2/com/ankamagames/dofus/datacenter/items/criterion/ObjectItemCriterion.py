@@ -1,7 +1,9 @@
 from pydofus2.com.ankamagames.dofus.datacenter.items.Item import Item
+from pydofus2.com.ankamagames.dofus.datacenter.items.ItemType import ItemType
 from pydofus2.com.ankamagames.dofus.datacenter.items.criterion.IItemCriterion import IItemCriterion
 from pydofus2.com.ankamagames.dofus.datacenter.items.criterion.ItemCriterion import ItemCriterion
 from pydofus2.com.ankamagames.dofus.datacenter.items.criterion.ItemCriterionOperator import ItemCriterionOperator
+from pydofus2.com.ankamagames.dofus.internalDatacenter.DataEnum import DataEnum
 from pydofus2.com.ankamagames.dofus.internalDatacenter.items.ItemWrapper import ItemWrapper
 from pydofus2.com.ankamagames.dofus.logic.game.common.managers.InventoryManager import InventoryManager
 from pydofus2.com.ankamagames.jerakine.data.I18n import I18n
@@ -50,7 +52,10 @@ class ObjectItemCriterion(ItemCriterion, IDataCenter):
 
     @property
     def text(self) -> str:
-        objectName: str = Item.getItemById(self._criterionValue).name
+        objectItem: Item = Item.getItemById(self._criterionValue)
+        if objectItem.type.superTypeId == DataEnum.ITEM_SUPERTYPE_INVISIBLE:
+            return ""
+        objectName = objectItem.name
         readableCriterion: str = ""
         if self._operator.text == ItemCriterionOperator.DIFFERENT:
             if self._criterionValueQuantity == 1 or self._criterionValueQuantity == -1:

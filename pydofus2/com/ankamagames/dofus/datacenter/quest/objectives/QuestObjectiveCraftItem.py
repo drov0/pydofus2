@@ -15,9 +15,9 @@ class QuestObjectiveCraftItem(QuestObjective, IDataCenter):
 
     @property
     def itemId(self) -> int:
-        if not self.parameters or len(self.parameters) < 2:
+        if not self.parameters or self.parameters.numParams < 2:
             return 0
-        return self.parameters[0]
+        return self.parameters.parameter0
 
     @property
     def item(self) -> Item:
@@ -27,9 +27,9 @@ class QuestObjectiveCraftItem(QuestObjective, IDataCenter):
 
     @property
     def quantity(self) -> int:
-        if not self.parameters or len(self.parameters) < 2:
+        if not self.parameters or self.parameters.numParams < 2:
             return 0
-        return self.parameters[1]
+        return self.parameters.parameter1
 
     @property
     def text(self) -> str:

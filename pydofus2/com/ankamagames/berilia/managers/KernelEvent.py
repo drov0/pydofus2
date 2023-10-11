@@ -35,6 +35,11 @@ class KernelEvent(Enum):
     FighterShowed = auto()
     FightJoined = auto()
     RoleplayStarted = auto()
+    FightLeader = auto()
+    
+    # buffs in fight
+    BuffAdd = auto()
+    BuffUpdate = auto()
     
     # Interactives
     IElemBeingUsed = auto()

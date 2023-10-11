@@ -349,7 +349,7 @@ class Item(IPostInit, IDataCenter):
         return self._processedImportantNotice
 
     @property
-    def type(self) -> object:
+    def type(self) -> "ItemType":
         if not self._type:
             self._type = ItemType.getItemTypeById(self.typeId)
         return self._type

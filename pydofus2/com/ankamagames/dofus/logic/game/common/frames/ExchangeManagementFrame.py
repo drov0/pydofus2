@@ -139,8 +139,8 @@ class ExchangeManagementFrame(Frame):
 
     def processExchangeStartOkNpcTradeMessage(msg: ExchangeStartOkNpcTradeMessage):
         source_name = PlayedCharacterManager().infos.name
-        npc_id = Kernel().entitiesFrame.getEntityInfos(msg.npcId).contextualId
-        npc = Npc.getNpcById(npc_id)
+        # NPCID = Kernel().entitiesFrame.getEntityInfos(msg.npcId).contextualId
+        # NPC = Npc.getNpcById(NPCID)
         target_name = Npc.getNpcById(Kernel().entitiesFrame.getEntityInfos(msg.npcId).npcId).name
         PlayedCharacterManager().isInExchange = True
         KernelEventsManager().send(KernelEvent.ExchangeStartOkNpcTrade, msg.npcId, source_name, target_name)

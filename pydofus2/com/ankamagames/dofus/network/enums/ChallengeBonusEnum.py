@@ -1,0 +1,4 @@
+class ChallengeBonusEnum:
+
+    CHALLENGE_EXPERIENCE_BONUS = 0
+    CHALLENGE_DROP_BONUS = 1

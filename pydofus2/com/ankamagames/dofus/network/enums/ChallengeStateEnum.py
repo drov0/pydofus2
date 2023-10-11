@@ -1,0 +1,5 @@
+class ChallengeStateEnum:
+
+    CHALLENGE_COMPLETED = 0
+    CHALLENGE_FAILED = 1
+    CHALLENGE_RUNNING = 2

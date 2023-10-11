@@ -1,9 +1,17 @@
 from typing import TYPE_CHECKING
 from pydofus2.com.ankamagames.atouin.utils.DataMapProvider import DataMapProvider
+from pydofus2.com.ankamagames.berilia.managers.KernelEvent import KernelEvent
+from pydofus2.com.ankamagames.berilia.managers.KernelEventsManager import KernelEventsManager
 from pydofus2.com.ankamagames.dofus.kernel.Kernel import Kernel
-from pydofus2.com.ankamagames.dofus.kernel.net.ConnectionsHandler import ConnectionsHandler
-from pydofus2.com.ankamagames.dofus.logic.game.common.managers.PlayedCharacterManager import PlayedCharacterManager
-from pydofus2.com.ankamagames.dofus.logic.game.fight.actions.GameContextKickAction import GameContextKickAction
+from pydofus2.com.ankamagames.dofus.kernel.net.ConnectionsHandler import (
+    ConnectionsHandler,
+)
+from pydofus2.com.ankamagames.dofus.logic.game.common.managers.PlayedCharacterManager import (
+    PlayedCharacterManager,
+)
+from pydofus2.com.ankamagames.dofus.logic.game.fight.actions.GameContextKickAction import (
+    GameContextKickAction,
+)
 from pydofus2.com.ankamagames.dofus.logic.game.fight.actions.GameFightPlacementPositionRequestAction import (
     GameFightPlacementPositionRequestAction,
 )
@@ -16,7 +24,9 @@ from pydofus2.com.ankamagames.dofus.logic.game.fight.actions.GameFightPlacementS
 from pydofus2.com.ankamagames.dofus.logic.game.fight.actions.GameFightPlacementSwapPositionsRequestAction import (
     GameFightPlacementSwapPositionsRequestAction,
 )
-from pydofus2.com.ankamagames.dofus.logic.game.fight.actions.RemoveEntityAction import RemoveEntityAction
+from pydofus2.com.ankamagames.dofus.logic.game.fight.actions.RemoveEntityAction import (
+    RemoveEntityAction,
+)
 
 if TYPE_CHECKING:
     pass
@@ -25,9 +35,13 @@ if TYPE_CHECKING:
         FightContextFrame,
     )
 
-from pydofus2.com.ankamagames.dofus.logic.game.fight.types.SwapPositionRequest import SwapPositionRequest
+from pydofus2.com.ankamagames.dofus.logic.game.fight.types.SwapPositionRequest import (
+    SwapPositionRequest,
+)
 from pydofus2.com.ankamagames.dofus.network.enums.TeamEnum import TeamEnum
-from pydofus2.com.ankamagames.dofus.network.messages.game.context.fight.GameFightEndMessage import GameFightEndMessage
+from pydofus2.com.ankamagames.dofus.network.messages.game.context.fight.GameFightEndMessage import (
+    GameFightEndMessage,
+)
 from pydofus2.com.ankamagames.dofus.network.messages.game.context.fight.GameFightLeaveMessage import (
     GameFightLeaveMessage,
 )
@@ -67,7 +81,9 @@ from pydofus2.com.ankamagames.dofus.network.messages.game.context.fight.GameFigh
 from pydofus2.com.ankamagames.dofus.network.messages.game.context.GameContextDestroyMessage import (
     GameContextDestroyMessage,
 )
-from pydofus2.com.ankamagames.dofus.network.messages.game.context.GameContextKickMessage import GameContextKickMessage
+from pydofus2.com.ankamagames.dofus.network.messages.game.context.GameContextKickMessage import (
+    GameContextKickMessage,
+)
 from pydofus2.com.ankamagames.dofus.network.messages.game.context.GameEntitiesDispositionMessage import (
     GameEntitiesDispositionMessage,
 )
@@ -82,6 +98,7 @@ from pydofus2.com.ankamagames.jerakine.messages.Frame import Frame
 from pydofus2.com.ankamagames.jerakine.messages.Message import Message
 from pydofus2.com.ankamagames.jerakine.types.enums.Priority import Priority
 from pydofus2.com.ankamagames.jerakine.types.positions.MapPoint import MapPoint
+
 
 class FightPreparationFrame(Frame):
 
@@ -138,7 +155,9 @@ class FightPreparationFrame(Frame):
         swapPositionRequest: SwapPositionRequest = None
         for swapPositionRequest in self._swapPositionRequests:
             if swapPositionRequest.requestId == pRequestId:
-                del self._swapPositionRequests[self._swapPositionRequests.index(swapPositionRequest)]
+                del self._swapPositionRequests[
+                    self._swapPositionRequests.index(swapPositionRequest)
+                ]
 
     def isSwapPositionRequestValid(self, pRequestId: int) -> bool:
         swapPositionRequest: SwapPositionRequest = None
@@ -148,7 +167,7 @@ class FightPreparationFrame(Frame):
         return False
 
     def process(self, msg: Message) -> bool:
-        alreadyInTeam: bool = False
+        myTeam: bool = False
         indexOfCharToRemove: int = 0
 
         if isinstance(msg, GameFightLeaveMessage):
@@ -158,13 +177,17 @@ class FightPreparationFrame(Frame):
                 Kernel().worker.removeFrame(self)
                 gfemsg = GameFightEndMessage()
                 gfemsg.init()
-                fightContextFrame2: "FightContextFrame" = Kernel().worker.getFrameByName("FightContextFrame")
+                fightContextFrame2: "FightContextFrame" = (
+                    Kernel().worker.getFrameByName("FightContextFrame")
+                )
                 if fightContextFrame2:
                     fightContextFrame2.process(gfemsg)
                 else:
                     Kernel().worker.process(gfemsg)
                 return True
-            fighterSwapPositionRequests = self.getPlayerSwapPositionRequests(gflmsg.charId)
+            fighterSwapPositionRequests = self.getPlayerSwapPositionRequests(
+                gflmsg.charId
+            )
             for swapPositionRequest in fighterSwapPositionRequests:
                 swapPositionRequest.destroy()
             return False
@@ -182,9 +205,13 @@ class FightPreparationFrame(Frame):
                 ConnectionsHandler().send(gfpprmsg2)
             return True
 
-        if isinstance(msg, GameEntitiesDispositionMessage) or isinstance(msg, GameFightPlacementSwapPositionsMessage):
+        if isinstance(msg, GameEntitiesDispositionMessage) or isinstance(
+            msg, GameFightPlacementSwapPositionsMessage
+        ):
             for iedi in msg.dispositions:
-                entitySwapPositionsRequests = self.getPlayerSwapPositionRequests(iedi.id)
+                entitySwapPositionsRequests = self.getPlayerSwapPositionRequests(
+                    iedi.id
+                )
                 for swapPositionRequest in entitySwapPositionsRequests:
                     swapPositionRequest.destroy()
             return False
@@ -250,22 +277,29 @@ class FightPreparationFrame(Frame):
             return True
 
         if isinstance(msg, GameFightUpdateTeamMessage):
-            gfutmsg = msg
-            gfutmsg_myId = PlayedCharacterManager().id
-            alreadyInTeam = False
-            for teamMember in gfutmsg.team.teamMembers:
-                if teamMember.id == gfutmsg_myId:
-                    alreadyInTeam = True
+            playerId = PlayedCharacterManager().id
+            for teamMember in msg.team.teamMembers:
+                if teamMember.id == playerId:
+                    myTeam = True
                 if teamMember.id not in self._fightersId:
                     self._fightersId.append(teamMember.id)
-            if alreadyInTeam or len(gfutmsg.team.teamMembers) >= 1 and gfutmsg.team.teamMembers[0].id == gfutmsg_myId:
-                PlayedCharacterManager().teamId = gfutmsg.team.teamId
-                self._fightContextFrame.isFightLeader = gfutmsg.team.leaderId == gfutmsg_myId
+            if msg.team and (
+                myTeam
+                or self._fightContextFrame.entitiesFrame.getEntityInfos(playerId)
+                and self._fightContextFrame.entitiesFrame.getEntityTeamId(playerId)
+                == msg.team.teamId
+            ):
+                PlayedCharacterManager().teamId = msg.team.teamId
+                self._fightContextFrame.isFightLeader = (msg.team.leaderId == playerId)
+                self._fightContextFrame.fightLeader = self._fightContextFrame.entitiesFrame.getEntityInfos(msg.team.leaderId)
+                KernelEventsManager().send(KernelEvent.FightLeader, self._fightContextFrame.challengeMod)
             return True
 
         if isinstance(msg, GameFightRemoveTeamMemberMessage):
             gfrtmmsg = msg
-            self._fightContextFrame.entitiesFrame.process(RemoveEntityAction.create(gfrtmmsg.charId))
+            self._fightContextFrame.entitiesFrame.process(
+                RemoveEntityAction.create(gfrtmmsg.charId)
+            )
             if gfrtmmsg.charId in self._fightersId:
                 self._fightersId.remove(gfrtmmsg.charId)
             return True
@@ -273,7 +307,9 @@ class FightPreparationFrame(Frame):
         if isinstance(msg, GameContextDestroyMessage):
             gfemsg2 = GameFightEndMessage()
             gfemsg2.init()
-            fightContextFrame: "FightContextFrame" = Kernel().worker.getFrameByName("FightContextFrame")
+            fightContextFrame: "FightContextFrame" = Kernel().worker.getFrameByName(
+                "FightContextFrame"
+            )
             if fightContextFrame:
                 fightContextFrame.process(gfemsg2)
             else:
@@ -321,10 +357,15 @@ class FightPreparationFrame(Frame):
                 return swapPositionRequest
         return None
 
-    def getPlayerSwapPositionRequests(self, pPlayerId: float) -> list[SwapPositionRequest]:
+    def getPlayerSwapPositionRequests(
+        self, pPlayerId: float
+    ) -> list[SwapPositionRequest]:
         swapPositionRequest: SwapPositionRequest = None
         swapPositionRequests: list[SwapPositionRequest] = list[SwapPositionRequest]()
         for swapPositionRequest in self._swapPositionRequests:
-            if swapPositionRequest.requesterId == pPlayerId or swapPositionRequest.requestedId == pPlayerId:
+            if (
+                swapPositionRequest.requesterId == pPlayerId
+                or swapPositionRequest.requestedId == pPlayerId
+            ):
                 swapPositionRequests.append(swapPositionRequest)
         return swapPositionRequests

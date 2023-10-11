@@ -212,5 +212,5 @@ class JobsFrame(Frame):
         paramsNewJob["sum_of_jobs_earned_levels"] = newJobsLevel
         paramsLastJob["sum_of_jobs_earned_levels"] = lastJobsLevel
         return LuaScriptManager().executeLuaFormula(
-            LuaFormulasEnum.JOBLEVELUP_PODSBONUS, paramsNewJob
-        ) - LuaScriptManager().executeLuaFormula(LuaFormulasEnum.JOBLEVELUP_PODSBONUS, paramsLastJob)
+            LuaFormulasEnum.JOB_LEVEL_UP_PODS_BONUS, paramsNewJob
+        ) - LuaScriptManager().executeLuaFormula(LuaFormulasEnum.JOB_LEVEL_UP_PODS_BONUS, paramsLastJob)

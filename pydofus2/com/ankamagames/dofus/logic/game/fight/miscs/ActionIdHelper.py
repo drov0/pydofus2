@@ -162,7 +162,43 @@ class ActionIdHelper:
         2837,
         2835,
     ]
+    
+    # Mapping for StatToBuffPercentActionIds
+    _stat_to_buff_map = {
+        1: 2846,
+        10: 2834,
+        11: 2844,
+        12: 2842,
+        13: 2840,
+        14: 2836,
+        15: 2838,
+        23: 2848
+    }
 
+    # Mapping for StatToDebuffPercentActionIds
+    _stat_to_debuff_map = {
+        1: 2847,
+        10: 2835,
+        11: 2845,
+        12: 2843,
+        13: 2841,
+        14: 2837,
+        15: 2839,
+        23: 2848
+    }
+
+    _stat_steal_ids = {266, 267, 268, 269, 270, 271}
+    
+    _global_limitation_ids = {2017, 2160, 2792, 2793, 2795}
+
+    _damage_inflicted_ids = {
+        100, 144, 89, 1071, 1092, 1118, 670, 671, 672, 279, 95, 82, 1012, 1223, 
+        1123, 1224, 1124, 97, 1063, 86, 1070, 276, 1096, 1122, 92, 1016, 1228, 
+        1128, 98, 1064, 87, 1067, 277, 1093, 1119, 93, 1013, 1225, 1125, 96, 
+        1065, 85, 1068, 1095, 1121, 275, 91, 1014, 1227, 1127, 99, 1066, 88, 
+        1069, 1094, 1120, 278, 94, 1015, 80, 1226, 1126, 2822, 2830, 2829, 2828
+    }
+    
     with open(CURRDIR / "actionIdToStatNameMap.json", "r") as fs:
         actionIdToStatNameMap = json.load(fs)
 
@@ -336,18 +372,8 @@ class ActionIdHelper:
 
     @classmethod
     def isHeal(cls, param1: int) -> bool:
-        _loc2_: int = param1
-        if _loc2_ != 81:
-            if _loc2_ != 90:
-                if _loc2_ != 108:
-                    if _loc2_ != 143:
-                        if _loc2_ != 407:
-                            if _loc2_ != 786:
-                                if _loc2_ != 1037:
-                                    if _loc2_ != 1109:
-                                        if _loc2_ != 2020:
-                                            return False
-        return True
+        heal_ids = {81, 90, 108, 143, 407, 786, 1037, 1109, 2020, 2998, 2999, 3000, 3001, 3002}
+        return param1 in heal_ids
 
     @classmethod
     def isShield(cls, param1: int) -> bool:
@@ -651,70 +677,18 @@ class ActionIdHelper:
 
     @classmethod
     def StatToBuffPercentActionIds(cls, param1: int) -> int:
-        if param1 == 1:
-            return 2846
-        if param1 == 10:
-            return 2834
-        if param1 == 11:
-            return 2844
-        if param1 == 12:
-            return 2842
-        if param1 == 13:
-            return 2840
-        if param1 == 14:
-            return 2836
-        if param1 == 15:
-            return 2838
-        if param1 == 23:
-            return 2848
-        else:
-            return -1
+        return cls._stat_to_buff_map.get(param1, -1)
 
     @classmethod
     def StatToDebuffPercentActionIds(cls, param1: int) -> int:
-        if param1 == 1:
-            return 2847
-        if param1 == 10:
-            return 2835
-        if param1 == 11:
-            return 2845
-        if param1 == 12:
-            return 2843
-        if param1 == 13:
-            return 2841
-        if param1 == 14:
-            return 2837
-        if param1 == 15:
-            return 2839
-        if param1 == 23:
-            return 2848
-        else:
-            return -1
+        return cls._stat_to_debuff_map.get(param1, -1)
 
     @classmethod
     def isLinearBuffActionIds(cls, param1: int) -> bool:
-        if param1 == [
-            31,
-            33,
-            34,
-            35,
-            36,
-            37,
-            59,
-            60,
-            61,
-            62,
-            63,
-            69,
-            101,
-            121,
-            124,
-            141,
-            142,
-        ]:
-            return False
-        else:
-            return True
+        non_linear_ids = [
+            31, 33, 34, 35, 36, 37, 59, 60, 61, 62, 63, 69, 101, 121, 124, 141, 142
+        ]
+        return param1 not in non_linear_ids
 
     @classmethod
     def isStatModifier(cls, actionId: int) -> bool:
@@ -762,89 +736,12 @@ class ActionIdHelper:
 
     @classmethod
     def isStatSteal(cls, param1: int) -> bool:
-        if not (param1 == 266 or param1 == 267 or param1 == 268 or param1 == 269 or param1 == 270):
-            return param1 == 271
-        return True
+        return param1 in cls._stat_steal_ids
 
     @classmethod
     def spellExecutionHasGlobalLimitation(cls, param1: int) -> bool:
-        _loc2_: int = param1
-        if _loc2_ != 2017:
-            if _loc2_ != 2160:
-                if _loc2_ != 2792:
-                    if _loc2_ != 2793:
-                        if _loc2_ != 2795:
-                            return False
-        return True
+        return param1 in cls._global_limitation_ids
 
     @classmethod
     def isDamageInflicted(cls, param1: int) -> bool:
-        if not (
-            param1 == 100
-            or param1 == 144
-            or param1 == 89
-            or param1 == 1071
-            or param1 == 1092
-            or param1 == 1118
-            or param1 == 670
-            or param1 == 671
-            or param1 == 672
-            or param1 == 279
-            or param1 == 95
-            or param1 == 82
-            or param1 == 1012
-            or param1 == 1223
-            or param1 == 1123
-            or param1 == 1224
-            or param1 == 1124
-            or param1 == 97
-            or param1 == 1063
-            or param1 == 86
-            or param1 == 1070
-            or param1 == 276
-            or param1 == 1096
-            or param1 == 1122
-            or param1 == 92
-            or param1 == 1016
-            or param1 == 1228
-            or param1 == 1128
-            or param1 == 98
-            or param1 == 1064
-            or param1 == 87
-            or param1 == 1067
-            or param1 == 277
-            or param1 == 1093
-            or param1 == 1119
-            or param1 == 93
-            or param1 == 1013
-            or param1 == 1225
-            or param1 == 1125
-            or param1 == 96
-            or param1 == 1065
-            or param1 == 85
-            or param1 == 1068
-            or param1 == 1095
-            or param1 == 1121
-            or param1 == 275
-            or param1 == 91
-            or param1 == 1014
-            or param1 == 1227
-            or param1 == 1127
-            or param1 == 99
-            or param1 == 1066
-            or param1 == 88
-            or param1 == 1069
-            or param1 == 1094
-            or param1 == 1120
-            or param1 == 278
-            or param1 == 94
-            or param1 == 1015
-            or param1 == 80
-            or param1 == 1226
-            or param1 == 1126
-            or param1 == 2822
-            or param1 == 2830
-            or param1 == 2829
-        ):
-            return param1 == 2828
-        return True
+        return param1 in cls._damage_inflicted_ids

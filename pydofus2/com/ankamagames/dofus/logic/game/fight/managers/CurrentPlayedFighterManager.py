@@ -11,6 +11,7 @@ from pydofus2.com.ankamagames.dofus.logic.game.fight.managers.SpellModifiersMana
     SpellModifiersManager
 from pydofus2.com.ankamagames.dofus.network.enums.CharacterSpellModificationTypeEnum import \
     CharacterSpellModificationTypeEnum
+from pydofus2.com.ankamagames.dofus.network.enums.SpellModifierTypeEnum import SpellModifierTypeEnum
 from pydofus2.com.ankamagames.jerakine.data.I18n import I18n
 
 if TYPE_CHECKING:
@@ -273,12 +274,7 @@ class CurrentPlayedFighterManager(metaclass=Singleton):
             return False, reason
         if pTargetId != 0:
             numberCastOnTarget = spellManager.getCastOnEntity(pTargetId)
-            spellModifiers = SpellModifiersManager().getSpellModifiers(self.currentFighterId, spellId)
-            bonus = (
-                float(spellModifiers.getModifierValue(CharacterSpellModificationTypeEnum.MAX_CAST_PER_TARGET))
-                if not not spellModifiers
-                else float(0)
-            )
+            bonus = SpellModifiersManager().getModifiedInt(self.currentFighterId, spellId, SpellModifierTypeEnum.MAX_CAST_PER_TARGET)
             if spellLevel.maxCastPerTarget + bonus <= numberCastOnTarget and spellLevel.maxCastPerTarget > 0:
                 reason = I18n.getUiText("ui.fightAutomsg.spellcast.castPerTarget", [spellName])
                 return False, reason

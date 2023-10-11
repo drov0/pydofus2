@@ -316,8 +316,7 @@ class BasicBuff:
     def __eq__(self, other: "BasicBuff", ignoreSpell: bool = False) -> bool:
         from pydofus2.com.ankamagames.dofus.logic.game.fight.types.StateBuff import StateBuff
 
-        sb1: "StateBuff" = None
-        sb2: "StateBuff" = None
+
         if (
             self.targetId != other.targetId
             or self.aliveSource != other.aliveSource
@@ -369,6 +368,7 @@ class BasicBuff:
             or self.actionId == ActionIds.ACTION_CHARACTER_REMOVE_SPELL_COOLDOWN
             or self.actionId == ActionIds.ACTION_CHARACTER_PROTECTION_FROM_SPELL
             or self.actionId == ActionIds.ACTION_CHARACTER_SET_SPELL_COOLDOWN
+            or self.actionId == ActionIds.ACTION_INHERITE_CHARAC
         ):
             if self.param1 != other.param1:
                 return False

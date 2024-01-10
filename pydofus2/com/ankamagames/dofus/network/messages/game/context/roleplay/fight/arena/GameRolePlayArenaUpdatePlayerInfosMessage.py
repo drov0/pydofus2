@@ -5,9 +5,11 @@ if TYPE_CHECKING:
     
 
 class GameRolePlayArenaUpdatePlayerInfosMessage(NetworkMessage):
-    solo: 'ArenaRankInfos'
-    def init(self, solo_: 'ArenaRankInfos'):
-        self.solo = solo_
+    arenaRanks: list['ArenaRankInfos']
+    banEndDate: int
+    def init(self, arenaRanks_: list['ArenaRankInfos'], banEndDate_: int):
+        self.arenaRanks = arenaRanks_
+        self.banEndDate = banEndDate_
         
         super().__init__()
     

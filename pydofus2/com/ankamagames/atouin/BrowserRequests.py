@@ -1,6 +1,7 @@
 import asyncio
 import json
 from urllib.parse import urlencode
+
 from pyppeteer import launch
 
 
@@ -19,7 +20,7 @@ class BrowserRequests:
         async def intercept(request):
             headers = {
                 **req['headers'],
-                'User-Agent': 'Zaap 3.9.3',
+                'User-Agent': 'Zaap 3.12.2',
                 'accept': '*/*',
                 'accept-encoding': 'gzip,deflate'
             }

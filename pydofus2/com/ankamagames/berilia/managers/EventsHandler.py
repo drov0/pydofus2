@@ -131,7 +131,8 @@ class EventsHandler:
         event = Event()
         event.sender = self
         event.name = event_id
-        if not self._listeners.get(event_id):
+        liteners = self._listeners.get(event_id, [])
+        if not liteners:
             return event
         event_listeners = self.getSortedListeners(event_id)
         to_remove = list[Listener]()
@@ -145,12 +146,12 @@ class EventsHandler:
                 to_remove.append(listener)
             if event.propagation_stopped:
                 break
+        with lock:
             if to_remove:
-                with lock:
-                    if event_id in self._sorted:
-                        del self._sorted[event_id]
-                    for listener in to_remove:
-                        listener.delete()
+                if event_id in self._sorted:
+                    del self._sorted[event_id]
+                for listener in to_remove:
+                    listener.delete()
 
     def reset(self):
         self.stopAllwaiting()

@@ -137,6 +137,7 @@ pydofus2/com/ankamagames/dofus/datacenter/items/Incarnation.py
 pydofus2/com/ankamagames/dofus/datacenter/items/IncarnationLevel.py
 pydofus2/com/ankamagames/dofus/datacenter/items/Item.py
 pydofus2/com/ankamagames/dofus/datacenter/items/ItemSet.py
+pydofus2/com/ankamagames/dofus/datacenter/items/ItemSuperType.py
 pydofus2/com/ankamagames/dofus/datacenter/items/ItemType.py
 pydofus2/com/ankamagames/dofus/datacenter/items/LegendaryPowerCategory.py
 pydofus2/com/ankamagames/dofus/datacenter/items/PresetIcon.py
@@ -303,6 +304,10 @@ pydofus2/com/ankamagames/dofus/internalDatacenter/DataEnum.py
 pydofus2/com/ankamagames/dofus/internalDatacenter/__init__.py
 pydofus2/com/ankamagames/dofus/internalDatacenter/connection/BasicCharacterWrapper.py
 pydofus2/com/ankamagames/dofus/internalDatacenter/connection/__init__.py
+pydofus2/com/ankamagames/dofus/internalDatacenter/fight/ChallengeTargetWrapper.py
+pydofus2/com/ankamagames/dofus/internalDatacenter/fight/ChallengeWrapper.py
+pydofus2/com/ankamagames/dofus/internalDatacenter/fight/EmptyChallengerWrapper.py
+pydofus2/com/ankamagames/dofus/internalDatacenter/fight/EnumChallengeCategory.py
 pydofus2/com/ankamagames/dofus/internalDatacenter/fight/FightLootWrapper.py
 pydofus2/com/ankamagames/dofus/internalDatacenter/fight/FightResultEntryWrapper.py
 pydofus2/com/ankamagames/dofus/internalDatacenter/fight/__init__.py
@@ -444,6 +449,7 @@ pydofus2/com/ankamagames/dofus/logic/game/common/misc/inventoryView/StorageSmith
 pydofus2/com/ankamagames/dofus/logic/game/common/misc/inventoryView/StorageView.py
 pydofus2/com/ankamagames/dofus/logic/game/common/misc/inventoryView/__init__.py
 pydofus2/com/ankamagames/dofus/logic/game/common/spell/SpellModifier.py
+pydofus2/com/ankamagames/dofus/logic/game/common/spell/SpellModifierValueTypeEnum.py
 pydofus2/com/ankamagames/dofus/logic/game/common/spell/SpellModifiers.py
 pydofus2/com/ankamagames/dofus/logic/game/common/spell/__init__.py
 pydofus2/com/ankamagames/dofus/logic/game/fight/__init__.py
@@ -625,6 +631,9 @@ pydofus2/com/ankamagames/dofus/network/enums/AlignmentSideEnum.py
 pydofus2/com/ankamagames/dofus/network/enums/AlignmentWarEffortDonationResultEnum.py
 pydofus2/com/ankamagames/dofus/network/enums/BreedEnum.py
 pydofus2/com/ankamagames/dofus/network/enums/BuildTypeEnum.py
+pydofus2/com/ankamagames/dofus/network/enums/ChallengeBonusEnum.py
+pydofus2/com/ankamagames/dofus/network/enums/ChallengeModEnum.py
+pydofus2/com/ankamagames/dofus/network/enums/ChallengeStateEnum.py
 pydofus2/com/ankamagames/dofus/network/enums/CharacterCreationResultEnum.py
 pydofus2/com/ankamagames/dofus/network/enums/CharacterDeletionErrorEnum.py
 pydofus2/com/ankamagames/dofus/network/enums/CharacterInventoryPositionEnum.py
@@ -651,6 +660,8 @@ pydofus2/com/ankamagames/dofus/network/enums/PlayerLifeStatusEnum.py
 pydofus2/com/ankamagames/dofus/network/enums/ProtocolConstantsEnum.py
 pydofus2/com/ankamagames/dofus/network/enums/ServerStatusEnum.py
 pydofus2/com/ankamagames/dofus/network/enums/SocialContactCategoryEnum.py
+pydofus2/com/ankamagames/dofus/network/enums/SpellModifierActionTypeEnum.py
+pydofus2/com/ankamagames/dofus/network/enums/SpellModifierTypeEnum.py
 pydofus2/com/ankamagames/dofus/network/enums/StatsUpgradeResultEnum.py
 pydofus2/com/ankamagames/dofus/network/enums/SubEntityBindingPointCategoryEnum.py
 pydofus2/com/ankamagames/dofus/network/enums/TeamEnum.py

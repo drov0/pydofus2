@@ -117,7 +117,7 @@ class DofusClient(threading.Thread):
         self._crashed = True
         self._crashMessage = message
         self._shutDownReason = f"Crashed for reason: {message}"
-        self.onShutdown(event, message, reason)
+        KernelEventsManager().send(KernelEvent.ClientShutdown, message, reason=self._shutDownReason)
 
     def onShutdown(self, event, message, reason=None):
         Logger().debug(f"Shutdown requested for reason: {message}")
@@ -221,7 +221,7 @@ class DofusClient(threading.Thread):
         for frame in self._registredInitFrames:
             self.worker.addFrame(frame())
         if not self._loginToken:
-            self._loginToken = Haapi.getLoginTokenCloudScraper(self._certId, self._certHash, 1, self._apiKey)
+            self._loginToken = Haapi.getLoginTokenCloudScraper(1, self._apiKey)
         AuthentificationManager().setToken(self._loginToken)
         self.waitNextLogin()
         self._loginToken = None

@@ -117,7 +117,7 @@ class ItemWrapper(Item, ISlotData, ICellZoneProvider, IDataCenter):
         
         self.livingobjectSkin: int = None
 
-        self.livingobjectCategory: int = None
+        self.livingObjectCategory: int = None
 
         self.livingobjectXp: int = None
 
@@ -127,7 +127,7 @@ class ItemWrapper(Item, ISlotData, ICellZoneProvider, IDataCenter):
 
         self.livingobjectFoodDate: str = None
 
-        self.wrapperobjectCategory: int = None
+        self.wrapperObjectCategory: int = None
 
         self._isobjectWrapped: bool = None
 
@@ -190,8 +190,8 @@ class ItemWrapper(Item, ISlotData, ICellZoneProvider, IDataCenter):
         with lock:
             cls._uniqueIndex += 1
         item.sortOrder = cls._uniqueIndex
-        item.livingobjectCategory = 0
-        item.wrapperobjectCategory = 0
+        item.livingObjectCategory = 0
+        item.wrapperObjectCategory = 0
         item.effects = list["EffectInstance"]()
         item.exchangeAllowed = True
         item.updateEffects(newEffects)
@@ -238,8 +238,8 @@ class ItemWrapper(Item, ISlotData, ICellZoneProvider, IDataCenter):
         item.quantity = itemFromServer.quantity
         self._uniqueIndex += 1
         item.sortOrder = self._uniqueIndex
-        item.livingobjectCategory = 0
-        item.wrapperobjectCategory = 0
+        item.livingObjectCategory = 0
+        item.wrapperObjectCategory = 0
         item.effects = list["EffectInstance"]()
         item.exchangeAllowed = True
         item.updateEffects(item.effectsList)
@@ -265,7 +265,7 @@ class ItemWrapper(Item, ISlotData, ICellZoneProvider, IDataCenter):
     @property
     def isSpeakingobject(self) -> bool:
         effect: ObjectEffect = None
-        if self.isLivingobject:
+        if self.isLivingObject:
             return True
         for effect in self.effectsList:
             if effect.actionId == ActionIds.ACTION_SPEAKING_ITEM:
@@ -273,12 +273,12 @@ class ItemWrapper(Item, ISlotData, ICellZoneProvider, IDataCenter):
         return False
 
     @property
-    def isLivingobject(self) -> bool:
-        return self.livingobjectCategory != 0
+    def isLivingObject(self) -> bool:
+        return self.livingObjectCategory != 0
 
     @property
-    def isWrapperobject(self) -> bool:
-        return self.wrapperobjectCategory != 0
+    def isWrapperObject(self) -> bool:
+        return self.wrapperObjectCategory != 0
 
     @property
     def isHarness(self) -> bool:
@@ -291,7 +291,7 @@ class ItemWrapper(Item, ISlotData, ICellZoneProvider, IDataCenter):
     @property
     def isobjectWrapped(self) -> bool:
         effect: ObjectEffect = None
-        if self.isLivingobject:
+        if self.isLivingObject:
             return False
         for effect in self.effectsList:
             if effect.actionId == ActionIds.ACTION_ITEM_WRAPPER_LOOK_OBJ_GID:
@@ -302,7 +302,7 @@ class ItemWrapper(Item, ISlotData, ICellZoneProvider, IDataCenter):
     @property
     def isMimicryobject(self) -> bool:
         effect: ObjectEffect = None
-        if self.isLivingobject:
+        if self.isLivingObject:
             return False
         for effect in self.effectsList:
             if effect.actionId == ActionIds.ACTION_ITEM_MIMICRY_OBJ_GID:
@@ -537,17 +537,17 @@ class ItemWrapper(Item, ISlotData, ICellZoneProvider, IDataCenter):
 
     def initPossiblePositions(self):
         cat = 0
-        superTypeId = int(self.type.superTypeId)
-        itemType = self.type  # assuming "type" is a class variable or attribute
+        itemType = self.type
         if not isinstance(itemType, ItemType):
             return
 
         if self.isLivingObject or self.isWrapperObject:
+            cat = 0
             cat = self.livingObjectCategory if self.isLivingObject else self.wrapperObjectCategory
             itemType = ItemType.getItemTypeById(cat)
 
         self._possiblePositions = itemType.possiblePositions
-        if not self._possiblePositions or len(self._possiblePositions) == 0:
+        if self._possiblePositions is None or len(self._possiblePositions) == 0:
             self._possiblePositions = itemType.superType.possiblePositions
 
     def update(
@@ -565,8 +565,8 @@ class ItemWrapper(Item, ISlotData, ICellZoneProvider, IDataCenter):
         self.quantity = quantity
         self.effectsList = newEffects
         self.effects = list["EffectInstance"]()
-        self.livingobjectCategory = 0
-        self.wrapperobjectCategory = 0
+        self.livingObjectCategory = 0
+        self.wrapperObjectCategory = 0
         self.livingobjectId = 0
         refItem: Item = Item.getItemById(objectGID)
         refItem.copy(refItem, self)
@@ -584,8 +584,8 @@ class ItemWrapper(Item, ISlotData, ICellZoneProvider, IDataCenter):
         item.quantity = self.quantity
         item.effects = self.effects
         item.effectsList = self.effectsList
-        item.wrapperobjectCategory = self.wrapperobjectCategory
-        item.livingobjectCategory = self.livingobjectCategory
+        item.wrapperObjectCategory = self.wrapperObjectCategory
+        item.livingObjectCategory = self.livingObjectCategory
         item.livingobjectFoodDate = self.livingobjectFoodDate
         item.livingobjectId = self.livingobjectId
         item.livingobjectLevel = self.livingobjectLevel
@@ -622,7 +622,7 @@ class ItemWrapper(Item, ISlotData, ICellZoneProvider, IDataCenter):
             self.livingobjectSkin = effect.value
 
         elif effect.effectId == ActionIds.ACTION_ITEM_LIVING_CATEGORY:
-            self.livingobjectCategory = effect.value
+            self.livingObjectCategory = effect.value
 
         elif effect.effectId == ActionIds.ACTION_ITEM_LIVING_LEVEL:
             self.livingobjectLevel = self.getLivingobjectLevel(effect.value)
@@ -693,7 +693,7 @@ class ItemWrapper(Item, ISlotData, ICellZoneProvider, IDataCenter):
             ):
                 pass
             if effectInstance.effectId == ActionIds.ACTION_ITEM_WRAPPER_COMPATIBLE_OBJ_TYPE:
-                self.wrapperobjectCategory = effectInstance.value
+                self.wrapperObjectCategory = effectInstance.value
             if effectInstance.effectId == ActionIds.ACTION_EVOLUTIVE_OBJECT_EXPERIENCE:
                 self.experiencePoints = effectInstance.value
             if effectInstance.effectId == ActionIds.ACTION_EVOLUTIVE_PET_LEVEL:

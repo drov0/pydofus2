@@ -1,5 +1,5 @@
 from pydofus2.com.ankamagames.dofus.logic.game.fight.steps.IFightStep import IFightStep
-from pydofus2.com.ankamagames.atouin.types.sequences.DestroyEntityStep import DestroyEntityStep
+from pydofus2.com.ankamagames.atouin.rtypes.sequences.DestroyEntityStep import DestroyEntityStep
 from pydofus2.com.ankamagames.dofus.logic.game.fight.miscs.FightEntitiesHolder import (
     FightEntitiesHolder,
 )

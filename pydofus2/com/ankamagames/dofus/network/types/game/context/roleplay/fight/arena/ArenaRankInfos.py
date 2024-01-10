@@ -1,21 +1,28 @@
 from pydofus2.com.ankamagames.jerakine.network.NetworkMessage import NetworkMessage
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
-    from pydofus2.com.ankamagames.dofus.network.types.game.context.roleplay.fight.arena.ArenaRanking import ArenaRanking
     from pydofus2.com.ankamagames.dofus.network.types.game.context.roleplay.fight.arena.ArenaLeagueRanking import ArenaLeagueRanking
     
 
 class ArenaRankInfos(NetworkMessage):
-    ranking: 'ArenaRanking'
+    arenaType: int
     leagueRanking: 'ArenaLeagueRanking'
-    victoryCount: int
-    fightcount: int
+    bestLeagueId: int
+    bestRating: int
+    dailyVictoryCount: int
+    seasonVictoryCount: int
+    dailyFightcount: int
+    seasonFightcount: int
     numFightNeededForLadder: int
-    def init(self, ranking_: 'ArenaRanking', leagueRanking_: 'ArenaLeagueRanking', victoryCount_: int, fightcount_: int, numFightNeededForLadder_: int):
-        self.ranking = ranking_
+    def init(self, arenaType_: int, leagueRanking_: 'ArenaLeagueRanking', bestLeagueId_: int, bestRating_: int, dailyVictoryCount_: int, seasonVictoryCount_: int, dailyFightcount_: int, seasonFightcount_: int, numFightNeededForLadder_: int):
+        self.arenaType = arenaType_
         self.leagueRanking = leagueRanking_
-        self.victoryCount = victoryCount_
-        self.fightcount = fightcount_
+        self.bestLeagueId = bestLeagueId_
+        self.bestRating = bestRating_
+        self.dailyVictoryCount = dailyVictoryCount_
+        self.seasonVictoryCount = seasonVictoryCount_
+        self.dailyFightcount = dailyFightcount_
+        self.seasonFightcount = seasonFightcount_
         self.numFightNeededForLadder = numFightNeededForLadder_
         
         super().__init__()

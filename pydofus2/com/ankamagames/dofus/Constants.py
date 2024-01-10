@@ -46,9 +46,10 @@ MAX_LOGIN_ATTEMPTS = 3
 ROOTDIR = Path(os.path.dirname(__file__))
 
 MAPS_PATH = Path(os.getenv("APPDATA")) / "pydofus2" / "content" / "maps"
+
 AVERAGE_PRICES_PATH = Path(os.getenv("APPDATA")) / "pydofus2" / "content" / "average_prices.json"
 
-DOFUS_ROOTDIR = Path(os.getenv("LOCALAPPDATA")) / "Ankama" / "Dofus"
+DOFUS_ROOTDIR = Path("D:/Dofus")
 
 DOFUS_DATA_DIR = DOFUS_ROOTDIR / "data"
 
@@ -62,7 +63,7 @@ PROTOCOL_SPEC_PATH = ROOTDIR / ".." / "jerakine" / "network" / "parser" / "D2pro
 
 WORLDGRAPH_PATH = DOFUS_CONTENT_DIR / "maps" / "world-graph.binary"
 
-LANG_FILE_PATH = DOFUS_DATA_DIR / "i18n" / "i18n_fr.d2i"
+LANG_FILE_PATH = DOFUS_DATA_DIR / "i18n" / "i18n_en.d2i"
 
 PROTOCOL_MSG_SHUFFLE_PATH = ROOTDIR / "network" / "MsgShuffle.json"
 

@@ -2,8 +2,6 @@ import heapq
 from time import perf_counter
 from typing import List, Union
 
-from whistle import Event
-
 from pydofus2.com.ankamagames.dofus.datacenter.world.MapPosition import \
     MapPosition
 from pydofus2.com.ankamagames.dofus.datacenter.world.SubArea import SubArea
@@ -76,7 +74,7 @@ class AStar(metaclass=Singleton):
         if self.running != None:
             self.callbackWithResult(None)
 
-    def compute(self, e: Event = None) -> None:
+    def compute(self, e = None) -> None:
         s = perf_counter()
         while self.openList:
             if self.iterations > self.MAX_ITERATION:

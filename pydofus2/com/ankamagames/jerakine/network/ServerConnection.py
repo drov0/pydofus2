@@ -307,7 +307,7 @@ class ServerConnection(mp.Thread):
             self._put(msg)
             if type(msg).__name__ == "NetworkDataContainerMessage":
                 Logger().debug(f"Received networK Datacontainer with content of size : {len(msg.content)}")
-                MessageReceiver().parse(msg.content, self.handleMessage, from_dataContainer=True)
+                MessageReceiver().parse(ByteArray(msg.content), self.handleMessage, from_dataContainer=True)
             
     @sendTrace
     def run(self):

@@ -4,7 +4,7 @@ from pydofus2.com.ankamagames.dofus.network.enums.GameActionMarkTypeEnum import 
 )
 from pydofus2.com.ankamagames.jerakine.metaclasses.Singleton import Singleton
 from pydofus2.com.ankamagames.atouin.enums.PlacementStrataEnums import PlacementStrataEnums
-from pydofus2.com.ankamagames.atouin.types.Selection import Selection
+from pydofus2.com.ankamagames.atouin.rtypes.Selection import Selection
 from pydofus2.com.ankamagames.atouin.utils.DataMapProvider import DataMapProvider
 from pydofus2.com.ankamagames.dofus.datacenter.spells.Spell import Spell
 from pydofus2.com.ankamagames.dofus.datacenter.spells.SpellLevel import SpellLevel

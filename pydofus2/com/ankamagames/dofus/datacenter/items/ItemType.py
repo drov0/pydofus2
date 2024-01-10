@@ -43,7 +43,7 @@ class ItemType(IDataCenter):
 
     evolutiveTypeId: int
     
-    possiblePositions: list[int]
+    possiblePositions: list[int] = None
 
     _name: str = None
 
@@ -99,7 +99,8 @@ class ItemType(IDataCenter):
     @property
     def superType(self) -> ItemSuperType:
         if self._superType is None:
-            self._superType = ItemSuperType.getItemSuperById(self.superTypeId)
+            self._superType = ItemSuperType.getItemSuperTypeById(self.superTypeId)
+        return self._superType
 
     def parseZone(self) -> None:
         params: list = None

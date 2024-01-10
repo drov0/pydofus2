@@ -5,7 +5,7 @@ import sys
 import threading
 from pathlib import Path
 
-LOGS_PATH = Path(os.getenv("APPDATA")) / "pydofus2" / "logs"
+LOGS_PATH = Path("D:/botdev/logs")
 if not os.path.isdir(LOGS_PATH):
     os.makedirs(LOGS_PATH)
 from typing import Type, TypeVar

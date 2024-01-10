@@ -1,16 +1,21 @@
 import json
 import os
 import ssl
-from urllib.parse import urlencode
 from time import sleep
+from urllib.parse import urlencode
+
+import aiohttp
+import cloudscraper
 import pyppeteer
 import requests
-from pydofus2.com.ankamagames.atouin.BrowserRequests import BrowserRequests
-from pydofus2.com.ankamagames.atouin.HappiConfig import AUTH_STATES, ZAAP_CONFIG
+
+from pydofus2.com.ankamagames.atouin.BrowserRequests import (BrowserRequests,
+                                                             HttpError)
+from pydofus2.com.ankamagames.atouin.HappiConfig import (AUTH_STATES,
+                                                         ZAAP_CONFIG)
 from pydofus2.com.ankamagames.atouin.ZaapError import ZaapError
 from pydofus2.com.ankamagames.jerakine.logger.Logger import Logger
 from pydofus2.com.ankamagames.jerakine.metaclasses.Singleton import Singleton
-import cloudscraper
 
 
 class HaapiException(Exception):
@@ -26,7 +31,7 @@ class Haapi:
         result = (
             cls.url
             + {
-                "CREATE_API_KEY": "/json/Ankama/v5/Api/CreateApiKey",
+                "CREATE_API_KEY": "/json/Ankama/v4/Api/CreateApiKey",
                 "GET_LOGIN_TOKEN": "/json/Ankama/v5/Account/CreateToken",
                 "SIGN_ON": "/json/Ankama/v5/Account/SignOnWithApiKey",
                 "SET_NICKNAME": "/json/Ankama/v5/Account/SetNicknameWithApiKey",
@@ -35,6 +40,9 @@ class Haapi:
                 "VALIDATE_CODE": "/json/Ankama/v5/Shield/ValidateCode",
                 "DELETE_API_KEY": "/json/Ankama/v5/Api/DeleteApiKey",
                 "CREATE_GUEST": "/json/Ankama/v2/Account/CreateGuest",
+                "CREATE_TOKEN_WITH_PASSWORD": "/json/Ankama/v4/Account/CreateTokenWithPassword",
+                "CREATE_TOKEN": "/json/Ankama/v4/Account/CreateToken",
+                "GET_ACCESS_TOKEN": "/json/Ankama/v4/Account/GetAccessToken"
             }[request]
         )
         if params:
@@ -42,12 +50,12 @@ class Haapi:
         return result
 
     @classmethod
-    async def createAPIKEY(cls, login, password, certId=None, certHash=None, game_id=102) -> str:
+    async def create_apikey(cls, login, password, certId=None, certHash=None, game=102) -> str:
         Logger().debug("[HAAPI] Sending http call to Create APIKEY")
         data = {
             "login": login,
             "password": password,
-            "game_id": game_id,
+            "game": game,
             "long_life_token": True,
             "shop_key": "ZAAP",
             "payment_mode": "OK",
@@ -72,12 +80,12 @@ class Haapi:
                 else None,
                 "expirationDate": body["expiration_date"],
             }
-        except Exception as e:
-            if "body" in e and "reason" in e["body"]:
+        except HttpError as e:
+            if "reason" in e.body:
                 print(f"error while creating api key: {json.dumps(e['body'])}")
                 raise ZaapError({"codeError": f"haapi.{e['body']['reason']}", "error": e})
-            elif e["statusCode"] == 403:
-                raise ZaapError({"error": e})
+            Logger().error(f"Error while creating api key: {e}")
+            raise e
 
     @classmethod
     async def getLoginToken(cls, certId, certHash, game_id, apiKey):
@@ -172,7 +180,7 @@ class Haapi:
         }
 
     @classmethod
-    def getLoginTokenCloudScraper(cls, certId, certHash, game_id, apiKey):
+    def getLoginTokenCloudScraper(cls, game_id, apiKey, certId='', certHash='', user_agent="Zaap 3.12.2"):
         nbrtries = 0
         client = cloudscraper.create_scraper()
         while nbrtries < 5:
@@ -188,10 +196,15 @@ class Haapi:
                 response = client.get(
                     url,
                     headers={
-                        'User-Agent': 'Zaap 3.9.3',
+                        "apikey": apiKey,
+                        "if-none-match": "null",
+                        'user-Agent': user_agent,
                         'accept': '*/*',
                         'accept-encoding': 'gzip,deflate',
-                        "APIKEY": apiKey,
+                        "sec-fetch-site": "none",
+                        "sec-fetch-mode": "no-cors",
+                        "sec-fetch-dest": "empty",
+                        "accept-language": "en-US",
                     },
                 )
                 if response.headers["content-type"] == "application/json":
@@ -231,3 +244,74 @@ class Haapi:
             except Exception:
                 Logger().error("No internet connection will try again in some seconds")
                 sleep(30)
+        
+    @classmethod
+    async def create_token_with_password(cls, login, password, game):
+        url = cls.getUrl("CREATE_TOKEN_WITH_PASSWORD")
+        data = {
+            "login": login,
+            "password": password,
+            "game": game
+        }
+        async with aiohttp.ClientSession() as session:
+            try:
+                async with session.post(url, data=data) as response:
+                    if response.status == 200:
+                        body = await response.json()
+                        return body  # or whatever part of the response you need
+                    else:
+                        error_details = await response.text()  # Get more details from the response
+                        Logger().error(f"Error creating token: {response.status}, {error_details}")
+                        return None
+            except Exception as e:
+                Logger().error(f"Exception occurred: {e}")
+                raise e
+            
+    @classmethod
+    async def create_token(cls, login, password, certificate_id, certificate_hash, game):
+        url = cls.getUrl("CREATE_TOKEN")
+        data = {
+            "login": login,
+            "password": password,
+            "certificate_id": certificate_id,
+            "certificate_hash": certificate_hash,
+            "game": game
+        }
+        async with aiohttp.ClientSession() as session:
+            try:
+                async with session.get(url, data=data) as response:
+                    if response.status == 200:
+                        body = await response.json()
+                        return body  # or whatever part of the response you need
+                    else:
+                        error_details = await response.text()  # Get more details from the response
+                        Logger().error(f"Error creating token: {response.status}, {error_details}")
+                        return None
+            except Exception as e:
+                Logger().error(f"Exception occurred: {e}")
+                raise e
+            
+    @classmethod
+    async def get_access_token(cls, login, password, game):
+        url = cls.getUrl(
+            "GET_ACCESS_TOKEN",
+            {
+                "login": login,
+                "password": password,
+                "game": game
+            }
+        )
+
+        async with aiohttp.ClientSession() as session:
+            try:
+                async with session.get(url) as response:
+                    if response.status == 200:
+                        body = await response.json()
+                        return body  # or whatever part of the response you need
+                    else:
+                        error_details = await response.text()  # Get more details from the response
+                        Logger().error(f"Error creating token: {response.status}, {error_details}")
+                        return None
+            except Exception as e:
+                Logger().error(f"Exception occurred: {e}")
+                raise e

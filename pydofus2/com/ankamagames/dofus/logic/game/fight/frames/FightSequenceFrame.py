@@ -123,8 +123,7 @@ from pydofus2.com.ankamagames.dofus.network.enums.GameActionFightInvisibilitySta
     GameActionFightInvisibilityStateEnum
 from pydofus2.com.ankamagames.dofus.network.enums.GameActionMarkTypeEnum import \
     GameActionMarkTypeEnum
-from pydofus2.com.ankamagames.dofus.network.messages.game.context.GameContextRefreshEntityLookMessage import \
-    GameContextRefreshEntityLookMessage
+
 from pydofus2.com.ankamagames.jerakine.entities.interfaces.IMovable import \
     IMovable
 from pydofus2.com.ankamagames.jerakine.logger.Logger import Logger
@@ -138,12 +137,6 @@ from pydofus2.com.ankamagames.jerakine.utils.display.spellZone.SpellShapeEnum im
 if TYPE_CHECKING:
     from pydofus2.com.ankamagames.dofus.logic.game.fight.frames.FightBattleFrame import (
         FightBattleFrame,
-    )
-    from pydofus2.com.ankamagames.dofus.logic.game.common.frames.SpellInventoryManagementFrame import (
-        SpellInventoryManagementFrame,
-    )
-    from pydofus2.com.ankamagames.dofus.logic.game.fight.frames.FightContextFrame import (
-        FightContextFrame,
     )
 
 from pydofus2.com.ankamagames.dofus.datacenter.effects.Effect import Effect
@@ -159,8 +152,6 @@ from pydofus2.com.ankamagames.dofus.logic.game.common.managers.PlayedCharacterMa
     PlayedCharacterManager
 from pydofus2.com.ankamagames.dofus.logic.game.common.misc.DofusEntities import \
     DofusEntities
-from pydofus2.com.ankamagames.dofus.logic.game.fight.frames.FightEntitiesFrame import \
-    FightEntitiesFrame
 from pydofus2.com.ankamagames.dofus.logic.game.fight.managers.BuffManager import \
     BuffManager
 from pydofus2.com.ankamagames.dofus.logic.game.fight.managers.CurrentPlayedFighterManager import \
@@ -345,7 +336,7 @@ class FightSequenceFrame(Frame, ISpellCastProvider):
         super().__init__()
         self._instanceId = FightSequenceFrame._currentInstanceId
         FightSequenceFrame._currentInstanceId = (1 + FightSequenceFrame._currentInstanceId) % 4000
-        self._fightEntitiesFrame: FightEntitiesFrame = None
+        self._fightEntitiesFrame = None
         self._fightBattleFrame = pFightBattleFrame
         self._parent = parent
         self._sequencer = None
@@ -625,7 +616,7 @@ class FightSequenceFrame(Frame, ISpellCastProvider):
                                         True,
                                     )
                                 )
-                    simf: "SpellInventoryManagementFrame" = Kernel().worker.getFrameByName("SpellInventoryManagementFrame")
+                    simf = Kernel().spellInventoryManagementFrame
                     for fighterInfos in entities:
                         gfsc = GameFightSpellCooldown()
                         if (
@@ -727,7 +718,7 @@ class FightSequenceFrame(Frame, ISpellCastProvider):
             return True
 
         if isinstance(msg, GameActionFightSlideMessage):
-            fightContextFrame_gafsmsg: "FightContextFrame" = Kernel().worker.getFrameByName("FightContextFrame")
+            fightContextFrame_gafsmsg = Kernel().fightContextFrame
             slideTargetInfos = fightContextFrame_gafsmsg.entitiesFrame.getEntityInfos(msg.targetId)
             if slideTargetInfos:
                 fightContextFrame_gafsmsg.saveFighterPosition(msg.targetId, msg.endCellId)
@@ -795,7 +786,6 @@ class FightSequenceFrame(Frame, ISpellCastProvider):
         if isinstance(msg, GameActionFightDeathMessage):
             gafdmsg = msg
             fightEntitiesFrame = Kernel().fightEntitiesFrame
-            fbf: "FightBattleFrame" = Kernel().worker.getFrameByName("FightBattleFrame")
             self.fighterHasBeenKilled(gafdmsg)
             return True
 
@@ -923,7 +913,7 @@ class FightSequenceFrame(Frame, ISpellCastProvider):
         if isinstance(msg, GameActionFightCarryCharacterMessage):
             gafcchmsg = msg
             if gafcchmsg.cellId != -1:
-                fightContextFrame_gafcchmsg: "FightContextFrame" = Kernel().worker.getFrameByName("FightContextFrame")
+                fightContextFrame_gafcchmsg = Kernel().fightContextFrame
                 fightContextFrame_gafcchmsg.saveFighterPosition(gafcchmsg.targetId, gafcchmsg.cellId)
                 carried = DofusEntities().getEntity(gafcchmsg.targetId)
                 carriedByCarried = carried.carriedEntity
@@ -940,7 +930,7 @@ class FightSequenceFrame(Frame, ISpellCastProvider):
                 if self._castingSpell and self._castingSpell.targetedCell
                 else int(gaftcmsg.cellId)
             )
-            fightContextFrame_gaftcmsg: "FightContextFrame" = Kernel().worker.getFrameByName("FightContextFrame")
+            fightContextFrame_gaftcmsg = Kernel().fightContextFrame
             fightContextFrame_gaftcmsg.saveFighterPosition(gaftcmsg.targetId, throwCellId)
             self.pushThrowCharacterStep(gaftcmsg.sourceId, gaftcmsg.targetId, throwCellId)
             return False
@@ -983,7 +973,7 @@ class FightSequenceFrame(Frame, ISpellCastProvider):
 
     def execute(self, callback: FunctionType = None) -> None:
         self._sequencer = SerialSequencer(self.FIGHT_SEQUENCERS_CATEGORY)
-        self._sequencer.add_listener(SequencerEvent.SEQUENCE_STEP_FINISH, self.onStepEnd)
+        self._sequencer.on(SequencerEvent.SEQUENCE_STEP_FINISH, self.onStepEnd)
         if self._parent:
             self._parent.addSubSequence(self._sequencer)
         self.executeBuffer(callback)
@@ -1046,7 +1036,7 @@ class FightSequenceFrame(Frame, ISpellCastProvider):
                     SpellWrapper.refreshAllPlayerSpellHolder(fighterInfos.stats.summoner)
 
     def fighterHasLeftBattle(self, gaflmsg: GameActionFightLeaveMessage) -> None:
-        fightEntityFrame_gaflmsg: FightEntitiesFrame = Kernel().fightEntitiesFrame
+        fightEntityFrame_gaflmsg = Kernel().fightEntitiesFrame
         entitiesL: dict = fightEntityFrame_gaflmsg.entities
         for gcaiL in entitiesL.values():
             if isinstance(gcaiL, GameFightFighterInformations):
@@ -1180,11 +1170,11 @@ class FightSequenceFrame(Frame, ISpellCastProvider):
                 self.summonEntity(gffinfos, gafmsmsg.sourceId, gafmsmsg.actionId)
         return gffinfos
 
-    def fighterSummonEntity(self, gafsnmsg: GameActionFightSummonMessage) -> None:
-        for summon in gafsnmsg.summons:
+    def fighterSummonEntity(self, msg: GameActionFightSummonMessage) -> None:
+        for summon in msg.summons:
             if (
-                gafsnmsg.actionId == ActionIds.ACTION_CHARACTER_ADD_ILLUSION_RANDOM
-                or gafsnmsg.actionId == ActionIds.ACTION_CHARACTER_ADD_ILLUSION_MIRROR
+                msg.actionId == ActionIds.ACTION_CHARACTER_ADD_ILLUSION_RANDOM
+                or msg.actionId == ActionIds.ACTION_CHARACTER_ADD_ILLUSION_MIRROR
             ):
                 fightEntities = Kernel().fightEntitiesFrame.entities
                 for fighterId in fightEntities:
@@ -1196,18 +1186,19 @@ class FightSequenceFrame(Frame, ISpellCastProvider):
                         and getattr(infos, "name") == getattr(summon, "name")
                     ):
                         summon.stats.summoner = infos.contextualId
+                        break
                 gfsfrsmsg = GameFightShowFighterRandomStaticPoseMessage()
                 gfsfrsmsg.init(summon)
-                Kernel().worker.getFrameByName("process(gfsfrsmsg")
+                Kernel().fightEntitiesFrame.process(gfsfrsmsg)
                 illusionCreature = DofusEntities().getEntity(summon.contextualId)
                 if illusionCreature:
                     illusionCreature.visible = False
                 self.pushStep(FightVisibilityStep(summon.contextualId, True))
             else:
-                self.summonEntity(summon, gafsnmsg.sourceId, gafsnmsg.actionId)
+                self.summonEntity(summon, msg.sourceId, msg.actionId)
 
     def fightersExchangedPositions(self, gafepmsg: GameActionFightExchangePositionsMessage) -> None:
-        fightContextFrame: FightContextFrame = Kernel().worker.getFrameByName("FightContextFrame")
+        fightContextFrame = Kernel().fightContextFrame
         if not self.isSpellTeleportingToPreviousPosition():
             fightContextFrame.saveFighterPosition(gafepmsg.sourceId, gafepmsg.targetCellId)
         else:
@@ -1223,7 +1214,7 @@ class FightSequenceFrame(Frame, ISpellCastProvider):
         )
 
     def fighterHasBeenTeleported(self, gaftosmmsg: GameActionFightTeleportOnSameMapMessage) -> None:
-        fightContextFrame: FightContextFrame = Kernel().worker.getFrameByName("FightContextFrame")
+        fightContextFrame = Kernel().fightContextFrame
         if not self.isSpellTeleportingToPreviousPosition():
             if not self._teleportThroughPortal:
                 fightContextFrame.saveFighterPosition(gaftosmmsg.targetId, gaftosmmsg.cellId)
@@ -1246,7 +1237,7 @@ class FightSequenceFrame(Frame, ISpellCastProvider):
         else:
             Logger().error(f"Got entity with unexpected id {movingEntity.id}")
         
-        fightContextFrame: "FightContextFrame" = Kernel().worker.getFrameByName("FightContextFrame")
+        fightContextFrame = Kernel().fightContextFrame
         if not fightContextFrame:
             return Logger().error("FightContextFrame not found")
         else:
@@ -1416,7 +1407,7 @@ class FightSequenceFrame(Frame, ISpellCastProvider):
         self.clearBuffer()
         if callback is not None and not self._parent:
             self._sequenceEndCallback = callback
-            self._sequencer.add_listener(SequencerEvent.SEQUENCE_END, self.onSequenceEnd)
+            self._sequencer.once(SequencerEvent.SEQUENCE_END, self.onSequenceEnd)
         self._lastCastingSpell = self._castingSpell
         if not self._parent:
             if not self._subSequenceWaitingCount:
@@ -1426,12 +1417,11 @@ class FightSequenceFrame(Frame, ISpellCastProvider):
                 callback()
             self._parent.subSequenceInitDone()
 
-    def onSequenceEnd(self, e: SequencerEvent) -> None:
-        self._sequencer.remove_listener(SequencerEvent.SEQUENCE_END, self.onSequenceEnd)
+    def onSequenceEnd(self, evt_id, e: SequencerEvent=None) -> None:
         self._sequenceEndCallback()
 
-    def onStepEnd(self, e: SequencerEvent, isEnd: bool = True) -> None:
-        self._sequencer.remove_listener(SequencerEvent.SEQUENCE_STEP_FINISH, self.onStepEnd)
+    def onStepEnd(self, e, isEnd: bool = True) -> None:
+        pass
 
     def subSequenceInitDone(self) -> None:
         self._subSequenceWaitingCount -= 1

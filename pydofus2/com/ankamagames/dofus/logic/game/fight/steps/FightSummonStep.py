@@ -1,5 +1,3 @@
-from typing import TYPE_CHECKING
-
 from pydofus2.com.ankamagames.atouin.managers.EntitiesManager import \
     EntitiesManager
 from pydofus2.com.ankamagames.dofus.internalDatacenter.spells.SpellWrapper import \
@@ -29,11 +27,6 @@ from pydofus2.com.ankamagames.jerakine.sequencer.AbstractSequencable import \
     AbstractSequencable
 from pydofus2.damageCalculation.tools.StatIds import StatIds
 
-if TYPE_CHECKING:
-
-    from pydofus2.com.ankamagames.dofus.logic.game.fight.frames.FightBattleFrame import \
-        FightBattleFrame
-
 
 class FightSummonStep(AbstractSequencable, IFightStep):
 
@@ -62,7 +55,7 @@ class FightSummonStep(AbstractSequencable, IFightStep):
         if EntitiesManager().entitiesScheduledForDestruction.get(self._summonInfos.contextualId):
             del EntitiesManager().entitiesScheduledForDestruction[self._summonInfos.contextualId]
         SpellWrapper.refreshAllPlayerSpellHolder(self._summonerId)
-        fightBattleFrame: "FightBattleFrame" = Kernel().worker.getFrameByName("FightBattleFrame")
+        fightBattleFrame = Kernel().battleFrame
         if fightBattleFrame and self._summonInfos.contextualId in fightBattleFrame.deadFightersList:
             fightBattleFrame.deadFightersList.remove(self._summonInfos.contextualId)
             buffs = BuffManager().getAllBuff(self._summonInfos.contextualId)

@@ -272,12 +272,9 @@ class StorageOptionManager(metaclass=Singleton):
         return self.inventory.getView("storageBidHouseFilter") != None
 
     def enableSmithMagicFilter(self, skill: Skill) -> None:
-        from pydofus2.com.ankamagames.dofus.logic.game.common.frames.CraftFrame import CraftFrame
-
-        craftFrame: CraftFrame = None
         self.disableSmithMagicFilter()
         if not skill:
-            craftFrame = Kernel().worker.getFrameByName("CraftFrame")
+            craftFrame = Kernel().craftFrame
             if not craftFrame:
                 Logger().error("Activation des filtres de forgemagie alors que la craftFrame n'est pas active")
                 return
@@ -291,10 +288,9 @@ class StorageOptionManager(metaclass=Singleton):
             self.inventory.removeView("storageSmithMagicFilter")
 
     def enableCraftFilter(self, skill: Skill, jobLevel: int) -> None:
-        craftFrame: "CraftFrame" = None
         self.disableCraftFilter()
         if not skill:
-            craftFrame = Kernel().worker.getFrameByName("CraftFrame")
+            craftFrame = Kernel().craftFrame
             if not craftFrame:
                 Logger().error("Activation des filtres de forgemagie alors que la craftFrame n'est pas active")
                 return

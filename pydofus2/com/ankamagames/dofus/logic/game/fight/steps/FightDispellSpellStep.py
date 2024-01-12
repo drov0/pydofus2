@@ -1,6 +1,5 @@
 from pydofus2.com.ankamagames.dofus.enums.ActionIds import ActionIds
 from pydofus2.com.ankamagames.dofus.kernel.Kernel import Kernel
-from pydofus2.com.ankamagames.dofus.logic.game.fight.frames.FightEntitiesFrame import FightEntitiesFrame
 from pydofus2.com.ankamagames.dofus.logic.game.fight.managers.BuffManager import BuffManager
 from pydofus2.com.ankamagames.dofus.logic.game.fight.steps.IFightStep import IFightStep
 from pydofus2.com.ankamagames.dofus.network.messages.game.context.GameContextRefreshEntityLookMessage import (
@@ -38,11 +37,11 @@ class FightDispellSpellStep(AbstractSequencable, IFightStep):
                 refreshEntityLook = True
         BuffManager().dispellSpell(self._fighterId, self._spellId, True)
         if refreshEntityLook:
-            entitiesFrame: "FightEntitiesFrame" = Kernel().worker.getFrameByName("FightEntitiesFrame")
+            entitiesFrame = Kernel().fightEntitiesFrame
             fighterInfos = entitiesFrame.getEntityInfos(self._fighterId)
             gcrelmsg = GameContextRefreshEntityLookMessage()
             gcrelmsg.init(self._fighterId, fighterInfos.look)
-            Kernel().worker.getFrameByName("FightEntitiesFrame").process(gcrelmsg)
+            Kernel().fightEntitiesFrame.process(gcrelmsg)
         self.executeCallbacks()
 
     @property

@@ -1,7 +1,4 @@
 import threading
-from typing import TYPE_CHECKING
-
-import pydofus2.com.ankamagames.dofus.logic.game.roleplay.frames.RoleplayContextFrame as rcf
 from pydofus2.com.ankamagames.atouin.managers.EntitiesManager import \
     EntitiesManager
 from pydofus2.com.ankamagames.atouin.managers.MapDisplayManager import \
@@ -104,11 +101,6 @@ from pydofus2.com.ankamagames.jerakine.benchmark.BenchmarkTimer import \
 from pydofus2.com.ankamagames.jerakine.logger.Logger import Logger
 from pydofus2.com.ankamagames.jerakine.messages.Frame import Frame
 from pydofus2.com.ankamagames.jerakine.messages.Message import Message
-from pydofus2.com.ankamagames.jerakine.metaclasses.Singleton import Singleton
-
-if TYPE_CHECKING:
-    from pydofus2.com.ankamagames.dofus.logic.game.roleplay.frames.RoleplayInteractivesFrame import \
-        RoleplayInteractivesFrame
 
 class RoleplayEntitiesFrame(AbstractEntitiesFrame, Frame):
     MAX_MAPDATA_REQ_FAILS = 3
@@ -191,10 +183,6 @@ class RoleplayEntitiesFrame(AbstractEntitiesFrame, Frame):
         msg.init(MapDisplayManager().currentMapPoint.mapId)
         ConnectionsHandler().send(msg)
 
-    @property
-    def rif(self) -> "RoleplayInteractivesFrame":
-        return Kernel().worker.getFrameByName("RoleplayInteractivesFrame")
-
     def process(self, msg: Message):
 
         if isinstance(msg, MapLoadedMessage):
@@ -233,7 +221,7 @@ class RoleplayEntitiesFrame(AbstractEntitiesFrame, Frame):
             else:
                 self._worldPoint = WorldPointWrapper(int(msg.mapId))
             self._isIndoor = PlayedCharacterManager().isIndoor
-            roleplayContextFrame: rcf.RoleplayContextFrame = Kernel().worker.getFrameByName("RoleplayContextFrame")
+            roleplayContextFrame = Kernel().roleplayContextFrame
             previousMap = PlayedCharacterManager().currentMap
             if (
                 roleplayContextFrame.newCurrentMapIsReceived
@@ -301,13 +289,13 @@ class RoleplayEntitiesFrame(AbstractEntitiesFrame, Frame):
                         mo.obstacleCellId,
                         mo.state == MapObstacleStateEnum.OBSTACLE_OPENED,
                     )
-            if self.rif:
+            if Kernel().interactivesFrame:
                 imumsg = InteractiveMapUpdateMessage()
                 imumsg.init(msg.interactiveElements)
-                self.rif.process(imumsg)
+                Kernel().interactivesFrame.process(imumsg)
                 smumsg = StatedMapUpdateMessage()
                 smumsg.init(msg.statedElements)
-                self.rif.process(smumsg)
+                Kernel().interactivesFrame.process(smumsg)
 
 
             if isinstance(msg, MapComplementaryInformationsAnomalyMessage):

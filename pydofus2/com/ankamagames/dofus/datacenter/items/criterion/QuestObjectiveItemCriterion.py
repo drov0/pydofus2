@@ -8,10 +8,6 @@ from pydofus2.com.ankamagames.dofus.datacenter.items.criterion.ItemCriterionOper
 from pydofus2.com.ankamagames.dofus.datacenter.quest.QuestObjective import QuestObjective
 from pydofus2.com.ankamagames.dofus.kernel.Kernel import Kernel
 from pydofus2.com.ankamagames.jerakine.interfaces.IDataCenter import IDataCenter
-from typing import TYPE_CHECKING
-
-if TYPE_CHECKING:
-    from pydofus2.com.ankamagames.dofus.logic.common.frames.QuestFrame import QuestFrame
 
 
 class QuestObjectiveItemCriterion(ItemCriterion, IDataCenter):
@@ -31,7 +27,7 @@ class QuestObjectiveItemCriterion(ItemCriterion, IDataCenter):
         obj: QuestObjective = QuestObjective.getQuestObjectiveById(self._objId)
         if not obj:
             return False
-        questFrame: "QuestFrame" = Kernel().worker.getFrameByName("QuestFrame")
+        questFrame = Kernel().questFrame
         activeObjs: list[int] = questFrame.getActiveObjectives()
         completedObjs: list[int] = questFrame.getCompletedObjectives()
         s: str = self._serverCriterionForm[0:2]

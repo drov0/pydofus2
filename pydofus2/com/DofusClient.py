@@ -95,6 +95,7 @@ class DofusClient(threading.Thread):
         Kernel().isMule = self.mule
         Kernel().mitm = self.mitm
         ModuleReader._clearObjectsCache = True
+        self._shutDownReason = None
         self.initListeners()
         Logger().info("Initialized")
 
@@ -124,6 +125,7 @@ class DofusClient(threading.Thread):
         self.shutdown(reason, message)
 
     def onRestart(self, event, message):
+        Logger().debug(f"Restart requested by event {event} for reason: {message}")
         self.onReconnect(event, message)
 
     def onLoginTimeout(self, listener: Listener):
@@ -250,6 +252,8 @@ class DofusClient(threading.Thread):
         self._shutDownReason = reason
         if Kernel.getInstance(self.name):
             Kernel.getInstance(self.name).worker.process(TerminateWorkerMessage())
+        else:
+            Logger().warning("Kernel is not running, kernel running instances : " + str(Kernel._instances))
         return
 
     @property

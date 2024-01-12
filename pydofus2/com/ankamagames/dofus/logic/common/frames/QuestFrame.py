@@ -201,6 +201,10 @@ class QuestFrame(Frame):
         self._achievementsList.init(list[AchievementAchieved]())
         return True
 
+    def processAchievements(self, b):
+        # TODO: implement this method if needed
+        pass
+    
     def process(self, msg: Message) -> bool:
 
         if isinstance(msg, QuestValidatedMessage):

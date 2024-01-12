@@ -9,9 +9,7 @@ from pydofus2.com.ankamagames.atouin.managers.EntitiesManager import EntitiesMan
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
-    from pydofus2.com.ankamagames.dofus.logic.game.fight.frames.FightEntitiesFrame import (
-        FightEntitiesFrame,
-    )
+    pass
 from pydofus2.com.ankamagames.dofus.types.entities.AnimatedCharacter import AnimatedCharacter
 
 from pydofus2.com.ankamagames.dofus.logic.game.fight.managers.FightersStateManager import (
@@ -45,7 +43,7 @@ class TackleUtil:
         position: MapPoint,
     ) -> float:
         stats: EntityStats = StatsManager().getStats(playerInfos.contextualId)
-        entitiesFrame: "FightEntitiesFrame" = Kernel().worker.getFrameByName("FightEntitiesFrame")
+        entitiesFrame = Kernel().fightEntitiesFrame
         if Constants.DETERMINIST_TACKLE:
             if not cls.canBeTackled(playerInfos, position):
                 return 1
@@ -113,7 +111,7 @@ class TackleUtil:
 
     @classmethod
     def getTacklerOnCell(cls, cellId) -> IEntity:
-        entitiesFrame: "FightEntitiesFrame" = Kernel().worker.getFrameByName("FightEntitiesFrame")
+        entitiesFrame = Kernel().fightEntitiesFrame
         entities: list[IEntity] = EntitiesManager().getEntitiesOnCell(cellId, AnimatedCharacter)
         for entity in entities:
             infos: "GameFightFighterInformations" = entitiesFrame.getEntityInfos(entity.id)
@@ -155,7 +153,7 @@ class TackleUtil:
             or FightersStateManager().getStatus(fighter.contextualId).cantTackle
         ):
             return False
-        entitiesFrame: "FightEntitiesFrame" = Kernel().worker.getFrameByName("FightEntitiesFrame")
+        entitiesFrame = Kernel().fightEntitiesFrame
         infos: "GameFightFighterInformations" = entitiesFrame.getEntityInfos(fighter.contextualId)
         if infos and infos.spawnInfo.teamId == target.spawnInfo.teamId:
             return False

@@ -21,9 +21,6 @@ if TYPE_CHECKING:
     from pydofus2.com.ankamagames.dofus.internalDatacenter.spells.SpellWrapper import (
         SpellWrapper,
     )
-    from pydofus2.com.ankamagames.dofus.logic.game.common.frames.SpellInventoryManagementFrame import (
-        SpellInventoryManagementFrame,
-    )
 
 from pydofus2.com.ankamagames.dofus.internalDatacenter.mount.MountData import MountData
 from pydofus2.com.ankamagames.dofus.internalDatacenter.stats.EntityStats import EntityStats
@@ -35,7 +32,6 @@ from pydofus2.com.ankamagames.dofus.logic.common.managers.StatsManager import St
 from pydofus2.com.ankamagames.dofus.logic.game.common.frames.AbstractEntitiesFrame import (
     AbstractEntitiesFrame,
 )
-import pydofus2.com.ankamagames.dofus.logic.game.common.frames.PlayedCharacterUpdatesFrame as pcuF
 from pydofus2.com.ankamagames.dofus.logic.game.common.managers.InventoryManager import (
     InventoryManager,
 )
@@ -50,9 +46,6 @@ from pydofus2.com.ankamagames.dofus.logic.game.fight.managers.CurrentPlayedFight
 )
 from pydofus2.com.ankamagames.dofus.logic.game.fight.types.castSpellManager.SpellManager import (
     SpellManager,
-)
-from pydofus2.com.ankamagames.dofus.logic.game.roleplay.frames.RoleplayContextFrame import (
-    RoleplayContextFrame,
 )
 from pydofus2.com.ankamagames.dofus.network.enums.CharacterInventoryPositionEnum import (
     CharacterInventoryPositionEnum,
@@ -134,7 +127,7 @@ class PlayedCharacterApi(IApi):
 
     @classmethod
     def getSpells(cls, returnBreedSpells: bool) -> list:
-        spim: "SpellInventoryManagementFrame" = Kernel().worker.getFrameByName("SpellInventoryManagementFrame")
+        spim = Kernel().spellInventoryManagementFrame
         if returnBreedSpells:
             return spim.getBreedSpellsInVariantslist()
         return spim.getCommonSpellsInVariantslist()
@@ -218,17 +211,16 @@ class PlayedCharacterApi(IApi):
     def getEntityInfos(cls) -> GameRolePlayCharacterInformations:
         entitiesFrame: AbstractEntitiesFrame = None
         if cls.isInFight():
-            entitiesFrame = Kernel().worker.getFrameByName("FightEntitiesFrame")
-            entitiesFrame = Kernel().worker.getFrameByName("RoleplayEntitiesFrame")
+            entitiesFrame = Kernel().fightEntitiesFrame
+        else:
+            entitiesFrame = Kernel().roleplayEntitiesFrame
         if not entitiesFrame:
             return None
         return entitiesFrame.getEntityInfos(PlayedCharacterManager().id)
 
     @classmethod
     def getKamasMaxLimit(cls) -> float:
-        playedCharacterFrame: pcuF.PlayedCharacterUpdatesFrame = Kernel().worker.getFrameByName(
-            "PlayedCharacterUpdatesFrame"
-        )
+        playedCharacterFrame = Kernel().playedCharacterUpdatesFrame
         if playedCharacterFrame:
             return playedCharacterFrame.kamasLimit
         return 0
@@ -307,7 +299,7 @@ class PlayedCharacterApi(IApi):
 
     @classmethod
     def isMutant(cls) -> bool:
-        rcf: RoleplayContextFrame = Kernel().worker.getFrameByName("RoleplayContextFrame")
+        rcf = Kernel().roleplayContextFrame
         infos: GameRolePlayActorInformations = rcf.entitiesFrame.getEntityInfos(PlayedCharacterManager().id)
         return infos is GameRolePlayMutantInformations
 
@@ -413,9 +405,7 @@ class PlayedCharacterApi(IApi):
 
     @classmethod
     def getPlayerSet(cls, objectGID: int) -> PlayerSetInfo:
-        return pcuF.PlayedCharacterUpdatesFrame(Kernel().worker.getFrameByName("PlayedCharacterUpdatesFrame")).getPlayerSet(
-            objectGID
-        )
+        return Kernel().playedCharacterUpdatesFrame.getPlayerSet(objectGID)
 
     @classmethod
     def getWeapon(cls) -> WeaponWrapper:
@@ -469,7 +459,7 @@ class PlayedCharacterApi(IApi):
 
     @classmethod
     def havenbagSharePermissions(cls) -> int:
-        hbFrame: HavenbagFrame = Kernel().worker.getFrameByName("HavenbagFrame")
+        hbFrame = Kernel().worker.getFrameByName("HavenbagFrame")
         return hbFrame.sharePermissions
 
     @classmethod

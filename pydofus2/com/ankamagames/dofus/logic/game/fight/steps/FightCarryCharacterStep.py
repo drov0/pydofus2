@@ -1,12 +1,6 @@
 from pydofus2.com.ankamagames.dofus.kernel.Kernel import Kernel
 from pydofus2.com.ankamagames.dofus.logic.game.common.misc.DofusEntities import DofusEntities
-from pydofus2.com.ankamagames.dofus.logic.game.fight.frames.FightEntitiesFrame import (
-    FightEntitiesFrame,
-)
 from pydofus2.com.ankamagames.dofus.logic.game.fight.steps.IFightStep import IFightStep
-from pydofus2.com.ankamagames.dofus.network.types.game.context.fight.GameFightFighterInformations import (
-    GameFightFighterInformations,
-)
 from pydofus2.com.ankamagames.dofus.types.entities.AnimatedCharacter import AnimatedCharacter
 from pydofus2.com.ankamagames.jerakine.entities.interfaces.IEntity import IEntity
 from pydofus2.com.ankamagames.jerakine.entities.interfaces.IMovable import IMovable
@@ -46,29 +40,20 @@ class FightCarryCharacterStep(AbstractSequencable, IFightStep):
         self._carriedId = carriedId
         self._cellId = cellId
         self._noAnimation = noAnimation
-        self._isCreature = Kernel().worker.getFrameByName("FightEntitiesFrame")
+        self._isCreature = True
 
     @property
     def stepType(self) -> str:
         return "carryCharacter"
 
     def start(self) -> None:
-        targetPosition: MapPoint = None
-        carriedEntityDirection: int = 0
-        entitiesFrame: FightEntitiesFrame = None
-        carriedAC: AnimatedCharacter = None
-        carriedEntityInfos: GameFightFighterInformations = None
-        cEntity: IEntity = DofusEntities().getEntity(self._fighterId)
-        position: MapPoint = cEntity.position
+        cEntity = DofusEntities().getEntity(self._fighterId)
+        position = cEntity.position
         carryingEntity = cEntity
         carriedEntity: IEntity = DofusEntities().getEntity(self._carriedId)
         if not carryingEntity or not carriedEntity:
-            Logger().warn(
-                "Unable to make "
-                + self._fighterId
-                + " carry "
-                + self._carriedId
-                + ", one of them is not in the stage."
+            Logger().warning(
+                f"Unable to make {self._fighterId} carry {self._carriedId}, one of them is not in the stage."
             )
             self.carryFinished()
             return
@@ -79,7 +64,7 @@ class FightCarryCharacterStep(AbstractSequencable, IFightStep):
         if targetPosition:
             carriedEntityDirection = position.advancedOrientationTo(targetPosition)
             self.updateCarriedEntityPosition(carryingEntity, carriedEntity)
-            entitiesFrame = Kernel().worker.getFrameByName("FightEntitiesFrame")
+            entitiesFrame = Kernel().fightEntitiesFrame
             carriedAC = carriedEntity
             while carriedAC:
                 carriedEntityInfos = entitiesFrame.getEntityInfos(carriedAC.id)
@@ -104,11 +89,9 @@ class FightCarryCharacterStep(AbstractSequencable, IFightStep):
                 self.updateCarriedEntityPosition(pCarryingEntity, carried.carriedEntity)
 
     def carryFinished(self, e=None) -> None:
-        carrierAnimatedEntity: AnimatedCharacter = None
-        carriedAnimatedEntity: AnimatedCharacter = None
-        carriedEntity: IEntity = DofusEntities().getEntity(self._carriedId)
+        carriedEntity = DofusEntities().getEntity(self._carriedId)
         carryingEntity = DofusEntities().getEntity(self._fighterId)
-        fightEntitiesFrame: FightEntitiesFrame = Kernel().worker.getFrameByName("FightEntitiesFrame")
+        fightEntitiesFrame = Kernel().fightEntitiesFrame
         if fightEntitiesFrame is not None:
             carrierAnimatedEntity = carryingEntity
             carriedAnimatedEntity = carriedEntity

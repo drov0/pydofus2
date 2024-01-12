@@ -5,13 +5,8 @@ from pydofus2.com.ankamagames.dofus.logic.game.common.misc.DofusEntities import 
     DofusEntities
 
 if TYPE_CHECKING:
-    from pydofus2.com.ankamagames.dofus.logic.game.fight.frames.FightContextFrame import (
-        FightContextFrame,
-    )
     from pydofus2.com.ankamagames.dofus.types.entities.AnimatedCharacter import AnimatedCharacter
 
-from pydofus2.com.ankamagames.dofus.logic.game.fight.frames.FightEntitiesFrame import \
-    FightEntitiesFrame
 from pydofus2.com.ankamagames.dofus.logic.game.fight.steps.IFightStep import \
     IFightStep
 from pydofus2.com.ankamagames.jerakine.logger.Logger import Logger
@@ -30,8 +25,6 @@ class FightEntitySlideStep(AbstractSequencable, IFightStep):
 
     _entity: "AnimatedCharacter"
 
-    _fightContextFrame: "FightContextFrame"
-
     _ttCacheName: str
 
     _ttName: str
@@ -45,7 +38,7 @@ class FightEntitySlideStep(AbstractSequencable, IFightStep):
         infos.disposition.cellId = endCell.cellId
         Logger().info(f"Slide fighter {fighterId} from {startCell.cellId} to {endCell.cellId}")
         self._entity: "AnimatedCharacter" = DofusEntities().getEntity(self._fighterId)
-        self._fightContextFrame: "FightContextFrame" = Kernel().worker.getFrameByName("FightContextFrame")
+        self._fightContextFrame = Kernel().fightContextFrame
 
     @property
     def stepType(self) -> str:

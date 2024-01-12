@@ -404,37 +404,35 @@ class MapPoint:
             )
         )
 
-    def getForbidenCellsInVicinity(self):
-        from pydofus2.com.ankamagames.atouin.managers.MapDisplayManager import \
-            MapDisplayManager
+    def is_walkable(self, base_cell_id):
         from pydofus2.com.ankamagames.atouin.utils.DataMapProvider import \
             DataMapProvider
+        dmp = DataMapProvider()
+        return (dmp.pointMov(self.x, self.y, True, base_cell_id) and
+                dmp.pointMov(self.x - 1, self.y, True, base_cell_id) and
+                dmp.pointMov(self.x, self.y - 1, True, base_cell_id))
 
-        forbiddenCellsIds = []
-        for i in range(8):
-            mp = self.getNearestCellInDirection(i)
-            if mp:
-                cellData = MapDisplayManager().dataMap.cells[mp.cellId]
-                forbidden = (not cellData.mov) or cellData.farmCell
-                if not forbidden:
-                    numWalkableCells = 8
-                    for j in range(8):
-                        mp2 = mp.getNearestCellInDirection(j)
-                        if mp2 and (
-                            not mp2.pointMov(mp, True)
-                            or not mp2.getNearestCellInDirection(DirectionsEnum.UP_LEFT).pointMov(
-                                DataMapProvider(), mp, True
-                            )
-                            and not mp2.getNearestCellInDirection(DirectionsEnum.DOWN_LEFT).pointMov(
-                                DataMapProvider(), mp, True
-                            )
-                        ):
-                            numWalkableCells -= 1
-                    if not numWalkableCells:
-                        forbidden = True
-                else:
-                    forbiddenCellsIds.append(mp.cellId)
-        return forbiddenCellsIds
+    def has_walkable_neighbors(self):
+        for direction in range(8):
+            neighbor = self.getNearestCellInDirection(direction)
+            if neighbor and neighbor.is_walkable(self.cellId):
+                return True
+        return False
+    
+    def hasNoLinkedZoneRP(self):
+        from pydofus2.com.ankamagames.atouin.managers.MapDisplayManager import \
+            MapDisplayManager
+        celss = MapDisplayManager().dataMap.cells
+        cell_data = celss[self.cellId]
+        return not cell_data.hasLinkedZoneRP()
+        
+    def getForbidenCellsInVicinity(self):
+        forbidden_cells_ids = set()
+        for direction in range(8):
+            neighbor = self.getNearestCellInDirection(direction)
+            if neighbor and (neighbor.hasNoLinkedZoneRP() or not neighbor.has_walkable_neighbors()):
+                forbidden_cells_ids.add(neighbor.cellId)
+        return list(forbidden_cells_ids)
 
     def __eq__(self, mp: "MapPoint") -> bool:
         if not isinstance(mp, MapPoint):

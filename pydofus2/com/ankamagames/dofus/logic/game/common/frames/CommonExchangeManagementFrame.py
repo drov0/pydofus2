@@ -61,7 +61,8 @@ class CommonExchangeManagementFrame(Frame):
     def leaveShopStock(self):
         ldrmsg = LeaveDialogRequestMessage()
         ldrmsg.init()
-        bidhouseManagementFrame = Kernel().worker.getFrameByName("BidHouseManagementFrame")  # Assuming the getFrame() method returns an instance of BidHouseManagementFrame
+        # TODO : Implement the BidHouseManagementFrame class
+        bidhouseManagementFrame = Kernel().bidHouseManagementFrame
         if bidhouseManagementFrame:
             bidhouseManagementFrame.switching = False
         ConnectionsHandler().send(ldrmsg)
@@ -157,7 +158,7 @@ class CommonExchangeManagementFrame(Frame):
             return True
 
         if isinstance(msg, ExchangeIsReadyMessage):
-            roleplayEntitiesFrame = Kernel().entitiesFrame
+            roleplayEntitiesFrame = Kernel().roleplayEntitiesFrame
             playerName = roleplayEntitiesFrame.getEntityInfos(msg.id).name
             KernelEventsManager().send(KernelEvent.ExchangeIsReady, playerName, msg.ready)
             return True

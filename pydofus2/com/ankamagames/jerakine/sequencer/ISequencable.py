@@ -1,4 +1,3 @@
-from whistle import EventDispatcher
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
@@ -7,7 +6,7 @@ if TYPE_CHECKING:
     )
 
 
-class ISequencable(EventDispatcher):
+class ISequencable:
     def start(self) -> None:
         pass
 

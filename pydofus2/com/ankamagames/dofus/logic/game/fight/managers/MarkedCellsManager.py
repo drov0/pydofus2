@@ -19,9 +19,6 @@ from pydofus2.com.ankamagames.dofus.network.types.game.actions.fight.GameActionM
 from pydofus2.com.ankamagames.dofus.types.entities.Glyph import Glyph
 from pydofus2.com.ankamagames.jerakine.interfaces.IDestroyable import IDestroyable
 from pydofus2.com.ankamagames.jerakine.logger.Logger import Logger
-from pydofus2.com.ankamagames.jerakine.types.events.PropertyChangeEvent import (
-    PropertyChangeEvent,
-)
 from pydofus2.com.ankamagames.jerakine.types.positions.MapPoint import MapPoint
 from pydofus2.com.ankamagames.jerakine.types.zones.Cross import Cross
 from pydofus2.com.ankamagames.jerakine.types.zones.Custom import Custom
@@ -216,21 +213,8 @@ class MarkedCellsManager(IDestroyable, metaclass=Singleton):
             self.removeGlyph(bufferId[i])
         self = None
 
-    def onPropertyChanged(self, pEvent: PropertyChangeEvent) -> None:
-        if pEvent.propertyName == "transparentOverlayMode":
-            for markId in self._marks:
-                mi = self._marks[markId]
-                if pEvent.propertyValue:
-                    strata = PlacementStrataEnums.STRATA_NO_Z_ORDER
-                else:
-                    strata = (
-                        mi.markType == int(PlacementStrataEnums.STRATA_PORTAL)
-                        if GameActionMarkTypeEnum.PORTAL
-                        else int(PlacementStrataEnums.STRATA_GLYPH)
-                    )
-                for selection in mi.selections:
-                    selection.renderer.strata = strata
-                    selection.update(True)
+    def onPropertyChanged(self, pEvent) -> None:
+        pass
 
     def getSelectionUid(self) -> str:
         self._markUid += 1

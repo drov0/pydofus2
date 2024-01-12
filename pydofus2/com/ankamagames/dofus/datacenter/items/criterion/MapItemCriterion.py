@@ -1,3 +1,9 @@
+from pydofus2.com.ankamagames.dofus.datacenter.items.criterion.IItemCriterion import IItemCriterion
+from pydofus2.com.ankamagames.dofus.datacenter.items.criterion.ItemCriterion import ItemCriterion
+from pydofus2.com.ankamagames.dofus.logic.game.common.managers.PlayedCharacterManager import PlayedCharacterManager
+from pydofus2.com.ankamagames.jerakine.interfaces.IDataCenter import IDataCenter
+
+
 class MapItemCriterion(ItemCriterion, IDataCenter):
 
     _mapId: float

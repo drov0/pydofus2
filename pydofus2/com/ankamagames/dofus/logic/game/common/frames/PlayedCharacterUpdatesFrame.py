@@ -5,7 +5,6 @@ from typing import TYPE_CHECKING
 import pydofus2.com.ankamagames.dofus.internalDatacenter.spells.SpellWrapper as swmod
 import pydofus2.com.ankamagames.dofus.kernel.Kernel as krnl
 import pydofus2.com.ankamagames.dofus.logic.game.common.managers.PlayedCharacterManager as pcm
-import pydofus2.com.ankamagames.dofus.logic.game.roleplay.frames.RoleplayContextFrame as rplCF
 from pydofus2.com.ankamagames.berilia.managers.KernelEvent import KernelEvent
 from pydofus2.com.ankamagames.berilia.managers.KernelEventsManager import \
     KernelEventsManager
@@ -132,8 +131,8 @@ class PlayedCharacterUpdatesFrame(Frame):
         return Priority.HIGH
 
     @property
-    def roleplayContextFrame(self) -> rplCF.RoleplayContextFrame:
-        return krnl.Kernel().worker.getFrameByName("RoleplayContextFrame")
+    def roleplayContextFrame(self):
+        return krnl.Kernel().roleplayContextFrame
 
     @property
     def kamasLimit(self) -> float:
@@ -150,7 +149,7 @@ class PlayedCharacterUpdatesFrame(Frame):
             scrmsg = msg
             if scrmsg.actorId == pcm.PlayedCharacterManager().id:
                 pcm.PlayedCharacterManager().restrictions = scrmsg.restrictions
-            rpEntitiesFrame: "RoleplayEntitiesFrame" = krnl.Kernel().worker.getFrameByName("RoleplayEntitiesFrame")
+            rpEntitiesFrame = krnl.Kernel().roleplayEntitiesFrame
             if rpEntitiesFrame:
                 infos: "GameRolePlayHumanoidInformations" = rpEntitiesFrame.getEntityInfos(scrmsg.actorId)
                 if infos and infos.humanoidInfo:
@@ -164,7 +163,7 @@ class PlayedCharacterUpdatesFrame(Frame):
 
         if isinstance(msg, CharacterStatsListMessage):
             cslmsg = msg
-            fightBattleFrame: "FightBattleFrame" = krnl.Kernel().worker.getFrameByName("FightBattleFrame")
+            fightBattleFrame= krnl.Kernel().battleFrame
             if fightBattleFrame is not None and fightBattleFrame.executingSequence:
                 fightBattleFrame.delayCharacterStatsList(cslmsg)
             else:
@@ -173,9 +172,9 @@ class PlayedCharacterUpdatesFrame(Frame):
                 playerInfos = self.roleplayContextFrame.entitiesFrame.getEntityInfos(pcm.PlayedCharacterManager().id)
                 if playerInfos:
                     playerInfos.alignmentInfos = cslmsg.stats.alignmentInfos
-            if krnl.Kernel().worker.getFrameByName("QuestFrame"):
-                if krnl.Kernel().worker.getFrameByName("QuestFrame").achievmentsListProcessed == False:
-                    krnl.Kernel().worker.getFrameByName("QuestFrame")
+            if krnl.Kernel().questFrame:
+                if krnl.Kernel().questFrame.achievmentsListProcessed == False:
+                    krnl.Kernel().questFrame.processAchievements(True)
             KernelEventsManager().send(KernelEvent.CharacterStats)
             return True
 

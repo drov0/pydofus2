@@ -124,10 +124,10 @@ class ExchangeManagementFrame(Frame):
     def processExchangeRequestedTradeMessage(self, msg: ExchangeRequestedTradeMessage):
         if msg.exchangeType != ExchangeTypeEnum.PLAYER_TRADE:
             return
-        self._source_informations: GameRolePlayNamedActorInformations = Kernel().entitiesFrame.getEntityInfos(
+        self._source_informations: GameRolePlayNamedActorInformations = Kernel().roleplayEntitiesFrame.getEntityInfos(
             msg.source
         )
-        self._target_informations: GameRolePlayNamedActorInformations = Kernel().entitiesFrame.getEntityInfos(
+        self._target_informations: GameRolePlayNamedActorInformations = Kernel().roleplayEntitiesFrame.getEntityInfos(
             msg.target
         )
         source_name = self._source_informations.name
@@ -141,7 +141,7 @@ class ExchangeManagementFrame(Frame):
         source_name = PlayedCharacterManager().infos.name
         # NPCID = Kernel().entitiesFrame.getEntityInfos(msg.npcId).contextualId
         # NPC = Npc.getNpcById(NPCID)
-        target_name = Npc.getNpcById(Kernel().entitiesFrame.getEntityInfos(msg.npcId).npcId).name
+        target_name = Npc.getNpcById(Kernel().roleplayEntitiesFrame.getEntityInfos(msg.npcId).npcId).name
         PlayedCharacterManager().isInExchange = True
         KernelEventsManager().send(KernelEvent.ExchangeStartOkNpcTrade, msg.npcId, source_name, target_name)
         KernelEventsManager().send(KernelEvent.ExchangeStartedType, ExchangeTypeEnum.NPC_TRADE)

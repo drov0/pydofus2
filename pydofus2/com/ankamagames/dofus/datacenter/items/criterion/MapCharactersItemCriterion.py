@@ -1,20 +1,23 @@
-from pydofus2.com.ankamagames.dofus.datacenter.items.criterion.IItemCriterion import IItemCriterion
-from pydofus2.com.ankamagames.dofus.datacenter.items.criterion.ItemCriterion import ItemCriterion
-from pydofus2.com.ankamagames.dofus.kernel.Kernel import Kernel
-from pydofus2.com.ankamagames.dofus.logic.game.common.managers.PlayedCharacterManager import PlayedCharacterManager
-from pydofus2.com.ankamagames.dofus.network.types.game.context.GameContextActorInformations import (
-    GameContextActorInformations,
-)
-from pydofus2.com.ankamagames.dofus.network.types.game.context.roleplay.GameRolePlayActorInformations import (
-    GameRolePlayActorInformations,
-)
-from pydofus2.com.ankamagames.jerakine.data.I18n import I18n
-from pydofus2.com.ankamagames.jerakine.interfaces.IDataCenter import IDataCenter
-
 from typing import TYPE_CHECKING
 
+from pydofus2.com.ankamagames.dofus.datacenter.items.criterion.IItemCriterion import \
+    IItemCriterion
+from pydofus2.com.ankamagames.dofus.datacenter.items.criterion.ItemCriterion import \
+    ItemCriterion
+from pydofus2.com.ankamagames.dofus.kernel.Kernel import Kernel
+from pydofus2.com.ankamagames.dofus.logic.game.common.managers.PlayedCharacterManager import \
+    PlayedCharacterManager
+from pydofus2.com.ankamagames.dofus.network.types.game.context.GameContextActorInformations import \
+    GameContextActorInformations
+from pydofus2.com.ankamagames.dofus.network.types.game.context.roleplay.GameRolePlayActorInformations import \
+    GameRolePlayActorInformations
+from pydofus2.com.ankamagames.jerakine.data.I18n import I18n
+from pydofus2.com.ankamagames.jerakine.interfaces.IDataCenter import \
+    IDataCenter
+
 if TYPE_CHECKING:
-    from pydofus2.com.ankamagames.dofus.logic.game.roleplay.frames.RoleplayEntitiesFrame import RoleplayEntitiesFrame
+    from pydofus2.com.ankamagames.dofus.logic.game.roleplay.frames.RoleplayEntitiesFrame import \
+        RoleplayEntitiesFrame
 
 
 class MapCharactersItemCriterion(ItemCriterion, IDataCenter):
@@ -45,7 +48,7 @@ class MapCharactersItemCriterion(ItemCriterion, IDataCenter):
         nbCharacters: int = 0
         entitiesInfos: dict = None
         actorInfo: GameContextActorInformations = None
-        entitiesFrame: "RoleplayEntitiesFrame" = Kernel().worker.getFrameByName("RoleplayEntitiesFrame")
+        entitiesFrame = Kernel().roleplayEntitiesFrame
         if entitiesFrame:
             entitiesInfos = entitiesFrame.entities
             for actorInfo in entitiesInfos:

@@ -12,11 +12,8 @@ class SubareaItemCriterion(ItemCriterion):
 
     @property
     def isRespected(self) -> bool:
-        playerPosition: int = PlayedCharacterManager().currentSubArea.id
-        if (
-            self._operator.text == ItemCriterionOperator.EQUAL
-            or self._operator.text == ItemCriterionOperator.DIFFERENT
-        ):
+        playerPosition = PlayedCharacterManager().currentSubArea.id
+        if self._operator.text in [ItemCriterionOperator.EQUAL, ItemCriterionOperator.DIFFERENT]:
             return super().isRespected
         else:
             return False
@@ -27,7 +24,7 @@ class SubareaItemCriterion(ItemCriterion):
         subArea: SubArea = SubArea.getSubAreaById(self._criterionValue)
         if not subArea:
             return "error on subareaItemCriterion"
-        zoneName: str = subArea.name
+        zoneName = subArea.name
         if self._operator.text == ItemCriterionOperator.EQUAL:
             readableCriterion = I18n.getUiText("ui.tooltip.beInSubarea", [zoneName])
         if self._operator.text == ItemCriterionOperator.DIFFERENT:

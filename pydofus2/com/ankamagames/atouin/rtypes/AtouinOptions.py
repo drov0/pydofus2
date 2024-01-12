@@ -1,4 +1,3 @@
-from PyQt5.QtCore import QObject, pyqtProperty
 from pydofus2.com.ankamagames.jerakine.managers.OptionManager import OptionManager
 
 class AtouinOptions(OptionManager):
@@ -37,10 +36,3 @@ class AtouinOptions(OptionManager):
         self.add("tacticalModeTemplatesPath")
         self.add("useWorldEntityPool", False)
 
-    @pyqtProperty(QObject)
-    def container(self):
-        return self._container
-
-    @pyqtProperty(QObject)
-    def handler(self):
-        return self._handler

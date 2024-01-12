@@ -7,8 +7,7 @@ from pydofus2.com.ankamagames.dofus.logic.game.common.misc.DofusEntities import 
     DofusEntities
 from pydofus2.com.ankamagames.dofus.modules.utils.pathFinding.world.Vertex import \
     Vertex
-from pydofus2.com.ankamagames.jerakine.entities.interfaces.IEntity import \
-    IEntity
+
 
 if TYPE_CHECKING:
     from pydofus2.com.ankamagames.dofus.network.types.game.character.choice.CharacterBaseInformations import (
@@ -34,6 +33,8 @@ if TYPE_CHECKING:
     from pydofus2.com.ankamagames.dofus.internalDatacenter.spells.SpellWrapper import SpellWrapper
     from pydofus2.com.ankamagames.dofus.types.entities.AnimatedCharacter import AnimatedCharacter
     from pydofus2.com.ankamagames.dofus.internalDatacenter.items.ItemWrapper import ItemWrapper
+    from pydofus2.com.ankamagames.dofus.internalDatacenter.items.WeaponWrapper import WeaponWrapper
+
 
 from pydofus2.com.ankamagames.dofus.internalDatacenter.DataEnum import DataEnum
 from pydofus2.com.ankamagames.dofus.logic.common.managers.StatsManager import \
@@ -84,7 +85,7 @@ class PlayedCharacterManager(IDestroyable, metaclass=Singleton):
         self.playerSpellList = list["SpellWrapper"]()
         self.playerShortcutList = list()
         self.inventory = list["ItemWrapper"]()
-        self.currentWeapon = None
+        self.currentWeapon: "WeaponWrapper" = None
         self.inventoryWeight = 0
         self.shopWeight = 0
         self.inventoryWeightMax = 0
@@ -242,15 +243,13 @@ class PlayedCharacterManager(IDestroyable, metaclass=Singleton):
     def isInFight(self) -> bool:
         from pydofus2.com.ankamagames.dofus.kernel.Kernel import Kernel
 
-        return Kernel().worker.getFrameByName("FightContextFrame")
+        return Kernel().fightContextFrame
 
     @property
     def isInKoli(self) -> bool:
         from pydofus2.com.ankamagames.dofus.kernel.Kernel import Kernel
-        from pydofus2.com.ankamagames.dofus.logic.game.fight.frames.FightContextFrame import \
-            FightContextFrame
 
-        fightContextFrame: FightContextFrame = Kernel().worker.getFrameByName("FightContextFrame")
+        fightContextFrame = Kernel().fightContextFrame
         return fightContextFrame and fightContextFrame.isKolossium
 
     @property

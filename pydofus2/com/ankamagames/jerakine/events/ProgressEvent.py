@@ -1,7 +1,4 @@
-from whistle import Event
-
-
-class ProgressEvent(Event):
+class ProgressEvent:
     SOCKET_DATA = "socketData"
 
     def __init__(self, data):

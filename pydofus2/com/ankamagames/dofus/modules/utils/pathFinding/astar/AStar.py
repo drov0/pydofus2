@@ -29,6 +29,7 @@ class AStar(metaclass=Singleton):
     HEURISTIC_SCALE: int = 1
     INDOOR_WEIGHT: int = 0
     MAX_ITERATION: int = 10000
+    CRITERION_WHITE_LIST = ["Ad", "DM", "MI", "Mk", "Oc", "Pc", "QF", "Qo", "Qs", "Sv", "PG"]
 
     def __init__(self):
         super().__init__()
@@ -126,31 +127,19 @@ class AStar(metaclass=Singleton):
                             return candidate
         return None
 
-    @staticmethod
-    def hasValidTransition(edge: Edge) -> bool:
+    @classmethod
+    def hasValidTransition(cls, edge: Edge) -> bool:
         from pydofus2.com.ankamagames.dofus.datacenter.items.criterion.GroupItemCriterion import \
             GroupItemCriterion
 
-        criterionWhiteList: list = [
-            "Ad",
-            "DM",
-            "MI",
-            "Mk",
-            "Oc",
-            "Pc",
-            "QF",
-            "Qo",
-            "Qs",
-            "Sv",
-            "PG"
-        ]
+
         valid = False
         for transition in edge.transitions:
             if transition.criterion:
                 if (
                     "&" not in transition.criterion
                     and "|" not in transition.criterion
-                    and transition.criterion[0:2] not in criterionWhiteList
+                    and transition.criterion[0:2] not in cls.CRITERION_WHITE_LIST
                 ):
                     if AStar.DEBUG:
                         Logger().debug(f"Edge {edge}, tr {transition} criterion is not composite and is not white listed")

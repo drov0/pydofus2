@@ -50,10 +50,8 @@ class FightTeam(GameContextActorInformations):
         self.teamOptions[FightOptionsEnum.FIGHT_OPTION_SET_TO_PARTY_ONLY] = teamOptions.isRestrictedToPartyOnly
 
     def hasGroupMember(self) -> bool:
-        partyMember: PartyMemberWrapper = None
-        fightTeamMember: FightTeamMemberInformations = None
-        teamHasGroupMember: bool = False
-        pmf: PartyManagementFrame = Kernel().worker.getFrameByName("PartyManagementFrame")
+        teamHasGroupMember = False
+        pmf = Kernel().partyFrame
         partyMemberNames: list[str] = list[str]()
         for partyMember in pmf.partyMembers:
             partyMemberNames.append(partyMember.name)

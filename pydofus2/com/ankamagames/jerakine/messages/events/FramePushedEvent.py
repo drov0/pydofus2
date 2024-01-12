@@ -1,11 +1,9 @@
-from whistle import Event
-
 from pydofus2.com.ankamagames.jerakine.messages.Frame import Frame
 
 
-class FramePushedEvent(Event):
+class FramePushedEvent:
 
-    EVENT_FRAME_PUSHED: str = "event_frame.appended"
+    EVENT_FRAME_PUSHED = "event_frame.appended"
 
     _frame: Frame
 

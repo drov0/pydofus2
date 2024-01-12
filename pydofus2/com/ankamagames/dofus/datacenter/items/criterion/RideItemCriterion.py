@@ -1,3 +1,19 @@
+from pydofus2.com.ankamagames.dofus.datacenter.items.criterion.IItemCriterion import \
+    IItemCriterion
+from pydofus2.com.ankamagames.dofus.datacenter.items.criterion.ItemCriterion import \
+    ItemCriterion
+from pydofus2.com.ankamagames.dofus.datacenter.items.criterion.ItemCriterionOperator import \
+    ItemCriterionOperator
+from pydofus2.com.ankamagames.dofus.datacenter.mounts.Mount import Mount
+from pydofus2.com.ankamagames.dofus.internalDatacenter.mount.MountData import \
+    MountData
+from pydofus2.com.ankamagames.dofus.logic.game.common.managers.PlayedCharacterManager import \
+    PlayedCharacterManager
+from pydofus2.com.ankamagames.jerakine.data.I18n import I18n
+from pydofus2.com.ankamagames.jerakine.interfaces.IDataCenter import \
+    IDataCenter
+
+
 class RideItemCriterion(ItemCriterion, IDataCenter):
     def __init__(self, pCriterion: str):
         super().__init__(pCriterion)
@@ -5,12 +21,12 @@ class RideItemCriterion(ItemCriterion, IDataCenter):
     @property
     def text(self) -> str:
         readableCriterion: str = None
-        mountModel: Mount = Mount.getMountById(_criterionValue)
-        if _criterionValue == 0 or not mountModel:
+        mountModel: Mount = Mount.getMountById(self._criterionValue)
+        if self._criterionValue == 0 or not mountModel:
             return ""
-        if _operator.text == ItemCriterionOperator.EQUAL:
+        if self._operator.text == ItemCriterionOperator.EQUAL:
             readableCriterion = I18n.getUiText("ui.tooltip.mountEquiped", [mountModel.name])
-        elif _operator.text == ItemCriterionOperator.DIFFERENT:
+        elif self._operator.text == ItemCriterionOperator.DIFFERENT:
             readableCriterion = I18n.getUiText("ui.tooltip.mountNonEquiped", [mountModel.name])
         return readableCriterion
 

@@ -1,4 +1,6 @@
+from pydofus2.com.ankamagames.dofus.datacenter.challenges.Challenge import Challenge
 from pydofus2.com.ankamagames.dofus.internalDatacenter.fight.ChallengeTargetWrapper import ChallengeTargetWrapper
+from pydofus2.com.ankamagames.dofus.internalDatacenter.fight.EnumChallengeCategory import EnumChallengeCategory
 from pydofus2.com.ankamagames.dofus.kernel.Kernel import Kernel
 from pydofus2.com.ankamagames.dofus.network.types.game.context.fight.challenge.ChallengeTargetWithAttackerInformation import ChallengeTargetWithAttackerInformation
 from pydofus2.com.ankamagames.jerakine.data.XmlConfig import XmlConfig
@@ -6,7 +8,7 @@ from pydofus2.com.ankamagames.jerakine.data.XmlConfig import XmlConfig
 
 class ChallengeWrapper:
     def __init__(self):
-        self._challenge = None
+        self._challenge: Challenge = None
         self._id = 0
         self._targets = []
         self._xpBonus = 0
@@ -26,8 +28,8 @@ class ChallengeWrapper:
         self._challenge = Challenge.getChallengeById(id)
         self._id = id
 
-    def setTargetsFromTargetInformation(self, targets):
-        self._targets = []
+    def setTargetsFromTargetInformation(self, targets: list[ChallengeTargetWithAttackerInformation]):
+        self._targets = list[ChallengeTargetWrapper]()
         for target in targets:
             targetWrapper = ChallengeTargetWrapper()
             targetWrapper.targetId = target.targetId
@@ -73,7 +75,7 @@ class ChallengeWrapper:
         return self._challenge.description
 
     @property
-    def targets(self):
+    def targets(self) -> list[ChallengeTargetWrapper]:
         return self._targets
 
     @property

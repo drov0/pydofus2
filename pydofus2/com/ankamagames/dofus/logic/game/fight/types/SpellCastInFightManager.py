@@ -1,9 +1,5 @@
-from pydofus2.com.ankamagames.dofus.internalDatacenter.spells.SpellWrapper import SpellWrapper
 from pydofus2.com.ankamagames.dofus.kernel.Kernel import Kernel
 
-from pydofus2.com.ankamagames.dofus.logic.game.fight.managers.CurrentPlayedFighterManager import (
-    CurrentPlayedFighterManager,
-)
 from pydofus2.com.ankamagames.dofus.logic.game.fight.types.castSpellManager.SpellManager import (
     SpellManager,
 )
@@ -13,10 +9,6 @@ if TYPE_CHECKING:
     from pydofus2.com.ankamagames.dofus.network.types.game.context.fight.GameFightSpellCooldown import (
         GameFightSpellCooldown,
     )
-    from pydofus2.com.ankamagames.dofus.logic.game.common.frames.SpellInventoryManagementFrame import (
-        SpellInventoryManagementFrame,
-    )
-
 
 class SpellCastInFightManager:
 
@@ -31,7 +23,7 @@ class SpellCastInFightManager:
     needCooldownUpdate: bool = False
 
     def __init__(self, entityId: float):
-        self._spells = dict()
+        self._spells = dict[int, SpellManager]()
         super().__init__()
         self.entityId = entityId
 
@@ -41,15 +33,12 @@ class SpellCastInFightManager:
             spell.newTurn()
 
     def resetInitialCooldown(self, hasBeenSummoned: bool = False) -> None:
-        spellWrapper: SpellWrapper = None
-        spellManager: SpellManager = None
-        spim: "SpellInventoryManagementFrame" = Kernel().worker.getFrameByName("SpellInventoryManagementFrame")
-        spellList: list = spim.getFullSpellListByOwnerId(self.entityId)
+        spellList = Kernel().spellInventoryManagementFrame.getFullSpellListByOwnerId(self.entityId)
         for spellWrapper in spellList:
             if spellWrapper.spellLevelInfos.initialCooldown != 0:
                 if hasBeenSummoned and spellWrapper.actualCooldown > spellWrapper.spellLevelInfos.initialCooldown:
                     return
-                if self._spells[spellWrapper.spellId] is None:
+                if self._spells.get(spellWrapper.spellId) is None:
                     self._spells[spellWrapper.spellId] = SpellManager(
                         self, spellWrapper.spellId, spellWrapper.spellLevel
                     )
@@ -57,12 +46,17 @@ class SpellCastInFightManager:
                 spellManager.resetInitialCooldown(self.currentTurn)
 
     def updateCooldowns(self, spellCooldowns: list["GameFightSpellCooldown"] = None) -> None:
+        from pydofus2.com.ankamagames.dofus.logic.game.fight.managers.CurrentPlayedFighterManager import (
+    CurrentPlayedFighterManager,
+)
         if self.needCooldownUpdate and not spellCooldowns:
             spellCooldowns = self._storedSpellCooldowns
-        playedFighterManager: CurrentPlayedFighterManager = CurrentPlayedFighterManager()
-        numCoolDown: int = len(spellCooldowns)
+        playedFighterManager = CurrentPlayedFighterManager()
+        numCoolDown = len(spellCooldowns)
         for k in range(numCoolDown):
             spellCooldown = spellCooldowns[k]
+            from pydofus2.com.ankamagames.dofus.internalDatacenter.spells.SpellWrapper import SpellWrapper
+
             spellW = SpellWrapper.getSpellWrapperById(spellCooldown.spellId, self.entityId)
             if not spellW:
                 self.needCooldownUpdate = True
@@ -85,14 +79,14 @@ class SpellCastInFightManager:
         pTargets: list,
         pCountForCooldown: bool = True,
     ) -> None:
-        if self._spells.get(pSpellId) == None:
+        if self._spells.get(pSpellId) is None:
             self._spells[pSpellId] = SpellManager(self, pSpellId, pSpellLevel)
         self._spells[pSpellId].cast(self.currentTurn, pTargets, pCountForCooldown)
 
     def getSpellManagerBySpellId(
         self, pSpellId: int, isForceNewInstance: bool = False, pSpellLevelId: int = -1
     ) -> SpellManager:
-        spellManager: SpellManager = self._spells[pSpellId]
-        if spellManager == None and isForceNewInstance and pSpellLevelId != -1:
+        spellManager = self._spells.get(pSpellId)
+        if spellManager is None and isForceNewInstance and pSpellLevelId != -1:
             spellManager = self._spells[pSpellId] = SpellManager(self, pSpellId, pSpellLevelId)
         return spellManager

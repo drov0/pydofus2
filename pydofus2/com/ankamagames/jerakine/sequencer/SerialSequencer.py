@@ -1,5 +1,5 @@
 import sys
-from whistle import EventDispatcher
+from pydofus2.com.ankamagames.berilia.managers.EventsHandler import EventsHandler
 from pydofus2.com.ankamagames.jerakine.events.SequencerEvent import SequencerEvent
 from pydofus2.com.ankamagames.jerakine.logger.Logger import Logger
 from pydofus2.com.ankamagames.jerakine.sequencer.IPausableSequencable import IPausableSequencable
@@ -11,7 +11,7 @@ from pydofus2.com.ankamagames.jerakine.sequencer.ISubSequenceSequencable import 
 from pydofus2.com.ankamagames.jerakine.sequencer.AbstractSequencable import AbstractSequencable
 
 
-class SerialSequencer(ISequencer, EventDispatcher):
+class SerialSequencer(ISequencer, EventsHandler):
 
     DEFAULT_SEQUENCER_NAME: str = "SerialSequencerDefault"
 
@@ -78,7 +78,7 @@ class SerialSequencer(ISequencer, EventDispatcher):
                         self._running = False
                 if not self._running:
                     self._running = False
-                    self.dispatch(SequencerEvent.SEQUENCE_END, SequencerEvent(self))
+                    self.send(SequencerEvent.SEQUENCE_END, SequencerEvent(self))
 
     def clear(self) -> None:
         self._lastStep = None
@@ -106,14 +106,13 @@ class SerialSequencer(ISequencer, EventDispatcher):
         try:
             if isinstance(self._currentStep, ISubSequenceSequencable):
                 self._activeSubSequenceCount += 1
-                self._currentStep.add_listener(SequencerEvent.SEQUENCE_END, self.onSubSequenceEnd)
+                self._currentStep.on(SequencerEvent.SEQUENCE_END, self.onSubSequenceEnd)
             if self._defaultStepTimeout != -sys.maxsize - 1 and self._currentStep.hasDefaultTimeout:
                 self._currentStep.timeout = self._defaultStepTimeout
-            if self.has_listeners(SequencerEvent.SEQUENCE_STEP_START):
-                self.dispatch(
-                    SequencerEvent.SEQUENCE_STEP_START,
-                    SequencerEvent(self, self._currentStep),
-                )
+            self.send(
+                SequencerEvent.SEQUENCE_STEP_START,
+                SequencerEvent(self, self._currentStep),
+            )
             self._currentStep.start()
         except Exception as e:
             if isinstance(self._currentStep, ISubSequenceSequencable):
@@ -127,24 +126,22 @@ class SerialSequencer(ISequencer, EventDispatcher):
     def stepFinished(self, step: ISequencable) -> None:
         step.removeListener(self)
         if self._running:
-            if self.has_listeners(SequencerEvent.SEQUENCE_STEP_FINISH):
-                self.dispatch(
-                    SequencerEvent.SEQUENCE_STEP_FINISH,
-                    SequencerEvent(self, self._currentStep),
-                )
+            self.send(
+                SequencerEvent.SEQUENCE_STEP_FINISH,
+                SequencerEvent(self, self._currentStep),
+            )
             self._running = len(self._steps) != 0
             if not self._running:
                 if self._activeSubSequenceCount < 1:
-                    self.dispatch(SequencerEvent.SEQUENCE_END, SequencerEvent(self))
+                    self.send(SequencerEvent.SEQUENCE_END, SequencerEvent(self))
                 else:
                     self._running = True
         else:
-            if self.has_listeners(SequencerEvent.SEQUENCE_STEP_FINISH):
-                self.dispatch(SequencerEvent.SEQUENCE_STEP_FINISH, SequencerEvent(self, self._currentStep))
+            self.send(SequencerEvent.SEQUENCE_STEP_FINISH, SequencerEvent(self, self._currentStep))
             self.start()
 
-    def onSubSequenceEnd(self, e: SequencerEvent) -> None:
+    def onSubSequenceEnd(self, evt_id, e: SequencerEvent=None) -> None:
         self._activeSubSequenceCount -= 1
         if not self._activeSubSequenceCount and len(self._steps) == 0:
             self._running = False
-            self.dispatch(SequencerEvent.SEQUENCE_END, SequencerEvent(self))
+            self.send(SequencerEvent.SEQUENCE_END, SequencerEvent(self))

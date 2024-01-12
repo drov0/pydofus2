@@ -1,34 +1,20 @@
-from typing import TYPE_CHECKING
-
 import pydofus2.com.ankamagames.dofus.logic.game.fight.managers.BuffManager as bffm
 from pydofus2.com.ankamagames.atouin.managers.EntitiesManager import \
     EntitiesManager
-from pydofus2.com.ankamagames.dofus.internalDatacenter.stats.EntityStats import \
-    EntityStats
 from pydofus2.com.ankamagames.dofus.internalDatacenter.stats.Stat import Stat
 from pydofus2.com.ankamagames.dofus.kernel.Kernel import Kernel
 from pydofus2.com.ankamagames.dofus.logic.common.managers.StatsManager import \
     StatsManager
 from pydofus2.com.ankamagames.dofus.logic.game.common.misc.DofusEntities import \
     DofusEntities
-from pydofus2.com.ankamagames.dofus.logic.game.fight.frames.FightEntitiesFrame import \
-    FightEntitiesFrame
 from pydofus2.com.ankamagames.dofus.logic.game.fight.steps.IFightStep import \
     IFightStep
-from pydofus2.com.ankamagames.dofus.network.types.game.context.fight.GameFightFighterInformations import \
-    GameFightFighterInformations
 from pydofus2.com.ankamagames.jerakine.entities.interfaces.IEntity import \
     IEntity
 from pydofus2.com.ankamagames.jerakine.logger.Logger import Logger
 from pydofus2.com.ankamagames.jerakine.sequencer.AbstractSequencable import \
     AbstractSequencable
 from pydofus2.damageCalculation.tools.StatIds import StatIds
-
-if TYPE_CHECKING:
-    from pydofus2.com.ankamagames.dofus.logic.game.fight.frames.FightBattleFrame import \
-        FightBattleFrame
-    from pydofus2.com.ankamagames.dofus.logic.game.fight.frames.FightContextFrame import \
-        FightContextFrame
 
 
 class FightDeathStep(AbstractSequencable, IFightStep):
@@ -43,7 +29,7 @@ class FightDeathStep(AbstractSequencable, IFightStep):
         super().__init__()
         self._entityId = entityId
         self._naturalDeath = naturalDeath
-        fightContexteFrame: "FightContextFrame" = Kernel().worker.getFrameByName("FightContextFrame")
+        fightContexteFrame = Kernel().fightContextFrame
         if fightContexteFrame:
             self._targetName = fightContexteFrame.getFighterName(entityId)
         else:
@@ -62,9 +48,9 @@ class FightDeathStep(AbstractSequencable, IFightStep):
         if not dyingEntity:
             return
         fightEntitites = Kernel().fightEntitiesFrame
-        fighterInfos: GameFightFighterInformations = fightEntitites.getEntityInfos(self._entityId)
-        fighterStats: EntityStats = StatsManager().getStats(fighterInfos.contextualId)
-        fightBattleFrame: "FightBattleFrame" = Kernel().worker.getFrameByName("FightBattleFrame")
+        fighterInfos = fightEntitites.getEntityInfos(self._entityId)
+        fighterStats = StatsManager().getStats(fighterInfos.contextualId)
+        fightBattleFrame = Kernel().battleFrame
         if fightBattleFrame:
             fightBattleFrame.deadFightersList.append(self._entityId)
         self._needToWarn = True

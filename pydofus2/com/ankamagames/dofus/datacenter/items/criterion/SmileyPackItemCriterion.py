@@ -1,10 +1,15 @@
-from pydofus2.com.ankamagames.dofus.datacenter.communication.SmileyPack import SmileyPack
-from pydofus2.com.ankamagames.dofus.datacenter.items.criterion.IItemCriterion import IItemCriterion
-from pydofus2.com.ankamagames.dofus.datacenter.items.criterion.ItemCriterion import ItemCriterion
-from pydofus2.com.ankamagames.dofus.datacenter.items.criterion.ItemCriterionOperator import ItemCriterionOperator
+from pydofus2.com.ankamagames.dofus.datacenter.communication.SmileyPack import \
+    SmileyPack
+from pydofus2.com.ankamagames.dofus.datacenter.items.criterion.IItemCriterion import \
+    IItemCriterion
+from pydofus2.com.ankamagames.dofus.datacenter.items.criterion.ItemCriterion import \
+    ItemCriterion
+from pydofus2.com.ankamagames.dofus.datacenter.items.criterion.ItemCriterionOperator import \
+    ItemCriterionOperator
 from pydofus2.com.ankamagames.dofus.kernel.Kernel import Kernel
 from pydofus2.com.ankamagames.jerakine.data.I18n import I18n
-from pydofus2.com.ankamagames.jerakine.interfaces.IDataCenter import IDataCenter
+from pydofus2.com.ankamagames.jerakine.interfaces.IDataCenter import \
+    IDataCenter
 
 
 class SmileyPackItemCriterion(ItemCriterion, IDataCenter):
@@ -14,7 +19,7 @@ class SmileyPackItemCriterion(ItemCriterion, IDataCenter):
     @property
     def isRespected(self) -> bool:
         pack: SmileyPack = None
-        packList = Kernel().worker.getFrameByName("ChatFrame")
+        packList = Kernel().chatFrame
         for pack in packList:
             if pack.id == self._criterionValue:
                 return False
@@ -33,8 +38,7 @@ class SmileyPackItemCriterion(ItemCriterion, IDataCenter):
         return SmileyPackItemCriterion(self.basicText)
 
     def getCriterion(self) -> int:
-        pack: SmileyPack = None
-        packList: list = Kernel().worker.getFrameByName("ChatFrame")
+        packList = Kernel().chatFrame.packList
         for pack in packList:
             if pack.id == self._criterionValue:
                 return 1

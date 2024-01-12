@@ -2,19 +2,12 @@ import math
 from functools import lru_cache
 from typing import TYPE_CHECKING, Any
 
-from build.lib.pydofus2.com.ankamagames.dofus.uiApi.PlayedCharacterApi import (
-    PlayedCharacterApi,
-)
-
 from pydofus2.com.ankamagames.berilia.types.messages.managers.SlotDataHolderManager import (
     SlotDataHolderManager,
 )
 from pydofus2.com.ankamagames.dofus.enums.ActionIds import ActionIds
 from pydofus2.com.ankamagames.dofus.logic.game.fight.miscs.ActionIdHelper import (
     ActionIdHelper,
-)
-from pydofus2.com.ankamagames.dofus.network.enums.CharacterSpellModificationTypeEnum import (
-    CharacterSpellModificationTypeEnum,
 )
 from pydofus2.com.ankamagames.dofus.network.enums.SpellModifierActionTypeEnum import (
     SpellModifierActionTypeEnum,
@@ -271,6 +264,10 @@ class SpellWrapper(ISlotData, ICellZoneProvider, IDataCenter):
         return self.spellLevelInfos.range
 
     @property
+    def minimalRange(self) -> int:
+        return self['minRange']
+    
+    @property
     def castZoneInLine(self) -> bool:
         return self["castInLine"]
 
@@ -351,6 +348,9 @@ class SpellWrapper(ISlotData, ICellZoneProvider, IDataCenter):
     def getEntityId(self):
         if not math.isnan(self.playerId) and self.playerId != 0:
             return self.playerId
+        from pydofus2.com.ankamagames.dofus.uiApi.PlayedCharacterApi import (
+    PlayedCharacterApi,
+)
         if PlayedCharacterApi().isInFight():
             return cpfm.CurrentPlayedFighterManager().currentFighterId
         return PlayedCharacterManager().id
@@ -387,6 +387,7 @@ class SpellWrapper(ISlotData, ICellZoneProvider, IDataCenter):
             self.isMaxRangeModifiableWithStats,
         )
 
+    @property
     def maxRange(self):
         entityId = self.getEntityId()
         stats = StatsManager().getStats(entityId)
@@ -433,6 +434,7 @@ class SpellWrapper(ISlotData, ICellZoneProvider, IDataCenter):
     def __getitem__(self, name) -> Any:
         if hasattr(self, name):
             return getattr(self, name)
+        
         if InventoryManager().currentBuildId != -1:
             for build in InventoryManager().builds:
                 if build.id == InventoryManager().currentBuildId:
@@ -443,8 +445,10 @@ class SpellWrapper(ISlotData, ICellZoneProvider, IDataCenter):
                         break
                 if isinstance(iw, WeaponWrapper):
                     return self.getWeaponProperty(name, iw)
+                
         elif self.id == 0 and PlayedCharacterManager().currentWeapon != None:
             return self.getWeaponProperty(name)
+        
         if str(name) in [
             "id",
             "nameId",
@@ -463,7 +467,8 @@ class SpellWrapper(ISlotData, ICellZoneProvider, IDataCenter):
             "defaultPreviewZone",
             "effectZone",
         ]:
-            return self.spell[name]
+            return getattr(self.spell, str(name))
+        
         elif str(name) in [
             "spellBreed",
             "needFreeCell",
@@ -472,73 +477,87 @@ class SpellWrapper(ISlotData, ICellZoneProvider, IDataCenter):
             "maxStack",
             "globalCooldown",
         ]:
-            return self.spellLevelInfos[str(name)]
+            return getattr(self.spellLevelInfos, str(name))
+        
         if str(name) == "maxCastPerTurn":
             return spellmm.SpellModifiersManager().getModifiedInt(
                 self.getEntityId(),
                 self.id,
                 SpellModifierTypeEnum.MAX_CAST_PER_TURN,
-                self.spellLevelInfos["maxCastPerTurn"],
+                self.spellLevelInfos.maxCastPerTurn,
             )
+            
         if str(name) in ["range", "maxRange"]:
             return self.maxRange
+        
         if str(name) == "minRange":
             return spellmm.SpellModifiersManager().getModifiedInt(
                 self.getEntityId(),
                 self.id,
                 SpellModifierTypeEnum.RANGE_MIN,
-                self.spellLevelInfos["minRange"],
+                self.spellLevelInfos.minRange,
             )
+
         if str(name) == "maxCastPerTarget":
             return spellmm.SpellModifiersManager().getModifiedInt(
                 self.getEntityId(),
                 self.id,
                 SpellModifierTypeEnum.MAX_CAST_PER_TARGET,
-                self.spellLevelInfos["maxCastPerTarget"],
+                self.spellLevelInfos.maxCastPerTarget,
             )
+
         if str(name) == "castInLine":
             return spellmm.SpellModifiersManager().getModifiedBool(
                 self.getEntityId(),
                 self.id,
                 SpellModifierTypeEnum.CAST_LINE,
-                self.spellLevelInfos["castInLine"],
+                self.spellLevelInfos.castInLine,
             )
+
         if str(name) == "castInDiagonal":
             return self.spellLevelInfos.castInDiagonal
+
         if str(name) == "castTestLos":
             return spellmm.SpellModifiersManager().getModifiedBool(
                 self.getEntityId(),
                 self.id,
                 SpellModifierTypeEnum.LOS,
-                self.spellLevelInfos["castTestLos"],
+                self.spellLevelInfos.castTestLos,
             )
+
         if str(name) == "rangeCanBeBoosted":
             return spellmm.SpellModifiersManager().getModifiedBool(
                 self.getEntityId(),
                 self.id,
                 SpellModifierTypeEnum.RANGEABLE,
-                self.spellLevelInfos["rangeCanBeBoosted"],
+                self.spellLevelInfos.rangeCanBeBoosted,
             )
+
         if str(name) == "apCost":
             return spellmm.SpellModifiersManager().getModifiedInt(
                 self.getEntityId(),
                 self.id,
                 SpellModifierTypeEnum.AP_COST,
-                self.spellLevelInfos["apCost"],
+                self.spellLevelInfos.apCost,
             )
+
         if str(name) == "minCastInterval":
             return spellmm.SpellModifiersManager().getModifiedInt(
                 self.getEntityId(),
                 self.id,
                 SpellModifierTypeEnum.CAST_INTERVAL,
-                self.spellLevelInfos["minCastInterval"],
+                self.spellLevelInfos.minCastInterval,
             )
+
         if str(name) == "isSpellWeapon":
             return self.id == 0
+
         if str(name) == "isDefaultSpellWeapon":
             return self.id == 0 and not PlayedCharacterManager().currentWeapon
+
         if str(name) == "statesCriterion":
             return self.spellLevelInfos.stateCriterion
+
         else:
             return
 
@@ -549,6 +568,7 @@ class SpellWrapper(ISlotData, ICellZoneProvider, IDataCenter):
 
         if str(name) == "id":
             return 0
+        
         elif str(name) in [
             "nameId",
             "descriptionId",
@@ -564,7 +584,8 @@ class SpellWrapper(ISlotData, ICellZoneProvider, IDataCenter):
             "minRange",
             "range",
         ]:
-            return weapon[name]
+            return getattr(weapon, name)
+        
         if str(name) in [
             "isDefaultSpellWeapon",
             "useParamCache",
@@ -572,8 +593,10 @@ class SpellWrapper(ISlotData, ICellZoneProvider, IDataCenter):
             "rangeCanBeBoosted",
         ]:
             return False
+        
         if str(name) in ["isSpellWeapon", "needFreeCell"]:
             return True
+        
         if str(name) in [
             "minCastInterval",
             "minPlayerLevel",
@@ -582,14 +605,19 @@ class SpellWrapper(ISlotData, ICellZoneProvider, IDataCenter):
             "maxCastPerTarget",
         ]:
             return 0
+        
         if str(name) == "typeId":
             return DataEnum.SPELL_TYPE_SPECIALS
+        
         if str(name) in ["scriptParams", "scriptParamsCritical", "spellLevels"]:
             return None
+        
         if str(name) in ["scriptId", "scriptIdCritical", "spellBreed"]:
             return 0
+        
         if str(name) == "variants":
             return []
+        
         else:
             return
 
@@ -600,7 +628,7 @@ class SpellWrapper(ISlotData, ICellZoneProvider, IDataCenter):
             if toReturn is None:
                 return 0
             return toReturn
-        return self.spellLevelInfos["criticalHitProbability"]
+        return self.spellLevelInfos.criticalHitProbability
 
     def clone(self) -> Any:
         return SpellWrapper.create(

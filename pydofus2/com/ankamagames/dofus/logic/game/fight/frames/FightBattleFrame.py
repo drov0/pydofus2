@@ -1,8 +1,5 @@
 from types import FunctionType
-from typing import TYPE_CHECKING
-
 import pydofus2.com.ankamagames.dofus.logic.game.common.frames.PlayedCharacterUpdatesFrame as pcuF
-import pydofus2.com.ankamagames.dofus.logic.game.fight.frames.FightEntitiesFrame as fenf
 import pydofus2.com.ankamagames.dofus.logic.game.fight.frames.FightSequenceFrame as fseqf
 import pydofus2.com.ankamagames.dofus.logic.game.fight.managers.BuffManager as bffm
 from pydofus2.com.ankamagames.atouin.utils.DataMapProvider import \
@@ -82,11 +79,6 @@ from pydofus2.com.ankamagames.jerakine.logger.Logger import Logger
 from pydofus2.com.ankamagames.jerakine.messages.Frame import Frame
 from pydofus2.com.ankamagames.jerakine.messages.Message import Message
 from pydofus2.com.ankamagames.jerakine.types.enums.Priority import Priority
-
-if TYPE_CHECKING:
-    from pydofus2.com.ankamagames.dofus.logic.game.fight.frames.FightContextFrame import \
-        FightContextFrame
-
 
 class FightBattleFrame(Frame):
 
@@ -240,7 +232,7 @@ class FightBattleFrame(Frame):
         elif isinstance(msg, SequenceEndMessage):
             semsg = msg
             if not self._currentSequenceFrame:
-                Logger().warn("Wow wow wow, I got a Sequence End but no Sequence Start? What the hell?")
+                Logger().warn("I got a Sequence End but no Sequence Start!")
                 return True
             self._currentSequenceFrame.mustAck = semsg.authorId == int(CurrentPlayedFighterManager().currentFighterId)
             self._currentSequenceFrame.ackIdent = semsg.actionId
@@ -268,7 +260,7 @@ class FightBattleFrame(Frame):
             self._turnsCount = gfnrmsg.roundNumber
             CurrentPlayedFighterManager().getSpellCastManager().currentTurn = self._turnsCount
             if GameDebugManager().buffsDebugActivated:
-                Logger().info(f"[BUFFS DEBUG] Début du tour de jeu {self._turnsCount} !");
+                Logger().info(f"[BUFFS DEBUG] Start of turn {self._turnsCount} !");
             bffm.BuffManager().spellBuffsToIgnore = []
             return True
 
@@ -294,10 +286,10 @@ class FightBattleFrame(Frame):
 
         elif isinstance(msg, GameContextDestroyMessage):
             if self._battleResults:
-                Logger().debug("Fin de combat propre (resultat connu)")
+                Logger().debug("Proper end of combat propre (resultats known)")
                 self.endBattle(self._battleResults)
             else:
-                Logger().debug("Fin de combat brutale (pas de resultat connu)")
+                Logger().debug("Brutal end of combat (no resultats known)")
                 self._executingSequence = False
                 fakegfemsg = GameFightEndMessage()
                 fakegfemsg.init(0, 0, 0, None, [])
@@ -454,7 +446,7 @@ class FightBattleFrame(Frame):
         self._holder.reset()
         self._synchroniseFighters = None
         Kernel().worker.removeFrame(self)
-        fightContextFrame = Kernel().worker.getFrameByName("FightContextFrame")
+        fightContextFrame = Kernel().fightContextFrame
         fightContextFrame.process(fightEnd)
 
     def onSkipTurnTimeOut(self, event) -> None:
@@ -463,7 +455,7 @@ class FightBattleFrame(Frame):
     def gameFightSynchronize(self, fighters: list[GameFightFighterInformations]) -> None:
         newWaveAppeared: bool = False
         newWaveMonster: bool = False
-        entitiesFrame: fenf.FightEntitiesFrame = Kernel().worker.getFrameByName("FightEntitiesFrame")
+        entitiesFrame = Kernel().fightEntitiesFrame
         newWaveMonsterIndex: int = 0
         bffm.BuffManager().synchronize()
         for fighterInfos in fighters:
@@ -494,7 +486,7 @@ class FightBattleFrame(Frame):
             self._neverSynchronizedBefore = False
 
     def removeSavedPosition(self, pEntityId: float) -> None:
-        fightContextFrame: "FightContextFrame" = Kernel().worker.getFrameByName("FightContextFrame")
+        fightContextFrame = Kernel().fightContextFrame
         savedPositions: list = fightContextFrame.fightersPositionsHistory.get(pEntityId)
         if savedPositions:
             nbPos = len(savedPositions)

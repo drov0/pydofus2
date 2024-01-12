@@ -32,7 +32,6 @@ class NpcFrame(Frame):
             return True
 
         elif isinstance(msg, NpcDialogQuestionMessage):
-            Logger().debug(f"Received NPC question : {msg.messageId}")
             KernelEventsManager().send(KernelEvent.NpcQuestion, msg.messageId, msg.dialogParams, msg.visibleReplies)
             return True
 

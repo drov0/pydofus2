@@ -15,6 +15,8 @@ from pydofus2.com.ankamagames.dofus.internalDatacenter.DataEnum import DataEnum
 from pydofus2.com.ankamagames.dofus.kernel.Kernel import Kernel
 from pydofus2.com.ankamagames.dofus.logic.game.common.managers.PlayedCharacterManager import \
     PlayedCharacterManager
+from pydofus2.com.ankamagames.dofus.logic.game.roleplay.frames.InteractiveElementData import \
+    InteractiveElementData
 from pydofus2.com.ankamagames.dofus.network.enums.MapObstacleStateEnum import \
     MapObstacleStateEnum
 from pydofus2.com.ankamagames.dofus.network.messages.game.context.GameContextDestroyMessage import \
@@ -44,13 +46,9 @@ from pydofus2.com.ankamagames.dofus.network.types.game.interactive.StatedElement
 from pydofus2.com.ankamagames.jerakine.logger.Logger import Logger
 from pydofus2.com.ankamagames.jerakine.messages.Frame import Frame
 from pydofus2.com.ankamagames.jerakine.messages.Message import Message
-from pydofus2.com.ankamagames.jerakine.types.enums.DirectionsEnum import DirectionsEnum
 from pydofus2.com.ankamagames.jerakine.types.enums.Priority import Priority
 from pydofus2.com.ankamagames.jerakine.types.positions.MapPoint import MapPoint
 
-if TYPE_CHECKING:
-    from pydofus2.com.ankamagames.dofus.logic.game.roleplay.frames.RoleplayMovementFrame import \
-        RoleplayMovementFrame
 
 class CollectableElement:
     def __init__(self, id: int, interactiveSkill: InteractiveElementSkill, enabled: bool):
@@ -68,15 +66,6 @@ class CollectableElement:
             self.enabled,
         )
 
-
-class InteractiveElementData:
-    def __init__(self, element: InteractiveElement, position: MapPoint, skillUID: int) -> None:
-        self.element = element
-        self.position = position
-        self.skillUID = skillUID
-        self.skillId = None
-
-
 class RoleplayInteractivesFrame(Frame):
 
     COLLECTABLE_COLLECTING_STATE_ID = 2
@@ -92,6 +81,8 @@ class RoleplayInteractivesFrame(Frame):
     REQUEST_TIMEOUT = 10
     
     BANK_HINT_GFX = 401
+    
+    NDIRECTIONS = 8
 
     def __init__(self):
         self._usingInteractive: bool = False
@@ -106,10 +97,6 @@ class RoleplayInteractivesFrame(Frame):
     @property
     def priority(self) -> int:
         return Priority.HIGH
-
-    @property
-    def movementFrame(self) -> "RoleplayMovementFrame":
-        return Kernel().worker.getFrameByName("RoleplayMovementFrame")
     
     @property
     def interactives(self) -> dict[int, InteractiveElementData]:
@@ -170,9 +157,9 @@ class RoleplayInteractivesFrame(Frame):
             entityId = self._enityUsingElement.get(msg.elemId)
             if entityId == PlayedCharacterManager().id:
                 self.usingInteractive = False
-            KernelEventsManager().send(KernelEvent.InteractiveElementUsed, entityId, msg.elemId)            
             del self._enityUsingElement[msg.elemId]
             del self._collectableResource[msg.elemId]
+            KernelEventsManager().send(KernelEvent.InteractiveElementUsed, entityId, msg.elemId)  
             return True
         
         if isinstance(msg, InteractiveUseErrorMessage):
@@ -239,18 +226,18 @@ class RoleplayInteractivesFrame(Frame):
     def registerInteractive(self, ie: InteractiveElement, firstSkill: int) -> None:
         if not MapDisplayManager().isIdentifiedElement(ie.elementId):
             return
-        if Kernel().entitiesFrame:
+        if Kernel().roleplayEntitiesFrame:
             found = False
-            for s, cie in enumerate(Kernel().entitiesFrame.interactiveElements):
+            for s, cie in enumerate(Kernel().roleplayEntitiesFrame.interactiveElements):
                 if cie.elementId == ie.elementId:
                     found = True
-                    Kernel().entitiesFrame.interactiveElements[int(s)] = ie
+                    Kernel().roleplayEntitiesFrame.interactiveElements[int(s)] = ie
                     break
             if not found:
-                Kernel().entitiesFrame.interactiveElements.append(ie)
+                Kernel().roleplayEntitiesFrame.interactiveElements.append(ie)
         else:
             Logger().error("Received interactiveElem register but no entities frame found")
-        worldPos: MapPoint = MapDisplayManager().getIdentifiedElementPosition(ie.elementId)
+        worldPos = MapDisplayManager().getIdentifiedElementPosition(ie.elementId)
         self._ie[ie.elementId] = InteractiveElementData(ie, worldPos, firstSkill)
 
     def removeInteractive(self, ie: InteractiveElement) -> None:
@@ -311,6 +298,14 @@ class RoleplayInteractivesFrame(Frame):
     def canBeCollected(self, elementId: int) -> CollectableElement:
         return self._collectableResource.get(elementId)
 
+    @classmethod
+    def is_exit_skill(cls, ie: InteractiveElement) -> bool:
+        if ie.enabledSkills:
+            for skill in ie.enabledSkills:
+                if skill.skillId == DataEnum.SKILL_POINT_OUT_EXIT:
+                    return True
+        return False
+    
     @classmethod
     def getNearestCellToIe(cls, ie: InteractiveElement, iePos: MapPoint, playerPos: MapPoint=None) -> Tuple[MapPoint, bool]:
         forbiddenCellsIds = list()

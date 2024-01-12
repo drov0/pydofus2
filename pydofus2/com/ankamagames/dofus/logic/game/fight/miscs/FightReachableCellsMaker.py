@@ -4,9 +4,7 @@ from pydofus2.com.ankamagames.atouin.managers.MapDisplayManager import \
     MapDisplayManager
 from pydofus2.com.ankamagames.dofus.kernel.Kernel import Kernel
 from pydofus2.com.ankamagames.dofus.logic.common.managers.StatsManager import \
-    StatsManager
-from pydofus2.com.ankamagames.dofus.logic.game.fight.frames.FightEntitiesFrame import \
-    FightEntitiesFrame
+    StatsManager    
 from pydofus2.com.ankamagames.dofus.logic.game.fight.miscs.TackleUtil import \
     TackleUtil
 from pydofus2.com.ankamagames.dofus.network.types.game.context.fight.GameFightMonsterInformations import \
@@ -97,7 +95,7 @@ class FightReachableCellsMaker:
         fromCellId: int = -1,
         movementPoint: int = -1,
     ):
-        entitiesFrame: FightEntitiesFrame = Kernel().worker.getFrameByName("FightEntitiesFrame")
+        entitiesFrame = Kernel().fightEntitiesFrame
         stats = StatsManager().getStats(infos.contextualId)
         movementPoints = stats.getStat(StatIds.MOVEMENT_POINTS)
         movementPointsValue = float(movementPoints.totalValue) if movementPoints is not None else float(0)

@@ -1,8 +1,8 @@
-from pydofus2.com.ankamagames.dofus.datacenter.items.criterion import ItemCriterion
-from pydofus2.com.ankamagames.jerakine.interfaces import IDataCenter
-from pydofus2.com.ankamagames.dofus.logic.game.common.managers import PlayedCharacterManager
-from pydofus2.com.ankamagames.jerakine.data import I18n
-from pydofus2.com.ankamagames.dofus.datacenter.items.criterion import IItemCriterion
+from pydofus2.com.ankamagames.dofus.datacenter.items.criterion.ItemCriterion import ItemCriterion
+from pydofus2.com.ankamagames.jerakine.interfaces.IDataCenter import IDataCenter
+from pydofus2.com.ankamagames.dofus.logic.game.common.managers.PlayedCharacterManager import PlayedCharacterManager
+from pydofus2.com.ankamagames.jerakine.data.I18n import I18n
+from pydofus2.com.ankamagames.dofus.datacenter.items.criterion.IItemCriterion import IItemCriterion
 
 
 class NameItemCriterion(ItemCriterion, IDataCenter):
@@ -26,16 +26,16 @@ class NameItemCriterion(ItemCriterion, IDataCenter):
             respected = name != criterionValue
 
         if self._operator.text == "~":
-            respected = name.toLowerCase() == criterionValue.toLowerCase()
+            respected = name.lower() == criterionValue.lower()
 
         if self._operator.text == "S":
-            respected = name.toLowerCase().index(criterionValue.toLowerCase()) == 0
+            respected = name.lower().index(criterionValue.lower()) == 0
 
         if self._operator.text == "s":
             respected = name.index(criterionValue) == 0
 
         if self._operator.text == "E":
-            respected = name.toLowerCase().index(criterionValue.toLowerCase()) == len(name) - len(criterionValue)
+            respected = name.lower().index(criterionValue.lower()) == len(name) - len(criterionValue)
 
         if self._operator.text == "e":
             respected = name.index(criterionValue) == len(name) - len(criterionValue)

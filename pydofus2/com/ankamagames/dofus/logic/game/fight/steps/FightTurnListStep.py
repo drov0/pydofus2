@@ -2,9 +2,6 @@ from pydofus2.com.ankamagames.dofus.kernel.Kernel import Kernel
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
-    from pydofus2.com.ankamagames.dofus.logic.game.fight.frames.FightBattleFrame import (
-        FightBattleFrame,
-    )
     from pydofus2.com.ankamagames.jerakine.sequencer.ISequencer import ISequencer
 from pydofus2.com.ankamagames.dofus.logic.game.fight.steps.IFightStep import IFightStep
 from pydofus2.com.ankamagames.jerakine.sequencer.AbstractSequencable import AbstractSequencable
@@ -32,7 +29,7 @@ class FightTurnListStep(AbstractSequencable, IFightStep):
         return "turnList"
 
     def start(self) -> None:
-        fbf: "FightBattleFrame" = Kernel().worker.getFrameByName("FightBattleFrame")
+        fbf = Kernel().battleFrame
         if fbf:
             fbf.fightersList = self._turnsList
             fbf.deadFightersList = self._deadTurnsList

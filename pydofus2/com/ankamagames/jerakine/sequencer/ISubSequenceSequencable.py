@@ -1,6 +1,8 @@
-from whistle import EventDispatcher
-from pydofus2.com.ankamagames.jerakine.sequencer.ISequencable import ISequencable
+from pydofus2.com.ankamagames.berilia.managers.EventsHandler import \
+    EventsHandler
+from pydofus2.com.ankamagames.jerakine.sequencer.ISequencable import \
+    ISequencable
 
 
-class ISubSequenceSequencable(ISequencable, EventDispatcher):
+class ISubSequenceSequencable(ISequencable, EventsHandler):
     pass

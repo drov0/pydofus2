@@ -1,10 +1,11 @@
 
-from pydofus2.com.ankamagames.berilia.managers.KernelEvent import KernelEvent
-from pydofus2.com.ankamagames.berilia.managers.KernelEventsManager import KernelEventsManager
 import pydofus2.com.ankamagames.dofus.kernel.Kernel as krnl
 import pydofus2.com.ankamagames.dofus.logic.game.common.managers.PlayedCharacterManager as pcm
 from pydofus2.com.ankamagames.atouin.managers.MapDisplayManager import \
     MapDisplayManager
+from pydofus2.com.ankamagames.berilia.managers.KernelEvent import KernelEvent
+from pydofus2.com.ankamagames.berilia.managers.KernelEventsManager import \
+    KernelEventsManager
 from pydofus2.com.ankamagames.dofus.internalDatacenter.world.WorldPointWrapper import \
     WorldPointWrapper
 from pydofus2.com.ankamagames.dofus.logic.common.managers.PlayerManager import \
@@ -136,7 +137,7 @@ class FightEntitiesFrame(AbstractEntitiesFrame, Frame):
     
     @classmethod
     def getCurrentInstance(cls) -> "FightEntitiesFrame":
-        return krnl.Kernel().worker.getFrameByName("FightEntitiesFrame")
+        return krnl.Kernel().fightEntitiesFrame
 
     def pushed(self) -> bool:
         self._illusionEntities = dict()
@@ -257,10 +258,7 @@ class FightEntitiesFrame(AbstractEntitiesFrame, Frame):
             return True
 
         if isinstance(msg, RemoveEntityAction):
-            fighterRemovedId = msg.actorId
-            self.removeActor(fighterRemovedId)
-            del self._realFightersLooks[fighterRemovedId]
-            return True
+            self.removeEntity(msg.actorId)
 
         if isinstance(msg, ShowCellSpectatorMessage):
             return True
@@ -576,6 +574,11 @@ class FightEntitiesFrame(AbstractEntitiesFrame, Frame):
             if infos.contextualId == pId:
                 return -1 if infos not in self._tempFighterList else self._tempFighterList.index(infos)
         return -1
+    
+    def removeEntity(self, actorId: float) -> None:
+        self.removeActor(actorId)
+        del self._realFightersLooks[actorId]
+        return True
 
 class TmpFighterInfos:
 

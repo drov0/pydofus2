@@ -1,12 +1,8 @@
 from pydofus2.com.ankamagames.dofus.internalDatacenter.spells.SpellWrapper import \
     SpellWrapper
 from pydofus2.com.ankamagames.dofus.kernel.Kernel import Kernel
-from pydofus2.com.ankamagames.dofus.logic.game.common.frames.SpellInventoryManagementFrame import \
-    SpellInventoryManagementFrame
 from pydofus2.com.ankamagames.dofus.logic.game.common.managers.PlayedCharacterManager import \
     PlayedCharacterManager
-from pydofus2.com.ankamagames.dofus.logic.game.fight.frames.FightEntitiesFrame import \
-    FightEntitiesFrame
 from pydofus2.com.ankamagames.dofus.logic.game.fight.managers.CurrentPlayedFighterManager import \
     CurrentPlayedFighterManager
 from pydofus2.com.ankamagames.dofus.logic.game.fight.steps.IFightStep import \
@@ -52,7 +48,7 @@ class FightSpellCooldownVariationStep(AbstractSequencable, IFightStep):
             or self._fighterId == PlayedCharacterManager().id
         ):
             spellCastManager = CurrentPlayedFighterManager().getSpellCastManagerById(self._fighterId)
-            simf: "SpellInventoryManagementFrame" = Kernel().worker.getFrameByName("SpellInventoryManagementFrame")
+            simf = Kernel().spellInventoryManagementFrame
             spellList = simf.getFullSpellListByOwnerId(self._fighterId)
             for spellKnown in spellList:
                 if spellKnown.id == self._spellId:

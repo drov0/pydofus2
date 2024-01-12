@@ -19,9 +19,11 @@ if TYPE_CHECKING:
         SpellWrapper,
     )
     from pydofus2.com.ankamagames.dofus.types.entities.AnimatedCharacter import AnimatedCharacter
+    from pydofus2.com.ankamagames.dofus.datacenter.items.Weapon import Weapon
+
 
 import pydofus2.com.ankamagames.dofus.logic.game.common.managers.PlayedCharacterManager as pcm
-import pydofus2.com.ankamagames.dofus.logic.game.fight.managers.SpellCastInFightManager as scifm
+import pydofus2.com.ankamagames.dofus.logic.game.fight.types.SpellCastInFightManager as scifm
 from pydofus2.com.ankamagames.dofus.datacenter.spells.SpellState import \
     SpellState
 from pydofus2.com.ankamagames.dofus.internalDatacenter.DataEnum import DataEnum
@@ -185,26 +187,26 @@ class CurrentPlayedFighterManager(metaclass=Singleton):
             if not StatsManager().getStats(self.currentFighterId):
                 reason = I18n.getUiText("ui.fightAutomsg.spellcast.notAvailableWithoutStats", [spellName])
                 return False, reason
-        selfSpell = None
+        thisSpell = None
         for spellKnown in player.spellsInventory:
             if spellKnown and spellKnown.id == spellId:
-                selfSpell = spellKnown
+                thisSpell = spellKnown
                 break
-        if not selfSpell:
+        if not thisSpell:
             reason = I18n.getUiText("ui.fightAutomsg.spellcast.notAvailable", [spellName])
             return False, reason
         entityStats = StatsManager().getStats(self.currentFighterId)
         currentPA = int(entityStats.getStatTotalValue(StatIds.ACTION_POINTS)) if entityStats is not None else 0
         if spellId == 0 and player.currentWeapon is not None:
-            weapon = Item.getItemById(player.currentWeapon.objectGID)
+            weapon : "Weapon" = Item.getItemById(player.currentWeapon.objectGID)
             if not weapon:
                 reason = I18n.getUiText("ui.fightAutomsg.spellcast.notAWeapon", [spellName])
                 return False, reason
             apCost = weapon.apCost
             maxCastPerTurn = weapon.maxCastPerTurn
         else:
-            apCost = selfSpell["apCost"]
-            maxCastPerTurn = selfSpell["maxCastPerTurn"]
+            apCost = thisSpell['apCost']
+            maxCastPerTurn = thisSpell['maxCastPerTurn']
         if apCost > currentPA:
             reason = I18n.getUiText("ui.fightAutomsg.spellcast.needAP", [spellName, apCost])
             return False, reason
@@ -257,7 +259,7 @@ class CurrentPlayedFighterManager(metaclass=Singleton):
             Logger().error(f"Cancast spell called but Player is not fighting!")
             reason = I18n.getUiText("ui.fightAutomsg.spellcast.available", [spellName])
             return True, reason
-        spellCastManager: scifm.SpellCastInFightManager = self.getSpellCastManager()
+        spellCastManager = self.getSpellCastManager()
         spellManager = spellCastManager.getSpellManagerBySpellId(spellId)
         if spellManager is None:
             reason = I18n.getUiText("ui.fightAutomsg.spellcast.available", [spellName])
@@ -265,8 +267,8 @@ class CurrentPlayedFighterManager(metaclass=Singleton):
         if maxCastPerTurn <= spellManager.numberCastThisTurn and maxCastPerTurn > 0:
             reason = I18n.getUiText("ui.fightAutomsg.spellcast.castPerTurn", [spellName, maxCastPerTurn])
             return False, reason
-        if spellManager.cooldown > 0 or selfSpell.actualCooldown > 0:
-            cooldown = max(spellManager.cooldown, selfSpell.actualCooldown)
+        if spellManager.cooldown > 0 or thisSpell.actualCooldown > 0:
+            cooldown = max(spellManager.cooldown, thisSpell.actualCooldown)
             if cooldown == 63:
                 reason = I18n.getUiText("ui.fightAutomsg.spellcast.noCast", [spellName])
             else:

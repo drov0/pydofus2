@@ -1,22 +1,31 @@
 import re
-from pydofus2.com.ankamagames.dofus.datacenter.items.criterion.AchievementAccountItemCriterion import (
-    AchievementAccountItemCriterion,
-)
-from pydofus2.com.ankamagames.dofus.datacenter.items.criterion.GroupItemCriterion import GroupItemCriterion
-from pydofus2.com.ankamagames.dofus.datacenter.items.criterion.IItemCriterion import IItemCriterion
-from pydofus2.com.ankamagames.dofus.datacenter.items.criterion.LevelItemCriterion import LevelItemCriterion
-from pydofus2.com.ankamagames.dofus.datacenter.items.criterion.PrestigeLevelItemCriterion import (
-    PrestigeLevelItemCriterion,
-)
-from pydofus2.com.ankamagames.dofus.datacenter.quest.AchievementObjective import AchievementObjective
+
+from pydofus2.com.ankamagames.dofus.datacenter.items.criterion.GroupItemCriterion import \
+    GroupItemCriterion
+from pydofus2.com.ankamagames.dofus.datacenter.items.criterion.IItemCriterion import \
+    IItemCriterion
+from pydofus2.com.ankamagames.dofus.datacenter.items.criterion.LevelItemCriterion import \
+    LevelItemCriterion
+from pydofus2.com.ankamagames.dofus.datacenter.items.criterion.PrestigeLevelItemCriterion import \
+    PrestigeLevelItemCriterion
+from pydofus2.com.ankamagames.dofus.datacenter.quest.AchievementCategory import \
+    AchievementCategory
+from pydofus2.com.ankamagames.dofus.datacenter.quest.AchievementObjective import \
+    AchievementObjective
+from pydofus2.com.ankamagames.dofus.datacenter.quest.AchievementReward import \
+    AchievementReward
 from pydofus2.com.ankamagames.dofus.datacenter.quest.Quest import Quest
-from pydofus2.com.ankamagames.dofus.datacenter.quest.QuestObjective import QuestObjective
-from pydofus2.com.ankamagames.dofus.misc.utils.GameDataQuery import GameDataQuery
+from pydofus2.com.ankamagames.dofus.datacenter.quest.QuestObjective import \
+    QuestObjective
+from pydofus2.com.ankamagames.dofus.internalDatacenter.quests.AchievementRewardsWrapper import \
+    AchievementRewardsWrapper
+from pydofus2.com.ankamagames.dofus.misc.utils.GameDataQuery import \
+    GameDataQuery
 from pydofus2.com.ankamagames.dofus.types.IdAccessors import IdAccessors
 from pydofus2.com.ankamagames.jerakine.data.GameData import GameData
-
 from pydofus2.com.ankamagames.jerakine.data.I18n import I18n
-from pydofus2.com.ankamagames.jerakine.interfaces.IDataCenter import IDataCenter
+from pydofus2.com.ankamagames.jerakine.interfaces.IDataCenter import \
+    IDataCenter
 
 
 class Achievement(IDataCenter):
@@ -47,19 +56,19 @@ class Achievement(IDataCenter):
 
     rewardIds: list[int]
 
-    _name: str
+    _name: str = None
 
-    _desc: str
+    _desc: str = None
 
-    _category: AchievementCategory
+    _category: AchievementCategory = None
 
-    _currentLevelRewards: AchievementRewardsWrapper
+    _currentLevelRewards: AchievementRewardsWrapper = None
 
-    _currentLevelRewardsAll: AchievementRewardsWrapper
+    _currentLevelRewardsAll: AchievementRewardsWrapper = None
 
-    _currentRewardsCriteriaRespected: list[GroupItemCriterion]
+    _currentRewardsCriteriaRespected: list[GroupItemCriterion] = None
 
-    _currentRewardsCriteriaNotRespected: list[GroupItemCriterion]
+    _currentRewardsCriteriaNotRespected: list[GroupItemCriterion] = None
 
     def __init__(self):
         super().__init__()
@@ -92,8 +101,9 @@ class Achievement(IDataCenter):
     def description(self) -> str:
         rawText: str = None
         if self._desc == None:
+            from pydofus2.com.ankamagames.dofus.datacenter.challenges.Challenge import \
+                Challenge
             rawText = I18n.getText(self.descriptionId)
-            self._desc = re.sub("[\s*challenge\s*,\s*(\d+)\s*]", repl, rawText, flags=re.MULTILINE)
 
             def repl(match):
                 challengeId = float(match)
@@ -103,6 +113,8 @@ class Achievement(IDataCenter):
                 if challenge == None:
                     return "???"
                 return challenge.name
+            
+            self._desc = re.sub("[\s*challenge\s*,\s*(\d+)\s*]", repl, rawText, flags=re.MULTILINE)
 
         return self._desc
 
@@ -171,6 +183,8 @@ class Achievement(IDataCenter):
         return self._currentLevelRewards
 
     def initCurrentLevelRewards(self, level: int) -> None:
+        from pydofus2.com.ankamagames.dofus.datacenter.items.criterion.AchievementAccountItemCriterion import \
+            evementAccountItemCriterion
         criterion: GroupItemCriterion = None
         rewardId: int = 0
         characterRewardsTruncated: bool = False

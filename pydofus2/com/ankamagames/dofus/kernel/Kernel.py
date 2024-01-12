@@ -19,6 +19,8 @@ if TYPE_CHECKING:
     from pyd2bot.logic.roleplay.behaviors.fight.FarmFights import FarmFights
     from pydofus2.com.ankamagames.dofus.logic.common.frames.AlignmentFrame import \
         AlignmentFrame
+    from pydofus2.com.ankamagames.dofus.logic.common.frames.BidHouseManagementFrame import \
+        BidHouseManagementFrame
     from pydofus2.com.ankamagames.dofus.logic.common.frames.ChatFrame import \
         ChatFrame
     from pydofus2.com.ankamagames.dofus.logic.common.frames.QuestFrame import \
@@ -27,6 +29,8 @@ if TYPE_CHECKING:
         AuthentificationFrame
     from pydofus2.com.ankamagames.dofus.logic.connection.frames.ServerSelectionFrame import \
         ServerSelectionFrame
+    from pydofus2.com.ankamagames.dofus.logic.game.common.frames.AveragePricesFrame import \
+        AveragePricesFrame
     from pydofus2.com.ankamagames.dofus.logic.game.common.frames.CommonExchangeManagementFrame import \
         CommonExchangeManagementFrame
     from pydofus2.com.ankamagames.dofus.logic.game.common.frames.ExchangeManagementFrame import \
@@ -35,6 +39,8 @@ if TYPE_CHECKING:
         InventoryManagementFrame
     from pydofus2.com.ankamagames.dofus.logic.game.common.frames.PlayedCharacterUpdatesFrame import \
         PlayedCharacterUpdatesFrame
+    from pydofus2.com.ankamagames.dofus.logic.game.common.frames.SpellInventoryManagementFrame import \
+        SpellInventoryManagementFrame
     from pydofus2.com.ankamagames.dofus.logic.game.fight.frames.FightBattleFrame import \
         FightBattleFrame
     from pydofus2.com.ankamagames.dofus.logic.game.fight.frames.FightContextFrame import \
@@ -57,7 +63,6 @@ if TYPE_CHECKING:
         RoleplayWorldFrame
     from pydofus2.com.ankamagames.dofus.logic.game.roleplay.frames.ZaapFrame import \
         ZaapFrame
-    from pydofus2.com.ankamagames.dofus.logic.game.common.frames.AveragePricesFrame import AveragePricesFrame
 
 
 class Kernel(metaclass=Singleton):
@@ -188,7 +193,7 @@ class Kernel(metaclass=Singleton):
         return self._worker.getFrameByName("RoleplayMovementFrame")
 
     @property
-    def entitiesFrame(self) -> "RoleplayEntitiesFrame":
+    def roleplayEntitiesFrame(self) -> "RoleplayEntitiesFrame":
         return self._worker.getFrameByName("RoleplayEntitiesFrame")
 
     @property
@@ -274,3 +279,11 @@ class Kernel(metaclass=Singleton):
     @property
     def averagePricesFrame(self) -> "AveragePricesFrame":
         return self._worker.getFrameByName("AveragePricesFrame")
+    
+    @property
+    def spellInventoryManagementFrame(self) -> "SpellInventoryManagementFrame":
+        return self._worker.getFrameByName("SpellInventoryManagementFrame")
+    
+    @property
+    def bidHouseManagementFrame(self) -> "BidHouseManagementFrame":
+        return self._worker.getFrameByName("BidHouseManagementFrame")

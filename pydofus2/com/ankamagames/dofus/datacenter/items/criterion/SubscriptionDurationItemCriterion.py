@@ -15,13 +15,13 @@ class SubscriptionDurationItemCriterion(ItemCriterion, IDataCenter):
 
     @property
     def text(self) -> str:
-        readableCriterionValue: str = PatternDecoder.combine(
+        readableCriterionValue = PatternDecoder.combine(
             I18n.getUiText("ui.social.daysSinceLastConnection", [self._criterionValue]),
             "n",
             self._criterionValue <= 1,
             self._criterionValue == 0,
         )
-        readableCriterionRef: str = I18n.getUiText("ui.veteran.totalSubscriptionDuration")
+        readableCriterionRef = I18n.getUiText("ui.veteran.totalSubscriptionDuration")
         return readableCriterionRef + " " + self._operator.text + " " + readableCriterionValue
 
     def clone(self) -> IItemCriterion:

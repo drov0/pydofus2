@@ -14,13 +14,6 @@ from pydofus2.com.ankamagames.dofus.logic.game.common.managers.PlayedCharacterMa
     PlayedCharacterManager
 from pydofus2.com.ankamagames.dofus.logic.game.fight.managers.CurrentPlayedFighterManager import \
     CurrentPlayedFighterManager
-
-if TYPE_CHECKING:
-    from pydofus2.com.ankamagames.dofus.logic.game.fight.frames.FightBattleFrame import (
-        FightBattleFrame,
-    )
-    from pydofus2.com.ankamagames.dofus.logic.game.fight.frames.FightEntitiesFrame import FightEntitiesFrame
-
 from pydofus2.com.ankamagames.dofus.logic.game.fight.types.CastingSpell import \
     CastingSpell
 from pydofus2.com.ankamagames.dofus.misc.utils.GameDebugManager import \
@@ -95,7 +88,7 @@ class BasicBuff:
         isPlayerId = currentPlayerId != 0
         fighterInfo: GameFightFighterInformations = None
         if isPlayerId:
-            entitiesFrame: "FightEntitiesFrame" = Kernel().worker.getFrameByName("FightEntitiesFrame")
+            entitiesFrame = Kernel().fightEntitiesFrame
             if entitiesFrame:
                 fighterInfo = entitiesFrame.getEntityInfos(currentPlayerId)
         if (
@@ -168,7 +161,7 @@ class BasicBuff:
     def getUnuableNextTurn(self) -> bool:
         if self.duration > 1 or self.duration < 0:
             return False
-        frame: "FightBattleFrame" = Kernel().worker.getFrameByName("FightBattleFrame")
+        frame = Kernel().battleFrame
         if frame:
             currentPlayerId = frame.currentPlayerId
             playerId = PlayedCharacterManager().id

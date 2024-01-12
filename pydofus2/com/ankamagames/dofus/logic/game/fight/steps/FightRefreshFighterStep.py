@@ -2,9 +2,6 @@ from pydofus2.com.ankamagames.dofus.kernel.Kernel import Kernel
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
-    from pydofus2.com.ankamagames.dofus.logic.game.fight.frames.FightEntitiesFrame import (
-        FightEntitiesFrame,
-    )
     from pydofus2.com.ankamagames.dofus.network.types.game.context.GameContextActorInformations import (
         GameContextActorInformations,
     )
@@ -26,7 +23,7 @@ class FightRefreshFighterStep(AbstractSequencable, IFightStep):
         return "refreshFighter"
 
     def start(self) -> None:
-        fightEntitiesFrame: "FightEntitiesFrame" = Kernel().worker.getFrameByName("FightEntitiesFrame")
+        fightEntitiesFrame = Kernel().fightEntitiesFrame
         currentFighterInfos: "GameContextActorInformations" = fightEntitiesFrame.getEntityInfos(
             self._infos.contextualId
         )

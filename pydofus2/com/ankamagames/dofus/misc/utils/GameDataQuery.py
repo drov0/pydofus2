@@ -1,24 +1,30 @@
 import inspect
+from collections.abc import Iterable
 from types import FunctionType
 from typing import Any
-from collections.abc import Iterable
+
 from pydofus2.com.ankamagames.dofus.misc.lists.GameDataList import GameDataList
 from pydofus2.com.ankamagames.jerakine.data.GameData import GameData
-
 from pydofus2.com.ankamagames.jerakine.data.GameDataField import GameDataField
-from pydofus2.com.ankamagames.jerakine.data.GameData import GameData
-from pydofus2.com.ankamagames.jerakine.data.I18nFileAccessor import I18nFileAccessor
-from pydofus2.com.ankamagames.jerakine.enum.GameDataTypeEnum import GameDataTypeEnum
-from pydofus2.com.ankamagames.jerakine.interfaces.IDataCenter import IDataCenter
+from pydofus2.com.ankamagames.jerakine.data.I18nFileAccessor import \
+    I18nFileAccessor
+from pydofus2.com.ankamagames.jerakine.enum.GameDataTypeEnum import \
+    GameDataTypeEnum
+from pydofus2.com.ankamagames.jerakine.interfaces.IDataCenter import \
+    IDataCenter
 from pydofus2.com.ankamagames.jerakine.logger.Logger import Logger
-from pydofus2.com.ankamagames.jerakine.utils.misc.StringUtils import StringUtils
+from pydofus2.com.ankamagames.jerakine.utils.misc.StringUtils import \
+    StringUtils
 
 
 class GameDataQuery:
+    
+    @classmethod
     def getQueryableFields(cls, target: object) -> list[str]:
         target = cls.checkPackage(target)
         return GameData().getDataProcessor(target["MODULE"]).getQueryableField()
 
+    @classmethod
     def union(cls, *idsVectors) -> list[int]:
         result: list[int] = list[int]()
         added: dict = dict()
@@ -30,6 +36,7 @@ class GameDataQuery:
                         added[id] = True
         return result
 
+    @classmethod
     def intersection(cls, *idsVectors) -> list[int]:
         id: int = 0
         ind: int = 0
@@ -63,13 +70,13 @@ class GameDataQuery:
         return result
 
     @classmethod
-    def querystr(cls, target: object, fieldName: str, value: str) -> list[int]:
+    def queryString(cls, target: object, fieldName: str, value: str) -> list[int]:
         target = cls.checkPackage(target)
         fieldName = cls.checkField(target, fieldName)
         if not fieldName:
             return list[int]()
         if not value:
-            raise cls.ArgumentError("value arg cannot be None")
+            raise ValueError("value arg cannot be None")
         return (
             GameData()
             .getDataProcessor(target["MODULE"])
@@ -185,7 +192,7 @@ class GameDataQuery:
         if name not in fields:
             fieldType = GameData().getDataProcessor(module).getFieldType(name + "Id")
             if name + "Id" not in fields or GameDataTypeEnum(fieldType) != GameDataTypeEnum.I18N:
-                Logger().error("Field " + name + " not found in " + target.__name__)
+                Logger().error(f"Field {name} not found in {target.__name__}")
                 return None
             name += "Id"
         return name

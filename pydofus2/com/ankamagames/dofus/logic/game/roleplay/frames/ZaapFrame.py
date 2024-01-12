@@ -134,5 +134,5 @@ class ZaapFrame(Frame):
             
         elif isinstance(msg, LeaveDialogMessage):
             if msg.dialogType == DialogTypeEnum.DIALOG_TELEPORTER:
-                Kernel().worker.removeFrame(self);
+                Kernel().worker.removeFrame(self)
             return True;

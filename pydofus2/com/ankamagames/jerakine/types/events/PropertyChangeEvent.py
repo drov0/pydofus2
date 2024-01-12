@@ -1,8 +1,6 @@
 from typing import Any
-from whistle import Event
 
-
-class PropertyChangeEvent(Event):
+class PropertyChangeEvent:
 
     PROPERTY_CHANGED: str = "watchPropertyChanged"
 

@@ -1,10 +1,9 @@
-from whistle import Event
 from pydofus2.com.ankamagames.jerakine.network.INetworkMessage import INetworkMessage
 
 
-class NetworkSentEvent(Event):
+class NetworkSentEvent:
 
-    EVENT_SENT: str = "messageSent"
+    EVENT_SENT = "messageSent"
 
     _message: INetworkMessage
 

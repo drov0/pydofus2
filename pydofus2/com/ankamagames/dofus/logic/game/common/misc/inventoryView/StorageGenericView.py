@@ -4,8 +4,6 @@ from pydofus2.com.ankamagames.dofus.internalDatacenter.DataEnum import DataEnum
 from pydofus2.com.ankamagames.dofus.internalDatacenter.items.ItemWrapper import \
     ItemWrapper
 from pydofus2.com.ankamagames.dofus.kernel.Kernel import Kernel
-from pydofus2.com.ankamagames.dofus.logic.game.common.frames.AveragePricesFrame import \
-    AveragePricesFrame
 from pydofus2.com.ankamagames.dofus.logic.game.common.misc.IStorageView import \
     IStorageView
 
@@ -230,7 +228,7 @@ class StorageGenericView(IStorageView):
         return self.compareFunction(a, b, sortDepth + 1)
 
     def getItemAveragePrice(self, pItemGID: int) -> float:
-        avgPricesFrame: AveragePricesFrame = Kernel().worker.getFrameByName("AveragePricesFrame")
+        avgPricesFrame = Kernel().averagePricesFrame
         return (
             float(avgPricesFrame.pricesData.items[pItemGID])
             if avgPricesFrame.pricesData.items.get(pItemGID) is not None

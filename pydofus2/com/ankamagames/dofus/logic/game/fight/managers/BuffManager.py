@@ -10,7 +10,6 @@ from pydofus2.com.ankamagames.dofus.internalDatacenter.spells.SpellWrapper impor
     SpellWrapper,
 )
 from pydofus2.com.ankamagames.dofus.kernel.Kernel import Kernel
-import pydofus2.com.ankamagames.dofus.logic.game.fight.frames.FightEntitiesFrame as fenf
 from pydofus2.com.ankamagames.dofus.logic.game.fight.managers.CurrentPlayedFighterManager import (
     CurrentPlayedFighterManager,
 )
@@ -59,9 +58,6 @@ from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from pydofus2.com.ankamagames.dofus.logic.game.fight.types.CastingSpell import (
         CastingSpell,
-    )
-    from pydofus2.com.ankamagames.dofus.logic.game.fight.frames.FightBattleFrame import (
-        FightBattleFrame,
     )
 
 
@@ -249,11 +245,9 @@ class BuffManager(metaclass=Singleton):
     def markFinishingBuffs(
         self, targetId: float, currentTurnIsEnding: bool = True
     ) -> None:
-        fightBattleFrame: "FightBattleFrame" = Kernel().worker.getFrameByName(
-            "FightBattleFrame"
-        )
+        fightBattleFrame = Kernel().battleFrame
         fightersCount = 0
-        currentFighterId: float = CurrentPlayedFighterManager().currentFighterId
+        currentFighterId = CurrentPlayedFighterManager().currentFighterId
         if GameDebugManager().buffsDebugActivated:
             Logger().debug(
                 f"[BUFFS DEBUG] Looking for buffs of {targetId}"
@@ -539,9 +533,7 @@ class BuffManager(metaclass=Singleton):
         self, sourceId: float, forceUndispellable: bool = False, dying: bool = False
     ) -> list:
         impactedTarget: list = []
-        entitiesFrame: "fenf.FightEntitiesFrame" = Kernel().worker.getFrameByName(
-            "FightEntitiesFrame"
-        )
+        entitiesFrame = Kernel().fightEntitiesFrame
         infos = entitiesFrame.getEntityInfos(sourceId)
         if GameDebugManager().buffsDebugActivated:
             Logger().debug(
@@ -597,7 +589,7 @@ class BuffManager(metaclass=Singleton):
                         buff.sourceJustReaffected = dontDecrementBuffThisTurn
 
     def getNextFighter(self, sourceId: float) -> float:
-        frame: "FightBattleFrame" = Kernel().worker.getFrameByName("FightBattleFrame")
+        frame = Kernel().battleFrame
         if frame is None:
             return 0
         found: bool = False
@@ -645,8 +637,8 @@ class BuffManager(metaclass=Singleton):
         return None
 
     @property
-    def fightEntitiesFrame(self) -> fenf.FightEntitiesFrame:
-        return Kernel().worker.getFrameByName("FightEntitiesFrame")
+    def fightEntitiesFrame(self):
+        return Kernel().fightEntitiesFrame
 
     def getBuffIndex(self, targetId: float, buffId: int) -> int:
         for i, sbuff in enumerate(self._buffs.get(targetId, [])):

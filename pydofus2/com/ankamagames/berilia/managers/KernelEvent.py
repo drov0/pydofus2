@@ -134,6 +134,7 @@ class KernelEvent(Enum):
     
     # job
     JobLevelUp = auto()
+    JobAllowMultiCraftRequest = auto()
     
     # quest
     TreasureHuntUpdate = auto()
@@ -142,3 +143,12 @@ class KernelEvent(Enum):
     TreasureHuntDigAnswer = auto()
     TreasureHintInformation = auto()
     TreasureHuntFlagRequestAnswer = auto()
+    
+    # Challenges
+    ChallengeListUpdate = auto()
+    CloseChallengeProposal = auto()
+    ChallengeTargetUpdate = auto()
+    ChallengeResult = auto()
+    ChallengeModSelected = auto()
+    ChallengeBonusSelected = auto()
+    

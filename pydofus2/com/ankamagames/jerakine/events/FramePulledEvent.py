@@ -1,7 +1,4 @@
-from whistle import Event
-
-
-class FramePulledEvent(Event):
+class FramePulledEvent:
     EVENT_FRAME_PULLED = "framePulled"
 
     def __init__(self, frame):

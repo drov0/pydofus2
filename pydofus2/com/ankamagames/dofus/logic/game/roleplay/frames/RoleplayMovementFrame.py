@@ -44,11 +44,6 @@ from pydofus2.com.ankamagames.jerakine.messages.Message import Message
 from pydofus2.com.ankamagames.jerakine.types.enums.Priority import Priority
 from pydofus2.com.ankamagames.jerakine.types.positions.MapPoint import MapPoint
 
-if TYPE_CHECKING:
-    from pydofus2.com.ankamagames.dofus.logic.game.roleplay.frames.RoleplayEntitiesFrame import \
-        RoleplayEntitiesFrame
-    from pydofus2.com.ankamagames.dofus.logic.game.roleplay.frames.RoleplayInteractivesFrame import \
-        RoleplayInteractivesFrame
 
 class RoleplayMovementFrame(Frame):
     VERBOSE = False
@@ -75,12 +70,12 @@ class RoleplayMovementFrame(Frame):
         return self.requestingMovement
 
     @property
-    def entitiesFrame(self) -> "RoleplayEntitiesFrame":
-        return Kernel().worker.getFrameByName("RoleplayEntitiesFrame")
+    def entitiesFrame(self):
+        return Kernel().roleplayEntitiesFrame
 
     @property
-    def interactivesFrame(self) -> "RoleplayInteractivesFrame":
-        return Kernel().worker.getFrameByName("RoleplayInteractivesFrame")
+    def interactivesFrame(self):
+        return Kernel().interactivesFrame
 
     def pushed(self) -> bool:
         self.isMoving = False

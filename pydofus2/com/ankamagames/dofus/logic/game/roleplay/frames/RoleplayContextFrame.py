@@ -36,6 +36,10 @@ from pydofus2.com.ankamagames.dofus.network.messages.game.context.roleplay.Curre
     CurrentMapMessage
 from pydofus2.com.ankamagames.dofus.network.messages.game.context.roleplay.havenbag.EnterHavenBagRequestMessage import \
     EnterHavenBagRequestMessage
+from pydofus2.com.ankamagames.dofus.network.messages.game.context.roleplay.job.JobAllowMultiCraftRequestMessage import \
+    JobAllowMultiCraftRequestMessage
+from pydofus2.com.ankamagames.dofus.network.messages.game.context.roleplay.job.JobMultiCraftAvailableSkillsMessage import \
+    JobMultiCraftAvailableSkillsMessage
 from pydofus2.com.ankamagames.dofus.network.messages.game.dialog.LeaveDialogMessage import \
     LeaveDialogMessage
 from pydofus2.com.ankamagames.dofus.network.messages.game.interactive.zaap.TeleportDestinationsMessage import \
@@ -62,6 +66,7 @@ class RoleplayContextFrame(Frame):
         self._previousMapId = None
         self._priority = Priority.NORMAL
         self._listMapNpcsMsg = []
+        self._playersMultiCraftSkill = list[MultiCraftEnableForPlayer]()
         super().__init__()
 
     @property
@@ -194,8 +199,34 @@ class RoleplayContextFrame(Frame):
             KernelEventsManager().send(KernelEvent.DialogLeft)
             return False
         
+        if isinstance(msg, JobAllowMultiCraftRequestMessage):
+            
+            if isinstance(msg, JobMultiCraftAvailableSkillsMessage):
+                if msg.enabled:
+                    self._add_or_update_multi_craft_skill(msg.playerId, msg.skills)
+                else:
+                    self._remove_multi_craft_skill(msg.playerId)
+            else:
+                PlayedCharacterManager().publicMode = msg.enabled
+                KernelEventsManager().send(KernelEvent.JobAllowMultiCraftRequest, msg.enabled)
+
+            return True
+        
         return False
     
+    def _add_or_update_multi_craft_skill(self, playerId, skills):
+        for mcefplayer in self._playersMultiCraftSkill:
+            if mcefplayer.playerId == playerId:
+                mcefplayer.skills = skills
+                return
+
+        # Player not found in the list, add a new entry
+        mcefp = MultiCraftEnableForPlayer(playerId, skills)
+        self._playersMultiCraftSkill.append(mcefp)
+
+    def _remove_multi_craft_skill(self, playerId):
+        self._playersMultiCraftSkill = [player for player in self._playersMultiCraftSkill if player.playerId != playerId]
+
     def addCommonExchangeFrame(self, exchangeType):
         if not Kernel().commonExchangeManagementFrame:
             self._commonExchangeFrame = CommonExchangeManagementFrame(exchangeType)
@@ -208,3 +239,13 @@ class RoleplayContextFrame(Frame):
         Kernel().worker.removeFrame(self.movementFrame)
         Kernel().worker.removeFrame(self._interactivesFrame)
         return True
+
+class MultiCraftEnableForPlayer(object):
+    
+    playerId:float
+    
+    skills:list[int]
+    
+    def __init__(self, playerId, skills):
+        self.playerId = playerId
+        self.skills = skills

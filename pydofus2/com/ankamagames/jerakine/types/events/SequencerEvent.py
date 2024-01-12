@@ -1,17 +1,16 @@
-from whistle import Event
 from pydofus2.com.ankamagames.jerakine.sequencer.ISequencable import ISequencable
 from pydofus2.com.ankamagames.jerakine.sequencer.ISequencer import ISequencer
 
 
-class SequencerEvent(Event):
+class SequencerEvent:
 
-    SEQUENCE_END: str = "onSequenceEnd"
+    SEQUENCE_END = "onSequenceEnd"
 
-    SEQUENCE_STEP_START: str = "SEQUENCE_STEP_START"
+    SEQUENCE_STEP_START = "SEQUENCE_STEP_START"
 
-    SEQUENCE_STEP_FINISH: str = "SEQUENCE_STEP_FINISH"
+    SEQUENCE_STEP_FINISH = "SEQUENCE_STEP_FINISH"
 
-    SEQUENCE_TIMEOUT: str = "onSequenceTimeOut"
+    SEQUENCE_TIMEOUT = "onSequenceTimeOut"
 
     _sequencer: ISequencer
 

@@ -46,3 +46,8 @@ class Edge:
 
     def __repr__(self) -> str:
         return self.__str__()
+
+    def clone(self) -> "Edge":
+        edge = Edge(self.src, self.dst)
+        edge._transitions = [t.clone() for t in self.transitions]
+        return edge

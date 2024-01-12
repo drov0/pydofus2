@@ -375,6 +375,7 @@ class ItemCriterionFactory:
             criterion = CommunityItemCriterion(pServerCriterionForm)
 
         else:
-            Logger().warn("Criterion '" + s + "' unknow or unused (" + pServerCriterionForm + ")")
+            # Logger().warn("Criterion '" + s + "' unknow or unused (" + pServerCriterionForm + ")")
+            pass
 
         return criterion

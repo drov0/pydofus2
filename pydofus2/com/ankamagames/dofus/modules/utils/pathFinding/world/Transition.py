@@ -122,3 +122,14 @@ class Transition:
             "cell": self._cell,
             "id": self._id,
         }
+        
+    def clone(self):
+        return Transition(
+            self._type,
+            self._direction,
+            self._skillId,
+            self._criterion,
+            self._transitionMapId,
+            self._cell,
+            self._id,
+        )

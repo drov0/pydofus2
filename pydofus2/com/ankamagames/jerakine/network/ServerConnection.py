@@ -304,10 +304,11 @@ class ServerConnection(mp.Thread):
         if msg.unpacked:
             msg.receptionTime = perf_counter()
             msg.sourceConnection = self.id
-            self._put(msg)
             if type(msg).__name__ == "NetworkDataContainerMessage":
-                Logger().debug(f"Received networK Datacontainer with content of size : {len(msg.content)}")
+                Logger().debug(f"Received network Datacontainer with content of size : {len(msg.content)}")
                 MessageReceiver().parse(ByteArray(msg.content), self.handleMessage, from_dataContainer=True)
+            else:
+                self._put(msg)
             
     @sendTrace
     def run(self):

@@ -1,10 +1,10 @@
 DOFUSINVOKER = D://Dofus//DofusInvoker.swf
+PYD2BOT_DIR = D://botdev//pyd2bot
+GRINDER_DIR = D://botdev/Grinder
 FFDEC = $(CURDIR)/FFDec/ffdec.bat
 DOFUS_SRC_DIR = $(CURDIR)/protocolBuilder/sources
 VENVACTIVATE = $(CURDIR)/../.venv/Scripts/activate
 SELECTCLASS = com.ankamagames.dofus.BuildInfos,com.ankamagames.dofus.network.++,com.ankamagames.jerakine.network.++
-PYD2BOT_DIR = $(CURDIR)/../pyd2bot
-GRINDER_DIR = $(CURDIR)/../Grinder
 PYDOFUS_DIR = $(CURDIR)/../pydofus2
 PYDOFUS_BINARY_DATA_DIR = $(PYDOFUS_DIR)/pydofus2/binaryData
 # Dist and build paths
@@ -12,7 +12,6 @@ PYD2BOT_BUILD_DIR = $(CURDIR)/pyd2botBuild
 PYD2BOT_DIST_DIR = $(CURDIR)/../Grinder/dist_electron/pyd2bot/
 PYD2BOT_BUILDENV = $(PYD2BOT_BUILD_DIR)/.buildEnv
 SNIFFER_APP_DIR = $(CURDIR)/sniffer
-
 PD2B_THRSERVER_DIR = $(PYD2BOT_DIR)/pyd2bot/thriftServer
 PYD2BOT_THRIFT_SERVICE = $(PD2B_THRSERVER_DIR)/pyd2botService.thrift
 GRINDER_THRIFT_DIR = $(GRINDER_DIR)/src/services

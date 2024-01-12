@@ -19,6 +19,6 @@ class TransitionTypeEnum(Enum):
 
     NPC_ACTION = 64
     
-    ITEM_TELEPORT = auto()
+    ITEM_TELEPORT = 128
     
-    ZAAP = auto()
+    ZAAP = 256

@@ -8,8 +8,6 @@ from pydofus2.com.ankamagames.dofus.datacenter.items.criterion.LevelItemCriterio
     LevelItemCriterion
 from pydofus2.com.ankamagames.dofus.datacenter.items.criterion.PrestigeLevelItemCriterion import \
     PrestigeLevelItemCriterion
-from pydofus2.com.ankamagames.dofus.datacenter.quest.AchievementCategory import \
-    AchievementCategory
 from pydofus2.com.ankamagames.dofus.datacenter.quest.AchievementObjective import \
     AchievementObjective
 from pydofus2.com.ankamagames.dofus.datacenter.quest.AchievementReward import \
@@ -26,7 +24,10 @@ from pydofus2.com.ankamagames.jerakine.data.GameData import GameData
 from pydofus2.com.ankamagames.jerakine.data.I18n import I18n
 from pydofus2.com.ankamagames.jerakine.interfaces.IDataCenter import \
     IDataCenter
-
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from pydofus2.com.ankamagames.dofus.datacenter.quest.AchievementCategory import \
+    AchievementCategory
 
 class Achievement(IDataCenter):
 
@@ -60,7 +61,7 @@ class Achievement(IDataCenter):
 
     _desc: str = None
 
-    _category: AchievementCategory = None
+    _category: 'AchievementCategory' = None
 
     _currentLevelRewards: AchievementRewardsWrapper = None
 
@@ -122,8 +123,10 @@ class Achievement(IDataCenter):
     #     return HyperlinkShowChallengeManager.parseChallengeLinks(I18n.getText(self.descriptionId), linkColor, hoverColor)
 
     @property
-    def category(self) -> AchievementCategory:
+    def category(self) -> 'AchievementCategory':
         if not self._category:
+            from pydofus2.com.ankamagames.dofus.datacenter.quest.AchievementCategory import \
+    AchievementCategory
             self._category = AchievementCategory.getAchievementCategoryById(self.categoryId)
         return self._category
 

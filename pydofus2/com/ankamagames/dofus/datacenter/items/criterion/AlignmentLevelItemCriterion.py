@@ -1,11 +1,12 @@
-from pydofus2.com.ankamagames.dofus import datacenter
 from typing import TYPE_CHECKING
+from pydofus2.com.ankamagames.dofus.datacenter.items.criterion.ItemCriterion import ItemCriterion
+
+from pydofus2.com.ankamagames.jerakine.interfaces.IDataCenter import IDataCenter
 
 if TYPE_CHECKING:
     from pydofus2.com.ankamagames.dofus.datacenter.items.criterion.IItemCriterion import (
         IItemCriterion,
     )
-import pydofus2.com.ankamagames.dofus.datacenter.items.criterion.ItemCriterionFactory as icFactory
 from pydofus2.com.ankamagames.dofus.logic.game.common.managers.PlayedCharacterManager import (
     PlayedCharacterManager,
 )
@@ -15,16 +16,17 @@ from pydofus2.com.ankamagames.dofus.network.types.game.character.alignment.Actor
 from pydofus2.com.ankamagames.jerakine.data.I18n import I18n
 
 
-class AlignmentLevelItemCriterion(icFactory.ItemCriterionFactory, datacenter):
+class AlignmentLevelItemCriterion(ItemCriterion, IDataCenter):
+    
     def __init__(self, pCriterion: str):
         super().__init__(pCriterion)
 
     @property
     def text(self) -> str:
-        readableCriterionRef: str = I18n.getUiText("ui.tooltip.AlignmentLevel")
+        readableCriterionRef = I18n.getUiText("ui.tooltip.AlignmentLevel")
         return readableCriterionRef + " " + self._operator.text + " " + self._criterionValue
 
-    def clone(self) -> IItemCriterion:
+    def clone(self) -> 'IItemCriterion':
         return AlignmentLevelItemCriterion(self.basicText)
 
     def getCriterion(self) -> int:

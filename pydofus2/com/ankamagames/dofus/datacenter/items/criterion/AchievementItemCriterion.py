@@ -3,7 +3,6 @@ from pydofus2.com.ankamagames.dofus.datacenter.items.criterion.IItemCriterion im
 )
 from pydofus2.com.ankamagames.dofus.datacenter.items.criterion.ItemCriterion import ItemCriterion
 from pydofus2.com.ankamagames.dofus.datacenter.items.criterion.ItemCriterionOperator import ItemCriterionOperator
-from pydofus2.com.ankamagames.dofus.datacenter.quest.Achievement import Achievement
 from pydofus2.com.ankamagames.dofus.kernel.Kernel import Kernel
 from pydofus2.com.ankamagames.jerakine.data.I18n import I18n
 from pydofus2.com.ankamagames.jerakine.interfaces.IDataCenter import IDataCenter
@@ -26,7 +25,9 @@ class AchievementItemCriterion(ItemCriterion, IDataCenter):
         return AchievementItemCriterion(self.basicText)
 
     @property
-    def text(self):
+    def text(self) -> str:
+        from pydofus2.com.ankamagames.dofus.datacenter.quest.Achievement import Achievement
+
         readableValue = f" '{Achievement.getAchievementById(self._criterionValue).name}'"
         readableCriterion = I18n.getUiText("ui.tooltip.unlockAchievement", [readableValue])
         

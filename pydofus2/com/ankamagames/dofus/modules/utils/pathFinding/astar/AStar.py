@@ -23,7 +23,7 @@ from pydofus2.com.ankamagames.jerakine.types.positions.MapPoint import MapPoint
 
 
 class AStar(metaclass=Singleton):
-    DEBUG = False
+    DEBUG = True
     _forbiddenSubareaIds = list[int]()
     _forbidenEdges = list[Edge]()
     HEURISTIC_SCALE: int = 1
@@ -109,9 +109,9 @@ class AStar(metaclass=Singleton):
                         if edge in self._forbidenEdges:
                             reasons.append("Edge is in forbiden edges list")
                         if not self.hasValidTransition(edge):
-                            reasons.append("\Edge has a non valid transition")
+                            reasons.append("Edge has a non valid transition")
                         if not self.hasValidDestinationSubarea(edge):
-                            reasons.append("\Edge has a non valid destination subarea")
+                            reasons.append("Edge has a non valid destination subarea")
                         Logger().debug(f"Edge dismissed for reason {', '.join(reasons)}")
         self.running = False
         return None
@@ -132,7 +132,6 @@ class AStar(metaclass=Singleton):
         from pydofus2.com.ankamagames.dofus.datacenter.items.criterion.GroupItemCriterion import \
             GroupItemCriterion
 
-
         valid = False
         for transition in edge.transitions:
             if transition.criterion:
@@ -141,8 +140,6 @@ class AStar(metaclass=Singleton):
                     and "|" not in transition.criterion
                     and transition.criterion[0:2] not in cls.CRITERION_WHITE_LIST
                 ):
-                    if AStar.DEBUG:
-                        Logger().debug(f"Edge {edge}, tr {transition} criterion is not composite and is not white listed")
                     return False
                 criterion = GroupItemCriterion(transition.criterion)
                 return criterion.isRespected

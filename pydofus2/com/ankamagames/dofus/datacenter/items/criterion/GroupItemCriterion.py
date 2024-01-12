@@ -1,11 +1,11 @@
-from pydofus2.com.ankamagames.dofus.datacenter.items.criterion.ItemCriterion import ItemCriterion
-from pydofus2.com.ankamagames.dofus.logic.game.common.managers.PlayedCharacterManager import (
-    PlayedCharacterManager,
-)
-from pydofus2.com.ankamagames.dofus.datacenter.items.criterion.IItemCriterion import (
-    IItemCriterion,
-)
-from pydofus2.com.ankamagames.jerakine.utils.misc.StringUtils import StringUtils
+from pydofus2.com.ankamagames.dofus.datacenter.items.criterion.IItemCriterion import \
+    IItemCriterion
+from pydofus2.com.ankamagames.dofus.datacenter.items.criterion.ItemCriterion import \
+    ItemCriterion
+from pydofus2.com.ankamagames.dofus.logic.game.common.managers.PlayedCharacterManager import \
+    PlayedCharacterManager
+from pydofus2.com.ankamagames.jerakine.utils.misc.StringUtils import \
+    StringUtils
 
 
 class GroupItemCriterion(IItemCriterion):
@@ -14,13 +14,15 @@ class GroupItemCriterion(IItemCriterion):
     _operators: list[str]
     _criterionTextForm: str
     _cleanCriterionTextForm: str
-    _malformated: bool = False
-    _singleOperatorType: bool = False
+    _malformated: bool
+    _singleOperatorType: bool
 
     def __init__(self, pCriterion: str):
         super().__init__()
         self._criterionTextForm = pCriterion
         self._cleanCriterionTextForm = self._criterionTextForm
+        self._malformated = False
+        self._singleOperatorType = False
         if not pCriterion:
             return
         self._cleanCriterionTextForm = str.replace(self._cleanCriterionTextForm, " ", "")
@@ -62,7 +64,7 @@ class GroupItemCriterion(IItemCriterion):
 
     @property
     def isRespected(self) -> bool:
-        criterion: IItemCriterion = None
+        criterion = None
         if not self._criteria or len(self._criteria) == 0:
             return True
         player: PlayedCharacterManager = PlayedCharacterManager()
@@ -149,13 +151,13 @@ class GroupItemCriterion(IItemCriterion):
     def split(self) -> None:
         if not self._cleanCriterionTextForm:
             return
-        next: int = 0
-        exit: bool = False
-        searchingstr: str = self._cleanCriterionTextForm
+        next = 0
+        exit = False
+        searchingstr = self._cleanCriterionTextForm
         self._criteria = list[IItemCriterion]()
         self._operators = list[str]()
-        andIndexes: list = StringUtils.getAllIndexOf("&", searchingstr)
-        orIndexes: list = StringUtils.getAllIndexOf("|", searchingstr)
+        andIndexes = StringUtils.getAllIndexOf("&", searchingstr)
+        orIndexes = StringUtils.getAllIndexOf("|", searchingstr)
         if len(andIndexes) == 0 or len(orIndexes) == 0:
             self._singleOperatorType = True
             while not exit:
@@ -228,7 +230,7 @@ class GroupItemCriterion(IItemCriterion):
         if not pCriteria:
             return None
         pCriteria = str.replace(pCriteria, " ", "")
-        if pCriteria[0:1] == "(":
+        if pCriteria[0] == "(":
             dl = StringUtils.getDelimitedText(pCriteria, "(", ")", True)
             if not dl:
                 return None
@@ -236,16 +238,18 @@ class GroupItemCriterion(IItemCriterion):
         else:
             ANDindex = pCriteria.find("&")
             ORindex = pCriteria.find("|")
-            from pydofus2.com.ankamagames.dofus.datacenter.items.criterion.ItemCriterionFactory import (
-                ItemCriterionFactory,
-            )
+            from pydofus2.com.ankamagames.dofus.datacenter.items.criterion.ItemCriterionFactory import \
+                ItemCriterionFactory
 
             if ANDindex == -1 and ORindex == -1:
                 criterion = ItemCriterionFactory.create(pCriteria)
+                
             elif (ANDindex < ORindex or ORindex == -1) and ANDindex != -1:
                 criterion = ItemCriterionFactory.create(pCriteria.split("&")[0])
+                
             else:
                 criterion = ItemCriterionFactory.create(pCriteria.split("|")[0])
+                
         return criterion
 
     @property

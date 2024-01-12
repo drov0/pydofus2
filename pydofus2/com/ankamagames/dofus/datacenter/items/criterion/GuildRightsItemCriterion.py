@@ -1,11 +1,9 @@
-from pydofus2.com.ankamagames.dofus.datacenter.items.criterion import (
-    IItemCriterion,
-    ItemCriterion,
-    ItemCriterionOperator,
-)
+from pydofus2.com.ankamagames.dofus.datacenter.items.criterion.IItemCriterion import IItemCriterion
+from pydofus2.com.ankamagames.dofus.datacenter.items.criterion.ItemCriterion import ItemCriterion
+from pydofus2.com.ankamagames.dofus.datacenter.items.criterion.ItemCriterionOperator import ItemCriterionOperator
 from pydofus2.com.ankamagames.dofus.kernel.Kernel import Kernel
-from pydofus2.com.ankamagames.jerakine.data import I18n
-from pydofus2.com.ankamagames.jerakine.interfaces import IDataCenter
+from pydofus2.com.ankamagames.jerakine.data.I18n import I18n
+from pydofus2.com.ankamagames.jerakine.interfaces.IDataCenter import IDataCenter
 
 
 class GuildRightsItemCriterion(ItemCriterion, IDataCenter):
@@ -14,7 +12,7 @@ class GuildRightsItemCriterion(ItemCriterion, IDataCenter):
 
     @property
     def isRespected(self) -> bool:
-        hasThisRight: bool = False
+        hasThisRight = False
         socialFrame: SocialFrame = Kernel().worker.getFrameByName("SocialFrame")
         if not socialFrame.hasGuild:
             if self._operator.text == ItemCriterionOperator.DIFFERENT:

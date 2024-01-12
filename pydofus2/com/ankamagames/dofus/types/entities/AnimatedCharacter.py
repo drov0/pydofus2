@@ -101,7 +101,7 @@ class AnimatedCharacter(IMovable, IEntity, IObstacle, IDisplayable):
         self._canSeeThrough = False
         EntitiesManager().addEntity(self.id, self)
     
-    def stop(self) -> None:
+    def stop_move(self) -> None:
         if self._movementAnimation:
             self._movementAnimation.stop()
             self._movementAnimation = None

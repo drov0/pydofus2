@@ -92,4 +92,5 @@ def clear_messages(n_clicks, ids):
 
 
 if __name__ == '__main__':
-    app.run_server(debug=True)
+    app.run(debug=True)
+    

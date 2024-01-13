@@ -147,16 +147,19 @@ class AStar(metaclass=Singleton):
         return valid
 
     def hasValidDestinationSubarea(self, edge: Edge) -> bool:
-        fromMapId: float = edge.src.mapId
+        fromMapId = edge.src.mapId
         fromMapPos = MapPosition.getMapPositionById(fromMapId)
-        fromSubareaId: int = fromMapPos.subAreaId
-        toMapId: float = edge.dst.mapId
+        fromSubareaId = fromMapPos.subAreaId
+        toMapId = edge.dst.mapId
         toMapPos = MapPosition.getMapPositionById(toMapId)
         if not toMapPos:
+            Logger().error(f"MapPosition {toMapId} not found")
             return False
-        if fromSubareaId ==  toMapPos.subAreaId:
+        if fromSubareaId == toMapPos.subAreaId:
             return True
-        return  toMapPos.subAreaId not in self._forbiddenSubareaIds
+        if toMapPos.subAreaId not in self._forbiddenSubareaIds:
+            return False
+        return True
 
     def orderNodes(self, a: Node, b: Node) -> int:
         return 0 if a.heuristic == b.heuristic else (1 if a.heuristic > b.heuristic else -1)

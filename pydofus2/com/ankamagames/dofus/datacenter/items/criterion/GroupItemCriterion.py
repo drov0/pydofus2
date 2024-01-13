@@ -11,7 +11,7 @@ from pydofus2.com.ankamagames.jerakine.utils.misc.StringUtils import \
 
 class GroupItemCriterion(IItemCriterion):
 
-    _criteria: list[IItemCriterion]
+    _criteria: list[ItemCriterion]
     _operators: list[str]
     _criterionTextForm: str
     _cleanCriterionTextForm: str
@@ -27,45 +27,44 @@ class GroupItemCriterion(IItemCriterion):
         if not pCriterion:
             return
         self._cleanCriterionTextForm = str.replace(self._cleanCriterionTextForm, " ", "")
-        delimitedlist: list[str] = StringUtils.getDelimitedText(self._cleanCriterionTextForm, "(", ")", True)
+        delimitedlist = StringUtils.getDelimitedText(self._cleanCriterionTextForm, "(", ")", True)
         if len(delimitedlist) > 0 and delimitedlist[0] == self._cleanCriterionTextForm:
             self._cleanCriterionTextForm = self._cleanCriterionTextForm[1:]
-            self._cleanCriterionTextForm = self._cleanCriterionTextForm[0 : len(self._cleanCriterionTextForm) - 1]
+            self._cleanCriterionTextForm = self._cleanCriterionTextForm[:-1]
         self.split()
         self.createNewGroups()
 
     @classmethod
-    def create(cls, pCriteria: list[IItemCriterion], pOperators: list[str]) -> "GroupItemCriterion":
-        pair = None
-        tabLength: int = len(pCriteria) + len(pOperators)
-        textForm: str = ""
-        criterionIndex: int = 0
-        operatorIndex: int = 0
-        for i in range(0, tabLength, 1):
-            pair = i % 2
-            if pair == 0:
+    def create(cls, pCriteria: list[ItemCriterion], pOperators: list[str]) -> "GroupItemCriterion":
+        textForm = ""
+        criterionIndex = 0
+        operatorIndex = 0
+        tabLength = len(pCriteria) + len(pOperators)
+
+        for i in range(tabLength):
+            if i % 2 == 0:
                 textForm += pCriteria[criterionIndex].basicText
                 criterionIndex += 1
             else:
                 textForm += pOperators[operatorIndex]
                 operatorIndex += 1
+
         return GroupItemCriterion(textForm)
 
     @property
-    def criteria(self) -> list[IItemCriterion]:
+    def criteria(self) -> list[ItemCriterion]:
         return self._criteria
 
     @property
-    def inlineCriteria(self) -> list[IItemCriterion]:
-        criterion: IItemCriterion = None
-        criteria: list[IItemCriterion] = list[IItemCriterion]()
+    def inlineCriteria(self) -> list[ItemCriterion]:
+        criteria = list[ItemCriterion]()
         for criterion in self._criteria:
-            criteria = criteria.concat(criterion.inlineCriteria)
+            criteria = criteria.extend(criterion.inlineCriteria)
         return criteria
 
     @property
     def isRespected(self) -> bool:
-        if not self._criteria or len(self._criteria) == 0:
+        if not self._criteria:
             return True
         
         player = PlayedCharacterManager()
@@ -91,18 +90,16 @@ class GroupItemCriterion(IItemCriterion):
 
     @property
     def text(self) -> str:
-        pair = None
         textForm = ""
         if self._criteria == None:
             return textForm
         tabLength: int = len(self._criteria) + len(self._operators)
-        criterionIndex: int = 0
-        operatorIndex: int = 0
+        criterionIndex = 0
+        operatorIndex = 0
         for i in range(0, tabLength, 1):
             if textForm != "":
                 textForm += " "
-            pair = i % 2
-            if pair == 0:
+            if i % 2 == 0:
                 textForm += self._criteria[criterionIndex]
                 criterionIndex += 1
             else:
@@ -127,8 +124,8 @@ class GroupItemCriterion(IItemCriterion):
         group: GroupItemCriterion = None
         if self._malformated or not self._criteria or len(self._criteria) <= 2 or self._singleOperatorType:
             return
-        copyCriteria: list[IItemCriterion] = list[IItemCriterion]()
-        copyOperators: list[str] = list[str]()
+        copyCriteria = list[ItemCriterion]()
+        copyOperators = list[str]()
         for crit in self._criteria:
             copyCriteria.append(crit.clone())
         for ope in self._operators:
@@ -143,9 +140,9 @@ class GroupItemCriterion(IItemCriterion):
                     crits = list[IItemCriterion]()
                     crits.append(copyCriteria[curIndex])
                     crits.append(copyCriteria[curIndex + 1])
-                    ops = list[str]([copyOperators[curIndex]])
+                    ops = [copyOperators[curIndex]]
                     group = GroupItemCriterion.create(crits, ops)
-                    copyCriteria = copyCriteria[: curIndex - 1] + [group] + copyCriteria[curIndex + 2 :]
+                    copyCriteria[curIndex:curIndex + 2] = [group]
                     del copyOperators[curIndex]
                     curIndex -= 1
                 curIndex += 1
@@ -158,15 +155,14 @@ class GroupItemCriterion(IItemCriterion):
     def split(self) -> None:
         if not self._cleanCriterionTextForm:
             return
-        next = 0
-        exit = False
         searchingstr = self._cleanCriterionTextForm
-        self._criteria = list[IItemCriterion]()
+        self._criteria = list[ItemCriterion]()
         self._operators = list[str]()
         andIndexes = StringUtils.getAllIndexOf("&", searchingstr)
         orIndexes = StringUtils.getAllIndexOf("|", searchingstr)
         if len(andIndexes) == 0 or len(orIndexes) == 0:
             self._singleOperatorType = True
+            exit = False
             while not exit:
                 criterion = self.getFirstCriterion(searchingstr)
                 if not criterion:
@@ -183,10 +179,12 @@ class GroupItemCriterion(IItemCriterion):
                     op = searchingstr[index + len(criterion.basicText) : index + 1 + len(criterion.basicText)]
                     if op:
                         self._operators.append(op)
-                    searchingstr = searchingstr[index + 1 + len(criterion.basicText) :]
+                    searchingstr = searchingstr[index + 1 + len(criterion.basicText):]
                 if not searchingstr:
                     exit = True
         else:
+            exit = False
+            next = 0
             while not exit:
                 if not searchingstr:
                     exit = True
@@ -205,12 +203,10 @@ class GroupItemCriterion(IItemCriterion):
                         next = 1
                         index2 = searchingstr.index(criterion2.basicText)
                         firstPart = searchingstr[0:index2]
-                        secondPart = searchingstr[index2 + len(criterion2.basicText) :]
+                        secondPart = searchingstr[index2 + len(criterion2.basicText):]
                         searchingstr = firstPart + secondPart
-                    if not searchingstr:
-                        exit = True
                 else:
-                    operator = searchingstr[0:1]
+                    operator = searchingstr[:1]
                     if not operator:
                         exit = True
                     else:
@@ -222,29 +218,24 @@ class GroupItemCriterion(IItemCriterion):
             self._malformated = True
 
     def checkSingleOperatorType(self, pOperators: list[str]) -> bool:
-        op: str = None
-        if len(pOperators) > 0:
-            for op in pOperators:
-                if op != pOperators[0]:
-                    return False
+        for op in pOperators:
+            if op != pOperators[0]:
+                return False
         return True
 
     def getFirstCriterion(self, pCriteria: str) -> ItemCriterion:
-        criterion = None
-        dl: list[str] = None
-        ANDindex: int = 0
-        ORindex: int = 0
         if not pCriteria:
             return None
+        
         pCriteria = str.replace(pCriteria, " ", "")
-        if pCriteria[0] == "(":
+        
+        if pCriteria.startswith("("):
             dl = StringUtils.getDelimitedText(pCriteria, "(", ")", True)
-            if not dl:
-                return None
             criterion = GroupItemCriterion(dl[0])
         else:
             ANDindex = pCriteria.find("&")
             ORindex = pCriteria.find("|")
+            
             from pydofus2.com.ankamagames.dofus.datacenter.items.criterion.ItemCriterionFactory import \
                 ItemCriterionFactory
 

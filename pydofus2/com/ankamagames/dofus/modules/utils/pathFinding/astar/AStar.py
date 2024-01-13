@@ -157,7 +157,7 @@ class AStar(metaclass=Singleton):
             return False
         if fromSubareaId == toMapPos.subAreaId:
             return True
-        if toMapPos.subAreaId not in self._forbiddenSubareaIds:
+        if toMapPos.subAreaId in self._forbiddenSubareaIds:
             return False
         return True
 

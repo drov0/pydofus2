@@ -156,16 +156,16 @@ class StringUtils:
     def getSingleDelimitedText(
         pStringEntry: str, pFirstDelimiter: str, pSecondDelimiter: str, pIncludeDelimiter: bool = False
     ) -> str:
-        firstDelimiterIndex: int = 0
-        nextFirstDelimiterIndex: int = 0
-        nextSecondDelimiterIndex: int = 0
-        numFirstDelimiter: int = 0
-        numSecondDelimiter: int = 0
-        diff: int = 0
-        delimitedContent: str = ""
-        currentIndex: int = 0
-        secondDelimiterToSkip: int = 0
-        exit: bool = False
+        firstDelimiterIndex = 0
+        nextFirstDelimiterIndex = 0
+        nextSecondDelimiterIndex = 0
+        numFirstDelimiter = 0
+        numSecondDelimiter = 0
+        diff = 0
+        delimitedContent = ""
+        currentIndex = 0
+        secondDelimiterToSkip = 0
+        exit = False
         firstDelimiterIndex = pStringEntry.find(pFirstDelimiter, currentIndex)
         if firstDelimiterIndex == -1:
             return ""
@@ -211,24 +211,61 @@ class StringUtils:
         return delimitedContent
 
     def getAllIndexOf(pStringLookFor: str, pWholeString: str) -> list:
-        nextIndex: int = 0
-        returnedArray = list()
-        exit: bool = False
-        currentIndex: int = 0
-        while not exit:
-            try:
-                nextIndex = pWholeString.index(pStringLookFor, currentIndex)
-            except ValueError:
-                nextIndex = -1
-            if nextIndex < currentIndex:
-                exit = True
-            else:
-                returnedArray.append(nextIndex)
-                currentIndex = nextIndex + len(pStringLookFor)
-        return returnedArray
-
-
+        index = pWholeString.find(pStringLookFor)
+        indices = []
+        while index != -1:
+            indices.append(index)
+            index = pWholeString.find(pStringLookFor, index + 1)
+        return indices
+    
 if __name__ == "__main__":
-    string = "(((Qa=1940&Qo>13584)|Qf=1940)&PO>9935,0)"
-    res = StringUtils.getDelimitedText(string, "(", ")")
-    print(res)
+    def testGetDelimitedText():
+        string = "(((Qa=1940&Qo>13584)|Qf=1940)&PO>9935,0)"
+        res = StringUtils.getDelimitedText(string, "(", ")")
+        print(res)
+
+    def testGetAllIndexOf():
+        test_cases = [
+            ("test", "this is a test string with test cases"),
+            ("a", "banana"),
+            ("xyz", "this has no match"),
+            (" ", "spaces should be counted too")
+        ]
+
+        for substring, string in test_cases:
+            result = StringUtils.getAllIndexOf(substring, string)
+            print(f"Indices of '{substring}' in '{string}': {result}")
+
+    def testGetSingleDelimitedText():
+        # Updated Test Cases
+        test_cases = [
+            ("Hello [World]!", "[", "]", False, "World"),
+            ("Hello [World]!", "[", "]", True, "[World]"),
+            ("[Start] and [End]", "[", "]", False, "Start"),
+            ("No delimiters here", "{", "}", False, ""),
+            ("Empty delimiters []", "[", "]", False, ""),
+            ("Nested [delimiters [like] this]", "[", "]", False, "delimiters [like] this"),
+            ("Deeply [nested [delimiters [like] this] example]", "[", "]", False, "nested [delimiters [like] this] example"),
+            ("Mismatched delimiters", "[", "}", False, ""),
+            ("Delimiters at [the] start", "[", "]", False, "the"),
+            ("Delimiters at the end [of]", "[", "]", False, "of"),
+            ("[Multiple] [delimiters] in [one] string", "[", "]", False, "Multiple"),
+            ("Special characters <|like|> these", "<|", "|>", False, "like"),
+            ("Escaped delimiters \\[not\\] a match", "\\[", "\\]", False, "not"),
+            ("Unbalanced [delimiters [like this", "[", "]", False, ""),
+            ("Unbalanced delimiters like] this]", "[", "]", False, ""),
+            ("Delimiters in [reverse] order]", "[", "]", False, "reverse"),
+            ("Empty string", "[", "]", False, ""),
+            ("Only delimiters []", "[]", "[]", False, ""),
+            ("Same opening and closing delimiter [[content[[", "[", "[", False, "content"),
+            ("Multiple same delimiters %%first%% and %%second%%", "%", "%", False, "first"),
+            ("Overlapping delimiters [[[nested]]]", "[", "]", False, "[nested")
+        ]
+
+        # Running the tests
+        for text, start_delim, end_delim, include_delim, expected in test_cases:
+            result = StringUtils.getSingleDelimitedText(text, start_delim, end_delim, include_delim)
+            assert result == expected, f"Test failed for '{text}'. Expected: '{expected}', Got: '{result}'"
+            print(f"Test passed for '{text}'. Result: '{result}'")
+        
+    testGetSingleDelimitedText()

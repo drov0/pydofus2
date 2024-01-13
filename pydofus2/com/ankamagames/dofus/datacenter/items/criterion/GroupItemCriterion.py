@@ -4,6 +4,7 @@ from pydofus2.com.ankamagames.dofus.datacenter.items.criterion.ItemCriterion imp
     ItemCriterion
 from pydofus2.com.ankamagames.dofus.logic.game.common.managers.PlayedCharacterManager import \
     PlayedCharacterManager
+from pydofus2.com.ankamagames.jerakine.logger.Logger import Logger
 from pydofus2.com.ankamagames.jerakine.utils.misc.StringUtils import \
     StringUtils
 
@@ -64,22 +65,28 @@ class GroupItemCriterion(IItemCriterion):
 
     @property
     def isRespected(self) -> bool:
-        criterion = None
         if not self._criteria or len(self._criteria) == 0:
             return True
-        player: PlayedCharacterManager = PlayedCharacterManager()
+        
+        player = PlayedCharacterManager()
+        
         if not player or not player.characteristics:
+            Logger().error("Character or characteristics doesn't exist !, returning true")
             return True
+        
         if self._criteria and len(self._criteria) == 1 and isinstance(self._criteria[0], ItemCriterion):
-            return self._criteria[0]
+            return self._criteria[0].isRespected
+        
         if len(self._operators) > 0 and self._operators[0] == "|":
             for criterion in self._criteria:
                 if criterion.isRespected:
                     return True
             return False
+        
         for criterion in self._criteria:
             if not criterion.isRespected:
                 return False
+            
         return True
 
     @property
@@ -222,8 +229,8 @@ class GroupItemCriterion(IItemCriterion):
                     return False
         return True
 
-    def getFirstCriterion(self, pCriteria: str) -> IItemCriterion:
-        criterion: IItemCriterion = None
+    def getFirstCriterion(self, pCriteria: str) -> ItemCriterion:
+        criterion = None
         dl: list[str] = None
         ANDindex: int = 0
         ORindex: int = 0

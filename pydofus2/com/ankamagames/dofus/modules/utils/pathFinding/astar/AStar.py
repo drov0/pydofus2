@@ -23,7 +23,7 @@ from pydofus2.com.ankamagames.jerakine.types.positions.MapPoint import MapPoint
 
 
 class AStar(metaclass=Singleton):
-    DEBUG = True
+    DEBUG = False
     _forbiddenSubareaIds = list[int]()
     _forbidenEdges = list[Edge]()
     HEURISTIC_SCALE: int = 1

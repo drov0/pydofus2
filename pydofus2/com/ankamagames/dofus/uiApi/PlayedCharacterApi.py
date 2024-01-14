@@ -1,83 +1,70 @@
+from typing import TYPE_CHECKING
+
 from pydofus2.com.ankamagames.berilia.interfaces.IApi import IApi
 from pydofus2.com.ankamagames.dofus.datacenter.breeds.Breed import Breed
-from pydofus2.com.ankamagames.dofus.datacenter.optionalFeatures.CustomModeBreedSpell import (
-    CustomModeBreedSpell,
-)
-from pydofus2.com.ankamagames.dofus.datacenter.optionalFeatures.ForgettableSpell import (
-    ForgettableSpell,
-)
+from pydofus2.com.ankamagames.dofus.datacenter.optionalFeatures.CustomModeBreedSpell import \
+    CustomModeBreedSpell
+from pydofus2.com.ankamagames.dofus.datacenter.optionalFeatures.ForgettableSpell import \
+    ForgettableSpell
 from pydofus2.com.ankamagames.dofus.datacenter.world.SubArea import SubArea
 from pydofus2.com.ankamagames.dofus.internalDatacenter.DataEnum import DataEnum
-from pydofus2.com.ankamagames.dofus.internalDatacenter.items.ItemWrapper import ItemWrapper
-from pydofus2.com.ankamagames.dofus.internalDatacenter.items.WeaponWrapper import WeaponWrapper
-from typing import TYPE_CHECKING
-from pydofus2.com.ankamagames.dofus.network.enums.AlignmentSideEnum import AlignmentSideEnum
-
-from pydofus2.com.ankamagames.dofus.types.data.PlayerSetInfo import PlayerSetInfo
+from pydofus2.com.ankamagames.dofus.internalDatacenter.items.ItemWrapper import \
+    ItemWrapper
+from pydofus2.com.ankamagames.dofus.internalDatacenter.items.WeaponWrapper import \
+    WeaponWrapper
+from pydofus2.com.ankamagames.dofus.network.enums.AlignmentSideEnum import \
+    AlignmentSideEnum
+from pydofus2.com.ankamagames.dofus.types.data.PlayerSetInfo import \
+    PlayerSetInfo
 
 if TYPE_CHECKING:
     from pydofus2.com.ankamagames.dofus.internalDatacenter.spells.SpellWrapper import (
         SpellWrapper,
     )
 
-from pydofus2.com.ankamagames.dofus.internalDatacenter.mount.MountData import MountData
-from pydofus2.com.ankamagames.dofus.internalDatacenter.stats.EntityStats import EntityStats
-from pydofus2.com.ankamagames.dofus.internalDatacenter.world.WorldPointWrapper import (
-    WorldPointWrapper,
-)
+from pydofus2.com.ankamagames.dofus.internalDatacenter.mount.MountData import \
+    MountData
+from pydofus2.com.ankamagames.dofus.internalDatacenter.stats.EntityStats import \
+    EntityStats
+from pydofus2.com.ankamagames.dofus.internalDatacenter.world.WorldPointWrapper import \
+    WorldPointWrapper
 from pydofus2.com.ankamagames.dofus.kernel.Kernel import Kernel
-from pydofus2.com.ankamagames.dofus.logic.common.managers.StatsManager import StatsManager
-from pydofus2.com.ankamagames.dofus.logic.game.common.frames.AbstractEntitiesFrame import (
-    AbstractEntitiesFrame,
-)
-from pydofus2.com.ankamagames.dofus.logic.game.common.managers.InventoryManager import (
-    InventoryManager,
-)
-from pydofus2.com.ankamagames.dofus.logic.game.common.managers.PlayedCharacterManager import (
-    PlayedCharacterManager,
-)
-from pydofus2.com.ankamagames.dofus.logic.game.fight.frames.FightPreparationFrame import (
-    FightPreparationFrame,
-)
-from pydofus2.com.ankamagames.dofus.logic.game.fight.managers.CurrentPlayedFighterManager import (
-    CurrentPlayedFighterManager,
-)
-from pydofus2.com.ankamagames.dofus.logic.game.fight.types.castSpellManager.SpellManager import (
-    SpellManager,
-)
-from pydofus2.com.ankamagames.dofus.network.enums.CharacterInventoryPositionEnum import (
-    CharacterInventoryPositionEnum,
-)
-from pydofus2.com.ankamagames.dofus.network.enums.PlayerLifeStatusEnum import (
-    PlayerLifeStatusEnum,
-)
-from pydofus2.com.ankamagames.dofus.network.types.game.character.characteristic.CharacterCharacteristicsInformations import (
-    CharacterCharacteristicsInformations,
-)
-from pydofus2.com.ankamagames.dofus.network.types.game.character.choice.CharacterBaseInformations import (
-    CharacterBaseInformations,
-)
-from pydofus2.com.ankamagames.dofus.network.types.game.character.restriction.ActorRestrictionsInformations import (
-    ActorRestrictionsInformations,
-)
-from pydofus2.com.ankamagames.dofus.network.types.game.context.roleplay.GameRolePlayActorInformations import (
-    GameRolePlayActorInformations,
-)
-from pydofus2.com.ankamagames.dofus.network.types.game.context.roleplay.GameRolePlayCharacterInformations import (
-    GameRolePlayCharacterInformations,
-)
-from pydofus2.com.ankamagames.dofus.network.types.game.context.roleplay.GameRolePlayMutantInformations import (
-    GameRolePlayMutantInformations,
-)
-from pydofus2.com.ankamagames.dofus.network.types.game.context.roleplay.GuildInformations import (
-    GuildInformations,
-)
-from pydofus2.com.ankamagames.dofus.network.types.game.data.items.ForgettableSpellItem import (
-    ForgettableSpellItem,
-)
-from pydofus2.com.ankamagames.dofus.network.types.game.guild.application.GuildApplicationInformation import (
-    GuildApplicationInformation,
-)
+from pydofus2.com.ankamagames.dofus.logic.common.managers.StatsManager import \
+    StatsManager
+from pydofus2.com.ankamagames.dofus.logic.game.common.frames.AbstractEntitiesFrame import \
+    AbstractEntitiesFrame
+from pydofus2.com.ankamagames.dofus.logic.game.common.managers.InventoryManager import \
+    InventoryManager
+from pydofus2.com.ankamagames.dofus.logic.game.common.managers.PlayedCharacterManager import \
+    PlayedCharacterManager
+from pydofus2.com.ankamagames.dofus.logic.game.fight.frames.FightPreparationFrame import \
+    FightPreparationFrame
+from pydofus2.com.ankamagames.dofus.logic.game.fight.managers.CurrentPlayedFighterManager import \
+    CurrentPlayedFighterManager
+from pydofus2.com.ankamagames.dofus.logic.game.fight.types.castSpellManager.SpellManager import \
+    SpellManager
+from pydofus2.com.ankamagames.dofus.network.enums.CharacterInventoryPositionEnum import \
+    CharacterInventoryPositionEnum
+from pydofus2.com.ankamagames.dofus.network.enums.PlayerLifeStatusEnum import \
+    PlayerLifeStatusEnum
+from pydofus2.com.ankamagames.dofus.network.types.game.character.characteristic.CharacterCharacteristicsInformations import \
+    CharacterCharacteristicsInformations
+from pydofus2.com.ankamagames.dofus.network.types.game.character.choice.CharacterBaseInformations import \
+    CharacterBaseInformations
+from pydofus2.com.ankamagames.dofus.network.types.game.character.restriction.ActorRestrictionsInformations import \
+    ActorRestrictionsInformations
+from pydofus2.com.ankamagames.dofus.network.types.game.context.roleplay.GameRolePlayActorInformations import \
+    GameRolePlayActorInformations
+from pydofus2.com.ankamagames.dofus.network.types.game.context.roleplay.GameRolePlayCharacterInformations import \
+    GameRolePlayCharacterInformations
+from pydofus2.com.ankamagames.dofus.network.types.game.context.roleplay.GameRolePlayMutantInformations import \
+    GameRolePlayMutantInformations
+from pydofus2.com.ankamagames.dofus.network.types.game.context.roleplay.GuildInformations import \
+    GuildInformations
+from pydofus2.com.ankamagames.dofus.network.types.game.data.items.ForgettableSpellItem import \
+    ForgettableSpellItem
+from pydofus2.com.ankamagames.dofus.network.types.game.guild.application.GuildApplicationInformation import \
+    GuildApplicationInformation
 
 
 class PlayedCharacterInfo(object):
@@ -276,8 +263,8 @@ class PlayedCharacterApi(IApi):
         return PlayedCharacterManager().isPartyLeader
 
     @classmethod
-    def isRidding(cls) -> bool:
-        return PlayedCharacterManager().isRidding
+    def isRiding(cls) -> bool:
+        return PlayedCharacterManager().isRiding
 
     @classmethod
     def isPetsMounting(cls) -> bool:

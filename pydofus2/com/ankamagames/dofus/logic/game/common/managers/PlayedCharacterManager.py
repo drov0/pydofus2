@@ -1,3 +1,4 @@
+import threading
 from typing import TYPE_CHECKING
 
 from pydofus2.com.ankamagames.dofus.datacenter.jobs.Job import Job
@@ -90,7 +91,6 @@ class PlayedCharacterManager(IDestroyable, metaclass=Singleton):
         self.inventoryWeightMax = 0
         self.state = 0
         self.publicMode = False
-        self.isRidding = False
         self.isPetsMounting = False
         self.petsMount = None
         self.hasCompanion = False
@@ -110,6 +110,7 @@ class PlayedCharacterManager(IDestroyable, metaclass=Singleton):
         self.isFighting = False
         self.instanceId = None
         self.isRiding = False
+        self.lock = threading.Lock()
         super().__init__()
 
     @property

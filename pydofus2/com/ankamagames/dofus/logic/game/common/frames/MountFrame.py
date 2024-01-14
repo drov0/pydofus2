@@ -106,6 +106,7 @@ class MountFrame(Frame):
         self._paddockList: list[MountData] = None
         self._inventoryWeight = None
         self._inventoryMaxWeight = None
+        self._isRiding = False
 
     @property
     def priority(self):
@@ -128,6 +129,7 @@ class MountFrame(Frame):
         return True
 
     def pulled(self):
+        Logger().info("MountFrame pulled")
         return True
     
     def initializeMountLists(self, stables, paddocks):
@@ -284,17 +286,10 @@ class MountFrame(Frame):
             return True
 
         if isinstance(msg, MountRidingMessage):
-            isRiding = msg.isRiding
-            # player = DofusEntities.getEntity(PlayedCharacterManager().id)
-            # rpEntitiesFrame = Kernel().roleplayEntitiesFrame
-            # if player and rpEntitiesFrame:
-            #     currentEmote = Emoticon.getEmoticonById(rpEntitiesFrame.currentEmoticon)
-            #     lastStaticAnim = player.getAnimation().replace("_", "_Statique_") if currentEmote and currentEmote.persistancy else player.getAnimation()
-            #     rpEntitiesFrame.lastStaticAnimations[player.id] = {"anim": lastStaticAnim}
-            #     player.setAnimation(AnimationEnum.ANIM_STATIQUE)
-            PlayedCharacterManager().isRiding = isRiding
-            Logger().info(f"Player is now {'riding' if isRiding else 'not riding'} mount")
-            KernelEventsManager().send(KernelEvent.MountRiding, isRiding)
+            self._isRiding = msg.isRiding
+            PlayedCharacterManager().isRiding = msg.isRiding
+            Logger().info(f"Player is {'riding' if msg.isRiding else 'not riding'} mount!")
+            KernelEventsManager().send(KernelEvent.MountRiding, msg.isRiding)
             return True
 
         if isinstance(msg, MountEquipedErrorMessage):

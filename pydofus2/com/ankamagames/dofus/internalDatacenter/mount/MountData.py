@@ -1,13 +1,17 @@
 import math
+
 from pydofus2.com.ankamagames.dofus.datacenter.mounts.Mount import Mount
-from pydofus2.com.ankamagames.dofus.datacenter.mounts.MountBehavior import MountBehavior
-from pydofus2.com.ankamagames.dofus.datacenter.mounts.MountFamily import MountFamily
-from pydofus2.com.ankamagames.dofus.misc.ObjectEffectAdapter import ObjectEffectAdapter
-from pydofus2.com.ankamagames.dofus.network.types.game.mount.MountClientData import (
-    MountClientData,
-)
+from pydofus2.com.ankamagames.dofus.datacenter.mounts.MountBehavior import \
+    MountBehavior
+from pydofus2.com.ankamagames.dofus.datacenter.mounts.MountFamily import \
+    MountFamily
+from pydofus2.com.ankamagames.dofus.misc.ObjectEffectAdapter import \
+    ObjectEffectAdapter
+from pydofus2.com.ankamagames.dofus.network.types.game.mount.MountClientData import \
+    MountClientData
 from pydofus2.com.ankamagames.jerakine.data.I18n import I18n
-from pydofus2.com.ankamagames.jerakine.interfaces.IDataCenter import IDataCenter
+from pydofus2.com.ankamagames.jerakine.interfaces.IDataCenter import \
+    IDataCenter
 
 
 class MountData(IDataCenter):
@@ -99,18 +103,17 @@ class MountData(IDataCenter):
         self.ability = list()
         super().__init__()
 
-    def makeMountData(self, o: MountClientData, cache: bool = True, xpRatio: int = 0) -> "MountData":
-        ability: int = 0
-        nEffect: int = 0
-        i: int = 0
-        mountData: MountData = MountData()
-        if self._dictionary_cache[o.id] and cache:
-            mountData = self.getMountFromCache(o.id)
-        mount: Mount = Mount.getMountById(o.model)
-        if not o.name:
-            mountData.name = I18n.getUiText("ui.common.noName")
-        else:
-            mountData.name = o.name
+    @classmethod
+    def makeMountData(cls, o, cache=True, xpRatio=0):
+        ability = 0
+        nEffect = 0
+        i = 0
+        mountData = MountData()
+        if cls._dictionary_cache.get(o.id) and cache:
+            mountData = cls.getMountFromCache(o.id)
+
+        mount = Mount.getMountById(o.model)
+        mountData.name = o.name if o.name else I18n.getUiText("ui.common.noName")
         mountData.id = o.id
         mountData.modelId = o.model
         mountData.description = mount.name
@@ -121,16 +124,25 @@ class MountData(IDataCenter):
         mountData.experienceForLevel = o.experienceForLevel
         mountData.experienceForNextLevel = o.experienceForNextLevel
         mountData.xpRatio = xpRatio
-        a: list[int] = o.ancestor.extend()
-        a.unshift(o.model)
-        mountData.ancestor = self.makeParent(a, 0, -1, 0)
-        mountData.ability = list()
+
+        try:
+            mountData.entityLook = None
+            mountData.colors = mountData.entityLook.getColors()
+        except Exception as e:
+            pass
+
+        a = o.ancestor[:]
+        a.insert(0, o.model)
+        mountData.ancestor = cls.makeParent(a, 0, -1, 0)
+        mountData.ability = []
         for ability in o.behaviors:
             mountData.ability.append(MountBehavior.getMountBehaviorById(ability))
-        mountData.effectList = list()
-        nEffect = len(o.effectList)
+
+        mountData.effectList = []
+        nEffect = int(len(o.effectList))
         for i in range(nEffect):
             mountData.effectList.append(ObjectEffectAdapter.fromNetwork(o.effectList[i]))
+
         mountData.maxPods = o.maxPods
         mountData.isRideable = o.isRideable
         mountData.isWild = o.isWild
@@ -153,26 +165,32 @@ class MountData(IDataCenter):
         mountData.boostMax = o.boostMax
         mountData.harnessGID = o.harnessGID
         mountData.useHarnessColors = o.useHarnessColors
-        if not self._dictionary_cache[o.id] or not cache:
-            self._dictionary_cache[mountData.id] = mountData
+
+        if not cls._dictionary_cache.get(o.id) or not cache:
+            cls._dictionary_cache[mountData.id] = mountData
+
         return mountData
 
-    def getMountFromCache(self, id: int) -> "MountData":
-        return self._dictionary_cache[id]
+    @classmethod
+    def getMountFromCache(cls, id: int) -> "MountData":
+        return cls._dictionary_cache.get(id)
 
-    def makeParent(self, ancestor: list[int], generation: int, start: int, index: int) -> object:
-        nextStart: int = start + math.pow(2, generation - 1)
-        ancestorIndex: int = nextStart + index
+    @classmethod
+    def makeParent(cls, ancestor, generation, start, index):
+        nextStart = start + int(2 ** (generation - 1))
+        ancestorIndex = nextStart + index
         if len(ancestor) <= ancestorIndex:
             return None
-        mount: Mount = Mount.getMountById(ancestor[ancestorIndex])
+
+        mount = Mount.getMountById(ancestor[ancestorIndex])
         if not mount:
             return None
+
         return {
             "mount": mount,
-            "mother": self.makeParent(ancestor, generation + 1, nextStart, 0 + 2 * (ancestorIndex - nextStart)),
-            "father": self.makeParent(ancestor, generation + 1, nextStart, 1 + 2 * (ancestorIndex - nextStart)),
-            "entityLook": None,
+            "mother": cls.makeParent(ancestor, generation + 1, nextStart, 2 * (ancestorIndex - nextStart)),
+            "father": cls.makeParent(ancestor, generation + 1, nextStart, 1 + 2 * (ancestorIndex - nextStart)),
+            "entityLook": None
         }
 
     @property

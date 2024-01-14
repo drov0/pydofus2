@@ -4,12 +4,30 @@ import pydofus2.com.ankamagames.dofus.datacenter.quest.Quest as qst
 from pydofus2.com.ankamagames.berilia.managers.KernelEvent import KernelEvent
 from pydofus2.com.ankamagames.berilia.managers.KernelEventsManager import \
     KernelEventsManager
+from pydofus2.com.ankamagames.dofus.datacenter.quest.Achievement import \
+    Achievement
+from pydofus2.com.ankamagames.dofus.datacenter.quest.AchievementReward import \
+    AchievementReward
 from pydofus2.com.ankamagames.dofus.datacenter.world.MapPosition import \
     MapPosition
+from pydofus2.com.ankamagames.dofus.internalDatacenter.FeatureEnum import \
+    FeatureEnum
+from pydofus2.com.ankamagames.dofus.internalDatacenter.items.ItemWrapper import \
+    ItemWrapper
 from pydofus2.com.ankamagames.dofus.internalDatacenter.quests.TreasureHuntWrapper import \
     TreasureHuntWrapper
+from pydofus2.com.ankamagames.dofus.internalDatacenter.spells.SpellWrapper import \
+    SpellWrapper
 from pydofus2.com.ankamagames.dofus.kernel.net.ConnectionsHandler import \
     ConnectionsHandler
+from pydofus2.com.ankamagames.dofus.logic.game.common.managers.FeatureManager import \
+    FeatureManager
+from pydofus2.com.ankamagames.dofus.logic.game.common.managers.TimeManager import \
+    TimeManager
+from pydofus2.com.ankamagames.dofus.misc.utils.ParamsDecoder import \
+    ParamsDecoder
+from pydofus2.com.ankamagames.dofus.network.enums.ChatActivableChannelsEnum import \
+    ChatActivableChannelsEnum
 from pydofus2.com.ankamagames.dofus.network.enums.TreasureHuntDigRequestEnum import \
     TreasureHuntDigRequestEnum
 from pydofus2.com.ankamagames.dofus.network.enums.TreasureHuntFlagRequestEnum import \
@@ -20,6 +38,8 @@ from pydofus2.com.ankamagames.dofus.network.enums.TreasureHuntTypeEnum import \
     TreasureHuntTypeEnum
 from pydofus2.com.ankamagames.dofus.network.messages.game.achievement.AchievementListMessage import \
     AchievementListMessage
+from pydofus2.com.ankamagames.dofus.network.messages.game.achievement.AchievementRewardSuccessMessage import \
+    AchievementRewardSuccessMessage
 from pydofus2.com.ankamagames.dofus.network.messages.game.context.roleplay.quest.QuestListMessage import \
     QuestListMessage
 from pydofus2.com.ankamagames.dofus.network.messages.game.context.roleplay.quest.QuestStartedMessage import \
@@ -245,25 +265,25 @@ class QuestFrame(Frame):
             return True
 
         elif isinstance(msg, QuestListMessage):
-            qlmsg = msg
-            self._activeQuests = qlmsg.activeQuests
-            self._completedQuests = qlmsg.finishedQuestsIds
-            self._completedQuests = self._completedQuests + qlmsg.reinitDoneQuestsIds
-            self._reinitDoneQuests = qlmsg.reinitDoneQuestsIds
+            self._activeQuests = msg.activeQuests
+            self._completedQuests = msg.finishedQuestsIds
+            self._completedQuests = self._completedQuests + msg.reinitDoneQuestsIds
+            self._reinitDoneQuests = msg.reinitDoneQuestsIds
             self._activeObjectives = list[int]()
             self._completedObjectives = list[int]()
             for questInfosDetailed in self._activeQuests:
                 if questInfosDetailed:
-                    for obj in questInfosDetailed.objectives:
-                        if obj.objectiveStatus:
-                            if obj.objectiveId not in self._activeObjectives:
-                                if obj.objectiveId in self._completedObjectives:
-                                    self._completedObjectives.remove(obj["objectiveId"])
-                                self._activeObjectives.append(obj["objectiveId"])
-                        elif obj.objectiveId not in self._completedObjectives:
-                            if obj.objectiveId in self._activeObjectives:
-                                self._activeObjectives.remove(obj["objectiveId"])
-                            self._completedObjectives.append(obj["objectiveId"])
+                    if isinstance(questInfosDetailed, QuestActiveDetailedInformations):
+                        for obj in questInfosDetailed.objectives:
+                            if obj.objectiveStatus:
+                                if obj.objectiveId not in self._activeObjectives:
+                                    if obj.objectiveId in self._completedObjectives:
+                                        self._completedObjectives.remove(obj.objectiveId)
+                                    self._activeObjectives.append(obj.objectiveId)
+                            elif obj.objectiveId not in self._completedObjectives:
+                                if obj.objectiveId in self._activeObjectives:
+                                    self._activeObjectives.remove(obj.objectiveId)
+                                self._completedObjectives.append(obj.objectiveId)
             for id in self._completedQuests:
                 quest = qst.Quest.getQuestById(id)
                 if quest:
@@ -450,8 +470,37 @@ class QuestFrame(Frame):
                 KernelEvent.TreasureHuntFlagRequestAnswer, result, err
             )
             return True
+
+        if isinstance(msg, AchievementRewardSuccessMessage):
+                arsmsg = msg  # Assuming msg is an object of type AchievementRewardSuccessMessage
+                for achievementRewardable in self._rewardableAchievements:
+                    if achievementRewardable.id == arsmsg.achievementId:
+                        rewardedAchievementIndex = self._rewardableAchievements.index(achievementRewardable)
+                        break
+                self._rewardableAchievements.pop(rewardedAchievementIndex)
+
+                for achievementIndex, achievementAchieved in enumerate(self._achievementsList.finishedAchievements):
+                    if achievementAchieved.id == arsmsg.achievementId and isinstance(achievementAchieved, AchievementAchievedRewardable):
+                        self._achievementsList.finishedAchievements[achievementIndex] = AchievementAchieved()
+                        self._achievementsList.finishedAchievements[achievementIndex].init(achievementAchieved.id, achievementAchieved.achievedBy)
+                        break
+
+                KernelEventsManager().send(KernelEvent.AchievementRewardSuccess, arsmsg.achievementId)
+
+                if self._rewardableAchievementsVisible and not self.doesRewardsUiNeedOpening():
+                    self._rewardableAchievementsVisible = False
+                    KernelEventsManager().send(KernelEvent.RewardableAchievementsVisible, self._rewardableAchievementsVisible)
+
+                rewardedAchievement = Achievement.getAchievementById(arsmsg.achievementId)
+                if FeatureManager().isFeatureWithKeywordEnabled(FeatureEnum.TEMPORIS_ACHIEVEMENT_PROGRESS) and rewardedAchievement is not None and rewardedAchievement.category.id == self.TEMPORIS_CATEGORY:
+                    self.displayRewardedAchievementInChat(rewardedAchievement)
+
+
         return False  # or whatever the default return value should be
 
+    def doesRewardsUiNeedOpening(self) -> bool:
+        return False
+    
     def pulled(self) -> bool:
         return True
 
@@ -461,3 +510,43 @@ class QuestFrame(Frame):
             if key != None:
                 return True
         return False
+
+    def displayRewardedAchievementInChat(self, rewardedAchievement):
+        if rewardedAchievement is None:
+            return
+
+        for jndex in range(len(rewardedAchievement.rewardIds)):
+            currentAchievementReward = AchievementReward.getAchievementRewardById(rewardedAchievement.rewardIds[jndex])
+            if currentAchievementReward is not None:
+                itemAwardIndex = 0
+                itemQuantity = 0
+                for itemId in currentAchievementReward.itemsReward:
+                    itemQuantity = currentAchievementReward.itemsQuantityReward[itemAwardIndex] if len(currentAchievementReward.itemsQuantityReward) > itemAwardIndex else 1
+                    currentItemAward = ItemWrapper.create(0, 0, itemId, itemQuantity, [], False)
+                    if currentItemAward is not None:
+                        chatMessage = I18n.getUiText("ui.temporis.rewardSuccess", ["{item," + str(currentItemAward.id) + "::" + currentItemAward.name + "}"])
+                        KernelEventsManager().send(KernelEvent.TextInformation, chatMessage, ChatActivableChannelsEnum.PSEUDO_CHANNEL_INFO, TimeManager().getTimestamp())
+
+                for spellId in currentAchievementReward.spellsReward:
+                    currentSpellAward = SpellWrapper.create(spellId, 1, False, 0, False)
+                    if currentSpellAward is not None:
+                        chatMessage = I18n.getUiText("ui.temporis.rewardSuccess", ["{spell," + str(currentSpellAward.id) + "," + str(currentSpellAward.spellLevel) + "}"])
+                        KernelEventsManager().send(KernelEvent.TextInformation, chatMessage, ChatActivableChannelsEnum.PSEUDO_CHANNEL_INFO, TimeManager().getTimestamp())
+
+                for emoteId in currentAchievementReward.emotesReward:
+                    currentEmoteAward = EmoteWrapper.create(emoteId, 0)
+                    if currentEmoteAward is not None:
+                        chatMessage = I18n.getUiText("ui.temporis.rewardSuccess", ["{showEmote," + str(currentEmoteAward.id) + "::" + currentEmoteAward.emote.name + "}"])
+                        KernelEventsManager().send(KernelEvent.TextInformation, chatMessage, ChatActivableChannelsEnum.PSEUDO_CHANNEL_INFO, TimeManager().getTimestamp())
+
+                for ornamentId in currentAchievementReward.ornamentsReward:
+                    currentOrnamentAward = OrnamentWrapper.create(ornamentId)
+                    if currentOrnamentAward is not None:
+                        chatMessage = ParamsDecoder.applyParams(I18n.getUiText("ui.temporis.rewardSuccess", ["$ornament%1"]), [str(currentOrnamentAward.id)])
+                        KernelEventsManager().send(KernelEvent.TextInformation, chatMessage, ChatActivableChannelsEnum.PSEUDO_CHANNEL_INFO, TimeManager().getTimestamp())
+
+                for titleId in currentAchievementReward.titlesReward:
+                    currentTitleAward = TitleWrapper.create(titleId)
+                    if currentTitleAward is not None:
+                        chatMessage = ParamsDecoder.applyParams(I18n.getUiText("ui.temporis.rewardSuccess", ["$title%1"]), [str(currentTitleAward.id)])
+                        KernelEventsManager().send(KernelEvent.TextInformation, chatMessage, ChatActivableChannelsEnum.PSEUDO_CHANNEL_INFO, TimeManager().getTimestamp())

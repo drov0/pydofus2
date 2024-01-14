@@ -3,11 +3,11 @@ from typing import TYPE_CHECKING
 from pydofus2.com.ankamagames.dofus.datacenter.jobs.Job import Job
 from pydofus2.com.ankamagames.dofus.datacenter.world.MapPosition import \
     MapPosition
+from pydofus2.com.ankamagames.dofus.internalDatacenter.mount.MountData import MountData
 from pydofus2.com.ankamagames.dofus.logic.game.common.misc.DofusEntities import \
     DofusEntities
 from pydofus2.com.ankamagames.dofus.modules.utils.pathFinding.world.Vertex import \
     Vertex
-
 
 if TYPE_CHECKING:
     from pydofus2.com.ankamagames.dofus.network.types.game.character.choice.CharacterBaseInformations import (
@@ -34,7 +34,6 @@ if TYPE_CHECKING:
     from pydofus2.com.ankamagames.dofus.types.entities.AnimatedCharacter import AnimatedCharacter
     from pydofus2.com.ankamagames.dofus.internalDatacenter.items.ItemWrapper import ItemWrapper
     from pydofus2.com.ankamagames.dofus.internalDatacenter.items.WeaponWrapper import WeaponWrapper
-
 
 from pydofus2.com.ankamagames.dofus.internalDatacenter.DataEnum import DataEnum
 from pydofus2.com.ankamagames.dofus.logic.common.managers.StatsManager import \
@@ -95,7 +94,7 @@ class PlayedCharacterManager(IDestroyable, metaclass=Singleton):
         self.isPetsMounting = False
         self.petsMount = None
         self.hasCompanion = False
-        self.mount = None
+        self.mount: MountData = None
         self.teamId = 0
         self.isSpectator = False
         self.experiencePercent = 0
@@ -110,6 +109,7 @@ class PlayedCharacterManager(IDestroyable, metaclass=Singleton):
         self._isPartyLeader: bool = False
         self.isFighting = False
         self.instanceId = None
+        self.isRiding = False
         super().__init__()
 
     @property

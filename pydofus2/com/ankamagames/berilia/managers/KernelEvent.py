@@ -152,3 +152,21 @@ class KernelEvent(Enum):
     ChallengeModSelected = auto()
     ChallengeBonusSelected = auto()
     
+    # achievements
+    AchievementRewardSuccess = auto()
+    RewardableAchievementsVisible = auto()
+    
+    # Mount 
+    MountSterilized = auto()
+    MountStableUpdate = auto()
+    MountRenamed = auto()
+    MountXpRatio = auto()
+    CertificateMountData = auto()
+    PaddockedMountData = auto()
+    MountRiding = auto()
+    MountReleased = auto()
+    MountSet = auto()
+    MountUnSet = auto()
+    ExchangeWeight = auto()
+    MountEquipedError = auto()
+    ExchangeStartOkMount = auto()

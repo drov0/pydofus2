@@ -10,8 +10,6 @@ from pydofus2.com.ankamagames.dofus.datacenter.items.criterion.PrestigeLevelItem
     PrestigeLevelItemCriterion
 from pydofus2.com.ankamagames.dofus.datacenter.quest.AchievementObjective import \
     AchievementObjective
-from pydofus2.com.ankamagames.dofus.datacenter.quest.AchievementReward import \
-    AchievementReward
 from pydofus2.com.ankamagames.dofus.datacenter.quest.Quest import Quest
 from pydofus2.com.ankamagames.dofus.datacenter.quest.QuestObjective import \
     QuestObjective
@@ -186,8 +184,7 @@ class Achievement(IDataCenter):
         return self._currentLevelRewards
 
     def initCurrentLevelRewards(self, level: int) -> None:
-        from pydofus2.com.ankamagames.dofus.datacenter.items.criterion.AchievementAccountItemCriterion import \
-            evementAccountItemCriterion
+        from pydofus2.com.ankamagames.dofus.datacenter.quest.AchievementReward import AchievementReward
         criterion: GroupItemCriterion = None
         rewardId: int = 0
         characterRewardsTruncated: bool = False

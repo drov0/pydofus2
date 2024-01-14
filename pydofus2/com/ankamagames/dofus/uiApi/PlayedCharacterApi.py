@@ -11,13 +11,11 @@ from pydofus2.com.ankamagames.dofus.internalDatacenter.DataEnum import DataEnum
 from pydofus2.com.ankamagames.dofus.internalDatacenter.items.ItemWrapper import ItemWrapper
 from pydofus2.com.ankamagames.dofus.internalDatacenter.items.WeaponWrapper import WeaponWrapper
 from typing import TYPE_CHECKING
+from pydofus2.com.ankamagames.dofus.network.enums.AlignmentSideEnum import AlignmentSideEnum
 
 from pydofus2.com.ankamagames.dofus.types.data.PlayerSetInfo import PlayerSetInfo
 
 if TYPE_CHECKING:
-    from pydofus2.com.ankamagames.dofus.internalDatacenter.items.IdolsPresetWrapper import (
-        IdolsPresetWrapper,
-    )
     from pydofus2.com.ankamagames.dofus.internalDatacenter.spells.SpellWrapper import (
         SpellWrapper,
     )
@@ -432,22 +430,6 @@ class PlayedCharacterApi(IApi):
     @classmethod
     def getWaitingGifts(cls) -> list:
         return PlayedCharacterManager().waitingGifts
-
-    @classmethod
-    def getSoloIdols(cls) -> list[int]:
-        return PlayedCharacterManager().soloIdols
-
-    @classmethod
-    def getPartyIdols(cls) -> list[int]:
-        return PlayedCharacterManager().partyIdols
-
-    @classmethod
-    def setPartyIdols(cls, pIdols: list[int]) -> None:
-        PlayedCharacterManager().partyIdols = pIdols
-
-    @classmethod
-    def getIdolsPresets(cls) -> list["IdolsPresetWrapper"]:
-        return PlayedCharacterManager().idolsPresets
 
     @classmethod
     def isInHisHavenbag(cls) -> bool:

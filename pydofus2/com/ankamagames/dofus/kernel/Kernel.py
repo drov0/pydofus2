@@ -63,6 +63,9 @@ if TYPE_CHECKING:
         RoleplayWorldFrame
     from pydofus2.com.ankamagames.dofus.logic.game.roleplay.frames.ZaapFrame import \
         ZaapFrame
+    from pydofus2.com.ankamagames.dofus.logic.game.common.frames.MountFrame import MountFrame
+    from pydofus2.com.ankamagames.dofus.logic.common.frames.MountDialogFrame import MountDialogFrame
+
 
 
 class Kernel(metaclass=Singleton):
@@ -287,3 +290,11 @@ class Kernel(metaclass=Singleton):
     @property
     def bidHouseManagementFrame(self) -> "BidHouseManagementFrame":
         return self._worker.getFrameByName("BidHouseManagementFrame")
+    
+    @property
+    def mountFrame(self) -> "MountFrame":
+        return self._worker.getFrameByName("MountFrame")
+    
+    @property
+    def mountDialogFrame(self) -> "MountDialogFrame":
+        return self._worker.getFrameByName("MountDialogFrame")

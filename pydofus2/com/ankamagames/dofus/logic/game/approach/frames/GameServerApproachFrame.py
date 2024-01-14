@@ -35,6 +35,8 @@ from pydofus2.com.ankamagames.dofus.logic.game.common.frames.InventoryManagement
     InventoryManagementFrame
 from pydofus2.com.ankamagames.dofus.logic.game.common.frames.JobsFrame import \
     JobsFrame
+from pydofus2.com.ankamagames.dofus.logic.game.common.frames.MountFrame import \
+    MountFrame
 from pydofus2.com.ankamagames.dofus.logic.game.common.frames.SpellInventoryManagementFrame import \
     SpellInventoryManagementFrame
 from pydofus2.com.ankamagames.dofus.logic.game.common.frames.SynchronisationFrame import \
@@ -230,6 +232,7 @@ class GameServerApproachFrame(Frame):
             Kernel().worker.addFrame(SpellInventoryManagementFrame())
             Kernel().worker.addFrame(InventoryManagementFrame())
             Kernel().worker.addFrame(ContextChangeFrame())
+            Kernel().worker.addFrame(MountFrame())
             Kernel().worker.addFrame(JobsFrame())
             Kernel().worker.addFrame(QuestFrame())
             Kernel().worker.addFrame(AveragePricesFrame())

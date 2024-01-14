@@ -96,7 +96,7 @@ _messages_to_discard = {
     "MapFightStartPositionsUpdateMessage",
     "GameDataPaddockObjectAddMessage",
     "GameDataPlayFarmObjectAnimationMessage",
-    "AchievementRewardSuccessMessage"
+    "PrismRemoveMessage"
 }
 
 _mule_fight_messages_to_discard = {

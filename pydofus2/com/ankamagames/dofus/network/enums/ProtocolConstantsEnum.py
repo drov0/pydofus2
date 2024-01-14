@@ -116,8 +116,6 @@ class ProtocolConstantsEnum:
 
     MAX_PRESET_COUNT: int = 18
 
-    MAX_IDOLS_PRESET_IDOL_COUNT: int = 6
-
     MIN_OBJ_COUNT_BY_XFERT: int = 1
 
     MAX_OBJ_COUNT_BY_XFERT: int = 800
@@ -145,8 +143,6 @@ class ProtocolConstantsEnum:
     MAX_FURNITURES_PER_PACKET: int = 40
 
     MIN_LEVEL_HAVENBAG: int = 10
-
-    MIN_PLAYERS_FOR_GROUP_IDOLS: int = 3
 
     MAX_KAMA: float = 1000000000000
 

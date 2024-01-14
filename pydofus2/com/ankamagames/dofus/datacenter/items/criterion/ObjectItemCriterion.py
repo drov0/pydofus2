@@ -8,16 +8,16 @@ from pydofus2.com.ankamagames.dofus.internalDatacenter.items.ItemWrapper import 
 from pydofus2.com.ankamagames.dofus.logic.game.common.managers.InventoryManager import InventoryManager
 from pydofus2.com.ankamagames.jerakine.data.I18n import I18n
 from pydofus2.com.ankamagames.jerakine.interfaces.IDataCenter import IDataCenter
+from pydofus2.com.ankamagames.jerakine.utils.pattern.PatternDecoder import PatternDecoder
 
 
 class ObjectItemCriterion(ItemCriterion, IDataCenter):
 
-    _criterionValueQuantity: int = -1
 
     def __init__(self, pCriterion: str):
-        itemIdAndQuantity: list = None
+        self._criterionValueQuantity = -1
         super().__init__(pCriterion)
-        if self._criterionValue == 0 and self._criterionValueText.index(",") != -1:
+        if self._criterionValue == 0 and "," in self._criterionValueText:
             itemIdAndQuantity = self._criterionValueText.split(",")
             self._criterionValue = int(itemIdAndQuantity[0])
             self._criterionValueQuantity = int(itemIdAndQuantity[1])
@@ -52,11 +52,11 @@ class ObjectItemCriterion(ItemCriterion, IDataCenter):
 
     @property
     def text(self) -> str:
-        objectItem: Item = Item.getItemById(self._criterionValue)
+        objectItem = Item.getItemById(self._criterionValue)
         if objectItem.type.superTypeId == DataEnum.ITEM_SUPERTYPE_INVISIBLE:
             return ""
         objectName = objectItem.name
-        readableCriterion: str = ""
+        readableCriterion = ""
         if self._operator.text == ItemCriterionOperator.DIFFERENT:
             if self._criterionValueQuantity == 1 or self._criterionValueQuantity == -1:
                 readableCriterion = I18n.getUiText("ui.common.doNotPossess", [objectName])
@@ -77,17 +77,24 @@ class ObjectItemCriterion(ItemCriterion, IDataCenter):
             if self._criterionValueQuantity == 0:
                 readableCriterion = I18n.getUiText("ui.common.doPossess", [objectName])
             else:
-                readableCriterion = I18n.getUiText(
+                readableCriterion = PatternDecoder.combine(I18n.getUiText(
                     "ui.common.doPossessQuantityOrMore", [self._criterionValueQuantity + 1, objectName]
-                )
+                ))
 
         elif self._operator.text == ItemCriterionOperator.INFERIOR:
             if self._criterionValueQuantity == 1:
                 readableCriterion = I18n.getUiText("ui.common.doNotPossess", [objectName])
             else:
-                readableCriterion = I18n.getUiText(
+                readableCriterion = PatternDecoder.combine(I18n.getUiText(
                     "ui.common.doPossessQuantityOrLess", [self._criterionValueQuantity - 1, objectName]
-                )
+                ))
+
+        elif self._operator.text == ItemCriterionOperator.EQUIPPED:
+            readableCriterion = I18n.getUiText("ui.common.doEquip",[objectName])
+            
+        elif self._operator.text == ItemCriterionOperator.NOT_EQUIPPED:
+            readableCriterion = I18n.getUiText("ui.common.doNotEquip",[objectName])
+
         return readableCriterion
 
     def clone(self) -> IItemCriterion:

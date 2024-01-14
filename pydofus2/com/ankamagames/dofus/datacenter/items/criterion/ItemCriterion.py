@@ -2,8 +2,6 @@ from typing import TYPE_CHECKING
 
 from pydofus2.com.ankamagames.dofus.datacenter.items.criterion.IItemCriterion import \
     IItemCriterion
-from pydofus2.com.ankamagames.dofus.internalDatacenter.stats.EntityStats import \
-    EntityStats
 from pydofus2.com.ankamagames.dofus.logic.common.managers.StatsManager import \
     StatsManager
 from pydofus2.com.ankamagames.dofus.logic.game.common.managers.PlayedCharacterManager import \
@@ -30,6 +28,10 @@ class ItemCriterion(IItemCriterion):
 
     def __init__(self, pCriterion: str):
         super().__init__()
+        self._operator = None
+        self._criterionRef = ""
+        self._criterionValue = 0
+        self._criterionValueText = ""
         self._serverCriterionForm = pCriterion
         self.getInfos()
 
@@ -94,6 +96,9 @@ class ItemCriterion(IItemCriterion):
         elif self._criterionRef == "Ct":
             readableCriterionRef = I18n.getUiText("ui.stats.takleEvade")
 
+        elif self._criterionRef == "CE":
+            readableCriterionRef = I18n.getUiText("ui.common.energyPoints")
+            
         else:
             knownCriteriaList = [
                 "CS",
@@ -147,13 +152,20 @@ class ItemCriterion(IItemCriterion):
     def getInfos(self) -> None:
         from pydofus2.com.ankamagames.dofus.datacenter.items.criterion.ItemCriterionOperator import \
             ItemCriterionOperator
-        for operator in ItemCriterionOperator.OPERATORS_LIST:
-            if self._serverCriterionForm.find(operator) == 2:
-                self._operator = ItemCriterionOperator(operator)
-                self._criterionRef = self._serverCriterionForm.split(operator)[0]
-                self._criterionValue = self._serverCriterionForm.split(operator)[1]
-                self._criterionValueText = self._serverCriterionForm.split(operator)[1]
+        OPERATORS_LIST = ItemCriterionOperator.OPERATORS_LIST
 
+        for operator in OPERATORS_LIST:
+            if self._serverCriterionForm.find(operator) == 2:
+                self._operator = ItemCriterionOperator(operator) 
+                parts = self._serverCriterionForm.split(operator)
+                self._criterionRef = parts[0]
+                try:
+                    self._criterionValue = int(parts[1])
+                except ValueError:
+                    self._criterionValue = 0
+                self._criterionValueText = parts[1]
+                break
+    
     def getCriterion(self) -> int:
         criterion: int = 0
         player = PlayedCharacterManager()
@@ -241,3 +253,6 @@ class ItemCriterion(IItemCriterion):
             criterion = stats.getStatAdditionalValue(StatIds.WISDOM)
 
         return criterion
+
+    def __repr__(self) -> str:
+        return self.text

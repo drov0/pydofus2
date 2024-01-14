@@ -21,18 +21,13 @@ class GroupItemCriterion(IItemCriterion):
     def __init__(self, pCriterion: str):
         super().__init__()
         self._criterionTextForm = pCriterion
-        self._cleanCriterionTextForm = self._criterionTextForm
+        self._cleanCriterionTextForm = self._criterionTextForm[:]
         self._malformated = False
         self._singleOperatorType = False
         if not pCriterion:
             return
-        self._cleanCriterionTextForm = str.replace(self._cleanCriterionTextForm, " ", "")
-        delimitedlist = StringUtils.getDelimitedText(self._cleanCriterionTextForm, "(", ")", True)
-        if len(delimitedlist) > 0 and delimitedlist[0] == self._cleanCriterionTextForm:
-            self._cleanCriterionTextForm = self._cleanCriterionTextForm[1:]
-            self._cleanCriterionTextForm = self._cleanCriterionTextForm[:-1]
-        self.split()
-        self.createNewGroups()
+        self.parse()
+        # self.createNewGroups()
 
     @classmethod
     def create(cls, pCriteria: list[ItemCriterion], pOperators: list[str]) -> "GroupItemCriterion":
@@ -91,16 +86,16 @@ class GroupItemCriterion(IItemCriterion):
     @property
     def text(self) -> str:
         textForm = ""
-        if self._criteria == None:
+        if not self._criteria:
             return textForm
-        tabLength: int = len(self._criteria) + len(self._operators)
+        tabLength = len(self._criteria) + len(self._operators)
         criterionIndex = 0
         operatorIndex = 0
-        for i in range(0, tabLength, 1):
-            if textForm != "":
+        for i in range(tabLength):
+            if textForm:
                 textForm += " "
             if i % 2 == 0:
-                textForm += self._criteria[criterionIndex]
+                textForm += self._criteria[criterionIndex].text
                 criterionIndex += 1
             else:
                 textForm += self._operators[operatorIndex]
@@ -115,13 +110,6 @@ class GroupItemCriterion(IItemCriterion):
         return GroupItemCriterion(self.basicText)
 
     def createNewGroups(self) -> None:
-        crit: IItemCriterion = None
-        ope: str = None
-        curIndex: int = 0
-        exit: bool = False
-        crits: list[IItemCriterion] = None
-        ops: list[str] = None
-        group: GroupItemCriterion = None
         if self._malformated or not self._criteria or len(self._criteria) <= 2 or self._singleOperatorType:
             return
         copyCriteria = list[ItemCriterion]()
@@ -131,13 +119,12 @@ class GroupItemCriterion(IItemCriterion):
         for ope in self._operators:
             copyOperators.append(ope)
         curIndex = 0
-        exit = False
-        while not exit:
+        while True:
             if len(copyCriteria) <= 2:
-                exit = True
+                break
             else:
+                crits = list[IItemCriterion]()
                 if copyOperators[curIndex] == "&":
-                    crits = list[IItemCriterion]()
                     crits.append(copyCriteria[curIndex])
                     crits.append(copyCriteria[curIndex + 1])
                     ops = [copyOperators[curIndex]]
@@ -147,91 +134,61 @@ class GroupItemCriterion(IItemCriterion):
                     curIndex -= 1
                 curIndex += 1
                 if curIndex >= len(copyOperators):
-                    exit = True
+                    break
         self._criteria = copyCriteria
         self._operators = copyOperators
         self._singleOperatorType = self.checkSingleOperatorType(self._operators)
 
-    def split(self) -> None:
-        if not self._cleanCriterionTextForm:
-            return
-        searchingstr = self._cleanCriterionTextForm
+    def remove_criterion_from_string(self, string, criterion):
+        index = string.index(criterion.basicText)
+        return string[:index] + string[index + len(criterion.basicText):]
+    
+    def find_next_operator_index(self, string):
+        for operator in ["&", "|"]:
+            index = string.find(operator)
+            if index != -1:
+                return index
+        return -1
+
+    def parse(self) -> None:
         self._criteria = list[ItemCriterion]()
         self._operators = list[str]()
-        andIndexes = StringUtils.getAllIndexOf("&", searchingstr)
-        orIndexes = StringUtils.getAllIndexOf("|", searchingstr)
-        if len(andIndexes) == 0 or len(orIndexes) == 0:
-            self._singleOperatorType = True
-            exit = False
-            while not exit:
-                criterion = self.getFirstCriterion(searchingstr)
-                if not criterion:
-                    indexNextCriterion = searchingstr.find("&")
-                    if indexNextCriterion == -1:
-                        indexNextCriterion = searchingstr.find("|")
-                    if indexNextCriterion == -1:
-                        searchingstr = ""
-                    else:
-                        searchingstr = searchingstr[indexNextCriterion + 1 :]
-                else:
-                    self._criteria.append(criterion)
-                    index = searchingstr.index(criterion.basicText)
-                    op = searchingstr[index + len(criterion.basicText) : index + 1 + len(criterion.basicText)]
-                    if op:
-                        self._operators.append(op)
-                    searchingstr = searchingstr[index + 1 + len(criterion.basicText):]
+        searchingstr = str.replace(searchingstr, " ", "")
+        delimitedlist = StringUtils.getDelimitedText(searchingstr, "(", ")", True)
+        if len(delimitedlist) > 0 and delimitedlist[0] == searchingstr:
+            searchingstr = searchingstr[1:-1]
+        if not searchingstr:
+            return
+        self._singleOperatorType = self.checkSingleOperatorType(self._operators)
+        while searchingstr:
+            criterion = self.getFirstCriterion(searchingstr)
+            if criterion:
+                self._criteria.append(criterion)
+                searchingstr = self.remove_criterion_from_string(searchingstr, criterion)
                 if not searchingstr:
-                    exit = True
-        else:
-            exit = False
-            next = 0
-            while not exit:
-                if not searchingstr:
-                    exit = True
-                elif next == 0:
-                    criterion2 = self.getFirstCriterion(searchingstr)
-                    if not criterion2:
-                        indexNextCriterion2 = searchingstr.find("&")
-                        if indexNextCriterion2 == -1:
-                            indexNextCriterion2 = searchingstr.find("|")
-                        if indexNextCriterion2 == -1:
-                            searchingstr = ""
-                        else:
-                            searchingstr = searchingstr[indexNextCriterion2 + 1 :]
-                    else:
-                        self._criteria.append(criterion2)
-                        next = 1
-                        index2 = searchingstr.index(criterion2.basicText)
-                        firstPart = searchingstr[0:index2]
-                        secondPart = searchingstr[index2 + len(criterion2.basicText):]
-                        searchingstr = firstPart + secondPart
-                else:
-                    operator = searchingstr[:1]
-                    if not operator:
-                        exit = True
-                    else:
-                        self._operators.append(operator)
-                        next = 0
-                        searchingstr = searchingstr[1:]
-            self._singleOperatorType = self.checkSingleOperatorType(self._operators)
-        if len(self._operators) >= len(self._criteria) and len(self._operators) > 0 and len(self._criteria) > 0:
+                    break
+                operator = searchingstr[:1]
+                self._operators.append(operator)
+                searchingstr = searchingstr[1:]
+            else:
+                operator_index = self.find_next_operator_index(searchingstr)
+                if operator_index == -1:
+                    break
+                searchingstr = searchingstr[operator_index + 1:]
+        if self._operators and self._criteria and len(self._operators) >= len(self._criteria):
+            Logger().error("Malformated criterion found !")
             self._malformated = True
-
-    def checkSingleOperatorType(self, pOperators: list[str]) -> bool:
-        for op in pOperators:
-            if op != pOperators[0]:
-                return False
-        return True
 
     def getFirstCriterion(self, pCriteria: str) -> ItemCriterion:
         if not pCriteria:
             return None
         
-        pCriteria = str.replace(pCriteria, " ", "")
+        pCriteria = pCriteria.replace(" ", "")
         
         if pCriteria.startswith("("):
             dl = StringUtils.getDelimitedText(pCriteria, "(", ")", True)
-            criterion = GroupItemCriterion(dl[0])
+            return GroupItemCriterion(dl[0])
+
         else:
             ANDindex = pCriteria.find("&")
             ORindex = pCriteria.find("|")
@@ -239,17 +196,33 @@ class GroupItemCriterion(IItemCriterion):
             from pydofus2.com.ankamagames.dofus.datacenter.items.criterion.ItemCriterionFactory import \
                 ItemCriterionFactory
 
-            if ANDindex == -1 and ORindex == -1:
-                criterion = ItemCriterionFactory.create(pCriteria)
+            if ANDindex == -1 and ORindex == -1: # No operators
+                firstCriterion = pCriteria
                 
-            elif (ANDindex < ORindex or ORindex == -1) and ANDindex != -1:
-                criterion = ItemCriterionFactory.create(pCriteria.split("&")[0])
+            elif ANDindex != -1 and (ANDindex < ORindex or ORindex == -1): # AND operator first or no OR operators
+                firstCriterion = pCriteria.split("&")[0]
                 
-            else:
-                criterion = ItemCriterionFactory.create(pCriteria.split("|")[0])
-                
-        return criterion
+            else: # OR operator first or no AND operator
+                firstCriterion = pCriteria.split("|")[0]
+
+            return ItemCriterionFactory.create(firstCriterion) 
+
+    def checkSingleOperatorType(self, pOperators: list[str]) -> bool:
+        for op in pOperators:
+            if op != pOperators[0]:
+                return False
+        return True
 
     @property
     def operators(self) -> list[str]:
         return self._operators
+    
+    def __repr__(self):
+        return self.text
+
+if __name__ == "__main__":
+    cr = GroupItemCriterion('(((Qo>3613&PO<11044,1&Qo<3597)&(Qo>3617&Qo<3600))&CE>0)')
+    # cr = GroupItemCriterion('Qo>3613&PO<11044,1&Qo<3597')
+    print(cr)
+    print(cr.operators)
+    print("number of criterias ", len(cr.criteria))

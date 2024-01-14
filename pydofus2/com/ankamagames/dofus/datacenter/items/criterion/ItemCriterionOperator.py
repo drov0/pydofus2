@@ -1,10 +1,12 @@
 class ItemCriterionOperator:
 
-    SUPERIOR: str = ">"
-    INFERIOR: str = "<"
-    EQUAL: str = "="
-    DIFFERENT: str = "!"
-    OPERATORS_LIST: list = [
+    SUPERIOR = ">"
+    INFERIOR = "<"
+    EQUAL = "="
+    DIFFERENT = "!"
+    EQUIPPED = "E"
+    NOT_EQUIPPED = "X"
+    OPERATORS_LIST = [
         SUPERIOR,
         INFERIOR,
         EQUAL,
@@ -23,7 +25,6 @@ class ItemCriterionOperator:
     _operator: str
 
     def __init__(self, pstrOperator: str):
-        super().__init__()
         self._operator = pstrOperator
 
     @property

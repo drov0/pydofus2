@@ -102,18 +102,6 @@ class StringUtils:
                 currentIndex -= len(pstrToConcat)
         return pstr
 
-    def getDelimitedText(
-        pText: str,
-        pFirstDelimiter: str,
-        pSecondDelimiter: str,
-        pIncludeDelimiter: bool = False,
-    ) -> list[str]:
-        r = re.findall(re.escape(pFirstDelimiter) + r"(.*)" + re.escape(pSecondDelimiter), pText)
-        r = [_.lstrip(pFirstDelimiter).rstrip(pSecondDelimiter) for _ in r]
-        if pIncludeDelimiter:
-            r = [pFirstDelimiter + _ + pSecondDelimiter for _ in r]
-        return r
-
     def noAccent(src: str) -> str:
         if StringUtils.pattern is None:
             StringUtils.initPatterns()
@@ -127,88 +115,79 @@ class StringUtils:
                 src = re.sub(c, StringUtils.pattern[c], src)
         return src
 
-    def getDelimitedText(
-        pText: str, pFirstDelimiter: str, pSecondDelimiter: str, pIncludeDelimiter: bool = False
-    ) -> list[str]:
-        delimitedText: str = None
-        firstPart: str = None
-        secondPart: str = None
-        returnedArray = list[str]()
-        exit: bool = False
-        text: str = pText
-        while not exit:
-            delimitedText = StringUtils.getSingleDelimitedText(
-                text, pFirstDelimiter, pSecondDelimiter, pIncludeDelimiter
-            )
+    def getDelimitedText(pText, pFirstDelimiter, pSecondDelimiter, pIncludeDelimiter=False):
+        returnedArray = []
+        text = pText
+
+        while True:
+            delimitedText = StringUtils.getSingleDelimitedText(text, pFirstDelimiter, pSecondDelimiter, pIncludeDelimiter)
             if delimitedText == "":
-                exit = True
+                break
             else:
                 returnedArray.append(delimitedText)
+                
                 if not pIncludeDelimiter:
                     delimitedText = pFirstDelimiter + delimitedText + pSecondDelimiter
-                firstPart = text[: text.index(delimitedText)]
-                while pFirstDelimiter in firstPart:
-                    firstPart = firstPart.replace(pFirstDelimiter, "")
-                secondPart = text[text.index(delimitedText) + len(delimitedText) :]
+
+                firstPartIndex = text.find(delimitedText)
+                firstPart = text[:firstPartIndex]
+                secondPart = text[firstPartIndex + len(delimitedText):]
+                
+                # Replace occurrences of the first delimiter in the first part
+                firstPart = firstPart.replace(pFirstDelimiter, "")
                 text = firstPart + secondPart
+
         return returnedArray
 
-    def getSingleDelimitedText(
-        pStringEntry: str, pFirstDelimiter: str, pSecondDelimiter: str, pIncludeDelimiter: bool = False
-    ) -> str:
-        firstDelimiterIndex = 0
-        nextFirstDelimiterIndex = 0
-        nextSecondDelimiterIndex = 0
-        numFirstDelimiter = 0
-        numSecondDelimiter = 0
-        diff = 0
-        delimitedContent = ""
-        currentIndex = 0
-        secondDelimiterToSkip = 0
-        exit = False
-        firstDelimiterIndex = pStringEntry.find(pFirstDelimiter, currentIndex)
+    def getSingleDelimitedText(pStringEntry, pFirstDelimiter, pSecondDelimiter, pIncludeDelimiter=False):
+        firstDelimiterIndex = pStringEntry.find(pFirstDelimiter)
         if firstDelimiterIndex == -1:
             return ""
+
+        delimiterDepth = 1  # Start with a depth of 1 for the first found delimiter
         currentIndex = firstDelimiterIndex + len(pFirstDelimiter)
-        while not exit:
+        delimitedContent = ""
+
+        while currentIndex < len(pStringEntry) and delimiterDepth > 0:
             nextFirstDelimiterIndex = pStringEntry.find(pFirstDelimiter, currentIndex)
             nextSecondDelimiterIndex = pStringEntry.find(pSecondDelimiter, currentIndex)
+
             if nextSecondDelimiterIndex == -1:
-                exit = True
-            if nextFirstDelimiterIndex < nextSecondDelimiterIndex and nextFirstDelimiterIndex != -1:
-                allIndexes = StringUtils.getAllIndexOf(
-                    pFirstDelimiter,
-                    pStringEntry[nextFirstDelimiterIndex + len(pFirstDelimiter) : nextSecondDelimiterIndex],
-                )
-                secondDelimiterToSkip += len(allIndexes)
-                currentIndex = nextSecondDelimiterIndex + len(pFirstDelimiter)
-            elif secondDelimiterToSkip > 1:
-                currentIndex = nextSecondDelimiterIndex + len(pSecondDelimiter)
-                secondDelimiterToSkip -= 1
+                break  # No closing delimiter found
+
+            if nextFirstDelimiterIndex != -1 and nextFirstDelimiterIndex < nextSecondDelimiterIndex:
+                # Found another opening delimiter before the closing one
+                delimiterDepth += 1
+                currentIndex = nextFirstDelimiterIndex + len(pFirstDelimiter)
             else:
-                delimitedContent = pStringEntry[firstDelimiterIndex : nextSecondDelimiterIndex + len(pSecondDelimiter)]
-                exit = True
-        if delimitedContent != "":
-            if not pIncludeDelimiter:
-                delimitedContent = delimitedContent[len(pFirstDelimiter) :]
-                delimitedContent = delimitedContent[0 : len(delimitedContent) - len(pSecondDelimiter)]
-            else:
-                numFirstDelimiter = len(StringUtils.getAllIndexOf(pFirstDelimiter, delimitedContent))
-                numSecondDelimiter = len(StringUtils.getAllIndexOf(pSecondDelimiter, delimitedContent))
-                diff = numFirstDelimiter - numSecondDelimiter
-                if diff > 0:
-                    while diff > 0:
-                        firstDelimiterIndex = delimitedContent.find(pFirstDelimiter)
-                        nextFirstDelimiterIndex = delimitedContent.find(
-                            pFirstDelimiter, firstDelimiterIndex + len(pFirstDelimiter)
-                        )
-                        delimitedContent = delimitedContent[nextFirstDelimiterIndex]
-                        diff -= 1
-                elif diff < 0:
-                    while diff < 0:
-                        delimitedContent = delimitedContent[: delimitedContent.index(reversed(pSecondDelimiter))]
-                        diff += 1
+                # Found a closing delimiter
+                delimiterDepth -= 1
+                if delimiterDepth == 0:
+                    # Found the matching closing delimiter
+                    delimitedContent = pStringEntry[firstDelimiterIndex:nextSecondDelimiterIndex + len(pSecondDelimiter)]
+                else:
+                    currentIndex = nextSecondDelimiterIndex + len(pSecondDelimiter)
+
+        if delimitedContent and not pIncludeDelimiter:
+            delimitedContent = delimitedContent[len(pFirstDelimiter):len(delimitedContent) - len(pSecondDelimiter)]
+
         return delimitedContent
+
+    def getAllIndexOf(pStringLookFor, pWholeString):
+        nextIndex = 0
+        returnedArray = []
+        currentIndex = 0
+
+        while True:
+            nextIndex = pWholeString.find(pStringLookFor, currentIndex)
+            if nextIndex < currentIndex:
+                break
+            else:
+                returnedArray.append(nextIndex)
+                currentIndex = nextIndex + len(pStringLookFor)
+
+        return returnedArray
+
 
     def getAllIndexOf(pStringLookFor: str, pWholeString: str) -> list:
         index = pWholeString.find(pStringLookFor)
@@ -268,4 +247,6 @@ if __name__ == "__main__":
             assert result == expected, f"Test failed for '{text}'. Expected: '{expected}', Got: '{result}'"
             print(f"Test passed for '{text}'. Result: '{result}'")
         
-    testGetSingleDelimitedText()
+    dtxt = "(((Qo>3613&PO<11044,1&Qo<3597)|(Qo>3617&Qo<3600))&CE>0)"
+    r = StringUtils.getSingleDelimitedText(dtxt, "(", ")")
+    print(r)

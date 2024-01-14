@@ -106,19 +106,30 @@ class QuestFrame(Frame):
 
     _followedQuestsCallback: FunctionType
 
-    _achievementsFinishedCache: list = None
+    _achievementsFinishedCache: list
 
     _achievementsList: AchievementListMessage
 
-    _achievementsListProcessed: bool = False
+    _achievementsListProcessed: bool
 
     def __init__(self):
-        self._followedQuests = list[int]()
+        self._followedQuests = list()
         self._questsInformations = dict()
         self._activeObjectives = list[int]()
-        self._completedObjectives = list[int]()
+        self._completedObjectives = list()
         self._treasureHunts = dict()
         self._flagColors = list()
+        self._activeQuests = list()
+        self._achievementsFinishedCache = list()
+        self._finishedAchievements = list()
+        self._finishedAccountAchievementIds = list()
+        self._finishedCharacterAchievementIds = list()
+        self._rewardableAchievements = list()
+        self._rewardableAchievementsVisible = False
+        self._achievementsList = AchievementListMessage()
+        self._achievementsListProcessed = False
+        self._completedQuests = list()
+        self._reinitDoneQuests = list()
         super().__init__()
 
     def treasureHuntFlagRequest(self, questType, index):

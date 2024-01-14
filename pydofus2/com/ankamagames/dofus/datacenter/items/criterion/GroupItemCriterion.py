@@ -2,11 +2,11 @@ from pydofus2.com.ankamagames.dofus.datacenter.items.criterion.IItemCriterion im
     IItemCriterion
 from pydofus2.com.ankamagames.dofus.datacenter.items.criterion.ItemCriterion import \
     ItemCriterion
+from pydofus2.com.ankamagames.dofus.datacenter.items.criterion.ItemCriterionFactory import \
+    ItemCriterionFactory
 from pydofus2.com.ankamagames.dofus.logic.game.common.managers.PlayedCharacterManager import \
     PlayedCharacterManager
 from pydofus2.com.ankamagames.jerakine.logger.Logger import Logger
-from pydofus2.com.ankamagames.jerakine.utils.misc.StringUtils import \
-    StringUtils
 
 
 class GroupItemCriterion(IItemCriterion):
@@ -14,20 +14,13 @@ class GroupItemCriterion(IItemCriterion):
     _criteria: list[ItemCriterion]
     _operators: list[str]
     _criterionTextForm: str
-    _cleanCriterionTextForm: str
-    _malformated: bool
-    _singleOperatorType: bool
 
     def __init__(self, pCriterion: str):
         super().__init__()
         self._criterionTextForm = pCriterion
-        self._cleanCriterionTextForm = self._criterionTextForm[:]
-        self._malformated = False
-        self._singleOperatorType = False
-        if not pCriterion:
-            return
+        self._operators = list[str]()
+        self._criteria = list[ItemCriterion]()
         self.parse()
-        # self.createNewGroups()
 
     @classmethod
     def create(cls, pCriteria: list[ItemCriterion], pOperators: list[str]) -> "GroupItemCriterion":
@@ -78,6 +71,8 @@ class GroupItemCriterion(IItemCriterion):
             return False
         
         for criterion in self._criteria:
+            if criterion is None:
+                raise ValueError(f"One of the criterion is null, full criteria: {self._criterionTextForm}")
             if not criterion.isRespected:
                 return False
             
@@ -109,109 +104,54 @@ class GroupItemCriterion(IItemCriterion):
     def clone(self) -> IItemCriterion:
         return GroupItemCriterion(self.basicText)
 
-    def createNewGroups(self) -> None:
-        if self._malformated or not self._criteria or len(self._criteria) <= 2 or self._singleOperatorType:
-            return
-        copyCriteria = list[ItemCriterion]()
-        copyOperators = list[str]()
-        for crit in self._criteria:
-            copyCriteria.append(crit.clone())
-        for ope in self._operators:
-            copyOperators.append(ope)
-        curIndex = 0
-        while True:
-            if len(copyCriteria) <= 2:
-                break
+    def parse(self):
+        position = 0
+        stack = []
+        while position < len(self._criterionTextForm):
+            char = self._criterionTextForm[position]
+
+            if char == "(":
+                stack.append(position)
+                position += 1
+
+            elif char == ")":
+                if not stack:
+                    raise ValueError(f"Unmatched parenthesis at position {position}")
+                start_pos = stack.pop()
+                if not stack:
+                    group_content = self._criterionTextForm[start_pos + 1:position]
+                    nested_group = GroupItemCriterion(group_content)
+                    self._criteria.append(nested_group)
+                position += 1
+
+            elif char in ["&", "|"] and not stack:
+                self._operators.append(char)
+                position += 1
+
             else:
-                crits = list[IItemCriterion]()
-                if copyOperators[curIndex] == "&":
-                    crits.append(copyCriteria[curIndex])
-                    crits.append(copyCriteria[curIndex + 1])
-                    ops = [copyOperators[curIndex]]
-                    group = GroupItemCriterion.create(crits, ops)
-                    copyCriteria[curIndex:curIndex + 2] = [group]
-                    del copyOperators[curIndex]
-                    curIndex -= 1
-                curIndex += 1
-                if curIndex >= len(copyOperators):
-                    break
-        self._criteria = copyCriteria
-        self._operators = copyOperators
-        self._singleOperatorType = self.checkSingleOperatorType(self._operators)
-
-    def remove_criterion_from_string(self, string, criterion):
-        index = string.index(criterion.basicText)
-        return string[:index] + string[index + len(criterion.basicText):]
-    
-    def find_next_operator_index(self, string):
-        for operator in ["&", "|"]:
-            index = string.find(operator)
-            if index != -1:
-                return index
-        return -1
-
-    def parse(self) -> None:
-        self._criteria = list[ItemCriterion]()
-        self._operators = list[str]()
-        searchingstr = str.replace(searchingstr, " ", "")
-        delimitedlist = StringUtils.getDelimitedText(searchingstr, "(", ")", True)
-        if len(delimitedlist) > 0 and delimitedlist[0] == searchingstr:
-            searchingstr = searchingstr[1:-1]
-        if not searchingstr:
-            return
-        self._singleOperatorType = self.checkSingleOperatorType(self._operators)
-        while searchingstr:
-            criterion = self.getFirstCriterion(searchingstr)
-            if criterion:
-                self._criteria.append(criterion)
-                searchingstr = self.remove_criterion_from_string(searchingstr, criterion)
-                if not searchingstr:
-                    break
-                operator = searchingstr[:1]
-                self._operators.append(operator)
-                searchingstr = searchingstr[1:]
-            else:
-                operator_index = self.find_next_operator_index(searchingstr)
-                if operator_index == -1:
-                    break
-                searchingstr = searchingstr[operator_index + 1:]
-        if self._operators and self._criteria and len(self._operators) >= len(self._criteria):
-            Logger().error("Malformated criterion found !")
-            self._malformated = True
-
-    def getFirstCriterion(self, pCriteria: str) -> ItemCriterion:
-        if not pCriteria:
-            return None
+                if not stack:
+                    criterion_end = self.find_next_operator_or_parenthesis(position)
+                    criterion = self._criterionTextForm[position:criterion_end].strip()
+                    criteria = ItemCriterionFactory.create(criterion)
+                    if criteria is not None:
+                        self._criteria.append(criteria)
+                    position = criterion_end
+                else:
+                    position += 1
         
-        pCriteria = pCriteria.replace(" ", "")
-        
-        if pCriteria.startswith("("):
-            dl = StringUtils.getDelimitedText(pCriteria, "(", ")", True)
-            return GroupItemCriterion(dl[0])
+        if stack:
+            raise ValueError(f"Unmatched parenthesis at position {stack.pop()}")
 
-        else:
-            ANDindex = pCriteria.find("&")
-            ORindex = pCriteria.find("|")
-            
-            from pydofus2.com.ankamagames.dofus.datacenter.items.criterion.ItemCriterionFactory import \
-                ItemCriterionFactory
+        if len(self._criteria) == 1 and isinstance(self._criteria[0], GroupItemCriterion):
+            top_group = self._criteria[0]
+            self._criteria = top_group._criteria
+            self._operators = top_group._operators
 
-            if ANDindex == -1 and ORindex == -1: # No operators
-                firstCriterion = pCriteria
-                
-            elif ANDindex != -1 and (ANDindex < ORindex or ORindex == -1): # AND operator first or no OR operators
-                firstCriterion = pCriteria.split("&")[0]
-                
-            else: # OR operator first or no AND operator
-                firstCriterion = pCriteria.split("|")[0]
-
-            return ItemCriterionFactory.create(firstCriterion) 
-
-    def checkSingleOperatorType(self, pOperators: list[str]) -> bool:
-        for op in pOperators:
-            if op != pOperators[0]:
-                return False
-        return True
+    def find_next_operator_or_parenthesis(self, start_pos):
+        for pos in range(start_pos, len(self._criterionTextForm)):
+            if self._criterionTextForm[pos] in ["&", "|", "(", ")"]:
+                return pos
+        return len(self._criterionTextForm)
 
     @property
     def operators(self) -> list[str]:
@@ -221,8 +161,8 @@ class GroupItemCriterion(IItemCriterion):
         return self.text
 
 if __name__ == "__main__":
-    cr = GroupItemCriterion('(((Qo>3613&PO<11044,1&Qo<3597)&(Qo>3617&Qo<3600))&CE>0)')
-    # cr = GroupItemCriterion('Qo>3613&PO<11044,1&Qo<3597')
+    # cr = GroupItemCriterion('((Qo>3613&PO<11044,1&Qo<3597)')
+    cr = GroupItemCriterion('QF>1423,0')
     print(cr)
     print(cr.operators)
     print("number of criterias ", len(cr.criteria))

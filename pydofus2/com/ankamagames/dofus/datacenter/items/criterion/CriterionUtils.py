@@ -6,13 +6,14 @@ from pydofus2.com.ankamagames.jerakine.utils.misc.StringUtils import StringUtils
 
 
 class CriterionUtils(IDataCenter):
+    
     @staticmethod
     def getCriteriaFromstr(pCriteriastrForm: str) -> list[IItemCriterion]:
         criteriastrForm: str = pCriteriastrForm
-        criteria: list[IItemCriterion] = list[IItemCriterion]()
+        criteria = list[IItemCriterion]()
         if not criteriastrForm or len(criteriastrForm) == 0:
             return criteria
-        tabParenthesis: list[str] = StringUtils.getDelimitedText(criteriastrForm, "(", ")", True)
+        tabParenthesis = StringUtils.getDelimitedText(criteriastrForm, "(", ")", True)
         for stringCriterion in tabParenthesis:
             newGroupCriterion = GroupItemCriterion(stringCriterion)
             criteria.append(newGroupCriterion)

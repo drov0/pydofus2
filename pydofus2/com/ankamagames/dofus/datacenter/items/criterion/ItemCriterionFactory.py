@@ -1,6 +1,7 @@
 
 from pydofus2.com.ankamagames.dofus.datacenter.items.criterion.IItemCriterion import \
     IItemCriterion
+from pydofus2.com.ankamagames.jerakine.logger.Logger import Logger
 
 
 class ItemCriterionFactory:
@@ -374,7 +375,7 @@ class ItemCriterionFactory:
             criterion = CommunityItemCriterion(pServerCriterionForm)
 
         else:
-            # Logger().warn("Criterion '" + s + "' unknow or unused (" + pServerCriterionForm + ")")
+            # Logger().warn(f"Criterion '{s}' unknow or unused ({pServerCriterionForm})")
             pass
 
         return criterion

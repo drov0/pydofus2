@@ -33,7 +33,7 @@ class CustomSharedObject:
         if cls._cache.get(name):
             return cls._cache[name]
         if not cls.COMMON_FOLDER:
-            cls.COMMON_FOLDER = cls.getCustomSharedObjectDirectory()
+            cls.COMMON_FOLDER = Constants.DOFUS_LOCAL_DATA_STORE
         cso: CustomSharedObject = CustomSharedObject()
         cso._name = name
         cso.getDataFromFile()

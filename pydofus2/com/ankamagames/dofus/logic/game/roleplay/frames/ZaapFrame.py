@@ -26,16 +26,28 @@ from pydofus2.com.ankamagames.dofus.network.messages.game.interactive.zaap.ZaapR
     ZaapRespawnUpdatedMessage
 from pydofus2.com.ankamagames.jerakine.data.I18n import I18n
 from pydofus2.com.ankamagames.jerakine.logger.Logger import Logger
+from pydofus2.com.ankamagames.jerakine.managers.StoreDataManager import \
+    StoreDataManager
 from pydofus2.com.ankamagames.jerakine.messages.Frame import Frame
+from pydofus2.com.ankamagames.jerakine.types.DataStoreType import DataStoreType
+from pydofus2.com.ankamagames.jerakine.types.enums.DataStoreEnum import \
+    DataStoreEnum
 from pydofus2.com.ankamagames.jerakine.types.enums.Priority import Priority
 
 
 class ZaapFrame(Frame):
-    spawnMapId = 0
-    _zaapsList = []
+    DATASTORE_SAVED_ZAAP = DataStoreType(
+        "spawnMapId", True, DataStoreEnum.LOCATION_LOCAL, DataStoreEnum.BIND_CHARACTER
+    )
 
     def __init__(self):
         super().__init__()
+        self._zaapsList = []
+        self.spawnMapId = StoreDataManager().getData(self.DATASTORE_SAVED_ZAAP, "spawnMapId")
+        if self.spawnMapId is None:
+            self.spawnMapId = 0
+        else:
+            Logger().info("Loaded Spawn map id: " + str(self.spawnMapId))
 
     @property
     def priority(self) -> int:
@@ -43,6 +55,7 @@ class ZaapFrame(Frame):
 
     def pushed(self):
         self._zaapsList = list[TeleportDestinationWrapper]()
+        
         return True
     
     def pulled(self) -> bool:
@@ -85,7 +98,8 @@ class ZaapFrame(Frame):
                         msg.spawnMapId == dest.mapId,
                     )
                 )
-            ZaapFrame.spawnMapId = msg.spawnMapId
+            self.spawnMapId = msg.spawnMapId
+            StoreDataManager().setData(self.DATASTORE_SAVED_ZAAP, "spawnMapId", msg.spawnMapId)
             KernelEventsManager().send(
                 KernelEvent.TeleportDestinationList,
                 self._zaapsList,
@@ -126,7 +140,8 @@ class ZaapFrame(Frame):
         elif isinstance(msg, ZaapRespawnUpdatedMessage):
             for zaap in self._zaapsList:
                 zaap.spawn = zaap.mapId == msg.mapId
-            ZaapFrame.spawnMapId = msg.mapId
+            self.spawnMapId = msg.mapId
+            StoreDataManager().setData(self.DATASTORE_SAVED_ZAAP, "spawnMapId", msg.mapId)
             KernelEventsManager().send(
                 KernelEvent.TeleportDestinationList, self._zaapsList, TeleporterTypeEnum.TELEPORTER_ZAAP
             )

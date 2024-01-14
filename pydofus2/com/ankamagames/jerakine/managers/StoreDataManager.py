@@ -29,14 +29,12 @@ class StoreDataManager(metaclass=ThreadSharedSingleton):
         self._aRegisteredClassAlias = dict()
         self._self = None
         aClass = self.getData(JerakineConstants.DATASTORE_CLASS_ALIAS, "classAliasList")
-        # Logger().debug("Class alias list : " + str(aClass))
         for s in aClass:
             className = base64.b64decode(s).decode()
             try:
                 oClass = getattr(sys.modules[__package__], className)
                 globals().update({aClass[s]: oClass})
             except Exception as e:
-                # Logger().warn("Impossible de trouver la class " + className)
                 pass
             self._aRegisteredClassAlias[className] = True
 
@@ -112,7 +110,7 @@ class StoreDataManager(metaclass=ThreadSharedSingleton):
 
     def setData(self, dataType: DataStoreType, sKey: str, oValue, deepClassScan: bool = False) -> bool:
         so: CustomSharedObject = None
-        if self._aData.get(dataType.category) is None:
+        if dataType.category not in self._aData:
             self._aData[dataType.category] = dict()
         self._aData[dataType.category][sKey] = oValue
         if dataType.persistant:
@@ -132,8 +130,6 @@ class StoreDataManager(metaclass=ThreadSharedSingleton):
         return True
 
     def getKeys(self, dataType: DataStoreType) -> list:
-        so: CustomSharedObject = None
-        key = None
         result: list = []
         if dataType.persistant:
             if dataType.location == DataStoreEnum.LOCATION_LOCAL:

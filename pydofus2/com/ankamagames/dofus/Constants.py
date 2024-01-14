@@ -1,11 +1,9 @@
 import os
 from pathlib import Path
 
-from pydofus2.com.ankamagames.jerakine.network.CustomDataWrapper import \
-    ByteArray
+from pydofus2.com.ankamagames.jerakine.network.CustomDataWrapper import ByteArray
 from pydofus2.com.ankamagames.jerakine.types.DataStoreType import DataStoreType
-from pydofus2.com.ankamagames.jerakine.types.enums.DataStoreEnum import \
-    DataStoreEnum
+from pydofus2.com.ankamagames.jerakine.types.enums.DataStoreEnum import DataStoreEnum
 from pydofus2.com.hurlan.crypto.SignatureKey import SignatureKey
 
 LOG_UPLOAD_MODE = False
@@ -30,11 +28,15 @@ ADMIN_MODULE = ["Ankama_Admin"]
 
 DETERMINIST_TACKLE = True
 
-DATASTORE_MODULE_DEBUG: DataStoreType = DataStoreType(
+DATASTORE_MODULE_DEBUG = DataStoreType(
     "Dofus_ModuleDebug", True, DataStoreEnum.LOCATION_LOCAL, DataStoreEnum.BIND_COMPUTER
 )
 
-DATASTORE_COMPUTER_OPTIONS: DataStoreType = DataStoreType(
+DATASTORE_LANG_VERSION = DataStoreType(
+    "lastLangVersion", True, DataStoreEnum.LOCATION_LOCAL, DataStoreEnum.BIND_ACCOUNT
+)
+
+DATASTORE_COMPUTER_OPTIONS = DataStoreType(
     "Dofus_ComputerOptions",
     True,
     DataStoreEnum.LOCATION_LOCAL,

@@ -61,7 +61,7 @@ class GroupItemCriterion(IItemCriterion):
             Logger().error("Character or characteristics doesn't exist !, returning true")
             return True
         
-        if self._criteria and len(self._criteria) == 1 and isinstance(self._criteria[0], ItemCriterion):
+        if self._criteria and len(self._criteria) == 1 and isinstance(self._criteria[0], IItemCriterion):
             return self._criteria[0].isRespected
         
         if len(self._operators) > 0 and self._operators[0] == "|":
@@ -117,6 +117,7 @@ class GroupItemCriterion(IItemCriterion):
             elif char == ")":
                 if not stack:
                     raise ValueError(f"Unmatched parenthesis at position {position}")
+
                 start_pos = stack.pop()
                 if not stack:
                     group_content = self._criterionTextForm[start_pos + 1:position]

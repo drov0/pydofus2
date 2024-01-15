@@ -56,7 +56,7 @@ class AStar(metaclass=Singleton):
         if not isinstance(dst, list):
             dst = [dst]
         if src in dst:
-            Logger().info("Destination is the Source so nothing to do")
+            Logger().info("Source vertex is one of the destinations.")
             return []
         self.destinations = set(dst)
         self.running = True

@@ -76,7 +76,6 @@ class AStar(metaclass=Singleton):
             self.callbackWithResult(None)
 
     def compute(self, e = None) -> None:
-        s = perf_counter()
         while self.openList:
             if self.iterations > self.MAX_ITERATION:
                 raise Exception("Too many iterations")

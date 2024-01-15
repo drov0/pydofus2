@@ -477,12 +477,14 @@ class QuestFrame(Frame):
                     if achievementRewardable.id == msg.achievementId:
                         rewardedAchievementIndex = self._rewardableAchievements.index(achievementRewardable)
                         break
-                self._rewardableAchievements.pop(rewardedAchievementIndex)
+                if self._rewardableAchievements:
+                    self._rewardableAchievements.pop(rewardedAchievementIndex)
 
                 for achievementIndex, achievementAchieved in enumerate(self._achievementsList.finishedAchievements):
                     if achievementAchieved.id == msg.achievementId and isinstance(achievementAchieved, AchievementAchievedRewardable):
-                        self._achievementsList.finishedAchievements[achievementIndex] = AchievementAchieved()
-                        self._achievementsList.finishedAchievements[achievementIndex].init(achievementAchieved.id, achievementAchieved.achievedBy)
+                        aa = AchievementAchieved()
+                        aa.init(achievementAchieved.id, achievementAchieved.achievedBy)
+                        self._achievementsList.finishedAchievements[achievementIndex] = aa
                         break
 
                 KernelEventsManager().send(KernelEvent.AchievementRewardSuccess, msg.achievementId)

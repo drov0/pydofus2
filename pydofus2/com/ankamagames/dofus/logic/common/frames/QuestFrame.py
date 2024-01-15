@@ -472,26 +472,26 @@ class QuestFrame(Frame):
             return True
 
         if isinstance(msg, AchievementRewardSuccessMessage):
-                arsmsg = msg  # Assuming msg is an object of type AchievementRewardSuccessMessage
+                rewardedAchievementIndex = 0
                 for achievementRewardable in self._rewardableAchievements:
-                    if achievementRewardable.id == arsmsg.achievementId:
+                    if achievementRewardable.id == msg.achievementId:
                         rewardedAchievementIndex = self._rewardableAchievements.index(achievementRewardable)
                         break
                 self._rewardableAchievements.pop(rewardedAchievementIndex)
 
                 for achievementIndex, achievementAchieved in enumerate(self._achievementsList.finishedAchievements):
-                    if achievementAchieved.id == arsmsg.achievementId and isinstance(achievementAchieved, AchievementAchievedRewardable):
+                    if achievementAchieved.id == msg.achievementId and isinstance(achievementAchieved, AchievementAchievedRewardable):
                         self._achievementsList.finishedAchievements[achievementIndex] = AchievementAchieved()
                         self._achievementsList.finishedAchievements[achievementIndex].init(achievementAchieved.id, achievementAchieved.achievedBy)
                         break
 
-                KernelEventsManager().send(KernelEvent.AchievementRewardSuccess, arsmsg.achievementId)
+                KernelEventsManager().send(KernelEvent.AchievementRewardSuccess, msg.achievementId)
 
                 if self._rewardableAchievementsVisible and not self.doesRewardsUiNeedOpening():
                     self._rewardableAchievementsVisible = False
                     KernelEventsManager().send(KernelEvent.RewardableAchievementsVisible, self._rewardableAchievementsVisible)
 
-                rewardedAchievement = Achievement.getAchievementById(arsmsg.achievementId)
+                rewardedAchievement = Achievement.getAchievementById(msg.achievementId)
                 if FeatureManager().isFeatureWithKeywordEnabled(FeatureEnum.TEMPORIS_ACHIEVEMENT_PROGRESS) and rewardedAchievement is not None and rewardedAchievement.category.id == self.TEMPORIS_CATEGORY:
                     self.displayRewardedAchievementInChat(rewardedAchievement)
 

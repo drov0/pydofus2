@@ -173,3 +173,4 @@ class KernelEvent(Enum):
     # social
     GuildInvited = auto()
     LeaveDialog = auto()
+    PlayerStatusUpdate = auto()

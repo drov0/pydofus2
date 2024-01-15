@@ -26,7 +26,6 @@ class AnimatedCharacter(IMovable, IEntity, IObstacle, IDisplayable):
         self.cantWalk8Directions: bool = False
         self._carriedEntity = None
         self._movementBehavior: MovementBehavior = None
-        self.isMoving = False
         super().__init__()
 
     @property

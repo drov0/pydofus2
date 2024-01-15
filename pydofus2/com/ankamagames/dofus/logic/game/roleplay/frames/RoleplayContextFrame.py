@@ -196,7 +196,7 @@ class RoleplayContextFrame(Frame):
             return False;
 
         elif isinstance(msg, LeaveDialogMessage):
-            KernelEventsManager().send(KernelEvent.DialogLeft)
+            KernelEventsManager().send(KernelEvent.LeaveDialog)
             return False
         
         if isinstance(msg, JobAllowMultiCraftRequestMessage):

@@ -74,7 +74,6 @@ class KernelEvent(Enum):
     CharacterNameSuggestion = auto()
     CharacterNameSuggestionFailed = auto()
     CharacterCreationResult = auto()
-    DialogLeft = auto()
     ExchangeClose = auto()
     QuestStart = auto()
     CharacterDelPrepare = auto()
@@ -85,7 +84,7 @@ class KernelEvent(Enum):
     MemberJoinedParty = auto()
     MemberLeftParty = auto()
     PartyDeleted = auto()
-    PartyInvitation = auto()
+    PartyInvited = auto()
     PartyMemberStartedFight = auto()
     PartyJoinFailed = auto()
     PartyInviteCancel = auto()
@@ -170,3 +169,7 @@ class KernelEvent(Enum):
     ExchangeWeight = auto()
     MountEquipedError = auto()
     ExchangeStartOkMount = auto()
+    
+    # social
+    GuildInvited = auto()
+    LeaveDialog = auto()

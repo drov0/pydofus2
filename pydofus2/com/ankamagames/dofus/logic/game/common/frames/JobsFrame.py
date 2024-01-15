@@ -99,6 +99,9 @@ class JobsFrame(Frame):
         # self._jobCrafterDirectoryListDialogFrame = JobCrafterDirectoryListDialogFrame()
         return True
 
+    def pulled(self) -> bool:
+        return True
+    
     def process(self, msg: Message) -> bool:
 
         if isinstance(msg, JobDescriptionMessage):
@@ -202,9 +205,6 @@ class JobsFrame(Frame):
 
         else:
             return False
-
-    def pulled(self) -> bool:
-        return True
 
     def jobLevelupPodsBonus(self, newJobsLevel: int, lastJobsLevel: int) -> int:
         paramsNewJob: dict = dict()

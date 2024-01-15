@@ -65,7 +65,8 @@ if TYPE_CHECKING:
         ZaapFrame
     from pydofus2.com.ankamagames.dofus.logic.game.common.frames.MountFrame import MountFrame
     from pydofus2.com.ankamagames.dofus.logic.common.frames.MountDialogFrame import MountDialogFrame
-
+    from pydofus2.com.ankamagames.dofus.logic.game.common.frames.SocialFrame import SocialFrame
+    from pydofus2.com.ankamagames.dofus.logic.game.common.frames.GuildDialogFrame import GuildDialogFrame
 
 
 class Kernel(metaclass=Singleton):
@@ -298,3 +299,11 @@ class Kernel(metaclass=Singleton):
     @property
     def mountDialogFrame(self) -> "MountDialogFrame":
         return self._worker.getFrameByName("MountDialogFrame")
+    
+    @property
+    def socialFrame(self) -> "SocialFrame":
+        return self._worker.getFrameByName("SocialFrame")
+    
+    @property
+    def guildDialogFrame(self) -> "GuildDialogFrame":
+        return self._worker.getFrameByName("GuildDialogFrame")

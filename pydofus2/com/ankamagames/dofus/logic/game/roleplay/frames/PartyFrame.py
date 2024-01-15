@@ -144,7 +144,7 @@ class PartyFrame(Frame):
                 + I18n.getUiText("ui.party.playerInvitation", [f"player,{msg.fromId}::{msg.fromName}"])
             )
             Logger().debug(f"{notifText}.")
-            KernelEventsManager().send(KernelEvent.PartyInvitation, msg.partyId, msg.partyType, msg.fromId, msg.fromName)
+            KernelEventsManager().send(KernelEvent.PartyInvited, msg.partyId, msg.partyType, msg.fromId, msg.fromName)
             return True
 
         elif isinstance(msg, PartyNewMemberMessage):

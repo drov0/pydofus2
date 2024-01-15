@@ -50,7 +50,7 @@ class NetworkMessageEncoder:
                 return cls.writePrimitive(spec, inst, data)
             if spec.dynamicType:
                 spec = inst.getSpec()
-                data.writeUnsignedShort(spec().protocolId)
+                data.writeUnsignedShort(spec.protocolId)
             else:
                 spec = ProtocolSpec.getClassSpecByName(spec.typename)
         if spec.parent:

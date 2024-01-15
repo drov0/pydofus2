@@ -14,5 +14,5 @@ class MovementFailError(Enum):
     MAPCHANGE_TIMEOUT = auto()
     INTERACTIVE_USE_ERROR = auto()
     NO_PATH_FOUND = auto()
-    NOMORE_SCROLL_CELL = auto()
+    NO_VALID_SCROLL_CELL = auto()
     INVALID_TRANSITION = auto()

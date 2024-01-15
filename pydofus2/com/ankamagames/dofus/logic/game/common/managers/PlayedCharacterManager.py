@@ -35,6 +35,8 @@ if TYPE_CHECKING:
     from pydofus2.com.ankamagames.dofus.types.entities.AnimatedCharacter import AnimatedCharacter
     from pydofus2.com.ankamagames.dofus.internalDatacenter.items.ItemWrapper import ItemWrapper
     from pydofus2.com.ankamagames.dofus.internalDatacenter.items.WeaponWrapper import WeaponWrapper
+    from pydofus2.com.ankamagames.jerakine.types.positions.MapPoint import MapPoint
+
 
 from pydofus2.com.ankamagames.dofus.internalDatacenter.DataEnum import DataEnum
 from pydofus2.com.ankamagames.dofus.logic.common.managers.StatsManager import \
@@ -286,11 +288,15 @@ class PlayedCharacterManager(IDestroyable, metaclass=Singleton):
         return DofusEntities().getEntity(self.id)
 
     @property
-    def currentCellId(self) -> int:
+    def playerMapPoint(self) -> "MapPoint":
         if self.entity is None:
-            Logger().error("No player entity found")
+            Logger().error("Can't get current MapPoint for reason : player entity not found!")
             return None
-        return self.entity.position.cellId
+        return self.entity.position
+
+    @property
+    def currentCellId(self) -> int:
+        return self.playerMapPoint.cellId
 
     @property
     def isMutated(self) -> bool:

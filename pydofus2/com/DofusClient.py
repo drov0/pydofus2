@@ -134,6 +134,7 @@ class DofusClient(threading.Thread):
         self.lastLoginTime = perf_counter()
 
     def initListeners(self):
+        KernelEventsManager().on(KernelEvent.SelectedServerRefused, self.onServerSelectionRefused, originator=self)
         KernelEventsManager().once(
             KernelEvent.CharacterSelectedSuccessfully,
             self.onCharacterSelectionSuccess,
@@ -150,8 +151,13 @@ class DofusClient(threading.Thread):
         KernelEventsManager().on(KernelEvent.ClientRestart, self.onRestart, originator=self)
         KernelEventsManager().on(KernelEvent.ClientReconnect, self.onReconnect, originator=self)
         KernelEventsManager().on(KernelEvent.ClientClosed, self.onConnectionClosed, originator=self)
-        KernelEventsManager().on(KernelEvent.FightStarted, self.onFight)
+        KernelEventsManager().on(KernelEvent.FightStarted, self.onFight, originator=self)
 
+    def onServerSelectionRefused(self, event, serverId, err_type, server_statusn, error_text, selectableServers):
+        Logger().error(f"Server selection refused for reason : {error_text}")
+        self._shutDownReason = f"Server selection refused for reason : {error_text}"
+        self.shutdown(DisconnectionReasonEnum.EXCEPTION_THROWN, error_text)
+        
     def onConnectionClosed(self, event, connId):
         reason = ConnectionsHandler().handleDisconnection()
         Logger().info(f"Connection '{connId}' closed for reason : {reason}")

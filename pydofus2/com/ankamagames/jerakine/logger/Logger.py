@@ -109,7 +109,8 @@ class Logger(logging.Logger, metaclass=LoggerSingleton):
             "%(asctime)s.%(msecs)03d | %(levelname)s | [%(module)s] %(message)s", datefmt="%H:%M:%S"
         )
         now = datetime.datetime.now()
-        fileHandler = logging.FileHandler(LOGS_PATH / f"{self.prefix}_{now.strftime('%Y-%m-%d')}.log")
+        self.outputFile = LOGS_PATH / f"{self.prefix}_{now.strftime('%Y-%m-%d')}.log"
+        fileHandler = logging.FileHandler(self.outputFile)
         fileHandler.setFormatter(self.formatter)
         self.addHandler(fileHandler)
         if consoleOut:

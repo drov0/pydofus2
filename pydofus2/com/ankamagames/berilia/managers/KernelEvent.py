@@ -24,6 +24,7 @@ class KernelEvent(Enum):
     TextInformation = auto()
     SelectedServerData = auto()
     ServerStatusUpdate = auto()
+    SelectedServerRefused = auto()
     
     # Fight
     FightSwordShowed = auto()

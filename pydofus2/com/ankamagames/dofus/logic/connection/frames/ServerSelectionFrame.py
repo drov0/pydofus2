@@ -17,12 +17,16 @@ from pydofus2.com.ankamagames.dofus.logic.connection.actions.ServerSelectionActi
     ServerSelectionAction
 from pydofus2.com.ankamagames.dofus.logic.connection.managers.AuthentificationManager import \
     AuthentificationManager
+from pydofus2.com.ankamagames.dofus.network.enums.ServerConnectionErrorEnum import \
+    ServerConnectionErrorEnum
 from pydofus2.com.ankamagames.dofus.network.enums.ServerStatusEnum import \
     ServerStatusEnum
 from pydofus2.com.ankamagames.dofus.network.messages.connection.SelectedServerDataExtendedMessage import \
     SelectedServerDataExtendedMessage
 from pydofus2.com.ankamagames.dofus.network.messages.connection.SelectedServerDataMessage import \
     SelectedServerDataMessage
+from pydofus2.com.ankamagames.dofus.network.messages.connection.SelectedServerRefusedMessage import \
+    SelectedServerRefusedMessage
 from pydofus2.com.ankamagames.dofus.network.messages.connection.ServerSelectionMessage import \
     ServerSelectionMessage
 from pydofus2.com.ankamagames.dofus.network.messages.connection.ServersListMessage import \
@@ -75,7 +79,6 @@ class ServerSelectionFrame(Frame):
         return True
 
     def process(self, msg: Message) -> bool:
-
         if isinstance(msg, ServersListMessage):
             slmsg = msg
             PlayerManager().server = None
@@ -100,9 +103,7 @@ class ServerSelectionFrame(Frame):
                 self._serversList.append(ssumsg.server)
                 self._serversList.sort(key=lambda x: x.date)
             serverStatus = ServerStatusEnum(ssumsg.server.status)
-            Logger().info(
-                f"Server {ssumsg.server.id} status changed to {serverStatus.name}."
-            )
+            Logger().info(f"Server {ssumsg.server.id} status changed to {serverStatus.name}.")
             self.broadcastServersListUpdate()
             KernelEventsManager().send(KernelEvent.ServerStatusUpdate, ssumsg.server)
             return True
@@ -116,15 +117,18 @@ class ServerSelectionFrame(Frame):
             for server in self._serversList:
                 Logger().info(f"Server {server.id} status {ServerStatusEnum(server.status).name}.")
                 if str(server.id) == str(msg.serverId):
-                    if (
-                        ServerStatusEnum(server.status) == ServerStatusEnum.ONLINE
-                        or ServerStatusEnum(server.status) == ServerStatusEnum.NOJOIN
-                    ):
+                    if ServerStatusEnum(server.status) == ServerStatusEnum.ONLINE:
                         self.sendServerSelection(server.id)
                         return True
                     else:
-                        Logger().debug(
-                            f"Server {server.id} not online but has status {ServerStatusEnum(server.status).name}."
+                        err_type = ServerConnectionErrorEnum.SERVER_CONNECTION_ERROR_DUE_TO_STATUS
+                        KernelEventsManager().send(
+                            KernelEvent.SelectedServerRefused,
+                            server.id,
+                            err_type,
+                            server.status,
+                            self.getSelectionErrorText(err_type, server.status),
+                            self.getSelectableServers(),
                         )
                         return True
             return True
@@ -138,6 +142,7 @@ class ServerSelectionFrame(Frame):
         elif isinstance(msg, ExpectedSocketClosureMessage):
             from pydofus2.com.ankamagames.dofus.logic.game.approach.frames.GameServerApproachFrame import \
                 GameServerApproachFrame
+
             if msg.reason == DisconnectionReasonEnum.SWITCHING_TO_GAME_SERVER:
                 Kernel().worker.addFrame(GameServerApproachFrame())
                 ConnectionsHandler().connectToGameServer(self._selectedServer.address, self._selectedServer.ports[0])
@@ -150,10 +155,16 @@ class ServerSelectionFrame(Frame):
                     from pydofus2.com.ankamagames.dofus.logic.connection.frames.AuthentificationFrame import \
                         AuthentificationFrame
 
-                    Logger().info(f"Connection closed to change server to {AuthentificationManager()._lva.serverId}, will reconnect")
+                    Logger().info(
+                        f"Connection closed to change server to {AuthentificationManager()._lva.serverId}, will reconnect"
+                    )
                     Kernel().worker.addFrame(AuthentificationFrame())
                     Kernel().worker.addFrame(QueueFrame())
-                    Kernel().worker.process(LoginValidationWithTokenAction.create(AuthentificationManager()._lva.serverId != 0, AuthentificationManager()._lva.serverId))
+                    Kernel().worker.process(
+                        LoginValidationWithTokenAction.create(
+                            AuthentificationManager()._lva.serverId != 0, AuthentificationManager()._lva.serverId
+                        )
+                    )
             return True
 
         if isinstance(msg, (SelectedServerDataMessage, SelectedServerDataExtendedMessage)):
@@ -165,8 +176,26 @@ class ServerSelectionFrame(Frame):
             PlayerManager().server = Server.getServerById(msg.serverId)
             PlayerManager().kisServerPort = 0
             self._connexionPorts = msg.ports
-            KernelEventsManager().send(KernelEvent.SelectedServerData, msg.serverId, msg.address, msg.ports, msg.canCreateNewCharacter, msg.ticket)
+            KernelEventsManager().send(
+                KernelEvent.SelectedServerData,
+                msg.serverId,
+                msg.address,
+                msg.ports,
+                msg.canCreateNewCharacter,
+                msg.ticket,
+            )
             ConnectionsHandler().closeConnection(DisconnectionReasonEnum.SWITCHING_TO_GAME_SERVER)
+            return True
+
+        if isinstance(msg, SelectedServerRefusedMessage):
+            ssrmsg = msg
+            for server in self._serversList:
+                self.getUpdateServerStatusFunction(ssrmsg.serverId, ssrmsg.serverStatus)(server)
+            self.broadcastServersListUpdate()
+            error_text = self.getSelectionErrorText(ssrmsg.error, ssrmsg.serverStatus)
+            KernelEventsManager().send(
+                KernelEvent.SelectedServerRefused, ssrmsg.serverId, ssrmsg.error, ssrmsg.serverStatus, error_text, self.getSelectableServers()
+            )
             return True
 
     def pulled(self) -> bool:
@@ -196,12 +225,39 @@ class ServerSelectionFrame(Frame):
                 self._serversUsedList.append(server)
                 PlayerManager().serversList.append(server.id)
         KernelEventsManager().send(
-            KernelEvent.ServersList,
-            self._serversList,
-            self._serversUsedList,
-            self._serversTypeAvailableSlots
+            KernelEvent.ServersList, self._serversList, self._serversUsedList, self._serversTypeAvailableSlots
         )
 
+    def getSelectionErrorText(self, error_type, server_status):
+        error_text = ""
+        if error_type == ServerConnectionErrorEnum.SERVER_CONNECTION_ERROR_DUE_TO_STATUS:
+            error_text = "Status is "
+            if server_status == ServerStatusEnum.OFFLINE:
+                error_text += "Offline"
+            elif server_status == ServerStatusEnum.STARTING:
+                error_text += "Starting"
+            elif server_status == ServerStatusEnum.NOJOIN:
+                error_text += "Nojoin"
+            elif server_status == ServerStatusEnum.SAVING:
+                error_text += "Saving"
+            elif server_status == ServerStatusEnum.STOPING:
+                error_text += "Stoping"
+            elif server_status == ServerStatusEnum.FULL:
+                error_text += "Full"
+            elif server_status == ServerStatusEnum.STATUS_UNKNOWN:
+                error_text += "Unknown"
+        elif error_type == ServerConnectionErrorEnum.SERVER_CONNECTION_ERROR_SUBSCRIBERS_ONLY:
+            error_text = "SubscribersOnly"
+        elif error_type == ServerConnectionErrorEnum.SERVER_CONNECTION_ERROR_REGULAR_PLAYERS_ONLY:
+            error_text = "RegularPlayersOnly"
+        elif error_type == ServerConnectionErrorEnum.SERVER_CONNECTION_ERROR_MONOACCOUNT_CANNOT_VERIFY:
+            error_text = "MonoaccountCannotVerify"
+        elif error_type == ServerConnectionErrorEnum.SERVER_CONNECTION_ERROR_MONOACCOUNT_ONLY:
+            error_text = "MonoaccountOnly"
+        else:  # Default case
+            error_text = "NoReason"
+        return error_text
+    
     def getUpdateServerStatusFunction(self, serverId: int, newStatus: int) -> FunctionType:
         def function(
             element: GameServerInformations,
@@ -211,6 +267,7 @@ class ServerSelectionFrame(Frame):
             gsi = element
             if serverId == gsi.id:
                 gsi.status = newStatus
+
         return function
 
     def onValidServerSelection(self) -> None:

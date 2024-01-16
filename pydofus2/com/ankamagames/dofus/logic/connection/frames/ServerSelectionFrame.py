@@ -103,26 +103,8 @@ class ServerSelectionFrame(Frame):
             Logger().info(
                 f"Server {ssumsg.server.id} status changed to {serverStatus.name}."
             )
-            Logger().info(f"My server id {AuthentificationManager()._lva.serverId}.")
-            if int(ssumsg.server.id) == int(AuthentificationManager()._lva.serverId):
-                if serverStatus != ServerStatusEnum.ONLINE:
-                    Logger().debug(
-                        f"Waiting for my server {ssumsg.server.id} to be online current status {ServerStatusEnum(ssumsg.server.status)}."
-                    )
-                    self._waitingServerOnline = True
-                else:
-                    self._waitingServerOnline = False
-                    ssmsg = ServerSelectionMessage()
-                    ssmsg.init(AuthentificationManager()._lva.serverId)
-                    Logger().debug(
-                        f"Sending ServerSelectionMessage to server {AuthentificationManager()._lva.serverId}."
-                    )
-                    ConnectionsHandler().send(ssmsg)
-            else:
-                Logger().debug(
-                    f"Not my server {int(ssumsg.server.id)} != {int(AuthentificationManager()._lva.serverId)}"
-                )
             self.broadcastServersListUpdate()
+            KernelEventsManager().send(KernelEvent.ServerStatusUpdate, ssumsg.server)
             return True
 
         elif isinstance(msg, ServerSelectionAction):
@@ -138,15 +120,12 @@ class ServerSelectionFrame(Frame):
                         ServerStatusEnum(server.status) == ServerStatusEnum.ONLINE
                         or ServerStatusEnum(server.status) == ServerStatusEnum.NOJOIN
                     ):
-                        ssmsg = ServerSelectionMessage()
-                        ssmsg.init(msg.serverId)
-                        ConnectionsHandler().send(ssmsg)
+                        self.sendServerSelection(server.id)
                         return True
                     else:
                         Logger().debug(
                             f"Server {server.id} not online but has status {ServerStatusEnum(server.status).name}."
                         )
-                        BenchmarkTimer(60, lambda: self.process(msg)).start()
                         return True
             return True
 
@@ -186,6 +165,7 @@ class ServerSelectionFrame(Frame):
             PlayerManager().server = Server.getServerById(msg.serverId)
             PlayerManager().kisServerPort = 0
             self._connexionPorts = msg.ports
+            KernelEventsManager().send(KernelEvent.SelectedServerData, msg.serverId, msg.address, msg.ports, msg.canCreateNewCharacter, msg.ticket)
             ConnectionsHandler().closeConnection(DisconnectionReasonEnum.SWITCHING_TO_GAME_SERVER)
             return True
 
@@ -217,11 +197,9 @@ class ServerSelectionFrame(Frame):
                 PlayerManager().serversList.append(server.id)
         KernelEventsManager().send(
             KernelEvent.ServersList,
-            return_value={
-                "all": self._serversList,
-                "used": self._serversUsedList,
-                "availableSlots": self._serversTypeAvailableSlots,
-            },
+            self._serversList,
+            self._serversUsedList,
+            self._serversTypeAvailableSlots
         )
 
     def getUpdateServerStatusFunction(self, serverId: int, newStatus: int) -> FunctionType:
@@ -242,3 +220,8 @@ class ServerSelectionFrame(Frame):
 
     def onCancelServerSelection(self) -> None:
         self._serverSelectionAction = None
+
+    def sendServerSelection(self, serverId: int) -> None:
+        ssmsg = ServerSelectionMessage()
+        ssmsg.init(serverId)
+        ConnectionsHandler().send(ssmsg)

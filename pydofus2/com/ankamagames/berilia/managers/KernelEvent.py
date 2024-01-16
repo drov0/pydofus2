@@ -22,6 +22,8 @@ class KernelEvent(Enum):
     ClientReconnect = auto()
     ClientClosed = auto()
     TextInformation = auto()
+    SelectedServerData = auto()
+    ServerStatusUpdate = auto()
     
     # Fight
     FightSwordShowed = auto()

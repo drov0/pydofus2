@@ -296,6 +296,8 @@ class PlayedCharacterManager(IDestroyable, metaclass=Singleton):
 
     @property
     def currentCellId(self) -> int:
+        if self.playerMapPoint is None:
+            return None
         return self.playerMapPoint.cellId
 
     @property

@@ -1,3 +1,5 @@
+from pydofus2.com.ankamagames.berilia.managers.KernelEvent import KernelEvent
+from pydofus2.com.ankamagames.berilia.managers.KernelEventsManager import KernelEventsManager
 import pydofus2.com.ankamagames.dofus.logic.game.common.managers.PlayedCharacterManager as pcm
 from pydofus2.com.ankamagames.atouin.managers.EntitiesManager import \
     EntitiesManager
@@ -116,6 +118,7 @@ class AbstractEntitiesFrame(Frame):
             EntitiesManager().addEntity(infos.contextualId, characterEntity)
             if infos.contextualId == pcm.PlayedCharacterManager().id:
                 Logger().info(f"Current Player added to the sceene")
+                KernelEventsManager().send(KernelEvent.PlayerAddedToSceene, characterEntity)
         else:
             if infos.contextualId == pcm.PlayedCharacterManager().id:
                 Logger().info(f"Current Player updated on the sceene")

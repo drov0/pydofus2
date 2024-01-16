@@ -67,6 +67,7 @@ class KernelEvent(Enum):
     StatsUpgradeResult = auto()
     ObtainedItem = auto()
     JobExperienceUpdate = auto()
+    PlayerAddedToSceene = auto()
     
     # NPC
     NpcDialogOpen = auto()

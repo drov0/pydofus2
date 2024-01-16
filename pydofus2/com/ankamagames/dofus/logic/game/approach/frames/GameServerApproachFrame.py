@@ -197,7 +197,7 @@ class GameServerApproachFrame(Frame):
                         cbi.id, cbi.name, cbi.level, cbi.entityLook, cbi.breed, cbi.sex, 0, 0, 0, bonusXp, False
                     )
                     PlayerManager().charactersList.append(o)
-            KernelEventsManager().send(KernelEvent.CharactersList, return_value=PlayerManager().charactersList)
+            KernelEventsManager().send(KernelEvent.CharactersList, PlayerManager().charactersList)
             if PlayerManager().allowAutoConnectCharacter:
                 characterId = PlayerManager().autoConnectOfASpecificCharacterId
                 Kernel().worker.process(CharacterSelectionAction.create(characterId, False))

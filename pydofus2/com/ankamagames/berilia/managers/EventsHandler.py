@@ -32,7 +32,7 @@ class EventsHandler:
 
         def onReceived(e, *args, **kwargs):
             received.set()
-            ret[0] = kwargs.get("return_value", None)
+            ret[0] = *args, *kwargs
 
         self.once(event, onReceived, originator=originator)
         self.__waiting_evts.append(received)

@@ -222,6 +222,7 @@ class Pathfinding(metaclass=Singleton):
         avoidObstacles: bool = True,
         forMapChange=False,
         mapChangeDirection=-1,
+        cellsBlacklist=[],
     ) -> MovementPath:
         self.forMapChange = forMapChange
         self.mapChangeDirection = mapChangeDirection
@@ -237,6 +238,8 @@ class Pathfinding(metaclass=Singleton):
                 mp = MapPoint.fromCoords(x, y)
                 moveCost = self.moveCost(x, y, parentId)
                 cellId = mp.cellId
+                if cellId in cellsBlacklist:
+                    continue
                 if self._allowTroughEntity:
                     distTmpToEnd = self.distFromEnd(mp.cellId)
                     if distTmpToEnd < self._distToEnd:

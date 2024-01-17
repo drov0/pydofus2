@@ -35,8 +35,6 @@ from pydofus2.com.ankamagames.dofus.network.messages.connection.ServerStatusUpda
     ServerStatusUpdateMessage
 from pydofus2.com.ankamagames.dofus.network.types.connection.GameServerInformations import \
     GameServerInformations
-from pydofus2.com.ankamagames.jerakine.benchmark.BenchmarkTimer import \
-    BenchmarkTimer
 from pydofus2.com.ankamagames.jerakine.logger.Logger import Logger
 from pydofus2.com.ankamagames.jerakine.messages.Frame import Frame
 from pydofus2.com.ankamagames.jerakine.messages.Message import Message
@@ -90,22 +88,21 @@ class ServerSelectionFrame(Frame):
             return True
 
         elif isinstance(msg, ServerStatusUpdateMessage):
-            ssumsg = msg
             serverHasBeenUpdated = False
             for knownServer in self._serversList:
-                if ssumsg.server.id == knownServer.id:
-                    knownServer.charactersCount = ssumsg.server.charactersCount
-                    knownServer.completion = ssumsg.server.completion
-                    knownServer.isSelectable = ssumsg.server.isSelectable
-                    knownServer.status = ssumsg.server.status
+                if msg.server.id == knownServer.id:
+                    knownServer.charactersCount = msg.server.charactersCount
+                    knownServer.completion = msg.server.completion
+                    knownServer.isSelectable = msg.server.isSelectable
+                    knownServer.status = msg.server.status
                     serverHasBeenUpdated = True
             if not serverHasBeenUpdated:
-                self._serversList.append(ssumsg.server)
+                self._serversList.append(msg.server)
                 self._serversList.sort(key=lambda x: x.date)
-            serverStatus = ServerStatusEnum(ssumsg.server.status)
-            Logger().info(f"Server {ssumsg.server.id} status changed to {serverStatus.name}.")
+            serverStatus = ServerStatusEnum(msg.server.status)
+            Logger().info(f"Server {msg.server.id} status changed to {serverStatus.name}.")
             self.broadcastServersListUpdate()
-            KernelEventsManager().send(KernelEvent.ServerStatusUpdate, ssumsg.server)
+            KernelEventsManager().send(KernelEvent.ServerStatusUpdate, msg.server)
             return True
 
         elif isinstance(msg, ServerSelectionAction):
@@ -169,10 +166,9 @@ class ServerSelectionFrame(Frame):
 
         if isinstance(msg, (SelectedServerDataMessage, SelectedServerDataExtendedMessage)):
             self._selectedServer = msg
-            if not Kernel().mitm:
-                AuthentificationManager().gameServerTicket = (
-                    AuthentificationManager().decodeWithAES(msg.ticket).decode()
-                )
+            AuthentificationManager().gameServerTicket = (
+                AuthentificationManager().decodeWithAES(msg.ticket).decode()
+            )
             PlayerManager().server = Server.getServerById(msg.serverId)
             PlayerManager().kisServerPort = 0
             self._connexionPorts = msg.ports
@@ -205,7 +201,6 @@ class ServerSelectionFrame(Frame):
         return True
 
     def getSelectableServers(self) -> list:
-        server = None
         selectableServers: list = list()
         for server in self._serversList:
             if server.status == ServerStatusEnum.ONLINE and server.isSelectable:
@@ -217,7 +212,7 @@ class ServerSelectionFrame(Frame):
         self._serversUsedList = list[GameServerInformations]()
         PlayerManager().serversList = list[int]()
         for server in self._serversList:
-            if not self._serversTypeAvailableSlots.get(server.type):
+            if server.type not in self._serversTypeAvailableSlots:
                 self._serversTypeAvailableSlots[server.type] = 0
             if server.charactersCount < server.charactersSlots:
                 self._serversTypeAvailableSlots[server.type] += 1
@@ -282,3 +277,8 @@ class ServerSelectionFrame(Frame):
         ssmsg = ServerSelectionMessage()
         ssmsg.init(serverId)
         ConnectionsHandler().send(ssmsg)
+
+    def getSelectedServerInformations(self) -> GameServerInformations:
+        for server in self._serversList:
+            if server.id == self._selectedServer.serverId:
+                return server

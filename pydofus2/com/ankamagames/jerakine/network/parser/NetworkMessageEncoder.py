@@ -23,9 +23,8 @@ class NetworkMessageEncoder:
         spec = inst.getSpec()
         try:
             return cls._encode(spec, inst, data, random_hash)
-        except:
-            Logger().error("Error while encoding %s", inst.__dict__)
-            raise
+        except Exception as e:
+            raise Exception(f"Error while encoding {inst.__class__.__name__} : {inst.__dict__}.\n{e}") from e
 
     @classmethod
     def jsonEncode(cls, inst: "bnm.NetworkMessage", random_hash=True) -> dict:
@@ -64,7 +63,10 @@ class NetworkMessageEncoder:
                     data.writeByte(0)
                     continue
             if field.isVector():
-                cls.writeArray(field, getattr(inst, field.name), data)
+                try:
+                    cls.writeArray(field, getattr(inst, field.name), data)
+                except Exception as e:
+                    raise Exception(f"Error while writing vector '{field}' of instance '{inst.__class__.__name__}'\n{e}") from e
             else:
                 try:
                     cls._encode(field, getattr(inst, field.name), data)
@@ -95,8 +97,12 @@ class NetworkMessageEncoder:
         if var.length is not None:
             assert n == var.length, f"Vector length {n} different from spec length {var.length}!"
         if var.lengthTypeId is not None:
-            primitiveName = TypeEnum.getPrimitiveName(TypeEnum(var.lengthTypeId))
-            dataWrite[primitiveName][1](data, n)
+            if TypeEnum(var.lengthTypeId) == TypeEnum.OBJECT:
+                raise Exception("Vector length type cant be an OBJECT!")
+            type_primite_name = TypeEnum.getPrimitiveName(TypeEnum(var.lengthTypeId))
+            if type_primite_name is None:
+                raise Exception(f"Unknown primitive type id {var.lengthTypeId}, {TypeEnum(var.lengthTypeId)}!")
+            dataWrite[type_primite_name][1](data, n)
         if var.type in D2PROTOCOL["primitives"]:
             for it in inst:
                 dataWrite[var.type][1](data, it)

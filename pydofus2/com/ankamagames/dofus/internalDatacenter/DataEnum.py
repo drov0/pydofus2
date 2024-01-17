@@ -5,6 +5,8 @@ class DataEnum:
     BREED_ROGUE: int = 13
 
     BREED_MASQUERAIDER: int = 14
+    
+    BREED_ECAFLIP = 6
 
     JOB_ID_BASE: int = 1
 

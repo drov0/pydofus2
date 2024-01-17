@@ -94,7 +94,7 @@ class ConnectionsHandler(metaclass=Singleton):
         self._disconnectMessage = message
         if Kernel().worker.contains("HandshakeFrame"):
             Kernel().worker.removeFrameByName("HandshakeFrame")
-        if not Kernel().mitm and self.conn.open:
+        if self.conn.open:
             self.conn.close()
             self.conn.join()
         if self._currentConnectionType == ConnectionType.TO_GAME_SERVER:
@@ -111,11 +111,10 @@ class ConnectionsHandler(metaclass=Singleton):
         from pydofus2.com.ankamagames.dofus.logic.connection.frames.HandshakeFrame import \
             HandshakeFrame
 
-        self._conn = ServerConnection(id, self._receivedMsgsQueue, MITM=Kernel().mitm)
+        self._conn = ServerConnection(id, self._receivedMsgsQueue)
         Kernel().worker.addFrame(HandshakeFrame())
-        if not Kernel().mitm:
-            self._conn.start()
-            self._conn.connect(host, port)
+        self._conn.start()
+        self._conn.connect(host, port)
 
     def send(self, msg: INetworkMessage) -> None:
         with self.sendMessageLock:

@@ -179,7 +179,7 @@ class ProtocolParser:
                 "name": name,
                 "length": length,
                 "dynamicType": dynamicType,
-                "lengthTypeId": TypeEnum.fromString(lengthType).value,
+                "lengthTypeId": TypeEnum.fromString(lengthType).value if lengthType is not None else None,
                 "type": var_type,
                 "typeId": TypeEnum.fromString(var_type).value,
                 "typename": TO_PTYPE[typename] if typename in TO_PTYPE else typename,

@@ -6126,7 +6126,7 @@
                 {
                     "dynamicType": false, 
                     "length": 5, 
-                    "lengthTypeId": -1, 
+                    "lengthTypeId": null, 
                     "name": "colors", 
                     "optional": false, 
                     "type": "Int", 
@@ -27151,7 +27151,7 @@
                 {
                     "dynamicType": false, 
                     "length": 2, 
-                    "lengthTypeId": -1, 
+                    "lengthTypeId": null, 
                     "name": "dispositions", 
                     "optional": false, 
                     "type": "IdentifiedEntityDispositionInformations", 
@@ -29629,23 +29629,23 @@
         }
     }, 
     "primitives": [
-        "Double", 
-        "VarShort", 
-        "UnsignedInt", 
-        "VarUhInt", 
-        "Boolean", 
-        "VarLong", 
         "ByteArray", 
-        "UnsignedByte", 
-        "Float", 
         "UTF", 
-        "Int", 
-        "VarUhLong", 
-        "Short", 
-        "VarInt", 
         "UnsignedShort", 
+        "VarUhShort", 
+        "Boolean", 
+        "Float", 
+        "Short", 
+        "Int", 
         "Byte", 
-        "VarUhShort"
+        "Double", 
+        "VarUhInt", 
+        "VarShort", 
+        "UnsignedByte", 
+        "VarLong", 
+        "VarUhLong", 
+        "UnsignedInt", 
+        "VarInt"
     ], 
     "type": {
         "AbstractCharacterInformation": {
@@ -36795,7 +36795,7 @@
                 {
                     "dynamicType": false, 
                     "length": 5, 
-                    "lengthTypeId": -1, 
+                    "lengthTypeId": null, 
                     "name": "colors", 
                     "optional": false, 
                     "type": "Int", 
@@ -43099,7 +43099,7 @@
                 {
                     "dynamicType": false, 
                     "length": null, 
-                    "lengthTypeId": -1, 
+                    "lengthTypeId": null, 
                     "name": "fightTeams", 
                     "optional": false, 
                     "type": "FightTeamLightInformations", 
@@ -43109,7 +43109,7 @@
                 {
                     "dynamicType": false, 
                     "length": null, 
-                    "lengthTypeId": -1, 
+                    "lengthTypeId": null, 
                     "name": "fightTeamsOptions", 
                     "optional": false, 
                     "type": "FightOptionsInformations", 
@@ -48340,7 +48340,7 @@
                 {
                     "dynamicType": false, 
                     "length": 2, 
-                    "lengthTypeId": -1, 
+                    "lengthTypeId": null, 
                     "name": "dispositions", 
                     "optional": false, 
                     "type": "IdentifiedEntityDispositionInformations", 
@@ -84740,7 +84740,7 @@
                 {
                     "dynamicType": false, 
                     "length": null, 
-                    "lengthTypeId": -1, 
+                    "lengthTypeId": null, 
                     "name": "fightTeams", 
                     "optional": false, 
                     "type": "FightTeamLightInformations", 
@@ -84750,7 +84750,7 @@
                 {
                     "dynamicType": false, 
                     "length": null, 
-                    "lengthTypeId": -1, 
+                    "lengthTypeId": null, 
                     "name": "fightTeamsOptions", 
                     "optional": false, 
                     "type": "FightOptionsInformations", 

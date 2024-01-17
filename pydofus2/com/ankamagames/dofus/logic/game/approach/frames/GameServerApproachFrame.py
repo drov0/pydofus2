@@ -37,7 +37,8 @@ from pydofus2.com.ankamagames.dofus.logic.game.common.frames.JobsFrame import \
     JobsFrame
 from pydofus2.com.ankamagames.dofus.logic.game.common.frames.MountFrame import \
     MountFrame
-from pydofus2.com.ankamagames.dofus.logic.game.common.frames.SocialFrame import SocialFrame
+from pydofus2.com.ankamagames.dofus.logic.game.common.frames.SocialFrame import \
+    SocialFrame
 from pydofus2.com.ankamagames.dofus.logic.game.common.frames.SpellInventoryManagementFrame import \
     SpellInventoryManagementFrame
 from pydofus2.com.ankamagames.dofus.logic.game.common.frames.SynchronisationFrame import \
@@ -82,6 +83,12 @@ from pydofus2.com.ankamagames.dofus.network.messages.game.character.choice.Chara
     CharactersListMessage
 from pydofus2.com.ankamagames.dofus.network.messages.game.character.choice.CharactersListRequestMessage import \
     CharactersListRequestMessage
+from pydofus2.com.ankamagames.dofus.network.messages.game.character.creation.CharacterCreationRequestMessage import \
+    CharacterCreationRequestMessage
+from pydofus2.com.ankamagames.dofus.network.messages.game.character.creation.CharacterCreationResultMessage import \
+    CharacterCreationResultMessage
+from pydofus2.com.ankamagames.dofus.network.messages.game.character.creation.CharacterNameSuggestionRequestMessage import \
+    CharacterNameSuggestionRequestMessage
 from pydofus2.com.ankamagames.dofus.network.messages.game.context.GameContextCreateRequestMessage import \
     GameContextCreateRequestMessage
 from pydofus2.com.ankamagames.dofus.network.messages.game.initialization.CharacterLoadingCompleteMessage import \
@@ -94,6 +101,8 @@ from pydofus2.com.ankamagames.dofus.network.messages.game.startup.StartupActions
     StartupActionsListMessage
 from pydofus2.com.ankamagames.dofus.network.messages.security.ClientKeyMessage import \
     ClientKeyMessage
+from pydofus2.com.ankamagames.dofus.network.messages.web.haapi.HaapiApiKeyRequestMessage import \
+    HaapiApiKeyRequestMessage
 from pydofus2.com.ankamagames.jerakine.logger.Logger import Logger
 from pydofus2.com.ankamagames.jerakine.messages.ConnectionResumedMessage import \
     ConnectionResumedMessage
@@ -142,13 +151,12 @@ class GameServerApproachFrame(Frame):
     def process(self, msg: Message) -> bool:
 
         if isinstance(msg, HelloGameMessage):
-            if not Kernel().mitm:
-                self.sendAuthTicket()
+            self.sendAuthTicket()
             return True
 
         elif isinstance(msg, AuthenticationTicketAcceptedMessage):
-            if not Kernel().mitm:
-                self.requestCharactersList()
+            self.requestHaapiApiKey()
+            self.requestCharactersList()
             return True
 
         elif isinstance(msg, AuthenticationTicketRefusedMessage):
@@ -241,9 +249,11 @@ class GameServerApproachFrame(Frame):
             Kernel().worker.addFrame(NpcFrame())
             Kernel().worker.addFrame(PartyFrame())
             KernelEventsManager().send(KernelEvent.CharacterSelectedSuccessfully, return_value=cssmsg.infos)
+            
             # if Kernel().beingInReconection and not self._reconnectMsgSend:
             #     self._reconnectMsgSend = True
             #     ConnectionsHandler().send(CharacterSelectedForceReadyMessage())
+            
             self._cssmsg = cssmsg
             PlayedCharacterManager().infos = self._cssmsg.infos
             DataStoreType.CHARACTER_ID = str(self._cssmsg.infos.id)
@@ -255,12 +265,11 @@ class GameServerApproachFrame(Frame):
 
         elif isinstance(msg, CharacterLoadingCompleteMessage):
             Kernel().worker.removeFrame(self)
-            if not Kernel().mitm:
-                flashKeyMsg = ClientKeyMessage()
-                flashKeyMsg.init(InterClientManager().getFlashKey())
-                ConnectionsHandler().send(flashKeyMsg)
-                gccrmsg = GameContextCreateRequestMessage()
-                ConnectionsHandler().send(gccrmsg)
+            flashKeyMsg = ClientKeyMessage()
+            flashKeyMsg.init(InterClientManager().getFlashKey())
+            ConnectionsHandler().send(flashKeyMsg)
+            gccrmsg = GameContextCreateRequestMessage()
+            ConnectionsHandler().send(gccrmsg)
             return True
 
         elif isinstance(msg, ConnectionResumedMessage):
@@ -333,6 +342,26 @@ class GameServerApproachFrame(Frame):
         return True
 
     def requestCharactersList(self) -> None:
-        clrmsg: CharactersListRequestMessage = CharactersListRequestMessage()
         if ConnectionsHandler().conn:
+            clrmsg = CharactersListRequestMessage()
+            clrmsg.init()
             ConnectionsHandler().send(clrmsg)
+        else:
+            KernelEventsManager().send(KernelEvent.ClientCrashed, "No connection to server found while requesting characters list")
+
+    def requestNameSuggestion(self):
+        msg = CharacterNameSuggestionRequestMessage()
+        msg.init()
+        ConnectionsHandler().send(msg)
+
+    def requestCharacterCreation(self, name, breedId, sex, colors, cosmeticId):
+        msg = CharacterCreationRequestMessage()
+        msg.init(
+            str(name), int(breedId), bool(sex), colors, cosmeticId
+        )
+        ConnectionsHandler().send(msg)
+        
+    def requestHaapiApiKey(self):
+        msg = HaapiApiKeyRequestMessage()
+        msg.init()
+        ConnectionsHandler().send(msg)

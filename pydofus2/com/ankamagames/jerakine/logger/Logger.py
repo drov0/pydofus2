@@ -110,6 +110,8 @@ class Logger(logging.Logger, metaclass=LoggerSingleton):
         )
         now = datetime.datetime.now()
         self.outputFile = LOGS_PATH / f"{self.prefix}_{now.strftime('%Y-%m-%d')}.log"
+        if not os.path.exists(LOGS_PATH):
+            os.makedirs(LOGS_PATH)
         fileHandler = logging.FileHandler(self.outputFile)
         fileHandler.setFormatter(self.formatter)
         self.addHandler(fileHandler)

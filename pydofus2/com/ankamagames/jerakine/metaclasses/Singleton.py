@@ -76,10 +76,11 @@ class Singleton(type):
                 listener(*args, **kwargs)
         Singleton.eventsHandler.on(SingletonEvent.THREAD_REGISTER, onThreadRegister, priority, timeout, ontimeout)
 
-    def WaitThreadRegister(cls, thname: int, timeout: float):
+    def WaitThreadRegister(cls: Type[T], thname: int, timeout: float) -> T:
         if thname in Singleton._instances and cls in Singleton._instances[thname]:
             return True
         waitEvt = threading.Event()
         cls.onceThreadRegister(thname, waitEvt.set)
         if not waitEvt.wait(timeout):
             raise TimeoutError(f"wait for {cls.__name__} signleton instanciation from thread {thname} timed out!")
+        return cls.getInstance(thname)

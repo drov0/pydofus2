@@ -37,7 +37,18 @@ def sendTrace(func):
         except Exception as e:
             exc_type, exc_value, exc_traceback = sys.exc_info()
             traceback_in_var = traceback.format_tb(exc_traceback)
-            error_trace = str(e) + '\n' + str(exc_type) + "\n" + str(exc_value) + "\n" + "\n".join(traceback_in_var)
+
+            # Start with the current exception's traceback
+            error_trace = "\n".join(traceback_in_var) + "\n" + str(exc_value)
+
+            # Check for and add traceback from the cause, if any
+            cause = e.__cause__
+            while cause:
+                cause_traceback = traceback.format_tb(cause.__traceback__)
+                error_trace += "\n\n-- Chained Exception --\n"
+                error_trace += "\n".join(cause_traceback) + "\n" + str(cause)
+                cause = cause.__cause__
+
             self._put(ConnectionProcessCrashedMessage(error_trace))
 
     return wrapped
@@ -52,7 +63,7 @@ class ServerConnection(mp.Thread):
     MESSAGE_SIZE_ASYNC_THRESHOLD: int = 300 * 1024
     CONNECTION_TIMEOUT = 7
 
-    def __init__(self, id: str = "ServerConnection", receptionQueue: queue.Queue = None, MITM=False):
+    def __init__(self, id: str = "ServerConnection", receptionQueue: queue.Queue = None):
         super().__init__(name=mp.current_thread().name)
         self.id = id
         self._latencyBuffer = []
@@ -79,24 +90,12 @@ class ServerConnection(mp.Thread):
             self.receptionQueue = queue.Queue(200)
         else:
             self.receptionQueue = receptionQueue
-        if not MITM:
-            self.socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        else:
-            self.socket = None
-            self.mitm_socket_closed = mp.Event()
-            self.clientSocket: socket.socket = None
+        self.socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.connectionTimeout = None
         self.nbrSendFails = 0
-        self.MITM = MITM
         self._asyncNetworkDataContainerMessage: NetworkDataContainerMessage = None
         
 
-    def setMITMSocket(self, socket, clientSocket):
-        if not self.MITM:
-            raise Exception("Cant set mitm socket when MITM flag is not set")
-        self.socket = socket
-        self.clientSocket = clientSocket
-        self.mitm_socket_closed.set()
 
     @property
     def latencyAvg(self) -> float:

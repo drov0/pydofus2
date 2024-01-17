@@ -179,10 +179,53 @@ class Haapi:
             "avatar": body["avatar_url"],
         }
 
+
     @classmethod
-    def getLoginTokenCloudScraper(cls, game_id, apiKey, certId='', certHash='', user_agent="Zaap 3.12.2"):
+    def getZaapVersion(cls):
+        import yaml
+        url = "https://launcher.cdn.ankama.com/installers/production/latest.yml?noCache=1hkaeforb"
+        # Make an HTTP request to get the YAML file
+        client = cloudscraper.create_scraper()
+        response = client.get(
+            url,
+            headers={
+                'user-Agent': "electron-builder",
+                "cache-control": "no-cache",
+                "sec-fetch-site": "none",
+                "sec-fetch-mode": "no-cors",
+                "sec-fetch-dest": "empty",
+                'accept-encoding': 'identity',
+                "accept-language": "en-US",
+            },
+        )
+
+        if response.status_code != 200:
+            raise Exception("Failed to download ZAAP version file")
+
+        # Parse the YAML content
+        try:
+            data = yaml.safe_load(response.content)
+        except yaml.YAMLError as e:
+            return "Failed to parse YAML file"
+
+        # Save the file locally
+        local_folder = os.path.dirname(os.path.abspath(__file__))
+        local_file_path = os.path.join(local_folder, 'latest.yml')
+        with open(local_file_path, 'wb') as file:
+            file.write(response.content)
+
+        # Extract the version
+        version = data.get("version")
+        if not version:
+            raise Exception("Failed to extract ZAAP version from YAML file")
+        
+        return version
+
+    @classmethod
+    def getLoginTokenCloudScraper(cls, game_id, apiKey, certId='', certHash=''):
         nbrtries = 0
         client = cloudscraper.create_scraper()
+        user_agent = f"Zaap {cls.getZaapVersion()}"
         while nbrtries < 5:
             try:
                 url = cls.getUrl(
@@ -315,3 +358,9 @@ class Haapi:
             except Exception as e:
                 Logger().error(f"Exception occurred: {e}")
                 raise e
+
+
+if __name__ == "__main__":
+    r = Haapi.getZaapVersion()
+    print(r)
+    

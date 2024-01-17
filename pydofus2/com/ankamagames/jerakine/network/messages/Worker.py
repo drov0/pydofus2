@@ -55,9 +55,6 @@ class Worker(MessageHandler):
             msg = self._queue.get()
             # Logger().debug(f"[RCV] {msg}")
             if type(msg).__name__ == "AccountLoggingKickedMessage":
-                from tkinter import Tk, messagebox
-                Tk().withdraw()
-                messagebox.showinfo("Account banned", "Bot has ben kicked!")
                 KernelEventsManager().send(KernelEvent.ClientShutdown, "Account banned")
                 break
             if type(msg).__name__ == "TerminateWorkerMessage":

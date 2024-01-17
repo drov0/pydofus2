@@ -69,7 +69,7 @@ class AuthentificationFrame(Frame):
             return True
     
         elif isinstance(msg, AccountSubscriptionElapsedDurationMessage):
-            PlayerManager().subscriptionDurationElapsed = msg.subscriptionElapsedDuration;
+            PlayerManager().subscriptionDurationElapsed = msg.subscriptionElapsedDuration
             return True
 
         elif isinstance(msg, HelloConnectMessage):
@@ -78,8 +78,7 @@ class AuthentificationFrame(Frame):
             AuthentificationManager().initAESKey()
             iMsg = AuthentificationManager().getIdentificationMessage()
             self._currentLogIsForced = isinstance(iMsg, IdentificationAccountForceMessage)
-            if not Kernel().mitm:
-                ConnectionsHandler().send(iMsg)
+            ConnectionsHandler().send(iMsg)
             return True
 
         elif isinstance(msg, IdentificationSuccessMessage):

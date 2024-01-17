@@ -6,7 +6,7 @@ from datetime import datetime
 from time import perf_counter, sleep
 from typing import TYPE_CHECKING
 
-from pyd2bot.thriftServer.pyd2botService.ttypes import DofusError
+from pyd2bot.thriftServer.pyd2botService.ttypes import D2BotError
 from pydofus2.com.ankamagames.atouin.Haapi import Haapi
 from pydofus2.com.ankamagames.atouin.resources.adapters.ElementsAdapter import \
     ElementsAdapter
@@ -63,23 +63,20 @@ class DofusClient(threading.Thread):
         super().__init__(name=name)
         self._killSig = threading.Event()
         self._registredInitFrames = []
-        self._shutDownListeners = []
         self._registredGameStartFrames = []
-        self._stopReason: DisconnectionReason = None
         self._lock = None
-        self._certId = None
         self._apiKey = None
-        self._certHash = None
-        self._serverId = None
+        self._certId = ''
+        self._certHash = ''
+        self._serverId = 0
         self._characterId = None
         self._loginToken = None
         self._conxTries = 0
         self._connectionUnexpectedFailureTimes = []
         self.mule = False
-        self.mitm = False
         self._shutDownReason = None
         self._crashed = False
-        self._crashMessage = ""
+        self._shutDownMessage = ""
         self._reconnectRecord = []
         self.terminated = threading.Event()
 
@@ -93,12 +90,17 @@ class DofusClient(threading.Thread):
         AdapterFactory.addAdapter("ele", ElementsAdapter)
         # AdapterFactory.addAdapter("dlm", MapsAdapter)
         Kernel().isMule = self.mule
-        Kernel().mitm = self.mitm
         ModuleReader._clearObjectsCache = True
         self._shutDownReason = None
         self.initListeners()
         Logger().info("Initialized")
 
+    def setLoginToken(self, token):
+        self._loginToken = token
+        
+    def setAutoServerSelection(self, serverId):
+        self._serverId = serverId
+    
     def registerInitFrame(self, frame):
         self._registredInitFrames.append(frame)
 
@@ -113,16 +115,10 @@ class DofusClient(threading.Thread):
     def onInGame(self):
         Logger().info("Character entered game server successfully")
 
-    def onCrash(self, event, message, reason=DisconnectionReasonEnum.EXCEPTION_THROWN):
-        Logger().error(f"Client crashed for reason : {message}")
+    def crash(self, event, message, reason=DisconnectionReasonEnum.EXCEPTION_THROWN):
         self._crashed = True
-        self._crashMessage = message
-        self._shutDownReason = f"Crashed for reason: {message}"
-        KernelEventsManager().send(KernelEvent.ClientShutdown, message, reason=self._shutDownReason)
-
-    def onShutdown(self, event, message, reason=None):
-        Logger().debug(f"Shutdown requested for reason: {message}")
-        self.shutdown(reason, message)
+        self._shutDownReason = reason
+        self.shutdown(message, reason)
 
     def onRestart(self, event, message):
         Logger().debug(f"Restart requested by event {event} for reason: {message}")
@@ -146,12 +142,11 @@ class DofusClient(threading.Thread):
             ontimeout=self.onLoginTimeout,
             originator=self,
         )
-        KernelEventsManager().on(KernelEvent.ClientCrashed, self.onCrash, originator=self)
-        KernelEventsManager().on(KernelEvent.ClientShutdown, self.onShutdown, originator=self)
+        KernelEventsManager().on(KernelEvent.ClientCrashed, self.crash, originator=self)
+        KernelEventsManager().on(KernelEvent.ClientShutdown, self.shutdown, originator=self)
         KernelEventsManager().on(KernelEvent.ClientRestart, self.onRestart, originator=self)
         KernelEventsManager().on(KernelEvent.ClientReconnect, self.onReconnect, originator=self)
         KernelEventsManager().on(KernelEvent.ClientClosed, self.onConnectionClosed, originator=self)
-        KernelEventsManager().on(KernelEvent.FightStarted, self.onFight, originator=self)
 
     def onServerSelectionRefused(self, event, serverId, err_type, server_statusn, error_text, selectableServers):
         Logger().error(f"Server selection refused for reason : {error_text}")
@@ -170,17 +165,16 @@ class DofusClient(threading.Thread):
                 Logger().error(
                     f"The connection was closed unexpectedly. Reconnection attempt {self._conxTries}/{self.MAX_CONN_TRIES}."
                 )
-                if not Kernel().mitm:      
-                    self._conxTries += 1
-                    self._connectionUnexpectedFailureTimes.append(perf_counter())
-                    self.onReconnect(None, reason.message)
+                self._conxTries += 1
+                self._connectionUnexpectedFailureTimes.append(perf_counter())
+                self.onReconnect(None, reason.message)
             else:
                 if not reason.expected:
                     self._connectionUnexpectedFailureTimes.append(perf_counter())
                     self.onReconnect(None, "The connection was closed unexpectedly.")
                 else:
                     if reason.type == DisconnectionReasonEnum.EXCEPTION_THROWN:
-                        self.onCrash(None, reason.message, reason.type)
+                        self.crash(None, reason.message, reason.type)
                     elif reason.type == DisconnectionReasonEnum.WANTED_SHUTDOWN:
                         self.shutdown(reason.type, reason.message)
                     elif reason.type in [DisconnectionReasonEnum.RESTARTING, DisconnectionReasonEnum.DISCONNECTED_BY_POPUP, DisconnectionReasonEnum.CONNECTION_LOST]:
@@ -215,9 +209,6 @@ class DofusClient(threading.Thread):
                         pass
         else:
             Logger().warning("The connection hasn't even start or already closed.")
-
-    def onFight(self):
-        Logger().debug("Fight started")
         
     def prepareLogin(self):
         PlayedCharacterManager().instanceId = self.name
@@ -229,7 +220,9 @@ class DofusClient(threading.Thread):
         for frame in self._registredInitFrames:
             self.worker.addFrame(frame())
         if not self._loginToken:
-            self._loginToken = Haapi.getLoginTokenCloudScraper(1, self._apiKey)
+            if self._apiKey is None:
+                return self.shutdown(DisconnectionReasonEnum.EXCEPTION_THROWN, msg="Unable to login for reason : No apikey and certificate or login token provided!")
+            self._loginToken = Haapi.getLoginTokenCloudScraper(1, self._apiKey, self._certId, self._certHash)
         AuthentificationManager().setToken(self._loginToken)
         self.waitNextLogin()
         self._loginToken = None
@@ -254,8 +247,11 @@ class DofusClient(threading.Thread):
                 self.terminated.wait(diff)
         self.lastLoginTime = perf_counter()
 
-    def shutdown(self, reason=DisconnectionReasonEnum.WANTED_SHUTDOWN, msg=""):
+    def shutdown(self, msg="", reason=None):
+        if not reason:
+            reason = DisconnectionReasonEnum.WANTED_SHUTDOWN
         self._shutDownReason = reason
+        self._shutDownMessage = msg
         if Kernel.getInstance(self.name):
             Kernel.getInstance(self.name).worker.process(TerminateWorkerMessage())
         else:
@@ -282,12 +278,15 @@ class DofusClient(threading.Thread):
             self.worker.run()
         except Exception as e:
             Logger().error(f"Error in main: {e}", exc_info=True)
-            self._crashMessage = str(e)
+            self._shutDownMessage = f"Error in main : {str(e)}"
             self._crashed = True
-            self._shutDownReason = f"Error in main : {str(e)}"
+            self._shutDownReason = DisconnectionReasonEnum.EXCEPTION_THROWN
+            
         if self._shutDownReason:
             Logger().info(f"Wanted shutdown for reason : {self._shutDownReason}")
-            self.onShutdown(None, f"Wanted shutdown for reason : {self._shutDownReason}", DisconnectionReasonEnum.EXCEPTION_THROWN)
+            if self._shutDownMessage:
+                Logger().error(f"Crashed for reason : {self._shutDownReason} :\n{self._shutDownMessage}")
+            
         Kernel().reset()
         Logger().info("goodby crual world")
         self.terminated.set()

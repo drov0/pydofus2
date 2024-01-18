@@ -207,7 +207,7 @@ class Haapi:
         try:
             data = yaml.safe_load(response.content)
         except yaml.YAMLError as e:
-            return "Failed to parse YAML file"
+            raise Exception("Failed to parse Zaap version YAML file")
 
         # Save the file locally
         local_folder = os.path.dirname(os.path.abspath(__file__))

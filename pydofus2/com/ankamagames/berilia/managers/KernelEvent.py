@@ -15,6 +15,7 @@ class KernelEvent(Enum):
     CharacterImpossibleSelection = auto()
     TutorielAvailable = auto()
     CharacterCreationStart = auto()
+    CharacterSelectedForce = auto()
     
     # client 
     ClientCrashed = auto()

@@ -468,6 +468,7 @@ class FightContextFrame(Frame):
             timeBeforeStart = msg.timeMaxBeforeFightStart * 100
             if timeBeforeStart == 0 and preFightIsActive:
                 timeBeforeStart = -1
+            Logger().separator("Joined fight", "*")
             KernelEventsManager().send(KernelEvent.FightJoined, msg.isFightStarted, msg.fightType, msg.isTeamPhase, msg.timeMaxBeforeFightStart)
             return True
 

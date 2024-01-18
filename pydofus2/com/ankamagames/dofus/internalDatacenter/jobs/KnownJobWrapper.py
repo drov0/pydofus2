@@ -37,3 +37,4 @@ class KnownJobWrapper(IDataCenter):
             obj.name = job.name
             obj.iconId = job.iconId
         return obj
+    

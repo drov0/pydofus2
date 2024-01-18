@@ -1,3 +1,5 @@
+from prettytable import PrettyTable
+
 from pydofus2.com.ankamagames.berilia.managers.KernelEvent import KernelEvent
 from pydofus2.com.ankamagames.berilia.managers.KernelEventsManager import \
     KernelEventsManager
@@ -63,7 +65,6 @@ from pydofus2.com.ankamagames.jerakine.types.enums.Priority import Priority
 
 
 class JobsFrame(Frame):
-
     _settings: dict
 
     def __init__(self):
@@ -101,9 +102,8 @@ class JobsFrame(Frame):
 
     def pulled(self) -> bool:
         return True
-    
-    def process(self, msg: Message) -> bool:
 
+    def process(self, msg: Message) -> bool:
         if isinstance(msg, JobDescriptionMessage):
             PlayedCharacterManager().jobs = dict()
             for jd in msg.jobsDescription:
@@ -136,7 +136,13 @@ class JobsFrame(Frame):
         if isinstance(msg, JobExperienceMultiUpdateMessage):
             for je in msg.experiencesUpdate:
                 self.updateJobExperience(je)
-            Logger().debug(f"Player jobs : {[f'{{ name: {j.name}, lvl: {j.jobLevel} }}' for id, j in PlayedCharacterManager().jobs.items()]}")
+            table = PrettyTable()
+            # Define the column headers
+            table.field_names = ["Name", "Level"]
+            # Iterate over the jobs and add a row for each job
+            for job in PlayedCharacterManager().jobs.values():
+                table.add_row([job.name, job.jobLevel])
+            Logger().info(f"Player jobs:\n{table}")
             return True
 
         if isinstance(msg, JobLevelUpMessage):

@@ -148,6 +148,10 @@ class DofusClient(threading.Thread):
         KernelEventsManager().on(
             KernelEvent.CharacterImpossibleSelection, self.onCharacterImpossibleSelection, originator=self
         )
+        KernelEventsManager().on(KernelEvent.FightStarted, self.onFight)
+    
+    def onFight(self, event):
+        pass
 
     def onCharacterImpossibleSelection(self, event):
         self.shutdown(

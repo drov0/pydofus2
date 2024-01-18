@@ -141,6 +141,7 @@ class Haapi:
     @classmethod
     async def signOnWithApikey(cls, game_id, apikey):
         result = await BrowserRequests.post(cls.getUrl("SIGN_ON"), data={"game": game_id}, headers={"APIKEY": apikey})
+            
         body = result["body"]
         if body["account"]["locked"] == ZAAP_CONFIG.USER_ACCOUNT_LOCKED.MAILNOVALID:
             Logger().error("[AUTH] Mail not confirmed by user")
@@ -255,6 +256,9 @@ class Haapi:
                     if token:
                         Logger().debug("[HAAPI] Login Token created")
                         return token
+                    elif response.json().get("reason") == "Certificate control failed.":
+                        Logger().error("Invalid certificate, please check your certificate")
+                        return None
                     else:
                         Logger().error("Error while calling HAAPI to get Login Token : %s" % response.json())
                         sleep(5)

@@ -37,9 +37,9 @@ class BrowserRequests:
         json_content = (204 != response.status) and 'content-type' in response.headers and 'application/json' in response.headers.get('content-type')
         if json_content:
             text_response = json.loads(text_response)
+        await browser.close()
         if response.status >= 400:
             raise HttpError(response, text_response)
-        await browser.close()
         return {'body': text_response}
     
     @classmethod

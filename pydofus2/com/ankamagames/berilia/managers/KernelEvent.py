@@ -2,29 +2,33 @@ from enum import Enum, auto
 
 
 class KernelEvent(Enum):
-    # Common
-    ReloginToken = auto()
-    MovementRequestRejected = auto()
+    # Infos
+    TextInformation = auto()
+
+    # Server
     ServersList = auto()
     CharactersList = auto()
-    ClientCrashed = auto()
-    PlayerLoggedIn = auto()
-    PlayerInGameReady = auto()
-    PlayerDead = auto()
-    PlayerAlive = auto()
     CharacterSelectedSuccessfully = auto()
-    ClientShutdown = auto()
-    ClientRestart = auto()
-    MapLoaded = auto()
-    MapDataProcessed = auto()
+    SelectedServerData = auto()
+    ServerStatusUpdate = auto()
+    SelectedServerRefused = auto()
+    CharacterImpossibleSelection = auto()
+    TutorielAvailable = auto()
+    CharacterCreationStart = auto()
+    
+    # client 
+    ClientCrashed = auto()
+    ReloginToken = auto()
     FramePushed = auto()
     FramePulled = auto()
     ClientReconnect = auto()
     ClientClosed = auto()
-    TextInformation = auto()
-    SelectedServerData = auto()
-    ServerStatusUpdate = auto()
-    SelectedServerRefused = auto()
+    ClientShutdown = auto()
+    ClientRestart = auto()
+    
+    # map 
+    MapLoaded = auto()
+    MapDataProcessed = auto()
     
     # Fight
     FightSwordShowed = auto()
@@ -50,6 +54,7 @@ class KernelEvent(Enum):
     InteractiveUseError = auto()
     
     # cell movement
+    MovementRequestRejected = auto()
 
     # Entities movement
     EntityMoving = auto()
@@ -60,6 +65,10 @@ class KernelEvent(Enum):
     PlayerMovementCompleted = auto()
     
     # Player updates
+    PlayerLoggedIn = auto()
+    PlayerInGameReady = auto()
+    PlayerDead = auto()
+    PlayerAlive = auto()
     CharacterStats = auto()
     PlayerLeveledUp = auto()
     PlayerPodsFull = auto()

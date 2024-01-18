@@ -67,10 +67,6 @@ class AuthentificationFrame(Frame):
                 else:
                     PlayerManager().destroy()
             return True
-    
-        elif isinstance(msg, AccountSubscriptionElapsedDurationMessage):
-            PlayerManager().subscriptionDurationElapsed = msg.subscriptionElapsedDuration
-            return True
 
         elif isinstance(msg, HelloConnectMessage):
             AuthentificationManager().setPublicKey(msg.key)

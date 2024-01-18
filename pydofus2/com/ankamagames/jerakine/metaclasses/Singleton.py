@@ -76,9 +76,9 @@ class Singleton(type):
                 listener(*args, **kwargs)
         Singleton.eventsHandler.on(SingletonEvent.THREAD_REGISTER, onThreadRegister, priority, timeout, ontimeout)
 
-    def WaitThreadRegister(cls: Type[T], thname: int, timeout: float) -> T:
+    def waitThreadRegister(cls: Type[T], thname: int, timeout: float) -> T:
         if thname in Singleton._instances and cls in Singleton._instances[thname]:
-            return True
+            return cls.getInstance(thname)
         waitEvt = threading.Event()
         cls.onceThreadRegister(thname, waitEvt.set)
         if not waitEvt.wait(timeout):

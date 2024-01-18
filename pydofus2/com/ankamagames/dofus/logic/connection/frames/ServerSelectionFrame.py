@@ -106,28 +106,7 @@ class ServerSelectionFrame(Frame):
             return True
 
         elif isinstance(msg, ServerSelectionAction):
-            if self._alreadyConnectedToServerId > 0 and msg.serverId != self._alreadyConnectedToServerId:
-                self._serverSelectionAction = msg
-                self.serverAlreadyInName = Server.getServerById(self._alreadyConnectedToServerId).name
-                self.serverSelectedName = Server.getServerById(msg.serverId).name
-                return True
-            for server in self._serversList:
-                Logger().info(f"Server {server.id} status {ServerStatusEnum(server.status).name}.")
-                if str(server.id) == str(msg.serverId):
-                    if ServerStatusEnum(server.status) == ServerStatusEnum.ONLINE:
-                        self.sendServerSelection(server.id)
-                        return True
-                    else:
-                        err_type = ServerConnectionErrorEnum.SERVER_CONNECTION_ERROR_DUE_TO_STATUS
-                        KernelEventsManager().send(
-                            KernelEvent.SelectedServerRefused,
-                            server.id,
-                            err_type,
-                            server.status,
-                            self.getSelectionErrorText(err_type, server.status),
-                            self.getSelectableServers(),
-                        )
-                        return True
+            self.selectServer(msg.serverId)
             return True
 
         elif isinstance(msg, SelectedServerDataExtendedMessage):
@@ -256,12 +235,11 @@ class ServerSelectionFrame(Frame):
     def getUpdateServerStatusFunction(self, serverId: int, newStatus: int) -> FunctionType:
         def function(
             element: GameServerInformations,
-            index: int,
-            arr: list[GameServerInformations],
+            index: int = None,
+            arr: list[GameServerInformations]=None,
         ) -> None:
-            gsi = element
-            if serverId == gsi.id:
-                gsi.status = newStatus
+            if serverId == element.id:
+                element.status = newStatus
 
         return function
 
@@ -273,7 +251,7 @@ class ServerSelectionFrame(Frame):
     def onCancelServerSelection(self) -> None:
         self._serverSelectionAction = None
 
-    def sendServerSelection(self, serverId: int) -> None:
+    def requestServerSelection(self, serverId: int) -> None:
         ssmsg = ServerSelectionMessage()
         ssmsg.init(serverId)
         ConnectionsHandler().send(ssmsg)
@@ -282,3 +260,24 @@ class ServerSelectionFrame(Frame):
         for server in self._serversList:
             if server.id == self._selectedServer.serverId:
                 return server
+            
+    def selectServer(self, serverId: int) -> None:
+        if self._alreadyConnectedToServerId > 0 and serverId != self._alreadyConnectedToServerId:
+            self._serverSelectionAction = ServerSelectionAction.create(serverId)
+            self.serverAlreadyInName = Server.getServerById(self._alreadyConnectedToServerId).name
+            self.serverSelectedName = Server.getServerById(serverId).name
+        for server in self._serversList:
+            Logger().info(f"Server {server.id} status {ServerStatusEnum(server.status).name}.")
+            if str(server.id) == str(serverId):
+                if ServerStatusEnum(server.status) == ServerStatusEnum.ONLINE:
+                    self.requestServerSelection(server.id)
+                else:
+                    err_type = ServerConnectionErrorEnum.SERVER_CONNECTION_ERROR_DUE_TO_STATUS
+                    KernelEventsManager().send(
+                        KernelEvent.SelectedServerRefused,
+                        server.id,
+                        err_type,
+                        server.status,
+                        self.getSelectionErrorText(err_type, server.status),
+                        self.getSelectableServers(),
+                    )

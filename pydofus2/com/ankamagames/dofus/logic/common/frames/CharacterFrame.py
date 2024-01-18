@@ -44,6 +44,7 @@ class CharacterFrame(Frame):
         return True
 
     def process(self, msg) -> bool:
+
         if isinstance(msg, ReloginTokenStatusMessage):
             if self._changeToServerId:
                 AuthentificationManager()._lva.serverId = self._changeToServerId
@@ -79,12 +80,15 @@ class CharacterFrame(Frame):
             return True
 
         elif isinstance(msg, ChangeServerAction):
-            self._changeToServerId = msg.serverId
-            rtrccmsg = ReloginTokenRequestMessage()
-            rtrccmsg.init()
-            ConnectionsHandler().send(rtrccmsg)
+            self.changeToServer(msg.serverId)
             return True
 
         elif isinstance(msg, CharacterDeletionPrepareMessage):
             KernelEventsManager().send(KernelEvent.CharacterDelPrepare, msg)
             return True
+    
+    def changeToServer(self, serverId):
+        self._changeToServerId = serverId
+        rtrccmsg = ReloginTokenRequestMessage()
+        rtrccmsg.init()
+        ConnectionsHandler().send(rtrccmsg)

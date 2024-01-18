@@ -259,6 +259,9 @@ class Haapi:
                     elif response.json().get("reason") == "Certificate control failed.":
                         Logger().error("Invalid certificate, please check your certificate")
                         return None
+                    elif response.json().get("reason") == f"Invalid security parameters. certificate_id : {certId}, certificate_hash: {certHash}":
+                        Logger().error("Invalid security parameters, please check your certificate")
+                        return None
                     else:
                         Logger().error("Error while calling HAAPI to get Login Token : %s" % response.json())
                         sleep(5)

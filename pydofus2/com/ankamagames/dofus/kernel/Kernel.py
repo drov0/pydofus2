@@ -53,6 +53,8 @@ if TYPE_CHECKING:
     from pydofus2.com.ankamagames.dofus.logic.game.approach.frames.GameServerApproachFrame import (
         GameServerApproachFrame,
     )
+    from pydofus2.com.ankamagames.dofus.logic.common.frames.CharacterFrame import CharacterFrame
+
 
 
 class Kernel(metaclass=Singleton):
@@ -286,3 +288,7 @@ class Kernel(metaclass=Singleton):
     @property
     def gameServerApproachFrame(self) -> "GameServerApproachFrame":
         return self._worker.getFrameByName("GameServerApproachFrame")
+
+    @property
+    def characterFrame(self) -> "CharacterFrame":
+        return self._worker.getFrameByName("CharacterFrame")

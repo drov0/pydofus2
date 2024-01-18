@@ -31,7 +31,7 @@ if __name__ == "__main__":
     client.setLoginToken(token)
     client.start()
 
-    eventsManager = KernelEventsManager.WaitThreadRegister(api_key, 25)
+    eventsManager = KernelEventsManager.waitThreadRegister(api_key, 25)
 
     Logger().info("Kernel event manager instance created")
         

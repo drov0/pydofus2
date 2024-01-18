@@ -117,6 +117,7 @@ from pydofus2.com.ankamagames.dofus.network.messages.web.haapi.HaapiApiKeyReques
     HaapiApiKeyRequestMessage,
 )
 from pydofus2.com.ankamagames.jerakine.logger.Logger import Logger
+from pydofus2.com.ankamagames.jerakine.managers.LangManager import LangManager
 from pydofus2.com.ankamagames.jerakine.messages.ConnectionResumedMessage import ConnectionResumedMessage
 from pydofus2.com.ankamagames.jerakine.messages.Frame import Frame
 from pydofus2.com.ankamagames.jerakine.messages.Message import Message
@@ -142,6 +143,7 @@ class GameServerApproachFrame(Frame):
         self._reconnectMsgSend = False
         self._requestedCharacterId = 0
         self.TUTORIAL_SELECTION_IS_AVAILABLE = False
+        self.authenticationTicketAccepted = False
         super().__init__()
 
     @property
@@ -158,7 +160,7 @@ class GameServerApproachFrame(Frame):
 
     def sendAuthTicket(self):
         atmsg = AuthenticationTicketMessage()
-        atmsg.init("fr", AuthentificationManager().gameServerTicket)
+        atmsg.init(LangManager().getEntry("config.lang.current"), AuthentificationManager().gameServerTicket)
         ConnectionsHandler().send(atmsg)
 
     def process(self, msg: Message) -> bool:
@@ -167,6 +169,7 @@ class GameServerApproachFrame(Frame):
             return True
 
         elif isinstance(msg, AuthenticationTicketAcceptedMessage):
+            self.authenticationTicketAccepted = True
             self.requestHaapiApiKey()
             self.requestCharactersList()
             return True

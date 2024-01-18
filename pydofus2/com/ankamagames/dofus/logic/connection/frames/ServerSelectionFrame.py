@@ -204,6 +204,7 @@ class ServerSelectionFrame(Frame):
 
     def getSelectionErrorText(self, error_type, server_status):
         error_text = ""
+        server_status = ServerStatusEnum(server_status)
         if error_type == ServerConnectionErrorEnum.SERVER_CONNECTION_ERROR_DUE_TO_STATUS:
             error_text = "Status is "
             if server_status == ServerStatusEnum.OFFLINE:

@@ -5,4 +5,7 @@ Py3AMF
 lupa
 pillow
 pyyaml
-
+pyppeteer
+cloudscraper
+aiohttp
+requests

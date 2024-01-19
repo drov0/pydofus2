@@ -15,7 +15,6 @@ from pydofus2.com.ankamagames.atouin.HappiConfig import (AUTH_STATES,
                                                          ZAAP_CONFIG)
 from pydofus2.com.ankamagames.atouin.ZaapError import ZaapError
 from pydofus2.com.ankamagames.jerakine.logger.Logger import Logger
-from pydofus2.com.ankamagames.jerakine.metaclasses.Singleton import Singleton
 
 
 class HaapiException(Exception):
@@ -264,7 +263,7 @@ class Haapi:
                         return None
                     else:
                         Logger().error("Error while calling HAAPI to get Login Token : %s" % response.json())
-                        sleep(5)
+                        return None
                 else:
                     from lxml import html
 

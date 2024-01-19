@@ -5,9 +5,12 @@ import sys
 import threading
 from pathlib import Path
 
-LOGS_PATH = Path("D:/botdev/logs")
+from pydofus2.com.ankamagames.dofus import Constants
+
+LOGS_PATH = Path(Constants.LOGS_DIR)
 if not os.path.isdir(LOGS_PATH):
     os.makedirs(LOGS_PATH)
+
 from typing import Type, TypeVar
 
 T = TypeVar("T")

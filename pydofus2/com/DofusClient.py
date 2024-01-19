@@ -7,41 +7,29 @@ from time import perf_counter, sleep
 from typing import TYPE_CHECKING
 
 from pydofus2.com.ankamagames.atouin.Haapi import Haapi
-from pydofus2.com.ankamagames.atouin.resources.adapters.ElementsAdapter import \
-    ElementsAdapter
+from pydofus2.com.ankamagames.atouin.resources.adapters.ElementsAdapter import ElementsAdapter
 from pydofus2.com.ankamagames.berilia.managers.KernelEvent import KernelEvent
-from pydofus2.com.ankamagames.berilia.managers.KernelEventsManager import \
-    KernelEventsManager
+from pydofus2.com.ankamagames.berilia.managers.KernelEventsManager import KernelEventsManager
 from pydofus2.com.ankamagames.berilia.managers.Listener import Listener
 from pydofus2.com.ankamagames.dofus.kernel.Kernel import Kernel
-from pydofus2.com.ankamagames.dofus.kernel.net.ConnectionsHandler import \
-    ConnectionsHandler
-from pydofus2.com.ankamagames.dofus.kernel.net.DisconnectionReasonEnum import \
-    DisconnectionReasonEnum
-from pydofus2.com.ankamagames.dofus.logic.common.frames.QueueFrame import \
-    QueueFrame
-from pydofus2.com.ankamagames.dofus.logic.common.managers.PlayerManager import \
-    PlayerManager
-from pydofus2.com.ankamagames.dofus.logic.connection.actions.LoginValidationWithTokenAction import \
-    LoginValidationWithTokenAction
-from pydofus2.com.ankamagames.dofus.logic.connection.frames.AuthentificationFrame import \
-    AuthentificationFrame
-from pydofus2.com.ankamagames.dofus.logic.connection.managers.AuthentificationManager import \
-    AuthentificationManager
-from pydofus2.com.ankamagames.dofus.logic.game.approach.frames.GameServerApproachFrame import \
-    GameServerApproachFrame
-from pydofus2.com.ankamagames.dofus.logic.game.common.managers.PlayedCharacterManager import \
-    PlayedCharacterManager
+from pydofus2.com.ankamagames.dofus.kernel.net.ConnectionsHandler import ConnectionsHandler
+from pydofus2.com.ankamagames.dofus.kernel.net.DisconnectionReasonEnum import DisconnectionReasonEnum
+from pydofus2.com.ankamagames.dofus.logic.common.frames.QueueFrame import QueueFrame
+from pydofus2.com.ankamagames.dofus.logic.common.managers.PlayerManager import PlayerManager
+from pydofus2.com.ankamagames.dofus.logic.connection.actions.LoginValidationWithTokenAction import (
+    LoginValidationWithTokenAction as LVA_WithToken,
+)
+from pydofus2.com.ankamagames.dofus.logic.connection.frames.AuthentificationFrame import AuthentificationFrame
+from pydofus2.com.ankamagames.dofus.logic.connection.managers.AuthentificationManager import AuthentificationManager
+from pydofus2.com.ankamagames.dofus.logic.game.approach.frames.GameServerApproachFrame import GameServerApproachFrame
+from pydofus2.com.ankamagames.dofus.logic.game.common.managers.PlayedCharacterManager import PlayedCharacterManager
 from pydofus2.com.ankamagames.jerakine.data.ModuleReader import ModuleReader
 from pydofus2.com.ankamagames.jerakine.logger.Logger import Logger
-from pydofus2.com.ankamagames.jerakine.network.messages.TerminateWorkerMessage import \
-    TerminateWorkerMessage
-from pydofus2.com.ankamagames.jerakine.resources.adapters.AdapterFactory import \
-    AdapterFactory
+from pydofus2.com.ankamagames.jerakine.network.messages.TerminateWorkerMessage import TerminateWorkerMessage
+from pydofus2.com.ankamagames.jerakine.resources.adapters.AdapterFactory import AdapterFactory
 
 if TYPE_CHECKING:
-    from pydofus2.com.ankamagames.jerakine.network.ServerConnection import \
-        ServerConnection
+    from pydofus2.com.ankamagames.jerakine.network.ServerConnection import ServerConnection
 
 # Set the locale to the locale identifier associated with the current language
 # The '.UTF-8' suffix specifies the character encoding
@@ -70,7 +58,7 @@ class DofusClient(threading.Thread):
         self._loginToken = None
         self._conxTries = 0
         self._connectionUnexpectedFailureTimes = []
-        self.mule = False
+        self._mule = False
         self._shutDownReason = None
         self._crashed = False
         self._shutDownMessage = ""
@@ -87,7 +75,7 @@ class DofusClient(threading.Thread):
         Kernel().init()
         AdapterFactory.addAdapter("ele", ElementsAdapter)
         # AdapterFactory.addAdapter("dlm", MapsAdapter)
-        Kernel().isMule = self.mule
+        Kernel().isMule = self._mule
         ModuleReader._clearObjectsCache = True
         self._shutDownReason = None
         self.initListeners()
@@ -123,7 +111,7 @@ class DofusClient(threading.Thread):
         self.onReconnect(event, message)
 
     def onLoginTimeout(self, listener: Listener):
-        self.worker.process(LoginValidationWithTokenAction.create(self._serverId != 0, self._serverId))
+        self.worker.process(LVA_WithToken.create(self._serverId != 0, self._serverId))
         listener.armTimer()
         self.lastLoginTime = perf_counter()
 
@@ -149,7 +137,7 @@ class DofusClient(threading.Thread):
             KernelEvent.CharacterImpossibleSelection, self.onCharacterImpossibleSelection, originator=self
         )
         KernelEventsManager().on(KernelEvent.FightStarted, self.onFight)
-    
+
     def onFight(self, event):
         pass
 
@@ -193,7 +181,7 @@ class DofusClient(threading.Thread):
                         DisconnectionReasonEnum.DISCONNECTED_BY_POPUP,
                         DisconnectionReasonEnum.CONNECTION_LOST,
                     ]:
-                        self.onRestart(None, reason.message)
+                        self.onRestart(event, reason.message)
                     elif reason.type == DisconnectionReasonEnum.SWITCHING_TO_GAME_SERVER:
                         Kernel().worker.addFrame(GameServerApproachFrame())
                         ConnectionsHandler().connectToGameServer(
@@ -201,20 +189,18 @@ class DofusClient(threading.Thread):
                             Kernel().serverSelectionFrame._selectedServer.ports[0],
                         )
                     elif reason.type == DisconnectionReasonEnum.CHANGING_SERVER:
-                        if not AuthentificationManager()._lva or AuthentificationManager()._lva.serverId is None:
+                        lva = AuthentificationManager()._lva
+                        targetServerId = lva.serverId if lva else None
+                        if targetServerId is None:
                             Logger().error(
                                 f"Closed connection to change server but no serverId is specified in Auth Manager"
                             )
                         else:
-                            Logger().info(f"Switching to {AuthentificationManager()._lva.serverId} server ...")
+                            Logger().info(f"Switching to target server {targetServerId} server ...")
                             Kernel().worker.addFrame(AuthentificationFrame())
                             Kernel().worker.addFrame(QueueFrame())
-                            Kernel().worker.process(
-                                LoginValidationWithTokenAction.create(
-                                    AuthentificationManager()._lva.serverId != 0,
-                                    AuthentificationManager()._lva.serverId,
-                                )
-                            )
+                            lva = LVA_WithToken.create(targetServerId != 0, targetServerId)
+                            Kernel().worker.process(lva)
                     elif reason.type == DisconnectionReasonEnum.SWITCHING_TO_HUMAN_VENDOR:
                         pass
 
@@ -255,10 +241,10 @@ class DofusClient(threading.Thread):
         self._reconnectRecord.append({"restartTime": formatted_time, "reason": message})
         Kernel().reset(reloadData=True)
         if afterTime:
-            sleep(afterTime)
+            self.terminated.wait(afterTime)
         self.initListeners()
         self.prepareLogin()
-        self.worker.process(LoginValidationWithTokenAction.create(self._serverId != 0, self._serverId))
+        self.worker.process(LVA_WithToken.create(self._serverId != 0, self._serverId))
 
     def waitNextLogin(self):
         if DofusClient.lastLoginTime is not None:
@@ -269,10 +255,8 @@ class DofusClient(threading.Thread):
         self.lastLoginTime = perf_counter()
 
     def shutdown(self, msg="", reason=None):
-        if not reason:
-            reason = DisconnectionReasonEnum.WANTED_SHUTDOWN
-        self._shutDownReason = reason
-        self._shutDownMessage = msg
+        self._shutDownReason = reason if reason else DisconnectionReasonEnum.WANTED_SHUTDOWN
+        self._shutDownMessage = msg if msg else "Wanted shutdown"
         if Kernel.getInstance(self.name):
             Kernel.getInstance(self.name).worker.process(TerminateWorkerMessage())
         else:
@@ -298,7 +282,7 @@ class DofusClient(threading.Thread):
         try:
             self.init()
             self.prepareLogin()
-            self.worker.process(LoginValidationWithTokenAction.create(self._serverId != 0, self._serverId))
+            self.worker.process(LVA_WithToken.create(self._serverId != 0, self._serverId))
             self.worker.run()
         except Exception as e:
             exc_type, exc_value, exc_traceback = sys.exc_info()

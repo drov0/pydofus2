@@ -1,7 +1,8 @@
 from collections import OrderedDict
+import os
+from pathlib import Path
 import xml.etree.ElementTree as ET
 import re
-from pydofus2.com.ankamagames.dofus import Constants
 from pydofus2.com.ankamagames.jerakine import JerakineConstants
 from pydofus2.com.ankamagames.jerakine.data.I18n import I18n
 from pydofus2.com.ankamagames.jerakine.managers.StoreDataManager import StoreDataManager
@@ -16,6 +17,8 @@ class XmlConfig(metaclass=ThreadSharedSingleton):
     _aLang = OrderedDict[str, str]()
 
     def __init__(self) -> None:
+        from pydofus2.com.ankamagames.dofus import Constants
+
         config_file_path = Constants.DOFUS_ROOTDIR / "config.xml"
         pattern = "(\[\S+(?:\.\S+)*\])"
         tree = ET.parse(config_file_path)
@@ -26,7 +29,12 @@ class XmlConfig(metaclass=ThreadSharedSingleton):
             m = re.match(pattern, v)
             if m:
                 var = m.group(0).replace("[", "").replace("]", "")
-                v = v.replace(m.group(0), self._constants[var])
+                if 'path' in var:
+                    second_path_part = v.replace(m.group(0), "")
+                    first_path_part = self._constants[var]
+                    v = str(Path(os.path.join(first_path_part, second_path_part)))
+                else:
+                    v = v.replace(m.group(0), self._constants[var])
             if key == "config.root.path":
                 v = str(Constants.DOFUS_ROOTDIR)
             self._constants[key] = v

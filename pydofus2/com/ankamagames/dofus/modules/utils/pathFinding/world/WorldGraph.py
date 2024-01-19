@@ -7,6 +7,7 @@ from pydofus2.com.ankamagames.dofus.modules.utils.pathFinding.world.TransitionTy
     TransitionTypeEnum
 from pydofus2.com.ankamagames.dofus.modules.utils.pathFinding.world.Vertex import \
     Vertex
+from pydofus2.com.ankamagames.jerakine.data.XmlConfig import XmlConfig
 from pydofus2.com.ankamagames.jerakine.logger.Logger import Logger
 from pydofus2.com.ankamagames.jerakine.metaclasses.ThreadSharedSingleton import \
     ThreadSharedSingleton
@@ -15,7 +16,7 @@ from pydofus2.com.ankamagames.jerakine.network.CustomDataWrapper import \
 from pydofus2.com.ankamagames.jerakine.types.enums.DirectionsEnum import \
     DirectionsEnum
 
-
+WORLDGRAPH_PATH = XmlConfig().getEntry("config.data.pathFinding")
 class WorldGraph(metaclass=ThreadSharedSingleton):
     
     def __init__(self):
@@ -27,7 +28,7 @@ class WorldGraph(metaclass=ThreadSharedSingleton):
 
     def init(self):
         s = perf_counter()
-        with open(Constants.WORLDGRAPH_PATH, "rb") as binaries:
+        with open(WORLDGRAPH_PATH, "rb") as binaries:
             data = ByteArray(binaries.read())
             edgeCount: int = data.readInt()
             for _ in range(edgeCount):

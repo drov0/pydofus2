@@ -1,5 +1,7 @@
+import os
 from typing import TYPE_CHECKING, Any
 from pydofus2.com.ankamagames.dofus import Constants
+from pydofus2.com.ankamagames.jerakine.data.XmlConfig import XmlConfig
 
 if TYPE_CHECKING:
     from pydofus2.com.ankamagames.jerakine.data.GameDataClassDefinition import GameDataClassDefinition
@@ -12,6 +14,7 @@ lock = threading.Lock()
 
 
 class GameData(metaclass=ThreadSharedSingleton):
+    
     def __init__(self) -> None:
         self._modules = dict[str, ModuleReader]()
 
@@ -20,7 +23,8 @@ class GameData(metaclass=ThreadSharedSingleton):
 
     def addModuleByName(self, moduleName: str) -> None:
         if moduleName not in self._modules:
-            file_path = Constants.DOFUS_COMMON_DIR / f"{moduleName}.d2o"
+            common_dir = XmlConfig().getEntry("config.data.path.common")
+            file_path = os.path.join(common_dir, f"{moduleName}.d2o")
             self.addModule(file_path, moduleName)
 
     def getModule(self, moduleName: str) -> ModuleReader:

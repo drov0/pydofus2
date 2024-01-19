@@ -1,5 +1,6 @@
 # utf-8
 import io
+from pathlib import Path
 from pydofus2.com.ankamagames.jerakine.logger.Logger import Logger
 import os
 from pydofus2.com.ankamagames.dofus import Constants as Constants
@@ -13,7 +14,7 @@ class CustomSharedObjectFileFormatError(Exception):
 class CustomSharedObject:
 
     DATAFILE_EXTENSION = "dat"
-    COMMON_FOLDER = Constants.DOFUS_LOCAL_DATA_STORE
+    COMMON_FOLDER = Path(os.getenv("APPDATA")) / "Dofus"
     directory = "Dofus"
     useDefaultDirectory = False
     clearedCacheAndRebooting = False
@@ -32,8 +33,6 @@ class CustomSharedObject:
     def getLocal(cls, name: str) -> "CustomSharedObject":
         if cls._cache.get(name):
             return cls._cache[name]
-        if not cls.COMMON_FOLDER:
-            cls.COMMON_FOLDER = Constants.DOFUS_LOCAL_DATA_STORE
         cso: CustomSharedObject = CustomSharedObject()
         cso._name = name
         cso.getDataFromFile()

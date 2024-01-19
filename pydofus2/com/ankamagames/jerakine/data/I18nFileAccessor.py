@@ -1,14 +1,21 @@
-from functools import lru_cache
+import os
 import threading
+import xml.etree.ElementTree as ET
+from functools import lru_cache
 from time import perf_counter
+
 from pydofus2.com.ankamagames.dofus import Constants
+from pydofus2.com.ankamagames.jerakine.data.BinaryStream import BinaryStream
 from pydofus2.com.ankamagames.jerakine.logger.Logger import Logger
 from pydofus2.com.ankamagames.jerakine.managers.LangManager import LangManager
-from pydofus2.com.ankamagames.jerakine.metaclasses.ThreadSharedSingleton import ThreadSharedSingleton
-from pydofus2.com.ankamagames.jerakine.data.BinaryStream import BinaryStream
+from pydofus2.com.ankamagames.jerakine.managers.StoreDataManager import \
+    StoreDataManager
+from pydofus2.com.ankamagames.jerakine.metaclasses.ThreadSharedSingleton import \
+    ThreadSharedSingleton
 
 
 class I18nFileAccessor(metaclass=ThreadSharedSingleton):
+    
 
     _initialized = threading.Event()
     _initializing = threading.Event()
@@ -23,13 +30,42 @@ class I18nFileAccessor(metaclass=ThreadSharedSingleton):
             if not I18nFileAccessor._initialized.wait(10):
                 raise RuntimeError("Wait for holder to initialise timedout")
             return
+        self.LANG_FILE_PATH = self.getLangFile()
         self.initI18n()
 
+    @staticmethod
+    def getLangFile() -> BinaryStream:
+        from pydofus2.com.ankamagames.jerakine.data.XmlConfig import XmlConfig
+
+        xml_file_path = XmlConfig().getEntry("config.data.path.i18n.list")
+        lang_files_dir = XmlConfig().getEntry('config.data.path.i18n')
+        tree = ET.parse(xml_file_path)
+        root = tree.getroot()
+        files_dict = {}
+        for file_elem in root.findall('.//file'):
+            file_name = file_elem.get('name')
+            if file_name:
+                full_path = os.path.join(lang_files_dir, file_name)
+                if os.path.exists(full_path):
+                    files_dict[file_name] = full_path
+        lastLang = StoreDataManager().getData(Constants.DATASTORE_LANG_VERSION, "lastLang")
+        file_name = None
+        if lastLang:
+            file_name = f"i18n_{lastLang}.d2i"
+        else:
+            # Get any file but in preference current if exists
+            file_name = XmlConfig().getEntry("config.lang.current")
+            if not file_name in files_dict:
+                file_name = list(files_dict.keys())[0]
+        if file_name is None:
+            raise RuntimeError("No lang file found")
+        return files_dict[file_name]
+        
     def initI18n(self):
         self._initializing.set()
         Logger().info("Loading I18n file...")
         s = perf_counter()
-        with open(Constants.LANG_FILE_PATH, "rb") as fp:
+        with open(self.LANG_FILE_PATH, "rb") as fp:
             stream = BinaryStream(fp, big_endian=True)
             self.indexes = dict()
             self.unDiacriticalIndex = dict()
@@ -100,7 +136,7 @@ class I18nFileAccessor(metaclass=ThreadSharedSingleton):
         if not pointer:
             return None
         if self.directBuffer is None:
-            with open(Constants.LANG_FILE_PATH, "rb") as fp:
+            with open(self.LANG_FILE_PATH, "rb") as fp:
                 stream = BinaryStream(fp, big_endian=True)
                 stream.position = pointer
                 return stream.readUTF()
@@ -114,7 +150,7 @@ class I18nFileAccessor(metaclass=ThreadSharedSingleton):
         pointer: int = self.unDiacriticalIndex.get(key)
         if not pointer:
             return None
-        with open(Constants.LANG_FILE_PATH, "rb") as fp:
+        with open(self.LANG_FILE_PATH, "rb") as fp:
             stream = BinaryStream(fp, big_endian=True)
             if self.directBuffer is None:
                 stream.position = pointer
@@ -134,7 +170,7 @@ class I18nFileAccessor(metaclass=ThreadSharedSingleton):
         pointer = self.textIndexes.get(textKey)
         if not pointer:
             return None
-        with open(Constants.LANG_FILE_PATH, "rb") as fp:
+        with open(self.LANG_FILE_PATH, "rb") as fp:
             stream = BinaryStream(fp, big_endian=True)
             stream.position = pointer
             return stream.readUTF()
@@ -149,7 +185,7 @@ class I18nFileAccessor(metaclass=ThreadSharedSingleton):
             self.directBuffer = None
         else:
             self.directBuffer = BinaryStream()
-            with open(Constants.LANG_FILE_PATH, "rb") as fp:
+            with open(self.LANG_FILE_PATH, "rb") as fp:
                 stream = BinaryStream(fp, big_endian=True)
                 stream.position = 0
                 self.directBuffer.writeBytes(stream.readBytes())

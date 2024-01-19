@@ -105,6 +105,7 @@ class MapRenderer(QGraphicsScene):
         pixmap.loadFromData(image_bytes)
         nged: NormalGraphicalElementData = uri.tag
         cellId = MapDisplayManager().dataMap.getGfxCell(nged.gfxId)
+        
         imageCenter = Cell.cellPixelCoords(cellId)
         
         pixmapItem = QGraphicsPixmapItem(pixmap)  # Create QGraphicsPixmapItem

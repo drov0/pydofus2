@@ -1,6 +1,5 @@
 import os
 from pathlib import Path
-
 from pydofus2.com.ankamagames.jerakine.network.CustomDataWrapper import ByteArray
 from pydofus2.com.ankamagames.jerakine.types.DataStoreType import DataStoreType
 from pydofus2.com.ankamagames.jerakine.types.enums.DataStoreEnum import DataStoreEnum
@@ -55,19 +54,7 @@ MAPS_PATH = Path(os.getenv("APPDATA")) / "pydofus2" / "content" / "maps"
 
 AVERAGE_PRICES_PATH = Path(os.getenv("APPDATA")) / "pydofus2" / "content" / "average_prices.json"
 
-DOFUS_DATA_DIR = DOFUS_ROOTDIR / "data"
-
-LANG_FILE_PATH = DOFUS_DATA_DIR / "i18n" / "i18n_en.d2i"
-
-DOFUS_COMMON_DIR = DOFUS_DATA_DIR / "common"
-
-DOFUS_LOCAL_DATA_STORE = Path(os.getenv("APPDATA")) / "Dofus"
-
-DOFUS_CONTENT_DIR = DOFUS_ROOTDIR / "content"
-
-PROTOCOL_SPEC_PATH = ROOTDIR / ".." / "jerakine" / "network" / "parser" / "D2protocol.json"
-
-WORLDGRAPH_PATH = DOFUS_CONTENT_DIR / "maps" / "world-graph.binary"
+PROTOCOL_SPEC_PATH = ROOTDIR.parent / "jerakine" / "network" / "parser" / "D2protocol.json"
 
 PROTOCOL_MSG_SHUFFLE_PATH = ROOTDIR / "network" / "MsgShuffle.json"
 

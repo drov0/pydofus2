@@ -1,13 +1,21 @@
 import math
 from pydofus2.com.ankamagames.berilia.managers.EventsHandler import EventsHandler
 from pydofus2.com.ankamagames.dofus.kernel.Kernel import Kernel
+from pydofus2.com.ankamagames.dofus.logic.common.managers.PlayerManager import PlayerManager
+from pydofus2.com.ankamagames.dofus.logic.game.common.managers.PlayedCharacterManager import PlayedCharacterManager
+from pydofus2.com.ankamagames.dofus.misc.stats.IHookStats import IHookStats
+from pydofus2.com.ankamagames.dofus.misc.stats.StatisticsEvent import StatisticsEvent
 from pydofus2.com.ankamagames.dofus.misc.stats.StatsAction import StatsAction
+from pydofus2.com.ankamagames.dofus.misc.stats.custom.SessionStartStats import SessionStartStats
 from pydofus2.com.ankamagames.dofus.misc.utils.HaapiKeyManager import HaapiKeyManager
 from pydofus2.com.ankamagames.jerakine.data.XmlConfig import XmlConfig
+from pydofus2.com.ankamagames.jerakine.logger.Logger import Logger
 from pydofus2.com.ankamagames.jerakine.managers.StoreDataManager import StoreDataManager
+from pydofus2.com.ankamagames.jerakine.messages.Message import Message
 from pydofus2.com.ankamagames.jerakine.metaclasses.Singleton import Singleton
 from pydofus2.com.ankamagames.jerakine.types.DataStoreType import DataStoreType
 from pydofus2.com.ankamagames.jerakine.types.enums.DataStoreEnum import DataStoreEnum
+import pytz
 
 
 class StatisticsManager(EventsHandler, metaclass=Singleton):
@@ -20,14 +28,15 @@ class StatisticsManager(EventsHandler, metaclass=Singleton):
         self._componentsStats = {}
         self._firstTimeUserExperience = {}
         self._removedStats = []
-        self._actionsSent = []
+        self._actionsSent = list[StatsAction]()
         self._dataStoreType = None
         self.initDataStoreType()
-        # self._dateTimeFormatter = ...  # Set up Python's datetime formatter as needed
+        self._dateTimeFormatter = '%Y-%m-%dT%H:%M:%S+00:00'
         self._exiting = False
         self._stepByStep = None
         self._sentryReported = False
-        self._apiCredentials = None  # Define the ApiUserCredentials class in Python
+        self._apiCredentials = None
+        self._pendingActions = list[StatsAction]()
 
     def initDataStoreType(self):
         if not self._dataStoreType or self._dataStoreType.category != "statistics":
@@ -73,15 +82,6 @@ class StatisticsManager(EventsHandler, metaclass=Singleton):
     def setFirstTimeUserExperience(self, pUiName, pValue):
         self._firstTimeUserExperience[pUiName] = pValue
 
-    def startStats(self, pStatsName: str, *args):
-        customStatsInfo = self._statsAssoc[pStatsName]
-        if customStatsInfo and (not customStatsInfo.ftue or self._firstTimeUserExperience.get(pStatsName)):
-            self._stats[pStatsName] = customStatsInfo.statsClass(*args)
-            removedIndex = self._removedStats.find(pStatsName)
-            if removedIndex != -1:
-                self._removedStats.pop(removedIndex)
-                del self._stats[pStatsName]
-    
     def init(self):
         if not self._pendingActions:
             self._pendingActions = []
@@ -129,7 +129,7 @@ class StatisticsManager(EventsHandler, metaclass=Singleton):
 
     def destroy(self): 
         StatsAction.reset()
-        ModuleLogger.active = false
+        ModuleLogger.active = False
         ModuleLogger.removeCallback(self.log)
         Kernel().worker.removeFrame(self._frame)
         self._statsAssoc.clear()
@@ -150,7 +150,7 @@ class StatisticsManager(EventsHandler, metaclass=Singleton):
     def frame(self):
         return self._frame
 
-    def saveActionTimestamp(self, pActionId, pTimestamp):
+    def saveActionTimestamp(self, pActionId: int, pTimestamp: int):
         StoreDataManager().setData(self._dataStoreType, self.getActionDataId(pActionId), pTimestamp)
 
     def getActionTimestamp(self, pActionId):
@@ -196,4 +196,86 @@ class StatisticsManager(EventsHandler, metaclass=Singleton):
         return len(self.getEventsToSend()) > 0
 
     def formatDate(self, pDate):
-        return self._dateTimeFormatter.formatUTC(pDate)
+        # Assuming pDate is a datetime object. If it's a string, you'll need to parse it first.
+        # Convert pDate to UTC
+        utc_date = pDate.astimezone(pytz.utc)
+        # Format the date in the desired format
+        formatted_date = utc_date.strftime(self._dateTimeFormatter)
+        return formatted_date
+
+    def quit(self):
+        self.send(StatisticsEvent.ALL_DATA_SENT)
+        self.destroy()
+    
+    
+    def startStats(self, pStatsName: str, *args):
+        customStatsInfo = self._statsAssoc[pStatsName]
+        if customStatsInfo and (not customStatsInfo.ftue or self._firstTimeUserExperience.get(pStatsName)):
+            self._stats[pStatsName] = customStatsInfo.statsClass(*args)
+            removedIndex = self._removedStats.find(pStatsName)
+            if removedIndex != -1:
+                self._removedStats.pop(removedIndex)
+                del self._stats[pStatsName]
+
+    def getActionDataId(self, pActionId):
+        id = None
+        characterName = PlayedCharacterManager().name
+        accountName = PlayerManager().nickname
+        if characterName:
+            id = characterName
+        elif accountName:
+            id = accountName
+        actionId = str(pActionId)
+        return f"{id}#{actionId}" if id else str(actionId)
+
+    def log(self, *args):
+        if isinstance(args[0], Message):
+            for stats in self._stats.values():
+                stats.process(args[0], args)
+            for componentStats in self._componentsStats:
+                if args[1] == componentStats.component:
+                    componentStats.process(args[0], args)
+        elif len(args) > 1 and args[1] == "hook":
+            for stats in self._stats:
+                if isinstance(stats, IHookStats):
+                    stats.onHook(args[0], args[2])
+            for componentStats in self._componentsStats:
+                if isinstance(componentStats, IHookStats):
+                    componentStats.onHook(args[0], args[2])
+
+    def registerStats(self, pUiName, pUiStatsClass, pFtue=False):
+        self._statsAssoc[pUiName] = {
+            "statClass": pUiStatsClass,
+            "ftue": pFtue
+        }
+
+    def initDataStoreType(self):
+        if not self._dataStoreType or self._dataStoreType.category != "statistics":
+            self._dataStoreType = DataStoreType("statistics", True, DataStoreEnum.LOCATION_LOCAL, DataStoreEnum.BIND_COMPUTER)
+
+    def onAccountApiCallResult(self, e):
+        Logger().info("Device info sent successfully")
+
+    def onAccountApiCallError(self, e):
+        if e.response.payload is None or e.response.payload.message == self.NORMAL_ERROR:
+            return
+        Logger().warn("Account Api Error : " + e.response.payload.message)
+
+    def sendDeviceInfos(self):
+        Logger().info("Calling method SendDeviceInfos")
+        self._accountApi.send_device_infos(0, AccountApi.sendDeviceInfos_ConnectionTypeEnum_ANKAMA, AccountApi.sendDeviceInfos_ClientTypeEnum_STANDALONE, SystemManager().os.replace(" ", "").upper(), AccountApi.sendDeviceInfos_DeviceEnum_PC, None, DeviceUtils.deviceUniqueIdentifier, HaapiKeyManager().getAccountSessionId(), onSuccess=self.onAccountApiCallResult, onError=self.onAccountApiCallError)
+
+    def getEventsToSend(self):
+        result = []
+        gameSessionId = 0
+        currentGameSessionId = HaapiKeyManager().getGameSessionId()
+        for action in self._pendingActions:
+            if not self._exiting and (currentGameSessionId != 0 and (action.gameSessionId == currentGameSessionId and not action.sendOnExit) or action.gameSessionId):
+                if gameSessionId == 0:
+                    gameSessionId = action.gameSessionId
+                elif gameSessionId != action.gameSessionId:
+                    break
+                result.append(action)
+                if self._stepByStep == gameSessionId:
+                    break
+        return result

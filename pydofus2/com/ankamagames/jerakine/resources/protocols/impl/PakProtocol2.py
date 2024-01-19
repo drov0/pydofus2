@@ -5,6 +5,7 @@ from pathlib import Path
 from typing import Dict, Optional, Union
 
 from pydofus2.com.ankamagames.jerakine.data.BinaryStream import BinaryStream
+from pydofus2.com.ankamagames.jerakine.logger.Logger import Logger
 from pydofus2.com.ankamagames.jerakine.newCache.ICache import ICache
 from pydofus2.com.ankamagames.jerakine.resources.IResourceObserver import \
     IResourceObserver
@@ -31,18 +32,19 @@ class PakProtocol2(AbstractProtocol):
 
     def loadDirectly(self, uri: Uri) -> bytes:
         index = None
-        data = bytearray()
         fileStream = None
         if not self._indexes.get(uri.path):
             fileStream = self.initStream(uri)
             if not fileStream:
+                Logger().error("Unable data for this uri : " + uri.path + " / " + uri.subPath + " / " + uri.fileType)
                 return
         index = self._indexes[uri.path].get(uri.subPath)
         if not index:
             return
         fileStream: BinaryStream = index['stream']
         fileStream.seek(index['o'])
-        return fileStream.readBytes(index['l'])
+        resource_bytes = fileStream.readBytes(index['l'])
+        return resource_bytes
         
     def load(self, uri: Uri, observer: 'IResourceObserver', dispatchProgress: bool, cache: 'ICache', forcedAdapter: 'type', uniqueFile: bool) -> None:
         index = None
@@ -52,12 +54,12 @@ class PakProtocol2(AbstractProtocol):
             fileStream = self.initStream(uri)
             if not fileStream:
                 if observer:
-                    observer.onFailed(uri, "UnableVisible to find container.", 'PAK_NOT_FOUND')
+                    observer.onFailed(uri, "Unable to find container.", 'PAK_NOT_FOUND')
                 return
         index = self._indexes[uri.path].get(uri.subPath)
         if not index:
             if observer:
-                observer.onFailed(uri, "UnableVisible to find the file in the container.", 'FILE_NOT_FOUND_IN_PAK')
+                observer.onFailed(uri, "Unable to find the file in the container.", 'FILE_NOT_FOUND_IN_PAK')
             return
         fileStream: BinaryStream = index['stream']
         fileStream.seek(index['o'])
@@ -95,6 +97,7 @@ class PakProtocol2(AbstractProtocol):
         self._indexes[uri.path] = indexes
         self._properties[uri.path] = properties
         while file and file.exists():
+            print("working on : " + fileUri.path)
             fs = BinaryStream(file.open('rb'), True)
             vMax = fs.readUnsignedByte()
             vMin = fs.readUnsignedByte()
@@ -109,12 +112,15 @@ class PakProtocol2(AbstractProtocol):
             propertiesCount = fs.readUnsignedInt()
             fs.position = propertiesOffset
             file = None
-            for _ in range(propertiesCount):
-                propertyName = fs.readUTF()
-                propertyValue = fs.readUTF()
-                properties[propertyName] = propertyValue
-                if propertyName == "link":
-                    file = fileUri.toFile().parent / propertyValue
+            propertyName = str(fs.readUTF())
+            propertyValue = str(fs.readUTF())
+            if propertyName == "link":
+                idx = fileUri.path.rfind("\\")
+                if idx != -1:
+                    fileUri = Uri(fileUri.path[:idx] + "/" + propertyValue)
+                else:
+                    fileUri = Uri(propertyValue)
+                file = fileUri.toFile()
             fs.seek(indexOffset)
             for _ in range(indexCount):
                 filePath = fs.readUTF()

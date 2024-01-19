@@ -1,11 +1,14 @@
-from datetime import datetime
 import hashlib
 import json
+from datetime import datetime
 from time import perf_counter
-from pydofus2.com.ankamagames.dofus.logic.connection.managers.AuthentificationManager import AuthentificationManager
 
+from pydofus2.com.ankamagames.dofus.logic.connection.managers.AuthentificationManager import AuthentificationManager
 from pydofus2.com.ankamagames.dofus.logic.game.common.managers.TimeManager import TimeManager
+from pydofus2.com.ankamagames.dofus.misc.stats.StatisticsManager import StatisticsManager
+from pydofus2.com.ankamagames.dofus.misc.utils.HaapiKeyManager import HaapiKeyManager
 from pydofus2.com.ankamagames.jerakine.logger.Logger import Logger
+
 
 class StatsAction:
     _usersActions = {}
@@ -31,28 +34,28 @@ class StatsAction:
             return "user-" + hashlib.md5(login.encode()).hexdigest()
         return None
 
-    @staticmethod
-    def get(pStatsActionId, pPersistent=False, pAggregate=False, pAddTimestamp=False, pSendOnExit=False):
+    @classmethod
+    def get(cls, pStatsActionId, pPersistent=False, pAggregate=False, pAddTimestamp=False, pSendOnExit=False):
         userId = StatsAction.getUserId()
         if pStatsActionId not in StatsAction._usersActions:
             sa = StatsAction(pStatsActionId, pPersistent, pAggregate, pAddTimestamp, pSendOnExit)
             sa._userId = userId
             sa._gameSessionId = HaapiKeyManager().getGameSessionId()
-            StatsAction._usersActions[pStatsActionId] = sa
-        return StatsAction._usersActions[pStatsActionId]
+            cls._usersActions[pStatsActionId] = sa
+        return cls._usersActions[pStatsActionId]
 
     @staticmethod
     def fromString(pString):
         try:
             obj = json.loads(pString)
-            sa = StatsAction(obj['event_id'])
-            if 'user' in obj:
-                sa._userId = obj['user']
-            if 'gameSessionId' in obj:
-                sa._gameSessionId = obj['gameSessionId']
-            for param in obj['data']:
-                sa.setParam(param, obj['data'][param])
-            sa.date = datetime.strptime(obj['date'], "%Y-%m-%dT%H:%M:%S")  # Adjust format as needed
+            sa = StatsAction(obj["event_id"])
+            if "user" in obj:
+                sa._userId = obj["user"]
+            if "gameSessionId" in obj:
+                sa._gameSessionId = obj["gameSessionId"]
+            for param in obj["data"]:
+                sa.setParam(param, obj["data"][param])
+            sa.date = datetime.strptime(obj["date"], "%Y-%m-%dT%H:%M:%S")  # TODO: Check if this is the correct format
             return sa
         except Exception as e:
             Logger().warning("Invalid event data from cache : " + pString)
@@ -69,39 +72,47 @@ class StatsAction:
     @property
     def id(self):
         return self._id
-    
+
+    @property
+    def user(self):
+        return self._userId
+
+    @user.setter
+    def user(self, pUser):
+        self._userId = pUser
+
     @property
     def params(self):
         return self._params
-    
+
     @property
     def paramsString(self):
         return json.dumps(self._params)
-    
+
     @property
     def date(self):
         return self._date
-    
+
     @date.setter
     def date(self, pDate):
         self._date = pDate
-    
+
     @property
     def sendOnExit(self):
         return self._sendOnExit
-    
+
     @sendOnExit.setter
     def sendOnExit(self, pSendOnExit):
         self._sendOnExit = pSendOnExit
-    
+
     @property
     def gameSessionId(self):
         return self._gameSessionId
-    
+
     @gameSessionId.setter
     def gameSessionId(self, pGameSessionId):
         self._gameSessionId = pGameSessionId
-        
+
     def start(self):
         if not self._started and self._addTimestamp:
             if not self._persistent:
@@ -118,10 +129,10 @@ class StatsAction:
     def restart(self):
         self._started = False
         self.start()
-        
+
     def cancel(self):
         self._usersActions.pop(self._id, None)
-        
+
     def updateTimestamp(self):
         self._timestamp = TimeManager().getTimestamp()
         if self._persistent:
@@ -129,7 +140,7 @@ class StatsAction:
 
     def addParam(self, pKey, pType):
         # Implement the logic for adding a parameter with type if necessary
-        pass
+        raise NotImplementedError()
 
     def hasParam(self, pKey):
         return pKey in self._params
@@ -140,7 +151,11 @@ class StatsAction:
     def send(self):
         self._date = datetime.now()
         if self._addTimestamp:
-            action_duration_seconds = int((TimeManager().getTimestamp() - self._timestamp) / 1000 if self._persistent else (perf_counter() - self._startTime) / 1000)
+            action_duration_seconds = int(
+                (TimeManager().getTimestamp() - self._timestamp) / 1000
+                if self._persistent
+                else (perf_counter() - self._startTime) / 1000
+            )
             self._params["action_duration_seconds"] = action_duration_seconds
             if self._persistent:
                 StatisticsManager().deleteTimeStamp(self._id)
@@ -149,10 +164,7 @@ class StatsAction:
             del StatsAction._usersActions[self._id]
 
     def toString(self, backup=False):
-        obj = {
-            "event_id": self._id,
-            "data": self.paramsString()
-        }
+        obj = {"event_id": self._id, "data": self.paramsString()}
 
         if backup:
             obj["user"] = self._userId

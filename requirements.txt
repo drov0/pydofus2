@@ -9,4 +9,5 @@ pyppeteer
 cloudscraper
 aiohttp
 requests
-prettytable 
+prettytable
+pytz

@@ -4,7 +4,8 @@ from typing import TYPE_CHECKING
 from pydofus2.com.ankamagames.dofus.datacenter.jobs.Job import Job
 from pydofus2.com.ankamagames.dofus.datacenter.world.MapPosition import \
     MapPosition
-from pydofus2.com.ankamagames.dofus.internalDatacenter.mount.MountData import MountData
+from pydofus2.com.ankamagames.dofus.internalDatacenter.mount.MountData import \
+    MountData
 from pydofus2.com.ankamagames.dofus.logic.game.common.misc.DofusEntities import \
     DofusEntities
 from pydofus2.com.ankamagames.dofus.modules.utils.pathFinding.world.Vertex import \
@@ -36,7 +37,6 @@ if TYPE_CHECKING:
     from pydofus2.com.ankamagames.dofus.internalDatacenter.items.ItemWrapper import ItemWrapper
     from pydofus2.com.ankamagames.dofus.internalDatacenter.items.WeaponWrapper import WeaponWrapper
     from pydofus2.com.ankamagames.jerakine.types.positions.MapPoint import MapPoint
-
 
 from pydofus2.com.ankamagames.dofus.internalDatacenter.DataEnum import DataEnum
 from pydofus2.com.ankamagames.dofus.logic.common.managers.StatsManager import \
@@ -417,6 +417,12 @@ class PlayedCharacterManager(IDestroyable, metaclass=Singleton):
             return None
         return self.currentCell.linkedZoneRP
 
+    @property
+    def name(self) -> str:
+        if self.infos:
+            return self.infos.name
+        return None
+    
     def addInfosAvailableCallback(self, pCallback: Callback) -> None:
         self._infosAvailableCallbacks.append(pCallback)
 

@@ -472,31 +472,31 @@ class QuestFrame(Frame):
             return True
 
         if isinstance(msg, AchievementRewardSuccessMessage):
-                rewardedAchievementIndex = 0
-                for achievementRewardable in self._rewardableAchievements:
-                    if achievementRewardable.id == msg.achievementId:
-                        rewardedAchievementIndex = self._rewardableAchievements.index(achievementRewardable)
-                        break
-                if self._rewardableAchievements:
-                    self._rewardableAchievements.pop(rewardedAchievementIndex)
+            rewardedAchievementIndex = 0
+            for achievementRewardable in self._rewardableAchievements:
+                if achievementRewardable.id == msg.achievementId:
+                    rewardedAchievementIndex = self._rewardableAchievements.index(achievementRewardable)
+                    break
+            if self._rewardableAchievements:
+                self._rewardableAchievements.pop(rewardedAchievementIndex)
 
-                for achievementIndex, achievementAchieved in enumerate(self._achievementsList.finishedAchievements):
-                    if achievementAchieved.id == msg.achievementId and isinstance(achievementAchieved, AchievementAchievedRewardable):
-                        aa = AchievementAchieved()
-                        aa.init(achievementAchieved.id, achievementAchieved.achievedBy)
-                        self._achievementsList.finishedAchievements[achievementIndex] = aa
-                        break
+            for achievementIndex, achievementAchieved in enumerate(self._achievementsList.finishedAchievements):
+                if achievementAchieved.id == msg.achievementId and isinstance(achievementAchieved, AchievementAchievedRewardable):
+                    aa = AchievementAchieved()
+                    aa.init(achievementAchieved.id, achievementAchieved.achievedBy)
+                    self._achievementsList.finishedAchievements[achievementIndex] = aa
+                    break
 
-                KernelEventsManager().send(KernelEvent.AchievementRewardSuccess, msg.achievementId)
+            KernelEventsManager().send(KernelEvent.AchievementRewardSuccess, msg.achievementId)
 
-                if self._rewardableAchievementsVisible and not self.doesRewardsUiNeedOpening():
-                    self._rewardableAchievementsVisible = False
-                    KernelEventsManager().send(KernelEvent.RewardableAchievementsVisible, self._rewardableAchievementsVisible)
+            if self._rewardableAchievementsVisible and not self.doesRewardsUiNeedOpening():
+                self._rewardableAchievementsVisible = False
+                KernelEventsManager().send(KernelEvent.RewardableAchievementsVisible, self._rewardableAchievementsVisible)
 
-                rewardedAchievement = Achievement.getAchievementById(msg.achievementId)
-                if FeatureManager().isFeatureWithKeywordEnabled(FeatureEnum.TEMPORIS_ACHIEVEMENT_PROGRESS) and rewardedAchievement is not None and rewardedAchievement.category.id == self.TEMPORIS_CATEGORY:
-                    self.displayRewardedAchievementInChat(rewardedAchievement)
-
+            rewardedAchievement = Achievement.getAchievementById(msg.achievementId)
+            if FeatureManager().isFeatureWithKeywordEnabled(FeatureEnum.TEMPORIS_ACHIEVEMENT_PROGRESS) and rewardedAchievement is not None and rewardedAchievement.category.id == self.TEMPORIS_CATEGORY:
+                self.displayRewardedAchievementInChat(rewardedAchievement)
+            return True
 
         return False  # or whatever the default return value should be
 

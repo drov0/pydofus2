@@ -214,8 +214,13 @@ class MessageReceiver(RawDataParser, metaclass=Singleton):
                 self.msgLen = int.from_bytes(buffer.read(self.msgLenLen), "big")
             if buffer.remaining() < self.msgLen:
                 break
-            msg_bytes = buffer.read(self.msgLen)            
-            msg = self.parseMessage(msg_bytes, self.msgId, self.msgLen, from_client, self.msgCount)
+            msg_bytes = buffer.read(self.msgLen)
+            try:     
+                msg = self.parseMessage(msg_bytes, self.msgId, self.msgLen, from_client, self.msgCount)
+            except:
+                Logger().error(f"Error while parsing message {self.msgId} from client {from_client}")
+                msg = NetworkMessage()
+                msg.unpacked = False
             if from_dataContainer:
                 Logger().debug(f"Received {msg} from data container")
             self.msgId = None

@@ -297,6 +297,8 @@ class ServerConnection(mp.Thread):
     def handleMessage(self, msg: NetworkMessage, from_client=False):
         if self.closed or not self.connected:
             return
+        if msg is None:
+            return
         if type(msg).__name__ == "BasicPongMessage" and self._lastSentPingTime:
             latency = round(1000 * (perf_counter() - self._lastSentPingTime), 2)
             Logger().info(f"Latency : {latency}ms, average {self.latencyAvg}, var {self.latencyVar}")

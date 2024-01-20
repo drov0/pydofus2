@@ -1,12 +1,16 @@
 import math
+import platform
 from pydofus2.com.ankamagames.berilia.managers.EventsHandler import EventsHandler
 from pydofus2.com.ankamagames.dofus.kernel.Kernel import Kernel
 from pydofus2.com.ankamagames.dofus.logic.common.managers.PlayerManager import PlayerManager
 from pydofus2.com.ankamagames.dofus.logic.game.common.managers.PlayedCharacterManager import PlayedCharacterManager
+from pydofus2.com.ankamagames.dofus.misc.DeviceUtils import DeviceUtils
+from pydofus2.com.ankamagames.dofus.misc.openApi.ApiUserCredentials import ApiUserCredentials
 from pydofus2.com.ankamagames.dofus.misc.stats.IHookStats import IHookStats
 from pydofus2.com.ankamagames.dofus.misc.stats.StatisticsEvent import StatisticsEvent
 from pydofus2.com.ankamagames.dofus.misc.stats.StatsAction import StatsAction
 from pydofus2.com.ankamagames.dofus.misc.stats.custom.SessionStartStats import SessionStartStats
+from pydofus2.com.ankamagames.dofus.misc.utils.GameID import GameID
 from pydofus2.com.ankamagames.dofus.misc.utils.HaapiKeyManager import HaapiKeyManager
 from pydofus2.com.ankamagames.jerakine.data.XmlConfig import XmlConfig
 from pydofus2.com.ankamagames.jerakine.logger.Logger import Logger
@@ -31,7 +35,7 @@ class StatisticsManager(EventsHandler, metaclass=Singleton):
         self._actionsSent = list[StatsAction]()
         self._dataStoreType = None
         self.initDataStoreType()
-        self._dateTimeFormatter = '%Y-%m-%dT%H:%M:%S+00:00'
+        self._dateTimeFormatter = "%Y-%m-%dT%H:%M:%S+00:00"
         self._exiting = False
         self._stepByStep = None
         self._sentryReported = False
@@ -40,14 +44,16 @@ class StatisticsManager(EventsHandler, metaclass=Singleton):
 
     def initDataStoreType(self):
         if not self._dataStoreType or self._dataStoreType.category != "statistics":
-            self._dataStoreType = DataStoreType("statistics", True, DataStoreEnum.LOCATION_LOCAL, DataStoreEnum.BIND_COMPUTER)
+            self._dataStoreType = DataStoreType(
+                "statistics", True, DataStoreEnum.LOCATION_LOCAL, DataStoreEnum.BIND_COMPUTER
+            )
 
     @property
     def sending(self):
         return len(self._actionsSent) > 0
 
     def onConfigfileLoaded(self):
-        self._apiCredentials = ApiUserCredentials("", XmlConfig().getEntry("config.haapiUrlAnkama"), None) 
+        self._apiCredentials = ApiUserCredentials("", XmlConfig().getEntry("config.haapiUrlAnkama"), None)
         self._gameApi = GameApi(self._apiCredentials)
         self.sendPendingEvents()
 
@@ -59,26 +65,30 @@ class StatisticsManager(EventsHandler, metaclass=Singleton):
 
     def onAccountSessionReady(self, event):
         HaapiKeyManager().remove_listener(AccountSessionReadyEvent.READY, self.onAccountSessionReady)
+
         def callback(apiKey):
             self._apiCredentials.apiToken = apiKey
             self._accountApi = AccountApi(self._apiCredentials)
             self.sendDeviceInfos()
+
         HaapiKeyManager().callWithApiKey(callback)
-    
+
     @property
     def statsEnabled(self):
         return self._statsAssoc is not None
-    
+
     @statsEnabled.setter
     def statsEnabled(self, value):
         self._statsAssoc = value
-        
+
     def startFirstTimeUserExperience(self, pUserId):
         for uiName in self._statsAssoc:
             if self._statsAssoc[uiName].ftue:
-                self._firstTimeUserExperience(uiName, True) 
-        StoreDataManager().setData(self._dataStoreType, f"firstTimeUserExperience-{pUserId}", pUserId, self._firstTimeUserExperience)
-    
+                self._firstTimeUserExperience(uiName, True)
+        StoreDataManager().setData(
+            self._dataStoreType, f"firstTimeUserExperience-{pUserId}", pUserId, self._firstTimeUserExperience
+        )
+
     def setFirstTimeUserExperience(self, pUiName, pValue):
         self._firstTimeUserExperience[pUiName] = pValue
 
@@ -127,7 +137,7 @@ class StatisticsManager(EventsHandler, metaclass=Singleton):
         HaapiKeyManager().on(GameSessionReadyEvent.READY, self.onGameSessionReady)
         HaapiKeyManager().on(AccountSessionReadyEvent.READY, self.onAccountSessionReady)
 
-    def destroy(self): 
+    def destroy(self):
         StatsAction.reset()
         ModuleLogger.active = False
         ModuleLogger.removeCallback(self.log)
@@ -145,7 +155,7 @@ class StatisticsManager(EventsHandler, metaclass=Singleton):
         if not self._exiting:
             SessionEndStats()
             self.init()
-        
+
     @property
     def frame(self):
         return self._frame
@@ -155,10 +165,10 @@ class StatisticsManager(EventsHandler, metaclass=Singleton):
 
     def getActionTimestamp(self, pActionId):
         data = StoreDataManager().getData(self._dataStoreType, self.getActionDataId(pActionId))
-        return data if isinstance(data, float) and not math.isnan(data) else float('nan')
+        return data if isinstance(data, float) and not math.isnan(data) else float("nan")
 
     def deleteTimeStamp(self, pActionId):
-        self.saveActionTimestamp(pActionId, float('nan'))
+        self.saveActionTimestamp(pActionId, float("nan"))
 
     def sendAction(self, action):
         if action in self._pendingActions:
@@ -206,8 +216,7 @@ class StatisticsManager(EventsHandler, metaclass=Singleton):
     def quit(self):
         self.send(StatisticsEvent.ALL_DATA_SENT)
         self.destroy()
-    
-    
+
     def startStats(self, pStatsName: str, *args):
         customStatsInfo = self._statsAssoc[pStatsName]
         if customStatsInfo and (not customStatsInfo.ftue or self._firstTimeUserExperience.get(pStatsName)):
@@ -244,14 +253,13 @@ class StatisticsManager(EventsHandler, metaclass=Singleton):
                     componentStats.onHook(args[0], args[2])
 
     def registerStats(self, pUiName, pUiStatsClass, pFtue=False):
-        self._statsAssoc[pUiName] = {
-            "statClass": pUiStatsClass,
-            "ftue": pFtue
-        }
+        self._statsAssoc[pUiName] = {"statClass": pUiStatsClass, "ftue": pFtue}
 
     def initDataStoreType(self):
         if not self._dataStoreType or self._dataStoreType.category != "statistics":
-            self._dataStoreType = DataStoreType("statistics", True, DataStoreEnum.LOCATION_LOCAL, DataStoreEnum.BIND_COMPUTER)
+            self._dataStoreType = DataStoreType(
+                "statistics", True, DataStoreEnum.LOCATION_LOCAL, DataStoreEnum.BIND_COMPUTER
+            )
 
     def onAccountApiCallResult(self, e):
         Logger().info("Device info sent successfully")
@@ -263,14 +271,29 @@ class StatisticsManager(EventsHandler, metaclass=Singleton):
 
     def sendDeviceInfos(self):
         Logger().info("Calling method SendDeviceInfos")
-        self._accountApi.send_device_infos(0, AccountApi.sendDeviceInfos_ConnectionTypeEnum_ANKAMA, AccountApi.sendDeviceInfos_ClientTypeEnum_STANDALONE, SystemManager().os.replace(" ", "").upper(), AccountApi.sendDeviceInfos_DeviceEnum_PC, None, DeviceUtils.deviceUniqueIdentifier, HaapiKeyManager().getAccountSessionId(), onSuccess=self.onAccountApiCallResult, onError=self.onAccountApiCallError)
+        self._accountApi.send_device_infos(
+            0,
+            AccountApi.sendDeviceInfos_ConnectionTypeEnum_ANKAMA,
+            AccountApi.sendDeviceInfos_ClientTypeEnum_STANDALONE,
+            platform.system().replace(" ", "").upper(),
+            AccountApi.sendDeviceInfos_DeviceEnum_PC,
+            None,
+            DeviceUtils.deviceUniqueIdentifier(),
+            HaapiKeyManager().getAccountSessionId(),
+            onSuccess=self.onAccountApiCallResult,
+            onError=self.onAccountApiCallError,
+        )
 
     def getEventsToSend(self):
         result = []
         gameSessionId = 0
         currentGameSessionId = HaapiKeyManager().getGameSessionId()
         for action in self._pendingActions:
-            if not self._exiting and (currentGameSessionId != 0 and (action.gameSessionId == currentGameSessionId and not action.sendOnExit) or action.gameSessionId):
+            if not self._exiting and (
+                currentGameSessionId != 0
+                and (action.gameSessionId == currentGameSessionId and not action.sendOnExit)
+                or action.gameSessionId
+            ):
                 if gameSessionId == 0:
                     gameSessionId = action.gameSessionId
                 elif gameSessionId != action.gameSessionId:
@@ -279,3 +302,101 @@ class StatisticsManager(EventsHandler, metaclass=Singleton):
                 if self._stepByStep == gameSessionId:
                     break
         return result
+
+    def sendPendingEvents(self):
+        Logger().info(f"Status: Sending = {len(self._actionsSent)} / Total not sent = {len(self._pendingActions)}")
+        if self.sending or not (self._apiCredentials and self._apiCredentials.apiPath):
+            return True
+
+        self._actionsSent = self.getEventsToSend()
+        if len(self._actionsSent):
+            if len(self._actionsSent) == 1:
+                action = self._actionsSent[0]
+                Logger().info("Calling method SendEvent")
+                # Ensure send_event and related methods are defined
+                self._gameApi.send_event(
+                    GameID.current,
+                    action.gameSessionId,
+                    action.id,
+                    action.paramsString,
+                    action.date,
+                    onSuccess=self.onApiCallResult,
+                    onError=self.onApiCallError,
+                )
+            else:
+                Logger().info(f"Calling method SendEvents containing {len(self._actionsSent)} events")
+                self._gameApi.send_events(
+                    GameID.current,
+                    self._actionsSent[0].gameSessionId,
+                    self.sentEventsToString(),
+                    onSuccess=self.onApiCallResult,
+                    onError=self.onApiCallError,
+                )
+            return True
+        return False
+
+    def sentEventsToString(self):
+        eventString = "["
+        for i, action in enumerate(self._actionsSent):
+            eventString += action.toString()
+            if i < len(self._actionsSent) - 1:
+                eventString += ","
+        return eventString + "]"
+
+    def onApiCallResult(self, e):
+        Logger().info("KPI events successfully submitted")
+        while self._actionsSent:
+            self._pendingActions.remove(self._actionsSent.pop())
+        if self._stepByStep and not self._pendingActions:
+            self._stepByStep = 0
+        if not self.sendPendingEvents() and self._exiting:
+            self.quit()  # Ensure quit method is defined
+
+    def onApiCallError(self, e, response):
+        if response.payload is None or response.payload.message == self.NORMAL_ERROR:
+            return
+        Logger().warn(
+            f"Failed to submit KPIs: '{response.errorMessage}' with gameSessionId {self._actionsSent[0].gameSessionId} and event(s): {self.sentEventsToString()}"
+        )
+        if self._exiting:
+            self._actionsSent.clear()
+            self.storeData()
+            if self._sentryReported:
+                self.quit()
+        else:
+            firstAction = self._actionsSent.pop()
+            if self._actionsSent:
+                self._stepByStep = firstAction.gameSessionId
+            else:
+                self._pendingActions.remove(firstAction)
+            self._actionsSent.clear()
+            self.sendPendingEvents()
+
+    def storeData(self):
+        stats = [action.toString() for action in self._pendingActions]
+        self._pendingActions.clear()
+        savedStats = StoreDataManager().getData(self._dataStoreType, "statsActions")
+        StoreDataManager().setData(self._dataStoreType, "statsActions", None)
+        if savedStats:
+            for savedStatsAction in savedStats:
+                savedAction = StatsAction.fromString(savedStatsAction)
+                if savedAction:
+                    stats.append(savedAction)
+        StoreDataManager().setData(self._dataStoreType, "statsActions", stats)
+
+    def onUiLoaded(self, pEvent, uiTarget):
+        removedIndex = 0
+        uiStatsInfo = self._statsAssoc.get(uiTarget.name)
+        if uiStatsInfo and (not uiStatsInfo.get('ftue') or self._firstTimeUserExperience.get(uiTarget.name)):
+            self._stats[uiTarget.name] = uiStatsInfo['statClass'](uiTarget)
+            removedIndex = self._removedStats.index(uiTarget.name) if uiTarget.name in self._removedStats else -1
+            if removedIndex != -1:
+                del self._stats[uiTarget.name]
+                self._removedStats.pop(removedIndex)
+    
+    def onUiUnloadStart(self, pEvent, name):
+        uiStats = self._stats.get(name)
+        if uiStats:
+            uiStats.remove()
+        if name in self._stats:
+            del self._stats[name]

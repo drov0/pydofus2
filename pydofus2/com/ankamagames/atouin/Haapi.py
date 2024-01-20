@@ -6,13 +6,12 @@ from urllib.parse import urlencode
 
 import aiohttp
 import cloudscraper
+from pydofus2.com.ankamagames.jerakine.data.XmlConfig import XmlConfig
 import pyppeteer
 import requests
 
-from pydofus2.com.ankamagames.atouin.BrowserRequests import (BrowserRequests,
-                                                             HttpError)
-from pydofus2.com.ankamagames.atouin.HappiConfig import (AUTH_STATES,
-                                                         ZAAP_CONFIG)
+from pydofus2.com.ankamagames.atouin.BrowserRequests import BrowserRequests, HttpError
+from pydofus2.com.ankamagames.atouin.HappiConfig import AUTH_STATES, ZAAP_CONFIG
 from pydofus2.com.ankamagames.atouin.ZaapError import ZaapError
 from pydofus2.com.ankamagames.jerakine.logger.Logger import Logger
 
@@ -23,25 +22,25 @@ class HaapiException(Exception):
 
 class Haapi:
     MAX_CREATE_API_KAY_RETRIES = 5
-    url = "https://haapi.ankama.com"
+    url = f"https://{XmlConfig().getEntry('config.haapiUrlAnkama')}"
 
     @classmethod
     def getUrl(cls, request, params={}):
         result = (
             cls.url
             + {
-                "CREATE_API_KEY": "/json/Ankama/v4/Api/CreateApiKey",
-                "GET_LOGIN_TOKEN": "/json/Ankama/v5/Account/CreateToken",
-                "SIGN_ON": "/json/Ankama/v5/Account/SignOnWithApiKey",
-                "SET_NICKNAME": "/json/Ankama/v5/Account/SetNicknameWithApiKey",
-                "SEND_MAIL_VALIDATION": "/json/Ankama/v5/Account/SendMailValidation",
-                "SECURITY_CODE": "/json/Ankama/v5/Shield/SecurityCode",
-                "VALIDATE_CODE": "/json/Ankama/v5/Shield/ValidateCode",
-                "DELETE_API_KEY": "/json/Ankama/v5/Api/DeleteApiKey",
-                "CREATE_GUEST": "/json/Ankama/v2/Account/CreateGuest",
-                "CREATE_TOKEN_WITH_PASSWORD": "/json/Ankama/v4/Account/CreateTokenWithPassword",
-                "CREATE_TOKEN": "/json/Ankama/v4/Account/CreateToken",
-                "GET_ACCESS_TOKEN": "/json/Ankama/v4/Account/GetAccessToken"
+                "CREATE_API_KEY": "/Ankama/v4/Api/CreateApiKey",
+                "GET_LOGIN_TOKEN": "/Ankama/v5/Account/CreateToken",
+                "SIGN_ON": "/Ankama/v5/Account/SignOnWithApiKey",
+                "SET_NICKNAME": "/Ankama/v5/Account/SetNicknameWithApiKey",
+                "SEND_MAIL_VALIDATION": "/Ankama/v5/Account/SendMailValidation",
+                "SECURITY_CODE": "/Ankama/v5/Shield/SecurityCode",
+                "VALIDATE_CODE": "/Ankama/v5/Shield/ValidateCode",
+                "DELETE_API_KEY": "/Ankama/v5/Api/DeleteApiKey",
+                "CREATE_GUEST": "/Ankama/v2/Account/CreateGuest",
+                "CREATE_TOKEN_WITH_PASSWORD": "/Ankama/v4/Account/CreateTokenWithPassword",
+                "CREATE_TOKEN": "/Ankama/v4/Account/CreateToken",
+                "GET_ACCESS_TOKEN": "/Ankama/v4/Account/GetAccessToken",
             }[request]
         )
         if params:
@@ -140,7 +139,7 @@ class Haapi:
     @classmethod
     async def signOnWithApikey(cls, game_id, apikey):
         result = await BrowserRequests.post(cls.getUrl("SIGN_ON"), data={"game": game_id}, headers={"APIKEY": apikey})
-            
+
         body = result["body"]
         if body["account"]["locked"] == ZAAP_CONFIG.USER_ACCOUNT_LOCKED.MAILNOVALID:
             Logger().error("[AUTH] Mail not confirmed by user")
@@ -179,22 +178,22 @@ class Haapi:
             "avatar": body["avatar_url"],
         }
 
-
     @classmethod
     def getZaapVersion(cls):
         import yaml
+
         url = "https://launcher.cdn.ankama.com/installers/production/latest.yml?noCache=1hkaeforb"
         # Make an HTTP request to get the YAML file
         client = cloudscraper.create_scraper()
         response = client.get(
             url,
             headers={
-                'user-Agent': "electron-builder",
+                "user-Agent": "electron-builder",
                 "cache-control": "no-cache",
                 "sec-fetch-site": "none",
                 "sec-fetch-mode": "no-cors",
                 "sec-fetch-dest": "empty",
-                'accept-encoding': 'identity',
+                "accept-encoding": "identity",
                 "accept-language": "en-US",
             },
         )
@@ -210,19 +209,44 @@ class Haapi:
 
         # Save the file locally
         local_folder = os.path.dirname(os.path.abspath(__file__))
-        local_file_path = os.path.join(local_folder, 'latest.yml')
-        with open(local_file_path, 'wb') as file:
+        local_file_path = os.path.join(local_folder, "latest.yml")
+        with open(local_file_path, "wb") as file:
             file.write(response.content)
 
         # Extract the version
         version = data.get("version")
         if not version:
             raise Exception("Failed to extract ZAAP version from YAML file")
-        
+
         return version
 
     @classmethod
-    def getLoginTokenCloudScraper(cls, game_id, apiKey, certId='', certHash=''):
+    async def signOnWithApikeyCloudScraper(cls, game_id, apikey):
+        client = cloudscraper.create_scraper()
+        user_agent = f"Zaap {cls.getZaapVersion()}"
+        url = cls.getUrl("SIGN_ON", {"game": game_id})
+        response = client.post(
+            url,
+            headers={
+                "APIKEY": apikey,
+                "if-none-match": "null",
+                "user-Agent": user_agent,
+                "accept": "*/*",
+                "accept-encoding": "gzip,deflate",
+                "sec-fetch-site": "none",
+                "sec-fetch-mode": "no-cors",
+                "sec-fetch-dest": "empty",
+                "accept-language": "en-US",
+            },
+        )
+        body = response.json()
+        if body["account"]["locked"] == ZAAP_CONFIG.USER_ACCOUNT_LOCKED.MAILNOVALID:
+            Logger().error("[AUTH] Mail not confirmed by user")
+            raise Exception(AUTH_STATES.USER_EMAIL_INVALID)
+        return {"id": str(body["id"]), "account": cls.parseAccount(body["account"])}
+
+    @classmethod
+    def getLoginTokenCloudScraper(cls, game_id, apiKey, certId="", certHash=""):
         nbrtries = 0
         client = cloudscraper.create_scraper()
         user_agent = f"Zaap {cls.getZaapVersion()}"
@@ -241,9 +265,9 @@ class Haapi:
                     headers={
                         "apikey": apiKey,
                         "if-none-match": "null",
-                        'user-Agent': user_agent,
-                        'accept': '*/*',
-                        'accept-encoding': 'gzip,deflate',
+                        "user-Agent": user_agent,
+                        "accept": "*/*",
+                        "accept-encoding": "gzip,deflate",
                         "sec-fetch-site": "none",
                         "sec-fetch-mode": "no-cors",
                         "sec-fetch-dest": "empty",
@@ -258,7 +282,10 @@ class Haapi:
                     elif response.json().get("reason") == "Certificate control failed.":
                         Logger().error("Invalid certificate, please check your certificate")
                         return None
-                    elif response.json().get("reason") == f"Invalid security parameters. certificate_id : {certId}, certificate_hash: {certHash}":
+                    elif (
+                        response.json().get("reason")
+                        == f"Invalid security parameters. certificate_id : {certId}, certificate_hash: {certHash}"
+                    ):
                         Logger().error("Invalid security parameters, please check your certificate")
                         return None
                     else:
@@ -293,15 +320,11 @@ class Haapi:
             except Exception:
                 Logger().error("No internet connection will try again in some seconds")
                 sleep(30)
-        
+
     @classmethod
     async def create_token_with_password(cls, login, password, game):
         url = cls.getUrl("CREATE_TOKEN_WITH_PASSWORD")
-        data = {
-            "login": login,
-            "password": password,
-            "game": game
-        }
+        data = {"login": login, "password": password, "game": game}
         async with aiohttp.ClientSession() as session:
             try:
                 async with session.post(url, data=data) as response:
@@ -315,7 +338,7 @@ class Haapi:
             except Exception as e:
                 Logger().error(f"Exception occurred: {e}")
                 raise e
-            
+
     @classmethod
     async def create_token(cls, login, password, certificate_id, certificate_hash, game):
         url = cls.getUrl("CREATE_TOKEN")
@@ -324,7 +347,7 @@ class Haapi:
             "password": password,
             "certificate_id": certificate_id,
             "certificate_hash": certificate_hash,
-            "game": game
+            "game": game,
         }
         async with aiohttp.ClientSession() as session:
             try:
@@ -339,17 +362,10 @@ class Haapi:
             except Exception as e:
                 Logger().error(f"Exception occurred: {e}")
                 raise e
-            
+
     @classmethod
     async def get_access_token(cls, login, password, game):
-        url = cls.getUrl(
-            "GET_ACCESS_TOKEN",
-            {
-                "login": login,
-                "password": password,
-                "game": game
-            }
-        )
+        url = cls.getUrl("GET_ACCESS_TOKEN", {"login": login, "password": password, "game": game})
 
         async with aiohttp.ClientSession() as session:
             try:
@@ -369,4 +385,3 @@ class Haapi:
 if __name__ == "__main__":
     r = Haapi.getZaapVersion()
     print(r)
-    

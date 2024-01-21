@@ -20,7 +20,7 @@ if __name__ == "__main__":
     DOFUS_GAMEID = 1 # Dofus 2
     
     characterCreator = CharacterCreator()
-    token = Haapi.getLoginTokenCloudScraper(DOFUS_GAMEID, apiKey=api_key, certId=int(certId), certHash=certHash)
+    token = Haapi.getLoginToken(DOFUS_GAMEID, apiKey=api_key, certId=int(certId), certHash=certHash)
     
     print(f"Token : {token}")
     if not token:

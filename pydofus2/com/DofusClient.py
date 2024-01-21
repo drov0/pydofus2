@@ -7,29 +7,41 @@ from time import perf_counter, sleep
 from typing import TYPE_CHECKING
 
 from pydofus2.com.ankamagames.atouin.Haapi import Haapi
-from pydofus2.com.ankamagames.atouin.resources.adapters.ElementsAdapter import ElementsAdapter
+from pydofus2.com.ankamagames.atouin.resources.adapters.ElementsAdapter import \
+    ElementsAdapter
 from pydofus2.com.ankamagames.berilia.managers.KernelEvent import KernelEvent
-from pydofus2.com.ankamagames.berilia.managers.KernelEventsManager import KernelEventsManager
+from pydofus2.com.ankamagames.berilia.managers.KernelEventsManager import \
+    KernelEventsManager
 from pydofus2.com.ankamagames.berilia.managers.Listener import Listener
 from pydofus2.com.ankamagames.dofus.kernel.Kernel import Kernel
-from pydofus2.com.ankamagames.dofus.kernel.net.ConnectionsHandler import ConnectionsHandler
-from pydofus2.com.ankamagames.dofus.kernel.net.DisconnectionReasonEnum import DisconnectionReasonEnum
-from pydofus2.com.ankamagames.dofus.logic.common.frames.QueueFrame import QueueFrame
-from pydofus2.com.ankamagames.dofus.logic.common.managers.PlayerManager import PlayerManager
-from pydofus2.com.ankamagames.dofus.logic.connection.actions.LoginValidationWithTokenAction import (
-    LoginValidationWithTokenAction as LVA_WithToken,
-)
-from pydofus2.com.ankamagames.dofus.logic.connection.frames.AuthentificationFrame import AuthentificationFrame
-from pydofus2.com.ankamagames.dofus.logic.connection.managers.AuthentificationManager import AuthentificationManager
-from pydofus2.com.ankamagames.dofus.logic.game.approach.frames.GameServerApproachFrame import GameServerApproachFrame
-from pydofus2.com.ankamagames.dofus.logic.game.common.managers.PlayedCharacterManager import PlayedCharacterManager
+from pydofus2.com.ankamagames.dofus.kernel.net.ConnectionsHandler import \
+    ConnectionsHandler
+from pydofus2.com.ankamagames.dofus.kernel.net.DisconnectionReasonEnum import \
+    DisconnectionReasonEnum
+from pydofus2.com.ankamagames.dofus.logic.common.frames.QueueFrame import \
+    QueueFrame
+from pydofus2.com.ankamagames.dofus.logic.common.managers.PlayerManager import \
+    PlayerManager
+from pydofus2.com.ankamagames.dofus.logic.connection.actions.LoginValidationWithTokenAction import \
+    LoginValidationWithTokenAction as LVA_WithToken
+from pydofus2.com.ankamagames.dofus.logic.connection.frames.AuthentificationFrame import \
+    AuthentificationFrame
+from pydofus2.com.ankamagames.dofus.logic.connection.managers.AuthentificationManager import \
+    AuthentificationManager
+from pydofus2.com.ankamagames.dofus.logic.game.approach.frames.GameServerApproachFrame import \
+    GameServerApproachFrame
+from pydofus2.com.ankamagames.dofus.logic.game.common.managers.PlayedCharacterManager import \
+    PlayedCharacterManager
 from pydofus2.com.ankamagames.jerakine.data.ModuleReader import ModuleReader
 from pydofus2.com.ankamagames.jerakine.logger.Logger import Logger
-from pydofus2.com.ankamagames.jerakine.network.messages.TerminateWorkerMessage import TerminateWorkerMessage
-from pydofus2.com.ankamagames.jerakine.resources.adapters.AdapterFactory import AdapterFactory
+from pydofus2.com.ankamagames.jerakine.network.messages.TerminateWorkerMessage import \
+    TerminateWorkerMessage
+from pydofus2.com.ankamagames.jerakine.resources.adapters.AdapterFactory import \
+    AdapterFactory
 
 if TYPE_CHECKING:
-    from pydofus2.com.ankamagames.jerakine.network.ServerConnection import ServerConnection
+    from pydofus2.com.ankamagames.jerakine.network.ServerConnection import \
+        ServerConnection
 
 # Set the locale to the locale identifier associated with the current language
 # The '.UTF-8' suffix specifies the character encoding
@@ -224,7 +236,7 @@ class DofusClient(threading.Thread):
                     DisconnectionReasonEnum.EXCEPTION_THROWN,
                     msg="Unable to login for reason : No apikey and certificate or login token provided!",
                 )
-            self._loginToken = Haapi.getLoginTokenCloudScraper(1, self._apiKey, self._certId, self._certHash)
+            self._loginToken = Haapi(self._apiKey).getLoginToken(1, self._certId, self._certHash)
             if self._loginToken is None:
                 return self.shutdown(
                     DisconnectionReasonEnum.EXCEPTION_THROWN,

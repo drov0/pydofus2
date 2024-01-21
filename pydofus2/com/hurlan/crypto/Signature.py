@@ -32,14 +32,13 @@ class Signature:
             header = input.readUTFBytes(len(self.ANKAMA_SIGNED_FILE_HEADER))
             if header == self.ANKAMA_SIGNED_FILE_HEADER:
                 formatVersion = int(input.readShort())
-                Logger().debug(f"formatVersion: {formatVersion}")
+                Logger().debug(f"Signature format version: {formatVersion}")
                 if formatVersion != 1:
                     raise SignatureError(f"Invalid signature format version, expected 1, got {formatVersion}.")
                 signature_length = input.readInt()
                 signature = input.readBytes(0, signature_length)
                 if not input.remaining() == 0:
-                    raise SignatureError("Invalid signature format, too much data.")
-                print('signature: ', signature[:])
+                    Logger().warning("Too much data found in the signature.")
                 return self.verifyV1Signature(signature, message)
         raise SignatureError("Invalid header")
 
@@ -82,7 +81,6 @@ class Signature:
             return None
         return output
 
-    
     def verifyV1Signature(self, signature: ByteArray, message: str) -> bytearray:
         decryptedHash = ByteArray()
         rsacipher = RSACipher(self._keyV1, PKCS1())

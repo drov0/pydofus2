@@ -3,6 +3,7 @@ from threading import Timer
 from pydofus2.com.ankamagames.berilia.managers.EventsHandler import EventsHandler
 from pydofus2.com.ankamagames.dofus.kernel.Kernel import Kernel
 from pydofus2.com.ankamagames.dofus.kernel.net.ConnectionsHandler import ConnectionsHandler
+from pydofus2.com.ankamagames.dofus.misc.utils.HaapiEvent import HaapiEvent
 from pydofus2.com.ankamagames.dofus.network.messages.web.haapi.HaapiApiKeyRequestMessage import HaapiApiKeyRequestMessage
 from pydofus2.com.ankamagames.jerakine.data.XmlConfig import XmlConfig
 from pydofus2.com.ankamagames.jerakine.logger.Logger import Logger
@@ -10,7 +11,7 @@ from pydofus2.com.ankamagames.jerakine.metaclasses.Singleton import Singleton
 
 class HaapiKeyManager(EventsHandler, metaclass=Singleton):
     _instance = None
-    ONE_HOUR_IN_MS = 3600000
+    ONE_HOUR_IN_S = 3600
 
     def __init__(self):
         self._apiKey = None
@@ -22,27 +23,9 @@ class HaapiKeyManager(EventsHandler, metaclass=Singleton):
         self._askedTokens = []  # Vector equivalent in Python
         self._accountApi = None  # Assuming AccountApi is implemented
         self._apiKeyCallbacks = []
-        self._apiCredentials = ApiUserCredentials("", XmlConfig().getEntry("config.haapiUrlAnkama"), None);
-        self._apiKeyExpirationTimer = Timer(self.ONE_HOUR_IN_MS / 1000, self.onApiKeyExpiration)
+        self._apiKeyExpirationTimer = Timer(self.ONE_HOUR_IN_S, self.onApiKeyExpiration)
         self._retryTimer = Timer(0.5, self.onTimerEnd)
-        # self._dateTimeFormatter = ...  # Set up Python's datetime formatter as needed
         super().__init__()
-        
-    def onAccountApiCallError(self, e, event:ApiClientEvent):
-        if event.response.payload is not None:
-            Logger().debug(f"Account Api Error: {event.response.errorMessage}")
-            self._askedToken = False
-            self.nextToken()
-
-    def onAccountApiCallResult(self, event):
-        payload = event.response.payload
-        if payload and isinstance(payload, Token):
-            token = payload.token
-            gameId = self._askedTokens.pop(0)
-            self._tokens[gameId] = token
-            self.send(TokenReadyEvent(gameId, token))
-            self._askedToken = False
-            self.nextToken()
 
     def onApiKeyExpiration(self):
         self._apiKey = None
@@ -70,12 +53,20 @@ class HaapiKeyManager(EventsHandler, metaclass=Singleton):
     def nextToken(self):
         if self._askedToken or len(self._askedTokens) == 0:
             return
-        # Logic for nextToken
         self._askedToken = True
-        if not self._apiCredentials.apiPath:
-            self._apiCredentials.apiPath = XmlConfig().getEntry("config.haapiUrlAnkama")
-        self._accountApi = AccountApi(self._apiCredentials)
-        self._accountApi.create_token(self._askedTokens[0], 0, None).onSuccess(self.onAccountApiCallResult).onError(self.onAccountApiCallError).call()
+        self._accountApi = AccountApi()
+        try:
+            token = self._accountApi.create_token(self._askedTokens[0], 0, None)
+            gameId = self._askedTokens.pop(0)
+            self._tokens[gameId] = token
+            self.send(HaapiEvent.TokenReadyEvent, gameId, token)
+            self._askedToken = False
+            self.nextToken()
+
+        except Exception as e:
+            Logger().debug(f"Account Api Error while creating token : {e}")
+            self._askedToken = False
+            self.nextToken()
 
     def destroy(self):
         HaapiKeyManager._instance = None
@@ -118,9 +109,8 @@ class HaapiKeyManager(EventsHandler, metaclass=Singleton):
         Logger().debug("SAVE API KEY")
         self._apiKey = pHaapiKey
         self._askedApiKey = False
-        self._apiCredentials.apiToken = pHaapiKey
-        self._accountApi = AccountApi(self._apiCredentials)
-        self._apiKeyExpirationTimer = Timer(self.ONE_HOUR_IN_MS / 1000, self.onApiKeyExpiration)
+        self._accountApi = AccountApi(pHaapiKey)
+        self._apiKeyExpirationTimer = Timer(self.ONE_HOUR_IN_S, self.onApiKeyExpiration)
         self._apiKeyExpirationTimer.start()
         if self._apiKeyCallbacks:
             for callback in self._apiKeyCallbacks:
@@ -129,11 +119,11 @@ class HaapiKeyManager(EventsHandler, metaclass=Singleton):
 
     def saveGameSessionId(self, key):
         self._gameSessionId = int(key)
-        self.send(GameSessionReadyEvent(self._gameSessionId))
+        self.send(HaapiEvent.GameSessionReadyEvent, self._gameSessionId)
 
     def saveAccountSessionId(self, key):
         self._accountSessionId = key
-        self.send(AccountSessionReadyEvent(self._accountSessionId))
+        self.send(HaapiEvent.AccountSessionReadyEvent, self._accountSessionId)
 
     def destroy(self):
         HaapiKeyManager.clear()

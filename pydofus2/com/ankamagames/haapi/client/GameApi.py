@@ -1,14 +1,15 @@
+import datetime
 import math
 from urllib.parse import urlencode
-
-import aiohttp
+import requests
 from pydofus2.com.ankamagames.dofus.BuildInfos import BuildInfos
 from pydofus2.com.ankamagames.jerakine.data.XmlConfig import XmlConfig
 from pydofus2.com.ankamagames.jerakine.logger.Logger import Logger
 
+
 class GameApi:
     BASE_URL = XmlConfig().getEntry("config.haapiUrlAnkama")
-    
+
     # Event types
     event_admin_right_with_api_key = "admin_right_with_api_key"
     event_end_anonymous_session = "end_anonymous_session"
@@ -50,53 +51,58 @@ class GameApi:
 
     def __init__(self):
         self.BASE_URL = XmlConfig().getEntry("config.haapiUrlAnkama")
-        self.session = aiohttp.ClientSession(
-            base_url=self.BASE_URL,
-            headers={
-                "x-flash-version": "31,1,1,889",
-                "Content-Type": "application/x-www-form-urlencoded",
-                "User-Agent": f"Dofus {BuildInfos().VERSION}",
-                "Accept": "*/*",
-                "Accept-Encoding": "gzip,deflate",
-                "Connection": "keep-alive"
-            }
-        )
-        
+        self.session = requests.Session()
+        self.session.headers.update({
+            "x-flash-version": "31,1,1,889",
+            "Content-Type": "application/x-www-form-urlencoded",
+            "User-Agent": f"Dofus {BuildInfos().VERSION}",
+            "Accept": "*/*",
+            "Accept-Encoding": "gzip,deflate",
+            "Connection": "keep-alive",
+        })
+
     @staticmethod
     def is_valid_param(param):
         if isinstance(param, (int, float)) and not isinstance(param, bool):
             return not math.isnan(param)
         return param is not None
-    
+
     @classmethod
     def getUrl(cls, request, params={}):
         result = (
             cls.BASE_URL
             + {
-                "SEND_EVENTS": "/Ankama/v4/Game/SendEvents"
+                "SEND_EVENTS": "/Ankama/v4/Game/SendEvents",
+                "SEND_EVENT": "/Ankama/v4/Game/SendEvent",
+                "START_SESSION_WITH_API_KEY": "/Ankama/v4/Game/StartSessionWithApiKey",
             }[request]
         )
         if params:
             result += "?" + urlencode(params)
         return result
-    
-    @classmethod
-    async def send_events(cls, game:int, session_id:int, events:str):
-        url = cls.getUrl("SEND_EVENTS", params={
-            "game": game,
-            "session_id": session_id,
-            "events": events
-        })
-        async with aiohttp.ClientSession() as session:
-            try:
-                async with session.get(url) as response:
-                    if response.status == 200:
-                        body = await response.json()
-                        return body  # or whatever part of the response you need
-                    else:
-                        error_details = await response.text()  # Get more details from the response
-                        Logger().error(f"Error creating token: {response.status}, {error_details}")
-                        return None
-            except Exception as e:
-                Logger().error(f"Exception occurred: {e}")
-                raise e
+
+    def send_events(self, game: int, session_id: int, events: str):
+        url = self.getUrl("SEND_EVENTS", params={"game": game, "session_id": session_id, "events": events})
+        response = self.session.post(url)
+        self.session.cookies.update(response.cookies)
+        if not response.ok:
+            raise Exception(f"Error while sending events: {response.text}")
+        return response
+
+    def send_event(self, game: int, session_id: int, event_id: int, data: str, date:str):
+        url = self.getUrl("SEND_EVENT", params={"game": game, "session_id": session_id, "event_id": event_id, "data": data, "date": date})
+        response = self.session.post(url)
+        self.session.cookies.update(response.cookies)
+        if not response.ok:
+            raise Exception(f"Error while sending event: {response.text}")
+        return response
+
+    def format_date(date_obj: datetime.datetime):
+        """
+        Format a datetime object to a string in the format "yyyy-MM-dd'T'HH:mm:ss+00:00".
+
+        :param date_obj: The datetime object to format.
+        :return: A string representing the formatted date.
+        """
+        formatted_date = date_obj.strftime("%Y-%m-%dT%H:%M:%S+00:00")
+        return formatted_date

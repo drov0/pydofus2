@@ -45,8 +45,8 @@ class OptionManager:
         self._useCache[name] = useCache
         self._defaultValue[name] = value
 
-        if useCache and StoreDataManager.getInstance().getData(self._dataStore, name) is not None:
-            self._properties[name] = StoreDataManager.getInstance().getData(self._dataStore, name)
+        if useCache and StoreDataManager().getData(self._dataStore, name) is not None:
+            self._properties[name] = StoreDataManager().getData(self._dataStore, name)
         else:
             self._properties[name] = value
 
@@ -69,4 +69,3 @@ class OptionManager:
             self._properties[name] = value
             if self._useCache[name] and not isinstance(value, QObject):
                 StoreDataManager().setData(self._dataStore, name, value)
-            self.propertyChanged.emit(PropertyChangeEvent(self, name, value, oldValue))

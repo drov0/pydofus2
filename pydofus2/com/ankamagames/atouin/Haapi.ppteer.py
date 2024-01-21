@@ -1,10 +1,19 @@
+import json
 import os
 import ssl
 from time import sleep
 from urllib.parse import urlencode
+
+import aiohttp
 import cloudscraper
+import pyppeteer
 import requests
-from pydofus2.com.ankamagames.atouin.HappiConfig import AUTH_STATES, ZAAP_CONFIG
+
+from pydofus2.com.ankamagames.atouin.BrowserRequests import (BrowserRequests,
+                                                             HttpError)
+from pydofus2.com.ankamagames.atouin.HappiConfig import (AUTH_STATES,
+                                                         ZAAP_CONFIG)
+from pydofus2.com.ankamagames.atouin.ZaapError import ZaapError
 from pydofus2.com.ankamagames.jerakine.data.XmlConfig import XmlConfig
 from pydofus2.com.ankamagames.jerakine.logger.Logger import Logger
 
@@ -14,48 +23,18 @@ class HaapiException(Exception):
 
 
 class Haapi:
-    MAX_CREATE_API_KEY_RETRIES = 5
+    MAX_CREATE_API_KAY_RETRIES = 5
+    url = f"https://{XmlConfig().getEntry('config.haapiUrlAnkama')}"
 
-    def __init__(self, api_key):
-        self.BASE_URL = f"https://{XmlConfig().getEntry('config.haapiUrlAnkama')}"
-        self.session = requests.Session()
-        self._curr_account = None
-        self._surr_session_id = None
-        self.api_key = api_key
-        self.session.headers.update(
-            {
-                "apikey": api_key,
-                "if-none-match": "null",
-                "user-Agent": f"Zaap {self.getZaapVersion()}",
-                "accept": "*/*",
-                "accept-encoding": "gzip,deflate",
-                "sec-fetch-site": "none",
-                "sec-fetch-mode": "no-cors",
-                "sec-fetch-dest": "empty",
-                "accept-language": "en-US",
-            }
-        )
-
-        # Set up the proxy
-        self.session.proxies.update(
-            {
-                "http": "http://localhost:8080",
-                "https": "http://localhost:8080",
-            }
-        )
-
-        self.verify_ssl = False
-        self.cert_path = "D:\mitmproxy-ca-cert.pem"
-
-    def getUrl(self, request, params={}):
+    @classmethod
+    def getUrl(cls, request, params={}):
         result = (
-            self.BASE_URL
+            cls.url
             + {
                 "CREATE_API_KEY": "/Ankama/v4/Api/CreateApiKey",
                 "GET_LOGIN_TOKEN": "/Ankama/v5/Account/CreateToken",
                 "SIGN_ON": "/Ankama/v5/Account/SignOnWithApiKey",
                 "SET_NICKNAME": "/Ankama/v5/Account/SetNicknameWithApiKey",
-                "START_SESSION_WITH_API_KEY": "/Ankama/v4/Game/StartSessionWithApiKey",
                 "SEND_MAIL_VALIDATION": "/Ankama/v5/Account/SendMailValidation",
                 "SECURITY_CODE": "/Ankama/v5/Shield/SecurityCode",
                 "VALIDATE_CODE": "/Ankama/v5/Shield/ValidateCode",
@@ -70,35 +49,118 @@ class Haapi:
             result += "?" + urlencode(params)
         return result
 
-    def signOnWithApikey(self, game_id):
-        url = self.getUrl("SIGN_ON", {"game": game_id})
-        response = self.session.post(url, verify=self.verify_ssl)
-        body = response.json()
+    @classmethod
+    async def create_apikey(cls, login, password, certId=None, certHash=None, game=102) -> str:
+        Logger().debug("[HAAPI] Sending http call to Create APIKEY")
+        data = {
+            "login": login,
+            "password": password,
+            "game": game,
+            "long_life_token": True,
+            "shop_key": "ZAAP",
+            "payment_mode": "OK",
+            "lang": "fr",
+        }
+        if certId:
+            data["certificate_id"] = str(certId)
+            data["certificate_hash"] = str(certHash)
+        try:
+            response = await BrowserRequests.post(cls.getUrl("CREATE_API_KEY"), data=data)
+            body = response["body"]
+            cls.APIKEY = body.get("key")
+            return {
+                "key": body["key"],
+                "accountId": body["account_id"],
+                "refreshToken": body["refresh_token"],
+                "security": body["data"]["security_state"]
+                if "data" in body and "security_state" in body["data"]
+                else None,
+                "reason": body["data"]["security_detail"]
+                if "data" in body and "security_detail" in body["data"]
+                else None,
+                "expirationDate": body["expiration_date"],
+            }
+        except HttpError as e:
+            if "reason" in e.body:
+                print(f"error while creating api key: {json.dumps(e['body'])}")
+                raise ZaapError({"codeError": f"haapi.{e['body']['reason']}", "error": e})
+            Logger().error(f"Error while creating api key: {e}")
+            raise e
+
+    @classmethod
+    async def getLoginToken(cls, certId, certHash, game_id, apiKey):
+        Logger().debug("Sending http call to get Login Token")
+        url = cls.getUrl(
+            "GET_LOGIN_TOKEN",
+            {
+                "game": game_id,
+                "certificate_id": certId,
+                "certificate_hash": certHash,
+            },
+        )
+        resp = await BrowserRequests.get(
+            url,
+            headers={
+                "APIKEY": apiKey,
+            },
+        )
+        token = resp["body"]["token"]
+        Logger().debug(f"Generated Login Token : {token}")
+        return resp["body"]["token"]
+
+    @classmethod
+    async def createGuest(cls, gameId=17, lang="en"):
+        url = cls.getUrl("CREATE_GUEST", {"game": gameId, "lang": lang})
+        resp = await BrowserRequests.get(url)
+        return resp["body"]
+
+    @classmethod
+    async def shieldSecurityCode(cls, apikey, bySMS=False):
+        url = cls.getUrl("SECURITY_CODE", {"transportType": "SMS" if bySMS else "EMAIL"})
+        resp = await BrowserRequests.get(url, {"apikey": apikey})
+        return resp["body"]["domain"]
+
+    @classmethod
+    async def shieldValidateCode(cls, apikey, validationCode, hm1, hm2):
+        userName = f"launcher-{os.getlogin()}"
+        url = cls.getUrl(
+            "VALIDATE_CODE",
+            {"game_id": ZAAP_CONFIG.ZAAP_GAME_ID, "code": validationCode, "hm1": hm1, "hm2": hm2, "name": userName},
+        )
+        try:
+            response = await BrowserRequests.get(url, {"apikey": apikey})
+            return response["body"]
+        except requests.exceptions.HTTPError as e:
+            if e.response and e.response.text:
+                error = json.loads(e.response.text)
+                if error["message"] == "ALREADYSECURED":
+                    raise Exception("ALREADYSECURED")
+                raise ZaapError({"codeError": f"haapi.{error['message']}", "error": e})
+            raise ZaapError({"codeError": "haapi.CODEPROBLEM", "complement": e})
+
+    @classmethod
+    async def signOnWithApikey(cls, game_id, apikey):
+        result = await BrowserRequests.post(cls.getUrl("SIGN_ON"), data={"game": game_id}, headers={"APIKEY": apikey})
+
+        body = result["body"]
         if body["account"]["locked"] == ZAAP_CONFIG.USER_ACCOUNT_LOCKED.MAILNOVALID:
             Logger().error("[AUTH] Mail not confirmed by user")
             raise Exception(AUTH_STATES.USER_EMAIL_INVALID)
-        self.session.cookies.update(response.cookies)
-        self._curr_account = {
-            "id": body["id"],
-            "id_string": str(body["id_string"]),
-            "account": self.parseAccount(body["account"]),
-        }
-        return self._curr_account
+        return {"id": str(body["id"]), "account": cls.parseAccount(body["account"])}
 
-    def startSessionWithApiKey(self, session_id, server_id="", character_id="", date=""):
-        url = self.getUrl(
-            "START_SESSION_WITH_API_KEY",
-            {
-                "session_id": session_id,
-                "server_id": server_id,
-                "character_id": character_id,
-                "date": date,
-            },
-        )
-        response = self.session.get(url, verify=self.verify_ssl)
-        self.session.cookies.update(response.cookies)
-        self._surr_session_id = response.json()
-        return response.json()
+    @classmethod
+    async def setNickname(cls, nickname, apikey, lang="en"):
+        url = cls.getUrl("SET_NICKNAME")
+        res = await BrowserRequests.post(url, {"nickname": nickname, "lang": lang}, {"apikey": apikey})
+        return res["body"]
+
+    @classmethod
+    async def deleteApikey(cls, apikey):
+        url = cls.getUrl("DELETE_API_KEY")
+        try:
+            return await BrowserRequests.get(url, {"apikey": apikey})
+        except pyppeteer.errors.PageError:
+            return True
 
     @classmethod
     def parseAccount(cls, body):
@@ -160,11 +222,14 @@ class Haapi:
 
         return version
 
-    def getLoginToken(self, game_id, certId="", certHash=""):
+    @classmethod
+    def getLoginToken(cls, game_id, apiKey, certId="", certHash=""):
         nbrtries = 0
+        client = cloudscraper.create_scraper()
+        user_agent = f"Zaap {cls.getZaapVersion()}"
         while nbrtries < 5:
             try:
-                url = self.getUrl(
+                url = cls.getUrl(
                     "GET_LOGIN_TOKEN",
                     {
                         "game": game_id,
@@ -172,8 +237,20 @@ class Haapi:
                         "certificate_hash": certHash,
                     },
                 )
-                Logger().debug("[HAAPI] Calling HAAPI to get Login Token, url: %s" % url)
-                response = self.session.get(url, verify=self.verify_ssl)
+                response = client.get(
+                    url,
+                    headers={
+                        "apikey": apiKey,
+                        "if-none-match": "null",
+                        "user-Agent": user_agent,
+                        "accept": "*/*",
+                        "accept-encoding": "gzip,deflate",
+                        "sec-fetch-site": "none",
+                        "sec-fetch-mode": "no-cors",
+                        "sec-fetch-dest": "empty",
+                        "accept-language": "en-US",
+                    },
+                )
                 if response.headers["content-type"] == "application/json":
                     token = response.json().get("token")
                     if token:
@@ -223,4 +300,5 @@ class Haapi:
 
 
 if __name__ == "__main__":
-    api = Haapi("test")
+    r = Haapi.getZaapVersion()
+    print(r)

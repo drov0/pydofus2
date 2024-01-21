@@ -62,7 +62,6 @@ class HaapiKeyManager(EventsHandler, metaclass=Singleton):
             self.send(HaapiEvent.TokenReadyEvent, gameId, token)
             self._askedToken = False
             self.nextToken()
-
         except Exception as e:
             Logger().debug(f"Account Api Error while creating token : {e}")
             self._askedToken = False

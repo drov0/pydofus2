@@ -1,3 +1,4 @@
+import json
 import locale
 import sys
 import threading
@@ -76,6 +77,8 @@ class DofusClient(threading.Thread):
         self._shutDownMessage = ""
         self._reconnectRecord = []
         self._shutDownListeners = []
+        self._sessionId = None
+        self._haapi: Haapi = None
         self.terminated = threading.Event()
 
     @property
@@ -84,6 +87,9 @@ class DofusClient(threading.Thread):
 
     def init(self):
         Logger().info("Initializing ...")
+        self._haapi = Haapi(self._apiKey)
+        acc = self._haapi.signOnWithApikey(1)
+        self._sessionId = self._haapi.startSessionWithApiKey(acc['id'])
         Kernel().init()
         AdapterFactory.addAdapter("ele", ElementsAdapter)
         # AdapterFactory.addAdapter("dlm", MapsAdapter)
@@ -112,7 +118,16 @@ class DofusClient(threading.Thread):
 
     def onInGame(self):
         Logger().info("Character entered game server successfully")
-
+        data = {
+            "client_open": 1,
+            "force_cpu": False,
+            "screen_size": 17,
+            "damage_preview": True,
+            "quality": 0,
+            "account_id": PlayerManager().accountId,
+        }
+        self._haapi.send_event(1, self._sessionId, 673, data=json.dumps(data))
+        
     def crash(self, event, message, reason=DisconnectionReasonEnum.EXCEPTION_THROWN):
         self._crashed = True
         self._shutDownReason = reason
@@ -320,6 +335,16 @@ class DofusClient(threading.Thread):
         Kernel().reset()
         Logger().info("goodby crual world")
         self.terminated.set()
-
+        
+        data = {
+            "client_open": 1,
+            "force_cpu": False,
+            "screen_size": 17,
+            "damage_preview": True,
+            "quality": 0,
+            "account_id": PlayerManager().accountId,
+        }
+        self._haapi.send_event(1, self._sessionId, 673, data=json.dumps(data))
+        
         for callback in self._shutDownListeners:
             callback(self.name, self._shutDownMessage, self._shutDownReason)

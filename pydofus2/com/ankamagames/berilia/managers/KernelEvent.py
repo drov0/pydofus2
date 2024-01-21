@@ -168,6 +168,7 @@ class KernelEvent(Enum):
     # achievements
     AchievementRewardSuccess = auto()
     RewardableAchievementsVisible = auto()
+    AchievementFinished = auto()
     
     # Mount 
     MountSterilized = auto()

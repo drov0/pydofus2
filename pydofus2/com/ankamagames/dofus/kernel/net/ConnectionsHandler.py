@@ -132,7 +132,7 @@ class ConnectionsHandler(metaclass=Singleton):
             ]:
                 if self.last_send_time is not None:
                     minNextSendTime = (
-                        self.last_send_time + 0.1 + abs(random.gauss(0, 0.1))
+                        self.last_send_time + 0.1 + abs(random.gauss(0, 0.3))
                     )
                     diff = minNextSendTime - perf_counter()
                     if diff > 0:

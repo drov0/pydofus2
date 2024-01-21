@@ -72,31 +72,14 @@ class GameApi:
         result = (
             cls.BASE_URL
             + {
-                "SEND_EVENTS": "/Ankama/v4/Game/SendEvents",
-                "SEND_EVENT": "/Ankama/v4/Game/SendEvent",
+
                 "START_SESSION_WITH_API_KEY": "/Ankama/v4/Game/StartSessionWithApiKey",
             }[request]
         )
         if params:
             result += "?" + urlencode(params)
         return result
-
-    def send_events(self, game: int, session_id: int, events: str):
-        url = self.getUrl("SEND_EVENTS", params={"game": game, "session_id": session_id, "events": events})
-        response = self.session.post(url)
-        self.session.cookies.update(response.cookies)
-        if not response.ok:
-            raise Exception(f"Error while sending events: {response.text}")
-        return response
-
-    def send_event(self, game: int, session_id: int, event_id: int, data: str, date:str):
-        url = self.getUrl("SEND_EVENT", params={"game": game, "session_id": session_id, "event_id": event_id, "data": data, "date": date})
-        response = self.session.post(url)
-        self.session.cookies.update(response.cookies)
-        if not response.ok:
-            raise Exception(f"Error while sending event: {response.text}")
-        return response
-
+    
     def format_date(date_obj: datetime.datetime):
         """
         Format a datetime object to a string in the format "yyyy-MM-dd'T'HH:mm:ss+00:00".

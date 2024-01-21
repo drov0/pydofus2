@@ -36,6 +36,8 @@ from pydofus2.com.ankamagames.dofus.network.enums.TreasureHuntRequestEnum import
     TreasureHuntRequestEnum
 from pydofus2.com.ankamagames.dofus.network.enums.TreasureHuntTypeEnum import \
     TreasureHuntTypeEnum
+from pydofus2.com.ankamagames.dofus.network.messages.game.achievement.AchievementFinishedMessage import \
+    AchievementFinishedMessage
 from pydofus2.com.ankamagames.dofus.network.messages.game.achievement.AchievementListMessage import \
     AchievementListMessage
 from pydofus2.com.ankamagames.dofus.network.messages.game.achievement.AchievementRewardSuccessMessage import \
@@ -338,9 +340,13 @@ class QuestFrame(Frame):
 
             elif isinstance(qsimsg.infos, QuestActiveInformations):
                 pass
-
+            
             return True
 
+        elif isinstance(msg, AchievementFinishedMessage):
+            KernelEventsManager().send(KernelEvent.AchievementFinished, msg.achievement.id, msg.achievement.finishedlevel)
+            return True
+        
         elif isinstance(msg, TreasureHuntMessage):
             self._treasureHunts[msg.questType] = TreasureHuntWrapper.create(
                 msg.questType,

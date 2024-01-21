@@ -16,7 +16,7 @@ class SignatureKey(RSA.RsaKey):
             raise Exception("Invalid public or private header")
         if header == SignatureKey.PUBLIC_KEY_HEADER:
             N = input.readUTF()
-            N = int.from_bytes(bytes(N, "utf"), "big")
+            N = int(N, 16)
             E = input.readUTF()
-            E = int.from_bytes(bytes(E, "utf"), "big")
+            E = int(E, 16)
             return SignatureKey(n=N, e=E)

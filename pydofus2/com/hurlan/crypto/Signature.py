@@ -1,11 +1,11 @@
 import hashlib
 import traceback
+from pydofus2.com.ankamagames.jerakine.logger.Logger import Logger
 from pydofus2.com.ankamagames.jerakine.network.CustomDataWrapper import ByteArray
 from pydofus2.com.hurlan.crypto.SignatureKey import SignatureKey
 from Cryptodome.PublicKey import RSA
 from pydofus2.com.hurlan.crypto.symmetric.PKCS1 import PKCS1
 from pydofus2.com.hurlan.crypto.symmetric.PSAKey import RSACipher
-
 
 class SignatureError(Exception):
     pass
@@ -16,10 +16,10 @@ class Signature:
     SIGNATURE_HEADER: str = "AKSD"
 
     def __init__(self, key1: SignatureKey, key2: RSA.RsaKey):
-        self.key1 = key1
-        self.key2 = key2
+        self._keyV1 = key1
+        self._keyV2 = key2
 
-    def verify(self, input: ByteArray) -> ByteArray:
+    def verify(self, input: ByteArray, message: bytes) -> ByteArray:
         headerSize = input.readUnsignedShort()
         if headerSize != len(self.ANKAMA_SIGNED_FILE_HEADER):
             input.position = 0
@@ -31,18 +31,27 @@ class Signature:
         else:
             header = input.readUTFBytes(len(self.ANKAMA_SIGNED_FILE_HEADER))
             if header == self.ANKAMA_SIGNED_FILE_HEADER:
-                return self.verifyV1Signature(input)
+                formatVersion = int(input.readShort())
+                Logger().debug(f"formatVersion: {formatVersion}")
+                if formatVersion != 1:
+                    raise SignatureError(f"Invalid signature format version, expected 1, got {formatVersion}.")
+                signature_length = input.readInt()
+                signature = input.readBytes(0, signature_length)
+                if not input.remaining() == 0:
+                    raise SignatureError("Invalid signature format, too much data.")
+                print('signature: ', signature[:])
+                return self.verifyV1Signature(signature, message)
         raise SignatureError("Invalid header")
 
     def verifyV2Signature(self, input: ByteArray, headerPosition: int) -> bool:
-        if not self.key2:
+        if not self._keyV2:
             raise SignatureError("No key for self signature version (2)")
         try:
             input.position = headerPosition - 4
             signedDataLenght = input.readShort()
             input.position = headerPosition - 4 - signedDataLenght
             cryptedData = input.readBytes(0, signedDataLenght)
-            rsaceipher = RSACipher(self.key2, PKCS1())
+            rsaceipher = RSACipher(self._keyV2, PKCS1())
             sigData = ByteArray()
             if not rsaceipher.verify(cryptedData, sigData):
                 return False
@@ -73,32 +82,25 @@ class Signature:
             return None
         return output
 
-    def verifyV1Signature(self, input: ByteArray) -> bytearray:
-        len: int = 0
-        try:
-            len = input.readInt()
-            sigData = input.readBytes(0, len)
-        except Exception as e:
-            raise SignatureError("Invalid signature format, not enough data.")
-
-        try:
-            decryptedHash = ByteArray()
-            rsacipher = RSACipher(self.key1, PKCS1())
-            rsacipher.verify(sigData, decryptedHash)
-        except Exception as e:
-            return None
-
+    
+    def verifyV1Signature(self, signature: ByteArray, message: str) -> bytearray:
+        decryptedHash = ByteArray()
+        rsacipher = RSACipher(self._keyV1, PKCS1())
+        rsacipher.verify(signature, decryptedHash)
         decryptedHash.position = 0
-        ramdomPart = decryptedHash.readByte()
-        for i in range(len(decryptedHash)):
-            decryptedHash[i] ^= ramdomPart
+        randomPart = decryptedHash[0]
 
-        contentLen: int = decryptedHash.readUnsignedInt()
-        testedContentLen: int = input.remaining()
-        signHash: str = decryptedHash.readUTFBytes(decryptedHash.remaining())[1:]
-        output = ByteArray(input.readBytes())
-        contentHash: str = hashlib.md5(output.readUTFBytes(output.remaining())).hexdigest()[1:]
-        if signHash and signHash == contentHash and contentLen == testedContentLen:
-            return output
+        # Apply XOR starting from the third byte
+        for i in range(2, len(decryptedHash)):
+            decryptedHash[i] ^= randomPart
+
+        expected_msg_len = decryptedHash.readUnsignedInt()
+        signHash = decryptedHash.readUTFBytes(decryptedHash.remaining())[1:]
+        
+        message_bytes = message.encode("utf-8")
+        message_hash = hashlib.md5(message_bytes).hexdigest()[1:]
+        
+        if signHash and signHash == message_hash and expected_msg_len == len(message_bytes):
+            return message_bytes
         else:
             return None

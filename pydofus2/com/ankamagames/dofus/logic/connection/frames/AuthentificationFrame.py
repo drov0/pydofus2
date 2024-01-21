@@ -137,7 +137,8 @@ class AuthentificationFrame(Frame):
                     )
             return True
 
-    def parseHosts(self, connectionHostsEntry):
+    @classmethod
+    def parseHosts(cls, connectionHostsEntry: str):
         allHostsInfos = {}
         for host in connectionHostsEntry.split('|'):
             field = host.split(':')

@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Dofus Sniffer Interface</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+    <script src="https://cdn.socket.io/4.0.0/socket.io.min.js"></script>
+    <script src="{{ url_for('static', filename='js/scripts.js') }}" defer></script>
+</head>
+<body>
+    <div class="header">
+        <h1>Dofus Sniffer Interface</h1>
+    </div>
+    <div class="container">
+        <button id="start-btn" class="button">Start Sniffer</button>
+        <button id="stop-btn" class="button button-red">Stop Sniffer</button>
+    
+        <div class="tabs">
+            <ul id="tab-labels-container" class="tab-labels">
+                <!-- Tab labels will be dynamically added here -->
+            </ul>
+        </div>
+        <div class="tab-container" id="tab-container">
+            <!-- Tab content will be dynamically added here -->
+        </div>
+    </div>
+</body>
+</html>

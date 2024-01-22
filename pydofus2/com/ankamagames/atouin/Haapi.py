@@ -120,6 +120,7 @@ class Haapi(metaclass=Singleton):
         url = self.getUrl("SIGN_ON", {"game": game_id})
         response = self.zaap_session.post(url, verify=self.verify_ssl)
         body = response.json()
+        print(body)
         if body["account"]["locked"] == ZAAP_CONFIG.USER_ACCOUNT_LOCKED.MAILNOVALID:
             Logger().error("[AUTH] Mail not confirmed by user")
             raise Exception(AUTH_STATES.USER_EMAIL_INVALID)

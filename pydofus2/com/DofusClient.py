@@ -336,15 +336,5 @@ class DofusClient(threading.Thread):
         Logger().info("goodby crual world")
         self.terminated.set()
         
-        data = {
-            "client_open": 1,
-            "force_cpu": False,
-            "screen_size": 17,
-            "damage_preview": True,
-            "quality": 0,
-            "account_id": PlayerManager().accountId,
-        }
-        self._haapi.send_event(1, self._sessionId, 673, data=json.dumps(data))
-        
         for callback in self._shutDownListeners:
             callback(self.name, self._shutDownMessage, self._shutDownReason)

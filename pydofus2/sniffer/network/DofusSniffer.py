@@ -58,7 +58,6 @@ class DofusSniffer(threading.Thread):
         if msg.unpacked:
             if self.recordMessages:
                 msgjson = msg.to_json()
-                msg.receptionTime = datetime.datetime.now().strftime('%H:%M:%S:%f')
                 msgjson["__receptionTime__"] = msg.receptionTime
                 msgjson["__direction__"] = 'snd' if from_client else 'rcv'
                 if 'hash_function' in msgjson:
@@ -100,7 +99,6 @@ class DofusSniffer(threading.Thread):
             self.running.clear()
             if self.on_crash:
                 self.on_crash(error_trace)
-
         
     def stop(self):
         self._stoped = True
@@ -109,7 +107,6 @@ class DofusSniffer(threading.Thread):
 
 
 if __name__ == "__main__":
-
     mySniffer = DofusSniffer()
     mySniffer.start()
     try:

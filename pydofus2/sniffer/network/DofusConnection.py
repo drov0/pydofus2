@@ -4,6 +4,8 @@ import socket
 from types import FunctionType
 
 from pydofus2.com.ankamagames.berilia.managers.EventsHandler import EventsHandler, Event
+from pydofus2.com.ankamagames.jerakine.network.CustomDataWrapper import ByteArray
+from pydofus2.com.ankamagames.jerakine.network.NetworkMessage import NetworkMessage
 from .Packet import TCPPacket
 from .SnifferBuffer import SnifferBuffer
 from pydofus2.com.ankamagames.dofus.network.MessageReceiver import \
@@ -49,7 +51,7 @@ class DofusConnection(EventsHandler):
     server_port: int
     client_port: int
     defaultHandle: FunctionType
-    handleServerMessage: FunctionType
+    handle: FunctionType
     currPlayerId: int
     
     def __init__(self, id):
@@ -113,6 +115,15 @@ class DofusConnection(EventsHandler):
                 self.state = ConnState.ESTABLISHED
             self.onPacket(p)
     
+    def onMessageParsed(self, msg: NetworkMessage, from_client: bool):
+        msg.receptionTime = datetime.datetime.now().strftime('%H:%M:%S:%f')
+        msg.sourceConnection = self.id
+        if type(msg).__name__ == "NetworkDataContainerMessage":
+            Logger().debug(f"Received network Datacontainer with content of size : {len(msg.content)}")
+            MessageReceiver(False).parse(ByteArray(msg.content), self.onMessageParsed, from_dataContainer=True)
+        else:
+            self.handle(self, msg, from_client)
+            
     def onPacket(self, p: TCPPacket):
         from_client = (p.src == LOCAL_IP)
         buffer = self.clientBuffer if from_client else self.serverBuffer
@@ -120,7 +131,7 @@ class DofusConnection(EventsHandler):
         if self.handle is None:
             self.handle = lambda conn, msg, from_client: None
         try:
-            MessageReceiver(True).parse(buffer.read(), lambda msg, from_client: self.handle(self, msg, from_client), from_client)
+            MessageReceiver(False).parse(buffer.read(), lambda msg, from_client: self.onMessageParsed(msg, from_client), from_client)
         except Exception as e:
             buffer.trim()
             Logger().warning(e)

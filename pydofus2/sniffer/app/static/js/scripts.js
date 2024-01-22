@@ -129,7 +129,7 @@ function appendMessageToTab(tabContentDiv, msg, fromClient) {
 
     var toggleLabel = document.createElement('label');
     toggleLabel.className = 'message-toggle';
-    toggleLabel.textContent = msg['__receptionTime__'] + '-' + msg['__type__'];
+    toggleLabel.textContent = msg['__receptionTime__'] + '  -  ' + msg['__type__'];
     toggleLabel.style.color = fromClient ? '#28a745' : '#007bff'; // Green if from client, Blue otherwise
 
     var detailsDiv = document.createElement('div');

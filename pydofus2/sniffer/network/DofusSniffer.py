@@ -1,17 +1,13 @@
 #!/usr/bin/python
 import asyncio
 import base64
-import datetime
 import json
 import os
 import threading
-
 import pyshark
-
 from pydofus2.com.ankamagames.jerakine.logger.Logger import Logger
 from pydofus2.com.ankamagames.jerakine.network.NetworkMessage import \
     NetworkMessage
-
 from .DofusConnection import LOCAL_IP, ConnEvent, DofusConnection
 from .Packet import TCPPacket
 

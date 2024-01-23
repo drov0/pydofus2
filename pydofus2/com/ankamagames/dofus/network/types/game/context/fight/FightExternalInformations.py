@@ -10,9 +10,9 @@ class FightExternalInformations(NetworkMessage):
     fightType: int
     fightStart: int
     fightSpectatorLocked: bool
-    fightTeams: list['FightTeamLightInformations']
-    fightTeamsOptions: list['FightOptionsInformations']
-    def init(self, fightId_: int, fightType_: int, fightStart_: int, fightSpectatorLocked_: bool, fightTeams_: list['FightTeamLightInformations'], fightTeamsOptions_: list['FightOptionsInformations']):
+    fightTeams: 'FightTeamLightInformations'
+    fightTeamsOptions: 'FightOptionsInformations'
+    def init(self, fightId_: int, fightType_: int, fightStart_: int, fightSpectatorLocked_: bool, fightTeams_: 'FightTeamLightInformations', fightTeamsOptions_: 'FightOptionsInformations'):
         self.fightId = fightId_
         self.fightType = fightType_
         self.fightStart = fightStart_

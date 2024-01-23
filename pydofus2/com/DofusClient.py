@@ -88,8 +88,9 @@ class DofusClient(threading.Thread):
     def init(self):
         Logger().info("Initializing ...")
         self._haapi = Haapi(self._apiKey)
-        acc = self._haapi.signOnWithApikey(1)
-        self._sessionId = self._haapi.startSessionWithApiKey(acc['id'])
+        if not self._sessionId:
+            acc = self._haapi.signOnWithApikey(1)
+            self._sessionId = self._haapi.startSessionWithApiKey(acc['id'])
         Kernel().init()
         AdapterFactory.addAdapter("ele", ElementsAdapter)
         # AdapterFactory.addAdapter("dlm", MapsAdapter)
@@ -99,6 +100,17 @@ class DofusClient(threading.Thread):
         self.initListeners()
         Logger().info("Initialized")
 
+    @property
+    def sessionId(self):
+        return self._sessionId
+    
+    @sessionId.setter
+    def sessionId(self, sessionId):
+        self._sessionId = sessionId
+        
+    def setApiKey(self, apiKey):
+        self._apiKey = apiKey
+        
     def setLoginToken(self, token):
         self._loginToken = token
 

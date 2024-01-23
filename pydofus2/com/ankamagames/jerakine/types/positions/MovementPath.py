@@ -254,8 +254,7 @@ class MovementPath:
         return len(self._aPath)
 
     def getCells(self) -> list[int]:
-        mp: MapPoint = None
-        cells: list[int] = list[int]()
+        cells = list[int]()
         for i in range(len(self._aPath)):
             mp = self._aPath[i].step
             cells.append(mp.cellId)
@@ -287,7 +286,7 @@ class MovementPath:
     @classmethod
     def fromClientMovement(cls, path: list[int]) -> "MovementPath":
         mp: MovementPath = MovementPath()
-        moveCount: int = 0
+        moveCount = 0
         previousElement = None
         for movement in path:
             destination = MapPoint.fromCellId(movement & 4095)

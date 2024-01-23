@@ -37,18 +37,13 @@ def sendTrace(func):
         except Exception as e:
             exc_type, exc_value, exc_traceback = sys.exc_info()
             traceback_in_var = traceback.format_tb(exc_traceback)
-
-            # Start with the current exception's traceback
             error_trace = "\n".join(traceback_in_var) + "\n" + str(exc_value)
-
-            # Check for and add traceback from the cause, if any
             cause = e.__cause__
             while cause:
                 cause_traceback = traceback.format_tb(cause.__traceback__)
                 error_trace += "\n\n-- Chained Exception --\n"
                 error_trace += "\n".join(cause_traceback) + "\n" + str(cause)
                 cause = cause.__cause__
-
             self._put(ConnectionProcessCrashedMessage(error_trace))
 
     return wrapped
@@ -81,8 +76,8 @@ class ServerConnection(mp.Thread):
         self.sendingQueue = list["INetworkMessage"]()
 
         self._sendSequenceId: int = 0
-        self._latestSent: int = 0
-        self._lastSent: int = None
+        self._latestSent = 0
+        self._lastSent = None
         self._lastSentPingTime = None
 
         self._firstConnectionTry: bool = True
@@ -90,12 +85,11 @@ class ServerConnection(mp.Thread):
             self.receptionQueue = queue.Queue(200)
         else:
             self.receptionQueue = receptionQueue
+    
         self.socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.connectionTimeout = None
         self.nbrSendFails = 0
         self._asyncNetworkDataContainerMessage: NetworkDataContainerMessage = None
-        
-
 
     @property
     def latencyAvg(self) -> float:

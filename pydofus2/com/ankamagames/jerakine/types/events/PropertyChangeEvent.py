@@ -2,7 +2,7 @@ from typing import Any
 
 class PropertyChangeEvent:
 
-    PROPERTY_CHANGED: str = "watchPropertyChanged"
+    PROPERTY_CHANGED = "watchPropertyChanged"
 
     _watchedClassInstance: Any
 
@@ -12,7 +12,7 @@ class PropertyChangeEvent:
 
     _propertyOldValue: Any
 
-    def __init__(self, watchedClassInstance, propertyName: str, propertyValue, propertyOldValue):
+    def __init__(self, watchedClassInstance, propertyName, propertyValue, propertyOldValue):
         super().__init__()
         self._watchedClassInstance = watchedClassInstance
         self._propertyName = propertyName

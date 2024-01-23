@@ -1,3 +1,8 @@
+from pydofus2.com.ankamagames.dofus.internalDatacenter.items.ItemWrapper import ItemWrapper
+from pydofus2.com.ankamagames.jerakine.data.GameData import GameData
+from pydofus2.com.ankamagames.jerakine.interfaces.IDataCenter import IDataCenter
+
+
 class VeteranReward(IDataCenter):
 
     MODULE: str = "VeteranRewards"
@@ -10,13 +15,14 @@ class VeteranReward(IDataCenter):
 
     itemQuantity: int
 
-    _itemWrapper: ItemWrapper
+    _itemWrapper: ItemWrapper = None
 
     def __init__(self):
         super().__init__()
 
-    def getAllVeteranRewards(self) -> list:
-        return GameDataFileAccessor().getObjects(MODULE)
+    @classmethod
+    def getAllVeteranRewards(cls) -> list:
+        return GameData().getObjects(cls.MODULE)
 
     @property
     def item(self) -> ItemWrapper:

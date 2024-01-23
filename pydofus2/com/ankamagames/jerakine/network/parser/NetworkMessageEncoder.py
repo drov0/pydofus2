@@ -135,9 +135,6 @@ class NetworkMessageEncoder:
                 ans[field.name] = cls.jsonEncode(value)
         if hasattr(inst, "hash_function"):
             ans["hash_function"] = getattr(inst, "hash_function")
-        elif spec.hash_function and random_hash:
-            hash = bytes(random.getrandbits(8) for _ in range(48))
-            ans["hash_function"] = hash
         return ans
 
     @classmethod

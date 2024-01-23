@@ -48,8 +48,5 @@ if __name__ == "__main__":
     eventsManager.once(KernelEvent.CharactersList, onCharactersList)
 
     client.join()
-    
-    if client._crashed:
-        raise Exception(client._shutDownMessage)
 
     print(client._shutDownMessage)
